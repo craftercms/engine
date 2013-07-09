@@ -1,0 +1,64 @@
+/*
+ * Copyright (C) 2007-2013 Crafter Software Corporation.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.craftercms.crafter.engine.macro.impl;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.craftercms.crafter.core.util.HttpServletUtils;
+import org.springframework.beans.factory.annotation.Required;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+
+/**
+ * Represents a macro that can be a cookie value.
+ *
+ * @author Alfonso Vásquez
+ */
+public class CookieMacro extends AbstractMacro {
+
+    private static final Log logger = LogFactory.getLog(CookieMacro.class);
+
+    private String cookieName;
+
+    @Required
+    public void setCookieName(String cookieName) {
+        this.cookieName = cookieName;
+    }
+
+    @Override
+    protected String createMacroName() {
+        return "{" + cookieName + "}";
+    }
+
+    @Override
+    protected String getMacroValue(String str) {
+        HttpServletRequest request = HttpServletUtils.getCurrentRequest();
+        Cookie cookie = HttpServletUtils.getCookie(cookieName, request);
+
+        if (cookie != null) {
+            return cookie.getValue();
+        } else {
+            if (logger.isDebugEnabled()) {
+                logger.debug("No cookie or default value found for macro  " + getName());
+            }
+
+            return null;
+        }
+    }
+
+}
