@@ -4,3 +4,40 @@
 *.jar
 *.war
 *.ear
+
+#Maven
+target/
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
+
+# IntelliJIdea files#
+*.iml
+.idea
+
+# Maven build overlays #
+overlays
+alfresco-svcs/.classpath
+alfresco-svcs/.project
+alfresco-svcs/.settings/org.eclipse.core.resources.prefs
+alfresco-svcs/.settings/org.eclipse.jdt.core.prefs
+alfresco-svcs/.settings/org.eclipse.m2e.core.prefs
+cstudio-share-war/.classpath
+cstudio-share-war/.project
+cstudio-share-war/.settings/.jsdtscope
+cstudio-share-war/.settings/org.eclipse.core.resources.prefs
+cstudio-share-war/.settings/org.eclipse.jdt.core.prefs
+cstudio-share-war/.settings/org.eclipse.m2e.core.prefs
+cstudio-share-war/.settings/org.eclipse.wst.common.component
+cstudio-share-war/.settings/org.eclipse.wst.common.project.facet.core.prefs.xml
+cstudio-share-war/.settings/org.eclipse.wst.common.project.facet.core.xml
+cstudio-share-war/.settings/org.eclipse.wst.jsdt.ui.superType.container
+cstudio-share-war/.settings/org.eclipse.wst.jsdt.ui.superType.name

@@ -18,7 +18,7 @@
 
     <filter>
         <filter-name>crafter.requestContextBindingFilter</filter-name>
-        <filter-class>org.craftercms.crafter.security.servlet.filters.RequestContextBindingFilter</filter-class>
+        <filter-class>org.craftercms.security.servlet.filters.RequestContextBindingFilter</filter-class>
     </filter>
     
     <filter>

@@ -11,15 +11,15 @@
     </appender>
 
     <!-- Application Loggers -->
-    <logger name="org.craftercms.crafter">
+    <logger name="org.craftercms.engine">
         <level value="info" />
     </logger>
 
-    <logger name="org.craftercms.crafter.security">
+    <logger name="org.craftercms.security">
         <level value="debug" />
     </logger>
 
-    <logger name="org.craftercms.crafter.security.servlet.filters.RequestContextBindingFilter">
+    <logger name="org.craftercms.security.servlet.filters.RequestContextBindingFilter">
         <level value="info" />
     </logger>
 

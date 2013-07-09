@@ -27,19 +27,19 @@
         </property>
     </bean>
 
-    <bean id="crafter.staticAssetsRequestHandler" class="org.craftercms.crafter.engine.controller.StaticAssetsRequestHandler">
+    <bean id="crafter.staticAssetsRequestHandler" class="org.craftercms.engine.controller.StaticAssetsRequestHandler">
         <property name="contentStoreService" ref="crafter.contentStoreService"/>
     </bean>
 
-    <bean id="crafter.pageRenderController" class="org.craftercms.crafter.engine.controller.PageRenderController">
+    <bean id="crafter.pageRenderController" class="org.craftercms.engine.controller.PageRenderController">
         <property name="fallbackPageUrl" value="/no-site.html"/>
     </bean>
 
-    <bean id="crafter.errorPageRenderController" class="org.craftercms.crafter.engine.controller.ErrorPageRenderController">
+    <bean id="crafter.errorPageRenderController" class="org.craftercms.engine.controller.ErrorPageRenderController">
         <property name="errorViewNamePrefix" value="${crafter.engine.error.viewName.prefix}"/>
     </bean>
 
-    <bean id="crafter.monitoringRenderController" class="org.craftercms.crafter.engine.controller.MonitoringController">
+    <bean id="crafter.monitoringRenderController" class="org.craftercms.engine.controller.MonitoringController">
         <property name="statusViewNamePrefix" value="${crafter.engine.monitoring.viewName.prefix}"/>
     </bean>
 

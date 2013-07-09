@@ -6,9 +6,9 @@
 
     <import resource="classpath:crafter/security/security-context.xml"/>
 
-    <bean id="crafter.tenantNameResolvingProcessor" class="org.craftercms.crafter.engine.security.SiteNameBasedTenantNameResolvingProcessor"/>
+    <bean id="crafter.tenantNameResolvingProcessor" class="org.craftercms.engine.security.SiteNameBasedTenantNameResolvingProcessor"/>
 
-    <bean id="crafter.pageAccessManager" class="org.craftercms.crafter.engine.security.CrafterPageAccessManager">
+    <bean id="crafter.pageAccessManager" class="org.craftercms.engine.security.CrafterPageAccessManager">
         <property name="authorizedRolesXPathQuery" value="${crafter.security.authorization.page.authorizedRoles.xpathQuery}"/>
     </bean>
 

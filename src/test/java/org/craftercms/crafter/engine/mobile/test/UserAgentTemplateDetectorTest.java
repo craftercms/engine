@@ -23,7 +23,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.craftercms.crafter.engine.mobile.UserAgentTemplateDetector;
+import org.craftercms.engine.mobile.UserAgentTemplateDetector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.mock.web.MockHttpServletRequest;

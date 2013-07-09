@@ -38,14 +38,14 @@
         </property>
     </bean>
 
-    <bean id="crafter.httpProxyRequestHandler" class="org.craftercms.crafter.engine.controller.HttpProxyRequestHandler">
+    <bean id="crafter.httpProxyRequestHandler" class="org.craftercms.engine.controller.HttpProxyRequestHandler">
         <property name="proxyRegistry" ref="crafter.httpProxyRegistry" />
     </bean>
 
-    <bean id="crafter.componentRenderController" class="org.craftercms.crafter.engine.controller.ComponentRenderController">
+    <bean id="crafter.componentRenderController" class="org.craftercms.engine.controller.ComponentRenderController">
         <property name="renderComponentViewName" value="/templates/web/render-component.ftl"/>
     </bean>
 
-    <bean id="crafter.profileRestController" class="org.craftercms.crafter.engine.controller.preview.rest.ProfileRestController" />
+    <bean id="crafter.profileRestController" class="org.craftercms.engine.controller.preview.rest.ProfileRestController" />
 
 </beans>

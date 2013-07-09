@@ -23,7 +23,7 @@
     <!--									-->
     <!-- ////////////////////////////////// -->
 
-    <bean id="crafter.siteContextResolvingFilter" class="org.craftercms.crafter.engine.servlet.filter.SiteContextFromCookieResolvingFilter">
+    <bean id="crafter.siteContextResolvingFilter" class="org.craftercms.engine.servlet.filter.SiteContextFromCookieResolvingFilter">
         <property name="siteContextRegistry" ref="crafter.siteContextRegistry" />
         <property name="siteContextFactory" ref="crafter.siteContextFactory" />
         <property name="paramOrCookieName" value="${crafter.engine.request.param.siteName}" />
@@ -37,7 +37,7 @@
     <!--									-->
     <!-- ////////////////////////////////// -->
 
-    <bean id="crafter.siteContextFactory" class="org.craftercms.crafter.engine.service.context.SiteContextFactory">
+    <bean id="crafter.siteContextFactory" class="org.craftercms.engine.service.context.SiteContextFactory">
         <property name="rootFolderPath" value="${crafter.engine.site.default.rootFolder.path}"/>
         <property name="staticAssetsPath" value="${crafter.engine.site.default.staticAssets.path}" />
         <property name="templatesPath" value="${crafter.engine.site.default.templates.path}" />
@@ -55,14 +55,14 @@
     <!--									-->
     <!-- ////////////////////////////////// -->
 
-    <bean id="crafter.httpProxyRegistry" class="org.craftercms.crafter.engine.http.HttpProxyRegistry" />
+    <bean id="crafter.httpProxyRegistry" class="org.craftercms.engine.http.HttpProxyRegistry" />
 
-    <bean id="crafter.proxy.authoring" class="org.craftercms.crafter.engine.http.impl.AlfrescoHttpProxy">
+    <bean id="crafter.proxy.authoring" class="org.craftercms.engine.http.impl.AlfrescoHttpProxy">
         <property name="alfrescoTicketCookieName" value="${crafter.engine.proxy.authoring.ticketCookieName}"/>
         <property name="baseServiceUrl" value="${crafter.engine.proxy.authoring.baseServiceUrl}"/>
     </bean>
 
-    <bean id="crafter.authoringOverlayCallback" class="org.craftercms.crafter.engine.service.PreviewOverlayCallback">
+    <bean id="crafter.authoringOverlayCallback" class="org.craftercms.engine.service.PreviewOverlayCallback">
         <property name="scriptFormat" value="${crafter.engine.proxy.authoring.callback.preview.script.format}"/>
         <property name="previewServerJsScriptSources" value="${crafter.engine.proxy.authoring.callback.preview.scripts}" />
         <property name="macroResolver" ref="crafter.macroResolver"/>
@@ -75,6 +75,6 @@
     <!--									-->
     <!-- ////////////////////////////////// -->
 
-    <bean id="crafter.authTokenResolvingProcessor" class="org.craftercms.crafter.engine.security.PreviewAuthenticationTokenResolvingProcessor"/>
+    <bean id="crafter.authTokenResolvingProcessor" class="org.craftercms.engine.security.PreviewAuthenticationTokenResolvingProcessor"/>
 
 </beans>

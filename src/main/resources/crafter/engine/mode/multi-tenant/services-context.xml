@@ -9,7 +9,7 @@
     <!--									-->
     <!-- ////////////////////////////////// -->
 
-    <bean id="crafter.siteContextResolvingFilter" class="org.craftercms.crafter.engine.servlet.filter.SiteContextFromRequestUriResolvingFilter">
+    <bean id="crafter.siteContextResolvingFilter" class="org.craftercms.engine.servlet.filter.SiteContextFromRequestUriResolvingFilter">
         <property name="siteNameRegex" value="${crafter.engine.request.uri.siteNameRegex}" />
         <property name="siteNameRegexGroup" value="${crafter.engine.request.uri.siteNameRegexGroup}"/>
         <property name="siteContextRegistry" ref="crafter.siteContextRegistry" />

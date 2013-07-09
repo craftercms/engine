@@ -21,6 +21,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<crafter.search>2.2.0-SNAPSHOT</crafter.search>
 		<crafter.core>2.2.0-SNAPSHOT</crafter.core>
+        <crafter.profile>2.2.0-SNAPSHOT</crafter.profile>
 	</properties>
 	<licenses>
 		<license>
@@ -60,6 +61,13 @@
 			<artifactId>crafter-search-api</artifactId>
 			<version>${crafter.search}</version>
 		</dependency>
+
+        <dependency>
+            <groupId>org.craftercms</groupId>
+            <artifactId>crafter-search-api</artifactId>
+            <version>${crafter.search}</version>
+        </dependency>
+
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
@@ -77,6 +85,20 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
+
+        <dependency>
+            <groupId>org.craftercms</groupId>
+            <artifactId>crafter-security-provider</artifactId>
+            <version>${crafter.profile}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib</artifactId>
+            <version>2.2.2</version>
+        </dependency>
+
 
 		<!-- Test dependencies -->
 		<dependency>

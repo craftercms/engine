@@ -11,7 +11,7 @@
 	</appender>
 	
 	<!-- Application Loggers -->
-	<logger name="org.craftercms.crafter">
+	<logger name="org.craftercms.engine">
 		<level value="info" />
 	</logger>
 	

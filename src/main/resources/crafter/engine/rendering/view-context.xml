@@ -23,7 +23,7 @@
         </property>
         <property name="viewResolvers">
             <list>
-                <bean class="org.craftercms.crafter.engine.view.CrafterPageViewResolver">
+                <bean class="org.craftercms.engine.view.CrafterPageViewResolver">
                     <property name="cacheUrlTransformations" value="${crafter.engine.page.view.resolver.url.transformation.cache}"/>
                     <property name="urlTransformerName" value="renderUrlToStoreUrl" />
                     <property name="urlTransformationService" ref="crafter.urlTransformationService" />
@@ -54,7 +54,7 @@
         </property>
     </bean>
 
-    <bean id="crafter.freeMarkerViewResolver" class="org.craftercms.crafter.engine.view.freemarker.CrafterFreeMarkerViewResolver">
+    <bean id="crafter.freeMarkerViewResolver" class="org.craftercms.engine.view.freemarker.CrafterFreeMarkerViewResolver">
         <property name="order" value="10" />
         <property name="cache" value="false" />
         <property name="contentType" value="text/html;charset=UTF-8" />
