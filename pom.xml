@@ -6,7 +6,7 @@
 	<artifactId>crafter-engine</artifactId>
 	<name>Crafter Engine</name>
 	<packaging>war</packaging>
-	<version>2.2.0-SNAPSHOT</version>
+	<version>2.2.1</version>
 	<parent>
 		<groupId>org.sonatype.oss</groupId>
 		<artifactId>oss-parent</artifactId>
@@ -19,8 +19,8 @@
 	</organization>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<crafter.search>2.2.0-SNAPSHOT</crafter.search>
-		<crafter.core>2.2.0-SNAPSHOT</crafter.core>
+		<crafter.search>2.2.1</crafter.search>
+		<crafter.core>2.2.1</crafter.core>
         <crafter.profile>2.2.0-SNAPSHOT</crafter.profile>
 	</properties>
 	<licenses>
@@ -49,7 +49,7 @@
 		<dependency>
 			<groupId>org.craftercms</groupId>
 			<artifactId>crafter-core</artifactId>
-			<version>${crafter.search}</version>
+			<version>${crafter.core}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.craftercms</groupId>
@@ -62,11 +62,6 @@
 			<version>${crafter.search}</version>
 		</dependency>
 
-        <dependency>
-            <groupId>org.craftercms</groupId>
-            <artifactId>crafter-search-api</artifactId>
-            <version>${crafter.search}</version>
-        </dependency>
 
 		<dependency>
 			<groupId>javax.servlet</groupId>
