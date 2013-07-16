@@ -20,7 +20,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<crafter.search>2.2.0-SNAPSHOT</crafter.search>
-		<crafter.core>2.2.0-SNAPSHOT</crafter.core>
+		<crafter.core>2.2.2-SNAPSHOT</crafter.core>
         <crafter.profile>2.2.0-SNAPSHOT</crafter.profile>
 	</properties>
 	<licenses>
