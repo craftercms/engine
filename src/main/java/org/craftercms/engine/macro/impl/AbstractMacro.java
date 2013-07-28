@@ -21,8 +21,8 @@ import org.craftercms.engine.macro.Macro;
 import javax.annotation.PostConstruct;
 
 /**
- * Abstract {@link org.craftercms.engine.macro.Macro} that provides a macro name attribute to hold the macro name (when the macro's name is variable) and
- * the ability to skip the macro if the name is not contained in the specified string.
+ * Abstract {@link org.craftercms.engine.macro.Macro} that provides a macro name attribute to hold the macro name (when the macro's name
+ * is variable) and the ability to skip the macro if the name is not contained in the specified string.
  *
  * @author Alfonso Vásquez
  */
