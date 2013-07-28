@@ -51,11 +51,11 @@ public class StaticAssetsRequestHandler extends WebContentGenerator implements H
     private static final Log logger = LogFactory.getLog(StaticAssetsRequestHandler.class);
 
     private ContentStoreService contentStoreService;
-    private String[] bypassFolderList;
+    private String staticAssetsPath;
 
     public StaticAssetsRequestHandler() {
         super(METHOD_GET, METHOD_HEAD);
-        bypassFolderList = new String[0];
+
         setRequireSession(false);
     }
 
@@ -64,8 +64,8 @@ public class StaticAssetsRequestHandler extends WebContentGenerator implements H
         this.contentStoreService = contentStoreService;
     }
 
-    public void setBypassFolderList(String bypassFolderList) {
-        this.bypassFolderList = bypassFolderList.split(",");
+    public void setStaticAssetsPath(String staticAssetsPath) {
+        this.staticAssetsPath = staticAssetsPath;
     }
 
     @Override
@@ -127,13 +127,12 @@ public class StaticAssetsRequestHandler extends WebContentGenerator implements H
             throw new IllegalStateException("Required request attribute '" + HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE +
                     "' is not set");
         }
-        // TODO: Remove this. This is kinda ugly.
-        String pattern = (String)request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
-        for (String folder : bypassFolderList) {
-            if (pattern.startsWith(folder))
-                return UrlUtils.appendUrl(folder, path);
+
+        if (StringUtils.isNotEmpty(staticAssetsPath)) {
+            return UrlUtils.appendUrl(staticAssetsPath, path);
+        } else {
+            return UrlUtils.appendUrl(context.getStaticAssetsPath(), path);
         }
-        return UrlUtils.appendUrl(context.getStaticAssetsPath(), path);
     }
 
     protected Content getContent(SiteContext context, String path) {
