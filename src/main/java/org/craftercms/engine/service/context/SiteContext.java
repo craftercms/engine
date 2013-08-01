@@ -34,11 +34,15 @@ public class SiteContext {
     protected String staticAssetsPath;
     protected String templatesPath;
     protected FreeMarkerConfig freeMarkerConfig;
+    protected String scriptsPath;
+    protected String scriptTemplatesPath;
+    protected FreeMarkerConfig scriptsFreeMarkerConfig;
     protected UrlTransformationEngine urlTransformationEngine;
     protected PreviewOverlayCallback overlayCallback;
 
     public SiteContext(String siteName, Context context, boolean fallback, String staticAssetsPath, String templatesPath,
-                       FreeMarkerConfig freeMarkerConfig, UrlTransformationEngine urlTransformationEngine,
+                       FreeMarkerConfig freeMarkerConfig, String scriptsPath, String scriptTemplatesPath,
+                       FreeMarkerConfig scriptsFreeMarkerConfig, UrlTransformationEngine urlTransformationEngine,
                        PreviewOverlayCallback overlayCallback) {
         this.siteName = siteName;
         this.context = context;
@@ -46,6 +50,9 @@ public class SiteContext {
         this.staticAssetsPath = staticAssetsPath;
         this.templatesPath = templatesPath;
         this.freeMarkerConfig = freeMarkerConfig;
+        this.scriptsPath = scriptsPath;
+        this.scriptTemplatesPath = scriptTemplatesPath;
+        this.scriptsFreeMarkerConfig = scriptsFreeMarkerConfig;
         this.urlTransformationEngine = urlTransformationEngine;
         this.overlayCallback = overlayCallback;
     }
@@ -72,6 +79,18 @@ public class SiteContext {
 
     public FreeMarkerConfig getFreeMarkerConfig() {
         return freeMarkerConfig;
+    }
+
+    public String getScriptsPath() {
+        return scriptsPath;
+    }
+
+    public String getScriptTemplatesPath() {
+        return scriptTemplatesPath;
+    }
+
+    public FreeMarkerConfig getScriptsFreeMarkerConfig() {
+        return scriptsFreeMarkerConfig;
     }
 
     public UrlTransformationEngine getUrlTransformationEngine() {
@@ -109,15 +128,14 @@ public class SiteContext {
     public String toString() {
         return "SiteContext[" +
                 "siteName='" + siteName + '\'' +
-                ", storeAdapter='" + context.getStoreAdapter() + '\'' +
-                ", storeServerUrl='" + context.getStoreServerUrl() + '\'' +
-                ", rootFolderPath='" + context.getRootFolderPath() + '\'' +
+                ", context=" + context +
+                ", fallback=" + fallback +
                 ", staticAssetsPath='" + staticAssetsPath + '\'' +
                 ", templatesPath='" + templatesPath + '\'' +
-                ", cacheOn=" + context.isCacheOn() +
-                ", maxAllowedItemsInCache=" + context.getMaxAllowedItemsInCache() +
-                ", ignoreHiddenFiles=" + context.ignoreHiddenFiles() +
                 ", freeMarkerConfig=" + freeMarkerConfig +
+                ", scriptsPath='" + scriptsPath + '\'' +
+                ", scriptTemplatesPath='" + scriptsPath + '\'' +
+                ", scriptsFreeMarkerConfig=" + scriptsFreeMarkerConfig +
                 ", urlTransformationEngine=" + urlTransformationEngine +
                 ", overlayCallback=" + overlayCallback +
                 ']';

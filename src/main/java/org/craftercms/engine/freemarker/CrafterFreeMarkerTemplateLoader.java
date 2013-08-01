@@ -42,7 +42,16 @@ public class CrafterFreeMarkerTemplateLoader implements TemplateLoader {
 
     private static final Log logger = LogFactory.getLog(CrafterFreeMarkerTemplateLoader.class);
 
+    private boolean useScriptTemplatesPath;
     private ContentStoreService contentStoreService;
+
+    public CrafterFreeMarkerTemplateLoader() {
+        useScriptTemplatesPath = false;
+    }
+
+    public void setUseScriptTemplatesPath(boolean useScriptTemplatesPath) {
+        this.useScriptTemplatesPath = useScriptTemplatesPath;
+    }
 
     @Required
     public void setContentStoreService(ContentStoreService contentStoreService) {
@@ -53,7 +62,7 @@ public class CrafterFreeMarkerTemplateLoader implements TemplateLoader {
     public Object findTemplateSource(String name) throws IOException {
         SiteContext context = AbstractSiteContextResolvingFilter.getCurrentContext();
 
-        String path = UrlUtils.appendUrl(context.getTemplatesPath(), name);
+        String path = getTemplatePath(context, name);
 
         if (logger.isDebugEnabled()) {
             logger.debug("Looking for FreeMarker template at [context=" + context + ", path='" + path + "']");
@@ -82,6 +91,12 @@ public class CrafterFreeMarkerTemplateLoader implements TemplateLoader {
 
     @Override
     public void closeTemplateSource(Object templateSource) throws IOException {
+    }
+
+    protected String getTemplatePath(SiteContext context, String name) {
+        String templatesPath = useScriptTemplatesPath ? context.getScriptTemplatesPath() : context.getTemplatesPath();
+
+        return UrlUtils.appendUrl(templatesPath, name);
     }
 
 }
