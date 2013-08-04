@@ -17,19 +17,21 @@
 package org.craftercms.engine.scripting;
 
 import org.craftercms.engine.exception.ScriptRenderingException;
+import org.craftercms.engine.exception.UnrecognizableMimeTypeException;
+import org.craftercms.engine.exception.UnrecognizableMimeTypeException;
+import org.springframework.http.MediaType;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Map;
+import java.util.List;
+import java.util.Locale;
 
 /**
- * Renders the result of a script.
+ * Resolves the view to use for a certain script base URL, HTTP method, format and status code.
  *
  * @author Alfonso Vásquez
  */
-public interface ScriptView {
+public interface ScriptViewResolver {
 
-    void render(Status status, Map<String, Object> model, HttpServletRequest request, HttpServletResponse response)
-            throws ScriptRenderingException;
+    ScriptView resolveView(String viewName, String method, List<MediaType> acceptableMimeTypes, Status status, Locale locale)
+            throws UnrecognizableMimeTypeException, ScriptRenderingException;
 
 }

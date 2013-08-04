@@ -26,8 +26,8 @@
     </bean>
 
     <bean id="crafter.restServicesRequestHandler" class="org.craftercms.engine.controller.RestServicesRequestHandler">
-        <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
         <property name="scriptFactory" ref="crafter.scriptFactory"/>
+        <property name="scriptViewResolver" ref="crafter.scriptViewResolver"/>
     </bean>
 
     <bean id="crafter.staticAssetsRequestHandler" class="org.craftercms.engine.controller.StaticAssetsRequestHandler">

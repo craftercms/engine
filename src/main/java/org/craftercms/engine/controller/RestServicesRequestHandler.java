@@ -1,21 +1,19 @@
 package org.craftercms.engine.controller;
 
-import freemarker.template.Configuration;
-import freemarker.template.ObjectWrapper;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.craftercms.core.service.CachingOptions;
-import org.craftercms.core.util.HttpServletUtils;
+import org.apache.tika.Tika;
 import org.craftercms.core.util.UrlUtils;
-import org.craftercms.core.util.cache.CacheCallback;
-import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.engine.exception.ScriptNotFoundException;
+import org.craftercms.engine.exception.ScriptViewNotFoundException;
 import org.craftercms.engine.scripting.*;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.http.MediaType;
 import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.context.support.WebApplicationObjectSupport;
 import org.springframework.web.servlet.HandlerMapping;
@@ -25,9 +23,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Request handler for scripted RESTful services.
@@ -38,17 +34,18 @@ public class RestServicesRequestHandler extends WebApplicationObjectSupport impl
 
     private static final Log logger = LogFactory.getLog(RestServicesRequestHandler.class);
 
-    private static final String SCRIPT_URL_FORMAT = "%s.%s.js"; // {url}.{method}.js
+    private static final String SCRIPT_URL_FORMAT = "%s.%s.%s"; // {url}.{method}.{scriptExt}
 
-    private static final String DEFAULT_FORMAT = "json";
-    private static final String DEFAULT_MIME_TYPE = "application/json";
+    private static final String FORMAT_REQUEST_PARAM = "format";
 
-    protected CacheTemplate cacheTemplate;
+    private static final MediaType DEFAULT_MIME_TYPE = MediaType.APPLICATION_JSON;
+
     protected ScriptFactory scriptFactory;
+    protected ScriptViewResolver scriptViewResolver;
+    protected Tika tika;
 
-    @Required
-    public void setCacheTemplate(CacheTemplate cacheTemplate) {
-        this.cacheTemplate = cacheTemplate;
+    public RestServicesRequestHandler() {
+        tika = new Tika();
     }
 
     @Required
@@ -56,20 +53,24 @@ public class RestServicesRequestHandler extends WebApplicationObjectSupport impl
         this.scriptFactory = scriptFactory;
     }
 
+    @Required
+    public void setScriptViewResolver(ScriptViewResolver scriptViewResolver) {
+        this.scriptViewResolver = scriptViewResolver;
+    }
+
     @Override
     public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         SiteContext siteContext = AbstractSiteContextResolvingFilter.getCurrentContext();
 
         String serviceUrl = getServiceUrl(request);
-        String scriptBaseUrl = getScriptBaseUrl(serviceUrl, siteContext);
-        String scriptUrl = getScriptUrl(scriptBaseUrl, request.getMethod());
-        String format = getFormat(serviceUrl);
-        String mimeType = getMimeType(serviceUrl);
-        Map<String, Object> model = new HashMap<String, Object>();
+        String scriptUrl = getScriptUrl(siteContext, request, serviceUrl);
+        List<MediaType> acceptableMimeTypes = getAcceptableMimeTypes(request, serviceUrl);
+        String viewName = getViewName(serviceUrl);
         Status status = new Status();
+        Map<String, Object> model = new HashMap<String, Object>();
 
-        executeScript(request, siteContext, scriptUrl, model, status);
-        renderView(request, response, siteContext, scriptBaseUrl, format, mimeType, model, status);
+        executeScript(request, response, scriptUrl, status, model);
+        renderView(request, response, viewName, acceptableMimeTypes, status, model);
     }
 
     protected String getServiceUrl(HttpServletRequest request) {
@@ -82,70 +83,67 @@ public class RestServicesRequestHandler extends WebApplicationObjectSupport impl
         return url;
     }
 
-    protected String getScriptBaseUrl(String serviceUrl, SiteContext siteContext) {
-        return UrlUtils.appendUrl(siteContext.getScriptsPath(), FilenameUtils.removeExtension(serviceUrl));
+    protected String getScriptUrl(SiteContext siteContext, HttpServletRequest request, String serviceUrl) {
+        String baseUrl = UrlUtils.appendUrl(siteContext.getScriptsPath(), FilenameUtils.removeExtension(serviceUrl));
+
+        return String.format(SCRIPT_URL_FORMAT, baseUrl, request.getMethod().toLowerCase(), scriptFactory.getScriptFileExtension());
     }
 
-    protected String getScriptUrl(String scriptBaseUrl, String method) {
-        return String.format(SCRIPT_URL_FORMAT, scriptBaseUrl, method);
+    protected String getViewName(String serviceUrl) {
+        return FilenameUtils.removeExtension(serviceUrl);
     }
 
-    protected String getFormat(String serviceUrl) {
+    protected List<MediaType> getAcceptableMimeTypes(HttpServletRequest request, String serviceUrl) {
+        List<MediaType> acceptableMediaTypes = null;
+
+        // Look first for the format in the extension
         String format = FilenameUtils.getExtension(serviceUrl);
-        if (StringUtils.isEmpty(format)) {
-            format = DEFAULT_FORMAT;
-        }
-
-        return format;
-    }
-
-    protected String getMimeType(String serviceUrl) {
-        String mimeType = getServletContext().getMimeType(FilenameUtils.getName(serviceUrl));
-        if (StringUtils.isEmpty(mimeType)) {
-            mimeType = DEFAULT_MIME_TYPE;
-        }
-
-        return mimeType;
-    }
-
-    protected Script getScript(final SiteContext siteContext, final String url) {
-        return cacheTemplate.execute(siteContext.getContext(), CachingOptions.DEFAULT_CACHING_OPTIONS, new CacheCallback<Script>() {
-
-            @Override
-            public Script doCacheable() {
-                return scriptFactory.getScript(url);
+        if (StringUtils.isNotEmpty(format)) {
+            MediaType mimeType = getMimeType(format);
+            if (mimeType != null) {
+                acceptableMediaTypes = Collections.singletonList(mimeType);
             }
+        }
 
-        }, url, "crafter.script");
-    }
-
-    protected ScriptView getView(final SiteContext siteContext, final String scriptBaseUrl, final String method, final String format,
-                                 final String mimeType) {
-        return cacheTemplate.execute(siteContext.getContext(), CachingOptions.DEFAULT_CACHING_OPTIONS, new CacheCallback<ScriptView>() {
-
-            @Override
-            public ScriptView doCacheable() {
-                Configuration configuration = siteContext.getScriptsFreeMarkerConfig().getConfiguration();
-                TemplateResolver templateResolver = new TemplateResolver(configuration);
-                ObjectWrapper objectWrapper = configuration.getObjectWrapper();
-
-                if (objectWrapper == null) {
-                    objectWrapper = ObjectWrapper.DEFAULT_WRAPPER;
+        if (CollectionUtils.isEmpty(acceptableMediaTypes)) {
+            // Try looking for the format in a param
+            format = request.getParameter(FORMAT_REQUEST_PARAM);
+            if (StringUtils.isNotEmpty(format)) {
+                MediaType mimeType = getMimeType(format);
+                if (mimeType != null) {
+                    acceptableMediaTypes = Collections.singletonList(mimeType);
                 }
-
-                return new ScriptView(scriptBaseUrl, method, format, mimeType, objectWrapper, templateResolver);
             }
+        }
 
-        }, scriptBaseUrl, method, format, "crafter.script.view");
+        if (CollectionUtils.isEmpty(acceptableMediaTypes)) {
+            // Use the mime types from the Accept header
+            String acceptHeader = request.getHeader("Accept");
+            if (StringUtils.isNotEmpty(acceptHeader)) {
+                acceptableMediaTypes = MediaType.parseMediaTypes(acceptHeader);
+            }
+        }
+
+        if (CollectionUtils.isEmpty(acceptableMediaTypes)) {
+            // Use default mime type
+            acceptableMediaTypes = Collections.singletonList(DEFAULT_MIME_TYPE);
+        }
+
+        return acceptableMediaTypes;
     }
 
-    protected Map<String, Object> createScriptVariables(HttpServletRequest request, Map<String, Object> model, Status status) {
-        Map<String, Object> scriptVariables = new HashMap<String, Object>();
-        scriptVariables.put("requestUrl", request.getRequestURI());
-        scriptVariables.put("requestParams", request.getParameterMap());
-        scriptVariables.put("headers", HttpServletUtils.createHeadersMap(request));
-        scriptVariables.put("cookies", HttpServletUtils.createCookiesMap(request));
-        scriptVariables.put("session", HttpServletUtils.createSessionMap(request));
+    protected MediaType getMimeType(String format) {
+        String type = tika.detect("format." + format);
+        if (StringUtils.isNotEmpty(type)) {
+            return MediaType.valueOf(type);
+        } else {
+            return null;
+        }
+    }
+
+    protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response, Status status,
+                                                        Map<String, Object> model) {
+        Map<String, Object> scriptVariables = ScriptUtils.createServletVariables(request, response, getServletContext());
         scriptVariables.put("model", model);
         scriptVariables.put("status", status);
         scriptVariables.put("logger", logger);
@@ -153,35 +151,42 @@ public class RestServicesRequestHandler extends WebApplicationObjectSupport impl
         return scriptVariables;
     }
 
-    protected void executeScript(HttpServletRequest request, SiteContext siteContext, String scriptUrl, Map<String, Object> model,
-                                 Status status) {
-        Map<String, Object> scriptVariables = createScriptVariables(request, model, status);
+    protected void executeScript(HttpServletRequest request, HttpServletResponse response, String scriptUrl, Status status,
+                                 Map<String, Object> model) {
+        Map<String, Object> scriptVariables = createScriptVariables(request, response, status, model);
 
         try {
-            getScript(siteContext, scriptUrl).executeScript(scriptVariables);
+            scriptFactory.getScript(scriptUrl).execute(scriptVariables);
         } catch (ScriptNotFoundException e) {
             logger.error("Script " + scriptUrl + " not found", e);
 
             status.setCode(HttpServletResponse.SC_BAD_REQUEST);
-            status.setMessage(e.getMessage());
-            status.setException(e);
             status.setRedirect(true);
+            model.put("message", e.getMessage());
+            model.put("exception", e);
         } catch (Exception e) {
             logger.error("Execution failed for script " + scriptUrl, e);
 
             status.setCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            status.setMessage(e.getMessage());
-            status.setException(e);
             status.setRedirect(true);
+            model.put("message", e.getMessage());
+            model.put("exception", e);
         }
     }
 
-    protected void renderView(HttpServletRequest request, HttpServletResponse response, SiteContext siteContext, String scriptBaseUrl,
-                              String format, String mimeType, Map<String, Object> model, Status status) {
+    protected void renderView(HttpServletRequest request, HttpServletResponse response, String viewName,
+                              List<MediaType> acceptableMimeTypes, Status status, Map<String, Object> model) {
         Locale locale = RequestContextUtils.getLocale(request);
-        ScriptView view = getView(siteContext, scriptBaseUrl, request.getMethod(), format, mimeType);
+        String method = request.getMethod().toLowerCase();
+        ScriptView view = scriptViewResolver.resolveView(viewName, method, acceptableMimeTypes, status, locale);
 
-        view.render(model, status, locale, request, response);
+        response.setStatus(status.getCode());
+
+        if (view != null) {
+            view.render(status, model, request, response);
+        } else {
+            throw new ScriptViewNotFoundException("No script view found for '" + viewName + "'");
+        }
     }
 
 }

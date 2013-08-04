@@ -1,63 +1,34 @@
+/*
+ * Copyright (C) 2007-2013 Crafter Software Corporation.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.craftercms.engine.scripting;
 
-import org.apache.commons.collections.MapUtils;
-import org.apache.commons.io.IOUtils;
-import org.craftercms.core.service.Content;
+import org.craftercms.core.util.cache.CachingAwareObject;
 import org.craftercms.engine.exception.ScriptException;
 
-import javax.script.Bindings;
-import javax.script.ScriptEngine;
-import javax.script.SimpleBindings;
-import java.io.*;
 import java.util.Map;
 
 /**
- * Represents a JSR-223 script inside the Crafter content store.
+ * Simple interface for scripts in some non-Java language (Groovy, Jython, Javascript, etc) that can be retrieved from the Crafter
+ * content stored and executed inside the JVM.
  *
  * @author Alfonso Vásquez
  */
-public class Script {
+public interface Script extends CachingAwareObject {
 
-    protected Content script;
-    protected Map<String, Object> globalScriptVariables;
-    protected ScriptEngine scriptEngine;
-
-    public Script(Content script, Map<String, Object> globalScriptVariables, ScriptEngine scriptEngine) {
-        this.script = script;
-        this.globalScriptVariables = globalScriptVariables;
-        this.scriptEngine = scriptEngine;
-    }
-
-    public void executeScript(Map<String, Object> scriptVariables) throws ScriptException {
-        InputStream scriptInput;
-        try {
-            scriptInput = script.getInputStream();
-        } catch (Exception e) {
-            throw new ScriptException("Unable to open input stream for script", e);
-        }
-        Reader scriptReader;
-        try {
-            scriptReader = new BufferedReader(new InputStreamReader(scriptInput, "UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            // Shouldn't happen EVER
-            throw new RuntimeException();
-        }
-
-        Bindings bindings = new SimpleBindings();
-        if (MapUtils.isNotEmpty(globalScriptVariables)) {
-            bindings.putAll(globalScriptVariables);
-        }
-        if (MapUtils.isNotEmpty(scriptVariables)) {
-            bindings.putAll(scriptVariables);
-        }
-
-        try {
-            scriptEngine.eval(scriptReader, bindings);
-        } catch (Exception e) {
-            throw new ScriptException(e.getMessage(), e);
-        } finally {
-            IOUtils.closeQuietly(scriptReader);
-        }
-    }
+    Object execute(Map<String, Object> variables) throws ScriptException;
 
 }

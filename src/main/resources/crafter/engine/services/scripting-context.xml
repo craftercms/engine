@@ -13,7 +13,7 @@
 
     <!-- Declared with scope="prototype" so that a new one is created for every SiteContext -->
     <bean id="crafter.scriptsFreeMarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer" scope="prototype">
-        <property name="templateLoaderPaths" value="WEB-INF/templates/scripts, WEB-INF" />
+        <property name="templateLoaderPaths" value="WEB-INF/templates" />
         <property name="defaultEncoding" value="UTF-8" />
         <property name="freemarkerSettings">
             <props>
@@ -33,9 +33,9 @@
         <property name="targetBeanName" value="crafter.scriptsFreeMarkerConfig" />
     </bean>
 
-    <bean id="crafter.scriptFactory" class="org.craftercms.engine.scripting.ScriptFactory">
-        <property name="storeService" ref="crafter.contentStoreService" />
-        <property name="globalScriptVariables" ref="crafter.scriptsVariables" />
+    <bean id="crafter.scriptFactory" class="org.craftercms.engine.scripting.impl.Jsr233CompiledScriptFactory">
+        <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
+        <property name="storeService" ref="crafter.contentStoreService"/>
     </bean>
 
     <util:map id="crafter.scriptsVariables">

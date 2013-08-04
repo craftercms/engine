@@ -26,6 +26,7 @@ import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 import org.apache.commons.lang.ArrayUtils;
 import org.craftercms.engine.freemarker.RenderComponentDirective;
+import org.craftercms.engine.freemarker.ServletContextHashModel;
 import org.craftercms.engine.service.SiteItemService;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;
@@ -79,7 +80,7 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     protected void initServletContext(ServletContext servletContext) throws BeansException {
         super.initServletContext(servletContext);
 
-        servletContextHashModel = new ServletContextHashModel();
+        servletContextHashModel = new ServletContextHashModel(servletContext, getObjectWrapper());
         applicationContextAccessor = new ApplicationContextAccessor(getApplicationContext());
     }
 
@@ -133,21 +134,12 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     protected SimpleHash buildTemplateModel(final Map<String, Object> model, final HttpServletRequest request,
                                             final HttpServletResponse response) {
     	RequestContext context = RequestContext.getCurrent();
-    	HttpSessionHashModel sessionHashModel;
-        HttpSession session = request.getSession(false);
-
-        if(session != null) {
-            sessionHashModel = new HttpSessionHashModel(session, getObjectWrapper());
-        }
-        else {
-            sessionHashModel = new HttpSessionHashModel(null, request, response, getObjectWrapper());
-        }
 
         AllHttpScopesAndAppContextHashModel templateModel = new AllHttpScopesAndAppContextHashModel(getObjectWrapper(),
                 getApplicationContext(), getServletContext(), request);
 
         templateModel.put(FreemarkerServlet.KEY_APPLICATION, servletContextHashModel);
-        templateModel.put(FreemarkerServlet.KEY_SESSION, sessionHashModel);
+        templateModel.put(FreemarkerServlet.KEY_SESSION, createSessionModel(request, response));
         templateModel.put(FreemarkerServlet.KEY_REQUEST, new HttpRequestHashModel(request, response, getObjectWrapper()));
         templateModel.put(FreemarkerServlet.KEY_REQUEST_PARAMETERS, new HttpRequestParametersHashModel(request));
         templateModel.put(KEY_APP_CONTEXT_CAP, applicationContextAccessor);
@@ -184,15 +176,13 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
         return templateModel;
     }
 
-    protected class ServletContextHashModel implements TemplateHashModel {
-        @Override
-        public TemplateModel get(String key) throws TemplateModelException {
-            return getObjectWrapper().wrap(getServletContext().getAttribute(key));
+    protected HttpSessionHashModel createSessionModel(HttpServletRequest request, HttpServletResponse response) {
+        HttpSession session = request.getSession(false);
+        if(session != null) {
+            return new HttpSessionHashModel(session, getObjectWrapper());
         }
-
-        @Override
-        public boolean isEmpty() throws TemplateModelException {
-            return !getServletContext().getAttributeNames().hasMoreElements();
+        else {
+            return new HttpSessionHashModel(null, request, response, getObjectWrapper());
         }
     }
 

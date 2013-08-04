@@ -1,19 +1,35 @@
+/*
+ * Copyright (C) 2007-2013 Crafter Software Corporation.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.craftercms.engine.scripting;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
- * Object used in REST service scripts to indicate the status result of the service.
+ * Represents a response status of a script.
  *
  * @author Alfonso Vásquez
  */
 public class Status {
 
-    private int code;
-    private String message;
-    private Throwable exception;
-    private boolean redirect;
+    protected int code;
+    protected boolean redirect;
 
     public Status() {
-        code = 200;
+        code = HttpServletResponse.SC_OK;
         redirect = false;
     }
 
@@ -23,22 +39,6 @@ public class Status {
 
     public void setCode(int code) {
         this.code = code;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public Throwable getException() {
-        return exception;
-    }
-
-    public void setException(Throwable exception) {
-        this.exception = exception;
     }
 
     public boolean isRedirect() {

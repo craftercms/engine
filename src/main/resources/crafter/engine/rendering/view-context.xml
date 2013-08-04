@@ -66,4 +66,8 @@
         <property name="requestContextAttribute" value="requestContext" />
     </bean>
 
+    <bean id="crafter.scriptViewResolver" class="org.craftercms.engine.scripting.impl.FreeMarkerScriptViewResolver">
+        <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
+    </bean>
+
 </beans>

@@ -14,22 +14,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.craftercms.engine.scripting;
-
-import org.craftercms.engine.exception.ScriptRenderingException;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Map;
+package org.craftercms.engine.exception;
 
 /**
- * Renders the result of a script.
+ * Thrown when a usable script view can't be found for a particular script
  *
  * @author Alfonso Vásquez
  */
-public interface ScriptView {
+public class ScriptViewNotFoundException extends ScriptRenderingException {
 
-    void render(Status status, Map<String, Object> model, HttpServletRequest request, HttpServletResponse response)
-            throws ScriptRenderingException;
+    public ScriptViewNotFoundException() {
+    }
+
+    public ScriptViewNotFoundException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public ScriptViewNotFoundException(String message) {
+        super(message);
+    }
+
+    public ScriptViewNotFoundException(Throwable cause) {
+        super(cause);
+    }
 
 }

@@ -1,69 +1,32 @@
+/*
+ * Copyright (C) 2007-2013 Crafter Software Corporation.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.craftercms.engine.scripting;
 
-import org.craftercms.core.exception.PathNotFoundException;
-import org.craftercms.core.service.Content;
-import org.craftercms.core.service.ContentStoreService;
-import org.craftercms.core.service.Context;
 import org.craftercms.engine.exception.ScriptException;
-import org.craftercms.engine.exception.ScriptNotFoundException;
-import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;
-import org.springframework.beans.factory.annotation.Required;
-
-import javax.annotation.PostConstruct;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import java.util.Map;
 
 /**
- * Returns a {@link Script} for a given url inside the Crafter content store.
+ * Returns a {@link Script} for a given url.
  *
  * @author Alfonso Vásquez
  */
-public class ScriptFactory {
+public interface ScriptFactory {
 
-    public static final String DEFAULT_SCRIPT_ENGINE_NAME = "JavaScript";
+    String getScriptFileExtension();
 
-    protected ContentStoreService storeService;
-    protected String scriptEngineName;
-    protected Map<String, Object> globalScriptVariables;
-    protected ScriptEngine scriptEngine;
-
-    public ScriptFactory() {
-        scriptEngineName = DEFAULT_SCRIPT_ENGINE_NAME;
-    }
-
-    @Required
-    public void setStoreService(ContentStoreService storeService) {
-        this.storeService = storeService;
-    }
-
-    public void setScriptEngineName(String scriptEngineName) {
-        this.scriptEngineName = scriptEngineName;
-    }
-
-    public void setGlobalScriptVariables(Map<String, Object> globalScriptVariables) {
-        this.globalScriptVariables = globalScriptVariables;
-    }
-
-    @PostConstruct
-    public void init() {
-        ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
-        scriptEngine = scriptEngineManager.getEngineByName(scriptEngineName);
-    }
-
-    public Script getScript(String url) throws ScriptException {
-        Context context = AbstractSiteContextResolvingFilter.getCurrentContext().getContext();
-        Content script;
-
-        try {
-            script = storeService.getContent(context, url);
-        } catch (PathNotFoundException e) {
-            throw new ScriptNotFoundException("No script found at " + url + " in content store", e);
-        } catch (Exception e) {
-            throw new ScriptException("Unable to retrieve script at " + url + " in content store", e);
-        }
-
-        return new Script(script, globalScriptVariables, scriptEngine);
-    }
+    Script getScript(String url) throws ScriptException;
 
 }
