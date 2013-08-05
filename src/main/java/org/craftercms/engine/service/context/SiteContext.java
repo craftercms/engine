@@ -34,15 +34,15 @@ public class SiteContext {
     protected String staticAssetsPath;
     protected String templatesPath;
     protected FreeMarkerConfig freeMarkerConfig;
-    protected String scriptsPath;
-    protected String scriptTemplatesPath;
-    protected FreeMarkerConfig scriptsFreeMarkerConfig;
+    protected String restScriptsPath;
+    protected String restScriptTemplatesPath;
+    protected FreeMarkerConfig restScriptsFreeMarkerConfig;
     protected UrlTransformationEngine urlTransformationEngine;
     protected PreviewOverlayCallback overlayCallback;
 
     public SiteContext(String siteName, Context context, boolean fallback, String staticAssetsPath, String templatesPath,
-                       FreeMarkerConfig freeMarkerConfig, String scriptsPath, String scriptTemplatesPath,
-                       FreeMarkerConfig scriptsFreeMarkerConfig, UrlTransformationEngine urlTransformationEngine,
+                       FreeMarkerConfig freeMarkerConfig, String restScriptsPath, String restScriptTemplatesPath,
+                       FreeMarkerConfig restScriptsFreeMarkerConfig, UrlTransformationEngine urlTransformationEngine,
                        PreviewOverlayCallback overlayCallback) {
         this.siteName = siteName;
         this.context = context;
@@ -50,9 +50,9 @@ public class SiteContext {
         this.staticAssetsPath = staticAssetsPath;
         this.templatesPath = templatesPath;
         this.freeMarkerConfig = freeMarkerConfig;
-        this.scriptsPath = scriptsPath;
-        this.scriptTemplatesPath = scriptTemplatesPath;
-        this.scriptsFreeMarkerConfig = scriptsFreeMarkerConfig;
+        this.restScriptsPath = restScriptsPath;
+        this.restScriptTemplatesPath = restScriptTemplatesPath;
+        this.restScriptsFreeMarkerConfig = restScriptsFreeMarkerConfig;
         this.urlTransformationEngine = urlTransformationEngine;
         this.overlayCallback = overlayCallback;
     }
@@ -81,16 +81,16 @@ public class SiteContext {
         return freeMarkerConfig;
     }
 
-    public String getScriptsPath() {
-        return scriptsPath;
+    public String getRestScriptsPath() {
+        return restScriptsPath;
     }
 
-    public String getScriptTemplatesPath() {
-        return scriptTemplatesPath;
+    public String getRestScriptTemplatesPath() {
+        return restScriptTemplatesPath;
     }
 
-    public FreeMarkerConfig getScriptsFreeMarkerConfig() {
-        return scriptsFreeMarkerConfig;
+    public FreeMarkerConfig getRestScriptsFreeMarkerConfig() {
+        return restScriptsFreeMarkerConfig;
     }
 
     public UrlTransformationEngine getUrlTransformationEngine() {
@@ -133,9 +133,9 @@ public class SiteContext {
                 ", staticAssetsPath='" + staticAssetsPath + '\'' +
                 ", templatesPath='" + templatesPath + '\'' +
                 ", freeMarkerConfig=" + freeMarkerConfig +
-                ", scriptsPath='" + scriptsPath + '\'' +
-                ", scriptTemplatesPath='" + scriptsPath + '\'' +
-                ", scriptsFreeMarkerConfig=" + scriptsFreeMarkerConfig +
+                ", restScriptsPath='" + restScriptsPath + '\'' +
+                ", restScriptTemplatesPath='" + restScriptsPath + '\'' +
+                ", restScriptsFreeMarkerConfig=" + restScriptsFreeMarkerConfig +
                 ", urlTransformationEngine=" + urlTransformationEngine +
                 ", overlayCallback=" + overlayCallback +
                 ']';

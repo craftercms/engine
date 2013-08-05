@@ -18,7 +18,6 @@ package org.craftercms.engine.scripting;
 
 import org.craftercms.engine.exception.ScriptRenderingException;
 import org.craftercms.engine.exception.UnrecognizableMimeTypeException;
-import org.craftercms.engine.exception.UnrecognizableMimeTypeException;
 import org.springframework.http.MediaType;
 
 import java.util.List;

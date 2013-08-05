@@ -70,7 +70,7 @@ public class FreeMarkerScriptViewResolver extends AbstractScriptViewResolver imp
 
             @Override
             public ScriptView doCacheable() throws ScriptRenderingException {
-                Configuration configuration = siteContext.getScriptsFreeMarkerConfig().getConfiguration();
+                Configuration configuration = siteContext.getRestScriptsFreeMarkerConfig().getConfiguration();
                 ObjectWrapper objectWrapper = configuration.getObjectWrapper();
 
                 if (logger.isDebugEnabled()) {

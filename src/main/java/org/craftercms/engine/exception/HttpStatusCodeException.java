@@ -23,9 +23,9 @@ import org.springframework.http.HttpStatus;
  * Exception thrown to cause specific HTTP status code errors
  *
  * @author Alfonso Vásquez
- * @see org.craftercms.engine.http.impl.HttpStatusCodeExceptionHandler
+ * @see org.craftercms.engine.http.impl.HttpStatusCodeAwareExceptionHandler
  */
-public class HttpStatusCodeException extends CrafterException {
+public class HttpStatusCodeException extends CrafterException implements HttpStatusCodeAwareException {
 
     private HttpStatus statusCode;
 
@@ -51,6 +51,7 @@ public class HttpStatusCodeException extends CrafterException {
         this.statusCode = statusCode;
     }
 
+    @Override
     public HttpStatus getStatusCode() {
         return statusCode;
     }

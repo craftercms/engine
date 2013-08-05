@@ -38,11 +38,13 @@
                     <property name="redirectContentType" value="${crafter.engine.page.redirect.contentType}" />
 					<property name="disabledXPathQuery" value="${crafter.engine.page.disabled.xpathQuery}" />
                     <property name="mimeTypeXPathQuery" value="${crafter.engine.page.mimeType.xpathQuery}" />
+                    <property name="scriptXPathQuery" value="${crafter.engine.page.script.xpathQuery}"/>
 					<property name="modeIsPreview" value="${crafter.engine.preview}" />
                     <property name="pageModelAttributeName" value="model" />
                     <property name="delegatedViewResolver" ref="crafter.freeMarkerViewResolver" />
                     <property name="userAgentTemplateDetector" ref="crafter.userAgentTemplateDetector" />
                     <property name="accessManager" ref="crafter.pageAccessManager"/>
+                    <property name="scriptFactory" ref="crafter.scriptFactory"/>
                 </bean>
             </list>
         </property>

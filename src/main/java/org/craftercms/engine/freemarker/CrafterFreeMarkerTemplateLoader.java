@@ -42,15 +42,15 @@ public class CrafterFreeMarkerTemplateLoader implements TemplateLoader {
 
     private static final Log logger = LogFactory.getLog(CrafterFreeMarkerTemplateLoader.class);
 
-    private boolean useScriptTemplatesPath;
+    private boolean useRestScriptTemplatesPath;
     private ContentStoreService contentStoreService;
 
     public CrafterFreeMarkerTemplateLoader() {
-        useScriptTemplatesPath = false;
+        useRestScriptTemplatesPath = false;
     }
 
-    public void setUseScriptTemplatesPath(boolean useScriptTemplatesPath) {
-        this.useScriptTemplatesPath = useScriptTemplatesPath;
+    public void setUseRestScriptTemplatesPath(boolean useRestScriptTemplatesPath) {
+        this.useRestScriptTemplatesPath = useRestScriptTemplatesPath;
     }
 
     @Required
@@ -94,7 +94,7 @@ public class CrafterFreeMarkerTemplateLoader implements TemplateLoader {
     }
 
     protected String getTemplatePath(SiteContext context, String name) {
-        String templatesPath = useScriptTemplatesPath ? context.getScriptTemplatesPath() : context.getTemplatesPath();
+        String templatesPath = useRestScriptTemplatesPath ? context.getRestScriptTemplatesPath() : context.getTemplatesPath();
 
         return UrlUtils.appendUrl(templatesPath, name);
     }

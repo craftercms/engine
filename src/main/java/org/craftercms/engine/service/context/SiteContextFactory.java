@@ -41,18 +41,17 @@ public class SiteContextFactory {
     protected String rootFolderPath;
     protected String staticAssetsPath;
     protected String templatesPath;
-    protected String scriptsPath;
-    protected String scriptTemplatesPath;
+    protected ObjectFactory<FreeMarkerConfig> freeMarkerConfigFactory;
+    protected String restScriptsPath;
+    protected String restScriptTemplatesPath;
+    protected ObjectFactory<FreeMarkerConfig> restScriptsFreeMarkerConfigFactory;
     protected boolean cacheOn;
     protected int maxAllowedItemsInCache;
     protected boolean ignoreHiddenFiles;
     protected UrlTransformationEngine urlTransformationEngine;
     protected PreviewOverlayCallback overlayCallback;
-
     protected ContentStoreService storeService;
     protected MacroResolver macroResolver;
-    protected ObjectFactory<FreeMarkerConfig> freeMarkerConfigFactory;
-    protected ObjectFactory<FreeMarkerConfig> scriptsFreeMarkerConfigFactory;
 
     public SiteContextFactory() {
         storeType = FileSystemContentStoreAdapter.STORE_TYPE;
@@ -96,13 +95,23 @@ public class SiteContextFactory {
     }
 
     @Required
-    public void setScriptsPath(String scriptsPath) {
-        this.scriptsPath = scriptsPath;
+    public void setFreeMarkerConfigFactory(ObjectFactory<FreeMarkerConfig> freeMarkerConfigFactory) {
+        this.freeMarkerConfigFactory = freeMarkerConfigFactory;
     }
 
     @Required
-    public void setScriptTemplatesPath(String scriptTemplatesPath) {
-        this.scriptTemplatesPath = scriptTemplatesPath;
+    public void setRestScriptsPath(String restScriptsPath) {
+        this.restScriptsPath = restScriptsPath;
+    }
+
+    @Required
+    public void setRestScriptTemplatesPath(String restScriptTemplatesPath) {
+        this.restScriptTemplatesPath = restScriptTemplatesPath;
+    }
+
+    @Required
+    public void setRestScriptsFreeMarkerConfigFactory(ObjectFactory<FreeMarkerConfig> restScriptsFreeMarkerConfigFactory) {
+        this.restScriptsFreeMarkerConfigFactory = restScriptsFreeMarkerConfigFactory;
     }
 
     public void setCacheOn(boolean cacheOn) {
@@ -136,32 +145,22 @@ public class SiteContextFactory {
         this.macroResolver = macroResolver;
     }
 
-    @Required
-    public void setFreeMarkerConfigFactory(ObjectFactory<FreeMarkerConfig> freeMarkerConfigFactory) {
-        this.freeMarkerConfigFactory = freeMarkerConfigFactory;
-    }
-
-    @Required
-    public void setScriptsFreeMarkerConfigFactory(ObjectFactory<FreeMarkerConfig> scriptsFreeMarkerConfigFactory) {
-        this.scriptsFreeMarkerConfigFactory = scriptsFreeMarkerConfigFactory;
-    }
-
     public SiteContext createContext(String siteName, boolean fallback) {
         String resolvedRootFolderPath = macroResolver.resolveMacros(rootFolderPath);
 
         Context context = storeService.createContext(storeType, storeServerUrl, username, password, resolvedRootFolderPath, cacheOn,
                 maxAllowedItemsInCache, ignoreHiddenFiles);
 
-        return new SiteContext(siteName, context, fallback, staticAssetsPath, templatesPath, getFreemarkerConfig(), scriptsPath,
-                scriptTemplatesPath, getScriptsFreeMarkerConfig(), urlTransformationEngine, overlayCallback);
+        return new SiteContext(siteName, context, fallback, staticAssetsPath, templatesPath, getFreemarkerConfig(), restScriptsPath,
+                restScriptTemplatesPath, getRestScriptsFreeMarkerConfig(), urlTransformationEngine, overlayCallback);
     }
 
     protected FreeMarkerConfig getFreemarkerConfig() {
         return freeMarkerConfigFactory.getObject();
     }
 
-    protected FreeMarkerConfig getScriptsFreeMarkerConfig() {
-        return scriptsFreeMarkerConfigFactory.getObject();
+    protected FreeMarkerConfig getRestScriptsFreeMarkerConfig() {
+        return restScriptsFreeMarkerConfigFactory.getObject();
     }
 
 }

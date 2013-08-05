@@ -2,7 +2,6 @@ package org.craftercms.engine.controller;
 
 import com.google.gson.Gson;
 import freemarker.cache.TemplateLoader;
-import org.apache.commons.lang.StringUtils;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.util.XmlUtils;
@@ -44,14 +43,14 @@ import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
 
 /**
- * Test for {@link RestServicesRequestHandler}
+ * Test for {@link RestScriptsRequestHandler}
  *
  * @author Alfonso Vásquez
  */
-public class RestServicesRequestHandlerTest {
+public class RestScriptsRequestHandlerTest {
 
     private ContentStoreService storeService;
-    private RestServicesRequestHandler handler;
+    private RestScriptsRequestHandler handler;
 
     @Before
     public void setUp() throws Exception {
@@ -60,7 +59,7 @@ public class RestServicesRequestHandlerTest {
 
         storeService = createContentStoreService();
 
-        handler = new RestServicesRequestHandler();
+        handler = new RestScriptsRequestHandler();
         handler.setScriptFactory(createScriptFactory(cacheTemplate, storeService));
         handler.setScriptViewResolver(createScriptViewResolver(cacheTemplate, servletContext));
         handler.setServletContext(servletContext);
@@ -235,9 +234,9 @@ public class RestServicesRequestHandlerTest {
     private SiteContext createSiteContext(ContentStoreService storeService) throws Exception {
         SiteContext siteContext = mock(SiteContext.class);
         when(siteContext.getContext()).thenReturn(mock(Context.class));
-        when(siteContext.getScriptsPath()).thenReturn("/scripts");
-        when(siteContext.getScriptTemplatesPath()).thenReturn("/scripts");
-        when(siteContext.getScriptsFreeMarkerConfig()).thenReturn(createScriptsFreeMarkerConfig(storeService));
+        when(siteContext.getRestScriptsPath()).thenReturn("/scripts");
+        when(siteContext.getRestScriptTemplatesPath()).thenReturn("/scripts");
+        when(siteContext.getRestScriptsFreeMarkerConfig()).thenReturn(createScriptsFreeMarkerConfig(storeService));
 
         return siteContext;
     }
@@ -245,7 +244,7 @@ public class RestServicesRequestHandlerTest {
     private FreeMarkerConfig createScriptsFreeMarkerConfig(ContentStoreService storeService) throws Exception {
         CrafterFreeMarkerTemplateLoader templateLoader = new CrafterFreeMarkerTemplateLoader();
         templateLoader.setContentStoreService(storeService);
-        templateLoader.setUseScriptTemplatesPath(true);
+        templateLoader.setUseRestScriptTemplatesPath(true);
 
         Properties freeMarkerProperties = new Properties();
         freeMarkerProperties.setProperty("output_encoding", "UTF-8");

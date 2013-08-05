@@ -18,7 +18,7 @@ package org.craftercms.engine.http.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.craftercms.engine.exception.HttpStatusCodeException;
+import org.craftercms.engine.exception.HttpStatusCodeAwareException;
 import org.craftercms.engine.http.ExceptionHandler;
 
 import javax.servlet.ServletException;
@@ -31,9 +31,9 @@ import java.io.IOException;
  *
  * @author Alfonso Vásquez
  */
-public class HttpStatusCodeExceptionHandler implements ExceptionHandler {
+public class HttpStatusCodeAwareExceptionHandler implements ExceptionHandler {
 
-    private static final Log logger = LogFactory.getLog(HttpStatusCodeExceptionHandler.class);
+    private static final Log logger = LogFactory.getLog(HttpStatusCodeAwareExceptionHandler.class);
 
     @Override
     public boolean handle(HttpServletRequest request, HttpServletResponse response, Exception ex) throws IOException {
@@ -41,10 +41,10 @@ public class HttpStatusCodeExceptionHandler implements ExceptionHandler {
             ex = (Exception) ex.getCause();
         }
 
-        if (ex instanceof HttpStatusCodeException ) {
+        if (ex instanceof HttpStatusCodeAwareException) {
             logger.warn(ex.getMessage(), ex);
 
-            response.sendError(((HttpStatusCodeException) ex).getStatusCode().value());
+            response.sendError(((HttpStatusCodeAwareException) ex).getStatusCode().value());
 
             return true;
         }

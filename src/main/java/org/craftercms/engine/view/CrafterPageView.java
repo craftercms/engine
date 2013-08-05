@@ -18,15 +18,22 @@ package org.craftercms.engine.view;
 
 import org.apache.commons.lang.StringUtils;
 import org.craftercms.core.util.cache.CachingAwareObject;
+import org.craftercms.engine.exception.HttpStatusCodeException;
 import org.craftercms.engine.exception.RenderingException;
 import org.craftercms.engine.model.SiteItem;
+import org.craftercms.engine.scripting.Script;
+import org.craftercms.engine.scripting.ScriptFactory;
+import org.craftercms.engine.scripting.ScriptUtils;
+import org.craftercms.engine.scripting.Status;
 import org.craftercms.engine.service.SiteItemService;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.view.AbstractView;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
@@ -47,6 +54,7 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject 
     protected String pageViewNameXPathQuery;
     protected String mimeTypeXPathQuery;
     protected String pageModelAttributeName;
+    protected Script script;
     protected ViewResolver delegatedViewResolver;
 
     public SiteItem getPage() {
@@ -105,6 +113,11 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject 
     @Required
     public void setPageModelAttributeName(String pageModelAttributeName) {
         this.pageModelAttributeName = pageModelAttributeName;
+    }
+
+    @Required
+    public void setScript(Script script) {
+        this.script = script;
     }
 
     @Required
@@ -204,8 +217,40 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject 
             response.setContentType(MediaType.parseMediaType(mimeType).toString());
         }
 
+        executeScript(request, response, model);
+
         addPageToModel(model);
+
         renderActualView(getPageViewName(), model, request, response);
+    }
+
+    protected void executeScript(HttpServletRequest request, HttpServletResponse response, Map<String, Object> model) {
+        if (script != null) {
+            Status status = new Status();
+            Map<String, Object> scriptVariables = createScriptVariables(request, response, status, model);
+
+            script.execute(scriptVariables);
+
+            if (status.isRedirect()) {
+                if (model.containsKey("message")) {
+                    throw new HttpStatusCodeException(HttpStatus.valueOf(status.getCode()), (String) model.get("message"));
+                } else {
+                    throw new HttpStatusCodeException(HttpStatus.valueOf(status.getCode()));
+                }
+            } else {
+                response.setStatus(status.getCode());
+            }
+        }
+    }
+
+    protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response, Status status,
+                                                        Map<String, Object> model) {
+        Map<String, Object> scriptVariables = ScriptUtils.createServletVariables(request, response, getServletContext());
+        scriptVariables.put("crafterModel", page);
+        scriptVariables.put("model", model);
+        scriptVariables.put("status", status);
+
+        return scriptVariables;
     }
 
     protected void addPageToModel(Map<String, Object> model) {

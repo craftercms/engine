@@ -65,7 +65,7 @@ public class FreeMarkerScriptView implements ScriptView {
 
     protected Object createTemplateModel(Status status, Map<String, Object> model, HttpServletRequest request,
                                          HttpServletResponse response) {
-        SimpleHash templateModel = new SimpleHash();
+        SimpleHash templateModel = new SimpleHash(objectWrapper);
         templateModel.put("requestUrl", request.getRequestURI());
         templateModel.put("application", servletContextHashModel);
         templateModel.put("request", new HttpRequestHashModel(request, response, objectWrapper));

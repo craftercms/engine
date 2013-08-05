@@ -48,7 +48,7 @@
         <property name="exceptionHandlers">
             <list>
                 <bean class="org.craftercms.engine.http.impl.ViewNotResolvedExceptionHandler" />
-                <bean class="org.craftercms.engine.http.impl.HttpStatusCodeExceptionHandler" />
+                <bean class="org.craftercms.engine.http.impl.HttpStatusCodeAwareExceptionHandler" />
                 <bean class="org.craftercms.engine.http.impl.DefaultExceptionHandler" />
             </list>
         </property>
@@ -145,13 +145,13 @@
         <property name="rootFolderPath" value="${crafter.engine.site.default.rootFolder.path}" />
         <property name="staticAssetsPath" value="${crafter.engine.site.default.staticAssets.path}" />
         <property name="templatesPath" value="${crafter.engine.site.default.templates.path}" />
-        <property name="scriptsPath" value="${crafter.engine.site.default.scripts.path}" />
-        <property name="scriptTemplatesPath" value="${crafter.engine.site.default.scripts.templates.path}" />
+        <property name="freeMarkerConfigFactory" ref="crafter.freeMarkerConfigFactory" />
+        <property name="restScriptsPath" value="${crafter.engine.site.default.rest.scripts.path}" />
+        <property name="restScriptTemplatesPath" value="${crafter.engine.site.default.rest.scripts.templates.path}" />
+        <property name="restScriptsFreeMarkerConfigFactory" ref="crafter.restScriptsFreeMarkerConfigFactory" />
         <property name="urlTransformationEngine" ref="crafter.urlTransformationEngine" />
         <property name="storeService" ref="crafter.contentStoreService" />
         <property name="macroResolver" ref="crafter.macroResolver" />
-        <property name="freeMarkerConfigFactory" ref="crafter.freeMarkerConfigFactory" />
-        <property name="scriptsFreeMarkerConfigFactory" ref="crafter.scriptsFreeMarkerConfigFactory" />
     </bean>
 
     <bean id="crafter.fallbackSiteContextFactory" class="org.craftercms.engine.service.context.SiteContextFactory">
@@ -159,13 +159,13 @@
         <property name="rootFolderPath" value="default-site"/>
         <property name="staticAssetsPath" value="/static-assets" />
         <property name="templatesPath" value="/" />
-        <property name="scriptsPath" value="/scripts" />
-        <property name="scriptTemplatesPath" value="/" />
+        <property name="freeMarkerConfigFactory" ref="crafter.freeMarkerConfigFactory"/>
+        <property name="restScriptsPath" value="/scripts/services" />
+        <property name="restScriptTemplatesPath" value="/scripts/services" />
+        <property name="restScriptsFreeMarkerConfigFactory" ref="crafter.restScriptsFreeMarkerConfigFactory" />
         <property name="urlTransformationEngine" ref="crafter.urlTransformationEngine" />
         <property name="storeService" ref="crafter.contentStoreService" />
         <property name="macroResolver" ref="crafter.macroResolver" />
-        <property name="freeMarkerConfigFactory" ref="crafter.freeMarkerConfigFactory"/>
-        <property name="scriptsFreeMarkerConfigFactory" ref="crafter.scriptsFreeMarkerConfigFactory" />
     </bean>
 
     <!-- ////////////////////////////////// -->

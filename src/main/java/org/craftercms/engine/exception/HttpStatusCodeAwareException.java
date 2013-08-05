@@ -14,22 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.craftercms.engine.scripting;
+package org.craftercms.engine.exception;
 
-import org.craftercms.engine.exception.ScriptRenderingException;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Map;
+import org.springframework.http.HttpStatus;
 
 /**
- * Renders the result of a REST script.
+ * Interface to be implemented by exceptions that want to expose an HTTP status code to the response.
  *
  * @author Alfonso Vásquez
  */
-public interface ScriptView {
+public interface HttpStatusCodeAwareException {
 
-    void render(Status status, Map<String, Object> model, HttpServletRequest request, HttpServletResponse response)
-            throws ScriptRenderingException;
+    HttpStatus getStatusCode();
 
 }

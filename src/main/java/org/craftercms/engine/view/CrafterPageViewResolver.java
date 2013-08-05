@@ -25,6 +25,8 @@ import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.core.util.url.ContentBundleUrlParser;
 import org.craftercms.engine.mobile.UserAgentTemplateDetector;
 import org.craftercms.engine.model.SiteItem;
+import org.craftercms.engine.scripting.Script;
+import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.security.CrafterPageAccessManager;
 import org.craftercms.engine.service.SiteItemService;
 import org.craftercms.engine.service.UrlTransformationService;
@@ -70,12 +72,14 @@ public class CrafterPageViewResolver extends ApplicationObjectSupport implements
     protected String redirectContentType;
     protected String disabledXPathQuery;
     protected String mimeTypeXPathQuery;
+    protected String scriptXPathQuery;
     protected String pageModelAttributeName;
     protected ViewResolver delegatedViewResolver;
     protected boolean localizeViews;
     protected UserAgentTemplateDetector userAgentTemplateDetector;
     protected boolean modeIsPreview;
     protected CrafterPageAccessManager accessManager;
+    protected ScriptFactory scriptFactory;
 
     public CrafterPageViewResolver() {
         order = 10;
@@ -166,6 +170,11 @@ public class CrafterPageViewResolver extends ApplicationObjectSupport implements
     }
 
     @Required
+    public void setScriptXPathQuery(String scriptXPathQuery) {
+        this.scriptXPathQuery = scriptXPathQuery;
+    }
+
+    @Required
     public void setPageModelAttributeName(String pageModelAttributeName) {
         this.pageModelAttributeName = pageModelAttributeName;
     }
@@ -187,6 +196,11 @@ public class CrafterPageViewResolver extends ApplicationObjectSupport implements
     @Required
     public void setAccessManager(CrafterPageAccessManager accessManager) {
         this.accessManager = accessManager;
+    }
+
+    @Required
+    public void setScriptFactory(ScriptFactory scriptFactory) {
+        this.scriptFactory = scriptFactory;
     }
 
     @Override
@@ -279,6 +293,13 @@ public class CrafterPageViewResolver extends ApplicationObjectSupport implements
                         view.setPageModelAttributeName(pageModelAttributeName);
                         view.setDelegatedViewResolver(delegatedViewResolver);
                         view.setUserAgentTemplateDetector(userAgentTemplateDetector);
+
+                        String scriptUrl = page.getItem().queryDescriptorValue(scriptXPathQuery);
+                        if (StringUtils.isNotEmpty(scriptUrl)) {
+                            Script script = scriptFactory.getScript(scriptUrl);
+                            view.setScript(script);
+                            view.addDependencyKey(script.getKey());
+                        }
 
                         view.addDependencyKey(page.getItem().getKey());
 

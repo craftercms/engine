@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2007-2013 Crafter Software Corporation.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.craftercms.engine.controller;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -26,13 +42,13 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * Request handler for scripted RESTful services.
+ * Request handler for REST scripts.
  *
  * @author Alfonso Vásquez
  */
-public class RestServicesRequestHandler extends WebApplicationObjectSupport implements HttpRequestHandler {
+public class RestScriptsRequestHandler extends WebApplicationObjectSupport implements HttpRequestHandler {
 
-    private static final Log logger = LogFactory.getLog(RestServicesRequestHandler.class);
+    private static final Log logger = LogFactory.getLog(RestScriptsRequestHandler.class);
 
     private static final String SCRIPT_URL_FORMAT = "%s.%s.%s"; // {url}.{method}.{scriptExt}
 
@@ -44,7 +60,7 @@ public class RestServicesRequestHandler extends WebApplicationObjectSupport impl
     protected ScriptViewResolver scriptViewResolver;
     protected Tika tika;
 
-    public RestServicesRequestHandler() {
+    public RestScriptsRequestHandler() {
         tika = new Tika();
     }
 
@@ -84,7 +100,7 @@ public class RestServicesRequestHandler extends WebApplicationObjectSupport impl
     }
 
     protected String getScriptUrl(SiteContext siteContext, HttpServletRequest request, String serviceUrl) {
-        String baseUrl = UrlUtils.appendUrl(siteContext.getScriptsPath(), FilenameUtils.removeExtension(serviceUrl));
+        String baseUrl = UrlUtils.appendUrl(siteContext.getRestScriptsPath(), FilenameUtils.removeExtension(serviceUrl));
 
         return String.format(SCRIPT_URL_FORMAT, baseUrl, request.getMethod().toLowerCase(), scriptFactory.getScriptFileExtension());
     }
