@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <bean id="crafter.scriptFactory" class="org.craftercms.engine.scripting.impl.Jsr233CompiledScriptFactory">
+        <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
+        <property name="storeService" ref="crafter.contentStoreService"/>
+        <property name="globalVariables" ref="crafter.restScriptsVariables"/>
+    </bean>
+
+    <util:map id="crafter.restScriptsVariables">
+        <entry key="siteItemService" value-ref="crafter.siteItemService" />
+        <entry key="urlTransformationService" value-ref="crafter.urlTransformationService" />
+        <entry key="searchService" value-ref="crafter.searchService" />
+    </util:map>
+
+</beans>

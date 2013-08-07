@@ -2,12 +2,15 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
     <import resource="classpath:crafter/core/core-context.xml"/>
     <import resource="classpath:crafter/engine/services/security-context.xml" />
+    <import resource="classpath:crafter/engine/services/scripting-context.xml" />
     <import resource="classpath:crafter/engine/services/url-transformation-context.xml"/>
 
     <!-- ////////////////////////////////// -->
@@ -45,7 +48,7 @@
         <property name="exceptionHandlers">
             <list>
                 <bean class="org.craftercms.engine.http.impl.ViewNotResolvedExceptionHandler" />
-                <bean class="org.craftercms.engine.http.impl.HttpStatusCodeExceptionHandler" />
+                <bean class="org.craftercms.engine.http.impl.HttpStatusCodeAwareExceptionHandler" />
                 <bean class="org.craftercms.engine.http.impl.DefaultExceptionHandler" />
             </list>
         </property>
@@ -142,10 +145,11 @@
         <property name="rootFolderPath" value="${crafter.engine.site.default.rootFolder.path}" />
         <property name="staticAssetsPath" value="${crafter.engine.site.default.staticAssets.path}" />
         <property name="templatesPath" value="${crafter.engine.site.default.templates.path}" />
+        <property name="freeMarkerConfigFactory" ref="crafter.freeMarkerConfigFactory" />
+        <property name="restScriptsPath" value="${crafter.engine.site.default.rest.scripts.path}" />
         <property name="urlTransformationEngine" ref="crafter.urlTransformationEngine" />
         <property name="storeService" ref="crafter.contentStoreService" />
         <property name="macroResolver" ref="crafter.macroResolver" />
-        <property name="freeMarkerConfigFactory" ref="crafter.freeMarkerConfigFactory"/>
     </bean>
 
     <bean id="crafter.fallbackSiteContextFactory" class="org.craftercms.engine.service.context.SiteContextFactory">
@@ -153,10 +157,11 @@
         <property name="rootFolderPath" value="default-site"/>
         <property name="staticAssetsPath" value="/static-assets" />
         <property name="templatesPath" value="/" />
+        <property name="freeMarkerConfigFactory" ref="crafter.freeMarkerConfigFactory"/>
+        <property name="restScriptsPath" value="/scripts/services" />
         <property name="urlTransformationEngine" ref="crafter.urlTransformationEngine" />
         <property name="storeService" ref="crafter.contentStoreService" />
         <property name="macroResolver" ref="crafter.macroResolver" />
-        <property name="freeMarkerConfigFactory" ref="crafter.freeMarkerConfigFactory"/>
     </bean>
 
     <!-- ////////////////////////////////// -->
@@ -236,20 +241,20 @@
                 <prop key="object_wrapper">org.craftercms.engine.freemarker.CrafterObjectWrapper</prop>
             </props>
         </property>
-        <property name="freemarkerVariables">
-            <map>
-                <entry key="siteItemService" value-ref="crafter.siteItemService" />
-                <entry key="urlTransformationService" value-ref="crafter.urlTransformationService" />
-                <entry key="searchService" value-ref="crafter.searchService" />
-                <entry key="breadcrumbBuilder" value-ref="crafter.breadcrumbBuilder" />
-            </map>
-        </property>
+        <property name="freemarkerVariables" ref="crafter.freemarkerVariables" />
         <property name="preTemplateLoaders">
             <array>
                 <ref bean="crafter.crafterFreeMarkerTemplateLoader" />
             </array>
         </property>
     </bean>
+
+    <util:map id="crafter.freemarkerVariables">
+        <entry key="siteItemService" value-ref="crafter.siteItemService" />
+        <entry key="urlTransformationService" value-ref="crafter.urlTransformationService" />
+        <entry key="searchService" value-ref="crafter.searchService" />
+        <entry key="breadcrumbBuilder" value-ref="crafter.breadcrumbBuilder" />
+    </util:map>
 
     <bean id="crafter.freeMarkerConfigFactory" class="org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean">
         <property name="targetBeanName" value="crafter.freeMarkerConfig" />

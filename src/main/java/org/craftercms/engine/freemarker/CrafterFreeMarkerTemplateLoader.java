@@ -53,7 +53,7 @@ public class CrafterFreeMarkerTemplateLoader implements TemplateLoader {
     public Object findTemplateSource(String name) throws IOException {
         SiteContext context = AbstractSiteContextResolvingFilter.getCurrentContext();
 
-        String path = UrlUtils.appendUrl(context.getTemplatesPath(), name);
+        String path = getTemplatePath(context, name);
 
         if (logger.isDebugEnabled()) {
             logger.debug("Looking for FreeMarker template at [context=" + context + ", path='" + path + "']");
@@ -82,6 +82,10 @@ public class CrafterFreeMarkerTemplateLoader implements TemplateLoader {
 
     @Override
     public void closeTemplateSource(Object templateSource) throws IOException {
+    }
+
+    protected String getTemplatePath(SiteContext context, String name) {
+        return UrlUtils.appendUrl(context.getTemplatesPath(), name);
     }
 
 }

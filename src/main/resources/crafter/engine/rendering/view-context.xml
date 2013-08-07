@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <!-- ////////////////////////////////// -->
     <!--								 	-->
@@ -12,7 +12,7 @@
     <bean id="crafter.mainViewResolver" class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
         <property name="order" value="0" />
         <property name="favorPathExtension" value="true" />
-        <property name="ignoreAcceptHeader" value="true" />
+        <property name="ignoreAcceptHeader" value="false" />
         <property name="defaultContentType" value="text/html" />
         <property name="mediaTypes">
             <map>
@@ -38,11 +38,13 @@
                     <property name="redirectContentType" value="${crafter.engine.page.redirect.contentType}" />
 					<property name="disabledXPathQuery" value="${crafter.engine.page.disabled.xpathQuery}" />
                     <property name="mimeTypeXPathQuery" value="${crafter.engine.page.mimeType.xpathQuery}" />
+                    <property name="scriptsXPathQuery" value="${crafter.engine.page.scripts.xpathQuery}"/>
 					<property name="modeIsPreview" value="${crafter.engine.preview}" />
                     <property name="pageModelAttributeName" value="model" />
                     <property name="delegatedViewResolver" ref="crafter.freeMarkerViewResolver" />
                     <property name="userAgentTemplateDetector" ref="crafter.userAgentTemplateDetector" />
                     <property name="accessManager" ref="crafter.pageAccessManager"/>
+                    <property name="scriptFactory" ref="crafter.scriptFactory"/>
                 </bean>
             </list>
         </property>

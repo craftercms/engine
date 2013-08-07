@@ -19,6 +19,7 @@ package org.craftercms.engine.model;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.craftercms.core.util.XmlUtils;
 import org.craftercms.engine.model.converters.ModelValueConverter;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -89,6 +90,22 @@ public class SiteItem {
             } else {
                 return result;
             }
+        } else {
+            return null;
+        }
+    }
+
+    public String getValue(String xPathQuery) {
+        if (getDom() != null) {
+            return XmlUtils.selectSingleNodeValue(getDom().getRootElement(), xPathQuery);
+        } else {
+            return null;
+        }
+    }
+
+    public List<String> getValues(String xPathQuery) {
+        if (getDom() != null) {
+            return XmlUtils.selectNodeValues(getDom().getRootElement(), xPathQuery);
         } else {
             return null;
         }

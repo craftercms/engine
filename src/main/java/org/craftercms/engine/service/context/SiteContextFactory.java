@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
 
 /**
- * Factory for creating {@link SiteContext} with common properties. It also uses the {@link org.craftercms.engine.macro.MacroResolver} to resolve any macros
+ * Factory for creating {@link SiteContext} with common properties. It also uses the {@link MacroResolver} to resolve any macros
  * specified in the {@code rootFolderPath} before creating the context (remember that macros can vary between requests).
  *
  * @author Alfonso Vásquez
@@ -41,15 +41,15 @@ public class SiteContextFactory {
     protected String rootFolderPath;
     protected String staticAssetsPath;
     protected String templatesPath;
+    protected ObjectFactory<FreeMarkerConfig> freeMarkerConfigFactory;
+    protected String restScriptsPath;
     protected boolean cacheOn;
     protected int maxAllowedItemsInCache;
     protected boolean ignoreHiddenFiles;
     protected UrlTransformationEngine urlTransformationEngine;
     protected PreviewOverlayCallback overlayCallback;
-
     protected ContentStoreService storeService;
     protected MacroResolver macroResolver;
-    protected ObjectFactory<FreeMarkerConfig> freeMarkerConfigFactory;
 
     public SiteContextFactory() {
         storeType = FileSystemContentStoreAdapter.STORE_TYPE;
@@ -92,6 +92,16 @@ public class SiteContextFactory {
         this.templatesPath = templatesPath;
     }
 
+    @Required
+    public void setFreeMarkerConfigFactory(ObjectFactory<FreeMarkerConfig> freeMarkerConfigFactory) {
+        this.freeMarkerConfigFactory = freeMarkerConfigFactory;
+    }
+
+    @Required
+    public void setRestScriptsPath(String restScriptsPath) {
+        this.restScriptsPath = restScriptsPath;
+    }
+
     public void setCacheOn(boolean cacheOn) {
         this.cacheOn = cacheOn;
     }
@@ -123,21 +133,15 @@ public class SiteContextFactory {
         this.macroResolver = macroResolver;
     }
 
-    @Required
-    public void setFreeMarkerConfigFactory(ObjectFactory<FreeMarkerConfig> freeMarkerConfigFactory) {
-        this.freeMarkerConfigFactory = freeMarkerConfigFactory;
-    }
-
     public SiteContext createContext(String siteName, boolean fallback) {
         String resolvedRootFolderPath = macroResolver.resolveMacros(rootFolderPath);
 
         Context context = storeService.createContext(storeType, storeServerUrl, username, password, resolvedRootFolderPath, cacheOn,
                 maxAllowedItemsInCache, ignoreHiddenFiles);
 
-        return new SiteContext(siteName, context, fallback, staticAssetsPath, templatesPath, getFreemarkerConfig(),
+        return new SiteContext(siteName, context, fallback, staticAssetsPath, templatesPath, getFreemarkerConfig(), restScriptsPath,
                 urlTransformationEngine, overlayCallback);
     }
-
 
     protected FreeMarkerConfig getFreemarkerConfig() {
         return freeMarkerConfigFactory.getObject();

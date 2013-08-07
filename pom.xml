@@ -61,6 +61,11 @@
 			<artifactId>crafter-search-api</artifactId>
 			<version>${crafter.search}</version>
 		</dependency>
+        <dependency>
+            <groupId>org.craftercms</groupId>
+            <artifactId>crafter-security-provider</artifactId>
+            <version>${crafter.profile}</version>
+        </dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
@@ -78,20 +83,21 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
-
-        <dependency>
-            <groupId>org.craftercms</groupId>
-            <artifactId>crafter-security-provider</artifactId>
-            <version>${crafter.profile}</version>
-        </dependency>
-
         <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib</artifactId>
             <version>2.2.2</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>2.1.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-core</artifactId>
+            <version>1.4</version>
+        </dependency>
 
 		<!-- Test dependencies -->
 		<dependency>

@@ -20,11 +20,14 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.core.service.CachingOptions;
+import org.craftercms.core.util.CollectionUtils;
 import org.craftercms.core.util.cache.CacheCallback;
 import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.core.util.url.ContentBundleUrlParser;
 import org.craftercms.engine.mobile.UserAgentTemplateDetector;
 import org.craftercms.engine.model.SiteItem;
+import org.craftercms.engine.scripting.Script;
+import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.security.CrafterPageAccessManager;
 import org.craftercms.engine.service.SiteItemService;
 import org.craftercms.engine.service.UrlTransformationService;
@@ -38,6 +41,7 @@ import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -70,12 +74,14 @@ public class CrafterPageViewResolver extends ApplicationObjectSupport implements
     protected String redirectContentType;
     protected String disabledXPathQuery;
     protected String mimeTypeXPathQuery;
+    protected String scriptXPathQuery;
     protected String pageModelAttributeName;
     protected ViewResolver delegatedViewResolver;
     protected boolean localizeViews;
     protected UserAgentTemplateDetector userAgentTemplateDetector;
     protected boolean modeIsPreview;
     protected CrafterPageAccessManager accessManager;
+    protected ScriptFactory scriptFactory;
 
     public CrafterPageViewResolver() {
         order = 10;
@@ -166,6 +172,11 @@ public class CrafterPageViewResolver extends ApplicationObjectSupport implements
     }
 
     @Required
+    public void setScriptsXPathQuery(String scriptXPathQuery) {
+        this.scriptXPathQuery = scriptXPathQuery;
+    }
+
+    @Required
     public void setPageModelAttributeName(String pageModelAttributeName) {
         this.pageModelAttributeName = pageModelAttributeName;
     }
@@ -187,6 +198,11 @@ public class CrafterPageViewResolver extends ApplicationObjectSupport implements
     @Required
     public void setAccessManager(CrafterPageAccessManager accessManager) {
         this.accessManager = accessManager;
+    }
+
+    @Required
+    public void setScriptFactory(ScriptFactory scriptFactory) {
+        this.scriptFactory = scriptFactory;
     }
 
     @Override
@@ -280,6 +296,8 @@ public class CrafterPageViewResolver extends ApplicationObjectSupport implements
                         view.setDelegatedViewResolver(delegatedViewResolver);
                         view.setUserAgentTemplateDetector(userAgentTemplateDetector);
 
+                        setScripts(page, view);
+
                         view.addDependencyKey(page.getItem().getKey());
 
                         return view;
@@ -291,6 +309,21 @@ public class CrafterPageViewResolver extends ApplicationObjectSupport implements
             }
 
         }, baseUrl, locale, PAGE_CONST_KEY_ELEM);
+    }
+
+    protected void setScripts(SiteItem page, CrafterPageView view) {
+        List<String> scriptUrls = page.getItem().queryDescriptorValues(scriptXPathQuery);
+        if (CollectionUtils.isNotEmpty(scriptUrls)) {
+            List<Script> scripts = new ArrayList<Script>(scriptUrls.size());
+
+            for (String scriptUrl : scriptUrls) {
+                Script script = scriptFactory.getScript(scriptUrl);
+                scripts.add(script);
+                view.addDependencyKey(script.getKey());
+            }
+
+            view.setScripts(scripts);
+        }
     }
 
 }
