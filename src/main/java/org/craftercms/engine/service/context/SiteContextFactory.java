@@ -43,8 +43,6 @@ public class SiteContextFactory {
     protected String templatesPath;
     protected ObjectFactory<FreeMarkerConfig> freeMarkerConfigFactory;
     protected String restScriptsPath;
-    protected String restScriptTemplatesPath;
-    protected ObjectFactory<FreeMarkerConfig> restScriptsFreeMarkerConfigFactory;
     protected boolean cacheOn;
     protected int maxAllowedItemsInCache;
     protected boolean ignoreHiddenFiles;
@@ -104,16 +102,6 @@ public class SiteContextFactory {
         this.restScriptsPath = restScriptsPath;
     }
 
-    @Required
-    public void setRestScriptTemplatesPath(String restScriptTemplatesPath) {
-        this.restScriptTemplatesPath = restScriptTemplatesPath;
-    }
-
-    @Required
-    public void setRestScriptsFreeMarkerConfigFactory(ObjectFactory<FreeMarkerConfig> restScriptsFreeMarkerConfigFactory) {
-        this.restScriptsFreeMarkerConfigFactory = restScriptsFreeMarkerConfigFactory;
-    }
-
     public void setCacheOn(boolean cacheOn) {
         this.cacheOn = cacheOn;
     }
@@ -152,15 +140,11 @@ public class SiteContextFactory {
                 maxAllowedItemsInCache, ignoreHiddenFiles);
 
         return new SiteContext(siteName, context, fallback, staticAssetsPath, templatesPath, getFreemarkerConfig(), restScriptsPath,
-                restScriptTemplatesPath, getRestScriptsFreeMarkerConfig(), urlTransformationEngine, overlayCallback);
+                urlTransformationEngine, overlayCallback);
     }
 
     protected FreeMarkerConfig getFreemarkerConfig() {
         return freeMarkerConfigFactory.getObject();
-    }
-
-    protected FreeMarkerConfig getRestScriptsFreeMarkerConfig() {
-        return restScriptsFreeMarkerConfigFactory.getObject();
     }
 
 }

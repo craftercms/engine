@@ -43,8 +43,6 @@
         <property name="templatesPath" value="${crafter.engine.site.default.templates.path}" />
         <property name="freeMarkerConfigFactory" ref="crafter.freeMarkerConfigFactory" />
         <property name="restScriptsPath" value="${crafter.engine.site.default.rest.scripts.path}" />
-        <property name="restScriptTemplatesPath" value="${crafter.engine.site.default.rest.scripts.templates.path}" />
-        <property name="restScriptsFreeMarkerConfigFactory" ref="crafter.restScriptsFreeMarkerConfigFactory" />
         <property name="cacheOn" value="false" />
         <property name="urlTransformationEngine" ref="crafter.urlTransformationEngine" />
         <property name="overlayCallback" ref="crafter.authoringOverlayCallback" />

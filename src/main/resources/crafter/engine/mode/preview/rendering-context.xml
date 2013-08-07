@@ -36,7 +36,7 @@
     <bean id="crafter.profileRestController" class="org.craftercms.engine.controller.preview.rest.ProfileRestController" />
 
     <util:map id="crafter.urlMappings">
-        <entry key="/api/1/services/**" value-ref="crafter.restScriptsRequestHandler"/>
+        <entry key="/api/1/services/**" value-ref="crafter.restScriptsController"/>
         <entry key="/static-assets/**" value-ref="crafter.staticAssetsRequestHandler"/>
         <entry key="/proxy/{proxyName}/**" value-ref="crafter.httpProxyRequestHandler"/>
         <entry key="/*" value-ref="crafter.pageRenderController"/>

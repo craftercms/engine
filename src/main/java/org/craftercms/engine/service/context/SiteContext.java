@@ -35,14 +35,11 @@ public class SiteContext {
     protected String templatesPath;
     protected FreeMarkerConfig freeMarkerConfig;
     protected String restScriptsPath;
-    protected String restScriptTemplatesPath;
-    protected FreeMarkerConfig restScriptsFreeMarkerConfig;
     protected UrlTransformationEngine urlTransformationEngine;
     protected PreviewOverlayCallback overlayCallback;
 
     public SiteContext(String siteName, Context context, boolean fallback, String staticAssetsPath, String templatesPath,
-                       FreeMarkerConfig freeMarkerConfig, String restScriptsPath, String restScriptTemplatesPath,
-                       FreeMarkerConfig restScriptsFreeMarkerConfig, UrlTransformationEngine urlTransformationEngine,
+                       FreeMarkerConfig freeMarkerConfig, String restScriptsPath, UrlTransformationEngine urlTransformationEngine,
                        PreviewOverlayCallback overlayCallback) {
         this.siteName = siteName;
         this.context = context;
@@ -51,8 +48,6 @@ public class SiteContext {
         this.templatesPath = templatesPath;
         this.freeMarkerConfig = freeMarkerConfig;
         this.restScriptsPath = restScriptsPath;
-        this.restScriptTemplatesPath = restScriptTemplatesPath;
-        this.restScriptsFreeMarkerConfig = restScriptsFreeMarkerConfig;
         this.urlTransformationEngine = urlTransformationEngine;
         this.overlayCallback = overlayCallback;
     }
@@ -83,14 +78,6 @@ public class SiteContext {
 
     public String getRestScriptsPath() {
         return restScriptsPath;
-    }
-
-    public String getRestScriptTemplatesPath() {
-        return restScriptTemplatesPath;
-    }
-
-    public FreeMarkerConfig getRestScriptsFreeMarkerConfig() {
-        return restScriptsFreeMarkerConfig;
     }
 
     public UrlTransformationEngine getUrlTransformationEngine() {
@@ -134,8 +121,6 @@ public class SiteContext {
                 ", templatesPath='" + templatesPath + '\'' +
                 ", freeMarkerConfig=" + freeMarkerConfig +
                 ", restScriptsPath='" + restScriptsPath + '\'' +
-                ", restScriptTemplatesPath='" + restScriptsPath + '\'' +
-                ", restScriptsFreeMarkerConfig=" + restScriptsFreeMarkerConfig +
                 ", urlTransformationEngine=" + urlTransformationEngine +
                 ", overlayCallback=" + overlayCallback +
                 ']';

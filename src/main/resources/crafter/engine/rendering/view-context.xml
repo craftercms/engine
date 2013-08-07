@@ -12,7 +12,7 @@
     <bean id="crafter.mainViewResolver" class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
         <property name="order" value="0" />
         <property name="favorPathExtension" value="true" />
-        <property name="ignoreAcceptHeader" value="true" />
+        <property name="ignoreAcceptHeader" value="false" />
         <property name="defaultContentType" value="text/html" />
         <property name="mediaTypes">
             <map>
@@ -38,7 +38,7 @@
                     <property name="redirectContentType" value="${crafter.engine.page.redirect.contentType}" />
 					<property name="disabledXPathQuery" value="${crafter.engine.page.disabled.xpathQuery}" />
                     <property name="mimeTypeXPathQuery" value="${crafter.engine.page.mimeType.xpathQuery}" />
-                    <property name="scriptXPathQuery" value="${crafter.engine.page.script.xpathQuery}"/>
+                    <property name="scriptsXPathQuery" value="${crafter.engine.page.scripts.xpathQuery}"/>
 					<property name="modeIsPreview" value="${crafter.engine.preview}" />
                     <property name="pageModelAttributeName" value="model" />
                     <property name="delegatedViewResolver" ref="crafter.freeMarkerViewResolver" />
@@ -66,10 +66,6 @@
         <property name="pageModelAttributeName" value="model" />
         <property name="componentModelAttributeName" value="model" />
         <property name="requestContextAttribute" value="requestContext" />
-    </bean>
-
-    <bean id="crafter.scriptViewResolver" class="org.craftercms.engine.scripting.impl.FreeMarkerScriptViewResolver">
-        <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
     </bean>
 
 </beans>

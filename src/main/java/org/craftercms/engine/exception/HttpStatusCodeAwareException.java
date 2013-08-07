@@ -16,8 +16,6 @@
  */
 package org.craftercms.engine.exception;
 
-import org.springframework.http.HttpStatus;
-
 /**
  * Interface to be implemented by exceptions that want to expose an HTTP status code to the response.
  *
@@ -25,6 +23,6 @@ import org.springframework.http.HttpStatus;
  */
 public interface HttpStatusCodeAwareException {
 
-    HttpStatus getStatusCode();
+    int getStatusCode();
 
 }

@@ -25,9 +25,8 @@
         <property name="urlMap" ref="crafter.urlMappings"/>
     </bean>
 
-    <bean id="crafter.restScriptsRequestHandler" class="org.craftercms.engine.controller.RestScriptsRequestHandler">
+    <bean id="crafter.restScriptsController" class="org.craftercms.engine.controller.RestScriptsController">
         <property name="scriptFactory" ref="crafter.scriptFactory"/>
-        <property name="scriptViewResolver" ref="crafter.scriptViewResolver"/>
     </bean>
 
     <bean id="crafter.staticAssetsRequestHandler" class="org.craftercms.engine.controller.StaticAssetsRequestHandler">
@@ -47,7 +46,7 @@
     </bean>
 
     <util:map id="crafter.urlMappings">
-        <entry key="/api/1/services/**" value-ref="crafter.restScriptsRequestHandler"/>
+        <entry key="/api/1/services/**" value-ref="crafter.restScriptsController"/>
         <entry key="/static-assets/**" value-ref="crafter.staticAssetsRequestHandler"/>
         <entry key="/*" value-ref="crafter.pageRenderController"/>
     </util:map>

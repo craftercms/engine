@@ -20,6 +20,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.core.service.CachingOptions;
+import org.craftercms.core.util.CollectionUtils;
 import org.craftercms.core.util.cache.CacheCallback;
 import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.core.util.url.ContentBundleUrlParser;
@@ -40,6 +41,7 @@ import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -170,7 +172,7 @@ public class CrafterPageViewResolver extends ApplicationObjectSupport implements
     }
 
     @Required
-    public void setScriptXPathQuery(String scriptXPathQuery) {
+    public void setScriptsXPathQuery(String scriptXPathQuery) {
         this.scriptXPathQuery = scriptXPathQuery;
     }
 
@@ -294,12 +296,7 @@ public class CrafterPageViewResolver extends ApplicationObjectSupport implements
                         view.setDelegatedViewResolver(delegatedViewResolver);
                         view.setUserAgentTemplateDetector(userAgentTemplateDetector);
 
-                        String scriptUrl = page.getItem().queryDescriptorValue(scriptXPathQuery);
-                        if (StringUtils.isNotEmpty(scriptUrl)) {
-                            Script script = scriptFactory.getScript(scriptUrl);
-                            view.setScript(script);
-                            view.addDependencyKey(script.getKey());
-                        }
+                        setScripts(page, view);
 
                         view.addDependencyKey(page.getItem().getKey());
 
@@ -312,6 +309,21 @@ public class CrafterPageViewResolver extends ApplicationObjectSupport implements
             }
 
         }, baseUrl, locale, PAGE_CONST_KEY_ELEM);
+    }
+
+    protected void setScripts(SiteItem page, CrafterPageView view) {
+        List<String> scriptUrls = page.getItem().queryDescriptorValues(scriptXPathQuery);
+        if (CollectionUtils.isNotEmpty(scriptUrls)) {
+            List<Script> scripts = new ArrayList<Script>(scriptUrls.size());
+
+            for (String scriptUrl : scriptUrls) {
+                Script script = scriptFactory.getScript(scriptUrl);
+                scripts.add(script);
+                view.addDependencyKey(script.getKey());
+            }
+
+            view.setScripts(scripts);
+        }
     }
 
 }
