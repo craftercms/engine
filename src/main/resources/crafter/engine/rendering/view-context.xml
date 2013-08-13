@@ -12,7 +12,8 @@
     <bean id="crafter.mainViewResolver" class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
         <property name="order" value="0" />
         <property name="favorPathExtension" value="true" />
-        <property name="ignoreAcceptHeader" value="false" />
+        <!-- We ignore accept header since most of the time views that can't be resolved will be resolved as application/xml -->
+        <property name="ignoreAcceptHeader" value="true" />
         <property name="defaultContentType" value="text/html" />
         <property name="mediaTypes">
             <map>
