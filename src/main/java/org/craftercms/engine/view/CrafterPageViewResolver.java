@@ -37,6 +37,7 @@ import org.craftercms.engine.util.LocaleUtils;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.support.ApplicationObjectSupport;
 import org.springframework.core.Ordered;
+import org.springframework.web.context.support.WebApplicationObjectSupport;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.view.RedirectView;
@@ -53,7 +54,7 @@ import java.util.Locale;
  *
  * @author Alfonso Vasquez
  */
-public class CrafterPageViewResolver extends ApplicationObjectSupport implements ViewResolver, Ordered {
+public class CrafterPageViewResolver extends WebApplicationObjectSupport implements ViewResolver, Ordered {
 
     private static final String PAGE_CONST_KEY_ELEM = "page";
 
@@ -287,6 +288,7 @@ public class CrafterPageViewResolver extends ApplicationObjectSupport implements
                         return getRedirectView(redirectUrl);
                     } else {
                         UserAgentAwareCrafterPageView view = new UserAgentAwareCrafterPageView();
+                        view.setServletContext(getServletContext());
                         view.setPage(page);
                         view.setLocale(locale);
                         view.setSiteItemService(siteItemService);
