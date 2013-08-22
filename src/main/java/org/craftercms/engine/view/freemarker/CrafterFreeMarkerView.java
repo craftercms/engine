@@ -16,14 +16,11 @@
  */
 package org.craftercms.engine.view.freemarker;
 
-import freemarker.ext.servlet.FreemarkerServlet;
 import freemarker.ext.servlet.HttpRequestHashModel;
 import freemarker.ext.servlet.HttpRequestParametersHashModel;
 import freemarker.ext.servlet.HttpSessionHashModel;
 import freemarker.template.SimpleHash;
 import freemarker.template.TemplateHashModel;
-import freemarker.template.TemplateModel;
-import freemarker.template.TemplateModelException;
 import org.apache.commons.lang.ArrayUtils;
 import org.craftercms.engine.freemarker.RenderComponentDirective;
 import org.craftercms.engine.freemarker.ServletContextHashModel;
@@ -47,7 +44,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Extends {@link org.springframework.web.servlet.view.freemarker.FreeMarkerView} to add {@link org.craftercms.engine.freemarker.RenderComponentDirective}s to support page component rendering in Freemarker templates
+ * Extends {@link FreeMarkerView} to add {@link RenderComponentDirective}s to support page component rendering in Freemarker templates
  * and provide the Spring application context as part of the Freemarker model.
  *
  * @author Alfonso Vásquez
@@ -56,6 +53,14 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
 
     public static final String RENDER_COMPONENT_DIRECTIVE_NAME = "renderComponent";
 
+    public static final String KEY_APPLICATION_CAP = "Application";
+    public static final String KEY_APPLICATION = "application";
+    public static final String KEY_SESSION_CAP = "Session";
+    public static final String KEY_SESSION = "session";
+    public static final String KEY_REQUEST_CAP = "Request";
+    public static final String KEY_REQUEST = "request";
+    public static final String KEY_REQUEST_PARAMS_CAP = "RequestParameters";
+    public static final String KEY_REQUEST_PARAMS = "requestParameters";
     public static final String KEY_APP_CONTEXT_CAP = "ApplicationContext";
     public static final String KEY_APP_CONTEXT = "applicationContext";
     public static final String KEY_COOKIES_CAP = "Cookies";
@@ -120,8 +125,8 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     }
 
     /**
-     * Instead of returning the same bean from the application context, a {@link org.springframework.web.servlet.view.freemarker.FreeMarkerConfig} is returned for the current
-     * {@link org.craftercms.engine.service.context.SiteContext}.
+     * Instead of returning the same bean from the application context, a {@link FreeMarkerConfig} is returned for the current
+     * {@link SiteContext}.
      */
     @Override
     protected FreeMarkerConfig autodetectConfiguration() throws BeansException {
@@ -134,24 +139,33 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     protected SimpleHash buildTemplateModel(final Map<String, Object> model, final HttpServletRequest request,
                                             final HttpServletResponse response) {
     	RequestContext context = RequestContext.getCurrent();
-
         AllHttpScopesAndAppContextHashModel templateModel = new AllHttpScopesAndAppContextHashModel(getObjectWrapper(),
                 getApplicationContext(), getServletContext(), request);
+        HttpSessionHashModel sessionModel = createSessionModel(request, response);
+        HttpRequestHashModel requestModel = new HttpRequestHashModel(request, response, getObjectWrapper());
+        HttpRequestParametersHashModel requestParamsModel = new HttpRequestParametersHashModel(request);
 
-        templateModel.put(FreemarkerServlet.KEY_APPLICATION, servletContextHashModel);
-        templateModel.put(FreemarkerServlet.KEY_SESSION, createSessionModel(request, response));
-        templateModel.put(FreemarkerServlet.KEY_REQUEST, new HttpRequestHashModel(request, response, getObjectWrapper()));
-        templateModel.put(FreemarkerServlet.KEY_REQUEST_PARAMETERS, new HttpRequestParametersHashModel(request));
+        templateModel.put(KEY_APPLICATION_CAP, servletContextHashModel);
+        templateModel.put(KEY_APPLICATION, servletContextHashModel);
+        templateModel.put(KEY_SESSION_CAP, sessionModel);
+        templateModel.put(KEY_SESSION, sessionModel);
+        templateModel.put(KEY_REQUEST_CAP, requestModel);
+        templateModel.put(KEY_REQUEST, requestModel);
+        templateModel.put(KEY_REQUEST_PARAMS_CAP, requestParamsModel);
+        templateModel.put(KEY_REQUEST_PARAMS, requestParamsModel);
         templateModel.put(KEY_APP_CONTEXT_CAP, applicationContextAccessor);
         templateModel.put(KEY_APP_CONTEXT, applicationContextAccessor);
         templateModel.put(KEY_COOKIES_CAP, createCookieMap(request));
         templateModel.put(KEY_COOKIES, createCookieMap(request));
-        if (context != null && context.getAuthenticationToken() != null && context.getAuthenticationToken().getProfile() != null) {
-            templateModel.put(KEY_PROFILE_CAP, context.getAuthenticationToken().getProfile());
-            templateModel.put(KEY_PROFILE, context.getAuthenticationToken().getProfile());
+        if (context != null) {
+            templateModel.put(KEY_CE_CONTEXT_CAP, context);
+            templateModel.put(KEY_CE_CONTEXT, context);
+
+            if (context.getAuthenticationToken() != null && context.getAuthenticationToken().getProfile() != null) {
+                templateModel.put(KEY_PROFILE_CAP, context.getAuthenticationToken().getProfile());
+                templateModel.put(KEY_PROFILE, context.getAuthenticationToken().getProfile());
+            }
         }
-        templateModel.put(KEY_CE_CONTEXT_CAP, context);
-        templateModel.put(KEY_CE_CONTEXT, context);
 
         templateModel.putAll(model);
 

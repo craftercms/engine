@@ -95,7 +95,7 @@ public class SiteItem {
         }
     }
 
-    public String getValue(String xPathQuery) {
+    public String queryValue(String xPathQuery) {
         if (getDom() != null) {
             return XmlUtils.selectSingleNodeValue(getDom().getRootElement(), xPathQuery);
         } else {
@@ -103,9 +103,25 @@ public class SiteItem {
         }
     }
 
-    public List<String> getValues(String xPathQuery) {
+    public List<String> queryValues(String xPathQuery) {
         if (getDom() != null) {
             return XmlUtils.selectNodeValues(getDom().getRootElement(), xPathQuery);
+        } else {
+            return null;
+        }
+    }
+
+    public String queryValue(String xPathQuery, Map<String, String> namespaceUris) {
+        if (getDom() != null) {
+            return XmlUtils.selectSingleNodeValue(getDom().getRootElement(), xPathQuery, namespaceUris);
+        } else {
+            return null;
+        }
+    }
+
+    public List<String> queryValues(String xPathQuery, Map<String, String> namespaceUris) {
+        if (getDom() != null) {
+            return XmlUtils.selectNodeValues(getDom().getRootElement(), xPathQuery, namespaceUris);
         } else {
             return null;
         }
