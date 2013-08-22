@@ -38,6 +38,8 @@
     -->
     <context:annotation-config/>
 
+    <bean id="crafter.applicationContextAccessor" class="org.craftercms.engine.util.spring.ApplicationContextAccessor" />
+
     <!-- ////////////////////////////////// -->
     <!--								 	-->
     <!--			 Filters				-->

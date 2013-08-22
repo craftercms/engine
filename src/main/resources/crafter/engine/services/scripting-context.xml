@@ -16,6 +16,7 @@
         <entry key="siteItemService" value-ref="crafter.siteItemService" />
         <entry key="urlTransformationService" value-ref="crafter.urlTransformationService" />
         <entry key="searchService" value-ref="crafter.searchService" />
+        <entry key="applicationContext" value-ref="crafter.applicationContextAccessor" />
     </util:map>
 
 </beans>

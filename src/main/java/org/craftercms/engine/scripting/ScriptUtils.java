@@ -17,6 +17,7 @@
 package org.craftercms.engine.scripting;
 
 import org.craftercms.core.util.HttpServletUtils;
+import org.craftercms.security.api.RequestContext;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -31,9 +32,8 @@ import java.util.Map;
  */
 public class ScriptUtils {
 
-    public static Map<String, Object> createServletVariables(HttpServletRequest request, HttpServletResponse response,
-                                                             ServletContext context) {
-        Map<String, Object> variables = new HashMap<String, Object>();
+    public static void addServletVariables(Map<String, Object> variables, HttpServletRequest request, HttpServletResponse response,
+                                           ServletContext context) {
         variables.put("requestUrl", request.getRequestURI());
         variables.put("application", context);
         variables.put("request", request);
@@ -43,8 +43,18 @@ public class ScriptUtils {
         variables.put("cookies", HttpServletUtils.createCookiesMap(request));
         variables.put("session", request.getSession(false));
         variables.put("sessionAttributes", HttpServletUtils.createSessionMap(request));
+    }
 
-        return variables;
+    public static void addCrafterVariables(Map<String, Object> variables) {
+        RequestContext context = RequestContext.getCurrent();
+
+        if (context != null) {
+            variables.put("crafterEngineRequestContext", context);
+
+            if (context.getAuthenticationToken() != null && context.getAuthenticationToken().getProfile() != null) {
+                variables.put("profile", context.getAuthenticationToken().getProfile());
+            }
+        }
     }
 
 }

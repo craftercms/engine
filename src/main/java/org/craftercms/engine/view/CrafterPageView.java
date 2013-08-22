@@ -247,7 +247,10 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject 
 
     protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response,
                                                         Map<String, Object> model) {
-        Map<String, Object> scriptVariables = ScriptUtils.createServletVariables(request, response, getServletContext());
+        Map<String, Object> scriptVariables = new HashMap<String, Object>();
+        ScriptUtils.addServletVariables(scriptVariables, request, response, getServletContext());
+        ScriptUtils.addCrafterVariables(scriptVariables);
+
         scriptVariables.put("crafterModel", page);
         scriptVariables.put("model", model);
 

@@ -36,6 +36,7 @@ import org.springframework.web.servlet.mvc.AbstractController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -106,7 +107,10 @@ public class RestScriptsController extends AbstractController {
     }
 
     protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response) {
-        Map<String, Object> scriptVariables = ScriptUtils.createServletVariables(request, response, getServletContext());
+        Map<String, Object> scriptVariables = new HashMap<String, Object>();
+        ScriptUtils.addServletVariables(scriptVariables, request, response, getServletContext());
+        ScriptUtils.addCrafterVariables(scriptVariables);
+
         scriptVariables.put("logger", logger);
 
         return scriptVariables;

@@ -16,18 +16,28 @@
  */
 package org.craftercms.engine.util.spring;
 
+import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 /**
  * Bean that provide simple access to the Spring application context's beans. Used for example to access Spring beans from an FTL.
  *
  * @author Alfonso Vásquez
  */
-public class ApplicationContextAccessor {
+public class ApplicationContextAccessor implements ApplicationContextAware {
 
     private ApplicationContext applicationContext;
 
+    public ApplicationContextAccessor() {
+    }
+
     public ApplicationContextAccessor(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
 
