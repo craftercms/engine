@@ -17,6 +17,7 @@
                 <entry key="storeUrlToFullRenderUrl" value-ref="crafter.storeUrlToFullRenderUrlTransformer" />
                 <entry key="toWebAppRelativeUrl" value-ref="crafter.addContextPathUrlTransformer"/>
                 <entry key="toServletRelativeUrl" value-ref="crafter.toServletRelativeUrlTransfomerPipeline"/>
+                <entry key="toFullUrl" value-ref="crafter.toFullUrlTransformerPipeline"/>
             </map>
         </property>
     </bean>
@@ -88,6 +89,16 @@
             <list>
                 <ref bean="crafter.addServletPathUrlTransformer"/>
                 <ref bean="crafter.addContextPathUrlTransformer"/>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="crafter.toFullUrlTransformerPipeline" class="org.craftercms.core.url.impl.UrlTransformerPipeline">
+        <constructor-arg>
+            <list>
+                <ref bean="crafter.addServletPathUrlTransformer"/>
+                <ref bean="crafter.addContextPathUrlTransformer"/>
+                <ref bean="crafter.addSchemeAndDomainAndServerPortUrlTransformer"/>
             </list>
         </constructor-arg>
     </bean>
