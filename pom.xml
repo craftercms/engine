@@ -19,9 +19,9 @@
 	</organization>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<crafter.search>2.2.3-SNAPSHOT</crafter.search>
-		<crafter.core>2.2.3-SNAPSHOT</crafter.core>
-        <crafter.profile>2.2.3-SNAPSHOT</crafter.profile>
+		<crafter.search>2.2.3</crafter.search>
+		<crafter.core>2.2.3</crafter.core>
+        <crafter.profile>2.2.3</crafter.profile>
 	</properties>
 	<licenses>
 		<license>
