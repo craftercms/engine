@@ -16,6 +16,7 @@
  */
 package org.craftercms.engine.view.freemarker;
 
+import freemarker.ext.beans.BeansWrapper;
 import freemarker.ext.servlet.HttpRequestHashModel;
 import freemarker.ext.servlet.HttpRequestParametersHashModel;
 import freemarker.ext.servlet.HttpSessionHashModel;
@@ -69,6 +70,8 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     public static final String KEY_PROFILE = "profile";
     public static final String KEY_CE_CONTEXT_CAP = "CrafterEngineRequestContext";
     public static final String KEY_CE_CONTEXT = "crafterEngineRequestContext";
+    public static final String KEY_STATICS = "statics";
+    public static final String KEY_ENUMS = "enums";
     
     protected SiteItemService siteItemService;
     protected String componentTemplateXPathQuery;
@@ -166,6 +169,9 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
                 templateModel.put(KEY_PROFILE, context.getAuthenticationToken().getProfile());
             }
         }
+
+        templateModel.put(KEY_STATICS, BeansWrapper.getDefaultInstance().getStaticModels());
+        templateModel.put(KEY_ENUMS, BeansWrapper.getDefaultInstance().getEnumModels());
 
         templateModel.putAll(model);
 

@@ -23,7 +23,7 @@ import java.util.Map;
 
 /**
  * Simple interface for scripts in some non-Java language (Groovy, Jython, Javascript, etc) that can be retrieved from the Crafter
- * content stored and executed inside the JVM.
+ * content store and executed inside the JVM.
  *
  * @author Alfonso Vásquez
  */
