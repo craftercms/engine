@@ -137,7 +137,7 @@ public class Jsr233CompiledScriptFactory implements ScriptFactory {
                 try {
                     compiledScript = scriptEngine.compile(scriptReader);
                 } catch (Exception e) {
-                    throw new ScriptException("Error while compiling script at " + getScriptLocation());
+                    throw new ScriptException("Error while compiling script at " + getScriptLocation(), e);
                 }
 
                 if (logger.isDebugEnabled()) {

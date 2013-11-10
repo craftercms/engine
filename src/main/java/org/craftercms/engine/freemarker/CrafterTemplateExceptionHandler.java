@@ -28,7 +28,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 
 /**
- * {@link freemarker.template.TemplateExceptionHandler} that instead of printing the errors directly in the HTML and stopping template processing, stores
+ * {@link TemplateExceptionHandler} that instead of printing the errors directly in the HTML and stopping template processing, stores
  * them in a model variable so they can be displayed later.
  *
  * @author Alfonso Vásquez
