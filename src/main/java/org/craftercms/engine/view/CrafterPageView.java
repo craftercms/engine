@@ -219,9 +219,9 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject 
             response.setContentType(MediaType.parseMediaType(mimeType).toString());
         }
 
-        if (CollectionUtils.isNotEmpty(scripts)) {
-            Map<String, Object> scriptVariables = createScriptVariables(request, response, model);
+        Map<String, Object> scriptVariables = createScriptVariables(request, response, model);
 
+        if (CollectionUtils.isNotEmpty(scripts)) {
             for (Script script : scripts) {
                 executeScript(script, scriptVariables);
             }
@@ -248,11 +248,9 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject 
     protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response,
                                                         Map<String, Object> model) {
         Map<String, Object> scriptVariables = new HashMap<String, Object>();
-        ScriptUtils.addServletVariables(scriptVariables, request, response, getServletContext());
-        ScriptUtils.addCrafterVariables(scriptVariables);
-
-        scriptVariables.put("crafterModel", page);
-        scriptVariables.put("model", model);
+        ScriptUtils.addCommonVariables(scriptVariables, request, response, getServletContext());
+        ScriptUtils.addCrafterVariables(scriptVariables, page);
+        ScriptUtils.addModelVariable(scriptVariables, model);
 
         return scriptVariables;
     }

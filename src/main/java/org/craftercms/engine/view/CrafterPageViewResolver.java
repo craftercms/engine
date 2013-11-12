@@ -35,7 +35,6 @@ import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;
 import org.craftercms.engine.util.LocaleUtils;
 import org.springframework.beans.factory.annotation.Required;
-import org.springframework.context.support.ApplicationObjectSupport;
 import org.springframework.core.Ordered;
 import org.springframework.web.context.support.WebApplicationObjectSupport;
 import org.springframework.web.servlet.View;
@@ -298,7 +297,7 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
                         view.setDelegatedViewResolver(delegatedViewResolver);
                         view.setUserAgentTemplateDetector(userAgentTemplateDetector);
 
-                        setScripts(page, view);
+                        loadScripts(page, view);
 
                         view.addDependencyKey(page.getItem().getKey());
 
@@ -313,7 +312,7 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
         }, baseUrl, locale, PAGE_CONST_KEY_ELEM);
     }
 
-    protected void setScripts(SiteItem page, CrafterPageView view) {
+    protected void loadScripts(SiteItem page, CrafterPageView view) {
         List<String> scriptUrls = page.getItem().queryDescriptorValues(scriptXPathQuery);
         if (CollectionUtils.isNotEmpty(scriptUrls)) {
             List<Script> scripts = new ArrayList<Script>(scriptUrls.size());

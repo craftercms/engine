@@ -16,13 +16,15 @@
  */
 package org.craftercms.engine.scripting;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.craftercms.core.util.HttpServletUtils;
+import org.craftercms.engine.model.SiteItem;
 import org.craftercms.security.api.RequestContext;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -32,29 +34,56 @@ import java.util.Map;
  */
 public class ScriptUtils {
 
-    public static void addServletVariables(Map<String, Object> variables, HttpServletRequest request, HttpServletResponse response,
-                                           ServletContext context) {
-        variables.put("requestUrl", request.getRequestURI());
-        variables.put("application", context);
-        variables.put("request", request);
-        variables.put("response", response);
-        variables.put("params", HttpServletUtils.createRequestParamsMap(request));
-        variables.put("headers", HttpServletUtils.createHeadersMap(request));
-        variables.put("cookies", HttpServletUtils.createCookiesMap(request));
-        variables.put("session", request.getSession(false));
-        variables.put("sessionAttributes", HttpServletUtils.createSessionMap(request));
+    private static final Log logger = LogFactory.getLog(ScriptUtils.class);
+
+    public static final String VARIABLE_REQUEST_URL =               "requestUrl";
+    public static final String VARIABLE_APPLICATION =               "application";
+    public static final String VARIABLE_REQUEST =                   "request";
+    public static final String VARIABLE_RESPONSE =                  "response";
+    public static final String VARIABLE_PARAMS =                    "params";
+    public static final String VARIABLE_HEADERS =                   "headers";
+    public static final String VARIABLE_COOKIES =                   "cookies";
+    public static final String VARIABLE_SESSION =                   "session";
+    public static final String VARIABLE_SESSION_ATTRS =             "sessionAttributes";
+    public static final String VARIABLE_LOGGER =                    "logger";
+    public static final String VARIABLE_MODEL =                     "model";
+    public static final String VARIABLE_CRAFTER_MODEL =             "crafterModel";
+    public static final String VARIABLE_CRAFTER_REQUEST_CONTEXT =   "crafterRequestContext";
+    public static final String VARIABLE_PROFILE =                   "profile";
+
+    public static void addCommonVariables(Map<String, Object> variables, HttpServletRequest request, HttpServletResponse response,
+                                          ServletContext context) {
+        variables.put(VARIABLE_REQUEST_URL, request.getRequestURI());
+        variables.put(VARIABLE_APPLICATION, context);
+        variables.put(VARIABLE_REQUEST, request);
+        variables.put(VARIABLE_RESPONSE, response);
+        variables.put(VARIABLE_PARAMS, HttpServletUtils.createRequestParamsMap(request));
+        variables.put(VARIABLE_HEADERS, HttpServletUtils.createHeadersMap(request));
+        variables.put(VARIABLE_COOKIES, HttpServletUtils.createCookiesMap(request));
+        variables.put(VARIABLE_SESSION, request.getSession(false));
+        variables.put(VARIABLE_SESSION_ATTRS, HttpServletUtils.createSessionMap(request));
+        variables.put(VARIABLE_LOGGER, logger);
+    }
+
+    public static void addModelVariable(Map<String, Object> variables, Object model) {
+        variables.put(VARIABLE_MODEL, model);
     }
 
     public static void addCrafterVariables(Map<String, Object> variables) {
         RequestContext context = RequestContext.getCurrent();
-
         if (context != null) {
-            variables.put("crafterEngineRequestContext", context);
+            variables.put(VARIABLE_CRAFTER_REQUEST_CONTEXT, context);
 
             if (context.getAuthenticationToken() != null && context.getAuthenticationToken().getProfile() != null) {
-                variables.put("profile", context.getAuthenticationToken().getProfile());
+                variables.put(VARIABLE_PROFILE, context.getAuthenticationToken().getProfile());
             }
         }
+    }
+
+    public static void addCrafterVariables(Map<String, Object> variables, SiteItem crafterModel) {
+        variables.put(VARIABLE_CRAFTER_MODEL, crafterModel);
+
+        addCrafterVariables(variables);
     }
 
 }

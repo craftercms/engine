@@ -16,6 +16,7 @@
  */
 package org.craftercms.engine.view.freemarker;
 
+import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.SiteItemService;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.servlet.view.AbstractUrlBasedView;
@@ -29,14 +30,21 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 public class CrafterFreeMarkerViewResolver extends FreeMarkerViewResolver {
 
     protected SiteItemService siteItemService;
+    protected ScriptFactory scriptFactory;
     protected String componentTemplateXPathQuery;
     protected String componentIncludeElementName;
     protected String pageModelAttributeName;
     protected String componentModelAttributeName;
+    protected String componentScriptsXPathQuery;
 
     @Required
     public void setSiteItemService(SiteItemService siteItemService) {
         this.siteItemService = siteItemService;
+    }
+
+    @Required
+    public void setScriptFactory(ScriptFactory scriptFactory) {
+        this.scriptFactory = scriptFactory;
     }
 
     @Required
@@ -59,6 +67,11 @@ public class CrafterFreeMarkerViewResolver extends FreeMarkerViewResolver {
         this.componentModelAttributeName = componentModelAttributeName;
     }
 
+    @Required
+    public void setComponentScriptsXPathQuery(String componentScriptsXPathQuery) {
+        this.componentScriptsXPathQuery = componentScriptsXPathQuery;
+    }
+
     @Override
     protected Class requiredViewClass() {
         return CrafterFreeMarkerView.class;
@@ -68,12 +81,14 @@ public class CrafterFreeMarkerViewResolver extends FreeMarkerViewResolver {
     protected AbstractUrlBasedView buildView(String viewName) throws Exception {
         CrafterFreeMarkerView view = (CrafterFreeMarkerView) super.buildView(viewName);
         view.setSiteItemService(siteItemService);
+        view.setScriptFactory(scriptFactory);
         view.setComponentTemplateXPathQuery(componentTemplateXPathQuery);
         view.setComponentTemplateNamePrefix(getPrefix());
         view.setComponentTemplateNameSuffix(getSuffix());
         view.setComponentIncludeElementName(componentIncludeElementName);
         view.setPageModelAttributeName(pageModelAttributeName);
         view.setComponentModelAttributeName(componentModelAttributeName);
+        view.setComponentScriptsXPathQuery(componentScriptsXPathQuery);
 
         return view;
     }
