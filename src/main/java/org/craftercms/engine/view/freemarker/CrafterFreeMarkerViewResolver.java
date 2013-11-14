@@ -33,8 +33,6 @@ public class CrafterFreeMarkerViewResolver extends FreeMarkerViewResolver {
     protected ScriptFactory scriptFactory;
     protected String componentTemplateXPathQuery;
     protected String componentIncludeElementName;
-    protected String pageModelAttributeName;
-    protected String componentModelAttributeName;
     protected String componentScriptsXPathQuery;
 
     @Required
@@ -58,16 +56,6 @@ public class CrafterFreeMarkerViewResolver extends FreeMarkerViewResolver {
     }
 
     @Required
-    public void setPageModelAttributeName(String pageModelAttributeName) {
-        this.pageModelAttributeName = pageModelAttributeName;
-    }
-
-    @Required
-    public void setComponentModelAttributeName(String componentModelAttributeName) {
-        this.componentModelAttributeName = componentModelAttributeName;
-    }
-
-    @Required
     public void setComponentScriptsXPathQuery(String componentScriptsXPathQuery) {
         this.componentScriptsXPathQuery = componentScriptsXPathQuery;
     }
@@ -86,8 +74,6 @@ public class CrafterFreeMarkerViewResolver extends FreeMarkerViewResolver {
         view.setComponentTemplateNamePrefix(getPrefix());
         view.setComponentTemplateNameSuffix(getSuffix());
         view.setComponentIncludeElementName(componentIncludeElementName);
-        view.setPageModelAttributeName(pageModelAttributeName);
-        view.setComponentModelAttributeName(componentModelAttributeName);
         view.setComponentScriptsXPathQuery(componentScriptsXPathQuery);
 
         return view;

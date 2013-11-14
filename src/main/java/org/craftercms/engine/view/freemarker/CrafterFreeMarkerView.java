@@ -84,8 +84,6 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     protected String componentTemplateNamePrefix;
     protected String componentTemplateNameSuffix;
     protected String componentIncludeElementName;
-    protected String pageModelAttributeName;
-    protected String componentModelAttributeName;
     protected String componentScriptsXPathQuery;
 
     protected ServletContextHashModel servletContextHashModel;
@@ -127,16 +125,6 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     @Required
     public void setComponentIncludeElementName(String componentIncludeElementName) {
         this.componentIncludeElementName = componentIncludeElementName;
-    }
-
-    @Required
-    public void setPageModelAttributeName(String pageModelAttributeName) {
-        this.pageModelAttributeName = pageModelAttributeName;
-    }
-
-    @Required
-    public void setComponentModelAttributeName(String componentModelAttributeName) {
-        this.componentModelAttributeName = componentModelAttributeName;
     }
 
     @Required
@@ -208,8 +196,6 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
         renderComponentDirective.setTemplateNamePrefix(componentTemplateNamePrefix);
         renderComponentDirective.setTemplateNameSuffix(componentTemplateNameSuffix);
         renderComponentDirective.setComponentIncludeElementName(componentIncludeElementName);
-        renderComponentDirective.setPageModelAttributeName(pageModelAttributeName);
-        renderComponentDirective.setComponentModelAttributeName(componentModelAttributeName);
         renderComponentDirective.setComponentScriptsXPathQuery(componentScriptsXPathQuery);
         renderComponentDirective.setServletContext(getServletContext());
 

@@ -74,12 +74,11 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     protected String redirectContentType;
     protected String disabledXPathQuery;
     protected String mimeTypeXPathQuery;
-    protected String scriptXPathQuery;
-    protected String pageModelAttributeName;
+    protected String scriptsXPathQuery;
     protected ViewResolver delegatedViewResolver;
     protected boolean localizeViews;
     protected UserAgentTemplateDetector userAgentTemplateDetector;
-    protected boolean modeIsPreview;
+    protected boolean modePreview;
     protected CrafterPageAccessManager accessManager;
     protected ScriptFactory scriptFactory;
 
@@ -100,8 +99,8 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     }
 
     @Required
-    public void setModeIsPreview(boolean modeIsPreview) {
-        this.modeIsPreview = modeIsPreview;
+    public void setModePreview(boolean modePreview) {
+        this.modePreview = modePreview;
     }
 
     public void setCacheUrlTransformations(boolean cacheUrlTransformations) {
@@ -173,12 +172,7 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
 
     @Required
     public void setScriptsXPathQuery(String scriptXPathQuery) {
-        this.scriptXPathQuery = scriptXPathQuery;
-    }
-
-    @Required
-    public void setPageModelAttributeName(String pageModelAttributeName) {
-        this.pageModelAttributeName = pageModelAttributeName;
+        this.scriptsXPathQuery = scriptXPathQuery;
     }
 
     @Required
@@ -272,7 +266,7 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
 
                 if (page != null) {
                     String disabled = page.getItem().queryDescriptorValue(disabledXPathQuery);
-                    if (!modeIsPreview && StringUtils.isNotEmpty(disabled) && Boolean.parseBoolean(disabled)) {
+                    if (!modePreview && StringUtils.isNotEmpty(disabled) && Boolean.parseBoolean(disabled)) {
                         // when a page is disabled it acts as if it does not exist this rule does not apply in preview because
                         // we want authors to see the page
                         return null;
@@ -289,11 +283,11 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
                         UserAgentAwareCrafterPageView view = new UserAgentAwareCrafterPageView();
                         view.setServletContext(getServletContext());
                         view.setPage(page);
+                        view.setModePreview(modePreview);
                         view.setLocale(locale);
                         view.setSiteItemService(siteItemService);
                         view.setPageViewNameXPathQuery(pageViewNameXPathQuery);
                         view.setMimeTypeXPathQuery(mimeTypeXPathQuery);
-                        view.setPageModelAttributeName(pageModelAttributeName);
                         view.setDelegatedViewResolver(delegatedViewResolver);
                         view.setUserAgentTemplateDetector(userAgentTemplateDetector);
 
@@ -313,7 +307,7 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     }
 
     protected void loadScripts(SiteItem page, CrafterPageView view) {
-        List<String> scriptUrls = page.getItem().queryDescriptorValues(scriptXPathQuery);
+        List<String> scriptUrls = page.getItem().queryDescriptorValues(scriptsXPathQuery);
         if (CollectionUtils.isNotEmpty(scriptUrls)) {
             List<Script> scripts = new ArrayList<Script>(scriptUrls.size());
 

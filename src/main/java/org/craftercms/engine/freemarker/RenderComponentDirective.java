@@ -30,6 +30,7 @@ import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.scripting.ScriptUtils;
 import org.craftercms.engine.service.SiteItemService;
+import org.craftercms.engine.view.CrafterPageView;
 import org.craftercms.security.api.RequestContext;
 import org.dom4j.Element;
 import org.dom4j.Node;
@@ -54,6 +55,8 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
 
     private static final Log logger = LogFactory.getLog(RenderComponentDirective.class);
 
+    public static final String KEY_COMPONENT_MODEL = "model";
+
     public static final String COMPONENT_PARAM_NAME = "component";
     public static final String COMPONENT_PATH_PARAM_NAME = "componentPath";
 
@@ -65,8 +68,6 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
     protected String templateNamePrefix;
     protected String templateNameSuffix;
     protected String componentIncludeElementName;
-    protected String pageModelAttributeName;
-    protected String componentModelAttributeName;
     protected String componentScriptsXPathQuery;
 
     @Required
@@ -107,16 +108,6 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
     @Required
     public void setComponentIncludeElementName(String componentIncludeElementName) {
         this.componentIncludeElementName = componentIncludeElementName;
-    }
-
-    @Required
-    public void setPageModelAttributeName(String pageModelAttributeName) {
-        this.pageModelAttributeName = pageModelAttributeName;
-    }
-
-    @Required
-    public void setComponentModelAttributeName(String componentModelAttributeName) {
-        this.componentModelAttributeName = componentModelAttributeName;
     }
 
     @Required
@@ -169,7 +160,7 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
     }
 
     protected SiteItem getComponent(String componentPath, Environment env) throws TemplateException {
-        SiteItem currentPage = (SiteItem) DeepUnwrap.unwrap(env.getVariable(pageModelAttributeName));
+        SiteItem currentPage = (SiteItem) DeepUnwrap.unwrap(env.getVariable(CrafterPageView.KEY_PAGE_MODEL));
         if (currentPage != null) {
             try {
                 componentPath = UrlUtils.resolveRelative(currentPage.getStoreUrl(), componentPath);
@@ -259,7 +250,7 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
 
     protected SimpleHash getComponentModel(SiteItem component, Map<String, Object> scriptsModel) throws TemplateException {
         SimpleHash componentModel = modelFactory.getObject();
-        componentModel.put(componentModelAttributeName, component);
+        componentModel.put(KEY_COMPONENT_MODEL, component);
         if (MapUtils.isNotEmpty(scriptsModel)) {
             componentModel.putAll(scriptsModel);
         }

@@ -13,8 +13,15 @@
             <#assign navigable = false>
         </#if>
 
-        <#if navItem.folder && !(navItem.getChildItem("index.xml")??)>
-            <#assign navigable = false>
+        <#if navItem.folder>
+            <#assign indexItem = navItem.getChildItem("index.xml")!>
+            <#if indexItem != "">
+                <#if indexItem.disabled?? && indexItem.disabled?lower_case == "true">
+                    <#assign navigable = false>
+                </#if>
+            <#else>
+                <#assign navigable = false>
+            </#if>
         </#if>
 
         <#if navigable>
