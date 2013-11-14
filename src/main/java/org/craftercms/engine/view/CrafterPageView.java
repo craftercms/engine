@@ -41,17 +41,20 @@ import java.util.*;
  */
 public class CrafterPageView extends AbstractView implements CachingAwareObject {
 
+    public static final String KEY_PAGE_MODEL = "model";
+    public static final String KEY_MODE_PREVIEW = "modePreview";
+
     protected transient String scope;
     protected transient Object key;
     protected transient List<Object> dependencyKeys;
     protected transient Long cachingTime;
 
     protected SiteItem page;
+    protected boolean modePreview;
     protected Locale locale;
     protected SiteItemService siteItemService;
     protected String pageViewNameXPathQuery;
     protected String mimeTypeXPathQuery;
-    protected String pageModelAttributeName;
     protected List<Script> scripts;
     protected ViewResolver delegatedViewResolver;
 
@@ -59,32 +62,9 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject 
         return page;
     }
 
-    public Locale getLocale() {
-        return locale;
-    }
-
-    public SiteItemService getSiteItemService() {
-        return siteItemService;
-    }
-
-    public String getPageViewNameXPathQuery() {
-        return pageViewNameXPathQuery;
-    }
-
-    public String getMimeTypeXPathQuery() {
-        return mimeTypeXPathQuery;
-    }
-
-    public String getPageModelAttributeName() {
-        return pageModelAttributeName;
-    }
-
-    public List<Script> getScripts() {
-        return scripts;
-    }
-
-    public ViewResolver getDelegatedViewResolver() {
-        return delegatedViewResolver;
+    @Required
+    public void setPage(SiteItem page) {
+        this.page = page;
     }
 
     @Required
@@ -93,8 +73,8 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject 
     }
 
     @Required
-    public void setPage(SiteItem page) {
-        this.page = page;
+    public void setModePreview(boolean modePreview) {
+        this.modePreview = modePreview;
     }
 
     @Required
@@ -110,11 +90,6 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject 
     @Required
     public void setMimeTypeXPathQuery(String mimeTypeXPathQuery) {
         this.mimeTypeXPathQuery = mimeTypeXPathQuery;
-    }
-
-    @Required
-    public void setPageModelAttributeName(String pageModelAttributeName) {
-        this.pageModelAttributeName = pageModelAttributeName;
     }
 
     @Required
@@ -219,15 +194,16 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject 
             response.setContentType(MediaType.parseMediaType(mimeType).toString());
         }
 
-        if (CollectionUtils.isNotEmpty(scripts)) {
-            Map<String, Object> scriptVariables = createScriptVariables(request, response, model);
+        Map<String, Object> scriptVariables = createScriptVariables(request, response, model);
 
+        if (CollectionUtils.isNotEmpty(scripts)) {
             for (Script script : scripts) {
                 executeScript(script, scriptVariables);
             }
         }
 
-        addPageToModel(model);
+        model.put(KEY_PAGE_MODEL, page);
+        model.put(KEY_MODE_PREVIEW, modePreview);
 
         renderActualView(getPageViewName(), model, request, response);
     }
@@ -248,19 +224,11 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject 
     protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response,
                                                         Map<String, Object> model) {
         Map<String, Object> scriptVariables = new HashMap<String, Object>();
-        ScriptUtils.addServletVariables(scriptVariables, request, response, getServletContext());
-        ScriptUtils.addCrafterVariables(scriptVariables);
-
-        scriptVariables.put("crafterModel", page);
-        scriptVariables.put("model", model);
+        ScriptUtils.addCommonVariables(scriptVariables, request, response, getServletContext());
+        ScriptUtils.addCrafterVariables(scriptVariables, page);
+        ScriptUtils.addModelVariable(scriptVariables, model);
 
         return scriptVariables;
-    }
-
-    protected void addPageToModel(Map<String, Object> model) {
-        if (!model.containsKey(pageModelAttributeName)) {
-            model.put(pageModelAttributeName, page);
-        }
     }
 
     protected String getPageViewName() throws RenderingException {

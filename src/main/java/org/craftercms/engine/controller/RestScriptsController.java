@@ -108,10 +108,8 @@ public class RestScriptsController extends AbstractController {
 
     protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> scriptVariables = new HashMap<String, Object>();
-        ScriptUtils.addServletVariables(scriptVariables, request, response, getServletContext());
+        ScriptUtils.addCommonVariables(scriptVariables, request, response, getServletContext());
         ScriptUtils.addCrafterVariables(scriptVariables);
-
-        scriptVariables.put("logger", logger);
 
         return scriptVariables;
     }
