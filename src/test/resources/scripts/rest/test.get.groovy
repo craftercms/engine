@@ -1,3 +1,5 @@
+package scripts.rest
+
 def values = [:]
 
 params.each { name, value -> values[name] = value }

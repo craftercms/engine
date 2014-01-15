@@ -1,3 +1,5 @@
+package scripts.rest
+
 import scripts.shared.Greeting
 
 Greeting greeting = new Greeting();
