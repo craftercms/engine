@@ -116,7 +116,7 @@ public class Jsr233CompiledScriptFactory implements ScriptFactory {
                 } catch (PathNotFoundException e) {
                     throw new ScriptNotFoundException("No script found at " + getScriptLocation() + " in content store", e);
                 } catch (Exception e) {
-                    throw new ScriptException("Unable to retrieve script at " + getScriptLocation() + " in content store", e);
+                    throw new ScriptException("Error while retrieving script at " + getScriptLocation() + " in content store", e);
                 }
 
                 InputStream scriptInput;
