@@ -36,7 +36,7 @@ public class ContentResourceConnector implements ResourceConnector {
         try {
             return new URL(null, spec, urlStreamHandler).openConnection();
         } catch (Exception e) {
-            throw new ResourceException("Error while trying to open URL connection to '" + spec + "'", e);
+            throw new ResourceException("Unable to open URL connection to '" + spec + "'", e);
         }
     }
 
