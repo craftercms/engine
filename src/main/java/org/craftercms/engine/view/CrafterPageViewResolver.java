@@ -309,6 +309,10 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     protected void loadScripts(SiteItem page, CrafterPageView view) {
         List<String> scriptUrls = page.getItem().queryDescriptorValues(scriptsXPathQuery);
         if (CollectionUtils.isNotEmpty(scriptUrls)) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Scripts associated to page " + page.getStoreUrl() + ": " + scriptUrls);
+            }
+
             List<Script> scripts = new ArrayList<Script>(scriptUrls.size());
 
             for (String scriptUrl : scriptUrls) {

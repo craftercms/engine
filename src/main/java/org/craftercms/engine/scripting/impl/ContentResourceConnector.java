@@ -18,6 +18,8 @@ import java.net.URLStreamHandler;
  */
 public class ContentResourceConnector implements ResourceConnector {
 
+    private static final String URL_REGEX = "[^:]+:.+";
+
     protected URLStreamHandler urlStreamHandler;
 
     @Required
@@ -27,16 +29,14 @@ public class ContentResourceConnector implements ResourceConnector {
 
     @Override
     public URLConnection getResourceConnection(String name) throws ResourceException {
-        if (!name.startsWith("/")) {
-            name = "/" + name;
+        if (!name.matches(URL_REGEX)) {
+            name =  ContentUrlStreamHandler.PROTOCOL + ':' + (!name.startsWith("/")? "/" : "") + name;
         }
 
-        String spec = ContentUrlStreamHandler.PROTOCOL + ":" + name;
-
         try {
-            return new URL(null, spec, urlStreamHandler).openConnection();
+            return new URL(null, name, urlStreamHandler).openConnection();
         } catch (Exception e) {
-            throw new ResourceException("Unable to open URL connection to '" + spec + "'", e);
+            throw new ResourceException("Unable to open URL connection to '" + name + "'", e);
         }
     }
 

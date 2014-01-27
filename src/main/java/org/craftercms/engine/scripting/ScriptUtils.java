@@ -44,7 +44,6 @@ public class ScriptUtils {
     public static final String VARIABLE_HEADERS =                   "headers";
     public static final String VARIABLE_COOKIES =                   "cookies";
     public static final String VARIABLE_SESSION =                   "session";
-    public static final String VARIABLE_SESSION_ATTRS =             "sessionAttributes";
     public static final String VARIABLE_LOGGER =                    "logger";
     public static final String VARIABLE_MODEL =                     "model";
     public static final String VARIABLE_CRAFTER_MODEL =             "crafterModel";
@@ -61,7 +60,6 @@ public class ScriptUtils {
         variables.put(VARIABLE_HEADERS, HttpServletUtils.createHeadersMap(request));
         variables.put(VARIABLE_COOKIES, HttpServletUtils.createCookiesMap(request));
         variables.put(VARIABLE_SESSION, request.getSession(false));
-        variables.put(VARIABLE_SESSION_ATTRS, HttpServletUtils.createSessionMap(request));
         variables.put(VARIABLE_LOGGER, logger);
     }
 
@@ -77,6 +75,9 @@ public class ScriptUtils {
             if (context.getAuthenticationToken() != null && context.getAuthenticationToken().getProfile() != null) {
                 variables.put(VARIABLE_PROFILE, context.getAuthenticationToken().getProfile());
             }
+        } else {
+            variables.put(VARIABLE_CRAFTER_REQUEST_CONTEXT, null);
+            variables.put(VARIABLE_PROFILE, null);
         }
     }
 
