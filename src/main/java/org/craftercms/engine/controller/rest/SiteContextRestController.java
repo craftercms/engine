@@ -23,16 +23,13 @@ public class SiteContextRestController {
     public static final String URL_ROOT =       "/site_context";
     public static final String URL_CONTEXT_ID = "/id";
 
-    public static final String MODEL_ATTR_SITE_NAME =   "siteName";
-    public static final String MODEL_ATTR_ID =          "id";
-
+    public static final String MODEL_ATTR_ID =  "id";
 
     @RequestMapping(value = URL_CONTEXT_ID, method = RequestMethod.GET)
     public Map<String, Object> getContextId() {
         SiteContext context = AbstractSiteContextResolvingFilter.getCurrentContext();
         if (context != null) {
-            Map<String, Object> model = new LinkedHashMap<String, Object>(2);
-            model.put(MODEL_ATTR_SITE_NAME, context.getSiteName());
+            Map<String, Object> model = new LinkedHashMap<String, Object>(1);
             model.put(MODEL_ATTR_ID, context.getContext().getId());
 
             return model;
