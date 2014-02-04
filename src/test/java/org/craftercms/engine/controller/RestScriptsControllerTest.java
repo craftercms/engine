@@ -3,6 +3,7 @@ package org.craftercms.engine.controller;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.util.cache.CacheTemplate;
+import org.craftercms.engine.controller.rest.RestScriptsController;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.scripting.impl.Jsr233CompiledScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
@@ -13,7 +14,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.mock.web.MockHttpSession;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.HandlerMapping;
@@ -30,7 +30,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Test for {@link RestScriptsController}
+ * Test for {@link org.craftercms.engine.controller.rest.RestScriptsController}
  *
  * @author Alfonso Vásquez
  */
@@ -65,7 +65,6 @@ public class RestScriptsControllerTest {
         assertEquals("test", responseBody.get("test-param"));
         assertEquals("test", responseBody.get("test-header"));
         assertEquals("test", responseBody.get("test-cookie"));
-        assertEquals("test", responseBody.get("test-attribute"));
 
         removeCurrentRequest();
     }
@@ -144,10 +143,6 @@ public class RestScriptsControllerTest {
 
         Cookie testCookie = new Cookie("test-cookie", "test");
         request.setCookies(testCookie);
-
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("test-attribute", "test");
-        request.setSession(session);
 
         request.setAttribute(AbstractSiteContextResolvingFilter.SITE_CONTEXT_ATTRIBUTE, createSiteContext());
         request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, serviceUrl);

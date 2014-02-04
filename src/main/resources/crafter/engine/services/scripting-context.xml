@@ -6,11 +6,20 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-    <bean id="crafter.scriptFactory" class="org.craftercms.engine.scripting.impl.Jsr233CompiledScriptFactory">
+    <bean id="crafter.groovyResourceConnector" class="org.craftercms.engine.scripting.impl.ContentResourceConnector">
+        <property name="storeService" ref="crafter.contentStoreService" />
+    </bean>
+
+    <bean id="crafter.scriptFactory" class="org.craftercms.engine.scripting.impl.GroovyScriptFactory">
+        <property name="resourceConnector" ref="crafter.groovyResourceConnector" />
+        <property name="globalVariables" ref="crafter.restScriptsVariables" />
+    </bean>
+
+    <!--bean id="crafter.scriptFactory" class="org.craftercms.engine.scripting.impl.Jsr233CompiledScriptFactory">
         <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
         <property name="storeService" ref="crafter.contentStoreService"/>
         <property name="globalVariables" ref="crafter.restScriptsVariables"/>
-    </bean>
+    </bean-->
 
     <util:map id="crafter.restScriptsVariables">
         <entry key="siteItemService" value-ref="crafter.siteItemService" />

@@ -25,7 +25,7 @@
         <property name="urlMap" ref="crafter.urlMappings"/>
     </bean>
 
-    <bean id="crafter.restScriptsController" class="org.craftercms.engine.controller.RestScriptsController">
+    <bean id="crafter.restScriptsController" class="org.craftercms.engine.controller.rest.RestScriptsController">
         <property name="scriptFactory" ref="crafter.scriptFactory"/>
     </bean>
 
@@ -44,6 +44,8 @@
     <bean id="crafter.monitoringRenderController" class="org.craftercms.engine.controller.MonitoringController">
         <property name="statusViewNamePrefix" value="${crafter.engine.monitoring.viewName.prefix}"/>
     </bean>
+
+    <bean id="crafter.siteContextRestController" class="org.craftercms.engine.controller.rest.SiteContextRestController" />
 
     <util:map id="crafter.urlMappings">
         <entry key="/api/1/services/**" value-ref="crafter.restScriptsController"/>
