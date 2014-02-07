@@ -21,6 +21,22 @@
         <property name="globalVariables" ref="crafter.restScriptsVariables"/>
     </bean-->
 
+    <bean id="crafter.pageScriptResolver" class="org.craftercms.engine.scripting.impl.ScriptResolverImpl">
+        <property name="storeService" ref="crafter.contentStoreService"/>
+        <property name="contentTypeXPathQuery" value="${crafter.engine.page.contentType.xpathQuery}"/>
+        <property name="contentTypePattern" value="${crafter.engine.page.contentType.pattern}"/>
+        <property name="scriptUrlFormat" value="${crafter.engine.page.contentType.script.url.format}"/>
+        <property name="scriptsXPathQuery" value="${crafter.engine.scripts.xpathQuery}"/>
+    </bean>
+
+    <bean id="crafter.componentScriptResolver" class="org.craftercms.engine.scripting.impl.ScriptResolverImpl">
+        <property name="storeService" ref="crafter.contentStoreService"/>
+        <property name="contentTypeXPathQuery" value="${crafter.engine.component.contentType.xpathQuery}"/>
+        <property name="contentTypePattern" value="${crafter.engine.component.contentType.pattern}"/>
+        <property name="scriptUrlFormat" value="${crafter.engine.component.contentType.script.url.format}"/>
+        <property name="scriptsXPathQuery" value="${crafter.engine.scripts.xpathQuery}"/>
+    </bean>
+
     <util:map id="crafter.restScriptsVariables">
         <entry key="siteItemService" value-ref="crafter.siteItemService" />
         <entry key="urlTransformationService" value-ref="crafter.urlTransformationService" />

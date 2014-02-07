@@ -14,18 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.craftercms.engine.scripting;
+package org.craftercms.engine.util;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.craftercms.core.service.Item;
+import org.craftercms.core.util.CollectionUtils;
 import org.craftercms.core.util.HttpServletUtils;
+import org.craftercms.core.util.UrlUtils;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.security.api.RequestContext;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Utility methods for scripts.

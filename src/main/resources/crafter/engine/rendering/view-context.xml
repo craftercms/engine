@@ -39,12 +39,12 @@
                     <property name="redirectContentType" value="${crafter.engine.page.redirect.contentType}" />
 					<property name="disabledXPathQuery" value="${crafter.engine.page.disabled.xpathQuery}" />
                     <property name="mimeTypeXPathQuery" value="${crafter.engine.page.mimeType.xpathQuery}" />
-                    <property name="scriptsXPathQuery" value="${crafter.engine.page.scripts.xpathQuery}"/>
 					<property name="modePreview" value="${crafter.engine.preview}" />
                     <property name="delegatedViewResolver" ref="crafter.freeMarkerViewResolver" />
                     <property name="userAgentTemplateDetector" ref="crafter.userAgentTemplateDetector" />
                     <property name="accessManager" ref="crafter.pageAccessManager"/>
                     <property name="scriptFactory" ref="crafter.scriptFactory"/>
+                    <property name="scriptResolver" ref="crafter.pageScriptResolver"/>
                 </bean>
             </list>
         </property>
@@ -63,9 +63,9 @@
         <property name="siteItemService" ref="crafter.siteItemService" />
         <property name="scriptFactory" ref="crafter.scriptFactory" />
         <property name="componentTemplateXPathQuery" value="${crafter.engine.component.view.name.xpathQuery}" />
-        <property name="componentScriptsXPathQuery" value="${crafter.engine.component.scripts.xpathQuery}" />
         <property name="componentIncludeElementName" value="${crafter.engine.component.include.element.name}" />
         <property name="requestContextAttribute" value="requestContext" />
+        <property name="componentScriptResolver" ref="crafter.componentScriptResolver"/>
     </bean>
 
 </beans>

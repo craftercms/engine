@@ -21,13 +21,13 @@ import freemarker.ext.servlet.HttpRequestHashModel;
 import freemarker.ext.servlet.HttpRequestParametersHashModel;
 import freemarker.ext.servlet.HttpSessionHashModel;
 import freemarker.template.SimpleHash;
-import freemarker.template.TemplateHashModel;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.engine.freemarker.RenderComponentDirective;
 import org.craftercms.engine.freemarker.ServletContextHashModel;
 import org.craftercms.engine.scripting.ScriptFactory;
+import org.craftercms.engine.scripting.ScriptResolver;
 import org.craftercms.engine.service.SiteItemService;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;
@@ -84,7 +84,7 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     protected String componentTemplateNamePrefix;
     protected String componentTemplateNameSuffix;
     protected String componentIncludeElementName;
-    protected String componentScriptsXPathQuery;
+    protected ScriptResolver componentScriptResolver;
 
     protected ServletContextHashModel servletContextHashModel;
     protected ApplicationContextAccessor applicationContextAccessor;
@@ -128,8 +128,8 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     }
 
     @Required
-    public void setComponentScriptsXPathQuery(String componentScriptsXPathQuery) {
-        this.componentScriptsXPathQuery = componentScriptsXPathQuery;
+    public void setComponentScriptResolver(ScriptResolver componentScriptResolver) {
+        this.componentScriptResolver = componentScriptResolver;
     }
 
     /**
@@ -195,8 +195,8 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
         renderComponentDirective.setTemplateXPathQuery(componentTemplateXPathQuery);
         renderComponentDirective.setTemplateNamePrefix(componentTemplateNamePrefix);
         renderComponentDirective.setTemplateNameSuffix(componentTemplateNameSuffix);
-        renderComponentDirective.setComponentIncludeElementName(componentIncludeElementName);
-        renderComponentDirective.setComponentScriptsXPathQuery(componentScriptsXPathQuery);
+        renderComponentDirective.setIncludeElementName(componentIncludeElementName);
+        renderComponentDirective.setScriptResolver(componentScriptResolver);
         renderComponentDirective.setServletContext(getServletContext());
 
         templateModel.put(RENDER_COMPONENT_DIRECTIVE_NAME, renderComponentDirective);
