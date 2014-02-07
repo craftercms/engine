@@ -28,7 +28,8 @@ import org.craftercms.core.util.UrlUtils;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.scripting.ScriptFactory;
-import org.craftercms.engine.scripting.ScriptUtils;
+import org.craftercms.engine.scripting.ScriptResolver;
+import org.craftercms.engine.util.ScriptUtils;
 import org.craftercms.engine.service.SiteItemService;
 import org.craftercms.engine.view.CrafterPageView;
 import org.craftercms.security.api.RequestContext;
@@ -67,8 +68,8 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
     protected String templateXPathQuery;
     protected String templateNamePrefix;
     protected String templateNameSuffix;
-    protected String componentIncludeElementName;
-    protected String componentScriptsXPathQuery;
+    protected String includeElementName;
+    protected ScriptResolver scriptResolver;
 
     @Required
     public void setServletContext(ServletContext servletContext) {
@@ -106,13 +107,13 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
     }
 
     @Required
-    public void setComponentIncludeElementName(String componentIncludeElementName) {
-        this.componentIncludeElementName = componentIncludeElementName;
+    public void setIncludeElementName(String includeElementName) {
+        this.includeElementName = includeElementName;
     }
 
     @Required
-    public void setComponentScriptsXPathQuery(String componentScriptsXPathQuery) {
-        this.componentScriptsXPathQuery = componentScriptsXPathQuery;
+    public void setScriptResolver(ScriptResolver scriptResolver) {
+        this.scriptResolver = scriptResolver;
     }
 
     public void execute(Environment env, Map params, TemplateModel[] loopVars, TemplateDirectiveBody body) throws TemplateException {
@@ -143,7 +144,7 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
                     ", actual: " + unwrappedComponentParam.getClass().getName(), env);
         }
 
-        Element includeElement = ((Element) unwrappedComponentParam).element(componentIncludeElementName);
+        Element includeElement = ((Element) unwrappedComponentParam).element(includeElementName);
         String componentUrl = includeElement.getTextTrim();
 
         return getComponent(componentUrl, env);
@@ -184,9 +185,12 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
     }
 
     protected Map<String, Object> executeScripts(SiteItem component, Environment env) throws TemplateException {
-        List<String> scriptUrls = component.getItem().queryDescriptorValues(componentScriptsXPathQuery);
-
+        List<String> scriptUrls = scriptResolver.getScriptUrls(component);
         if (CollectionUtils.isNotEmpty(scriptUrls)) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Scripts associated to component " + component.getStoreUrl() + ": " + scriptUrls);
+            }
+
             Map<String, Object> model = new HashMap<String, Object>();
             Map<String, Object> scriptVariables = createScriptVariables(component, model);
 

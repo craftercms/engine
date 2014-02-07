@@ -25,7 +25,7 @@ import org.craftercms.core.util.UrlUtils;
 import org.craftercms.engine.exception.HttpStatusCodeAwareException;
 import org.craftercms.engine.exception.ScriptNotFoundException;
 import org.craftercms.engine.scripting.ScriptFactory;
-import org.craftercms.engine.scripting.ScriptUtils;
+import org.craftercms.engine.util.ScriptUtils;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;
 import org.springframework.beans.factory.annotation.Required;

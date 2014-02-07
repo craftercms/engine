@@ -24,7 +24,7 @@ import org.craftercms.engine.exception.HttpStatusCodeAwareException;
 import org.craftercms.engine.exception.RenderingException;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.scripting.Script;
-import org.craftercms.engine.scripting.ScriptUtils;
+import org.craftercms.engine.util.ScriptUtils;
 import org.craftercms.engine.service.SiteItemService;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.http.MediaType;

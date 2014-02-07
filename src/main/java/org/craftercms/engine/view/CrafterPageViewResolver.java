@@ -28,6 +28,8 @@ import org.craftercms.engine.mobile.UserAgentTemplateDetector;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.scripting.ScriptFactory;
+import org.craftercms.engine.scripting.ScriptResolver;
+import org.craftercms.engine.util.ScriptUtils;
 import org.craftercms.engine.security.CrafterPageAccessManager;
 import org.craftercms.engine.service.SiteItemService;
 import org.craftercms.engine.service.UrlTransformationService;
@@ -44,6 +46,7 @@ import org.springframework.web.servlet.view.RedirectView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 /**
  * {@link org.springframework.web.servlet.ViewResolver} that resolves to {@link CrafterPageView}s. This resolver retrieves the Crafter page from the
@@ -74,7 +77,7 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     protected String redirectContentType;
     protected String disabledXPathQuery;
     protected String mimeTypeXPathQuery;
-    protected String scriptsXPathQuery;
+    protected ScriptResolver scriptResolver;
     protected ViewResolver delegatedViewResolver;
     protected boolean localizeViews;
     protected UserAgentTemplateDetector userAgentTemplateDetector;
@@ -171,8 +174,8 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     }
 
     @Required
-    public void setScriptsXPathQuery(String scriptXPathQuery) {
-        this.scriptsXPathQuery = scriptXPathQuery;
+    public void setScriptResolver(ScriptResolver scriptResolver) {
+        this.scriptResolver = scriptResolver;
     }
 
     @Required
@@ -307,7 +310,7 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     }
 
     protected void loadScripts(SiteItem page, CrafterPageView view) {
-        List<String> scriptUrls = page.getItem().queryDescriptorValues(scriptsXPathQuery);
+        List<String> scriptUrls = scriptResolver.getScriptUrls(page);
         if (CollectionUtils.isNotEmpty(scriptUrls)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Scripts associated to page " + page.getStoreUrl() + ": " + scriptUrls);

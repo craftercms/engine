@@ -17,6 +17,7 @@
 package org.craftercms.engine.view.freemarker;
 
 import org.craftercms.engine.scripting.ScriptFactory;
+import org.craftercms.engine.scripting.ScriptResolver;
 import org.craftercms.engine.service.SiteItemService;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.servlet.view.AbstractUrlBasedView;
@@ -33,7 +34,7 @@ public class CrafterFreeMarkerViewResolver extends FreeMarkerViewResolver {
     protected ScriptFactory scriptFactory;
     protected String componentTemplateXPathQuery;
     protected String componentIncludeElementName;
-    protected String componentScriptsXPathQuery;
+    protected ScriptResolver componentScriptResolver;
 
     @Required
     public void setSiteItemService(SiteItemService siteItemService) {
@@ -56,8 +57,8 @@ public class CrafterFreeMarkerViewResolver extends FreeMarkerViewResolver {
     }
 
     @Required
-    public void setComponentScriptsXPathQuery(String componentScriptsXPathQuery) {
-        this.componentScriptsXPathQuery = componentScriptsXPathQuery;
+    public void setComponentScriptResolver(ScriptResolver componentScriptResolver) {
+        this.componentScriptResolver = componentScriptResolver;
     }
 
     @Override
@@ -74,7 +75,7 @@ public class CrafterFreeMarkerViewResolver extends FreeMarkerViewResolver {
         view.setComponentTemplateNamePrefix(getPrefix());
         view.setComponentTemplateNameSuffix(getSuffix());
         view.setComponentIncludeElementName(componentIncludeElementName);
-        view.setComponentScriptsXPathQuery(componentScriptsXPathQuery);
+        view.setComponentScriptResolver(componentScriptResolver);
 
         return view;
     }
