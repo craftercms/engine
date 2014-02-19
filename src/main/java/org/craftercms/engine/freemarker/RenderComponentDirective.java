@@ -161,8 +161,10 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
     }
 
     protected SiteItem getComponent(String componentPath, Environment env) throws TemplateException {
-        SiteItem currentPage = (SiteItem) DeepUnwrap.unwrap(env.getVariable(CrafterPageView.KEY_PAGE_MODEL));
-        if (currentPage != null) {
+        Object unwrappedCurrentPage = DeepUnwrap.unwrap(env.getVariable(CrafterPageView.KEY_PAGE_MODEL));
+        if (unwrappedCurrentPage != null && unwrappedCurrentPage instanceof SiteItem) {
+            SiteItem currentPage = (SiteItem) unwrappedCurrentPage;
+
             try {
                 componentPath = UrlUtils.resolveRelative(currentPage.getStoreUrl(), componentPath);
             } catch (URISyntaxException e) {
