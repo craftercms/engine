@@ -21,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.core.service.CachingOptions;
 import org.craftercms.core.util.CollectionUtils;
+import org.craftercms.core.util.HttpServletUtils;
 import org.craftercms.core.util.cache.CacheCallback;
 import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.core.util.url.ContentBundleUrlParser;
@@ -62,6 +63,7 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     protected int order;
     protected boolean cacheUrlTransformations;
     protected String urlTransformerName;
+    protected String fullHttpsUrlTransformerName;
     protected UrlTransformationService urlTransformationService;
     protected String localizedUrlDelimiter;
     protected ContentBundleUrlParser urlParser;
@@ -75,6 +77,7 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     protected String disabledXPathQuery;
     protected String mimeTypeXPathQuery;
     protected String scriptsXPathQuery;
+    protected String forceHttpsXPathQuery;
     protected ViewResolver delegatedViewResolver;
     protected boolean localizeViews;
     protected UserAgentTemplateDetector userAgentTemplateDetector;
@@ -110,6 +113,11 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     @Required
     public void setUrlTransformerName(String urlTransformerName) {
         this.urlTransformerName = urlTransformerName;
+    }
+
+    @Required
+    public void setFullHttpsUrlTransformerName(String fullHttpsUrlTransformerName) {
+        this.fullHttpsUrlTransformerName = fullHttpsUrlTransformerName;
     }
 
     @Required
@@ -176,6 +184,11 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     }
 
     @Required
+    public void setForceHttpsXPathQuery(String forceHttpsXPathQuery) {
+        this.forceHttpsXPathQuery = forceHttpsXPathQuery;
+    }
+
+    @Required
     public void setDelegatedViewResolver(ViewResolver delegatedViewResolver) {
         this.delegatedViewResolver = delegatedViewResolver;
     }
@@ -201,8 +214,8 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
 
     @Override
     public View resolveViewName(String viewName, Locale locale) throws Exception {
-        View view = getCachedLocalizedView(urlTransformationService.transform(urlTransformerName, viewName, cacheUrlTransformations),
-                locale);
+        View view = getCachedLocalizedView(urlTransformationService.transform(urlTransformerName, viewName,
+                        cacheUrlTransformations), locale);
 
         if (view instanceof CrafterPageView) {
             accessManager.checkAccess(((CrafterPageView) view).getPage());
@@ -226,7 +239,8 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     protected SiteItem getLocalizedPage(String baseUrl, Locale locale) {
         List<Locale> candidateLocales = LocaleUtils.getLocaleLookupList(locale);
         for (Locale candidateLocale : candidateLocales) {
-            String localizedUrl = LocaleUtils.getLocalizedUrl(urlParser, baseUrl, candidateLocale, localizedUrlDelimiter);
+            String localizedUrl = LocaleUtils.getLocalizedUrl(urlParser, baseUrl, candidateLocale,
+                    localizedUrlDelimiter);
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Retrieving localized Crafter page descriptor at " + localizedUrl + "...");
@@ -243,11 +257,19 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
         return null;
     }
 
-    protected View getRedirectView(String redirectUrl) {
-        View view = new RedirectView(redirectUrl, true, true);
-        view = (View) getApplicationContext().getAutowireCapableBeanFactory().initializeBean(view, "redirect:" + redirectUrl);
+    protected View getRedirectView(String redirectUrl, boolean relative) {
+        View view = new RedirectView(redirectUrl, relative, true);
+        view = (View) getApplicationContext().getAutowireCapableBeanFactory().initializeBean(view,
+                "redirect:" + redirectUrl);
 
         return view;
+    }
+
+    protected View getCurrentPageHttpsRedirectView() {
+        String currentUrl = HttpServletUtils.getCurrentRequest().getRequestURI();
+        String fullHttpsUrl = urlTransformationService.transform(fullHttpsUrlTransformerName, currentUrl);
+
+        return getRedirectView(fullHttpsUrl, false);
     }
 
     protected View getCachedLocalizedView(final String baseUrl, final Locale locale) {
@@ -267,18 +289,21 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
                 if (page != null) {
                     String disabled = page.getItem().queryDescriptorValue(disabledXPathQuery);
                     if (!modePreview && StringUtils.isNotEmpty(disabled) && Boolean.parseBoolean(disabled)) {
-                        // when a page is disabled it acts as if it does not exist this rule does not apply in preview because
-                        // we want authors to see the page
+                        // when a page is disabled it acts as if it does not exist this rule does not apply in preview
+                        // because we want authors to see the page
                         return null;
                     }
 
                     String redirectUrl = page.getItem().queryDescriptorValue(redirectUrlXPathQuery);
                     String contentType = page.getItem().queryDescriptorValue(contentTypeXPathQuery);
+                    String forceHttps = page.getItem().queryDescriptorValue(forceHttpsXPathQuery);
 
                     if (StringUtils.isNotEmpty(contentType) &&
                         StringUtils.equalsIgnoreCase(redirectContentType, contentType) &&
                         StringUtils.isNotEmpty(redirectUrl)) {
-                        return getRedirectView(redirectUrl);
+                        return getRedirectView(redirectUrl, true);
+                    } else if (StringUtils.isNotEmpty(forceHttps) && Boolean.parseBoolean(forceHttps)) {
+                        return getCurrentPageHttpsRedirectView();
                     } else {
                         UserAgentAwareCrafterPageView view = new UserAgentAwareCrafterPageView();
                         view.setServletContext(getServletContext());
