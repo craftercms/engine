@@ -18,6 +18,7 @@
                 <entry key="toWebAppRelativeUrl" value-ref="crafter.addContextPathUrlTransformer"/>
                 <entry key="toServletRelativeUrl" value-ref="crafter.toServletRelativeUrlTransfomerPipeline"/>
                 <entry key="toFullUrl" value-ref="crafter.toFullUrlTransformerPipeline"/>
+                <entry key="toFullHttpsUrl" value-ref="crafter.toFullHttpsUrlTransformerPipeline"/>
             </map>
         </property>
     </bean>
@@ -84,6 +85,12 @@
     <bean id="crafter.addSchemeAndDomainAndServerPortUrlTransformer"
           class="org.craftercms.core.url.impl.AddSchemeAndDomainAndServerPortUrlTransformer" />
 
+    <bean id="crafter.addSchemeAndDomainAndServerPortHttpsUrlTransformer"
+          class="org.craftercms.core.url.impl.AddSchemeAndDomainAndServerPortUrlTransformer">
+        <property name="forceHttps" value="true"/>
+        <property name="httpsPort" value="${crafter.engine.https.port}"/>
+    </bean>
+
     <bean id="crafter.toServletRelativeUrlTransfomerPipeline" class="org.craftercms.core.url.impl.UrlTransformerPipeline">
         <constructor-arg>
             <list>
@@ -99,6 +106,16 @@
                 <ref bean="crafter.addServletPathUrlTransformer"/>
                 <ref bean="crafter.addContextPathUrlTransformer"/>
                 <ref bean="crafter.addSchemeAndDomainAndServerPortUrlTransformer"/>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="crafter.toFullHttpsUrlTransformerPipeline" class="org.craftercms.core.url.impl.UrlTransformerPipeline">
+        <constructor-arg>
+            <list>
+                <ref bean="crafter.addServletPathUrlTransformer"/>
+                <ref bean="crafter.addContextPathUrlTransformer"/>
+                <ref bean="crafter.addSchemeAndDomainAndServerPortHttpsUrlTransformer"/>
             </list>
         </constructor-arg>
     </bean>
