@@ -27,6 +27,7 @@
                 <bean class="org.craftercms.engine.view.CrafterPageViewResolver">
                     <property name="cacheUrlTransformations" value="${crafter.engine.page.view.resolver.url.transformation.cache}"/>
                     <property name="urlTransformerName" value="renderUrlToStoreUrl" />
+                    <property name="fullHttpsUrlTransformerName" value="toFullHttpsUrl" />
                     <property name="urlTransformationService" ref="crafter.urlTransformationService" />
                     <property name="localizeViews" value="${crafter.engine.page.view.localized}" />
                     <property name="localizedUrlDelimiter" value="_" />
@@ -39,6 +40,7 @@
                     <property name="redirectContentType" value="${crafter.engine.page.redirect.contentType}" />
 					<property name="disabledXPathQuery" value="${crafter.engine.page.disabled.xpathQuery}" />
                     <property name="mimeTypeXPathQuery" value="${crafter.engine.page.mimeType.xpathQuery}" />
+                    <property name="forceHttpsXPathQuery" value="${crafter.engine.page.forceHttps.xpathQuery}" />
 					<property name="modePreview" value="${crafter.engine.preview}" />
                     <property name="delegatedViewResolver" ref="crafter.freeMarkerViewResolver" />
                     <property name="userAgentTemplateDetector" ref="crafter.userAgentTemplateDetector" />
