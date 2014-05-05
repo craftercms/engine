@@ -1,5 +1,6 @@
 package org.craftercms.engine.scripting.impl;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -7,7 +8,6 @@ import org.craftercms.core.exception.CrafterException;
 import org.craftercms.core.exception.PathNotFoundException;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
-import org.craftercms.core.util.CollectionUtils;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.scripting.ScriptResolver;
 import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;

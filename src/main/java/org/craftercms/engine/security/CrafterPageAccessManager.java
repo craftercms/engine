@@ -16,14 +16,15 @@
  */
 package org.craftercms.engine.security;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.craftercms.commons.http.RequestContext;
 import org.craftercms.engine.model.SiteItem;
+import org.craftercms.profile.api.Profile;
 import org.craftercms.security.annotations.RunIfSecurityEnabled;
-import org.craftercms.security.api.RequestContext;
-import org.craftercms.security.api.SecurityConstants;
-import org.craftercms.security.api.UserProfile;
+import org.craftercms.security.authentication.Authentication;
 import org.craftercms.security.exception.AccessDeniedException;
 import org.craftercms.security.exception.AuthenticationRequiredException;
+import org.craftercms.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Required;
 
 import java.util.List;
@@ -56,20 +57,27 @@ public class CrafterPageAccessManager {
     @RunIfSecurityEnabled
     public void checkAccess(SiteItem page) throws AuthenticationRequiredException, AccessDeniedException {
         RequestContext context = RequestContext.getCurrent();
+        String pageUrl = page.getStoreUrl();
+        Profile profile = null;
 
-        if (context != null && context.getAuthenticationToken() != null && context.getAuthenticationToken().getProfile() != null) {
-            UserProfile profile = context.getAuthenticationToken().getProfile();
-            String username = profile.getUserName();
-            String pageUrl = page.getStoreUrl();
-            List<String> authorizedRoles = getAuthorizedRolesForPage(page);
+        if (context != null) {
+            Authentication auth = SecurityUtils.getAuthentication(context.getRequest());
+            if (auth != null) {
+                profile = auth.getProfile();
+            }
+        }
 
-            if (CollectionUtils.isNotEmpty(authorizedRoles) && !containsRole(SecurityConstants.ANONYMOUS_USERNAME, authorizedRoles)) {
-                if (profile.isAnonymous()) {
-                    throw new AuthenticationRequiredException("User is anonymous but page '" + pageUrl + "' requires authentication");
-                }
-                if (!containsRole("Authenticated", authorizedRoles) && !profile.hasAnyRole(authorizedRoles)) {
-                    throw new AccessDeniedException("User '" + username + "' is not authorized to view page '" + pageUrl + "'");
-                }
+        List<String> authorizedRoles = getAuthorizedRolesForPage(page);
+
+        if (CollectionUtils.isNotEmpty(authorizedRoles) && !containsRole("anonymous", authorizedRoles)) {
+            // If profile == null it is anonymous
+            if (profile == null) {
+                throw new AuthenticationRequiredException("User is anonymous but page '" + pageUrl +
+                        "' requires authentication");
+            }
+            if (!containsRole("authenticated", authorizedRoles) && !profile.hasAnyRole(authorizedRoles)) {
+                throw new AccessDeniedException("User '" + profile.getUsername() + "' is not authorized " +
+                        "to view page '" + pageUrl + "'");
             }
         }
     }
@@ -80,7 +88,7 @@ public class CrafterPageAccessManager {
 
     protected boolean containsRole(String role, List<String> roles) {
         for (String r : roles) {
-            if (r.equals(role)) {
+            if (r.equalsIgnoreCase(role)) {
                 return true;
             }
         }

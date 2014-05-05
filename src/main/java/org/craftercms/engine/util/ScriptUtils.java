@@ -16,24 +16,18 @@
  */
 package org.craftercms.engine.util;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.craftercms.core.service.Item;
-import org.craftercms.core.util.CollectionUtils;
+import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.util.HttpServletUtils;
-import org.craftercms.core.util.UrlUtils;
 import org.craftercms.engine.model.SiteItem;
-import org.craftercms.security.api.RequestContext;
+import org.craftercms.security.authentication.Authentication;
+import org.craftercms.security.utils.SecurityUtils;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Utility methods for scripts.
@@ -55,11 +49,10 @@ public class ScriptUtils {
     public static final String VARIABLE_LOGGER =                    "logger";
     public static final String VARIABLE_MODEL =                     "model";
     public static final String VARIABLE_CRAFTER_MODEL =             "crafterModel";
-    public static final String VARIABLE_CRAFTER_REQUEST_CONTEXT =   "crafterRequestContext";
     public static final String VARIABLE_PROFILE =                   "profile";
 
-    public static void addCommonVariables(Map<String, Object> variables, HttpServletRequest request, HttpServletResponse response,
-                                          ServletContext context) {
+    public static void addCommonVariables(Map<String, Object> variables, HttpServletRequest request,
+                                          HttpServletResponse response, ServletContext context) {
         variables.put(VARIABLE_REQUEST_URL, request.getRequestURI());
         variables.put(VARIABLE_APPLICATION, context);
         variables.put(VARIABLE_REQUEST, request);
@@ -78,15 +71,13 @@ public class ScriptUtils {
     public static void addCrafterVariables(Map<String, Object> variables) {
         RequestContext context = RequestContext.getCurrent();
         if (context != null) {
-            variables.put(VARIABLE_CRAFTER_REQUEST_CONTEXT, context);
-
-            if (context.getAuthenticationToken() != null && context.getAuthenticationToken().getProfile() != null) {
-                variables.put(VARIABLE_PROFILE, context.getAuthenticationToken().getProfile());
+            Authentication auth = SecurityUtils.getAuthentication(context.getRequest());
+            if (auth != null) {
+                variables.put(VARIABLE_PROFILE, auth.getProfile());
             }
-        } else {
-            variables.put(VARIABLE_CRAFTER_REQUEST_CONTEXT, null);
-            variables.put(VARIABLE_PROFILE, null);
         }
+
+        variables.put(VARIABLE_PROFILE, null);
     }
 
     public static void addCrafterVariables(Map<String, Object> variables, SiteItem crafterModel) {

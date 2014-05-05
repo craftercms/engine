@@ -20,19 +20,19 @@ import freemarker.core.Environment;
 import freemarker.template.*;
 import freemarker.template.utility.DeepUnwrap;
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.craftercms.core.util.CollectionUtils;
+import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.util.UrlUtils;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.scripting.ScriptResolver;
-import org.craftercms.engine.util.ScriptUtils;
 import org.craftercms.engine.service.SiteItemService;
+import org.craftercms.engine.util.ScriptUtils;
 import org.craftercms.engine.view.CrafterPageView;
-import org.craftercms.security.api.RequestContext;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.springframework.beans.factory.ObjectFactory;
@@ -219,8 +219,6 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
 
         if (context != null) {
             ScriptUtils.addCommonVariables(scriptVariables, context.getRequest(), context.getResponse(), servletContext);
-        } else {
-            logger.warn("There's no Crafter request context associated to the current thread");
         }
 
         ScriptUtils.addCrafterVariables(scriptVariables, component);

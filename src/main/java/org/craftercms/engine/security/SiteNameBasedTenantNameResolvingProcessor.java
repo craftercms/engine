@@ -18,14 +18,17 @@ package org.craftercms.engine.security;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.craftercms.core.util.HttpServletUtils;
+import org.craftercms.commons.http.RequestContext;
 import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;
-import org.craftercms.security.api.RequestContext;
-import org.craftercms.security.api.RequestSecurityProcessor;
-import org.craftercms.security.api.RequestSecurityProcessorChain;
+import org.craftercms.security.processors.RequestSecurityProcessor;
+import org.craftercms.security.processors.RequestSecurityProcessorChain;
+import org.craftercms.security.utils.SecurityUtils;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
- * Security processor that resolves the tenant ID using the site name request attribute set by the {@link org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter}.
+ * Security processor that resolves the tenant using the site name request attribute set by the
+ * {@link org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter}.
  *
  * @author Alfonso Vásquez
  */
@@ -35,14 +38,14 @@ public class SiteNameBasedTenantNameResolvingProcessor implements RequestSecurit
 
     @Override
     public void processRequest(RequestContext context, RequestSecurityProcessorChain processorChain) throws Exception {
-        String tenantName = (String) HttpServletUtils.getAttribute(AbstractSiteContextResolvingFilter.SITE_NAME_ATTRIBUTE,
-                HttpServletUtils.SCOPE_REQUEST);
+        HttpServletRequest request = context.getRequest();
+        String tenant = (String) request.getAttribute(AbstractSiteContextResolvingFilter.SITE_NAME_ATTRIBUTE);
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Tenant name resolved for current request: " + tenantName);
+            logger.debug("Tenant resolved for current request: " + tenant);
         }
 
-        context.setTenantName(tenantName);
+        SecurityUtils.setTenant(request, tenant);
 
         processorChain.processRequest(context);
     }
