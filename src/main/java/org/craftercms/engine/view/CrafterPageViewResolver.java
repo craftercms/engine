@@ -16,11 +16,11 @@
  */
 package org.craftercms.engine.view;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.core.service.CachingOptions;
-import org.craftercms.core.util.CollectionUtils;
 import org.craftercms.core.util.HttpServletUtils;
 import org.craftercms.core.util.cache.CacheCallback;
 import org.craftercms.core.util.cache.CacheTemplate;
@@ -48,10 +48,10 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * {@link org.springframework.web.servlet.ViewResolver} that resolves to {@link CrafterPageView}s. This resolver retrieves the Crafter page from the
- * content store and searches in the page DOM for the actual view name. The returned {@link CrafterPageView} then adds
- * the page and the site navigation to the model, obtains the actual page view name from the delegated view resolver
- * and delegates rendering to that view.
+ * {@link org.springframework.web.servlet.ViewResolver} that resolves to {@link CrafterPageView}s. This resolver
+ * retrieves the Crafter page from the content store and searches in the page DOM for the actual view name. The
+ * returned {@link CrafterPageView} then adds the page and the site navigation to the model, obtains the actual
+ * page view name from the delegated view resolver and delegates rendering to that view.
  *
  * @author Alfonso Vasquez
  */

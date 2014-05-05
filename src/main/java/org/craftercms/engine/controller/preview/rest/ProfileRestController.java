@@ -16,10 +16,8 @@
  */
 package org.craftercms.engine.controller.preview.rest;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.craftercms.core.controller.rest.RestControllerBase;
-import org.craftercms.core.util.CollectionUtils;
-import org.craftercms.security.api.SecurityConstants;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -27,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,8 +49,8 @@ public class ProfileRestController {
     public Map<String, String> getProfile(HttpSession session) {
         Map<String, String> profile = (Map<String, String>) session.getAttribute(PROFILE_SESSION_ATTRIBUTE);
         if (profile == null || StringUtils.isEmpty(profile.get("username"))) {
-            profile = new HashMap<String, String>();
-            profile.put("username", SecurityConstants.ANONYMOUS_USERNAME);
+            profile = new HashMap<>();
+            profile.put("username", "anonymous");
 
             session.setAttribute(PROFILE_SESSION_ATTRIBUTE, profile);
         }
@@ -70,13 +69,9 @@ public class ProfileRestController {
             profile.put(paramName, request.getParameter(paramName).trim());
         }
 
-        if (!profile.containsKey("username")) {
-            profile.put("username", SecurityConstants.ANONYMOUS_USERNAME);
-        }
-
         session.setAttribute(PROFILE_SESSION_ATTRIBUTE, profile);
 
-        return CollectionUtils.asMap("username", profile.get("username"));
+        return Collections.singletonMap("username", profile.get("username"));
     }
 
 }

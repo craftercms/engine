@@ -23,6 +23,7 @@
         <property name="locations">
             <list>
                 <value>classpath:crafter/core/core.properties</value>
+                <value>classpath:crafter/profile/client-config.properties</value>
                 <value>classpath:crafter/security/security.properties</value>
                 <value>classpath:crafter/engine/server-config.properties</value>
                 <value>classpath*:crafter/engine/extension/server-config.properties</value>

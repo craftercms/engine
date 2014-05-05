@@ -22,8 +22,6 @@ import freemarker.ext.servlet.HttpRequestParametersHashModel;
 import freemarker.ext.servlet.HttpSessionHashModel;
 import freemarker.template.SimpleHash;
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.craftercms.engine.freemarker.RenderComponentDirective;
 import org.craftercms.engine.freemarker.ServletContextHashModel;
 import org.craftercms.engine.scripting.ScriptFactory;
@@ -32,7 +30,8 @@ import org.craftercms.engine.service.SiteItemService;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;
 import org.craftercms.engine.util.spring.ApplicationContextAccessor;
-import org.craftercms.security.api.RequestContext;
+import org.craftercms.security.authentication.Authentication;
+import org.craftercms.security.utils.SecurityUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Required;
@@ -55,8 +54,6 @@ import java.util.Map;
  */
 public class CrafterFreeMarkerView extends FreeMarkerView {
 
-    private static final Log logger = LogFactory.getLog(CrafterFreeMarkerView.class);
-
     public static final String RENDER_COMPONENT_DIRECTIVE_NAME = "renderComponent";
 
     public static final String KEY_APPLICATION_CAP = "Application";
@@ -73,8 +70,6 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     public static final String KEY_COOKIES = "cookies";
     public static final String KEY_PROFILE_CAP = "Profile";
     public static final String KEY_PROFILE = "profile";
-    public static final String KEY_CRAFTER_REQUEST_CONTEXT_CAP = "CrafterRequestContext";
-    public static final String KEY_CRAFTER_REQUEST_CONTEXT = "crafterRequestContext";
     public static final String KEY_STATICS = "statics";
     public static final String KEY_ENUMS = "enums";
     
@@ -146,7 +141,6 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     @Override
     protected SimpleHash buildTemplateModel(final Map<String, Object> model, final HttpServletRequest request,
                                             final HttpServletResponse response) {
-    	RequestContext context = RequestContext.getCurrent();
         AllHttpScopesAndAppContextHashModel templateModel = new AllHttpScopesAndAppContextHashModel(getObjectWrapper(),
                 getApplicationContext(), getServletContext(), request);
         HttpSessionHashModel sessionModel = createSessionModel(request, response);
@@ -165,16 +159,11 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
         templateModel.put(KEY_APP_CONTEXT, applicationContextAccessor);
         templateModel.put(KEY_COOKIES_CAP, createCookieMap(request));
         templateModel.put(KEY_COOKIES, createCookieMap(request));
-        if (context != null) {
-            templateModel.put(KEY_CRAFTER_REQUEST_CONTEXT_CAP, context);
-            templateModel.put(KEY_CRAFTER_REQUEST_CONTEXT, context);
 
-            if (context.getAuthenticationToken() != null && context.getAuthenticationToken().getProfile() != null) {
-                templateModel.put(KEY_PROFILE_CAP, context.getAuthenticationToken().getProfile());
-                templateModel.put(KEY_PROFILE, context.getAuthenticationToken().getProfile());
-            }
-        } else {
-            logger.warn("There's no Crafter request context associated to the current thread");
+        Authentication auth = SecurityUtils.getAuthentication(request);
+        if (auth != null) {
+            templateModel.put(KEY_PROFILE_CAP, auth.getProfile());
+            templateModel.put(KEY_PROFILE, auth.getProfile());
         }
 
         templateModel.put(KEY_STATICS, BeansWrapper.getDefaultInstance().getStaticModels());
