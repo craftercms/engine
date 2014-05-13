@@ -1,11 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
     <import resource="classpath:crafter/core/rest-context.xml"/>
     <import resource="classpath:crafter/engine/rendering/controller-context.xml" />
     <import resource="classpath:crafter/engine/rendering/view-context.xml" />
+
+    <!-- Used to overwrite certain <mvc:annotation-driven> configuration -->
+    <bean id="crafter.annotationDrivenConfigCustomizer" class="org.craftercms.engine.util.spring.mvc.AnnotationDrivenConfigCustomizer">
+        <property name="contentNegotiationManager" ref="crafter.contentNegotiationManager"/>
+        <property name="messageConverters" ref="crafter.messageConverters"/>
+    </bean>
+
+    <bean id="crafter.contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManager"/>
+
+    <!-- Use the default message converters, overwrite if need to specify new message converters -->
+    <util:list id="crafter.messageConverters"/>
 
     <!-- ////////////////////////////////// -->
     <!--								 	-->
@@ -17,8 +31,6 @@
         <property name="locations">
             <list>
                 <value>classpath:crafter/core/core.properties</value>
-                <value>classpath:crafter/profile/client-config.properties</value>
-                <value>classpath:crafter/security/security.properties</value>
                 <value>classpath:crafter/engine/server-config.properties</value>
                 <value>classpath*:crafter/engine/extension/server-config.properties</value>
             </list>
