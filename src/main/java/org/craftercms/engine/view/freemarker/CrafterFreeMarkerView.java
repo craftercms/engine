@@ -47,8 +47,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Extends {@link FreeMarkerView} to add {@link RenderComponentDirective}s to support page component rendering in Freemarker templates
- * and provide the Spring application context as part of the Freemarker model.
+ * Extends {@link FreeMarkerView} to add {@link RenderComponentDirective}s to support page component rendering in
+ * Freemarker templates and provide the Spring application context as part of the Freemarker model.
  *
  * @author Alfonso Vásquez
  */

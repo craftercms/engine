@@ -24,8 +24,9 @@ import org.craftercms.engine.exception.HttpStatusCodeAwareException;
 import org.craftercms.engine.exception.RenderingException;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.scripting.Script;
-import org.craftercms.engine.util.ScriptUtils;
 import org.craftercms.engine.service.SiteItemService;
+import org.craftercms.engine.util.ScriptUtils;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.View;
@@ -39,7 +40,10 @@ import java.util.*;
 /**
  * @author Alfonso Vásquez
  */
-public class CrafterPageView extends AbstractView implements CachingAwareObject {
+public class CrafterPageView extends AbstractView implements CachingAwareObject, InitializingBean {
+
+    public static final String DEFAULT_CONTENT_TYPE = "text/html;charset=UTF-8";
+    public static final String DEFAULT_CHARSET = "UTF-8";
 
     public static final String KEY_PAGE_MODEL = "model";
     public static final String KEY_MODE_PREVIEW = "modePreview";
@@ -187,12 +191,18 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject 
     }
 
     @Override
-    protected void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response)
-            throws Exception {
-        String mimeType = page.getItem().queryDescriptorValue(mimeTypeXPathQuery);
+    public void afterPropertiesSet() throws Exception {
+        String mimeType = getMimeType();
         if (StringUtils.isNotEmpty(mimeType)) {
-            response.setContentType(MediaType.parseMediaType(mimeType).toString());
+            setContentType(MediaType.parseMediaType(mimeType).toString() + ";charset=" + DEFAULT_CHARSET);
+        } else {
+            setContentType(DEFAULT_CONTENT_TYPE);
         }
+    }
+
+    @Override
+    protected void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request,
+                                           HttpServletResponse response) throws Exception {
 
         Map<String, Object> scriptVariables = createScriptVariables(request, response, model);
 
@@ -212,9 +222,9 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject 
         try {
             script.execute(scriptVariables);
         } catch (Exception e) {
-            Exception httpStatusCodeAwareEx = (Exception) ExceptionUtils.getThrowableOfType(e, HttpStatusCodeAwareException.class);
-            if (httpStatusCodeAwareEx != null) {
-                throw httpStatusCodeAwareEx;
+            Exception cause = (Exception) ExceptionUtils.getThrowableOfType(e, HttpStatusCodeAwareException.class);
+            if (cause != null) {
+                throw cause;
             } else {
                 throw e;
             }
@@ -240,11 +250,18 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject 
         }
     }
 
+    protected String getMimeType() {
+        return page.getItem().queryDescriptorValue(mimeTypeXPathQuery);
+    }
+
     protected void renderActualView(String pageViewName, Map<String, Object> model, HttpServletRequest request,
                                     HttpServletResponse response) throws Exception {
         View actualView = delegatedViewResolver.resolveViewName(pageViewName, locale);
         if (actualView == null) {
             throw new RenderingException("No view was resolved for page view name '" + pageViewName + "'");
+        }
+        if (actualView instanceof AbstractView) {
+            ((AbstractView) actualView).setContentType(getContentType());
         }
 
         actualView.render(model, request, response);

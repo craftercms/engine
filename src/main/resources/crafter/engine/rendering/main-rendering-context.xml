@@ -16,7 +16,7 @@
         <property name="messageConverters" ref="crafter.messageConverters"/>
     </bean>
 
-    <bean id="crafter.contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManager"/>
+    <bean id="crafter.contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean"/>
 
     <!-- Use the default message converters, overwrite if need to specify new message converters -->
     <util:list id="crafter.messageConverters"/>
@@ -28,6 +28,7 @@
     <!-- ////////////////////////////////// -->
 
     <bean name="crafter.properties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="order" value="0"/>
         <property name="locations">
             <list>
                 <value>classpath:crafter/core/core.properties</value>
