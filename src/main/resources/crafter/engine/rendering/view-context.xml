@@ -18,7 +18,7 @@
                 <property name="defaultContentType" value="text/html" />
                 <property name="mediaTypes">
                     <map>
-                        <entry key="${crafter.engine.page.url.extension}" value="text/html" />
+                        <entry key="html" value="text/html" />
                         <entry key="xml" value="application/xml" />
                         <entry key="json" value="application/json" />
                     </map>
