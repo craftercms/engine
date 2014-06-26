@@ -42,6 +42,7 @@ import org.springframework.web.context.support.WebApplicationObjectSupport;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.view.RedirectView;
+import org.springframework.web.servlet.view.UrlBasedViewResolver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -215,8 +216,8 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
 
     @Override
     public View resolveViewName(String viewName, Locale locale) throws Exception {
-        View view = getCachedLocalizedView(urlTransformationService.transform(urlTransformerName, viewName,
-                        cacheUrlTransformations), locale);
+        String url = urlTransformationService.transform(urlTransformerName, viewName, cacheUrlTransformations);
+        View view = getCachedLocalizedView(url, locale);
 
         if (view instanceof CrafterPageView) {
             accessManager.checkAccess(((CrafterPageView) view).getPage());
@@ -260,10 +261,8 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
 
     protected View getRedirectView(String redirectUrl, boolean relative) {
         View view = new RedirectView(redirectUrl, relative, true);
-        view = (View) getApplicationContext().getAutowireCapableBeanFactory().initializeBean(view,
-                "redirect:" + redirectUrl);
 
-        return view;
+        return applyLifecycleMethods(UrlBasedViewResolver.REDIRECT_URL_PREFIX + redirectUrl, view);
     }
 
     protected View getCurrentPageHttpsRedirectView() {
@@ -321,7 +320,7 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
 
                         view.addDependencyKey(page.getItem().getKey());
 
-                        return view;
+                        return applyLifecycleMethods(page.getStoreUrl(), view);
                     }
                 } else {
                     // Return null to continue with the ViewResolverChain
@@ -349,6 +348,10 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
 
             view.setScripts(scripts);
         }
+    }
+
+    protected View applyLifecycleMethods(String viewName, View view) {
+        return (View) getApplicationContext().getAutowireCapableBeanFactory().initializeBean(view, viewName);
     }
 
 }

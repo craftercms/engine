@@ -57,7 +57,7 @@
 
     <bean id="crafter.replacePageExtWithDescriptorExtUrlTransformer"
           class="org.craftercms.core.url.impl.ReplaceSubstringUrlTransformer">
-        <property name="substringToReplace" value=".${crafter.engine.page.url.extension}" />
+        <property name="substringToReplace" value="${crafter.engine.page.url.extension}" />
         <property name="replacement" value="${crafter.core.store.descriptorFile.extension}" />
     </bean>
 
@@ -79,7 +79,7 @@
     <bean id="crafter.replaceDescriptorExtWithPageExtUrlTransformer"
           class="org.craftercms.core.url.impl.ReplaceSubstringUrlTransformer">
         <property name="substringToReplace" value="${crafter.core.store.descriptorFile.extension}" />
-        <property name="replacement" value=".${crafter.engine.page.url.extension}" />
+        <property name="replacement" value="${crafter.engine.page.url.extension}" />
     </bean>
 
     <bean id="crafter.addSchemeAndDomainAndServerPortUrlTransformer"
