@@ -128,13 +128,13 @@ public class RestScriptsController extends AbstractController {
         } catch (Exception e) {
             logger.error("Execution failed for script " + scriptUrl, e);
 
-            HttpStatusCodeAwareException httpStatusAwareEx = ExceptionUtils.getThrowableOfType(e, HttpStatusCodeAwareException.class);
+            HttpStatusCodeAwareException cause = ExceptionUtils.getThrowableOfType(e, HttpStatusCodeAwareException.class);
             String errorMsg;
 
-            if (httpStatusAwareEx != null) {
-                response.setStatus(httpStatusAwareEx.getStatusCode());
+            if (cause != null) {
+                response.setStatus(cause.getStatusCode());
 
-                errorMsg = ((Exception) httpStatusAwareEx).getMessage();
+                errorMsg = ((Exception) cause).getMessage();
             } else {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
