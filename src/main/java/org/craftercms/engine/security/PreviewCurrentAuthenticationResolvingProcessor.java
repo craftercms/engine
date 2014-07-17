@@ -16,8 +16,6 @@
  */
 package org.craftercms.engine.security;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.bson.types.ObjectId;
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.engine.controller.preview.rest.ProfileRestController;
@@ -39,21 +37,19 @@ import java.util.Map;
  */
 public class PreviewCurrentAuthenticationResolvingProcessor implements RequestSecurityProcessor {
 
-    private static final Log logger = LogFactory.getLog(RequestSecurityProcessor.class);
-
     @Override
     public void processRequest(RequestContext context, RequestSecurityProcessorChain processorChain) throws Exception {
         HttpServletRequest request = context.getRequest();
-        Map<String, Object> attributes = (Map<String, Object>) request.getAttribute(ProfileRestController
-                .PROFILE_SESSION_ATTRIBUTE);
+        Map<String, String> attributes = (Map<String, String>) request.getSession(true).getAttribute(
+                ProfileRestController.PROFILE_SESSION_ATTRIBUTE);
 
-        if (attributes != null && !"anonymous".equalsIgnoreCase((String) attributes.get("username"))) {
+        if (attributes != null && !"anonymous".equalsIgnoreCase(attributes.get("username"))) {
             Profile profile = new Profile();
             profile.setId(new ObjectId());
-            profile.setUsername((String) attributes.get("username"));
+            profile.setUsername(attributes.get("username"));
             profile.setEnabled(true);
 
-            String rolesStr = (String) attributes.get("roles");
+            String rolesStr = attributes.get("roles");
             if (rolesStr != null) {
                 String[] roles = rolesStr.split(",");
                 profile.getRoles().addAll(Arrays.asList(roles));
