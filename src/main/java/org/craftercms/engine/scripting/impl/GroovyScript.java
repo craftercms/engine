@@ -2,11 +2,14 @@ package org.craftercms.engine.scripting.impl;
 
 import groovy.lang.Binding;
 import groovy.util.GroovyScriptEngine;
+import groovy.util.ResourceException;
 import org.apache.commons.collections.MapUtils;
 import org.craftercms.core.util.cache.impl.CachingAwareObjectBase;
 import org.craftercms.engine.exception.ScriptException;
+import org.craftercms.engine.exception.ScriptNotFoundException;
 import org.craftercms.engine.scripting.Script;
 
+import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,7 +44,12 @@ public class GroovyScript extends CachingAwareObjectBase implements Script {
         try {
             return scriptEngine.run(scriptName, new Binding(allVariables));
         } catch (Exception e) {
-            throw new ScriptException(e.getMessage(), e);
+            Throwable cause = e.getCause();
+            if (e instanceof ResourceException && cause instanceof FileNotFoundException) {
+                throw new ScriptNotFoundException(cause.getMessage(), cause);
+            } else {
+                throw new ScriptException(e.getMessage(), e);
+            }
         }
     }
 
