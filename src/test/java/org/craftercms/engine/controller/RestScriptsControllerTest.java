@@ -1,5 +1,11 @@
 package org.craftercms.engine.controller;
 
+import java.util.Map;
+import javax.servlet.ServletContext;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.util.cache.CacheTemplate;
@@ -18,12 +24,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -81,7 +81,7 @@ public class RestScriptsControllerTest {
 
     @Test
     public void testError2() throws Exception {
-        testError("/testError2.json", HttpServletResponse.SC_BAD_REQUEST,"This is an error test message");
+        testError("/testError2.json", HttpServletResponse.SC_BAD_REQUEST, "This is an error test message");
     }
 
     private void testError(String serviceUrl, int statusCode, String message) throws Exception {

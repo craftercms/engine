@@ -16,7 +16,7 @@
     </logger>
 
     <logger name="org.craftercms.security">
-        <level value="debug" />
+        <level value="info" />
     </logger>
 
     <logger name="org.craftercms.security.servlet.filters.RequestContextBindingFilter">
