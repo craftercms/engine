@@ -9,8 +9,9 @@
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
     <import resource="classpath:crafter/core/core-context.xml"/>
-    <import resource="classpath:crafter/engine/services/security-context.xml" />
-    <import resource="classpath:crafter/engine/services/scripting-context.xml" />
+    <import resource="classpath:crafter/engine/services/security-context.xml"/>
+    <import resource="classpath:crafter/engine/services/social-context.xml"/>
+    <import resource="classpath:crafter/engine/services/scripting-context.xml"/>
     <import resource="classpath:crafter/engine/services/url-transformation-context.xml"/>
 
     <!-- ////////////////////////////////// -->
@@ -149,6 +150,7 @@
         <property name="templatesPath" value="${crafter.engine.site.default.templates.path}" />
         <property name="freeMarkerConfigFactory" ref="crafter.freeMarkerConfigFactory" />
         <property name="restScriptsPath" value="${crafter.engine.site.default.rest.scripts.path}" />
+        <property name="controllerScriptsPath" value="${crafter.engine.site.default.controller.scripts.path}" />
         <property name="urlTransformationEngine" ref="crafter.urlTransformationEngine" />
         <property name="storeService" ref="crafter.contentStoreService" />
         <property name="macroResolver" ref="crafter.macroResolver" />
@@ -160,7 +162,8 @@
         <property name="staticAssetsPath" value="/static-assets" />
         <property name="templatesPath" value="/" />
         <property name="freeMarkerConfigFactory" ref="crafter.freeMarkerConfigFactory"/>
-        <property name="restScriptsPath" value="/scripts/services" />
+        <property name="restScriptsPath" value="/scripts/rest" />
+        <property name="controllerScriptsPath" value="/scripts/controllers" />
         <property name="urlTransformationEngine" ref="crafter.urlTransformationEngine" />
         <property name="storeService" ref="crafter.contentStoreService" />
         <property name="macroResolver" ref="crafter.macroResolver" />

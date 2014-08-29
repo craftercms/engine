@@ -35,6 +35,8 @@
 
     <bean id="crafter.pageRenderController" class="org.craftercms.engine.controller.PageRenderController">
         <property name="fallbackPageUrl" value="/no-site.html"/>
+        <property name="scriptFactory" ref="crafter.scriptFactory"/>
+        <property name="storeService" ref="crafter.contentStoreService"/>
     </bean>
 
     <bean id="crafter.errorPageRenderController" class="org.craftercms.engine.controller.ErrorPageRenderController">

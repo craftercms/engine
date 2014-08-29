@@ -16,6 +16,12 @@
  */
 package org.craftercms.engine.controller.rest;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -25,19 +31,13 @@ import org.craftercms.core.util.UrlUtils;
 import org.craftercms.engine.exception.HttpStatusCodeAwareException;
 import org.craftercms.engine.exception.ScriptNotFoundException;
 import org.craftercms.engine.scripting.ScriptFactory;
-import org.craftercms.engine.util.ScriptUtils;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;
+import org.craftercms.engine.util.ScriptUtils;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Controller for REST script requests.
@@ -82,6 +82,13 @@ public class RestScriptsController extends AbstractController {
         String scriptUrl = getScriptUrl(siteContext, request, serviceUrl);
 
         Object responseBody = executeScript(request, response, scriptUrl);
+
+        if (response.isCommitted()) {
+            // If response has been already committed by the script, just return null
+            logger.debug("Response already committed by script " + scriptUrl);
+
+            return null;
+        }
 
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject(responseBodyModelAttributeName, responseBody);

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:utils="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <utils:list id="crafter.connectionFactories">
+    <!-- Override to provide the connection factories -->
+    </utils:list>
+
+    <bean id="crafter.connectionFactoryLocator"
+          class="org.springframework.social.connect.support.ConnectionFactoryRegistry">
+        <property name="connectionFactories">
+            <ref bean="crafter.connectionFactories"/>
+        </property>
+    </bean>
+
+    <bean id="crafter.tenantResolver" class="org.craftercms.security.utils.social.RequestTenantResolver"/>
+
+    <bean id="crafter.usersConnectionRepository"
+          class="org.craftercms.profile.social.ProfileUsersConnectionRepository">
+        <property name="connectionFactoryLocator" ref="crafter.connectionFactoryLocator"/>
+        <property name="tenantResolver" ref="crafter.tenantResolver"/>
+        <property name="profileService" ref="crafter.profileServiceRestClient"/>
+    </bean>
+
+</beans>

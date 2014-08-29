@@ -35,11 +35,13 @@ public class SiteContext {
     protected String templatesPath;
     protected FreeMarkerConfig freeMarkerConfig;
     protected String restScriptsPath;
+    protected String controllerScriptsPath;
     protected UrlTransformationEngine urlTransformationEngine;
     protected PreviewOverlayCallback overlayCallback;
 
-    public SiteContext(String siteName, Context context, boolean fallback, String staticAssetsPath, String templatesPath,
-                       FreeMarkerConfig freeMarkerConfig, String restScriptsPath, UrlTransformationEngine urlTransformationEngine,
+    public SiteContext(String siteName, Context context, boolean fallback, String staticAssetsPath,
+                       String templatesPath, FreeMarkerConfig freeMarkerConfig, String restScriptsPath,
+                       String controllerScriptsPath, UrlTransformationEngine urlTransformationEngine,
                        PreviewOverlayCallback overlayCallback) {
         this.siteName = siteName;
         this.context = context;
@@ -48,6 +50,7 @@ public class SiteContext {
         this.templatesPath = templatesPath;
         this.freeMarkerConfig = freeMarkerConfig;
         this.restScriptsPath = restScriptsPath;
+        this.controllerScriptsPath = controllerScriptsPath;
         this.urlTransformationEngine = urlTransformationEngine;
         this.overlayCallback = overlayCallback;
     }
@@ -78,6 +81,10 @@ public class SiteContext {
 
     public String getRestScriptsPath() {
         return restScriptsPath;
+    }
+
+    public String getControllerScriptsPath() {
+        return controllerScriptsPath;
     }
 
     public UrlTransformationEngine getUrlTransformationEngine() {
@@ -121,6 +128,7 @@ public class SiteContext {
                 ", templatesPath='" + templatesPath + '\'' +
                 ", freeMarkerConfig=" + freeMarkerConfig +
                 ", restScriptsPath='" + restScriptsPath + '\'' +
+                ", controllerScriptsPath='" + controllerScriptsPath + '\'' +
                 ", urlTransformationEngine=" + urlTransformationEngine +
                 ", overlayCallback=" + overlayCallback +
                 ']';
