@@ -16,20 +16,36 @@
  */
 package org.craftercms.engine.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.craftercms.core.exception.CrafterException;
+import org.craftercms.core.exception.PathNotFoundException;
+import org.craftercms.core.service.ContentStoreService;
+import org.craftercms.core.util.ExceptionUtils;
+import org.craftercms.core.util.UrlUtils;
+import org.craftercms.engine.exception.HttpStatusCodeAwareException;
+import org.craftercms.engine.exception.ScriptException;
+import org.craftercms.engine.scripting.Script;
+import org.craftercms.engine.scripting.ScriptFactory;
+import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;
+import org.craftercms.engine.util.ScriptUtils;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 /**
- * Default controller for rendering Crafter pages. If the site context is the fallback context, a fallback page is always rendered.
+ * Default controller for rendering Crafter pages. If the site context is the fallback context, a fallback page is
+ * always rendered. The controller also tries to find a script controller for the page URL (when not fallback). If
+ * one is found, it's executed and its return value is interpreted as a view name to be rendered.
  *
  * @author Alfonso Vasquez
  * @author Dejan Brkic
@@ -38,26 +54,59 @@ public class PageRenderController extends AbstractController {
 	
 	private static final Log logger = LogFactory.getLog(PageRenderController.class);
 
+    private static final String SCRIPT_URL_FORMAT = "%s.%s.%s"; // {url}.{method}.{scriptExt}
+
     protected String fallbackPageUrl;
+    protected ScriptFactory scriptFactory;
+    protected ContentStoreService storeService;
 
     @Required
     public void setFallbackPageUrl(String fallbackPageUrl) {
         this.fallbackPageUrl = fallbackPageUrl;
     }
 
-    @Override
-    protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        String pageUrl;
+    @Required
+    public void setScriptFactory(final ScriptFactory scriptFactory) {
+        this.scriptFactory = scriptFactory;
+    }
 
-        if ( AbstractSiteContextResolvingFilter.getCurrentContext().isFallback()) {
+    @Required
+    public void setStoreService(final ContentStoreService storeService) {
+        this.storeService = storeService;
+    }
+
+    @Override
+    protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
+        throws Exception {
+        String pageUrl;
+        SiteContext siteContext = AbstractSiteContextResolvingFilter.getCurrentContext();
+
+        if (siteContext.isFallback()) {
             logger.warn("Rendering fallback page [" + fallbackPageUrl + "]");
 
             pageUrl = fallbackPageUrl;
         } else {
             pageUrl = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
             if (StringUtils.isEmpty(pageUrl)) {
-                throw new IllegalStateException("Required request attribute '" + HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE +
-                        "' is not set");
+                throw new IllegalStateException("Required request attribute '" + HandlerMapping
+                    .PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE + "' is not set");
+            }
+
+            Script controllerScript = getControllerScript(siteContext, request, pageUrl);
+            if (controllerScript != null) {
+                Map<String, Object> model = new HashMap<>();
+                Map<String, Object> variables = createScriptVariables(request, response, model);
+                String viewName = executeScript(controllerScript, variables);
+
+                if (StringUtils.isNotEmpty(viewName)) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Rendering view " + viewName + " returned by script " + controllerScript);
+                    }
+
+                    return new ModelAndView(viewName, model);
+                } else {
+                    return null;
+                }
             }
 
             if (logger.isDebugEnabled()) {
@@ -66,6 +115,72 @@ public class PageRenderController extends AbstractController {
         }
 
         return new ModelAndView(pageUrl);
+    }
+
+    protected Script getControllerScript(SiteContext siteContext, HttpServletRequest request, String pageUrl) {
+        String scriptUrl = getScriptUrl(siteContext, request, pageUrl);
+
+        try {
+            // Check controller script exists
+            storeService.getContent(siteContext.getContext(), scriptUrl);
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Controller script found for page " + pageUrl + " at " + scriptUrl);
+            }
+
+            return scriptFactory.getScript(scriptUrl);
+        } catch (PathNotFoundException e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("No controller script for page " + pageUrl + " at " + scriptUrl, e);
+            }
+        } catch (CrafterException e) {
+            logger.error("Error while trying to retrieve controller script at " + scriptUrl, e);
+        }
+
+        return null;
+    }
+
+    protected String getScriptUrl(SiteContext siteContext, HttpServletRequest request, String pageUrl) {
+        String method = request.getMethod().toLowerCase();
+        String pageUrlNoExt = FilenameUtils.removeExtension(pageUrl);
+        String controllerScriptsPath = siteContext.getControllerScriptsPath();
+
+        String baseUrl = UrlUtils.appendUrl(controllerScriptsPath, pageUrlNoExt);
+
+        return String.format(SCRIPT_URL_FORMAT, baseUrl, method, scriptFactory.getScriptFileExtension());
+    }
+
+    protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response,
+                                                        Map<String, Object> model) {
+        Map<String, Object> variables = new HashMap<String, Object>();
+        ScriptUtils.addCommonVariables(variables, request, response, getServletContext());
+        ScriptUtils.addCrafterVariables(variables);
+        ScriptUtils.addModelVariable(variables, model);
+
+        return variables;
+    }
+
+    protected String executeScript(Script script, Map<String, Object> scriptVariables) throws Exception {
+        try {
+            Object result = script.execute(scriptVariables);
+            if (result != null) {
+                if (result instanceof String) {
+                    return (String) result;
+                } else {
+                    throw new ScriptException("Expected String view name as return value of controller script " +
+                        script + ". Actual type of returns value: " + result.getClass().getName());
+                }
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            Exception cause = (Exception) ExceptionUtils.getThrowableOfType(e, HttpStatusCodeAwareException.class);
+            if (cause != null) {
+                throw cause;
+            } else {
+                throw e;
+            }
+        }
     }
 
 }

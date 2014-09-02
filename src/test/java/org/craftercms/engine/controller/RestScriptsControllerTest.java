@@ -26,6 +26,8 @@ import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -82,6 +84,23 @@ public class RestScriptsControllerTest {
     @Test
     public void testError2() throws Exception {
         testError("/testError2.json", HttpServletResponse.SC_BAD_REQUEST, "This is an error test message");
+    }
+
+    @Test
+    public void testRedirect() throws Exception {
+        MockHttpServletRequest request = createRequest("/testRedirect.json");
+        MockHttpServletResponse response = createResponse();
+
+        setCurrentRequest(request);
+
+        ModelAndView modelAndView = controller.handleRequest(request, response);
+
+        assertNull(modelAndView);
+        assertTrue(response.isCommitted());
+        assertEquals(HttpServletResponse.SC_MOVED_TEMPORARILY, response.getStatus());
+        assertEquals("/api/1/services/test.json", response.getRedirectedUrl());
+
+        removeCurrentRequest();
     }
 
     private void testError(String serviceUrl, int statusCode, String message) throws Exception {

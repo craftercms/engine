@@ -43,6 +43,7 @@ public class SiteContextFactory {
     protected String templatesPath;
     protected ObjectFactory<FreeMarkerConfig> freeMarkerConfigFactory;
     protected String restScriptsPath;
+    protected String controllerScriptsPath;
     protected boolean cacheOn;
     protected int maxAllowedItemsInCache;
     protected boolean ignoreHiddenFiles;
@@ -102,6 +103,11 @@ public class SiteContextFactory {
         this.restScriptsPath = restScriptsPath;
     }
 
+    @Required
+    public void setControllerScriptsPath(final String controllerScriptsPath) {
+        this.controllerScriptsPath = controllerScriptsPath;
+    }
+
     public void setCacheOn(boolean cacheOn) {
         this.cacheOn = cacheOn;
     }
@@ -136,11 +142,11 @@ public class SiteContextFactory {
     public SiteContext createContext(String siteName, boolean fallback) {
         String resolvedRootFolderPath = macroResolver.resolveMacros(rootFolderPath);
 
-        Context context = storeService.createContext(storeType, storeServerUrl, username, password, resolvedRootFolderPath, cacheOn,
-                maxAllowedItemsInCache, ignoreHiddenFiles);
+        Context context = storeService.createContext(storeType, storeServerUrl, username, password,
+            resolvedRootFolderPath, cacheOn, maxAllowedItemsInCache, ignoreHiddenFiles);
 
-        return new SiteContext(siteName, context, fallback, staticAssetsPath, templatesPath, getFreemarkerConfig(), restScriptsPath,
-                urlTransformationEngine, overlayCallback);
+        return new SiteContext(siteName, context, fallback, staticAssetsPath, templatesPath, getFreemarkerConfig(),
+            restScriptsPath, controllerScriptsPath, urlTransformationEngine, overlayCallback);
     }
 
     protected FreeMarkerConfig getFreemarkerConfig() {

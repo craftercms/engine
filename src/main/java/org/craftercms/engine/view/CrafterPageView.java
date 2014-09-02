@@ -16,8 +16,19 @@
  */
 package org.craftercms.engine.view;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.craftercms.core.util.ExceptionUtils;
 import org.craftercms.core.util.cache.CachingAwareObject;
 import org.craftercms.engine.exception.HttpStatusCodeAwareException;
@@ -33,14 +44,12 @@ import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.view.AbstractView;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.*;
-
 /**
  * @author Alfonso Vásquez
  */
 public class CrafterPageView extends AbstractView implements CachingAwareObject, InitializingBean {
+
+    private static final Log logger = LogFactory.getLog(CrafterPageView.class);
 
     public static final String DEFAULT_CONTENT_TYPE = "text/html;charset=UTF-8";
     public static final String DEFAULT_CHARSET = "UTF-8";
@@ -209,6 +218,13 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
         if (CollectionUtils.isNotEmpty(scripts)) {
             for (Script script : scripts) {
                 executeScript(script, scriptVariables);
+
+                // If the response has been already committed by one of the scripts, stop and don't render the view
+                if (response.isCommitted()) {
+                    logger.debug("Response already committed by script");
+
+                    return;
+                }
             }
         }
 

@@ -38,10 +38,12 @@
     </bean>
 
     <util:map id="crafter.restScriptsVariables">
-        <entry key="siteItemService" value-ref="crafter.siteItemService" />
-        <entry key="urlTransformationService" value-ref="crafter.urlTransformationService" />
-        <entry key="searchService" value-ref="crafter.searchService" />
-        <entry key="applicationContext" value-ref="crafter.applicationContextAccessor" />
+        <entry key="siteItemService" value-ref="crafter.siteItemService"/>
+        <entry key="urlTransformationService" value-ref="crafter.urlTransformationService"/>
+        <entry key="searchService" value-ref="crafter.searchService"/>
+        <entry key="applicationContext" value-ref="crafter.applicationContextAccessor"/>
+        <entry key="connectionFactoryLocator" value-ref="crafter.connectionFactoryLocator"/>
+        <entry key="usersConnectionRepository" value-ref="crafter.usersConnectionRepository"/>
     </util:map>
 
 </beans>
