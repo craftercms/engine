@@ -17,7 +17,7 @@
 
     <bean id="crafter.tenantResolver" class="org.craftercms.security.utils.social.RequestTenantResolver"/>
 
-    <bean id="crafter.textEncryptor" class="org.craftercms.commons.crypto.impl.NoopTextEncryptor"/>
+    <bean id="crafter.textEncryptor" class="org.craftercms.commons.crypto.impl.NoOpTextEncryptor"/>
 
     <bean id="crafter.usersConnectionRepository"
           class="org.craftercms.profile.social.ProfileUsersConnectionRepository">

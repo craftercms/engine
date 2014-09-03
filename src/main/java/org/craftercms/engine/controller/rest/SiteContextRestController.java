@@ -1,15 +1,16 @@
 package org.craftercms.engine.controller.rest;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * REST controller for stuff related for the {@link org.craftercms.engine.service.context.SiteContext}
@@ -26,6 +27,7 @@ public class SiteContextRestController {
     public static final String MODEL_ATTR_ID =  "id";
 
     @RequestMapping(value = URL_CONTEXT_ID, method = RequestMethod.GET)
+    @ResponseBody
     public Map<String, Object> getContextId() {
         SiteContext context = AbstractSiteContextResolvingFilter.getCurrentContext();
         if (context != null) {
