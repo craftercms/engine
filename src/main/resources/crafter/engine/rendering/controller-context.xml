@@ -49,6 +49,13 @@
 
     <bean id="crafter.siteContextRestController" class="org.craftercms.engine.controller.rest.SiteContextRestController" />
 
+    <!-- Overwrite CacheRestController from core -->
+    <bean id="crafter.cacheRestController" class="org.craftercms.engine.controller.rest.FreeMarkerAwareCacheRestController">
+        <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
+        <property name="storeService" ref="crafter.contentStoreService"/>
+        <property name="siteContextRegistry" ref="crafter.siteContextRegistry"/>
+    </bean>
+
     <util:map id="crafter.urlMappings">
         <entry key="/api/1/services/**" value-ref="crafter.restScriptsController"/>
         <entry key="/static-assets/**" value-ref="crafter.staticAssetsRequestHandler"/>

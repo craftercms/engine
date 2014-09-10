@@ -16,14 +16,14 @@
  */
 package org.craftercms.engine.service.context;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
-
-import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Registry for site {@link SiteContext}s.
@@ -52,6 +52,10 @@ public class SiteContextRegistry implements BeanPostProcessor {
         }
 
         return bean;
+    }
+
+    public Collection<SiteContext> list() {
+        return registry.values();
     }
 
     public SiteContext get(String siteName) {
