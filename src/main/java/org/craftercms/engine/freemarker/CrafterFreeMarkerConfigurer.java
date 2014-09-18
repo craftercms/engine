@@ -16,14 +16,15 @@
  */
 package org.craftercms.engine.freemarker;
 
+import java.io.IOException;
+
+import freemarker.cache.CacheStorage;
 import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import org.craftercms.engine.macro.MacroResolver;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
-
-import java.io.IOException;
 
 /**
  * Extends {@link org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer} to:
@@ -38,6 +39,7 @@ public class CrafterFreeMarkerConfigurer extends FreeMarkerConfigurer {
 
     private MacroResolver macroResolver;
     private TemplateExceptionHandler templateExceptionHandler;
+    private CacheStorage cacheStorage;
 
     public void setMacroResolver(MacroResolver macroResolver) {
         this.macroResolver = macroResolver;
@@ -47,10 +49,17 @@ public class CrafterFreeMarkerConfigurer extends FreeMarkerConfigurer {
         this.templateExceptionHandler = templateExceptionHandler;
     }
 
+    public void setCacheStorage(final CacheStorage cacheStorage) {
+        this.cacheStorage = cacheStorage;
+    }
+
     @Override
     protected void postProcessConfiguration(Configuration config) throws IOException, TemplateException {
         if (templateExceptionHandler != null) {
             config.setTemplateExceptionHandler(templateExceptionHandler);
+        }
+        if (cacheStorage != null) {
+            config.setCacheStorage(cacheStorage);
         }
     }
 

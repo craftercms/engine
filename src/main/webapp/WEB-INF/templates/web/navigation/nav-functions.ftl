@@ -1,5 +1,10 @@
 <#function getNavItemName item>
-    <#return item.getChildItem("index.xml").navLabel!(item.storeName?replace("-", " ")?replace(".xml", "")?cap_first)>
+    <#assign actualNavItem = item>
+    <#if item.folder>
+        <#assign actualNavItem = item.getChildItem("index.xml")>
+    </#if>
+
+    <#return actualNavItem.navLabel!(item.storeName?replace("-", " ")?replace(".xml", "")?cap_first)>
 </#function>
 
 <#function getNavItemUrl item>

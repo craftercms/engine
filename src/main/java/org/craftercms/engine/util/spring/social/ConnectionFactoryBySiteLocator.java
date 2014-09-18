@@ -12,11 +12,14 @@ import org.springframework.social.connect.ConnectionFactoryLocator;
 /**
  * {@link org.springframework.social.connect.ConnectionFactoryLocator} that resolves {@link org.springframework.social
  * .connect.ConnectionFactory}s according to the current site. Basically, each site has it's own locator, which is
- * used to find the corresponding {@code ConnectionFactory} for the site.
+ * used to find the corresponding {@code ConnectionFactory} for the site. If you want to use a global locator in case
+ * there's no specific site locator, just specify one with * as site name.
  *
  * @author avasquez
  */
 public class ConnectionFactoryBySiteLocator implements ConnectionFactoryLocator {
+
+    public static final String DEFAULT_LOCATOR_KEY = "*";
 
     private Map<String, ConnectionFactoryLocator> connectionFactoryLocators;
 
@@ -49,11 +52,14 @@ public class ConnectionFactoryBySiteLocator implements ConnectionFactoryLocator 
         String siteName = context.getSiteName();
         ConnectionFactoryLocator locator = connectionFactoryLocators.get(siteName);
 
-        if (locator != null) {
-            return locator;
-        } else {
-            throw new IllegalStateException("No ConnectionFactoryLocator found for site name '" + siteName + "'");
+        if (locator == null) {
+            locator = connectionFactoryLocators.get(DEFAULT_LOCATOR_KEY);
+            if (locator == null) {
+                throw new IllegalStateException("No ConnectionFactoryLocator found for site name '" + siteName + "'");
+            }
         }
+
+        return locator;
     }
 
 }
