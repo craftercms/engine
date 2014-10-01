@@ -1,8 +1,10 @@
 package org.craftercms.engine.scripting.impl;
 
+import java.util.Arrays;
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+
 import org.craftercms.core.exception.CrafterException;
-import org.craftercms.core.exception.PathNotFoundException;
-import org.craftercms.core.service.Content;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.service.Item;
@@ -17,13 +19,12 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
-
-import java.util.Arrays;
-import java.util.List;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Alfonso Vásquez
@@ -97,12 +98,10 @@ public class ScriptResolverImplTest {
 
     private ContentStoreService createContentStoreService() {
         ContentStoreService storeService = mock(ContentStoreService.class);
-        when(storeService.getContent(any(Context.class), eq("/scripts/pages/mypage1.groovy")))
-                .thenReturn(mock(Content.class));
-        when(storeService.getContent(any(Context.class), eq("/scripts/pages/mypage2.groovy")))
-                .thenThrow(new PathNotFoundException());
-        when(storeService.getContent(any(Context.class), eq("/scripts/pages/mypage3.groovy")))
-                .thenThrow(new CrafterException());
+        when(storeService.exists(any(Context.class), eq("/scripts/pages/mypage1.groovy"))).thenReturn(true);
+        when(storeService.exists(any(Context.class), eq("/scripts/pages/mypage2.groovy"))).thenReturn(false);
+        when(storeService.exists(any(Context.class), eq("/scripts/pages/mypage3.groovy"))).thenThrow(
+            new CrafterException());
 
         return storeService;
     }

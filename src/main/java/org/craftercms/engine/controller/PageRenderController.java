@@ -26,7 +26,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.core.exception.CrafterException;
-import org.craftercms.core.exception.PathNotFoundException;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.util.ExceptionUtils;
 import org.craftercms.core.util.UrlUtils;
@@ -122,16 +121,14 @@ public class PageRenderController extends AbstractController {
 
         try {
             // Check controller script exists
-            storeService.getContent(siteContext.getContext(), scriptUrl);
+            if (storeService.exists(siteContext.getContext(), scriptUrl)) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Controller script found for page " + pageUrl + " at " + scriptUrl);
+                }
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("Controller script found for page " + pageUrl + " at " + scriptUrl);
-            }
-
-            return scriptFactory.getScript(scriptUrl);
-        } catch (PathNotFoundException e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("No controller script for page " + pageUrl + " at " + scriptUrl, e);
+                return scriptFactory.getScript(scriptUrl);
+            } else if (logger.isDebugEnabled()) {
+                logger.debug("No controller script for page " + pageUrl + " at " + scriptUrl);
             }
         } catch (CrafterException e) {
             logger.error("Error while trying to retrieve controller script at " + scriptUrl, e);
