@@ -1,22 +1,21 @@
 package org.craftercms.engine.scripting.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.core.exception.CrafterException;
-import org.craftercms.core.exception.PathNotFoundException;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.scripting.ScriptResolver;
 import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;
 import org.springframework.beans.factory.annotation.Required;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Default implementation of {@link org.craftercms.engine.scripting.ScriptResolver}.
@@ -69,17 +68,18 @@ public class ScriptResolverImpl implements ScriptResolver {
             if (StringUtils.isNotEmpty(scriptUrl)) {
                 try {
                     // Check that the script exists. If not, ignore.
-                    storeService.getContent(context, scriptUrl);
+                    if (storeService.exists(context, scriptUrl)) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Script for content type '" + contentType + "' found at " + scriptUrl);
+                        }
 
-                    scriptUrls = new ArrayList<String>();
-                    scriptUrls.add(scriptUrl);
-                } catch (PathNotFoundException e) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("No script for content type '" + contentType + "' found at " + scriptUrl, e);
+                        scriptUrls = new ArrayList<>();
+                        scriptUrls.add(scriptUrl);
+                    } if (logger.isDebugEnabled()) {
+                        logger.debug("No script for content type '" + contentType + "' found at " + scriptUrl);
                     }
                 } catch (CrafterException e) {
-                    logger.error("Error while retrieving script for content type '" + contentType + "' at " +
-                            scriptUrl, e);
+                    logger.error("Error retrieving script for content type '" + contentType + "' at " + scriptUrl, e);
                 }
             }
         }

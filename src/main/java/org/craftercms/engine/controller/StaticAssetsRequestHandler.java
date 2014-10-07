@@ -16,6 +16,11 @@
  */
 package org.craftercms.engine.controller;
 
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -24,6 +29,7 @@ import org.craftercms.core.exception.PathNotFoundException;
 import org.craftercms.core.service.Content;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
+import org.craftercms.core.util.HttpServletUtils;
 import org.craftercms.core.util.UrlUtils;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;
@@ -34,11 +40,6 @@ import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.support.WebContentGenerator;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 /**
  * Request handler to render static assets. Similar to {@link org.springframework.web.servlet.resource.ResourceHttpRequestHandler}, but
@@ -52,6 +53,7 @@ public class StaticAssetsRequestHandler extends WebContentGenerator implements H
 
     private ContentStoreService contentStoreService;
     private String staticAssetsPath;
+    private boolean disableCaching;
 
     public StaticAssetsRequestHandler() {
         super(METHOD_GET, METHOD_HEAD);
@@ -68,8 +70,13 @@ public class StaticAssetsRequestHandler extends WebContentGenerator implements H
         this.staticAssetsPath = staticAssetsPath;
     }
 
+    public void setDisableCaching(final boolean disableCaching) {
+        this.disableCaching = disableCaching;
+    }
+
     @Override
-    public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException,
+        IOException {
         checkAndPrepare(request, response, true);
 
         SiteContext context = AbstractSiteContextResolvingFilter.getCurrentContext();
@@ -93,24 +100,34 @@ public class StaticAssetsRequestHandler extends WebContentGenerator implements H
         MediaType mediaType = getMediaType(path);
         if (mediaType != null) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Determined media type '" + mediaType + "' for static asset at [context=" + context + ", path='" + path +
-                        "']");
+                logger.debug("Determined media type '" + mediaType + "' for static asset at [context=" + context +
+                    ", path='" + path + "']");
             }
         }
         else {
             if (logger.isDebugEnabled()) {
-                logger.debug("No media type found for static asset at [context=" + context + ", path='" + path + "'] - not sending " +
-                        "a content-type header");
+                logger.debug("No media type found for static asset at [context=" + context + ", path='" + path +
+                    "'] - not sending a content-type header");
             }
         }
 
         if ((new ServletWebRequest(request, response)).checkNotModified(content.getLastModified())) {
-            logger.debug("Static asset not modified - returning 304");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Static asset not modified - returning 304");
+            }
 
             return;
         }
 
         setHeaders(response, content, mediaType);
+
+        if (disableCaching) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caching disabled on client");
+            }
+
+            HttpServletUtils.disableCaching(response);
+        }
 
         if (METHOD_HEAD.equals(request.getMethod())) {
             logger.trace("HEAD request - skipping content");
@@ -124,8 +141,8 @@ public class StaticAssetsRequestHandler extends WebContentGenerator implements H
     protected String getPath(HttpServletRequest request, SiteContext context) {
         String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         if (StringUtils.isEmpty(path)) {
-            throw new IllegalStateException("Required request attribute '" + HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE +
-                    "' is not set");
+            throw new IllegalStateException("Required request attribute '" + HandlerMapping
+                .PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE + "' is not set");
         }
 
         if (StringUtils.isNotEmpty(staticAssetsPath)) {
