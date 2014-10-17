@@ -78,25 +78,8 @@
     <!-- ////////////////////////////////// -->
 
     <bean id="crafter.currentAuthenticationResolvingProcessor"
-          class="org.craftercms.engine.security.PreviewCurrentAuthenticationResolvingProcessor"/>
-
-    <!-- Order of the processors is important, so if you need to override this bean try to maintain a similar order -->
-    <bean id="crafter.securityFilter" class="org.craftercms.security.servlet.filters.RequestSecurityFilter">
-        <property name="securityProcessors">
-            <list>
-                <!-- Security cookies not necessary in preview -->
-                <!--ref bean="crafter.addSecurityCookiesProcessor"/-->
-                <ref bean="crafter.tenantNameResolvingProcessor"/>
-                <ref bean="crafter.currentAuthenticationResolvingProcessor"/>
-                <ref bean="crafter.loginProcessor"/>
-                <ref bean="crafter.logoutProcessor"/>
-                <ref bean="crafter.saveRequestAwareProcessor"/>
-                <ref bean="crafter.securityExceptionProcessor"/>
-                <ref bean="crafter.urlAccessRestrictionCheckingProcessor"/>
-            </list>
-        </property>
-        <property name="urlsToInclude" value="${crafter.security.urlsToInclude}"/>
-        <property name="urlsToExclude" value="${crafter.security.urlsToExclude}"/>
+          class="org.craftercms.engine.security.PreviewCurrentAuthenticationResolvingProcessor">
+        <property name="authenticationManager" ref="crafter.authenticationManager"/>
     </bean>
 
     <!-- ////////////////////////////////// -->

@@ -16,26 +16,26 @@
  */
 package org.craftercms.engine.security;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+
 import org.bson.types.ObjectId;
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.engine.controller.preview.rest.ProfileRestController;
 import org.craftercms.profile.api.Profile;
 import org.craftercms.security.authentication.impl.DefaultAuthentication;
-import org.craftercms.security.processors.RequestSecurityProcessor;
 import org.craftercms.security.processors.RequestSecurityProcessorChain;
+import org.craftercms.security.processors.impl.CurrentAuthenticationResolvingProcessor;
 import org.craftercms.security.utils.SecurityUtils;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Obtains and sets the authentication for the current request, using the current Crafter Studio persona.
  *
  * @author Alfonso Vásquez
  */
-public class PreviewCurrentAuthenticationResolvingProcessor implements RequestSecurityProcessor {
+public class PreviewCurrentAuthenticationResolvingProcessor extends CurrentAuthenticationResolvingProcessor {
 
     @Override
     public void processRequest(RequestContext context, RequestSecurityProcessorChain processorChain) throws Exception {
@@ -43,28 +43,32 @@ public class PreviewCurrentAuthenticationResolvingProcessor implements RequestSe
         Map<String, String> attributes = (Map<String, String>) request.getSession(true).getAttribute(
                 ProfileRestController.PROFILE_SESSION_ATTRIBUTE);
 
-        if (attributes != null && !"anonymous".equalsIgnoreCase(attributes.get("username"))) {
-            Profile profile = new Profile();
-            profile.setId(new ObjectId());
-            profile.setUsername(attributes.get("username"));
-            profile.setEnabled(true);
+        if (attributes != null) {
+            if (!"anonymous".equalsIgnoreCase(attributes.get("username"))) {
+                Profile profile = new Profile();
+                profile.setId(new ObjectId());
+                profile.setUsername(attributes.get("username"));
+                profile.setEnabled(true);
 
-            String rolesStr = attributes.get("roles");
-            if (rolesStr != null) {
-                String[] roles = rolesStr.split(",");
-                profile.getRoles().addAll(Arrays.asList(roles));
+                String rolesStr = attributes.get("roles");
+                if (rolesStr != null) {
+                    String[] roles = rolesStr.split(",");
+                    profile.getRoles().addAll(Arrays.asList(roles));
+                }
+
+                Map<String, Object> attributesNoUsernameNoRoles = new HashMap<String, Object>(attributes);
+                attributesNoUsernameNoRoles.remove("username");
+                attributesNoUsernameNoRoles.remove("roles");
+
+                profile.setAttributes(attributesNoUsernameNoRoles);
+
+                SecurityUtils.setAuthentication(request, new DefaultAuthentication("", profile));
             }
 
-            Map<String, Object> attributesNoUsernameNoRoles = new HashMap<String, Object>(attributes);
-            attributesNoUsernameNoRoles.remove("username");
-            attributesNoUsernameNoRoles.remove("roles");
-
-            profile.setAttributes(attributesNoUsernameNoRoles);
-
-            SecurityUtils.setAuthentication(request, new DefaultAuthentication("", profile));
+            processorChain.processRequest(context);
+        } else {
+            super.processRequest(context, processorChain);
         }
-
-        processorChain.processRequest(context);
     }
 
 }
