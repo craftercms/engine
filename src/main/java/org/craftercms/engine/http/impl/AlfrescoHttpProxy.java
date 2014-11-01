@@ -26,6 +26,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
+import java.net.URLDecoder;
 
 /**
  * Extension of {@link HttpProxyImpl} that proxies to Alfresco.
@@ -58,6 +59,8 @@ public class AlfrescoHttpProxy extends HttpProxyImpl {
 
             try {
                 queryString = HttpServletUtils.getQueryStringFromParams(queryParams, "UTF-8");
+                queryString = URLDecoder.decode(queryString, "UTF-8");
+
             } catch (UnsupportedEncodingException e) {
                 logger.error("Unable to encode params " + queryParams + " into a query string", e);
             }
