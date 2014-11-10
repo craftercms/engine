@@ -38,36 +38,37 @@ import org.craftercms.security.utils.SecurityUtils;
 public class PreviewCurrentAuthenticationResolvingProcessor extends CurrentAuthenticationResolvingProcessor {
 
     @Override
+    @SuppressWarnings("unchecked")
     public void processRequest(RequestContext context, RequestSecurityProcessorChain processorChain) throws Exception {
         HttpServletRequest request = context.getRequest();
         Map<String, String> attributes = (Map<String, String>) request.getSession(true).getAttribute(
                 ProfileRestController.PROFILE_SESSION_ATTRIBUTE);
 
-        if (attributes != null) {
-            if (!"anonymous".equalsIgnoreCase(attributes.get("username"))) {
-                Profile profile = new Profile();
-                profile.setId(new ObjectId());
-                profile.setUsername(attributes.get("username"));
-                profile.setEnabled(true);
+        if (attributes != null && !"anonymous".equalsIgnoreCase(attributes.get("username"))) {
+            Profile profile = new Profile();
+            profile.setId(new ObjectId());
+            profile.setUsername(attributes.get("username"));
+            profile.setEnabled(true);
 
-                String rolesStr = attributes.get("roles");
-                if (rolesStr != null) {
-                    String[] roles = rolesStr.split(",");
-                    profile.getRoles().addAll(Arrays.asList(roles));
-                }
-
-                Map<String, Object> attributesNoUsernameNoRoles = new HashMap<String, Object>(attributes);
-                attributesNoUsernameNoRoles.remove("username");
-                attributesNoUsernameNoRoles.remove("roles");
-
-                profile.setAttributes(attributesNoUsernameNoRoles);
-
-                SecurityUtils.setAuthentication(request, new DefaultAuthentication("", profile));
+            String rolesStr = attributes.get("roles");
+            if (rolesStr != null) {
+                String[] roles = rolesStr.split(",");
+                profile.getRoles().addAll(Arrays.asList(roles));
             }
 
-            processorChain.processRequest(context);
-        } else {
+            Map<String, Object> attributesNoUsernameNoRoles = new HashMap<String, Object>(attributes);
+            attributesNoUsernameNoRoles.remove("username");
+            attributesNoUsernameNoRoles.remove("roles");
+
+            profile.setAttributes(attributesNoUsernameNoRoles);
+
+            SecurityUtils.setAuthentication(request, new DefaultAuthentication("", profile));
+        }
+
+        if (SecurityUtils.getAuthentication(request) == null) {
             super.processRequest(context, processorChain);
+        } else {
+            processorChain.processRequest(context);
         }
     }
 
