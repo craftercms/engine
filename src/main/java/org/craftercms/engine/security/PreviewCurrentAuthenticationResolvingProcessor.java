@@ -21,6 +21,9 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.bson.types.ObjectId;
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.engine.controller.preview.rest.ProfileRestController;
@@ -31,11 +34,13 @@ import org.craftercms.security.processors.impl.CurrentAuthenticationResolvingPro
 import org.craftercms.security.utils.SecurityUtils;
 
 /**
- * Obtains and sets the authentication for the current request, using the current Crafter Studio persona.
+ * Obtains and sets the authentication for the current request, using the current Crafter Studio Persona.
  *
  * @author Alfonso Vásquez
  */
 public class PreviewCurrentAuthenticationResolvingProcessor extends CurrentAuthenticationResolvingProcessor {
+
+    private static final Log logger = LogFactory.getLog(PreviewCurrentAuthenticationResolvingProcessor.class);
 
     @Override
     @SuppressWarnings("unchecked")
@@ -44,31 +49,39 @@ public class PreviewCurrentAuthenticationResolvingProcessor extends CurrentAuthe
         Map<String, String> attributes = (Map<String, String>) request.getSession(true).getAttribute(
                 ProfileRestController.PROFILE_SESSION_ATTRIBUTE);
 
-        if (attributes != null && !"anonymous".equalsIgnoreCase(attributes.get("username"))) {
-            Profile profile = new Profile();
-            profile.setId(new ObjectId());
-            profile.setUsername(attributes.get("username"));
-            profile.setEnabled(true);
-
-            String rolesStr = attributes.get("roles");
-            if (rolesStr != null) {
-                String[] roles = rolesStr.split(",");
-                profile.getRoles().addAll(Arrays.asList(roles));
+        if (MapUtils.isNotEmpty(attributes)) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Persona set: " + attributes);
             }
 
-            Map<String, Object> attributesNoUsernameNoRoles = new HashMap<String, Object>(attributes);
-            attributesNoUsernameNoRoles.remove("username");
-            attributesNoUsernameNoRoles.remove("roles");
+            if (!"anonymous".equalsIgnoreCase(attributes.get("username"))) {
+                Profile profile = new Profile();
+                profile.setId(new ObjectId());
+                profile.setUsername(attributes.get("username"));
+                profile.setEnabled(true);
 
-            profile.setAttributes(attributesNoUsernameNoRoles);
+                String rolesStr = attributes.get("roles");
+                if (rolesStr != null) {
+                    String[] roles = rolesStr.split(",");
+                    profile.getRoles().addAll(Arrays.asList(roles));
+                }
 
-            SecurityUtils.setAuthentication(request, new DefaultAuthentication("", profile));
-        }
+                Map<String, Object> attributesNoUsernameNoRoles = new HashMap<String, Object>(attributes);
+                attributesNoUsernameNoRoles.remove("username");
+                attributesNoUsernameNoRoles.remove("roles");
 
-        if (SecurityUtils.getAuthentication(request) == null) {
-            super.processRequest(context, processorChain);
-        } else {
+                profile.setAttributes(attributesNoUsernameNoRoles);
+
+                SecurityUtils.setAuthentication(request, new DefaultAuthentication("", profile));
+            }
+
             processorChain.processRequest(context);
+        } else {
+            if (logger.isDebugEnabled()) {
+                logger.debug("No persona set. Trying to resolve authentication normally");
+            }
+
+            super.processRequest(context, processorChain);
         }
     }
 
