@@ -16,17 +16,17 @@
  */
 package org.craftercms.engine.http.impl;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.Map;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.core.util.HttpServletUtils;
 import org.springframework.beans.factory.annotation.Required;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import java.io.UnsupportedEncodingException;
-import java.util.Map;
-import java.net.URLDecoder;
 
 /**
  * Extension of {@link HttpProxyImpl} that proxies to Alfresco.
@@ -60,7 +60,6 @@ public class AlfrescoHttpProxy extends HttpProxyImpl {
             try {
                 queryString = HttpServletUtils.getQueryStringFromParams(queryParams, "UTF-8");
                 queryString = URLDecoder.decode(queryString, "UTF-8");
-
             } catch (UnsupportedEncodingException e) {
                 logger.error("Unable to encode params " + queryParams + " into a query string", e);
             }
