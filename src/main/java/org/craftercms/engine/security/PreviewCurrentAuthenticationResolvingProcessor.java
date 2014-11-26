@@ -17,6 +17,7 @@
 package org.craftercms.engine.security;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -24,11 +25,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.bson.types.ObjectId;
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.engine.controller.preview.rest.ProfileRestController;
 import org.craftercms.profile.api.Profile;
-import org.craftercms.security.authentication.impl.DefaultAuthentication;
 import org.craftercms.security.processors.RequestSecurityProcessorChain;
 import org.craftercms.security.processors.impl.CurrentAuthenticationResolvingProcessor;
 import org.craftercms.security.utils.SecurityUtils;
@@ -50,15 +49,17 @@ public class PreviewCurrentAuthenticationResolvingProcessor extends CurrentAuthe
                 ProfileRestController.PROFILE_SESSION_ATTRIBUTE);
 
         if (MapUtils.isNotEmpty(attributes)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Persona set: " + attributes);
-            }
-
             if (!"anonymous".equalsIgnoreCase(attributes.get("username"))) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Non-anonymous persona set: " + attributes);
+                }
+
                 Profile profile = new Profile();
-                profile.setId(new ObjectId());
                 profile.setUsername(attributes.get("username"));
                 profile.setEnabled(true);
+                profile.setCreatedOn(new Date());
+                profile.setLastModified(new Date());
+                profile.setTenant("preview");
 
                 String rolesStr = attributes.get("roles");
                 if (rolesStr != null) {
@@ -72,10 +73,16 @@ public class PreviewCurrentAuthenticationResolvingProcessor extends CurrentAuthe
 
                 profile.setAttributes(attributesNoUsernameNoRoles);
 
-                SecurityUtils.setAuthentication(request, new DefaultAuthentication("", profile));
-            }
+                SecurityUtils.setAuthentication(request, new PersonaAuthentication(profile));
 
-            processorChain.processRequest(context);
+                processorChain.processRequest(context);
+            } else {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Anonymous persona set. Trying to resolve authentication normally");
+                }
+
+                super.processRequest(context, processorChain);
+            }
         } else {
             if (logger.isDebugEnabled()) {
                 logger.debug("No persona set. Trying to resolve authentication normally");
