@@ -49,17 +49,17 @@ public class RestScriptsController extends AbstractController {
     private static final Log logger = LogFactory.getLog(RestScriptsController.class);
 
     public static final String DEFAULT_RESPONSE_BODY_MODEL_ATTR_NAME = "responseBody";
-    public static final String DEFAULT_ERROR_MODEL_ATTR_NAME = "error";
+    public static final String DEFAULT_ERROR_MESSAGE_MODEL_ATTR_NAME = "message";
 
     private static final String SCRIPT_URL_FORMAT = "%s.%s.%s"; // {url}.{method}.{scriptExt}
 
     protected ScriptFactory scriptFactory;
     protected String responseBodyModelAttributeName;
-    protected String errorModelAttributeName;
+    protected String errorMessageModelAttributeName;
 
     public RestScriptsController() {
         responseBodyModelAttributeName = DEFAULT_RESPONSE_BODY_MODEL_ATTR_NAME;
-        errorModelAttributeName = DEFAULT_ERROR_MODEL_ATTR_NAME;
+        errorMessageModelAttributeName = DEFAULT_ERROR_MESSAGE_MODEL_ATTR_NAME;
     }
 
     @Required
@@ -71,8 +71,8 @@ public class RestScriptsController extends AbstractController {
         this.responseBodyModelAttributeName = responseBodyModelAttributeName;
     }
 
-    public void setErrorModelAttributeName(String errorModelAttributeName) {
-        this.errorModelAttributeName = errorModelAttributeName;
+    public void setErrorMessageModelAttributeName(String errorMessageModelAttributeName) {
+        this.errorMessageModelAttributeName = errorMessageModelAttributeName;
     }
 
     @Override
@@ -131,7 +131,7 @@ public class RestScriptsController extends AbstractController {
 
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
-            return Collections.singletonMap(errorModelAttributeName, "REST script not found");
+            return Collections.singletonMap(errorMessageModelAttributeName, "REST script not found");
         } catch (Exception e) {
             logger.error("Execution failed for script " + scriptUrl, e);
 
@@ -148,7 +148,7 @@ public class RestScriptsController extends AbstractController {
                 errorMsg = e.getMessage();
             }
 
-            return Collections.singletonMap(errorModelAttributeName, errorMsg);
+            return Collections.singletonMap(errorMessageModelAttributeName, errorMsg);
         }
     }
 

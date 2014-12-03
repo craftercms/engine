@@ -19,10 +19,6 @@
         <level value="info" />
     </logger>
 
-    <logger name="org.craftercms.security.servlet.filters.RequestContextBindingFilter">
-        <level value="info" />
-    </logger>
-
     <!-- 3rdparty Loggers -->
     <logger name="org.springframework.core">
         <level value="info" />

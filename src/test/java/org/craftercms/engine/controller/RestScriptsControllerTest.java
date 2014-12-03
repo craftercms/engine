@@ -113,8 +113,9 @@ public class RestScriptsControllerTest {
 
         assertEquals(statusCode, response.getStatus());
 
-        Map<String, Object> responseBody = (Map<String, Object>) modelAndView.getModel().get("responseBody");
-        assertEquals(message, responseBody.get("error"));
+        Map<String, Object> responseBody = (Map<String, Object>) modelAndView.getModel().get(RestScriptsController
+            .DEFAULT_RESPONSE_BODY_MODEL_ATTR_NAME);
+        assertEquals(message, responseBody.get(RestScriptsController.DEFAULT_ERROR_MESSAGE_MODEL_ATTR_NAME));
 
         removeCurrentRequest();
     }
@@ -155,7 +156,8 @@ public class RestScriptsControllerTest {
     }
 
     private MockHttpServletRequest createRequest(String serviceUrl) throws Exception {
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", "http://localhost:8080/api/1/services/" + serviceUrl);
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "http://localhost:8080/api/1/services/" +
+            serviceUrl);
 
         request.setParameter("test-param", "test");
         request.addHeader("test-header", "test");

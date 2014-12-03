@@ -17,25 +17,29 @@
 package org.craftercms.engine.security;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
-import org.bson.types.ObjectId;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.engine.controller.preview.rest.ProfileRestController;
 import org.craftercms.profile.api.Profile;
-import org.craftercms.security.authentication.impl.DefaultAuthentication;
 import org.craftercms.security.processors.RequestSecurityProcessorChain;
 import org.craftercms.security.processors.impl.CurrentAuthenticationResolvingProcessor;
 import org.craftercms.security.utils.SecurityUtils;
 
 /**
- * Obtains and sets the authentication for the current request, using the current Crafter Studio persona.
+ * Obtains and sets the authentication for the current request, using the current Crafter Studio Persona.
  *
  * @author Alfonso Vásquez
  */
 public class PreviewCurrentAuthenticationResolvingProcessor extends CurrentAuthenticationResolvingProcessor {
+
+    private static final Log logger = LogFactory.getLog(PreviewCurrentAuthenticationResolvingProcessor.class);
 
     @Override
     @SuppressWarnings("unchecked")
@@ -44,31 +48,47 @@ public class PreviewCurrentAuthenticationResolvingProcessor extends CurrentAuthe
         Map<String, String> attributes = (Map<String, String>) request.getSession(true).getAttribute(
                 ProfileRestController.PROFILE_SESSION_ATTRIBUTE);
 
-        if (attributes != null && !"anonymous".equalsIgnoreCase(attributes.get("username"))) {
-            Profile profile = new Profile();
-            profile.setId(new ObjectId());
-            profile.setUsername(attributes.get("username"));
-            profile.setEnabled(true);
+        if (MapUtils.isNotEmpty(attributes)) {
+            if (!"anonymous".equalsIgnoreCase(attributes.get("username"))) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Non-anonymous persona set: " + attributes);
+                }
 
-            String rolesStr = attributes.get("roles");
-            if (rolesStr != null) {
-                String[] roles = rolesStr.split(",");
-                profile.getRoles().addAll(Arrays.asList(roles));
+                Profile profile = new Profile();
+                profile.setUsername(attributes.get("username"));
+                profile.setEnabled(true);
+                profile.setCreatedOn(new Date());
+                profile.setLastModified(new Date());
+                profile.setTenant("preview");
+
+                String rolesStr = attributes.get("roles");
+                if (rolesStr != null) {
+                    String[] roles = rolesStr.split(",");
+                    profile.getRoles().addAll(Arrays.asList(roles));
+                }
+
+                Map<String, Object> attributesNoUsernameNoRoles = new HashMap<String, Object>(attributes);
+                attributesNoUsernameNoRoles.remove("username");
+                attributesNoUsernameNoRoles.remove("roles");
+
+                profile.setAttributes(attributesNoUsernameNoRoles);
+
+                SecurityUtils.setAuthentication(request, new PersonaAuthentication(profile));
+
+                processorChain.processRequest(context);
+            } else {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Anonymous persona set. Trying to resolve authentication normally");
+                }
+
+                super.processRequest(context, processorChain);
+            }
+        } else {
+            if (logger.isDebugEnabled()) {
+                logger.debug("No persona set. Trying to resolve authentication normally");
             }
 
-            Map<String, Object> attributesNoUsernameNoRoles = new HashMap<String, Object>(attributes);
-            attributesNoUsernameNoRoles.remove("username");
-            attributesNoUsernameNoRoles.remove("roles");
-
-            profile.setAttributes(attributesNoUsernameNoRoles);
-
-            SecurityUtils.setAuthentication(request, new DefaultAuthentication("", profile));
-        }
-
-        if (SecurityUtils.getAuthentication(request) == null) {
             super.processRequest(context, processorChain);
-        } else {
-            processorChain.processRequest(context);
         }
     }
 

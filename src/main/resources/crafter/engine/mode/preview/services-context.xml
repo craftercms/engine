@@ -77,6 +77,12 @@
     <!--									-->
     <!-- ////////////////////////////////// -->
 
+    <bean id="crafter.addSecurityCookiesProcessor"
+          class="org.craftercms.engine.security.PreviewAddSecurityCookiesProcessor">
+        <property name="ticketCookieManager" ref="crafter.ticketCookieManager"/>
+        <property name="profileLastModifiedCookieManager" ref="crafter.profileLastModifiedCookieManager"/>
+    </bean>
+
     <bean id="crafter.currentAuthenticationResolvingProcessor"
           class="org.craftercms.engine.security.PreviewCurrentAuthenticationResolvingProcessor">
         <property name="authenticationManager" ref="crafter.authenticationManager"/>

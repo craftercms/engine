@@ -2,13 +2,22 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
     <import resource="classpath:crafter/core/rest-context.xml"/>
     <import resource="classpath:crafter/engine/rendering/controller-context.xml" />
     <import resource="classpath:crafter/engine/rendering/view-context.xml" />
+
+    <!--
+    Activates various annotations to be detected in bean classes: Spring's @Required and @Autowired, as well as JSR
+    250's @PostConstruct, @PreDestroy and @Resource (if available), JAX-WS's @WebServiceRef (if available), EJB3's @EJB
+    (if available), and JPA's @PersistenceContext and @PersistenceUnit (if available).
+    -->
+    <context:annotation-config/>
 
     <!-- Used to overwrite certain <mvc:annotation-driven> configuration -->
     <bean id="crafter.annotationDrivenConfigCustomizer" class="org.craftercms.engine.util.spring.mvc.AnnotationDrivenConfigCustomizer">
