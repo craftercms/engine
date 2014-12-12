@@ -21,7 +21,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 /**
- * Bean that provide simple access to the Spring application context's beans. Used for example to access Spring beans from an FTL.
+ * Bean that provide simple access to the Spring application context's beans. Used for example to access Spring beans
+ * from an FTL or a Groovy script.
  *
  * @author Alfonso Vásquez
  */

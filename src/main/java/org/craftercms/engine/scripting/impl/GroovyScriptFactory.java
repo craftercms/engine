@@ -1,12 +1,12 @@
 package org.craftercms.engine.scripting.impl;
 
+import java.util.Map;
+
 import groovy.util.GroovyScriptEngine;
 import org.craftercms.engine.exception.ScriptException;
 import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.springframework.beans.factory.annotation.Required;
-
-import java.util.Map;
 
 /**
  * {@link org.craftercms.engine.scripting.ScriptFactory} used specifically for Groovy. Very useful when scripts
@@ -23,7 +23,7 @@ public class GroovyScriptFactory implements ScriptFactory {
 
     @Required
     public void setResourceConnector(ContentResourceConnector resourceConnector) {
-        scriptEngine = new GroovyScriptEngine(resourceConnector);
+        scriptEngine = new GroovyScriptEngine(resourceConnector, getClass().getClassLoader());
     }
 
     @Required
