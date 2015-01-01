@@ -3,7 +3,7 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean name="crafter.properties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <bean name="crafter.properties" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
         <property name="locations">
             <list>
                 <value>classpath:crafter/core/core.properties</value>
@@ -16,7 +16,6 @@
         <property name="ignoreUnresolvablePlaceholders" value="true" />
     </bean>
 
-    
     <!-- ////////////////////////////////// -->
     <!--								 	-->
     <!--			 Filters				-->

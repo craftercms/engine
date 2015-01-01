@@ -36,7 +36,7 @@
     <!--									-->
     <!-- ////////////////////////////////// -->
 
-    <bean name="crafter.properties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <bean name="crafter.properties" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
         <property name="order" value="0"/>
         <property name="locations">
             <list>

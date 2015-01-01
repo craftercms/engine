@@ -12,7 +12,7 @@
     <!--									-->
     <!-- ////////////////////////////////// -->
 
-    <bean name="crafter.properties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <bean name="crafter.properties" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
         <property name="locations">
             <list>
                 <value>classpath:crafter/core/core.properties</value>
@@ -33,7 +33,7 @@
         <property name="renderComponentViewName" value="/templates/web/render-component.ftl"/>
     </bean>
 
-    <bean id="crafter.profileRestController" class="org.craftercms.engine.controller.preview.rest.ProfileRestController" />
+    <bean id="crafter.profileRestController" class="org.craftercms.engine.controller.preview.rest.ProfileRestController"/>
 
     <util:map id="crafter.urlMappings">
         <entry key="/api/1/services/**" value-ref="crafter.restScriptsController"/>
