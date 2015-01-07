@@ -16,18 +16,19 @@
  */
 package org.craftercms.engine.util;
 
+import java.util.Map;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.util.HttpServletUtils;
 import org.craftercms.engine.model.SiteItem;
+import org.craftercms.profile.api.Profile;
 import org.craftercms.security.authentication.Authentication;
 import org.craftercms.security.utils.SecurityUtils;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Map;
 
 /**
  * Utility methods for scripts.
@@ -38,18 +39,18 @@ public class ScriptUtils {
 
     private static final Log logger = LogFactory.getLog(ScriptUtils.class);
 
-    public static final String VARIABLE_REQUEST_URL =               "requestUrl";
-    public static final String VARIABLE_APPLICATION =               "application";
-    public static final String VARIABLE_REQUEST =                   "request";
-    public static final String VARIABLE_RESPONSE =                  "response";
-    public static final String VARIABLE_PARAMS =                    "params";
-    public static final String VARIABLE_HEADERS =                   "headers";
-    public static final String VARIABLE_COOKIES =                   "cookies";
-    public static final String VARIABLE_SESSION =                   "session";
-    public static final String VARIABLE_LOGGER =                    "logger";
-    public static final String VARIABLE_MODEL =                     "model";
-    public static final String VARIABLE_CRAFTER_MODEL =             "crafterModel";
-    public static final String VARIABLE_PROFILE =                   "profile";
+    public static final String VARIABLE_REQUEST_URL = "requestUrl";
+    public static final String VARIABLE_APPLICATION = "application";
+    public static final String VARIABLE_REQUEST = "request";
+    public static final String VARIABLE_RESPONSE = "response";
+    public static final String VARIABLE_PARAMS = "params";
+    public static final String VARIABLE_HEADERS = "headers";
+    public static final String VARIABLE_COOKIES = "cookies";
+    public static final String VARIABLE_SESSION = "session";
+    public static final String VARIABLE_LOGGER = "logger";
+    public static final String VARIABLE_MODEL = "model";
+    public static final String VARIABLE_CRAFTER_MODEL = "crafterModel";
+    public static final String VARIABLE_PROFILE = "profile";
 
     public static void addCommonVariables(Map<String, Object> variables, HttpServletRequest request,
                                           HttpServletResponse response, ServletContext context) {
@@ -69,15 +70,17 @@ public class ScriptUtils {
     }
 
     public static void addCrafterVariables(Map<String, Object> variables) {
+        Profile profile = null;
         RequestContext context = RequestContext.getCurrent();
+
         if (context != null) {
             Authentication auth = SecurityUtils.getAuthentication(context.getRequest());
             if (auth != null) {
-                variables.put(VARIABLE_PROFILE, auth.getProfile());
+                profile = auth.getProfile();
             }
         }
 
-        variables.put(VARIABLE_PROFILE, null);
+        variables.put(VARIABLE_PROFILE, profile);
     }
 
     public static void addCrafterVariables(Map<String, Object> variables, SiteItem crafterModel) {
