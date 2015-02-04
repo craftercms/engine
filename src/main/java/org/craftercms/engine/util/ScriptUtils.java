@@ -50,6 +50,7 @@ public class ScriptUtils {
     public static final String VARIABLE_LOGGER = "logger";
     public static final String VARIABLE_MODEL = "model";
     public static final String VARIABLE_CRAFTER_MODEL = "crafterModel";
+    public static final String VARIABLE_AUTH = "authentication";
     public static final String VARIABLE_PROFILE = "profile";
 
     public static void addCommonVariables(Map<String, Object> variables, HttpServletRequest request,
@@ -70,16 +71,18 @@ public class ScriptUtils {
     }
 
     public static void addCrafterVariables(Map<String, Object> variables) {
+        Authentication auth = null;
         Profile profile = null;
         RequestContext context = RequestContext.getCurrent();
 
         if (context != null) {
-            Authentication auth = SecurityUtils.getAuthentication(context.getRequest());
+            auth = SecurityUtils.getAuthentication(context.getRequest());
             if (auth != null) {
                 profile = auth.getProfile();
             }
         }
 
+        variables.put(VARIABLE_AUTH, auth);
         variables.put(VARIABLE_PROFILE, profile);
     }
 
