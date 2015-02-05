@@ -266,6 +266,7 @@
         <entry key="searchService" value-ref="crafter.searchService" />
         <entry key="breadcrumbBuilder" value-ref="crafter.breadcrumbBuilder" />
         <entry key="configProperties" value-ref="crafter.propertyResolver"/>
+        <entry key="tenantsResolver" value-ref="crafter.tenantsResolver"/>
     </util:map>
 
     <bean id="crafter.freeMarkerConfigFactory" class="org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean">

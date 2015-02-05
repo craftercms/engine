@@ -27,4 +27,9 @@ public class PersonaAuthentication implements Authentication {
         return profile;
     }
 
+    @Override
+    public boolean isRemembered() {
+        return false;
+    }
+
 }

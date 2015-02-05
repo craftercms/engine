@@ -16,6 +16,14 @@
  */
 package org.craftercms.engine.view.freemarker;
 
+import java.util.HashMap;
+import java.util.Map;
+import javax.servlet.ServletContext;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.ext.servlet.HttpRequestHashModel;
 import freemarker.ext.servlet.HttpRequestParametersHashModel;
@@ -37,14 +45,6 @@ import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerView;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Extends {@link FreeMarkerView} to add {@link RenderComponentDirective}s to support page component rendering in
@@ -68,6 +68,8 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     public static final String KEY_APP_CONTEXT = "applicationContext";
     public static final String KEY_COOKIES_CAP = "Cookies";
     public static final String KEY_COOKIES = "cookies";
+    public static final String KEY_AUTH_CAP = "Authentication";
+    public static final String KEY_AUTH = "authentication";
     public static final String KEY_PROFILE_CAP = "Profile";
     public static final String KEY_PROFILE = "profile";
     public static final String KEY_STATICS = "statics";
@@ -162,6 +164,8 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
 
         Authentication auth = SecurityUtils.getAuthentication(request);
         if (auth != null) {
+            templateModel.put(KEY_AUTH_CAP, auth);
+            templateModel.put(KEY_AUTH, auth);
             templateModel.put(KEY_PROFILE_CAP, auth.getProfile());
             templateModel.put(KEY_PROFILE, auth.getProfile());
         }

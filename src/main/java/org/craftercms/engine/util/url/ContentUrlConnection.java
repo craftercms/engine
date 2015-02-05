@@ -1,14 +1,19 @@
 package org.craftercms.engine.util.url;
 
-import org.craftercms.core.service.Content;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.FileNameMap;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Collection;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TimeZone;
+
+import org.craftercms.core.service.Content;
 
 /**
  * Implementation of {@link java.net.URLConnection} that wraps a {@link org.craftercms.core.service.Content}.
@@ -17,11 +22,11 @@ import java.util.*;
  */
 public class ContentUrlConnection extends URLConnection {
 
-    private static final String CONTENT_LENGTH =    "content-length";
-    private static final String CONTENT_TYPE =      "content-type";
-    private static final String LAST_MODIFIED =     "last-modified";
-    private static final String DATE_FORMAT =       "EEE, dd MMM yyyy HH:mm:ss 'GMT'";
-    private static final String TIMEZONE =          "GMT";
+    private static final String CONTENT_LENGTH = "content-length";
+    private static final String CONTENT_TYPE = "content-type";
+    private static final String LAST_MODIFIED = "last-modified";
+    private static final String DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss 'GMT'";
+    private static final String TIMEZONE = "GMT";
 
     protected Content content;
     protected Map<String, String> headers;
@@ -30,7 +35,6 @@ public class ContentUrlConnection extends URLConnection {
     protected long lastModified;
     protected InputStream is;
 
-
     protected boolean connected;
     protected boolean initializedHeaders;
 
@@ -38,7 +42,7 @@ public class ContentUrlConnection extends URLConnection {
         super(url);
 
         this.content = content;
-        this.headers = new LinkedHashMap<String, String>();
+        this.headers = new LinkedHashMap<>();
     }
 
     @Override

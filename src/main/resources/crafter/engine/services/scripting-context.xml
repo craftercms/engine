@@ -50,6 +50,7 @@
         <entry key="connectionFactoryLocator" value-ref="crafter.connectionFactoryLocator"/>
         <entry key="usersConnectionRepository" value-ref="crafter.usersConnectionRepository"/>
         <entry key="connector" value-ref="crafter.connector"/>
+        <entry key="tenantsResolver" value-ref="crafter.tenantsResolver"/>
     </util:map>
 
 </beans>
