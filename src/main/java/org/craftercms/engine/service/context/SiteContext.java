@@ -16,6 +16,8 @@
  */
 package org.craftercms.engine.service.context;
 
+import org.craftercms.core.exception.CrafterException;
+import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.url.UrlTransformationEngine;
 import org.craftercms.engine.service.PreviewOverlayCallback;
@@ -28,6 +30,7 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
  */
 public class SiteContext {
 
+    protected ContentStoreService storeService;
     protected String siteName;
     protected Context context;
     protected boolean fallback;
@@ -39,10 +42,11 @@ public class SiteContext {
     protected UrlTransformationEngine urlTransformationEngine;
     protected PreviewOverlayCallback overlayCallback;
 
-    public SiteContext(String siteName, Context context, boolean fallback, String staticAssetsPath,
-                       String templatesPath, FreeMarkerConfig freeMarkerConfig, String restScriptsPath,
-                       String controllerScriptsPath, UrlTransformationEngine urlTransformationEngine,
-                       PreviewOverlayCallback overlayCallback) {
+    public SiteContext(ContentStoreService storeService, String siteName, Context context, boolean fallback,
+                       String staticAssetsPath, String templatesPath, FreeMarkerConfig freeMarkerConfig,
+                       String restScriptsPath, String controllerScriptsPath,
+                       UrlTransformationEngine urlTransformationEngine, PreviewOverlayCallback overlayCallback) {
+        this.storeService = storeService;
         this.siteName = siteName;
         this.context = context;
         this.fallback = fallback;
@@ -93,6 +97,10 @@ public class SiteContext {
 
     public PreviewOverlayCallback getOverlayCallback() {
         return overlayCallback;
+    }
+
+    public void destroy() throws CrafterException {
+        storeService.destroyContext(context);
     }
 
     @Override
