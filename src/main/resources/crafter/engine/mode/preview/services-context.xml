@@ -22,7 +22,8 @@
     <!--									-->
     <!-- ////////////////////////////////// -->
 
-    <bean id="crafter.siteContextResolvingFilter" class="org.craftercms.engine.servlet.filter.SiteContextFromCookieResolvingFilter">
+    <bean id="crafter.siteContextResolvingFilter"
+          class="org.craftercms.engine.servlet.filter.SiteContextFromCookieResolvingFilter">
         <property name="siteContextRegistry" ref="crafter.siteContextRegistry" />
         <property name="siteContextFactory" ref="crafter.siteContextFactory" />
         <property name="paramOrCookieName" value="${crafter.engine.request.param.siteName}" />
@@ -65,7 +66,8 @@
 
     <bean id="crafter.authoringOverlayCallback" class="org.craftercms.engine.service.PreviewOverlayCallback">
         <property name="scriptFormat" value="${crafter.engine.proxy.authoring.callback.preview.script.format}"/>
-        <property name="previewServerJsScriptSources" value="${crafter.engine.proxy.authoring.callback.preview.scripts}" />
+        <property name="previewServerJsScriptSources"
+                  value="${crafter.engine.proxy.authoring.callback.preview.scripts}" />
         <property name="macroResolver" ref="crafter.macroResolver"/>
         <property name="userAgentTemplateDetector" ref="crafter.userAgentTemplateDetector"/>
     </bean>
@@ -94,7 +96,8 @@
     <!-- ////////////////////////////////// -->
 
     <!-- Declared with scope="prototype" so that a new one is created for every SiteContext -->
-    <bean id="crafter.freeMarkerConfig" class="org.craftercms.engine.freemarker.CrafterFreeMarkerConfigurer" scope="prototype">
+    <bean id="crafter.freeMarkerConfig" class="org.craftercms.engine.freemarker.CrafterFreeMarkerConfigurer"
+          scope="prototype">
         <property name="templateExceptionHandler" ref="crafter.crafterTemplateExceptionHandler" />
         <property name="templateLoaderPaths" value="WEB-INF" />
         <property name="defaultEncoding" value="UTF-8" />

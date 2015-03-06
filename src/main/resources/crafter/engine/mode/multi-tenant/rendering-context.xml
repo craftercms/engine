@@ -3,4 +3,28 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
+    <bean name="crafter.properties" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:crafter/core/core.properties</value>
+                <value>classpath:crafter/security/security.properties</value>
+                <value>classpath:crafter/engine/server-config.properties</value>
+                <value>classpath:crafter/engine/mode/multi-tenant/server-config.properties</value>
+                <value>classpath*:crafter/engine/extension/server-config.properties</value>
+            </list>
+        </property>
+        <property name="ignoreUnresolvablePlaceholders" value="true" />
+    </bean>
+
+    <!-- ////////////////////////////////// -->
+    <!--								 	-->
+    <!--			Controllers				-->
+    <!--									-->
+    <!-- ////////////////////////////////// -->
+
+    <bean id="crafter.siteMappingsRestController"
+          class="org.craftercms.engine.controller.rest.multitenant.SiteMappingsRestController">
+        <property name="filter" ref="crafter.siteContextResolvingFilter"/>
+    </bean>
+
 </beans>

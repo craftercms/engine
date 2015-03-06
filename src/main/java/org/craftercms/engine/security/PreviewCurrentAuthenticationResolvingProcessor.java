@@ -26,7 +26,7 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.http.RequestContext;
-import org.craftercms.engine.controller.preview.rest.ProfileRestController;
+import org.craftercms.engine.controller.rest.preview.ProfileRestController;
 import org.craftercms.profile.api.Profile;
 import org.craftercms.security.processors.RequestSecurityProcessorChain;
 import org.craftercms.security.processors.impl.CurrentAuthenticationResolvingProcessor;
