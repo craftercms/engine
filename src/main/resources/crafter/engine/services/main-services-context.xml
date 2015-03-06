@@ -3,10 +3,12 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:task="http://www.springframework.org/schema/task"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
-       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+       http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
 
     <import resource="classpath:crafter/core/core-context.xml"/>
     <import resource="classpath:crafter/engine/services/security-context.xml"/>
@@ -46,6 +48,15 @@
             <bean factory-bean="crafter.properties" factory-method="getAppliedPropertySources"/>
         </constructor-arg>
     </bean>
+
+    <!-- ////////////////////////////////// -->
+    <!--								 	-->
+    <!--			 Scheduling				-->
+    <!--									-->
+    <!-- ////////////////////////////////// -->
+
+    <task:annotation-driven scheduler="crafter.scheduler"/>
+    <task:scheduler id="crafter.scheduler" pool-size="${crafter.engine.scheduler.threads.pool.size}"/>
 
     <!-- ////////////////////////////////// -->
     <!--								 	-->

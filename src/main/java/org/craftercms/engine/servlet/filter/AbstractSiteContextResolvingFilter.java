@@ -16,6 +16,18 @@
  */
 package org.craftercms.engine.servlet.filter;
 
+import java.io.IOException;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,13 +38,6 @@ import org.craftercms.engine.service.context.SiteContextRegistry;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.ServletWebRequest;
-
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Abstract {@link javax.servlet.Filter} that exposes a {@link org.craftercms.engine.service.context.SiteContext} from the {@link org.craftercms.engine.service.context.SiteContextRegistry} as a session attribute. The context to
@@ -87,7 +92,8 @@ public abstract class AbstractSiteContextResolvingFilter implements Filter {
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
+        ServletException {
         doFilter(new ServletWebRequest((HttpServletRequest) request, (HttpServletResponse) response), chain);
     }
 
@@ -130,8 +136,8 @@ public abstract class AbstractSiteContextResolvingFilter implements Filter {
         }
     }
 
-    protected void handleSiteNameResolved(String siteName, ServletWebRequest request, FilterChain chain) throws IOException,
-            ServletException {
+    protected void handleSiteNameResolved(String siteName, ServletWebRequest request, FilterChain chain)
+        throws IOException, ServletException {
         if (logger.isDebugEnabled()) {
             logger.debug("Site name resolved for current request: '" + siteName + "'");
         }
@@ -152,7 +158,8 @@ public abstract class AbstractSiteContextResolvingFilter implements Filter {
         chain.doFilter(request.getRequest(), request.getResponse());
     }
 
-    protected void handleNoSiteNameResolved(ServletWebRequest request, FilterChain chain) throws IOException, ServletException {
+    protected void handleNoSiteNameResolved(ServletWebRequest request, FilterChain chain) throws IOException,
+        ServletException {
         logger.warn("Unable to resolve a site name for the request. Using fallback site");
 
         setCurrentSiteNameAttribute(request, fallbackSiteName);

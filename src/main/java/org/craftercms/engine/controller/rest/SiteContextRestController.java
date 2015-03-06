@@ -1,7 +1,6 @@
 package org.craftercms.engine.controller.rest;
 
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.craftercms.core.controller.rest.RestControllerBase;
@@ -13,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
- * REST controller for stuff related for the {@link org.craftercms.engine.service.context.SiteContext}
+ * REST controller for operations related for the {@link org.craftercms.engine.service.context.SiteContext}
  *
  * @author Alfonso Vásquez
  */
@@ -28,13 +27,10 @@ public class SiteContextRestController {
 
     @RequestMapping(value = URL_CONTEXT_ID, method = RequestMethod.GET)
     @ResponseBody
-    public Map<String, Object> getContextId() {
+    public Map<String, String> getContextId() {
         SiteContext context = AbstractSiteContextResolvingFilter.getCurrentContext();
         if (context != null) {
-            Map<String, Object> model = new LinkedHashMap<String, Object>(1);
-            model.put(MODEL_ATTR_ID, context.getContext().getId());
-
-            return model;
+            return Collections.singletonMap(MODEL_ATTR_ID, context.getContext().getId());
         } else {
             return Collections.emptyMap();
         }

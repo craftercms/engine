@@ -143,10 +143,12 @@ public class SiteContextFactory {
         String resolvedRootFolderPath = macroResolver.resolveMacros(rootFolderPath);
 
         Context context = storeService.createContext(storeType, storeServerUrl, username, password,
-            resolvedRootFolderPath, cacheOn, maxAllowedItemsInCache, ignoreHiddenFiles);
+                                                     resolvedRootFolderPath, cacheOn, maxAllowedItemsInCache,
+                                                     ignoreHiddenFiles);
 
-        return new SiteContext(siteName, context, fallback, staticAssetsPath, templatesPath, getFreemarkerConfig(),
-            restScriptsPath, controllerScriptsPath, urlTransformationEngine, overlayCallback);
+        return new SiteContext(storeService, siteName, context, fallback, staticAssetsPath, templatesPath,
+                               getFreemarkerConfig(), restScriptsPath, controllerScriptsPath, urlTransformationEngine,
+                               overlayCallback);
     }
 
     protected FreeMarkerConfig getFreemarkerConfig() {

@@ -37,7 +37,7 @@ public class SiteContextRegistry implements BeanPostProcessor {
     protected Map<String, SiteContext> registry;
 
     public SiteContextRegistry() {
-        registry = new ConcurrentHashMap<String, SiteContext>();
+        registry = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -62,22 +62,20 @@ public class SiteContextRegistry implements BeanPostProcessor {
         return registry.get(siteName);
     }
 
-    public void register(SiteContext siteContext) {
-        registry.put(siteContext.getSiteName(), siteContext);
+    public void register(SiteContext context) {
+        registry.put(context.getSiteName(), context);
 
-        logger.info("[SITE CONTEXT REGISTRY] Site context registered: " + siteContext);
+        logger.info("[SITE CONTEXT REGISTRY] Site context registered: " + context);
     }
 
     public SiteContext unregister(String siteName) {
-        SiteContext siteContext = registry.remove(siteName);
+        SiteContext context = registry.remove(siteName);
 
-        logger.info("[SITE CONTEXT REGISTRY] Site context unregistered: " + siteContext);
+        context.destroy();
 
-        return siteContext;
-    }
+        logger.info("[SITE CONTEXT REGISTRY] Site context unregistered: " + context);
 
-    public Collection<SiteContext> getSiteContexts() {
-        return registry.values();
+        return context;
     }
 
 }

@@ -16,12 +16,12 @@
  */
 package org.craftercms.engine.servlet.filter;
 
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.context.request.ServletWebRequest;
-
-import java.util.Map;
 
 /**
  * Filter that resolves the current site name from a mapping of the request domain name to site name.

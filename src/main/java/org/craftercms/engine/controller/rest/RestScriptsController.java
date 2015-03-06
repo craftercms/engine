@@ -110,7 +110,8 @@ public class RestScriptsController extends AbstractController {
     protected String getScriptUrl(SiteContext siteContext, HttpServletRequest request, String serviceUrl) {
         String baseUrl = UrlUtils.appendUrl(siteContext.getRestScriptsPath(), FilenameUtils.removeExtension(serviceUrl));
 
-        return String.format(SCRIPT_URL_FORMAT, baseUrl, request.getMethod().toLowerCase(), scriptFactory.getScriptFileExtension());
+        return String.format(SCRIPT_URL_FORMAT, baseUrl, request.getMethod().toLowerCase(),
+                             scriptFactory.getScriptFileExtension());
     }
 
     protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response) {
