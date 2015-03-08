@@ -16,6 +16,8 @@
  */
 package org.craftercms.engine.util.breadcrumb;
 
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.craftercms.core.service.CachingOptions;
 import org.craftercms.core.service.ContentStoreService;
@@ -26,8 +28,6 @@ import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.core.util.cache.impl.CachingAwareList;
 import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;
 import org.springframework.beans.factory.annotation.Required;
-
-import java.util.List;
 
 /**
  * Helper class to create navigation breadcrumbs.
@@ -81,7 +81,8 @@ public class BreadcrumbBuilder {
             @Override
             public List<BreadcrumbItem> doCacheable() {
                 CachingAwareList<BreadcrumbItem> breadcrumb = new CachingAwareList<BreadcrumbItem>();
-                String breadcrumbUrl = StringUtils.substringBeforeLast(StringUtils.substringAfter(url, homePath), "/index.xml");
+                String breadcrumbUrl = StringUtils.substringBeforeLast(StringUtils.substringAfter(url, homePath),
+                                                                       "/index.xml");
                 String[] breadcrumbUrlComponents = breadcrumbUrl.split("/");
                 String currentUrl = homePath;
 
@@ -94,7 +95,8 @@ public class BreadcrumbBuilder {
                     String breadcrumbName = item.queryDescriptorValue(breadcrumbNameXPathQuery);
                     if (StringUtils.isEmpty(breadcrumbName)) {
                         if (StringUtils.isNotEmpty(breadcrumbUrlComponent)) {
-                            breadcrumbName = StringUtils.capitalize(breadcrumbUrlComponent.replace("-", " ").replace(".xml", ""));
+                            breadcrumbName = StringUtils.capitalize(breadcrumbUrlComponent.replace("-", " ")
+                                                                        .replace(".xml", ""));
                         } else {
                             breadcrumbName = HOME_BREADCRUMB_NAME;
                         }

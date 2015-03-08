@@ -43,6 +43,7 @@
         <entry key="searchService" value-ref="crafter.searchService"/>
         <entry key="applicationContext" value-ref="crafter.applicationContextAccessor"/>
         <entry key="configProperties" value-ref="crafter.propertyResolver"/>
+        <entry key="breadcrumbBuilder" value-ref="crafter.breadcrumbBuilder" />
         <entry key="profileService" value-ref="crafter.profileServiceRestClient"/>
         <entry key="tenantService" value-ref="crafter.tenantServiceRestClient"/>
         <entry key="authenticationService" value-ref="crafter.authenticationServiceRestClient"/>

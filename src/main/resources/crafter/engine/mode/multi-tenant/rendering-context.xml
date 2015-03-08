@@ -4,6 +4,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <bean name="crafter.properties" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+        <property name="order" value="0"/>
         <property name="locations">
             <list>
                 <value>classpath:crafter/core/core.properties</value>
