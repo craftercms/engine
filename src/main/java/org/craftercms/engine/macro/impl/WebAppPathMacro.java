@@ -16,10 +16,10 @@
  */
 package org.craftercms.engine.macro.impl;
 
+import javax.servlet.ServletContext;
+
 import org.apache.commons.lang.StringUtils;
 import org.springframework.web.context.ServletContextAware;
-
-import javax.servlet.ServletContext;
 
 /**
  * Represents a {webapp.path} macro, which resolves to the web app exploded dir path of the current web app.
@@ -43,7 +43,8 @@ public class WebAppPathMacro extends AbstractMacro implements ServletContextAwar
     @Override
     protected String getMacroValue(String str) {
         if (servletContext == null) {
-            throw new IllegalStateException("No ServletContext was set. Are you sure you're running in a servlet environment?");
+            throw new IllegalStateException("No ServletContext was set. Are you sure you're running in a " +
+                                            "servlet environment?");
         }
 
         String webAppPath = servletContext.getRealPath("/");
