@@ -1,25 +1,29 @@
 package org.craftercms.engine.scripting.impl;
 
+import java.util.Collections;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+
+import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;
 import org.craftercms.engine.test.utils.ContentStoreServiceMockUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.Collections;
-import java.util.Map;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Alfonso Vásquez
@@ -81,17 +85,17 @@ public class GroovyScriptFactoryTest {
 
     private MockHttpServletRequest createRequest() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setAttribute(AbstractSiteContextResolvingFilter.SITE_CONTEXT_ATTRIBUTE, createSiteContext());
+        request.setAttribute(SiteContext.SITE_CONTEXT_ATTRIBUTE, createSiteContext());
 
         return request;
     }
 
     private void setCurrentRequest(HttpServletRequest request) {
-        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+        RequestContext.setCurrent(new RequestContext(request, null));
     }
 
     private void removeCurrentRequest() {
-        RequestContextHolder.resetRequestAttributes();
+        RequestContext.clear();
     }
 
 }

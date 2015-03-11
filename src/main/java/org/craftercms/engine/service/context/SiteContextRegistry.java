@@ -70,12 +70,13 @@ public class SiteContextRegistry implements BeanPostProcessor {
 
     public SiteContext unregister(String siteName) {
         SiteContext context = registry.remove(siteName);
+        if (context != null) {
+            context.destroy();
 
-        context.destroy();
+            logger.info("[SITE CONTEXT REGISTRY] Site context unregistered: " + context);
+        }
 
-        logger.info("[SITE CONTEXT REGISTRY] Site context unregistered: " + context);
-
-        return context;
+        return null;
     }
 
 }

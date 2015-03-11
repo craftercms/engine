@@ -19,24 +19,17 @@
 
     <!-- ////////////////////////////////// -->
     <!--								 	-->
-    <!--			 Filters				-->
+    <!--			Contexts				-->
     <!--									-->
     <!-- ////////////////////////////////// -->
 
-    <bean id="crafter.siteContextResolvingFilter"
-          class="org.craftercms.engine.servlet.filter.SiteContextFromCookieResolvingFilter">
+    <bean id="crafter.siteContextResolver" class="org.craftercms.engine.service.context.CookieSiteContextResolver">
         <property name="siteContextRegistry" ref="crafter.siteContextRegistry" />
         <property name="siteContextFactory" ref="crafter.siteContextFactory" />
         <property name="paramOrCookieName" value="${crafter.engine.request.param.siteName}" />
         <property name="fallbackSiteContextFactory" ref="crafter.fallbackSiteContextFactory" />
         <property name="fallbackSiteName" value="default" />
     </bean>
-
-    <!-- ////////////////////////////////// -->
-    <!--								 	-->
-    <!--			Contexts				-->
-    <!--									-->
-    <!-- ////////////////////////////////// -->
 
     <bean id="crafter.siteContextFactory" class="org.craftercms.engine.service.context.SiteContextFactory">
         <property name="rootFolderPath" value="${crafter.engine.site.default.rootFolder.path}"/>

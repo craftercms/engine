@@ -16,13 +16,13 @@
  */
 package org.craftercms.engine.macro.impl;
 
+import javax.servlet.http.Cookie;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.craftercms.core.util.HttpServletUtils;
+import org.craftercms.commons.http.HttpUtils;
+import org.craftercms.commons.http.RequestContext;
 import org.springframework.beans.factory.annotation.Required;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * Represents a macro that can be a cookie value.
@@ -47,8 +47,7 @@ public class CookieMacro extends AbstractMacro {
 
     @Override
     protected String getMacroValue(String str) {
-        HttpServletRequest request = HttpServletUtils.getCurrentRequest();
-        Cookie cookie = HttpServletUtils.getCookie(cookieName, request);
+        Cookie cookie = HttpUtils.getCookie(cookieName, RequestContext.getCurrent().getRequest());
 
         if (cookie != null) {
             return cookie.getValue();

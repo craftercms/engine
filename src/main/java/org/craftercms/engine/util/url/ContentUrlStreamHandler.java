@@ -1,12 +1,10 @@
 package org.craftercms.engine.util.url;
 
-import groovy.util.ResourceException;
 import org.craftercms.core.exception.PathNotFoundException;
 import org.craftercms.core.service.Content;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -34,7 +32,7 @@ public class ContentUrlStreamHandler extends URLStreamHandler {
             throw new MalformedURLException("Unrecognized protocol: " + url.getProtocol());
         }
 
-        Context context = AbstractSiteContextResolvingFilter.getCurrentContext().getContext();
+        Context context = SiteContext.getCurrent().getContext();
 
         try {
             Content content = storeService.getContent(context, url.getFile());

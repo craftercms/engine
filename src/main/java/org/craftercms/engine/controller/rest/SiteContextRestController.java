@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -28,7 +27,7 @@ public class SiteContextRestController {
     @RequestMapping(value = URL_CONTEXT_ID, method = RequestMethod.GET)
     @ResponseBody
     public Map<String, String> getContextId() {
-        SiteContext context = AbstractSiteContextResolvingFilter.getCurrentContext();
+        SiteContext context = SiteContext.getCurrent();
         if (context != null) {
             return Collections.singletonMap(MODEL_ATTR_ID, context.getContext().getId());
         } else {

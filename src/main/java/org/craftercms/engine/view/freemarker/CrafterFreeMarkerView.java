@@ -36,7 +36,6 @@ import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.scripting.ScriptResolver;
 import org.craftercms.engine.service.SiteItemService;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;
 import org.craftercms.engine.util.spring.ApplicationContextAccessor;
 import org.craftercms.security.authentication.Authentication;
 import org.craftercms.security.utils.SecurityUtils;
@@ -135,7 +134,7 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
      */
     @Override
     protected FreeMarkerConfig autodetectConfiguration() throws BeansException {
-        SiteContext siteContext = AbstractSiteContextResolvingFilter.getCurrentContext();
+        SiteContext siteContext = SiteContext.getCurrent();
 
         return siteContext.getFreeMarkerConfig();
     }

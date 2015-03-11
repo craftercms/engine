@@ -16,12 +16,16 @@
  */
 package org.craftercms.engine.view;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.service.CachingOptions;
-import org.craftercms.core.util.HttpServletUtils;
 import org.craftercms.core.util.cache.CacheCallback;
 import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.core.util.url.ContentBundleUrlParser;
@@ -34,7 +38,6 @@ import org.craftercms.engine.security.CrafterPageAccessManager;
 import org.craftercms.engine.service.SiteItemService;
 import org.craftercms.engine.service.UrlTransformationService;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;
 import org.craftercms.engine.util.LocaleUtils;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.Ordered;
@@ -43,10 +46,6 @@ import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.view.RedirectView;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * {@link org.springframework.web.servlet.ViewResolver} that resolves to {@link CrafterPageView}s. This resolver
@@ -266,14 +265,14 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     }
 
     protected View getCurrentPageHttpsRedirectView() {
-        String currentUrl = HttpServletUtils.getCurrentRequest().getRequestURI();
+        String currentUrl = RequestContext.getCurrent().getRequest().getRequestURI();
         String fullHttpsUrl = urlTransformationService.transform(fullHttpsUrlTransformerName, currentUrl);
 
         return getRedirectView(fullHttpsUrl, false);
     }
 
     protected View getCachedLocalizedView(final String baseUrl, final Locale locale) {
-        SiteContext context = AbstractSiteContextResolvingFilter.getCurrentContext();
+        SiteContext context = SiteContext.getCurrent();
 
         return cacheTemplate.execute(context.getContext(), cachingOptions, new CacheCallback<View>() {
 

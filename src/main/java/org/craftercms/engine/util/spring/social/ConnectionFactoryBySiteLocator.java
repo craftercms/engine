@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.social.connect.ConnectionFactory;
 import org.springframework.social.connect.ConnectionFactoryLocator;
@@ -44,7 +43,7 @@ public class ConnectionFactoryBySiteLocator implements ConnectionFactoryLocator 
     }
 
     private ConnectionFactoryLocator getCurrentConnectionFactoryLocator() {
-        SiteContext context = AbstractSiteContextResolvingFilter.getCurrentContext();
+        SiteContext context = SiteContext.getCurrent();
         if (context == null) {
             throw new IllegalStateException("No site context associated to current request");
         }

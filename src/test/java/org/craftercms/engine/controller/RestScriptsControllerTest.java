@@ -6,6 +6,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.util.cache.CacheTemplate;
@@ -13,15 +14,12 @@ import org.craftercms.engine.controller.rest.RestScriptsController;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.scripting.impl.Jsr233CompiledScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;
 import org.craftercms.engine.test.utils.CacheTemplateMockUtils;
 import org.craftercms.engine.test.utils.ContentStoreServiceMockUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -165,7 +163,7 @@ public class RestScriptsControllerTest {
         Cookie testCookie = new Cookie("test-cookie", "test");
         request.setCookies(testCookie);
 
-        request.setAttribute(AbstractSiteContextResolvingFilter.SITE_CONTEXT_ATTRIBUTE, createSiteContext());
+        request.setAttribute(SiteContext.SITE_CONTEXT_ATTRIBUTE, createSiteContext());
         request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, serviceUrl);
 
         return request;
@@ -176,11 +174,11 @@ public class RestScriptsControllerTest {
     }
 
     private void setCurrentRequest(HttpServletRequest request) {
-        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+        RequestContext.setCurrent(new RequestContext(request, null));
     }
 
     private void removeCurrentRequest() {
-        RequestContextHolder.resetRequestAttributes();
+        RequestContext.clear();
     }
 
 }

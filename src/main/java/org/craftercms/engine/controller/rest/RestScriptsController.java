@@ -32,7 +32,6 @@ import org.craftercms.engine.exception.HttpStatusCodeAwareException;
 import org.craftercms.engine.exception.ScriptNotFoundException;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;
 import org.craftercms.engine.util.ScriptUtils;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.servlet.HandlerMapping;
@@ -77,7 +76,7 @@ public class RestScriptsController extends AbstractController {
 
     @Override
     protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        SiteContext siteContext = AbstractSiteContextResolvingFilter.getCurrentContext();
+        SiteContext siteContext = SiteContext.getCurrent();
         String serviceUrl = getServiceUrl(request);
         String scriptUrl = getScriptUrl(siteContext, request, serviceUrl);
 
@@ -101,7 +100,8 @@ public class RestScriptsController extends AbstractController {
         String url = (String) request.getAttribute(pathWithinHandlerMappingAttr);
 
         if (StringUtils.isEmpty(url)) {
-            throw new IllegalStateException("Required request attribute '" + pathWithinHandlerMappingAttr + "' is not set");
+            throw new IllegalStateException("Required request attribute '" + pathWithinHandlerMappingAttr +
+                                            "' is not set");
         }
 
         return url;

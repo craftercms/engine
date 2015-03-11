@@ -16,6 +16,9 @@
  */
 package org.craftercms.engine.service.context;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.exception.CrafterException;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
@@ -30,6 +33,9 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
  */
 public class SiteContext {
 
+    public static final String SITE_CONTEXT_ATTRIBUTE = "siteContext";
+    public static final String SITE_NAME_ATTRIBUTE = "siteName";
+
     protected ContentStoreService storeService;
     protected String siteName;
     protected Context context;
@@ -41,6 +47,17 @@ public class SiteContext {
     protected String controllerScriptsPath;
     protected UrlTransformationEngine urlTransformationEngine;
     protected PreviewOverlayCallback overlayCallback;
+
+    public static SiteContext getCurrent() {
+        return (SiteContext) RequestContext.getCurrent().getRequest().getAttribute(SITE_CONTEXT_ATTRIBUTE);
+    }
+
+    public static void setCurrent(SiteContext context) {
+        HttpServletRequest request = RequestContext.getCurrent().getRequest();
+
+        request.setAttribute(SITE_CONTEXT_ATTRIBUTE, context);
+        request.setAttribute(SITE_NAME_ATTRIBUTE, context.getSiteName());
+    }
 
     public SiteContext(ContentStoreService storeService, String siteName, Context context, boolean fallback,
                        String staticAssetsPath, String templatesPath, FreeMarkerConfig freeMarkerConfig,

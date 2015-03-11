@@ -30,7 +30,6 @@ import org.craftercms.engine.exception.ScriptNotFoundException;
 import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;
 import org.springframework.beans.factory.annotation.Required;
 
 import javax.annotation.PostConstruct;
@@ -99,7 +98,7 @@ public class Jsr233CompiledScriptFactory implements ScriptFactory {
 
     @Override
     public Script getScript(String url) throws ScriptException {
-        SiteContext siteContext = AbstractSiteContextResolvingFilter.getCurrentContext();
+        SiteContext siteContext = SiteContext.getCurrent();
 
         return getCachedScript(siteContext, url);
     }

@@ -16,6 +16,10 @@
  */
 package org.craftercms.engine.service;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -30,12 +34,7 @@ import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.service.filter.ExcludeByNameItemFilter;
 import org.craftercms.engine.service.filter.ExpectedNodeValueItemFilter;
 import org.craftercms.engine.service.filter.IncludeByNameItemFilter;
-import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;
 import org.springframework.beans.factory.annotation.Required;
-
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Service for accessing {@link org.craftercms.engine.model.SiteItem}s.
@@ -68,7 +67,7 @@ public class SiteItemService {
     }
 
     public SiteItem getSiteItem(String url) {
-        SiteContext context = AbstractSiteContextResolvingFilter.getCurrentContext();
+        SiteContext context = SiteContext.getCurrent();
 
         try {
             return new SiteItem(contentStoreService.getItem(context.getContext(), url), modelValueConverters);
@@ -112,7 +111,7 @@ public class SiteItemService {
             }
         }
 
-        SiteContext context = AbstractSiteContextResolvingFilter.getCurrentContext();
+        SiteContext context = SiteContext.getCurrent();
 
         try {
             Tree tree = contentStoreService.getTree(context.getContext(), url, depth, compositeFilter);

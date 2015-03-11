@@ -26,7 +26,7 @@ import org.craftercms.core.service.Item;
 import org.craftercms.core.util.cache.CacheCallback;
 import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.core.util.cache.impl.CachingAwareList;
-import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;
+import org.craftercms.engine.service.context.SiteContext;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
@@ -74,7 +74,7 @@ public class BreadcrumbBuilder {
     }
 
     public List<BreadcrumbItem> buildBreadcrumb(final String url) {
-        final Context context = AbstractSiteContextResolvingFilter.getCurrentContext().getContext();
+        final Context context = SiteContext.getCurrent().getContext();
 
         return cacheTemplate.execute(context, cachingOptions, new CacheCallback<List<BreadcrumbItem>>() {
 

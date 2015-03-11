@@ -17,15 +17,14 @@
 package org.craftercms.engine.http.impl;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Map;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.craftercms.core.util.HttpServletUtils;
+import org.craftercms.commons.http.HttpUtils;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.util.MultiValueMap;
 
 /**
  * Extension of {@link HttpProxyImpl} that proxies to Alfresco.
@@ -53,18 +52,19 @@ public class AlfrescoHttpProxy extends HttpProxyImpl {
         }
 
         if (alfTicket != null) {
-            Map<String, Object> queryParams = HttpServletUtils.getParamsFromQueryString(queryString);
-            queryParams.put("alf_ticket", alfTicket);
+            MultiValueMap<String, String> queryParams = HttpUtils.getParamsFromQueryString(queryString);
+            queryParams.set("alf_ticket", alfTicket);
 
             try {
-                queryString = HttpServletUtils.getQueryStringFromParams(queryParams, "UTF-8");
+                queryString = HttpUtils.getQueryStringFromParams(queryParams, "UTF-8");
                 //queryString = URLDecoder.decode(queryString, "UTF-8");
             } catch (UnsupportedEncodingException e) {
                 logger.error("Unable to encode params " + queryParams + " into a query string", e);
             }
         } else {
             if (logger.isDebugEnabled()) {
-                logger.debug("'" + alfrescoTicketCookieName + "' cookie not specified. Proxy request will be generated without it");
+                logger.debug("'" + alfrescoTicketCookieName + "' cookie not specified. Proxy request will be " +
+                             "generated without it");
             }
 
             if (StringUtils.isNotEmpty(queryString)) {
@@ -76,12 +76,7 @@ public class AlfrescoHttpProxy extends HttpProxyImpl {
     }
 
     protected String getCurrentTicket(HttpServletRequest request) {
-        Cookie ticketCookie = HttpServletUtils.getCookie(alfrescoTicketCookieName, request);
-        if (ticketCookie != null) {
-            return ticketCookie.getValue();
-        } else {
-            return null;
-        }
+        return HttpUtils.getCookieValue(alfrescoTicketCookieName, request);
     }
 
 }

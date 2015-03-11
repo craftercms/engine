@@ -34,7 +34,6 @@ import org.craftercms.engine.exception.ScriptException;
 import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;
 import org.craftercms.engine.util.ScriptUtils;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.servlet.HandlerMapping;
@@ -78,7 +77,7 @@ public class PageRenderController extends AbstractController {
     protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
         throws Exception {
         String pageUrl;
-        SiteContext siteContext = AbstractSiteContextResolvingFilter.getCurrentContext();
+        SiteContext siteContext = SiteContext.getCurrent();
 
         if (siteContext.isFallback()) {
             logger.warn("Rendering fallback page [" + fallbackPageUrl + "]");
