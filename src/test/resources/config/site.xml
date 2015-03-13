@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+    <security>
+        <login formUrl="/signin" defaultSuccessUrl="/home" alwaysUseDefaultSuccessUrl="true"
+               failureUrl="/signin?error=true"/>
+        <logout successUrl="/home"/>
+        <urlRestrictions>
+            <restriction url="/home" expression="hasRole('USER')"/>
+            <restriction url="/admin" expression="hasRole('ADMIN')"/>
+        </urlRestrictions>
+    </security>
+</site>

@@ -48,7 +48,9 @@
         <property name="statusViewNamePrefix" value="${crafter.engine.monitoring.viewName.prefix}"/>
     </bean>
 
-    <bean id="crafter.siteContextRestController" class="org.craftercms.engine.controller.rest.SiteContextRestController" />
+    <bean id="crafter.siteContextRestController" class="org.craftercms.engine.controller.rest.SiteContextRestController">
+        <property name="contextRegistry" ref="crafter.siteContextRegistry"/>
+    </bean>
 
     <!-- Overwrite CacheRestController from core -->
     <bean id="crafter.cacheRestController" class="org.craftercms.engine.controller.rest.FreeMarkerAwareCacheRestController">
