@@ -53,6 +53,9 @@ public class ScriptUtils {
     public static final String VARIABLE_AUTH = "authentication";
     public static final String VARIABLE_PROFILE = "profile";
 
+    private ScriptUtils() {
+    }
+
     public static void addCommonVariables(Map<String, Object> variables, HttpServletRequest request,
                                           HttpServletResponse response, ServletContext context) {
         variables.put(VARIABLE_REQUEST_URL, request.getRequestURI());

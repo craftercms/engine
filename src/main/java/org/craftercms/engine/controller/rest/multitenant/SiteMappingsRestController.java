@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping(RestControllerBase.REST_BASE_URI + SiteMappingsRestController.URL_ROOT)
 public class SiteMappingsRestController {
 
-    public static final String URL_ROOT = "/site_mappings";
+    public static final String URL_ROOT = "/site/mappings";
     public static final String URL_RELOAD = "/reload";
 
     private SiteContextResolver contextResolver;

@@ -21,9 +21,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping(RestControllerBase.REST_BASE_URI + SiteContextRestController.URL_ROOT)
 public class SiteContextRestController {
 
-    public static final String URL_ROOT = "/site_context";
+    public static final String URL_ROOT = "/site/context";
     public static final String URL_CONTEXT_ID = "/id";
-    public static final String URL_FORCE_RECREATE = "/force_recreate";
+    public static final String URL_DESTROY = "/destroy";
 
     public static final String MODEL_ATTR_ID =  "id";
 
@@ -40,15 +40,15 @@ public class SiteContextRestController {
         return Collections.singletonMap(MODEL_ATTR_ID, SiteContext.getCurrent().getContext().getId());
     }
 
-    @RequestMapping(value = URL_FORCE_RECREATE, method = RequestMethod.GET)
+    @RequestMapping(value = URL_DESTROY, method = RequestMethod.GET)
     @ResponseBody
-    public Map<String, String> forceContextRecreate() {
+    public Map<String, String> destroy() {
         String siteName = SiteContext.getCurrent().getSiteName();
 
         contextRegistry.unregister(siteName);
 
         return Collections.singletonMap(RestControllerBase.MESSAGE_MODEL_ATTRIBUTE_NAME,
-                                        "Site context for '" + siteName + " destroyed. Will be recreated on next " +
+                                        "Site context for '" + siteName + "' destroyed. Will be recreated on next " +
                                         "request");
     }
 

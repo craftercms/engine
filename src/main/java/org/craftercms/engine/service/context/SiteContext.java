@@ -16,8 +16,7 @@
  */
 package org.craftercms.engine.service.context;
 
-import javax.servlet.http.HttpServletRequest;
-
+import org.apache.commons.configuration.XMLConfiguration;
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.exception.CrafterException;
 import org.craftercms.core.service.ContentStoreService;
@@ -34,7 +33,6 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
 public class SiteContext {
 
     public static final String SITE_CONTEXT_ATTRIBUTE = "siteContext";
-    public static final String SITE_NAME_ATTRIBUTE = "siteName";
 
     protected ContentStoreService storeService;
     protected String siteName;
@@ -47,22 +45,29 @@ public class SiteContext {
     protected String controllerScriptsPath;
     protected UrlTransformationEngine urlTransformationEngine;
     protected PreviewOverlayCallback overlayCallback;
+    protected XMLConfiguration config;
 
     public static SiteContext getCurrent() {
-        return (SiteContext) RequestContext.getCurrent().getRequest().getAttribute(SITE_CONTEXT_ATTRIBUTE);
+        RequestContext requestContext = RequestContext.getCurrent();
+        if (requestContext != null) {
+            return (SiteContext)requestContext.getRequest().getAttribute(SITE_CONTEXT_ATTRIBUTE);
+        } else {
+            return null;
+        }
     }
 
     public static void setCurrent(SiteContext context) {
-        HttpServletRequest request = RequestContext.getCurrent().getRequest();
-
-        request.setAttribute(SITE_CONTEXT_ATTRIBUTE, context);
-        request.setAttribute(SITE_NAME_ATTRIBUTE, context.getSiteName());
+        RequestContext requestContext = RequestContext.getCurrent();
+        if (requestContext != null) {
+            requestContext.getRequest().setAttribute(SITE_CONTEXT_ATTRIBUTE, context);
+        }
     }
 
     public SiteContext(ContentStoreService storeService, String siteName, Context context, boolean fallback,
                        String staticAssetsPath, String templatesPath, FreeMarkerConfig freeMarkerConfig,
                        String restScriptsPath, String controllerScriptsPath,
-                       UrlTransformationEngine urlTransformationEngine, PreviewOverlayCallback overlayCallback) {
+                       UrlTransformationEngine urlTransformationEngine, PreviewOverlayCallback overlayCallback,
+                       XMLConfiguration config) {
         this.storeService = storeService;
         this.siteName = siteName;
         this.context = context;
@@ -74,6 +79,7 @@ public class SiteContext {
         this.controllerScriptsPath = controllerScriptsPath;
         this.urlTransformationEngine = urlTransformationEngine;
         this.overlayCallback = overlayCallback;
+        this.config = config;
     }
 
     public String getSiteName() {
@@ -116,6 +122,10 @@ public class SiteContext {
         return overlayCallback;
     }
 
+    public XMLConfiguration getConfig() {
+        return config;
+    }
+
     public void destroy() throws CrafterException {
         storeService.destroyContext(context);
     }
@@ -145,18 +155,19 @@ public class SiteContext {
 
     @Override
     public String toString() {
-        return "SiteContext[" +
-                "siteName='" + siteName + '\'' +
-                ", context=" + context +
-                ", fallback=" + fallback +
-                ", staticAssetsPath='" + staticAssetsPath + '\'' +
-                ", templatesPath='" + templatesPath + '\'' +
-                ", freeMarkerConfig=" + freeMarkerConfig +
-                ", restScriptsPath='" + restScriptsPath + '\'' +
-                ", controllerScriptsPath='" + controllerScriptsPath + '\'' +
-                ", urlTransformationEngine=" + urlTransformationEngine +
-                ", overlayCallback=" + overlayCallback +
-                ']';
+        return "SiteContext{" +
+               "siteName='" + siteName + '\'' +
+               ", context=" + context +
+               ", fallback=" + fallback +
+               ", staticAssetsPath='" + staticAssetsPath + '\'' +
+               ", templatesPath='" + templatesPath + '\'' +
+               ", freeMarkerConfig=" + freeMarkerConfig +
+               ", restScriptsPath='" + restScriptsPath + '\'' +
+               ", controllerScriptsPath='" + controllerScriptsPath + '\'' +
+               ", urlTransformationEngine=" + urlTransformationEngine +
+               ", overlayCallback=" + overlayCallback +
+               ", config=" + config +
+               '}';
     }
 
 }

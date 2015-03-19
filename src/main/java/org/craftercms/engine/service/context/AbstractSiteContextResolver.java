@@ -20,6 +20,8 @@ import org.springframework.beans.factory.annotation.Required;
  */
 public abstract class AbstractSiteContextResolver implements SiteContextResolver {
 
+    public static final String SITE_NAME_ATTRIBUTE = "siteName";
+
     private static final Log logger = LogFactory.getLog(AbstractSiteContextResolver.class);
 
     protected Lock createContextLock;
@@ -56,6 +58,7 @@ public abstract class AbstractSiteContextResolver implements SiteContextResolver
     @Override
     public SiteContext getContext(HttpServletRequest request) {
         String siteName = StringUtils.lowerCase(getSiteName(request));
+
         if (StringUtils.isNotEmpty(siteName)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Site name resolved for current request: '" + siteName + "'");
@@ -65,6 +68,8 @@ public abstract class AbstractSiteContextResolver implements SiteContextResolver
 
             logger.warn("Unable to resolve a site name for the request. Using fallback site");
         }
+
+        request.setAttribute(SITE_NAME_ATTRIBUTE, siteName);
 
         return getContext(siteName);
     }

@@ -16,10 +16,15 @@
  */
 package org.craftercms.engine.service.context;
 
+import java.io.IOException;
+
+import org.apache.commons.configuration.XMLConfiguration;
+import org.craftercms.core.service.Content;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.store.impl.filesystem.FileSystemContentStoreAdapter;
 import org.craftercms.core.url.UrlTransformationEngine;
+import org.craftercms.engine.exception.ConfigurationException;
 import org.craftercms.engine.macro.MacroResolver;
 import org.craftercms.engine.service.PreviewOverlayCallback;
 import org.springframework.beans.factory.ObjectFactory;
@@ -44,6 +49,7 @@ public class SiteContextFactory {
     protected ObjectFactory<FreeMarkerConfig> freeMarkerConfigFactory;
     protected String restScriptsPath;
     protected String controllerScriptsPath;
+    protected String configPath;
     protected boolean cacheOn;
     protected int maxAllowedItemsInCache;
     protected boolean ignoreHiddenFiles;
@@ -108,6 +114,11 @@ public class SiteContextFactory {
         this.controllerScriptsPath = controllerScriptsPath;
     }
 
+    @Required
+    public void setConfigPath(String configPath) {
+        this.configPath = configPath;
+    }
+
     public void setCacheOn(boolean cacheOn) {
         this.cacheOn = cacheOn;
     }
@@ -148,11 +159,28 @@ public class SiteContextFactory {
 
         return new SiteContext(storeService, siteName, context, fallback, staticAssetsPath, templatesPath,
                                getFreemarkerConfig(), restScriptsPath, controllerScriptsPath, urlTransformationEngine,
-                               overlayCallback);
+                               overlayCallback, getConfig(context, storeService));
     }
 
     protected FreeMarkerConfig getFreemarkerConfig() {
         return freeMarkerConfigFactory.getObject();
+    }
+
+    protected XMLConfiguration getConfig(Context context, ContentStoreService storeService) {
+        if (storeService.exists(context, configPath)) {
+            Content configContent = storeService.getContent(context, configPath);
+            XMLConfiguration config = new XMLConfiguration();
+
+            try {
+                config.load(configContent.getInputStream());
+            } catch (IOException | org.apache.commons.configuration.ConfigurationException e) {
+                throw new ConfigurationException("Unable to load main config file at " + configPath, e);
+            }
+
+            return config;
+        } else {
+            return null;
+        }
     }
 
 }

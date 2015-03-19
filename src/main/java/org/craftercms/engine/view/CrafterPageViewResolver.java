@@ -25,8 +25,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.http.RequestContext;
+import org.craftercms.commons.lang.Callback;
 import org.craftercms.core.service.CachingOptions;
-import org.craftercms.core.util.cache.CacheCallback;
 import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.core.util.url.ContentBundleUrlParser;
 import org.craftercms.engine.mobile.UserAgentTemplateDetector;
@@ -274,10 +274,10 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     protected View getCachedLocalizedView(final String baseUrl, final Locale locale) {
         SiteContext context = SiteContext.getCurrent();
 
-        return cacheTemplate.execute(context.getContext(), cachingOptions, new CacheCallback<View>() {
+        return cacheTemplate.getObject(context.getContext(), cachingOptions, new Callback<View>() {
 
             @Override
-            public View doCacheable() {
+            public View execute() {
                 SiteItem page;
                 if (localizeViews) {
                     page = getLocalizedPage(baseUrl, locale);

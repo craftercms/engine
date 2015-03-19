@@ -131,7 +131,7 @@ public class RestScriptsControllerTest {
 
     private CacheTemplate createCacheTemplate() {
         CacheTemplate cacheTemplate = mock(CacheTemplate.class);
-        CacheTemplateMockUtils.setUpExecuteWithNoCaching(cacheTemplate);
+        CacheTemplateMockUtils.setUpWithNoCaching(cacheTemplate);
 
         return cacheTemplate;
     }
