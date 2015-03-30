@@ -1,28 +1,29 @@
 package org.craftercms.engine.scripting.impl;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
+import groovy.lang.GroovyClassLoader;
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
-import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.test.utils.ContentStoreServiceMockUtils;
+import org.craftercms.engine.util.groovy.ContentStoreGroovyResourceLoader;
+import org.craftercms.engine.util.groovy.ContentStoreResourceConnector;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -32,36 +33,44 @@ public class GroovyScriptFactoryTest {
 
     private ContentStoreService storeService;
     private ScriptFactory scriptFactory;
+    private GroovyClassLoader classLoader;
+    private Map<String, Object> globalVars;
 
     @Before
     public void setUp() throws Exception {
         storeService = createContentStoreService();
-        scriptFactory = createScriptFactory(storeService);
 
-        setCurrentRequest(createRequest());
+        setCurrentRequest(createRequest(storeService));
+
+        classLoader = createGroovyClassLoader();
+        globalVars = createGlobalVars(classLoader);
+        scriptFactory = createScriptFactory(classLoader, globalVars);
     }
 
     @After
     public void tearDown() throws Exception {
         removeCurrentRequest();
+        destroyApplicationContext();
     }
 
     @Test
     public void testExecuteScript() throws Exception {
-        Script script = scriptFactory.getScript("/scripts/rest/testImport.get.groovy");
-        Map vars = Collections.singletonMap("name", "Alfonso");
+        Map<String, Object> vars = Collections.<String, Object>singletonMap("name", "Alfonso");
 
-        String result = (String) script.execute(vars);
+        String result = (String) scriptFactory.getScript("/scripts/testImport.get.groovy").execute(vars);
 
         assertEquals("Hello Alfonso!", result);
 
-        verify(storeService, atLeastOnce()).getContent(any(Context.class), anyString());
-        verify(storeService, atLeastOnce()).getContent(any(Context.class), eq("/scripts/shared/Greeting.groovy"));
+        result = (String) scriptFactory.getScript("/scripts/testAppContext.get.groovy").execute(vars);
+
+        assertEquals("Hello Alfonso!", result);
     }
 
-    private SiteContext createSiteContext() throws Exception {
+    private SiteContext createSiteContext(ContentStoreService storeService) throws Exception {
         SiteContext siteContext = mock(SiteContext.class);
+        when(siteContext.getSiteName()).thenReturn("test");
         when(siteContext.getContext()).thenReturn(mock(Context.class));
+        when(siteContext.getStoreService()).thenReturn(storeService);
 
         return siteContext;
     }
@@ -73,19 +82,40 @@ public class GroovyScriptFactoryTest {
         return storeService;
     }
 
-    private ScriptFactory createScriptFactory(ContentStoreService storeService) {
-        ContentResourceConnector resourceConnector = new ContentResourceConnector();
-        resourceConnector.setStoreService(storeService);
+    private GroovyClassLoader createGroovyClassLoader() {
+        ContentStoreGroovyResourceLoader resourceLoader = new ContentStoreGroovyResourceLoader(SiteContext.getCurrent(),
+                                                                                               "/classes");
+        GroovyClassLoader classLoader = new GroovyClassLoader(getClass().getClassLoader());
 
-        GroovyScriptFactory scriptFactory = new GroovyScriptFactory();
-        scriptFactory.setResourceConnector(resourceConnector);
+        classLoader.setResourceLoader(resourceLoader);
 
-        return scriptFactory;
+        return classLoader;
     }
 
-    private MockHttpServletRequest createRequest() throws Exception {
+    private Map<String, Object> createGlobalVars(GroovyClassLoader classLoader) {
+        GenericApplicationContext context = new GenericApplicationContext();
+        context.setClassLoader(classLoader);
+
+        XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader(context);
+        xmlReader.loadBeanDefinitions(new ClassPathResource("config/spring/application-context.xml"));
+
+        context.refresh();
+
+        Map<String, Object> globalVars = new HashMap<>(1);
+        globalVars.put("applicationContext", context);
+
+        return globalVars;
+    }
+
+    private ScriptFactory createScriptFactory(GroovyClassLoader parentClassLoader, Map<String, Object> globalVars) {
+        ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(SiteContext.getCurrent());
+
+        return new GroovyScriptFactory(resourceConnector, parentClassLoader, globalVars);
+    }
+
+    private MockHttpServletRequest createRequest(ContentStoreService storeService) throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setAttribute(SiteContext.SITE_CONTEXT_ATTRIBUTE, createSiteContext());
+        request.setAttribute(SiteContext.SITE_CONTEXT_ATTRIBUTE, createSiteContext(storeService));
 
         return request;
     }
@@ -96,6 +126,10 @@ public class GroovyScriptFactoryTest {
 
     private void removeCurrentRequest() {
         RequestContext.clear();
+    }
+
+    private void destroyApplicationContext() {
+        ((GenericApplicationContext)globalVars.get("applicationContext")).destroy();
     }
 
 }

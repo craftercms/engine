@@ -25,21 +25,8 @@ import org.craftercms.core.exception.CrafterException;
  */
 public class HttpProxyException extends CrafterException {
 
-    private static final long serialVersionUID = 1672152184352330583L;
-
-    public HttpProxyException() {
-    }
-
     public HttpProxyException(String message, Throwable cause) {
         super(message, cause);
-    }
-
-    public HttpProxyException(String message) {
-        super(message);
-    }
-
-    public HttpProxyException(Throwable cause) {
-        super(cause);
     }
 
 }

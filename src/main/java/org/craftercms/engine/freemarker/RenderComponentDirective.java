@@ -16,8 +16,21 @@
  */
 package org.craftercms.engine.freemarker;
 
+import java.io.IOException;
+import java.io.Writer;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.servlet.ServletContext;
+
 import freemarker.core.Environment;
-import freemarker.template.*;
+import freemarker.template.SimpleHash;
+import freemarker.template.Template;
+import freemarker.template.TemplateDirectiveBody;
+import freemarker.template.TemplateDirectiveModel;
+import freemarker.template.TemplateException;
+import freemarker.template.TemplateModel;
 import freemarker.template.utility.DeepUnwrap;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.collections4.CollectionUtils;
@@ -31,20 +44,13 @@ import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.scripting.ScriptResolver;
 import org.craftercms.engine.service.SiteItemService;
+import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.ScriptUtils;
 import org.craftercms.engine.view.CrafterPageView;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Required;
-
-import javax.servlet.ServletContext;
-import java.io.IOException;
-import java.io.Writer;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Custom directive to render a component by processing the template defined in the component element's template name
@@ -63,7 +69,6 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
 
     protected ServletContext servletContext;
     protected SiteItemService siteItemService;
-    protected ScriptFactory scriptFactory;
     protected ObjectFactory<SimpleHash> modelFactory;
     protected String templateXPathQuery;
     protected String templateNamePrefix;
@@ -79,11 +84,6 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
     @Required
     public void setSiteItemService(SiteItemService siteItemService) {
         this.siteItemService = siteItemService;
-    }
-
-    @Required
-    public void setScriptFactory(ScriptFactory scriptFactory) {
-        this.scriptFactory = scriptFactory;
     }
 
     @Required
@@ -116,13 +116,15 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
         this.scriptResolver = scriptResolver;
     }
 
-    public void execute(Environment env, Map params, TemplateModel[] loopVars, TemplateDirectiveBody body) throws TemplateException {
+    public void execute(Environment env, Map params, TemplateModel[] loopVars, TemplateDirectiveBody body)
+        throws TemplateException {
         TemplateModel componentParam = (TemplateModel) params.get(COMPONENT_PARAM_NAME);
         TemplateModel componentPathParam = (TemplateModel) params.get(COMPONENT_PATH_PARAM_NAME);
         SiteItem component;
 
         if (componentParam == null && componentPathParam == null) {
-            throw new TemplateException("No '" + COMPONENT_PARAM_NAME + "' or '" + COMPONENT_PATH_PARAM_NAME + "' param specified", env);
+            throw new TemplateException("No '" + COMPONENT_PARAM_NAME + "' or '" + COMPONENT_PATH_PARAM_NAME +
+                                        "' param specified", env);
         } else if (componentParam != null) {
             component = getComponentFromNode(componentParam, env);
         } else {
@@ -140,8 +142,9 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
     protected SiteItem getComponentFromNode(TemplateModel componentParam, Environment env) throws TemplateException {
         Object unwrappedComponentParam = DeepUnwrap.unwrap(componentParam);
         if (!(unwrappedComponentParam instanceof Node)) {
-            throw new TemplateException("Param '" + COMPONENT_PARAM_NAME + " of unexpected type: expected: " + Node.class.getName() +
-                    ", actual: " + unwrappedComponentParam.getClass().getName(), env);
+            throw new TemplateException("Param '" + COMPONENT_PARAM_NAME + " of unexpected type: expected: " +
+                                        Node.class.getName() + ", actual: " +
+                                        unwrappedComponentParam.getClass().getName(), env);
         }
 
         Element includeElement = ((Element) unwrappedComponentParam).element(includeElementName);
@@ -150,7 +153,8 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
         return getComponent(componentUrl, env);
     }
 
-    protected SiteItem getComponentFromPath(TemplateModel componentPathParam, Environment env) throws TemplateException {
+    protected SiteItem getComponentFromPath(TemplateModel componentPathParam, Environment env)
+        throws TemplateException {
         Object unwrappedComponentPathParam = DeepUnwrap.unwrap(componentPathParam);
         if (!(unwrappedComponentPathParam instanceof String)) {
             throw new TemplateException("Param '" + COMPONENT_PATH_PARAM_NAME + " of unexpected type: expected: " +
@@ -176,7 +180,8 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
         try {
            component = siteItemService.getSiteItem(componentPath);
         } catch (Exception e) {
-            throw new TemplateException("Unable to load component " + componentPath + " from the underlying repository", e, env);
+            throw new TemplateException("Unable to load component " + componentPath +
+                                        " from the underlying repository", e, env);
         }
 
         if (component == null) {
@@ -195,6 +200,13 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
 
             Map<String, Object> model = new HashMap<String, Object>();
             Map<String, Object> scriptVariables = createScriptVariables(component, model);
+            SiteContext context = SiteContext.getCurrent();
+            ScriptFactory scriptFactory = context.getScriptFactory();
+
+            if (scriptFactory == null) {
+                throw new IllegalStateException("No script factory associate to current site context '" +
+                                                context.getSiteName() + "'");
+            }
 
             for (String scriptUrl : scriptUrls) {
                 Script script;
@@ -227,7 +239,8 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
         return scriptVariables;
     }
 
-    protected void executeScript(Script script, Map<String, Object> scriptVariables, Environment env) throws TemplateException {
+    protected void executeScript(Script script, Map<String, Object> scriptVariables, Environment env)
+        throws TemplateException {
         try {
             script.execute(scriptVariables);
         } catch (Exception e) {
@@ -252,7 +265,8 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
         }
     }
 
-    protected SimpleHash getComponentModel(SiteItem component, Map<String, Object> scriptsModel) throws TemplateException {
+    protected SimpleHash getComponentModel(SiteItem component, Map<String, Object> scriptsModel)
+        throws TemplateException {
         SimpleHash componentModel = modelFactory.getObject();
         componentModel.put(KEY_COMPONENT_MODEL, component);
         if (MapUtils.isNotEmpty(scriptsModel)) {
@@ -262,7 +276,8 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
         return componentModel;
     }
 
-    protected void processComponentTemplate(Template template, SimpleHash model, Writer output, Environment env) throws TemplateException {
+    protected void processComponentTemplate(Template template, SimpleHash model, Writer output, Environment env)
+        throws TemplateException {
         try {
             template.process(model, output);
         } catch (IOException e) {

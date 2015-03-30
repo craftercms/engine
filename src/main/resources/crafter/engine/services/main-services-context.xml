@@ -90,7 +90,7 @@
     </bean>
 
     <bean id="crafter.siteItemService" class="org.craftercms.engine.service.SiteItemService">
-        <property name="contentStoreService" ref="crafter.contentStoreService"/>
+        <property name="storeService" ref="crafter.contentStoreService"/>
         <property name="modelValueConverters">
             <map>
                 <entry key="i">
@@ -173,9 +173,12 @@
         <property name="restScriptsPath" value="${crafter.engine.site.default.rest.scripts.path}"/>
         <property name="controllerScriptsPath" value="${crafter.engine.site.default.controller.scripts.path}"/>
         <property name="configPath" value="${crafter.engine.site.default.config.path}"/>
+        <property name="applicationContextPath" value="${crafter.engine.site.default.config.appContext.path}"/>
+        <property name="groovyClassesPath" value="${crafter.engine.site.default.classes.groovy.path}"/>
         <property name="urlTransformationEngine" ref="crafter.urlTransformationEngine"/>
         <property name="storeService" ref="crafter.contentStoreService"/>
         <property name="macroResolver" ref="crafter.macroResolver"/>
+        <property name="groovyGlobalVars" ref="crafter.restScriptsVariables"/>
     </bean>
 
     <bean id="crafter.fallbackSiteContextFactory" class="org.craftercms.engine.service.context.SiteContextFactory">
@@ -187,9 +190,12 @@
         <property name="restScriptsPath" value="/scripts/rest"/>
         <property name="controllerScriptsPath" value="/scripts/controllers"/>
         <property name="configPath" value="/config/site.xml"/>
+        <property name="applicationContextPath" value="/config/spring/application-context.xml"/>
+        <property name="groovyClassesPath" value="/classes"/>
         <property name="urlTransformationEngine" ref="crafter.urlTransformationEngine"/>
         <property name="storeService" ref="crafter.contentStoreService"/>
         <property name="macroResolver" ref="crafter.macroResolver"/>
+        <property name="groovyGlobalVars" ref="crafter.restScriptsVariables"/>
     </bean>
 
     <!-- ////////////////////////////////// -->
@@ -285,7 +291,7 @@
         <entry key="urlTransformationService" value-ref="crafter.urlTransformationService"/>
         <entry key="searchService" value-ref="crafter.searchService"/>
         <entry key="breadcrumbBuilder" value-ref="crafter.breadcrumbBuilder"/>
-        <entry key="configProperties" value-ref="crafter.propertyResolver"/>
+        <entry key="globalProperties" value-ref="crafter.propertyResolver"/>
         <entry key="tenantsResolver" value-ref="crafter.tenantsResolver"/>
     </util:map>
 
@@ -293,6 +299,12 @@
           class="org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean">
         <property name="targetBeanName" value="crafter.freeMarkerConfig"/>
     </bean>
+
+    <!-- ////////////////////////////////// -->
+    <!--								 	-->
+    <!--		  Class Loaders 			-->
+    <!--									-->
+    <!-- ////////////////////////////////// -->
 
     <import resource="classpath*:crafter/engine/extension/services-context.xml"/>
 

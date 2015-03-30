@@ -55,17 +55,11 @@ public class PageRenderController extends AbstractController {
     private static final String SCRIPT_URL_FORMAT = "%s.%s.%s"; // {url}.{method}.{scriptExt}
 
     protected String fallbackPageUrl;
-    protected ScriptFactory scriptFactory;
     protected ContentStoreService storeService;
 
     @Required
     public void setFallbackPageUrl(String fallbackPageUrl) {
         this.fallbackPageUrl = fallbackPageUrl;
-    }
-
-    @Required
-    public void setScriptFactory(final ScriptFactory scriptFactory) {
-        this.scriptFactory = scriptFactory;
     }
 
     @Required
@@ -115,12 +109,19 @@ public class PageRenderController extends AbstractController {
         return new ModelAndView(pageUrl);
     }
 
-    protected Script getControllerScript(SiteContext siteContext, HttpServletRequest request, String pageUrl) {
-        String scriptUrl = getScriptUrl(siteContext, request, pageUrl);
+    protected Script getControllerScript(SiteContext context, HttpServletRequest request, String pageUrl) {
+        ScriptFactory scriptFactory = context.getScriptFactory();
+
+        if (scriptFactory == null) {
+            throw new IllegalStateException("No script factory associate to current site context '" +
+                                            context.getSiteName() + "'");
+        }
+
+        String scriptUrl = getScriptUrl(context, scriptFactory, request, pageUrl);
 
         try {
             // Check controller script exists
-            if (storeService.exists(siteContext.getContext(), scriptUrl)) {
+            if (storeService.exists(context.getContext(), scriptUrl)) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Controller script found for page " + pageUrl + " at " + scriptUrl);
                 }
@@ -136,10 +137,11 @@ public class PageRenderController extends AbstractController {
         return null;
     }
 
-    protected String getScriptUrl(SiteContext siteContext, HttpServletRequest request, String pageUrl) {
+    protected String getScriptUrl(SiteContext context, ScriptFactory scriptFactory, HttpServletRequest request,
+                                  String pageUrl) {
         String method = request.getMethod().toLowerCase();
         String pageUrlNoExt = FilenameUtils.removeExtension(pageUrl);
-        String controllerScriptsPath = siteContext.getControllerScriptsPath();
+        String controllerScriptsPath = context.getControllerScriptsPath();
 
         String baseUrl = UrlUtils.appendUrl(controllerScriptsPath, pageUrlNoExt);
 
@@ -164,7 +166,8 @@ public class PageRenderController extends AbstractController {
                     return (String) result;
                 } else {
                     throw new ScriptException("Expected String view name as return value of controller script " +
-                        script + ". Actual type of returns value: " + result.getClass().getName());
+                                              script + ". Actual type of returns value: " +
+                                              result.getClass().getName());
                 }
             } else {
                 return null;

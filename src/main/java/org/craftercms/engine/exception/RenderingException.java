@@ -25,21 +25,8 @@ import org.craftercms.core.exception.CrafterException;
  */
 public class RenderingException extends CrafterException {
 
-    private static final long serialVersionUID = 5230366572654807937L;
-
-    public RenderingException() {
-    }
-
-    public RenderingException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
     public RenderingException(String message) {
         super(message);
-    }
-
-    public RenderingException(Throwable cause) {
-        super(cause);
     }
 
 }

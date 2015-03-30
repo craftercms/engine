@@ -1,5 +1,6 @@
 package org.craftercms.engine.controller;
 
+import java.util.Collections;
 import java.util.Map;
 import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
@@ -9,13 +10,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
-import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.engine.controller.rest.RestScriptsController;
 import org.craftercms.engine.scripting.ScriptFactory;
-import org.craftercms.engine.scripting.impl.Jsr233CompiledScriptFactory;
+import org.craftercms.engine.scripting.impl.GroovyScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.test.utils.CacheTemplateMockUtils;
 import org.craftercms.engine.test.utils.ContentStoreServiceMockUtils;
+import org.craftercms.engine.util.groovy.ContentStoreResourceConnector;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -41,18 +41,15 @@ public class RestScriptsControllerTest {
 
     @Before
     public void setUp() throws Exception {
-        CacheTemplate cacheTemplate = createCacheTemplate();
-
         storeService = createContentStoreService();
 
         controller = new RestScriptsController();
-        controller.setScriptFactory(createScriptFactory(cacheTemplate, storeService));
         controller.setServletContext(createServletContext());
     }
 
     @Test
     public void testHandleRequest() throws Exception {
-        MockHttpServletRequest request = createRequest("/test.json");
+        MockHttpServletRequest request = createRequest("/test.json", storeService);
         MockHttpServletResponse response = createResponse();
 
         setCurrentRequest(request);
@@ -86,7 +83,7 @@ public class RestScriptsControllerTest {
 
     @Test
     public void testRedirect() throws Exception {
-        MockHttpServletRequest request = createRequest("/testRedirect.json");
+        MockHttpServletRequest request = createRequest("/testRedirect.json", storeService);
         MockHttpServletResponse response = createResponse();
 
         setCurrentRequest(request);
@@ -102,7 +99,7 @@ public class RestScriptsControllerTest {
     }
 
     private void testError(String serviceUrl, int statusCode, String message) throws Exception {
-        MockHttpServletRequest request = createRequest(serviceUrl);
+        MockHttpServletRequest request = createRequest(serviceUrl, storeService);
         MockHttpServletResponse response = createResponse();
 
         setCurrentRequest(request);
@@ -111,8 +108,8 @@ public class RestScriptsControllerTest {
 
         assertEquals(statusCode, response.getStatus());
 
-        Map<String, Object> responseBody = (Map<String, Object>) modelAndView.getModel().get(RestScriptsController
-            .DEFAULT_RESPONSE_BODY_MODEL_ATTR_NAME);
+        Map<String, Object> responseBody = (Map<String, Object>) modelAndView.getModel().get(
+            RestScriptsController.DEFAULT_RESPONSE_BODY_MODEL_ATTR_NAME);
         assertEquals(message, responseBody.get(RestScriptsController.DEFAULT_ERROR_MESSAGE_MODEL_ATTR_NAME));
 
         removeCurrentRequest();
@@ -129,33 +126,25 @@ public class RestScriptsControllerTest {
         return storeService;
     }
 
-    private CacheTemplate createCacheTemplate() {
-        CacheTemplate cacheTemplate = mock(CacheTemplate.class);
-        CacheTemplateMockUtils.setUpWithNoCaching(cacheTemplate);
-
-        return cacheTemplate;
-    }
-
-    private SiteContext createSiteContext() throws Exception {
+    private SiteContext createSiteContext(ContentStoreService storeService) throws Exception {
         SiteContext siteContext = mock(SiteContext.class);
+
+        ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(siteContext);
+        ScriptFactory scriptFactory = new GroovyScriptFactory(resourceConnector,
+                                                              Collections.<String, Object>emptyMap());
+
+        when(siteContext.getSiteName()).thenReturn("test");
         when(siteContext.getContext()).thenReturn(mock(Context.class));
-        when(siteContext.getRestScriptsPath()).thenReturn("/scripts/rest");
+        when(siteContext.getRestScriptsPath()).thenReturn("/scripts");
+        when(siteContext.getStoreService()).thenReturn(storeService);
+        when(siteContext.getScriptFactory()).thenReturn(scriptFactory);
 
         return siteContext;
     }
 
-    private ScriptFactory createScriptFactory(CacheTemplate cacheTemplate, ContentStoreService storeService) {
-        Jsr233CompiledScriptFactory scriptFactory = new Jsr233CompiledScriptFactory();
-        scriptFactory.setCacheTemplate(cacheTemplate);
-        scriptFactory.setStoreService(storeService);
-        scriptFactory.init();
-
-        return scriptFactory;
-    }
-
-    private MockHttpServletRequest createRequest(String serviceUrl) throws Exception {
+    private MockHttpServletRequest createRequest(String serviceUrl, ContentStoreService storeService) throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "http://localhost:8080/api/1/services/" +
-            serviceUrl);
+                                                                           serviceUrl);
 
         request.setParameter("test-param", "test");
         request.addHeader("test-header", "test");
@@ -163,7 +152,7 @@ public class RestScriptsControllerTest {
         Cookie testCookie = new Cookie("test-cookie", "test");
         request.setCookies(testCookie);
 
-        request.setAttribute(SiteContext.SITE_CONTEXT_ATTRIBUTE, createSiteContext());
+        request.setAttribute(SiteContext.SITE_CONTEXT_ATTRIBUTE, createSiteContext(storeService));
         request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, serviceUrl);
 
         return request;

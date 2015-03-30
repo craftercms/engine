@@ -20,7 +20,7 @@ import org.craftercms.core.service.Content;
  *
  * @author Alfonso Vásquez
  */
-public class ContentUrlConnection extends URLConnection {
+public class ContentStoreUrlConnection extends URLConnection {
 
     private static final String CONTENT_LENGTH = "content-length";
     private static final String CONTENT_TYPE = "content-type";
@@ -38,7 +38,7 @@ public class ContentUrlConnection extends URLConnection {
     protected boolean connected;
     protected boolean initializedHeaders;
 
-    public ContentUrlConnection(URL url, Content content) {
+    public ContentStoreUrlConnection(URL url, Content content) {
         super(url);
 
         this.content = content;

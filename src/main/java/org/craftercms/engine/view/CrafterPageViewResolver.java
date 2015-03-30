@@ -84,7 +84,6 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     protected UserAgentTemplateDetector userAgentTemplateDetector;
     protected boolean modePreview;
     protected CrafterPageAccessManager accessManager;
-    protected ScriptFactory scriptFactory;
 
     public CrafterPageViewResolver() {
         order = 10;
@@ -208,11 +207,6 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
         this.accessManager = accessManager;
     }
 
-    @Required
-    public void setScriptFactory(ScriptFactory scriptFactory) {
-        this.scriptFactory = scriptFactory;
-    }
-
     @Override
     public View resolveViewName(String viewName, Locale locale) throws Exception {
         String url = urlTransformationService.transform(urlTransformerName, viewName, cacheUrlTransformations);
@@ -272,7 +266,7 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     }
 
     protected View getCachedLocalizedView(final String baseUrl, final Locale locale) {
-        SiteContext context = SiteContext.getCurrent();
+        final SiteContext context = SiteContext.getCurrent();
 
         return cacheTemplate.getObject(context.getContext(), cachingOptions, new Callback<View>() {
 
@@ -315,7 +309,7 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
                         view.setDelegatedViewResolver(delegatedViewResolver);
                         view.setUserAgentTemplateDetector(userAgentTemplateDetector);
 
-                        loadScripts(page, view);
+                        loadScripts(context.getScriptFactory(), page, view);
 
                         view.addDependencyKey(page.getItem().getKey());
 
@@ -330,22 +324,24 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
         }, baseUrl, locale, PAGE_CONST_KEY_ELEM);
     }
 
-    protected void loadScripts(SiteItem page, CrafterPageView view) {
-        List<String> scriptUrls = scriptResolver.getScriptUrls(page);
-        if (CollectionUtils.isNotEmpty(scriptUrls)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Scripts associated to page " + page.getStoreUrl() + ": " + scriptUrls);
+    protected void loadScripts(ScriptFactory scriptFactory, SiteItem page, CrafterPageView view) {
+        if (scriptFactory != null) {
+            List<String> scriptUrls = scriptResolver.getScriptUrls(page);
+            if (CollectionUtils.isNotEmpty(scriptUrls)) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Scripts associated to page " + page.getStoreUrl() + ": " + scriptUrls);
+                }
+
+                List<Script> scripts = new ArrayList<Script>(scriptUrls.size());
+
+                for (String scriptUrl : scriptUrls) {
+                    Script script = scriptFactory.getScript(scriptUrl);
+                    scripts.add(script);
+                    view.addDependencyKey(script.getKey());
+                }
+
+                view.setScripts(scripts);
             }
-
-            List<Script> scripts = new ArrayList<Script>(scriptUrls.size());
-
-            for (String scriptUrl : scriptUrls) {
-                Script script = scriptFactory.getScript(scriptUrl);
-                scripts.add(script);
-                view.addDependencyKey(script.getKey());
-            }
-
-            view.setScripts(scripts);
         }
     }
 

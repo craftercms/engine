@@ -1,4 +1,4 @@
-package scripts.shared
+package org.craftercms.test
 
 class Greeting {
 

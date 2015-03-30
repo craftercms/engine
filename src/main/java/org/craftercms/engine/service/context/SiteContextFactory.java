@@ -16,24 +16,35 @@
  */
 package org.craftercms.engine.service.context;
 
-import java.io.IOException;
+import java.net.URLClassLoader;
+import java.util.Map;
 
+import groovy.lang.GroovyClassLoader;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.craftercms.core.service.Content;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.store.impl.filesystem.FileSystemContentStoreAdapter;
 import org.craftercms.core.url.UrlTransformationEngine;
-import org.craftercms.engine.exception.ConfigurationException;
+import org.craftercms.engine.exception.SiteContextCreationException;
 import org.craftercms.engine.macro.MacroResolver;
+import org.craftercms.engine.scripting.ScriptFactory;
+import org.craftercms.engine.scripting.impl.GroovyScriptFactory;
 import org.craftercms.engine.service.PreviewOverlayCallback;
+import org.craftercms.engine.util.groovy.ContentStoreGroovyResourceLoader;
+import org.craftercms.engine.util.groovy.ContentStoreResourceConnector;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
 
 /**
- * Factory for creating {@link SiteContext} with common properties. It also uses the {@link MacroResolver} to resolve any macros
- * specified in the {@code rootFolderPath} before creating the context (remember that macros can vary between requests).
+ * Factory for creating {@link SiteContext} with common properties. It also uses the {@link MacroResolver} to resolve
+ * any macros specified in the {@code rootFolderPath} before creating the context (remember that macros can vary
+ * between requests).
  *
  * @author Alfonso Vásquez
  */
@@ -46,13 +57,16 @@ public class SiteContextFactory {
     protected String rootFolderPath;
     protected String staticAssetsPath;
     protected String templatesPath;
-    protected ObjectFactory<FreeMarkerConfig> freeMarkerConfigFactory;
     protected String restScriptsPath;
     protected String controllerScriptsPath;
     protected String configPath;
+    protected String applicationContextPath;
+    protected String groovyClassesPath;
+    protected Map<String, Object> groovyGlobalVars;
     protected boolean cacheOn;
     protected int maxAllowedItemsInCache;
     protected boolean ignoreHiddenFiles;
+    protected ObjectFactory<FreeMarkerConfig> freeMarkerConfigFactory;
     protected UrlTransformationEngine urlTransformationEngine;
     protected PreviewOverlayCallback overlayCallback;
     protected ContentStoreService storeService;
@@ -100,11 +114,6 @@ public class SiteContextFactory {
     }
 
     @Required
-    public void setFreeMarkerConfigFactory(ObjectFactory<FreeMarkerConfig> freeMarkerConfigFactory) {
-        this.freeMarkerConfigFactory = freeMarkerConfigFactory;
-    }
-
-    @Required
     public void setRestScriptsPath(String restScriptsPath) {
         this.restScriptsPath = restScriptsPath;
     }
@@ -119,6 +128,21 @@ public class SiteContextFactory {
         this.configPath = configPath;
     }
 
+    @Required
+    public void setApplicationContextPath(String applicationContextPath) {
+        this.applicationContextPath = applicationContextPath;
+    }
+
+    @Required
+    public void setGroovyClassesPath(String groovyClassesPath) {
+        this.groovyClassesPath = groovyClassesPath;
+    }
+
+    @Required
+    public void setGroovyGlobalVars(Map<String, Object> groovyGlobalVars) {
+        this.groovyGlobalVars = groovyGlobalVars;
+    }
+
     public void setCacheOn(boolean cacheOn) {
         this.cacheOn = cacheOn;
     }
@@ -129,6 +153,11 @@ public class SiteContextFactory {
 
     public void setIgnoreHiddenFiles(boolean ignoreHiddenFiles) {
         this.ignoreHiddenFiles = ignoreHiddenFiles;
+    }
+
+    @Required
+    public void setFreeMarkerConfigFactory(ObjectFactory<FreeMarkerConfig> freeMarkerConfigFactory) {
+        this.freeMarkerConfigFactory = freeMarkerConfigFactory;
     }
 
     @Required
@@ -157,30 +186,91 @@ public class SiteContextFactory {
                                                      resolvedRootFolderPath, cacheOn, maxAllowedItemsInCache,
                                                      ignoreHiddenFiles);
 
-        return new SiteContext(storeService, siteName, context, fallback, staticAssetsPath, templatesPath,
-                               getFreemarkerConfig(), restScriptsPath, controllerScriptsPath, urlTransformationEngine,
-                               overlayCallback, getConfig(context, storeService));
+        SiteContext siteContext = new SiteContext();
+        siteContext.setStoreService(storeService);
+        siteContext.setSiteName(siteName);
+        siteContext.setContext(context);
+        siteContext.setFallback(fallback);
+        siteContext.setStaticAssetsPath(staticAssetsPath);
+        siteContext.setTemplatesPath(templatesPath);
+        siteContext.setFreeMarkerConfig(getFreemarkerConfig());
+        siteContext.setUrlTransformationEngine(urlTransformationEngine);
+        siteContext.setOverlayCallback(overlayCallback);
+
+        if (!fallback) {
+            URLClassLoader classLoader = getClassLoader(siteContext);
+
+            siteContext.setRestScriptsPath(restScriptsPath);
+            siteContext.setControllerScriptsPath(controllerScriptsPath);
+            siteContext.setConfigPath(configPath);
+            siteContext.setApplicationContextPath(applicationContextPath);
+            siteContext.setGroovyClassesPath(groovyClassesPath);
+            siteContext.setScriptFactory(getScriptFactory(siteContext, classLoader));
+            siteContext.setConfig(getConfig(context));
+            siteContext.setApplicationContext(getApplicationContext(context, classLoader));
+            siteContext.setClassLoader(classLoader);
+        }
+
+        return siteContext;
     }
 
     protected FreeMarkerConfig getFreemarkerConfig() {
         return freeMarkerConfigFactory.getObject();
     }
 
-    protected XMLConfiguration getConfig(Context context, ContentStoreService storeService) {
-        if (storeService.exists(context, configPath)) {
-            Content configContent = storeService.getContent(context, configPath);
+    protected XMLConfiguration getConfig(Context context) {
+        Content configContent = storeService.findContent(context, configPath);
+        if (configContent != null) {
             XMLConfiguration config = new XMLConfiguration();
 
             try {
                 config.load(configContent.getInputStream());
-            } catch (IOException | org.apache.commons.configuration.ConfigurationException e) {
-                throw new ConfigurationException("Unable to load main config file at " + configPath, e);
+            } catch (Exception e) {
+                throw new SiteContextCreationException("Unable to load config file at " + configPath, e);
             }
 
             return config;
         } else {
             return null;
         }
+    }
+
+    protected URLClassLoader getClassLoader(SiteContext siteContext) {
+        ContentStoreGroovyResourceLoader resourceLoader = new ContentStoreGroovyResourceLoader(siteContext,
+                                                                                               groovyClassesPath);
+        GroovyClassLoader classLoader = new GroovyClassLoader(getClass().getClassLoader());
+
+        classLoader.setResourceLoader(resourceLoader);
+
+        return classLoader;
+    }
+
+    protected ConfigurableApplicationContext getApplicationContext(Context context, URLClassLoader classLoader) {
+        Content appContextContent = storeService.findContent(context, applicationContextPath);
+        if (appContextContent != null) {
+            GenericApplicationContext appContext = new GenericApplicationContext();
+            appContext.setClassLoader(classLoader);
+
+            try {
+                XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader(appContext);
+                xmlReader.loadBeanDefinitions(new ClassPathResource(applicationContextPath));
+
+                appContext.refresh();
+            } catch (Exception e) {
+                throw new SiteContextCreationException("Unable to load application context at " +
+                                                       applicationContextPath, e);
+            }
+
+            return appContext;
+        } else {
+            return null;
+        }
+    }
+
+    protected ScriptFactory getScriptFactory(SiteContext siteContext, URLClassLoader classLoader) {
+        ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(siteContext);
+
+        return new GroovyScriptFactory(resourceConnector, classLoader, groovyGlobalVars);
     }
 
 }

@@ -48,7 +48,6 @@
                     <property name="delegatedViewResolver" ref="crafter.freeMarkerViewResolver" />
                     <property name="userAgentTemplateDetector" ref="crafter.userAgentTemplateDetector" />
                     <property name="accessManager" ref="crafter.pageAccessManager"/>
-                    <property name="scriptFactory" ref="crafter.scriptFactory"/>
                     <property name="scriptResolver" ref="crafter.pageScriptResolver"/>
                 </bean>
             </list>
@@ -66,7 +65,6 @@
         <property name="cache" value="false" />
         <property name="contentType" value="text/html;charset=UTF-8" />
         <property name="siteItemService" ref="crafter.siteItemService" />
-        <property name="scriptFactory" ref="crafter.scriptFactory" />
         <property name="componentTemplateXPathQuery" value="${crafter.engine.component.view.name.xpathQuery}" />
         <property name="componentIncludeElementName" value="${crafter.engine.component.include.element.name}" />
         <property name="requestContextAttribute" value="requestContext" />

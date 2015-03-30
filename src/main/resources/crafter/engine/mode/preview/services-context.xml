@@ -39,11 +39,14 @@
         <property name="restScriptsPath" value="${crafter.engine.site.default.rest.scripts.path}"/>
         <property name="controllerScriptsPath" value="${crafter.engine.site.default.controller.scripts.path}"/>
         <property name="configPath" value="${crafter.engine.site.default.config.path}"/>
+        <property name="applicationContextPath" value="${crafter.engine.site.default.config.appContext.path}"/>
+        <property name="groovyClassesPath" value="${crafter.engine.site.default.classes.groovy.path}"/>
         <property name="cacheOn" value="false"/>
         <property name="urlTransformationEngine" ref="crafter.urlTransformationEngine"/>
         <property name="overlayCallback" ref="crafter.authoringOverlayCallback"/>
         <property name="storeService" ref="crafter.contentStoreService"/>
         <property name="macroResolver" ref="crafter.macroResolver"/>
+        <property name="groovyGlobalVars" ref="crafter.restScriptsVariables"/>
     </bean>
 
     <!-- ////////////////////////////////// -->

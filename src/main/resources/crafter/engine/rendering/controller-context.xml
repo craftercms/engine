@@ -25,9 +25,7 @@
         <property name="urlMap" ref="crafter.urlMappings"/>
     </bean>
 
-    <bean id="crafter.restScriptsController" class="org.craftercms.engine.controller.rest.RestScriptsController">
-        <property name="scriptFactory" ref="crafter.scriptFactory"/>
-    </bean>
+    <bean id="crafter.restScriptsController" class="org.craftercms.engine.controller.rest.RestScriptsController"/>
 
     <bean id="crafter.staticAssetsRequestHandler" class="org.craftercms.engine.controller.StaticAssetsRequestHandler">
         <property name="contentStoreService" ref="crafter.contentStoreService"/>
@@ -36,7 +34,6 @@
 
     <bean id="crafter.pageRenderController" class="org.craftercms.engine.controller.PageRenderController">
         <property name="fallbackPageUrl" value="/no-site.html"/>
-        <property name="scriptFactory" ref="crafter.scriptFactory"/>
         <property name="storeService" ref="crafter.contentStoreService"/>
     </bean>
 

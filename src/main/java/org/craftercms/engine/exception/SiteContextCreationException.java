@@ -19,25 +19,14 @@ package org.craftercms.engine.exception;
 import org.craftercms.core.exception.CrafterException;
 
 /**
- * Thrown if an error prevents from registering a site.
+ * Thrown if an error prevents from creating a site context.
  *
  * @author Alfonso Vásquez
  */
-public class SiteRegistrationException extends CrafterException {
+public class SiteContextCreationException extends CrafterException {
 
-    public SiteRegistrationException() {
-    }
-
-    public SiteRegistrationException(String message, Throwable cause) {
+    public SiteContextCreationException(String message, Throwable cause) {
         super(message, cause);
-    }
-
-    public SiteRegistrationException(String message) {
-        super(message);
-    }
-
-    public SiteRegistrationException(Throwable cause) {
-        super(cause);
     }
 
 }

@@ -23,8 +23,8 @@ import java.util.Map;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import org.craftercms.core.exception.PathNotFoundException;
 import org.craftercms.core.service.ContentStoreService;
+import org.craftercms.core.service.Item;
 import org.craftercms.core.service.ItemFilter;
 import org.craftercms.core.service.Tree;
 import org.craftercms.core.service.impl.CompositeItemFilter;
@@ -43,14 +43,14 @@ import org.springframework.beans.factory.annotation.Required;
  */
 public class SiteItemService {
 
-    protected ContentStoreService contentStoreService;
+    protected ContentStoreService storeService;
     protected Map<String, ModelValueConverter<?>> modelValueConverters;
     protected List<ItemFilter> defaultFilters;
     protected Comparator<SiteItem> sortComparator;
 
     @Required
-    public void setContentStoreService(ContentStoreService contentStoreService) {
-        this.contentStoreService = contentStoreService;
+    public void setStoreService(ContentStoreService storeService) {
+        this.storeService = storeService;
     }
 
     @Required
@@ -68,11 +68,11 @@ public class SiteItemService {
 
     public SiteItem getSiteItem(String url) {
         SiteContext context = SiteContext.getCurrent();
+        Item item = storeService.findItem(context.getContext(), url);
 
-        try {
-            return new SiteItem(contentStoreService.getItem(context.getContext(), url), modelValueConverters);
-        } catch (PathNotFoundException e) {
-            // Return null instead of PathNotFoundException, so that when this is called in a template it won't fail.
+        if (item != null) {
+            return new SiteItem(item, modelValueConverters);
+        } else {
             return null;
         }
     }
@@ -112,13 +112,11 @@ public class SiteItemService {
         }
 
         SiteContext context = SiteContext.getCurrent();
+        Tree tree = storeService.findTree(context.getContext(), null, url, depth, compositeFilter, null);
 
-        try {
-            Tree tree = contentStoreService.getTree(context.getContext(), url, depth, compositeFilter);
-
+        if (tree != null) {
             return new SiteItem(tree, modelValueConverters, sortComparator);
-        } catch (PathNotFoundException e) {
-            // Return null instead of PathNotFoundException, so that when this is called in a template it won't fail.
+        } else {
             return null;
         }
     }

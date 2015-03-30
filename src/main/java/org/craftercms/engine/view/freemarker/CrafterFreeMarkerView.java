@@ -32,7 +32,6 @@ import freemarker.template.SimpleHash;
 import org.apache.commons.lang.ArrayUtils;
 import org.craftercms.engine.freemarker.RenderComponentDirective;
 import org.craftercms.engine.freemarker.ServletContextHashModel;
-import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.scripting.ScriptResolver;
 import org.craftercms.engine.service.SiteItemService;
 import org.craftercms.engine.service.context.SiteContext;
@@ -75,7 +74,6 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     public static final String KEY_ENUMS = "enums";
     
     protected SiteItemService siteItemService;
-    protected ScriptFactory scriptFactory;
     protected String componentTemplateXPathQuery;
     protected String componentTemplateNamePrefix;
     protected String componentTemplateNameSuffix;
@@ -96,11 +94,6 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     @Required
     public void setSiteItemService(SiteItemService siteItemService) {
         this.siteItemService = siteItemService;
-    }
-
-    @Required
-    public void setScriptFactory(ScriptFactory scriptFactory) {
-        this.scriptFactory = scriptFactory;
     }
 
     @Required
@@ -129,14 +122,12 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     }
 
     /**
-     * Instead of returning the same bean from the application context, a {@link FreeMarkerConfig} is returned for the current
-     * {@link SiteContext}.
+     * Instead of returning the same bean from the application context, a {@link FreeMarkerConfig} is returned for
+     * the current {@link SiteContext}.
      */
     @Override
     protected FreeMarkerConfig autodetectConfiguration() throws BeansException {
-        SiteContext siteContext = SiteContext.getCurrent();
-
-        return siteContext.getFreeMarkerConfig();
+        return SiteContext.getCurrent().getFreeMarkerConfig();
     }
 
     @Override
@@ -182,7 +173,6 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
 
         RenderComponentDirective renderComponentDirective = new RenderComponentDirective();
         renderComponentDirective.setSiteItemService(siteItemService);
-        renderComponentDirective.setScriptFactory(scriptFactory);
         renderComponentDirective.setModelFactory(componentModelFactory);
         renderComponentDirective.setTemplateXPathQuery(componentTemplateXPathQuery);
         renderComponentDirective.setTemplateNamePrefix(componentTemplateNamePrefix);
