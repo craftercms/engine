@@ -21,6 +21,8 @@ import java.util.Map;
 
 import groovy.lang.GroovyClassLoader;
 import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.craftercms.core.service.Content;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
@@ -41,8 +43,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
+import org.xml.sax.InputSource;
 
 /**
  * Factory for creating {@link SiteContext} with common properties. It also uses the {@link MacroResolver} to resolve
@@ -52,6 +54,8 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
  * @author Alfonso Vásquez
  */
 public class SiteContextFactory implements ApplicationContextAware {
+
+    private static final Log logger = LogFactory.getLog(SiteContextFactory.class);
 
     protected String storeType;
     protected String storeServerUrl;
@@ -194,41 +198,47 @@ public class SiteContextFactory implements ApplicationContextAware {
         Context context = storeService.createContext(storeType, storeServerUrl, username, password,
                                                      resolvedRootFolderPath, cacheOn, maxAllowedItemsInCache,
                                                      ignoreHiddenFiles);
+        try {
+            SiteContext siteContext = new SiteContext();
+            siteContext.setStoreService(storeService);
+            siteContext.setSiteName(siteName);
+            siteContext.setContext(context);
+            siteContext.setFallback(fallback);
+            siteContext.setStaticAssetsPath(staticAssetsPath);
+            siteContext.setTemplatesPath(templatesPath);
+            siteContext.setFreeMarkerConfig(getFreemarkerConfig());
+            siteContext.setUrlTransformationEngine(urlTransformationEngine);
+            siteContext.setOverlayCallback(overlayCallback);
 
-        SiteContext siteContext = new SiteContext();
-        siteContext.setStoreService(storeService);
-        siteContext.setSiteName(siteName);
-        siteContext.setContext(context);
-        siteContext.setFallback(fallback);
-        siteContext.setStaticAssetsPath(staticAssetsPath);
-        siteContext.setTemplatesPath(templatesPath);
-        siteContext.setFreeMarkerConfig(getFreemarkerConfig());
-        siteContext.setUrlTransformationEngine(urlTransformationEngine);
-        siteContext.setOverlayCallback(overlayCallback);
+            if (!fallback) {
+                URLClassLoader classLoader = getClassLoader(siteContext);
 
-        if (!fallback) {
-            URLClassLoader classLoader = getClassLoader(siteContext);
+                siteContext.setRestScriptsPath(restScriptsPath);
+                siteContext.setControllerScriptsPath(controllerScriptsPath);
+                siteContext.setConfigPath(configPath);
+                siteContext.setApplicationContextPath(applicationContextPath);
+                siteContext.setGroovyClassesPath(groovyClassesPath);
+                siteContext.setScriptFactory(getScriptFactory(siteContext, classLoader));
+                siteContext.setConfig(getConfig(siteContext));
+                siteContext.setApplicationContext(getApplicationContext(siteContext, classLoader));
+                siteContext.setClassLoader(classLoader);
+            }
 
-            siteContext.setRestScriptsPath(restScriptsPath);
-            siteContext.setControllerScriptsPath(controllerScriptsPath);
-            siteContext.setConfigPath(configPath);
-            siteContext.setApplicationContextPath(applicationContextPath);
-            siteContext.setGroovyClassesPath(groovyClassesPath);
-            siteContext.setScriptFactory(getScriptFactory(siteContext, classLoader));
-            siteContext.setConfig(getConfig(context));
-            siteContext.setApplicationContext(getApplicationContext(context, classLoader));
-            siteContext.setClassLoader(classLoader);
+            return siteContext;
+        } catch (RuntimeException e) {
+            // Destroy context if the site context creation failed
+            storeService.destroyContext(context);
+
+            throw e;
         }
-
-        return siteContext;
     }
 
     protected FreeMarkerConfig getFreemarkerConfig() {
         return freeMarkerConfigFactory.getObject();
     }
 
-    protected XMLConfiguration getConfig(Context context) {
-        Content configContent = storeService.findContent(context, configPath);
+    protected XMLConfiguration getConfig(SiteContext siteContext) {
+        Content configContent = storeService.findContent(siteContext.getContext(), configPath);
         if (configContent != null) {
             XMLConfiguration config = new XMLConfiguration();
 
@@ -237,6 +247,9 @@ public class SiteContextFactory implements ApplicationContextAware {
             } catch (Exception e) {
                 throw new SiteContextCreationException("Unable to load config file at " + configPath, e);
             }
+
+            logger.info("Configuration loaded from " + configPath + " for site context '" + siteContext.getSiteName() +
+                        "'");
 
             return config;
         } else {
@@ -254,21 +267,26 @@ public class SiteContextFactory implements ApplicationContextAware {
         return classLoader;
     }
 
-    protected ConfigurableApplicationContext getApplicationContext(Context context, URLClassLoader classLoader) {
-        Content appContextContent = storeService.findContent(context, applicationContextPath);
+    protected ConfigurableApplicationContext getApplicationContext(SiteContext siteContext,
+                                                                   URLClassLoader classLoader) {
+        Content appContextContent = storeService.findContent(siteContext.getContext(), applicationContextPath);
         if (appContextContent != null) {
             GenericApplicationContext appContext = new GenericApplicationContext(mainApplicationContext);
             appContext.setClassLoader(classLoader);
 
             try {
                 XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader(appContext);
-                xmlReader.loadBeanDefinitions(new ClassPathResource(applicationContextPath));
+                xmlReader.setValidationMode(XmlBeanDefinitionReader.VALIDATION_XSD);
+                xmlReader.loadBeanDefinitions(new InputSource(appContextContent.getInputStream()));
 
                 appContext.refresh();
             } catch (Exception e) {
                 throw new SiteContextCreationException("Unable to load application context at " +
                                                        applicationContextPath, e);
             }
+
+            logger.info("Application context loaded from " + applicationContextPath + " for site context '" +
+                        siteContext.getSiteName() + "'");
 
             return appContext;
         } else {
