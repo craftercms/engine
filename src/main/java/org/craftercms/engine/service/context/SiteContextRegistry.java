@@ -47,7 +47,7 @@ public class SiteContextRegistry {
             iter.remove();
         }
 
-        logger.info("[SITE CONTEXT REGISTRY] Site context registry destroyed");
+        logger.info("Site context registry destroyed");
     }
 
     public Collection<SiteContext> list() {
@@ -61,7 +61,7 @@ public class SiteContextRegistry {
     public void register(SiteContext context) {
         registry.put(context.getSiteName(), context);
 
-        logger.info("[SITE CONTEXT REGISTRY] Site context registered: " + context);
+        logger.info("Site context registered: " + context);
     }
 
     public SiteContext unregister(String siteName) {
@@ -69,7 +69,7 @@ public class SiteContextRegistry {
         if (context != null) {
             context.destroy();
 
-            logger.info("[SITE CONTEXT REGISTRY] Site context unregistered: " + context);
+            logger.info("Site context unregistered: " + context);
         }
 
         return null;

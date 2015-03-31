@@ -33,9 +33,12 @@ import org.craftercms.engine.scripting.impl.GroovyScriptFactory;
 import org.craftercms.engine.service.PreviewOverlayCallback;
 import org.craftercms.engine.util.groovy.ContentStoreGroovyResourceLoader;
 import org.craftercms.engine.util.groovy.ContentStoreResourceConnector;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
@@ -48,7 +51,7 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
  *
  * @author Alfonso Vásquez
  */
-public class SiteContextFactory {
+public class SiteContextFactory implements ApplicationContextAware {
 
     protected String storeType;
     protected String storeServerUrl;
@@ -71,6 +74,7 @@ public class SiteContextFactory {
     protected PreviewOverlayCallback overlayCallback;
     protected ContentStoreService storeService;
     protected MacroResolver macroResolver;
+    protected ApplicationContext mainApplicationContext;
 
     public SiteContextFactory() {
         storeType = FileSystemContentStoreAdapter.STORE_TYPE;
@@ -179,6 +183,11 @@ public class SiteContextFactory {
         this.macroResolver = macroResolver;
     }
 
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.mainApplicationContext = applicationContext;
+    }
+
     public SiteContext createContext(String siteName, boolean fallback) {
         String resolvedRootFolderPath = macroResolver.resolveMacros(rootFolderPath);
 
@@ -248,7 +257,7 @@ public class SiteContextFactory {
     protected ConfigurableApplicationContext getApplicationContext(Context context, URLClassLoader classLoader) {
         Content appContextContent = storeService.findContent(context, applicationContextPath);
         if (appContextContent != null) {
-            GenericApplicationContext appContext = new GenericApplicationContext();
+            GenericApplicationContext appContext = new GenericApplicationContext(mainApplicationContext);
             appContext.setClassLoader(classLoader);
 
             try {

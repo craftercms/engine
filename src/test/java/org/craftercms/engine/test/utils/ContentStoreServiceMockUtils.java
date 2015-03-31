@@ -1,5 +1,7 @@
 package org.craftercms.engine.test.utils;
 
+import java.io.IOException;
+
 import org.apache.commons.io.IOUtils;
 import org.craftercms.core.exception.PathNotFoundException;
 import org.craftercms.core.service.CachingOptions;
@@ -11,9 +13,9 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.core.io.ClassPathResource;
 
-import java.io.IOException;
-
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.when;
 
 /**
  * Test utils for mocking a {@link ContentStoreService}.
@@ -46,8 +48,21 @@ public class ContentStoreServiceMockUtils {
 
         };
 
+        Answer<Boolean> existsAnswer = new Answer<Boolean>() {
+
+            @Override
+            public Boolean answer(InvocationOnMock invocation) throws Throwable {
+                Object[] args = invocation.getArguments();
+                String url = (String) args[1];
+
+                return new ClassPathResource(url).exists();
+            }
+
+        };
+
         when(mock.getContent(any(Context.class), anyString())).then(getContentAnswer);
         when(mock.getContent(any(Context.class), any(CachingOptions.class), anyString())).then(getContentAnswer);
+        when(mock.exists(any(Context.class), anyString())).then(existsAnswer);
 
         return mock;
     }

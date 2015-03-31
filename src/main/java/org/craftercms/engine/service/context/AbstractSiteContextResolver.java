@@ -58,6 +58,7 @@ public abstract class AbstractSiteContextResolver implements SiteContextResolver
     @Override
     public SiteContext getContext(HttpServletRequest request) {
         String siteName = StringUtils.lowerCase(getSiteName(request));
+        boolean fallback = false;
 
         if (StringUtils.isNotEmpty(siteName)) {
             if (logger.isDebugEnabled()) {
@@ -65,19 +66,20 @@ public abstract class AbstractSiteContextResolver implements SiteContextResolver
             }
         } else {
             siteName = fallbackSiteName;
+            fallback = true;
 
             logger.warn("Unable to resolve a site name for the request. Using fallback site");
         }
 
         request.setAttribute(SITE_NAME_ATTRIBUTE, siteName);
 
-        return getContext(siteName);
+        return getContext(siteName, fallback);
     }
 
-    protected SiteContext getContext(String siteName) {
+    protected SiteContext getContext(String siteName, boolean fallback) {
         SiteContext context = siteContextRegistry.get(siteName);
         if (context == null) {
-            context = createAndRegisterContext(siteName, false);
+            context = createAndRegisterContext(siteName, fallback);
         }
 
         if (logger.isDebugEnabled()) {

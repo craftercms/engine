@@ -29,8 +29,8 @@ public class CookieSiteContextResolver extends AbstractSiteContextResolver {
     public String getSiteName(HttpServletRequest request) {
         String siteName = request.getParameter(paramOrCookieName);
         if (StringUtils.isEmpty(siteName)) {
-            String cookie = HttpUtils.getCookieValue(paramOrCookieName, request);
-            if (StringUtils.isEmpty(cookie)) {
+            siteName = HttpUtils.getCookieValue(paramOrCookieName, request);
+            if (StringUtils.isEmpty(siteName)) {
                 logger.warn("No '" + paramOrCookieName + "' request param or cookie found");
             }
         }
