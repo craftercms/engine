@@ -16,16 +16,17 @@
  */
 package org.craftercms.engine.freemarker;
 
-import freemarker.core.Environment;
-import freemarker.template.TemplateException;
-import freemarker.template.TemplateExceptionHandler;
-import org.craftercms.core.util.HttpServletUtils;
-import org.springframework.beans.factory.annotation.Required;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import javax.servlet.http.HttpServletRequest;
+
+import freemarker.core.Environment;
+import freemarker.template.TemplateException;
+import freemarker.template.TemplateExceptionHandler;
+import org.craftercms.commons.http.RequestContext;
+import org.springframework.beans.factory.annotation.Required;
 
 /**
  * {@link TemplateExceptionHandler} that instead of printing the errors directly in the HTML and stopping template processing, stores
@@ -34,6 +35,8 @@ import java.io.Writer;
  * @author Alfonso Vásquez
  */
 public class CrafterTemplateExceptionHandler implements TemplateExceptionHandler {
+
+    public static final String FREEMARKER_CURRENT_ERROR_ID_ATTRIBUTE = "freemarkerCurrentErrorId";
 
     public static final String ERROR_FORMAT =
         "<script type='text/javascript'>" +
@@ -90,14 +93,16 @@ public class CrafterTemplateExceptionHandler implements TemplateExceptionHandler
     }
 
     protected String createErrorId() {
-        Integer currentErrorId = (Integer) HttpServletUtils.getAttribute("crafter.currentErrorId", HttpServletUtils.SCOPE_REQUEST);
+        HttpServletRequest request = RequestContext.getCurrent().getRequest();
+        Integer currentErrorId = (Integer)request.getAttribute(FREEMARKER_CURRENT_ERROR_ID_ATTRIBUTE);
+
         if (currentErrorId == null) {
             currentErrorId = 1;
         } else {
             currentErrorId++;
         }
 
-        HttpServletUtils.setAttribute("crafter.currentErrorId", currentErrorId, HttpServletUtils.SCOPE_REQUEST);
+        request.setAttribute(FREEMARKER_CURRENT_ERROR_ID_ATTRIBUTE, currentErrorId);
 
         return currentErrorId.toString();
     }

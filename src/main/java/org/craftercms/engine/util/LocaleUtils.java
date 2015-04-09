@@ -16,17 +16,22 @@
  */
 package org.craftercms.engine.util;
 
+import java.util.List;
+import java.util.Locale;
+
 import org.apache.commons.lang.StringUtils;
 import org.craftercms.core.util.url.ContentBundleUrl;
 import org.craftercms.core.util.url.ContentBundleUrlParser;
 
-import java.util.List;
-import java.util.Locale;
-
 /**
+ * Locale related utility methods
+ *
  * @author Alfonso Vásquez
  */
 public class LocaleUtils {
+
+    private LocaleUtils() {
+    }
 
     /**
      * Calls {@link org.apache.commons.lang.LocaleUtils#localeLookupList(java.util.Locale, java.util.Locale)}
@@ -42,7 +47,8 @@ public class LocaleUtils {
      *     baseName + delim + language + delim + country + delim + variant
      * </pre>
      */
-    public static String getLocalizedUrl(ContentBundleUrlParser urlParser, String baseUrl, Locale locale, String delim) {
+    public static String getLocalizedUrl(ContentBundleUrlParser urlParser, String baseUrl, Locale locale,
+                                         String delim) {
         String language = locale.getLanguage();
 	    String country = locale.getCountry();
 	    String variant = locale.getVariant();

@@ -19,14 +19,13 @@ package org.craftercms.engine.util.breadcrumb;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.craftercms.core.service.CachingOptions;
+import org.craftercms.commons.lang.Callback;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.service.Item;
-import org.craftercms.core.util.cache.CacheCallback;
 import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.core.util.cache.impl.CachingAwareList;
-import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;
+import org.craftercms.engine.service.context.SiteContext;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
@@ -40,22 +39,13 @@ public class BreadcrumbBuilder {
     public static final String HOME_BREADCRUMB_NAME = "Home";
 
     protected CacheTemplate cacheTemplate;
-    protected CachingOptions cachingOptions;
     protected ContentStoreService storeService;
     protected String homePath;
     protected String breadcrumbNameXPathQuery;
 
-    public BreadcrumbBuilder() {
-        cachingOptions = CachingOptions.DEFAULT_CACHING_OPTIONS;
-    }
-
     @Required
     public void setCacheTemplate(CacheTemplate cacheTemplate) {
         this.cacheTemplate = cacheTemplate;
-    }
-
-    public void setCachingOptions(CachingOptions cachingOptions) {
-        this.cachingOptions = cachingOptions;
     }
 
     @Required
@@ -74,12 +64,12 @@ public class BreadcrumbBuilder {
     }
 
     public List<BreadcrumbItem> buildBreadcrumb(final String url) {
-        final Context context = AbstractSiteContextResolvingFilter.getCurrentContext().getContext();
+        final Context context = SiteContext.getCurrent().getContext();
 
-        return cacheTemplate.execute(context, cachingOptions, new CacheCallback<List<BreadcrumbItem>>() {
+        return cacheTemplate.getObject(context, new Callback<List<BreadcrumbItem>>() {
 
             @Override
-            public List<BreadcrumbItem> doCacheable() {
+            public List<BreadcrumbItem> execute() {
                 CachingAwareList<BreadcrumbItem> breadcrumb = new CachingAwareList<BreadcrumbItem>();
                 String breadcrumbUrl = StringUtils.substringBeforeLast(StringUtils.substringAfter(url, homePath),
                                                                        "/index.xml");

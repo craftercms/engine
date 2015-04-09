@@ -25,14 +25,13 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.craftercms.commons.http.HttpUtils;
 import org.craftercms.core.exception.PathNotFoundException;
 import org.craftercms.core.service.Content;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
-import org.craftercms.core.util.HttpServletUtils;
 import org.craftercms.core.util.UrlUtils;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.http.MediaType;
 import org.springframework.util.FileCopyUtils;
@@ -79,7 +78,7 @@ public class StaticAssetsRequestHandler extends WebContentGenerator implements H
         IOException {
         checkAndPrepare(request, response, true);
 
-        SiteContext context = AbstractSiteContextResolvingFilter.getCurrentContext();
+        SiteContext context = SiteContext.getCurrent();
         String path = getPath(request, context);
 
         if (logger.isDebugEnabled()) {
@@ -126,7 +125,7 @@ public class StaticAssetsRequestHandler extends WebContentGenerator implements H
                 logger.debug("Caching disabled on client");
             }
 
-            HttpServletUtils.disableCaching(response);
+            HttpUtils.disableCaching(response);
         }
 
         if (METHOD_HEAD.equals(request.getMethod())) {

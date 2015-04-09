@@ -23,8 +23,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.craftercms.commons.http.HttpUtils;
 import org.craftercms.commons.http.RequestContext;
-import org.craftercms.core.util.HttpServletUtils;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.profile.api.Profile;
 import org.craftercms.security.authentication.Authentication;
@@ -53,15 +53,18 @@ public class ScriptUtils {
     public static final String VARIABLE_AUTH = "authentication";
     public static final String VARIABLE_PROFILE = "profile";
 
+    private ScriptUtils() {
+    }
+
     public static void addCommonVariables(Map<String, Object> variables, HttpServletRequest request,
                                           HttpServletResponse response, ServletContext context) {
         variables.put(VARIABLE_REQUEST_URL, request.getRequestURI());
         variables.put(VARIABLE_APPLICATION, context);
         variables.put(VARIABLE_REQUEST, request);
         variables.put(VARIABLE_RESPONSE, response);
-        variables.put(VARIABLE_PARAMS, HttpServletUtils.createRequestParamsMap(request));
-        variables.put(VARIABLE_HEADERS, HttpServletUtils.createHeadersMap(request));
-        variables.put(VARIABLE_COOKIES, HttpServletUtils.createCookiesMap(request));
+        variables.put(VARIABLE_PARAMS, HttpUtils.createRequestParamsMap(request));
+        variables.put(VARIABLE_HEADERS, HttpUtils.createHeadersMap(request));
+        variables.put(VARIABLE_COOKIES, HttpUtils.createCookiesMap(request));
         variables.put(VARIABLE_SESSION, request.getSession(false));
         variables.put(VARIABLE_LOGGER, logger);
     }

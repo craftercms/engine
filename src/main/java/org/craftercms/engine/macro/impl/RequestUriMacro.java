@@ -17,7 +17,7 @@
 package org.craftercms.engine.macro.impl;
 
 import org.apache.commons.lang.StringUtils;
-import org.craftercms.core.util.HttpServletUtils;
+import org.craftercms.commons.http.RequestContext;
 
 /**
  * Represents a {request.uri} macro, which resolves to the current request uri.
@@ -33,7 +33,7 @@ public class RequestUriMacro extends AbstractMacro {
 
     @Override
     protected String getMacroValue(String str) {
-        String requestUri = HttpServletUtils.getCurrentRequest().getRequestURI();
+        String requestUri = RequestContext.getCurrent().getRequest().getRequestURI();
 
         if (!requestUri.startsWith("/")) {
             requestUri = "/" + requestUri;

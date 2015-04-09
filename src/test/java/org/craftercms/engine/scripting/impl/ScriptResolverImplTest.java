@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
+import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.exception.CrafterException;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
@@ -11,13 +12,10 @@ import org.craftercms.core.service.Item;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.scripting.ScriptResolver;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -52,7 +50,7 @@ public class ScriptResolverImplTest {
         Item item = mock(Item.class);
         when(item.queryDescriptorValue("*/content-type")).thenReturn("/page/mypage1");
         when(item.queryDescriptorValues("*/scripts/item/key")).thenReturn(Arrays.asList(
-                "/scripts/pages/script1.groovy"));
+            "/scripts/pages/script1.groovy"));
 
         SiteItem siteItem = mock(SiteItem.class);
         when(siteItem.getItem()).thenReturn(item);
@@ -69,7 +67,7 @@ public class ScriptResolverImplTest {
         Item item = mock(Item.class);
         when(item.queryDescriptorValue("*/content-type")).thenReturn("/page/mypage2");
         when(item.queryDescriptorValues("*/scripts/item/key")).thenReturn(Arrays.asList(
-                "/scripts/pages/script1.groovy"));
+            "/scripts/pages/script1.groovy"));
 
         SiteItem siteItem = mock(SiteItem.class);
         when(siteItem.getItem()).thenReturn(item);
@@ -126,17 +124,17 @@ public class ScriptResolverImplTest {
 
     private MockHttpServletRequest createRequest() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setAttribute(AbstractSiteContextResolvingFilter.SITE_CONTEXT_ATTRIBUTE, createSiteContext());
+        request.setAttribute(SiteContext.SITE_CONTEXT_ATTRIBUTE, createSiteContext());
 
         return request;
     }
 
     private void setCurrentRequest(HttpServletRequest request) {
-        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+        RequestContext.setCurrent(new RequestContext(request, null));
     }
 
     private void removeCurrentRequest() {
-        RequestContextHolder.resetRequestAttributes();
+        RequestContext.clear();
     }
 
 }

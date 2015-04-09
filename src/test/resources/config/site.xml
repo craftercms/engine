@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+    <security>
+        <login>
+            <formUrl>/signin</formUrl>
+            <defaultSuccessUrl>/home</defaultSuccessUrl>
+            <alwaysUseDefaultSuccessUrl>true</alwaysUseDefaultSuccessUrl>
+            <failureUrl>/signin?error=loginFailure</failureUrl>
+        </login>
+        <logout>
+            <successUrl>/home</successUrl>
+        </logout>
+        <accessDenied>
+            <errorPageUrl>/signin?error=accessDenied</errorPageUrl>
+        </accessDenied>
+        <urlRestrictions>
+            <restriction>
+                <url>/*</url>
+                <expression>hasRole('USER')</expression>
+            </restriction>
+        </urlRestrictions>
+    </security>
+    <socialConnections>
+        <facebookConnectionFactory>
+            <appId>000000000000000</appId>
+            <appSecret>c852cb30cda311e488300800200c9a66</appSecret>
+        </facebookConnectionFactory>
+    </socialConnections>
+</site>

@@ -16,13 +16,17 @@
  */
 package org.craftercms.engine.view;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.craftercms.commons.http.RequestContext;
+import org.craftercms.commons.lang.Callback;
 import org.craftercms.core.service.CachingOptions;
-import org.craftercms.core.util.HttpServletUtils;
-import org.craftercms.core.util.cache.CacheCallback;
 import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.core.util.url.ContentBundleUrlParser;
 import org.craftercms.engine.mobile.UserAgentTemplateDetector;
@@ -34,7 +38,6 @@ import org.craftercms.engine.security.CrafterPageAccessManager;
 import org.craftercms.engine.service.SiteItemService;
 import org.craftercms.engine.service.UrlTransformationService;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;
 import org.craftercms.engine.util.LocaleUtils;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.Ordered;
@@ -43,10 +46,6 @@ import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.view.RedirectView;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * {@link org.springframework.web.servlet.ViewResolver} that resolves to {@link CrafterPageView}s. This resolver
@@ -85,7 +84,6 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     protected UserAgentTemplateDetector userAgentTemplateDetector;
     protected boolean modePreview;
     protected CrafterPageAccessManager accessManager;
-    protected ScriptFactory scriptFactory;
 
     public CrafterPageViewResolver() {
         order = 10;
@@ -209,11 +207,6 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
         this.accessManager = accessManager;
     }
 
-    @Required
-    public void setScriptFactory(ScriptFactory scriptFactory) {
-        this.scriptFactory = scriptFactory;
-    }
-
     @Override
     public View resolveViewName(String viewName, Locale locale) throws Exception {
         String url = urlTransformationService.transform(urlTransformerName, viewName, cacheUrlTransformations);
@@ -266,19 +259,19 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     }
 
     protected View getCurrentPageHttpsRedirectView() {
-        String currentUrl = HttpServletUtils.getCurrentRequest().getRequestURI();
+        String currentUrl = RequestContext.getCurrent().getRequest().getRequestURI();
         String fullHttpsUrl = urlTransformationService.transform(fullHttpsUrlTransformerName, currentUrl);
 
         return getRedirectView(fullHttpsUrl, false);
     }
 
     protected View getCachedLocalizedView(final String baseUrl, final Locale locale) {
-        SiteContext context = AbstractSiteContextResolvingFilter.getCurrentContext();
+        final SiteContext context = SiteContext.getCurrent();
 
-        return cacheTemplate.execute(context.getContext(), cachingOptions, new CacheCallback<View>() {
+        return cacheTemplate.getObject(context.getContext(), cachingOptions, new Callback<View>() {
 
             @Override
-            public View doCacheable() {
+            public View execute() {
                 SiteItem page;
                 if (localizeViews) {
                     page = getLocalizedPage(baseUrl, locale);
@@ -316,7 +309,7 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
                         view.setDelegatedViewResolver(delegatedViewResolver);
                         view.setUserAgentTemplateDetector(userAgentTemplateDetector);
 
-                        loadScripts(page, view);
+                        loadScripts(context.getScriptFactory(), page, view);
 
                         view.addDependencyKey(page.getItem().getKey());
 
@@ -331,22 +324,24 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
         }, baseUrl, locale, PAGE_CONST_KEY_ELEM);
     }
 
-    protected void loadScripts(SiteItem page, CrafterPageView view) {
-        List<String> scriptUrls = scriptResolver.getScriptUrls(page);
-        if (CollectionUtils.isNotEmpty(scriptUrls)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Scripts associated to page " + page.getStoreUrl() + ": " + scriptUrls);
+    protected void loadScripts(ScriptFactory scriptFactory, SiteItem page, CrafterPageView view) {
+        if (scriptFactory != null) {
+            List<String> scriptUrls = scriptResolver.getScriptUrls(page);
+            if (CollectionUtils.isNotEmpty(scriptUrls)) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Scripts associated to page " + page.getStoreUrl() + ": " + scriptUrls);
+                }
+
+                List<Script> scripts = new ArrayList<Script>(scriptUrls.size());
+
+                for (String scriptUrl : scriptUrls) {
+                    Script script = scriptFactory.getScript(scriptUrl);
+                    scripts.add(script);
+                    view.addDependencyKey(script.getKey());
+                }
+
+                view.setScripts(scripts);
             }
-
-            List<Script> scripts = new ArrayList<Script>(scriptUrls.size());
-
-            for (String scriptUrl : scriptUrls) {
-                Script script = scriptFactory.getScript(scriptUrl);
-                scripts.add(script);
-                view.addDependencyKey(script.getKey());
-            }
-
-            view.setScripts(scripts);
         }
     }
 

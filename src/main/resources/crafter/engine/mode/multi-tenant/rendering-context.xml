@@ -25,7 +25,7 @@
 
     <bean id="crafter.siteMappingsRestController"
           class="org.craftercms.engine.controller.rest.multitenant.SiteMappingsRestController">
-        <property name="filter" ref="crafter.siteContextResolvingFilter"/>
+        <property name="contextResolver" ref="crafter.siteContextResolver"/>
     </bean>
 
 </beans>

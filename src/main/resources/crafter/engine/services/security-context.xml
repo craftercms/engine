@@ -7,7 +7,36 @@
     <import resource="classpath:crafter/security/security-context.xml"/>
 
     <bean id="crafter.pageAccessManager" class="org.craftercms.engine.security.CrafterPageAccessManager">
-        <property name="authorizedRolesXPathQuery" value="${crafter.security.authorization.page.authorizedRoles.xpathQuery}"/>
+        <property name="authorizedRolesXPathQuery"
+                  value="${crafter.security.authorization.page.authorizedRoles.xpathQuery}"/>
+    </bean>
+
+    <bean id="crafter.loginSuccessHandler" class="org.craftercms.engine.security.ConfigAwareLoginSuccessHandler">
+        <property name="defaultTargetUrl" value="${crafter.security.login.success.url}"/>
+        <property name="alwaysUseDefaultTargetUrl" value="${crafter.security.login.success.alwaysUseDefaultUrl}"/>
+    </bean>
+
+    <bean id="crafter.loginFailureHandler" class="org.craftercms.engine.security.ConfigAwareLoginFailureHandler">
+        <property name="targetUrl" value="${crafter.security.login.failure.url}"/>
+    </bean>
+
+    <bean id="crafter.logoutSuccessHandler" class="org.craftercms.engine.security.ConfigAwareLogoutSuccessHandler">
+        <property name="targetUrl" value="${crafter.security.logout.success.url}"/>
+    </bean>
+
+    <bean id="crafter.authenticationRequiredHandler"
+          class="org.craftercms.engine.security.ConfigAwareAuthenticationRequiredHandler">
+        <property name="loginFormUrl" value="${crafter.security.login.form.url}"/>
+    </bean>
+
+    <bean id="crafter.accessDeniedHandler" class="org.craftercms.engine.security.ConfigAwareAccessDeniedHandler">
+        <property name="errorPageUrl" value="${crafter.security.accessDenied.error.url}"/>
+    </bean>
+
+    <bean id="crafter.urlAccessRestrictionCheckingProcessor"
+          class="org.craftercms.engine.security.ConfigAwareUrlAccessRestrictionCheckingProcessor">
+        <property name="urlRestrictions" ref="crafter.urlRestrictions"/>
+        <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
     </bean>
 
 </beans>

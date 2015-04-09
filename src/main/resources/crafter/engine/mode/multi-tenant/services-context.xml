@@ -19,12 +19,12 @@
 
     <!-- ////////////////////////////////// -->
     <!--								 	-->
-    <!--			 Filters				-->
+    <!--			 Contexts				-->
     <!--									-->
     <!-- ////////////////////////////////// -->
 
-    <bean id="crafter.siteContextResolvingFilter" 
-          class="org.craftercms.engine.servlet.filter.ReloadableMappingsSiteContextResolvingFilter">
+    <bean id="crafter.siteContextResolver"
+          class="org.craftercms.engine.service.context.ReloadableMappingsSiteContextResolver">
         <property name="siteContextRegistry" ref="crafter.siteContextRegistry" />
         <property name="siteContextFactory" ref="crafter.siteContextFactory" />
         <property name="fallbackSiteContextFactory" ref="crafter.fallbackSiteContextFactory" />

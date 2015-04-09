@@ -16,7 +16,9 @@
  */
 package org.craftercms.engine.macro.impl;
 
-import org.craftercms.core.util.HttpServletUtils;
+import javax.servlet.http.HttpServletRequest;
+
+import org.craftercms.commons.http.RequestContext;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
@@ -49,9 +51,12 @@ public class ScopeAttributeMacro extends AbstractMacro {
 
     @Override
     protected String getMacroValue(String str) {
-        int scope = requestScope? HttpServletUtils.SCOPE_REQUEST : HttpServletUtils.SCOPE_SESSION;
-
-        return (String) HttpServletUtils.getAttribute(attributeName, scope);
+        HttpServletRequest request = RequestContext.getCurrent().getRequest();
+        if (requestScope) {
+            return (String)request.getAttribute(attributeName);
+        } else {
+            return (String)request.getSession().getAttribute(attributeName);
+        }
     }
 
 }

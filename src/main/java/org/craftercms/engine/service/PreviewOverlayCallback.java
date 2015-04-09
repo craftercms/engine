@@ -1,7 +1,7 @@
 package org.craftercms.engine.service;
 
 import org.apache.commons.lang.StringUtils;
-import org.craftercms.core.util.HttpServletUtils;
+import org.craftercms.commons.http.RequestContext;
 import org.craftercms.engine.macro.MacroResolver;
 import org.craftercms.engine.mobile.UserAgentTemplateDetector;
 import org.springframework.beans.factory.annotation.Required;
@@ -34,11 +34,12 @@ public class PreviewOverlayCallback {
     }
 
     public String render() {
-        String queryString = HttpServletUtils.getCurrentRequest().getQueryString();
+        String queryString = RequestContext.getCurrent().getRequest().getQueryString();
 		StringBuilder scriptsStr = new StringBuilder();
 
         // TODO: Shouldn't we also check if CStudio-Agent header is also present?
-		if(StringUtils.isEmpty(queryString) || !queryString.contains(userAgentTemplateDetector.getAgentQueryStringParamName())) {
+		if(StringUtils.isEmpty(queryString) ||
+           !queryString.contains(userAgentTemplateDetector.getAgentQueryStringParamName())) {
 			for (String scriptSrc : previewServerJsScriptSources) {
                 String script = scriptFormat.replace("{scriptSrc}", scriptSrc);
 
