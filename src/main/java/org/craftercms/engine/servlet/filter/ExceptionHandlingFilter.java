@@ -16,15 +16,20 @@
  */
 package org.craftercms.engine.servlet.filter;
 
-import org.craftercms.engine.http.ExceptionHandler;
-import org.springframework.beans.factory.annotation.Required;
-
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.craftercms.engine.http.ExceptionHandler;
+import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Top level filter used for handling uncaught and unhandled exceptions within the code.
@@ -45,7 +50,8 @@ public class ExceptionHandlingFilter implements Filter {
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
+        ServletException {
         try {
             chain.doFilter(request, response);
         } catch (Exception e) {
@@ -57,8 +63,8 @@ public class ExceptionHandlingFilter implements Filter {
     public void destroy() {
     }
 
-    protected void handleException(HttpServletRequest request, HttpServletResponse response, Exception ex) throws ServletException,
-            IOException {
+    protected void handleException(HttpServletRequest request, HttpServletResponse response, Exception ex)
+        throws ServletException, IOException {
         boolean handled = false;
 
         for (Iterator<ExceptionHandler> iter = exceptionHandlers.iterator(); iter.hasNext() && !handled;) {

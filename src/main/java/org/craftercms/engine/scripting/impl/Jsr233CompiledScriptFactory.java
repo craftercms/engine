@@ -16,13 +16,23 @@
  */
 package org.craftercms.engine.scripting.impl;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.util.Map;
+import javax.annotation.PostConstruct;
+import javax.script.Compilable;
+import javax.script.CompiledScript;
+import javax.script.ScriptEngineManager;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.craftercms.commons.lang.Callback;
 import org.craftercms.core.exception.PathNotFoundException;
-import org.craftercms.core.service.CachingOptions;
 import org.craftercms.core.service.Content;
 import org.craftercms.core.service.ContentStoreService;
-import org.craftercms.core.util.cache.CacheCallback;
 import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.core.util.cache.CachingAwareObject;
 import org.craftercms.engine.exception.ScriptException;
@@ -30,15 +40,7 @@ import org.craftercms.engine.exception.ScriptNotFoundException;
 import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;
 import org.springframework.beans.factory.annotation.Required;
-
-import javax.annotation.PostConstruct;
-import javax.script.Compilable;
-import javax.script.CompiledScript;
-import javax.script.ScriptEngineManager;
-import java.io.*;
-import java.util.Map;
 
 /**
  * {@link ScriptFactory} for JSR 233 compiled scripts
@@ -99,24 +101,26 @@ public class Jsr233CompiledScriptFactory implements ScriptFactory {
 
     @Override
     public Script getScript(String url) throws ScriptException {
-        SiteContext siteContext = AbstractSiteContextResolvingFilter.getCurrentContext();
+        SiteContext siteContext = SiteContext.getCurrent();
 
         return getCachedScript(siteContext, url);
     }
 
     protected Script getCachedScript(final SiteContext siteContext, final String url) throws ScriptException {
-        return cacheTemplate.execute(siteContext.getContext(), CachingOptions.DEFAULT_CACHING_OPTIONS, new CacheCallback<Script>() {
+        return cacheTemplate.getObject(siteContext.getContext(), new Callback<Script>() {
 
             @Override
-            public Script doCacheable() throws ScriptException {
+            public Script execute() throws ScriptException {
                 Content scriptContent;
 
                 try {
                     scriptContent = storeService.getContent(siteContext.getContext(), url);
                 } catch (PathNotFoundException e) {
-                    throw new ScriptNotFoundException("No script found at " + getScriptLocation() + " in content store", e);
+                    throw new ScriptNotFoundException(
+                        "No script found at " + getScriptLocation() + " in content store", e);
                 } catch (Exception e) {
-                    throw new ScriptException("Error while retrieving script at " + getScriptLocation() + " in content store", e);
+                    throw new ScriptException(
+                        "Error while retrieving script at " + getScriptLocation() + " in content store", e);
                 }
 
                 InputStream scriptInput;
@@ -146,7 +150,7 @@ public class Jsr233CompiledScriptFactory implements ScriptFactory {
 
                 Jsr233CompiledScript script = new Jsr233CompiledScript(compiledScript, globalVariables);
                 if (scriptContent instanceof CachingAwareObject) {
-                    script.addDependencyKey(((CachingAwareObject) scriptContent).getKey());
+                    script.addDependencyKey(((CachingAwareObject)scriptContent).getKey());
                 }
 
                 return script;

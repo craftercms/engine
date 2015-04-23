@@ -3,7 +3,8 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean name="crafter.properties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <bean name="crafter.properties" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+        <property name="order" value="0"/>
         <property name="locations">
             <list>
                 <value>classpath:crafter/core/core.properties</value>
@@ -13,22 +14,7 @@
                 <value>classpath*:crafter/engine/extension/server-config.properties</value>
             </list>
         </property>
-        <property name="ignoreUnresolvablePlaceholders" value="true" />
-    </bean>
-
-    
-    <!-- ////////////////////////////////// -->
-    <!--								 	-->
-    <!--			 Filters				-->
-    <!--									-->
-    <!-- ////////////////////////////////// -->
-
-    <bean id="crafter.siteContextResolvingFilter" class="org.craftercms.engine.servlet.filter.SiteContextFromCookieResolvingFilter">
-        <property name="siteContextRegistry" ref="crafter.siteContextRegistry" />
-        <property name="siteContextFactory" ref="crafter.siteContextFactory" />
-        <property name="paramOrCookieName" value="${crafter.engine.request.param.siteName}" />
-        <property name="fallbackSiteContextFactory" ref="crafter.fallbackSiteContextFactory" />
-        <property name="fallbackSiteName" value="default" />
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
     </bean>
 
     <!-- ////////////////////////////////// -->
@@ -37,18 +23,30 @@
     <!--									-->
     <!-- ////////////////////////////////// -->
 
+    <bean id="crafter.siteContextResolver" class="org.craftercms.engine.service.context.CookieSiteContextResolver">
+        <property name="siteContextRegistry" ref="crafter.siteContextRegistry"/>
+        <property name="siteContextFactory" ref="crafter.siteContextFactory"/>
+        <property name="paramOrCookieName" value="${crafter.engine.request.param.siteName}"/>
+        <property name="fallbackSiteContextFactory" ref="crafter.fallbackSiteContextFactory"/>
+        <property name="fallbackSiteName" value="default"/>
+    </bean>
+
     <bean id="crafter.siteContextFactory" class="org.craftercms.engine.service.context.SiteContextFactory">
         <property name="rootFolderPath" value="${crafter.engine.site.default.rootFolder.path}"/>
-        <property name="staticAssetsPath" value="${crafter.engine.site.default.staticAssets.path}" />
-        <property name="templatesPath" value="${crafter.engine.site.default.templates.path}" />
-        <property name="freeMarkerConfigFactory" ref="crafter.freeMarkerConfigFactory" />
-        <property name="restScriptsPath" value="${crafter.engine.site.default.rest.scripts.path}" />
-        <property name="controllerScriptsPath" value="${crafter.engine.site.default.controller.scripts.path}" />
-        <property name="cacheOn" value="false" />
-        <property name="urlTransformationEngine" ref="crafter.urlTransformationEngine" />
-        <property name="overlayCallback" ref="crafter.authoringOverlayCallback" />
-        <property name="storeService" ref="crafter.contentStoreService" />
-        <property name="macroResolver" ref="crafter.macroResolver" />
+        <property name="staticAssetsPath" value="${crafter.engine.site.default.staticAssets.path}"/>
+        <property name="templatesPath" value="${crafter.engine.site.default.templates.path}"/>
+        <property name="freeMarkerConfigFactory" ref="crafter.freeMarkerConfigFactory"/>
+        <property name="restScriptsPath" value="${crafter.engine.site.default.rest.scripts.path}"/>
+        <property name="controllerScriptsPath" value="${crafter.engine.site.default.controller.scripts.path}"/>
+        <property name="configPath" value="${crafter.engine.site.default.config.path}"/>
+        <property name="applicationContextPath" value="${crafter.engine.site.default.config.appContext.path}"/>
+        <property name="groovyClassesPath" value="${crafter.engine.site.default.classes.groovy.path}"/>
+        <property name="cacheOn" value="false"/>
+        <property name="urlTransformationEngine" ref="crafter.urlTransformationEngine"/>
+        <property name="overlayCallback" ref="crafter.authoringOverlayCallback"/>
+        <property name="storeService" ref="crafter.contentStoreService"/>
+        <property name="macroResolver" ref="crafter.macroResolver"/>
+        <property name="groovyGlobalVars" ref="crafter.restScriptsVariables"/>
     </bean>
 
     <!-- ////////////////////////////////// -->
@@ -57,7 +55,7 @@
     <!--									-->
     <!-- ////////////////////////////////// -->
 
-    <bean id="crafter.httpProxyRegistry" class="org.craftercms.engine.http.HttpProxyRegistry" />
+    <bean id="crafter.httpProxyRegistry" class="org.craftercms.engine.http.HttpProxyRegistry"/>
 
     <bean id="crafter.proxy.authoring" class="org.craftercms.engine.http.impl.AlfrescoHttpProxy">
         <property name="alfrescoTicketCookieName" value="${crafter.engine.proxy.authoring.ticketCookieName}"/>
@@ -66,7 +64,8 @@
 
     <bean id="crafter.authoringOverlayCallback" class="org.craftercms.engine.service.PreviewOverlayCallback">
         <property name="scriptFormat" value="${crafter.engine.proxy.authoring.callback.preview.script.format}"/>
-        <property name="previewServerJsScriptSources" value="${crafter.engine.proxy.authoring.callback.preview.scripts}" />
+        <property name="previewServerJsScriptSources"
+                  value="${crafter.engine.proxy.authoring.callback.preview.scripts}"/>
         <property name="macroResolver" ref="crafter.macroResolver"/>
         <property name="userAgentTemplateDetector" ref="crafter.userAgentTemplateDetector"/>
     </bean>
@@ -76,6 +75,12 @@
     <!--		     Security   			-->
     <!--									-->
     <!-- ////////////////////////////////// -->
+
+    <bean id="crafter.addSecurityCookiesProcessor"
+          class="org.craftercms.engine.security.PreviewAddSecurityCookiesProcessor">
+        <property name="ticketCookieManager" ref="crafter.ticketCookieManager"/>
+        <property name="profileLastModifiedCookieManager" ref="crafter.profileLastModifiedCookieManager"/>
+    </bean>
 
     <bean id="crafter.currentAuthenticationResolvingProcessor"
           class="org.craftercms.engine.security.PreviewCurrentAuthenticationResolvingProcessor">
@@ -89,20 +94,21 @@
     <!-- ////////////////////////////////// -->
 
     <!-- Declared with scope="prototype" so that a new one is created for every SiteContext -->
-    <bean id="crafter.freeMarkerConfig" class="org.craftercms.engine.freemarker.CrafterFreeMarkerConfigurer" scope="prototype">
-        <property name="templateExceptionHandler" ref="crafter.crafterTemplateExceptionHandler" />
-        <property name="templateLoaderPaths" value="WEB-INF" />
-        <property name="defaultEncoding" value="UTF-8" />
+    <bean id="crafter.freeMarkerConfig" class="org.craftercms.engine.freemarker.CrafterFreeMarkerConfigurer"
+          scope="prototype">
+        <property name="templateExceptionHandler" ref="crafter.crafterTemplateExceptionHandler"/>
+        <property name="templateLoaderPaths" value="WEB-INF"/>
+        <property name="defaultEncoding" value="UTF-8"/>
         <property name="freemarkerSettings">
             <props>
                 <prop key="output_encoding">UTF-8</prop>
                 <prop key="object_wrapper">org.craftercms.engine.freemarker.CrafterObjectWrapper</prop>
             </props>
         </property>
-        <property name="freemarkerVariables" ref="crafter.freemarkerVariables" />
+        <property name="freemarkerVariables" ref="crafter.freemarkerVariables"/>
         <property name="preTemplateLoaders">
             <array>
-                <ref bean="crafter.crafterFreeMarkerTemplateLoader" />
+                <ref bean="crafter.crafterFreeMarkerTemplateLoader"/>
             </array>
         </property>
         <property name="cacheStorage">

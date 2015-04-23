@@ -6,13 +6,8 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-    <!-- ////////////////////////////////// -->
-    <!--								 	-->
-    <!--			Controllers				-->
-    <!--									-->
-    <!-- ////////////////////////////////// -->
-
-    <bean name="crafter.properties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <bean name="crafter.properties" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+        <property name="order" value="0"/>
         <property name="locations">
             <list>
                 <value>classpath:crafter/core/core.properties</value>
@@ -25,6 +20,12 @@
         <property name="ignoreUnresolvablePlaceholders" value="true" />
     </bean>
 
+    <!-- ////////////////////////////////// -->
+    <!--								 	-->
+    <!--			Controllers				-->
+    <!--									-->
+    <!-- ////////////////////////////////// -->
+
     <bean id="crafter.httpProxyRequestHandler" class="org.craftercms.engine.controller.HttpProxyRequestHandler">
         <property name="proxyRegistry" ref="crafter.httpProxyRegistry" />
     </bean>
@@ -33,7 +34,7 @@
         <property name="renderComponentViewName" value="/templates/web/render-component.ftl"/>
     </bean>
 
-    <bean id="crafter.profileRestController" class="org.craftercms.engine.controller.preview.rest.ProfileRestController" />
+    <bean id="crafter.profileRestController" class="org.craftercms.engine.controller.rest.preview.ProfileRestController"/>
 
     <util:map id="crafter.urlMappings">
         <entry key="/api/1/services/**" value-ref="crafter.restScriptsController"/>

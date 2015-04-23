@@ -32,9 +32,7 @@ import org.craftercms.engine.exception.HttpStatusCodeAwareException;
 import org.craftercms.engine.exception.ScriptNotFoundException;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;
 import org.craftercms.engine.util.ScriptUtils;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
@@ -49,39 +47,40 @@ public class RestScriptsController extends AbstractController {
     private static final Log logger = LogFactory.getLog(RestScriptsController.class);
 
     public static final String DEFAULT_RESPONSE_BODY_MODEL_ATTR_NAME = "responseBody";
-    public static final String DEFAULT_ERROR_MODEL_ATTR_NAME = "error";
+    public static final String DEFAULT_ERROR_MESSAGE_MODEL_ATTR_NAME = "message";
 
     private static final String SCRIPT_URL_FORMAT = "%s.%s.%s"; // {url}.{method}.{scriptExt}
 
-    protected ScriptFactory scriptFactory;
     protected String responseBodyModelAttributeName;
-    protected String errorModelAttributeName;
+    protected String errorMessageModelAttributeName;
 
     public RestScriptsController() {
         responseBodyModelAttributeName = DEFAULT_RESPONSE_BODY_MODEL_ATTR_NAME;
-        errorModelAttributeName = DEFAULT_ERROR_MODEL_ATTR_NAME;
-    }
-
-    @Required
-    public void setScriptFactory(ScriptFactory scriptFactory) {
-        this.scriptFactory = scriptFactory;
+        errorMessageModelAttributeName = DEFAULT_ERROR_MESSAGE_MODEL_ATTR_NAME;
     }
 
     public void setResponseBodyModelAttributeName(String responseBodyModelAttributeName) {
         this.responseBodyModelAttributeName = responseBodyModelAttributeName;
     }
 
-    public void setErrorModelAttributeName(String errorModelAttributeName) {
-        this.errorModelAttributeName = errorModelAttributeName;
+    public void setErrorMessageModelAttributeName(String errorMessageModelAttributeName) {
+        this.errorMessageModelAttributeName = errorMessageModelAttributeName;
     }
 
     @Override
-    protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        SiteContext siteContext = AbstractSiteContextResolvingFilter.getCurrentContext();
-        String serviceUrl = getServiceUrl(request);
-        String scriptUrl = getScriptUrl(siteContext, request, serviceUrl);
+    protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
+        throws Exception {
+        SiteContext context = SiteContext.getCurrent();
+        ScriptFactory scriptFactory = context.getScriptFactory();
 
-        Object responseBody = executeScript(request, response, scriptUrl);
+        if (scriptFactory == null) {
+            throw new IllegalStateException("No script factory associate to current site context '" +
+                                            context.getSiteName() + "'");
+        }
+
+        String serviceUrl = getServiceUrl(request);
+        String scriptUrl = getScriptUrl(scriptFactory, context, request, serviceUrl);
+        Object responseBody = executeScript(scriptFactory, request, response, scriptUrl);
 
         if (response.isCommitted()) {
             // If response has been already committed by the script, just return null
@@ -101,16 +100,20 @@ public class RestScriptsController extends AbstractController {
         String url = (String) request.getAttribute(pathWithinHandlerMappingAttr);
 
         if (StringUtils.isEmpty(url)) {
-            throw new IllegalStateException("Required request attribute '" + pathWithinHandlerMappingAttr + "' is not set");
+            throw new IllegalStateException("Required request attribute '" + pathWithinHandlerMappingAttr +
+                                            "' is not set");
         }
 
         return url;
     }
 
-    protected String getScriptUrl(SiteContext siteContext, HttpServletRequest request, String serviceUrl) {
-        String baseUrl = UrlUtils.appendUrl(siteContext.getRestScriptsPath(), FilenameUtils.removeExtension(serviceUrl));
+    protected String getScriptUrl(ScriptFactory scriptFactory, SiteContext siteContext, HttpServletRequest request,
+                                  String serviceUrl) {
+        String baseUrl = UrlUtils.appendUrl(siteContext.getRestScriptsPath(),
+                                            FilenameUtils.removeExtension(serviceUrl));
 
-        return String.format(SCRIPT_URL_FORMAT, baseUrl, request.getMethod().toLowerCase(), scriptFactory.getScriptFileExtension());
+        return String.format(SCRIPT_URL_FORMAT, baseUrl, request.getMethod().toLowerCase(),
+                             scriptFactory.getScriptFileExtension());
     }
 
     protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response) {
@@ -121,7 +124,8 @@ public class RestScriptsController extends AbstractController {
         return scriptVariables;
     }
 
-    protected Object executeScript(HttpServletRequest request, HttpServletResponse response, String scriptUrl) {
+    protected Object executeScript(ScriptFactory scriptFactory, HttpServletRequest request,
+                                   HttpServletResponse response, String scriptUrl) {
         Map<String, Object> scriptVariables = createScriptVariables(request, response);
 
         try {
@@ -131,11 +135,12 @@ public class RestScriptsController extends AbstractController {
 
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
-            return Collections.singletonMap(errorModelAttributeName, "REST script not found");
+            return Collections.singletonMap(errorMessageModelAttributeName, "REST script not found");
         } catch (Exception e) {
             logger.error("Execution failed for script " + scriptUrl, e);
 
-            HttpStatusCodeAwareException cause = ExceptionUtils.getThrowableOfType(e, HttpStatusCodeAwareException.class);
+            HttpStatusCodeAwareException cause = ExceptionUtils.getThrowableOfType(e,
+                                                                                   HttpStatusCodeAwareException.class);
             String errorMsg;
 
             if (cause != null) {
@@ -148,7 +153,7 @@ public class RestScriptsController extends AbstractController {
                 errorMsg = e.getMessage();
             }
 
-            return Collections.singletonMap(errorModelAttributeName, errorMsg);
+            return Collections.singletonMap(errorMessageModelAttributeName, errorMsg);
         }
     }
 

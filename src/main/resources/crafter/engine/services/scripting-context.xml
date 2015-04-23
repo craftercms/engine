@@ -6,21 +6,6 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-    <bean id="crafter.groovyResourceConnector" class="org.craftercms.engine.scripting.impl.ContentResourceConnector">
-        <property name="storeService" ref="crafter.contentStoreService" />
-    </bean>
-
-    <bean id="crafter.scriptFactory" class="org.craftercms.engine.scripting.impl.GroovyScriptFactory">
-        <property name="resourceConnector" ref="crafter.groovyResourceConnector" />
-        <property name="globalVariables" ref="crafter.restScriptsVariables" />
-    </bean>
-
-    <!--bean id="crafter.scriptFactory" class="org.craftercms.engine.scripting.impl.Jsr233CompiledScriptFactory">
-        <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
-        <property name="storeService" ref="crafter.contentStoreService"/>
-        <property name="globalVariables" ref="crafter.restScriptsVariables"/>
-    </bean-->
-
     <bean id="crafter.pageScriptResolver" class="org.craftercms.engine.scripting.impl.ScriptResolverImpl">
         <property name="storeService" ref="crafter.contentStoreService"/>
         <property name="contentTypeXPathQuery" value="${crafter.engine.page.contentType.xpathQuery}"/>
@@ -42,6 +27,8 @@
         <entry key="urlTransformationService" value-ref="crafter.urlTransformationService"/>
         <entry key="searchService" value-ref="crafter.searchService"/>
         <entry key="applicationContext" value-ref="crafter.applicationContextAccessor"/>
+        <entry key="globalProperties" value-ref="crafter.propertyResolver"/>
+        <entry key="breadcrumbBuilder" value-ref="crafter.breadcrumbBuilder" />
         <entry key="profileService" value-ref="crafter.profileServiceRestClient"/>
         <entry key="tenantService" value-ref="crafter.tenantServiceRestClient"/>
         <entry key="authenticationService" value-ref="crafter.authenticationServiceRestClient"/>
@@ -49,6 +36,7 @@
         <entry key="connectionFactoryLocator" value-ref="crafter.connectionFactoryLocator"/>
         <entry key="usersConnectionRepository" value-ref="crafter.usersConnectionRepository"/>
         <entry key="connector" value-ref="crafter.connector"/>
+        <entry key="tenantsResolver" value-ref="crafter.tenantsResolver"/>
     </util:map>
 
 </beans>

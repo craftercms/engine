@@ -14,7 +14,7 @@ import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.scripting.ScriptResolver;
-import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;
+import org.craftercms.engine.service.context.SiteContext;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
@@ -60,7 +60,7 @@ public class ScriptResolverImpl implements ScriptResolver {
     @Override
     public List<String> getScriptUrls(SiteItem item) {
         List<String> scriptUrls = null;
-        Context context = AbstractSiteContextResolvingFilter.getCurrentContext().getContext();
+        Context context = SiteContext.getCurrent().getContext();
         String contentType = item.getItem().queryDescriptorValue(contentTypeXPathQuery);
 
         if (StringUtils.isNotEmpty(contentType)) {

@@ -16,33 +16,47 @@
  */
 package org.craftercms.engine.util.spring;
 
+import org.craftercms.engine.service.context.SiteContext;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 /**
- * Bean that provide simple access to the Spring application context's beans. Used for example to access Spring beans from an FTL.
+ * Bean that provide simple access to the Spring application context's beans: first it uses the site's own context.
+ * If not specified, it uses the main context. Used for example to access Spring beans from an FTL or a Groovy script.
  *
  * @author Alfonso Vásquez
  */
 public class ApplicationContextAccessor implements ApplicationContextAware {
 
-    private ApplicationContext applicationContext;
+    private ApplicationContext mainApplicationContext;
 
     public ApplicationContextAccessor() {
     }
 
-    public ApplicationContextAccessor(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
+    public ApplicationContextAccessor(ApplicationContext mainApplicationContext) {
+        this.mainApplicationContext = mainApplicationContext;
     }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
+        this.mainApplicationContext = applicationContext;
     }
 
     public Object get(String beanName) {
-        return applicationContext.getBean(beanName);
+        return getApplicationContext().getBean(beanName);
+    }
+
+    protected ApplicationContext getApplicationContext() {
+        SiteContext context = SiteContext.getCurrent();
+        if (context != null) {
+            ApplicationContext applicationContext = context.getApplicationContext();
+            if (applicationContext != null) {
+                return applicationContext;
+            }
+        }
+
+        return mainApplicationContext;
     }
 
 }

@@ -16,12 +16,12 @@
  */
 package org.craftercms.engine.macro.impl;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.craftercms.core.util.HttpServletUtils;
+import org.craftercms.commons.http.RequestContext;
 import org.springframework.beans.factory.annotation.Required;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * Represents a macro that can be a request parameter.
@@ -46,7 +46,7 @@ public class RequestParamMacro extends AbstractMacro {
 
     @Override
     protected String getMacroValue(String str) {
-        HttpServletRequest request = HttpServletUtils.getCurrentRequest();
+        HttpServletRequest request = RequestContext.getCurrent().getRequest();
         String requestParamValue = request.getParameter(requestParamName);
 
         if (requestParamValue != null) {

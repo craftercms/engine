@@ -20,28 +20,29 @@ import org.craftercms.core.exception.UrlTransformationException;
 import org.craftercms.core.service.CachingOptions;
 import org.craftercms.core.url.UrlTransformationEngine;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.servlet.filter.AbstractSiteContextResolvingFilter;
 
 /**
- * Simple wrapper to a {@link UrlTransformationEngine} that uses the {@link UrlTransformationEngine} of the current context.
+ * Simple wrapper to a {@link UrlTransformationEngine} that uses the {@link UrlTransformationEngine} of the current
+ * context.
  *
  * @author Alfonso Vásquez
  */
 public class UrlTransformationService {
 
     public String transform(String transformerName, String url) throws UrlTransformationException {
-        SiteContext context = AbstractSiteContextResolvingFilter.getCurrentContext();
+        SiteContext context = SiteContext.getCurrent();
 
         return context.getUrlTransformationEngine().transformUrl(context.getContext(), transformerName, url);
     }
 
     public String transform(String transformerName, String url, boolean cache) throws UrlTransformationException {
-        SiteContext context = AbstractSiteContextResolvingFilter.getCurrentContext();
+        SiteContext context = SiteContext.getCurrent();
         CachingOptions cachingOptions = new CachingOptions();
 
         cachingOptions.setDoCaching(cache);
 
-        return context.getUrlTransformationEngine().transformUrl(context.getContext(), cachingOptions, transformerName, url);
+        return context.getUrlTransformationEngine().transformUrl(context.getContext(), cachingOptions,
+                                                                 transformerName, url);
     }
 
 }

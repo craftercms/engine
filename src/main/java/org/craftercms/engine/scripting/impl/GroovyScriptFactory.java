@@ -1,12 +1,12 @@
 package org.craftercms.engine.scripting.impl;
 
+import java.util.Map;
+
 import groovy.util.GroovyScriptEngine;
+import groovy.util.ResourceConnector;
 import org.craftercms.engine.exception.ScriptException;
 import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.scripting.ScriptFactory;
-import org.springframework.beans.factory.annotation.Required;
-
-import java.util.Map;
 
 /**
  * {@link org.craftercms.engine.scripting.ScriptFactory} used specifically for Groovy. Very useful when scripts
@@ -16,24 +16,25 @@ import java.util.Map;
  */
 public class GroovyScriptFactory implements ScriptFactory {
 
-    public static final String GROOVY_SCRIPT_EXTENSION = "groovy";
+    public static final String GROOVY_FILE_EXTENSION = "groovy";
 
     protected GroovyScriptEngine scriptEngine;
     protected Map<String, Object> globalVariables;
 
-    @Required
-    public void setResourceConnector(ContentResourceConnector resourceConnector) {
-        scriptEngine = new GroovyScriptEngine(resourceConnector);
+    public GroovyScriptFactory(ResourceConnector resourceConnector, Map<String, Object> globalVariables) {
+        this.scriptEngine = new GroovyScriptEngine(resourceConnector);
+        this.globalVariables = globalVariables;
     }
 
-    @Required
-    public void setGlobalVariables(Map<String, Object> globalVariables) {
+    public GroovyScriptFactory(ResourceConnector resourceConnector, ClassLoader parentClassLoader,
+                               Map<String, Object> globalVariables) {
+        this.scriptEngine = new GroovyScriptEngine(resourceConnector, parentClassLoader);
         this.globalVariables = globalVariables;
     }
 
     @Override
     public String getScriptFileExtension() {
-        return GROOVY_SCRIPT_EXTENSION;
+        return GROOVY_FILE_EXTENSION;
     }
 
     @Override

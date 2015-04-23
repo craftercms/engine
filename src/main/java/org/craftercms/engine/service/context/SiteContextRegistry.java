@@ -17,41 +17,37 @@
 package org.craftercms.engine.service.context;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.annotation.PreDestroy;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.BeanPostProcessor;
 
 /**
  * Registry for site {@link SiteContext}s.
  *
  * @author Alfonso Vásquez
  */
-public class SiteContextRegistry implements BeanPostProcessor {
+public class SiteContextRegistry {
 
     private static final Log logger = LogFactory.getLog(SiteContextRegistry.class);
 
     protected Map<String, SiteContext> registry;
 
     public SiteContextRegistry() {
-        registry = new ConcurrentHashMap<String, SiteContext>();
+        registry = new ConcurrentHashMap<>();
     }
 
-    @Override
-    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-        return bean;
-    }
-
-    @Override
-    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        if (bean instanceof SiteContext) {
-            register((SiteContext) bean);
+    @PreDestroy
+    public void destroy() {
+        for (Iterator<SiteContext> iter = registry.values().iterator(); iter.hasNext();) {
+            iter.next().destroy();
+            iter.remove();
         }
 
-        return bean;
+        logger.info("Site context registry destroyed");
     }
 
     public Collection<SiteContext> list() {
@@ -62,22 +58,21 @@ public class SiteContextRegistry implements BeanPostProcessor {
         return registry.get(siteName);
     }
 
-    public void register(SiteContext siteContext) {
-        registry.put(siteContext.getSiteName(), siteContext);
+    public void register(SiteContext context) {
+        registry.put(context.getSiteName(), context);
 
-        logger.info("[SITE CONTEXT REGISTRY] Site context registered: " + siteContext);
+        logger.info("Site context registered: " + context);
     }
 
     public SiteContext unregister(String siteName) {
-        SiteContext siteContext = registry.remove(siteName);
+        SiteContext context = registry.remove(siteName);
+        if (context != null) {
+            context.destroy();
 
-        logger.info("[SITE CONTEXT REGISTRY] Site context unregistered: " + siteContext);
+            logger.info("Site context unregistered: " + context);
+        }
 
-        return siteContext;
-    }
-
-    public Collection<SiteContext> getSiteContexts() {
-        return registry.values();
+        return null;
     }
 
 }
