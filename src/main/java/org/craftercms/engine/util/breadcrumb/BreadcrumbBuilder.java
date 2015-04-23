@@ -85,8 +85,8 @@ public class BreadcrumbBuilder {
                     String breadcrumbName = item.queryDescriptorValue(breadcrumbNameXPathQuery);
                     if (StringUtils.isEmpty(breadcrumbName)) {
                         if (StringUtils.isNotEmpty(breadcrumbUrlComponent)) {
-                            breadcrumbName = StringUtils.capitalize(breadcrumbUrlComponent.replace("-", " ")
-                                                                        .replace(".xml", ""));
+                            breadcrumbName = StringUtils.capitalize(
+                                breadcrumbUrlComponent.replace("-", " ").replace(".xml", ""));
                         } else {
                             breadcrumbName = HOME_BREADCRUMB_NAME;
                         }
