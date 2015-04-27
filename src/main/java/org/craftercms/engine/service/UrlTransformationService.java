@@ -31,18 +31,24 @@ public class UrlTransformationService {
 
     public String transform(String transformerName, String url) throws UrlTransformationException {
         SiteContext context = SiteContext.getCurrent();
-
-        return context.getUrlTransformationEngine().transformUrl(context.getContext(), transformerName, url);
+        if (context != null) {
+            return context.getUrlTransformationEngine().transformUrl(context.getContext(), transformerName, url);
+        } else {
+            return url;
+        }
     }
 
     public String transform(String transformerName, String url, boolean cache) throws UrlTransformationException {
         SiteContext context = SiteContext.getCurrent();
-        CachingOptions cachingOptions = new CachingOptions();
+        if (context != null) {
+            CachingOptions cachingOptions = new CachingOptions();
+            cachingOptions.setDoCaching(cache);
 
-        cachingOptions.setDoCaching(cache);
-
-        return context.getUrlTransformationEngine().transformUrl(context.getContext(), cachingOptions,
-                                                                 transformerName, url);
+            return context.getUrlTransformationEngine().transformUrl(context.getContext(), cachingOptions,
+                                                                     transformerName, url);
+        } else {
+            return url;
+        }
     }
 
 }

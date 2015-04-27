@@ -267,61 +267,65 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
 
     protected View getCachedLocalizedView(final String baseUrl, final Locale locale) {
         final SiteContext context = SiteContext.getCurrent();
+        if (context != null) {
+            return cacheTemplate.getObject(context.getContext(), cachingOptions, new Callback<View>() {
 
-        return cacheTemplate.getObject(context.getContext(), cachingOptions, new Callback<View>() {
+                @Override
+                public View execute() {
+                    SiteItem page;
+                    if (localizeViews) {
+                        page = getLocalizedPage(baseUrl, locale);
+                    } else {
+                        page = getPage(baseUrl);
+                    }
 
-            @Override
-            public View execute() {
-                SiteItem page;
-                if (localizeViews) {
-                    page = getLocalizedPage(baseUrl, locale);
-                } else {
-                    page = getPage(baseUrl);
-                }
+                    if (page != null) {
+                        String disabled = page.getItem().queryDescriptorValue(disabledXPathQuery);
+                        if (!modePreview && StringUtils.isNotEmpty(disabled) && Boolean.parseBoolean(disabled)) {
+                            // when a page is disabled it acts as if it does not exist this rule does not apply in
+                            // preview because we want authors to see the page
+                            return null;
+                        }
 
-                if (page != null) {
-                    String disabled = page.getItem().queryDescriptorValue(disabledXPathQuery);
-                    if (!modePreview && StringUtils.isNotEmpty(disabled) && Boolean.parseBoolean(disabled)) {
-                        // when a page is disabled it acts as if it does not exist this rule does not apply in preview
-                        // because we want authors to see the page
+                        String redirectUrl = page.getItem().queryDescriptorValue(redirectUrlXPathQuery);
+                        String contentType = page.getItem().queryDescriptorValue(contentTypeXPathQuery);
+                        String forceHttps = page.getItem().queryDescriptorValue(forceHttpsXPathQuery);
+
+                        if (StringUtils.isNotEmpty(contentType) &&
+                            StringUtils.equalsIgnoreCase(redirectContentType, contentType) &&
+                            StringUtils.isNotEmpty(redirectUrl)) {
+                            return getRedirectView(redirectUrl, true);
+                        } else if (StringUtils.isNotEmpty(forceHttps) && Boolean.parseBoolean(forceHttps)) {
+                            return getCurrentPageHttpsRedirectView();
+                        } else {
+                            UserAgentAwareCrafterPageView view = new UserAgentAwareCrafterPageView();
+                            view.setServletContext(getServletContext());
+                            view.setPage(page);
+                            view.setModePreview(modePreview);
+                            view.setLocale(locale);
+                            view.setSiteItemService(siteItemService);
+                            view.setPageViewNameXPathQuery(pageViewNameXPathQuery);
+                            view.setMimeTypeXPathQuery(mimeTypeXPathQuery);
+                            view.setDelegatedViewResolver(delegatedViewResolver);
+                            view.setUserAgentTemplateDetector(userAgentTemplateDetector);
+
+                            loadScripts(context.getScriptFactory(), page, view);
+
+                            view.addDependencyKey(page.getItem().getKey());
+
+                            return applyLifecycleMethods(page.getStoreUrl(), view);
+                        }
+                    } else {
+                        // Return null to continue with the ViewResolverChain
                         return null;
                     }
-
-                    String redirectUrl = page.getItem().queryDescriptorValue(redirectUrlXPathQuery);
-                    String contentType = page.getItem().queryDescriptorValue(contentTypeXPathQuery);
-                    String forceHttps = page.getItem().queryDescriptorValue(forceHttpsXPathQuery);
-
-                    if (StringUtils.isNotEmpty(contentType) &&
-                        StringUtils.equalsIgnoreCase(redirectContentType, contentType) &&
-                        StringUtils.isNotEmpty(redirectUrl)) {
-                        return getRedirectView(redirectUrl, true);
-                    } else if (StringUtils.isNotEmpty(forceHttps) && Boolean.parseBoolean(forceHttps)) {
-                        return getCurrentPageHttpsRedirectView();
-                    } else {
-                        UserAgentAwareCrafterPageView view = new UserAgentAwareCrafterPageView();
-                        view.setServletContext(getServletContext());
-                        view.setPage(page);
-                        view.setModePreview(modePreview);
-                        view.setLocale(locale);
-                        view.setSiteItemService(siteItemService);
-                        view.setPageViewNameXPathQuery(pageViewNameXPathQuery);
-                        view.setMimeTypeXPathQuery(mimeTypeXPathQuery);
-                        view.setDelegatedViewResolver(delegatedViewResolver);
-                        view.setUserAgentTemplateDetector(userAgentTemplateDetector);
-
-                        loadScripts(context.getScriptFactory(), page, view);
-
-                        view.addDependencyKey(page.getItem().getKey());
-
-                        return applyLifecycleMethods(page.getStoreUrl(), view);
-                    }
-                } else {
-                    // Return null to continue with the ViewResolverChain
-                    return null;
                 }
-            }
 
-        }, baseUrl, locale, PAGE_CONST_KEY_ELEM);
+            }, baseUrl, locale, PAGE_CONST_KEY_ELEM);
+        } else {
+            // Return null to continue with the ViewResolverChain
+            return null;
+        }
     }
 
     protected void loadScripts(ScriptFactory scriptFactory, SiteItem page, CrafterPageView view) {
