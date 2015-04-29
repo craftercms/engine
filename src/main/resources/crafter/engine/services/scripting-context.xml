@@ -33,10 +33,9 @@
         <entry key="tenantService" value-ref="crafter.tenantServiceRestClient"/>
         <entry key="authenticationService" value-ref="crafter.authenticationServiceRestClient"/>
         <entry key="authenticationManager" value-ref="crafter.authenticationManager"/>
+        <entry key="textEncryptor" value-ref="crafter.textEncryptor"/>
         <entry key="connectionFactoryLocator" value-ref="crafter.connectionFactoryLocator"/>
-        <entry key="usersConnectionRepository" value-ref="crafter.usersConnectionRepository"/>
-        <entry key="connector" value-ref="crafter.connector"/>
-        <entry key="tenantsResolver" value-ref="crafter.tenantsResolver"/>
+        <entry key="providerLoginSupport" value-ref="crafter.providerLoginSupport"/>
     </util:map>
 
 </beans>

@@ -16,6 +16,8 @@
  */
 package org.craftercms.engine.security;
 
+import java.util.List;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.engine.model.SiteItem;
@@ -26,8 +28,6 @@ import org.craftercms.security.exception.AccessDeniedException;
 import org.craftercms.security.exception.AuthenticationRequiredException;
 import org.craftercms.security.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Required;
-
-import java.util.List;
 
 /**
  * Manages access to Crafter pages, depending on the roles specified in the page and the current user's roles.
@@ -73,11 +73,11 @@ public class CrafterPageAccessManager {
             // If profile == null it is anonymous
             if (profile == null) {
                 throw new AuthenticationRequiredException("User is anonymous but page '" + pageUrl +
-                        "' requires authentication");
+                                                          "' requires authentication");
             }
             if (!containsRole("authenticated", authorizedRoles) && !profile.hasAnyRole(authorizedRoles)) {
                 throw new AccessDeniedException("User '" + profile.getUsername() + "' is not authorized " +
-                        "to view page '" + pageUrl + "'");
+                                                "to view page '" + pageUrl + "'");
             }
         }
     }

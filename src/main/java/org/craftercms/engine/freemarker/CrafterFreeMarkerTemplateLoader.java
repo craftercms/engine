@@ -16,6 +16,10 @@
  */
 package org.craftercms.engine.freemarker;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+
 import freemarker.cache.TemplateLoader;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,10 +30,6 @@ import org.craftercms.core.service.Context;
 import org.craftercms.core.util.UrlUtils;
 import org.craftercms.engine.service.context.SiteContext;
 import org.springframework.beans.factory.annotation.Required;
-
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 
 /**
  * Freemarker {@link freemarker.cache.TemplateLoader} similar to {@link org.springframework.ui.freemarker.SpringTemplateLoader} but instead of using
@@ -51,20 +51,24 @@ public class CrafterFreeMarkerTemplateLoader implements TemplateLoader {
     @Override
     public Object findTemplateSource(String name) throws IOException {
         SiteContext context = SiteContext.getCurrent();
+        if (context != null) {
+            String path = getTemplatePath(context, name);
 
-        String path = getTemplatePath(context, name);
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("Looking for FreeMarker template at [context=" + context + ", path='" + path + "']");
-        }
-
-        try {
-            return contentStoreService.getContent(context.getContext(), path);
-        } catch (PathNotFoundException e) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Unable to find FreeMarker template at [context=" + context + ", path='" + path + "']");
+                logger.debug("Looking for FreeMarker template at [context=" + context + ", path='" + path + "']");
             }
 
+            try {
+                return contentStoreService.getContent(context.getContext(), path);
+            } catch (PathNotFoundException e) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Unable to find FreeMarker template at [context=" + context + ", path='" + path +
+                                 "']");
+                }
+
+                return null;
+            }
+        } else {
             return null;
         }
     }

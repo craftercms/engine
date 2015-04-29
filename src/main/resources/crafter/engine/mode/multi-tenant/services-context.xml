@@ -32,4 +32,8 @@
         <property name="mappingsFile" value="${crafter.engine.site.mappings.file.path}"/>
     </bean>
 
+    <bean id="crafter.tenantsResolver" class="org.craftercms.engine.util.tenant.SiteNameTenantResolver"/>
+
+    <bean id="crafter.accessTokenIdResolver" class="org.craftercms.engine.security.ConfigAwareAccessTokenIdResolver"/>
+
 </beans>

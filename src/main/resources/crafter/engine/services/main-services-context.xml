@@ -302,9 +302,27 @@
 
     <!-- ////////////////////////////////// -->
     <!--								 	-->
-    <!--		  Class Loaders 			-->
+    <!--		  Social Services			-->
     <!--									-->
     <!-- ////////////////////////////////// -->
+
+    <bean id="crafter.connectionFactoryLocator"
+          class="org.craftercms.engine.util.spring.social.ConfigAwareConnectionFactoryLocator">
+        <property name="defaultLocator" ref="crafter.defaultConnectionFactoryLocator"/>
+        <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
+    </bean>
+
+    <bean id="crafter.defaultConnectionFactoryLocator"
+          class="org.springframework.social.connect.support.ConnectionFactoryRegistry">
+        <!-- Override to specify default connection factories -->
+    </bean>
+
+    <bean id="crafter.providerLoginSupport" class="org.craftercms.security.social.impl.ProviderLoginSupportImpl">
+        <property name="connectionFactoryLocator" ref="crafter.connectionFactoryLocator"/>
+        <property name="authenticationManager" ref="crafter.authenticationManager"/>
+        <property name="profileService" ref="crafter.profileServiceRestClient"/>
+        <property name="textEncryptor" ref="crafter.textEncryptor"/>
+    </bean>
 
     <import resource="classpath*:crafter/engine/extension/services-context.xml"/>
 

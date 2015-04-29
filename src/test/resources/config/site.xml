@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
+    <profile>
+        <api>
+            <accessTokenId>6da00306-b0b8-49dd-87ed-b4fb157eb454</accessTokenId>
+        </api>
+    </profile>
     <security>
         <login>
             <formUrl>/signin</formUrl>
