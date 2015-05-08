@@ -45,8 +45,8 @@ public class PreviewCurrentAuthenticationResolvingProcessor extends CurrentAuthe
     @SuppressWarnings("unchecked")
     public void processRequest(RequestContext context, RequestSecurityProcessorChain processorChain) throws Exception {
         HttpServletRequest request = context.getRequest();
-        Map<String, String> attributes = (Map<String, String>) request.getSession(true).getAttribute(
-                ProfileRestController.PROFILE_SESSION_ATTRIBUTE);
+        Map<String, String> attributes = (Map<String, String>)
+            request.getSession(true).getAttribute(ProfileRestController.PROFILE_SESSION_ATTRIBUTE);
 
         if (MapUtils.isNotEmpty(attributes)) {
             if (!"anonymous".equalsIgnoreCase(attributes.get("username"))) {
