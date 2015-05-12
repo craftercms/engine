@@ -16,16 +16,16 @@
  */
 package org.craftercms.engine.http.impl;
 
+import java.io.IOException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.craftercms.commons.http.HttpUtils;
 import org.craftercms.core.util.ExceptionUtils;
 import org.craftercms.engine.exception.HttpStatusCodeAwareException;
 import org.craftercms.engine.http.ExceptionHandler;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 /**
  * Handler for {@code HttpStatusCodeException}s.
@@ -38,11 +38,13 @@ public class HttpStatusCodeAwareExceptionHandler implements ExceptionHandler {
 
     @Override
     public boolean handle(HttpServletRequest request, HttpServletResponse response, Exception ex) throws IOException {
-        HttpStatusCodeAwareException httpStatusCodeAwareEx = ExceptionUtils.getThrowableOfType(ex, HttpStatusCodeAwareException.class);
+        HttpStatusCodeAwareException httpStatusCodeAwareEx =
+            ExceptionUtils.getThrowableOfType(ex, HttpStatusCodeAwareException.class);
+
         if (httpStatusCodeAwareEx != null) {
             ex = (Exception) httpStatusCodeAwareEx;
 
-            logger.error(ex.getMessage(), ex);
+            logger.error(request.getMethod() + " " + HttpUtils.getFullRequestUri(request, true) + " failed", ex);
 
             response.sendError(httpStatusCodeAwareEx.getStatusCode());
 
