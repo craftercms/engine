@@ -78,6 +78,10 @@
         <property name="contextResolver" ref="crafter.siteContextResolver"/>
     </bean>
 
+    <bean id="crafter.scriptFilter" class="org.craftercms.engine.scripting.impl.ScriptFilter">
+        <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
+    </bean>
+
     <!-- ////////////////////////////////// -->
     <!--								 	-->
     <!--			Services				-->

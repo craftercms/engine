@@ -36,7 +36,7 @@ import org.craftercms.engine.exception.RenderingException;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.service.SiteItemService;
-import org.craftercms.engine.util.ScriptUtils;
+import org.craftercms.engine.util.GroovyUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.http.MediaType;
@@ -250,9 +250,9 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
     protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response,
                                                         Map<String, Object> model) {
         Map<String, Object> scriptVariables = new HashMap<String, Object>();
-        ScriptUtils.addCommonVariables(scriptVariables, request, response, getServletContext());
-        ScriptUtils.addCrafterVariables(scriptVariables, page);
-        ScriptUtils.addModelVariable(scriptVariables, model);
+        GroovyUtils.addCommonVariables(scriptVariables, request, response, getServletContext());
+        GroovyUtils.addCrafterVariables(scriptVariables, page);
+        GroovyUtils.addModelVariable(scriptVariables, model);
 
         return scriptVariables;
     }
