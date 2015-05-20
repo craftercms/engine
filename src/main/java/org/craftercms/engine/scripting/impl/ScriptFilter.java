@@ -46,7 +46,6 @@ public class ScriptFilter implements Filter {
 
     private ServletContext servletContext;
     private CacheTemplate cacheTemplate;
-    private ScriptFactory scriptFactory;
     protected PathMatcher pathMatcher;
 
     public ScriptFilter() {
@@ -56,11 +55,6 @@ public class ScriptFilter implements Filter {
     @Required
     public void setCacheTemplate(CacheTemplate cacheTemplate) {
         this.cacheTemplate = cacheTemplate;
-    }
-
-    @Required
-    public void setScriptFactory(ScriptFactory scriptFactory) {
-        this.scriptFactory = scriptFactory;
     }
 
     public void setPathMatcher(PathMatcher pathMatcher) {
@@ -119,6 +113,8 @@ public class ScriptFilter implements Filter {
 
                                 if (StringUtils.isNotEmpty(scriptUrl) && StringUtils.isNotEmpty(includeStr)) {
                                     ContentStoreService storeService = context.getStoreService();
+                                    ScriptFactory scriptFactory = context.getScriptFactory();
+
                                     if (!storeService.exists(context.getContext(), scriptUrl)) {
                                         throw new ConfigurationException("No filter script found at " + scriptUrl);
                                     }

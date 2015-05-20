@@ -42,7 +42,6 @@ public class ScriptFilterTest {
     @Mock
     private FilterConfig filterConfig;
     private SiteContext context;
-    private ScriptFactory scriptFactory;
     private ServletContext servletContext;
     private ScriptFilter filter;
 
@@ -54,12 +53,10 @@ public class ScriptFilterTest {
         ContentStoreServiceMockUtils.setUpGetContentFromClassPath(storeService);
 
         context = createSiteContext(storeService);
-        scriptFactory = createScriptFactory(context);
         servletContext = new MockServletContext();
 
         filter = new ScriptFilter();
         filter.setCacheTemplate(cacheTemplate);
-        filter.setScriptFactory(scriptFactory);
 
         when(filterConfig.getServletContext()).thenReturn(servletContext);
 
@@ -112,13 +109,14 @@ public class ScriptFilterTest {
     }
 
     private SiteContext createSiteContext(ContentStoreService storeService) throws Exception {
-        XMLConfiguration config = new XMLConfiguration("config/site.xml");
-
         SiteContext siteContext = mock(SiteContext.class);
+        ScriptFactory scriptFactory = createScriptFactory(siteContext);
+
         when(siteContext.getSiteName()).thenReturn("default");
         when(siteContext.getContext()).thenReturn(mock(Context.class));
         when(siteContext.getStoreService()).thenReturn(storeService);
-        when(siteContext.getConfig()).thenReturn(config);
+        when(siteContext.getConfig()).thenReturn(new XMLConfiguration("config/site.xml"));
+        when(siteContext.getScriptFactory()).thenReturn(scriptFactory);
 
         return siteContext;
     }
