@@ -68,7 +68,7 @@ public class GroovyScriptFactoryTest {
 
     private SiteContext createSiteContext(ContentStoreService storeService) throws Exception {
         SiteContext siteContext = mock(SiteContext.class);
-        when(siteContext.getSiteName()).thenReturn("test");
+        when(siteContext.getSiteName()).thenReturn("default");
         when(siteContext.getContext()).thenReturn(mock(Context.class));
         when(siteContext.getStoreService()).thenReturn(storeService);
 

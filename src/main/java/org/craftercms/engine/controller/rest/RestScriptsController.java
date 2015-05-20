@@ -32,7 +32,7 @@ import org.craftercms.engine.exception.HttpStatusCodeAwareException;
 import org.craftercms.engine.exception.ScriptNotFoundException;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.util.ScriptUtils;
+import org.craftercms.engine.util.GroovyUtils;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
@@ -118,8 +118,8 @@ public class RestScriptsController extends AbstractController {
 
     protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> scriptVariables = new HashMap<String, Object>();
-        ScriptUtils.addCommonVariables(scriptVariables, request, response, getServletContext());
-        ScriptUtils.addCrafterVariables(scriptVariables);
+        GroovyUtils.addCommonVariables(scriptVariables, request, response, getServletContext());
+        GroovyUtils.addSecurityVariables(scriptVariables);
 
         return scriptVariables;
     }

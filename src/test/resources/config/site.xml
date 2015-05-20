@@ -1,10 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
+    <filters>
+        <filter>
+            <script>/scripts/filters/testFilter1.groovy</script>
+            <mapping>
+                <include>/**</include>
+            </mapping>
+        </filter>
+        <filter>
+            <script>/scripts/filters/testFilter2.groovy</script>
+            <mapping>
+                <include>/**</include>
+            </mapping>
+        </filter>
+        <filter>
+            <script>/scripts/filters/testFilter3.groovy</script>
+            <mapping>
+                <include>/**</include>
+                <exclude>/static-assets/**</exclude>
+            </mapping>
+        </filter>
+    </filters>
+
     <profile>
         <api>
             <accessTokenId>cd287b58-ab9c-457f-a4f0-39ef49f04c69</accessTokenId>
         </api>
     </profile>
+
     <security>
         <login>
             <formUrl>/signin</formUrl>
@@ -25,6 +48,7 @@
             </restriction>
         </urlRestrictions>
     </security>
+
     <socialConnections>
         <facebookConnectionFactory>
             <appId>000000000000000</appId>

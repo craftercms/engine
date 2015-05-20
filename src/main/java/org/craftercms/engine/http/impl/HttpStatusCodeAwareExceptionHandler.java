@@ -46,7 +46,7 @@ public class HttpStatusCodeAwareExceptionHandler implements ExceptionHandler {
 
             logger.error(request.getMethod() + " " + HttpUtils.getFullRequestUri(request, true) + " failed", ex);
 
-            response.sendError(httpStatusCodeAwareEx.getStatusCode());
+            response.sendError(httpStatusCodeAwareEx.getStatusCode(), ex.getMessage());
 
             return true;
         }

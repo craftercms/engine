@@ -17,6 +17,7 @@
 package org.craftercms.engine.util;
 
 import java.util.Map;
+import javax.servlet.FilterChain;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,13 +32,13 @@ import org.craftercms.security.authentication.Authentication;
 import org.craftercms.security.utils.SecurityUtils;
 
 /**
- * Utility methods for scripts.
+ * Utility methods for Groovy scripts and classes.
  *
  * @author Alfonso Vásquez
  */
-public class ScriptUtils {
+public class GroovyUtils {
 
-    private static final Log logger = LogFactory.getLog(ScriptUtils.class);
+    private static final Log logger = LogFactory.getLog(GroovyUtils.class);
 
     public static final String VARIABLE_REQUEST_URL = "requestUrl";
     public static final String VARIABLE_APPLICATION = "application";
@@ -52,8 +53,9 @@ public class ScriptUtils {
     public static final String VARIABLE_CRAFTER_MODEL = "crafterModel";
     public static final String VARIABLE_AUTH = "authentication";
     public static final String VARIABLE_PROFILE = "profile";
+    public static final String VARIABLE_FILTER_CHAIN = "filterChain";
 
-    private ScriptUtils() {
+    private GroovyUtils() {
     }
 
     public static void addCommonVariables(Map<String, Object> variables, HttpServletRequest request,
@@ -73,10 +75,10 @@ public class ScriptUtils {
         variables.put(VARIABLE_MODEL, model);
     }
 
-    public static void addCrafterVariables(Map<String, Object> variables) {
+    public static void addSecurityVariables(Map<String, Object> variables) {
+        RequestContext context = RequestContext.getCurrent();
         Authentication auth = null;
         Profile profile = null;
-        RequestContext context = RequestContext.getCurrent();
 
         if (context != null) {
             auth = SecurityUtils.getAuthentication(context.getRequest());
@@ -92,7 +94,11 @@ public class ScriptUtils {
     public static void addCrafterVariables(Map<String, Object> variables, SiteItem crafterModel) {
         variables.put(VARIABLE_CRAFTER_MODEL, crafterModel);
 
-        addCrafterVariables(variables);
+        addSecurityVariables(variables);
+    }
+
+    public static void addFilterChainVariable(Map<String, Object> variables, FilterChain filterChain) {
+        variables.put(VARIABLE_FILTER_CHAIN, filterChain);
     }
 
 }

@@ -34,7 +34,7 @@ import org.craftercms.engine.exception.ScriptException;
 import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.util.ScriptUtils;
+import org.craftercms.engine.util.GroovyUtils;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
@@ -113,7 +113,7 @@ public class PageRenderController extends AbstractController {
         ScriptFactory scriptFactory = context.getScriptFactory();
 
         if (scriptFactory == null) {
-            throw new IllegalStateException("No script factory associate to current site context '" +
+            throw new IllegalStateException("No script factory associated to current site context '" +
                                             context.getSiteName() + "'");
         }
 
@@ -151,9 +151,9 @@ public class PageRenderController extends AbstractController {
     protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response,
                                                         Map<String, Object> model) {
         Map<String, Object> variables = new HashMap<String, Object>();
-        ScriptUtils.addCommonVariables(variables, request, response, getServletContext());
-        ScriptUtils.addCrafterVariables(variables);
-        ScriptUtils.addModelVariable(variables, model);
+        GroovyUtils.addCommonVariables(variables, request, response, getServletContext());
+        GroovyUtils.addSecurityVariables(variables);
+        GroovyUtils.addModelVariable(variables, model);
 
         return variables;
     }
