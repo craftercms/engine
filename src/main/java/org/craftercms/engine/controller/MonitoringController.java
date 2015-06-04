@@ -1,10 +1,17 @@
 package org.craftercms.engine.controller;
 
+import java.util.List;
+
+import org.craftercms.engine.util.logging.CircularQueueLogAppender;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.MimeType;
+import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping(MonitoringController.URL_ROOT)
@@ -24,5 +31,11 @@ public class MonitoringController {
     @RequestMapping(value = "/{" + ACTION_PATH_VAR + "}", method = RequestMethod.GET)
     public String render(@PathVariable(ACTION_PATH_VAR) String action) {
         return statusViewNamePrefix + action + ".ftl";
+    }
+
+    @RequestMapping(value = "/log", method = RequestMethod.GET,produces = MimeTypeUtils.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public List<String> logger() {
+        return CircularQueueLogAppender.loggerQueue().getLoggedEvents();
     }
 }
