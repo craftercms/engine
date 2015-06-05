@@ -1,5 +1,6 @@
 package org.craftercms.engine.controller;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.craftercms.engine.util.logging.CircularQueueLogAppender;
@@ -35,7 +36,7 @@ public class MonitoringController {
 
     @RequestMapping(value = "/log", method = RequestMethod.GET,produces = MimeTypeUtils.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public List<String> logger() {
-        return CircularQueueLogAppender.loggerQueue().getLoggedEvents();
+    public List<HashMap<String,Object>> logger(@RequestParam final String siteId) {
+        return CircularQueueLogAppender.loggerQueue().getLoggedEvents(siteId);
     }
 }
