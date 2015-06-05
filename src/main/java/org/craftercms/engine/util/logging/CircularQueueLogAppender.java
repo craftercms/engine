@@ -1,10 +1,13 @@
 package org.craftercms.engine.util.logging;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.collections.Buffer;
 import org.apache.commons.collections.BufferUtils;
@@ -25,6 +28,8 @@ public class CircularQueueLogAppender  extends AppenderSkeleton{
     private Buffer buffer; //This has to be sync !!!!
     private static CircularQueueLogAppender instance;
     private int maxQueueSize;
+    private SimpleDateFormat dateFormat;
+    private String dateFormatString;
 
     @Override
     protected void append(final LoggingEvent event) {
@@ -32,7 +37,14 @@ public class CircularQueueLogAppender  extends AppenderSkeleton{
         if(ctx!=null) {
             final String siteName = ctx.getSiteName();
             if(StringUtils.isNoneBlank(siteName)){
-                buffer.add(subAppend(event,siteName));
+                Map<String,Object> mappy=new HashMap<>();
+                mappy.put("site",siteName);
+                mappy.put("level",event.getLevel().toString());
+                mappy.put("message",event.getRenderedMessage());
+                mappy.put("thread",event.getThreadName());
+                mappy.put("exception",subAppend(event));
+                mappy.put("timestamp",dateFormat.format(new Date(event.getTimeStamp())));
+                buffer.add(mappy);
             }
         }
     }
@@ -49,6 +61,7 @@ public class CircularQueueLogAppender  extends AppenderSkeleton{
         }
         buffer= BufferUtils.synchronizedBuffer(new CircularFifoBuffer(maxQueueSize));
         instance=this;
+        dateFormat=new SimpleDateFormat(dateFormatString);
     }
 
     @Override
@@ -61,21 +74,28 @@ public class CircularQueueLogAppender  extends AppenderSkeleton{
         return true;
     }
 
+    public void setDateFormat(final String dateFormat) {
+        this.dateFormatString = dateFormat;
+    }
+
     public static CircularQueueLogAppender loggerQueue(){
         return instance;
     }
 
-    public List<String> getLoggedEvents() {
-        final Iterator<Object> iter = buffer.iterator();
-        final List<String> str= new ArrayList<>();
+    public List<HashMap<String,Object>> getLoggedEvents(final String siteId) {
+        final Iterator<HashMap<String,Object>> iter = buffer.iterator();
+        final List<HashMap<String,Object>> str= new ArrayList<>();
         while (iter.hasNext()){
-        str.add(String.valueOf(iter.next()));
+            HashMap<String,Object> map = iter.next();
+            if(map.get("site").toString().equalsIgnoreCase(siteId)){
+                str.add(map);
+            }
         }
         return str;
     }
 
-    protected String subAppend(final LoggingEvent event,final String tenantName ) {
-        StringBuffer buffer=new StringBuffer( tenantName + "-> "+this.layout.format(event));
+    protected String subAppend(final LoggingEvent event ) {
+        StringBuffer buffer=new StringBuffer();
         if(layout.ignoresThrowable()) {
             buffer.append(Layout.LINE_SEP);
             String[] s = event.getThrowableStrRep();
