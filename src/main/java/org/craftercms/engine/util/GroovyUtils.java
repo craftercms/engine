@@ -22,14 +22,14 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.http.HttpUtils;
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.profile.api.Profile;
 import org.craftercms.security.authentication.Authentication;
 import org.craftercms.security.utils.SecurityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility methods for Groovy scripts and classes.
@@ -38,7 +38,7 @@ import org.craftercms.security.utils.SecurityUtils;
  */
 public class GroovyUtils {
 
-    private static final Log logger = LogFactory.getLog(GroovyUtils.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(GroovyUtils.class);
 
     public static final String VARIABLE_REQUEST_URL = "requestUrl";
     public static final String VARIABLE_APPLICATION = "application";
@@ -68,7 +68,7 @@ public class GroovyUtils {
         variables.put(VARIABLE_HEADERS, HttpUtils.createHeadersMap(request));
         variables.put(VARIABLE_COOKIES, HttpUtils.createCookiesMap(request));
         variables.put(VARIABLE_SESSION, request.getSession(false));
-        variables.put(VARIABLE_LOGGER, logger);
+        variables.put(VARIABLE_LOGGER, LOGGER);
     }
 
     public static void addModelVariable(Map<String, Object> variables, Object model) {

@@ -74,8 +74,8 @@ public class RestScriptsController extends AbstractController {
         ScriptFactory scriptFactory = context.getScriptFactory();
 
         if (scriptFactory == null) {
-            throw new IllegalStateException("No script factory associate to current site context '" +
-                                            context.getSiteName() + "'");
+            throw new IllegalStateException(
+                "No script factory associate to current site context '" + context.getSiteName() + "'");
         }
 
         String serviceUrl = getServiceUrl(request);
@@ -100,8 +100,8 @@ public class RestScriptsController extends AbstractController {
         String url = (String) request.getAttribute(pathWithinHandlerMappingAttr);
 
         if (StringUtils.isEmpty(url)) {
-            throw new IllegalStateException("Required request attribute '" + pathWithinHandlerMappingAttr +
-                                            "' is not set");
+            throw new IllegalStateException(
+                "Required request attribute '" + pathWithinHandlerMappingAttr + "' is not set");
         }
 
         return url;

@@ -11,7 +11,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.core.exception.CrafterException;
 import org.craftercms.core.service.ContentStoreService;
-import org.craftercms.core.service.Context;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.scripting.ScriptResolver;
 import org.craftercms.engine.service.context.SiteContext;
@@ -60,37 +59,47 @@ public class ScriptResolverImpl implements ScriptResolver {
     @Override
     public List<String> getScriptUrls(SiteItem item) {
         List<String> scriptUrls = null;
-        Context context = SiteContext.getCurrent().getContext();
-        String contentType = item.getItem().queryDescriptorValue(contentTypeXPathQuery);
+        SiteContext context = SiteContext.getCurrent();
 
-        if (StringUtils.isNotEmpty(contentType)) {
-            String scriptUrl = getScriptUrlForContentType(contentType);
-            if (StringUtils.isNotEmpty(scriptUrl)) {
-                try {
-                    // Check that the script exists. If not, ignore.
-                    if (storeService.exists(context, scriptUrl)) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("Script for content type '" + contentType + "' found at " + scriptUrl);
+        if (context != null) {
+            String contentType = item.getItem().queryDescriptorValue(contentTypeXPathQuery);
+
+            if (StringUtils.isNotEmpty(contentType)) {
+                String scriptUrl = getScriptUrlForContentType(contentType);
+                if (StringUtils.isNotEmpty(scriptUrl)) {
+                    try {
+                        // Check that the script exists. If not, ignore.
+                        if (storeService.exists(context.getContext(), scriptUrl)) {
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("Script for content type '" + contentType + "' found at " + scriptUrl);
+                            }
+
+                            scriptUrls = new ArrayList<>();
+                            scriptUrls.add(scriptUrl);
                         }
-
-                        scriptUrls = new ArrayList<>();
-                        scriptUrls.add(scriptUrl);
-                    } if (logger.isDebugEnabled()) {
-                        logger.debug("No script for content type '" + contentType + "' found at " + scriptUrl);
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("No script for content type '" + contentType + "' found at " + scriptUrl);
+                        }
+                    } catch (CrafterException e) {
+                        logger.error("Error retrieving script for content type '" + contentType + "' at " +
+                                     scriptUrl, e);
                     }
-                } catch (CrafterException e) {
-                    logger.error("Error retrieving script for content type '" + contentType + "' at " + scriptUrl, e);
                 }
             }
-        }
 
-        if (CollectionUtils.isNotEmpty(scriptUrls)) {
-            List<String> additionalUrls = item.getItem().queryDescriptorValues(scriptsXPathQuery);
-            if (CollectionUtils.isNotEmpty(additionalUrls)) {
-                scriptUrls.addAll(additionalUrls);
+            if (CollectionUtils.isNotEmpty(scriptUrls)) {
+                List<String> additionalUrls = item.getItem().queryDescriptorValues(scriptsXPathQuery);
+
+                if (scriptUrls == null) {
+                    scriptUrls = new ArrayList<>();
+                }
+
+                if (CollectionUtils.isNotEmpty(additionalUrls)) {
+                    scriptUrls.addAll(additionalUrls);
+                }
+            } else {
+                scriptUrls = item.getItem().queryDescriptorValues(scriptsXPathQuery);
             }
-        } else {
-            scriptUrls = item.getItem().queryDescriptorValues(scriptsXPathQuery);
         }
 
         return scriptUrls;

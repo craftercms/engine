@@ -154,6 +154,45 @@
 
     <!-- ////////////////////////////////// -->
     <!--								 	-->
+    <!--			Scheduling  		    -->
+    <!--									-->
+    <!-- ////////////////////////////////// -->
+
+    <bean id="crafter.hourlyScriptJobResolver"
+          class="org.craftercms.engine.scripting.impl.FolderBasedScriptJobResolver">
+        <property name="cronExpression" value="${crafter.engine.scripts.jobs.hourly.cron}"/>
+        <property name="folderUrl" value="${crafter.engine.scripts.jobs.hourly.path}"/>
+    </bean>
+
+    <bean id="crafter.dailyScriptJobResolver"
+          class="org.craftercms.engine.scripting.impl.FolderBasedScriptJobResolver">
+        <property name="cronExpression" value="${crafter.engine.scripts.jobs.daily.cron}"/>
+        <property name="folderUrl" value="${crafter.engine.scripts.jobs.daily.path}"/>
+    </bean>
+
+    <bean id="crafter.weeklyScriptJobResolver"
+          class="org.craftercms.engine.scripting.impl.FolderBasedScriptJobResolver">
+        <property name="cronExpression" value="${crafter.engine.scripts.jobs.weekly.cron}"/>
+        <property name="folderUrl" value="${crafter.engine.scripts.jobs.weekly.path}"/>
+    </bean>
+
+    <bean id="crafter.monthlyScriptJobResolver"
+          class="org.craftercms.engine.scripting.impl.FolderBasedScriptJobResolver">
+        <property name="cronExpression" value="${crafter.engine.scripts.jobs.monthly.cron}"/>
+        <property name="folderUrl" value="${crafter.engine.scripts.jobs.monthly.path}"/>
+    </bean>
+
+    <util:list id="crafter.scriptJobResolvers">
+        <ref bean="crafter.hourlyScriptJobResolver"/>
+        <ref bean="crafter.dailyScriptJobResolver"/>
+        <ref bean="crafter.weeklyScriptJobResolver"/>
+        <ref bean="crafter.monthlyScriptJobResolver"/>
+    </util:list>
+
+    <bean id="crafter.schedulerFactory" class="org.quartz.impl.StdSchedulerFactory"/>
+
+    <!-- ////////////////////////////////// -->
+    <!--								 	-->
     <!--			Contexts				-->
     <!--									-->
     <!-- ////////////////////////////////// -->
@@ -183,6 +222,7 @@
         <property name="storeService" ref="crafter.contentStoreService"/>
         <property name="macroResolver" ref="crafter.macroResolver"/>
         <property name="groovyGlobalVars" ref="crafter.restScriptsVariables"/>
+        <property name="jobResolvers" ref="crafter.scriptJobResolvers"/>
     </bean>
 
     <bean id="crafter.fallbackSiteContextFactory" class="org.craftercms.engine.service.context.SiteContextFactory">
@@ -200,6 +240,7 @@
         <property name="storeService" ref="crafter.contentStoreService"/>
         <property name="macroResolver" ref="crafter.macroResolver"/>
         <property name="groovyGlobalVars" ref="crafter.restScriptsVariables"/>
+        <property name="jobResolvers" ref="crafter.scriptJobResolvers"/>
     </bean>
 
     <!-- ////////////////////////////////// -->

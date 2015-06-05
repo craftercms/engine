@@ -26,6 +26,8 @@ import org.craftercms.core.service.Context;
 import org.craftercms.core.url.UrlTransformationEngine;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.PreviewOverlayCallback;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
@@ -57,6 +59,7 @@ public class SiteContext {
     protected XMLConfiguration config;
     protected ConfigurableApplicationContext applicationContext;
     protected URLClassLoader classLoader;
+    protected Scheduler scheduler;
 
     public static SiteContext getCurrent() {
         RequestContext requestContext = RequestContext.getCurrent();
@@ -146,6 +149,10 @@ public class SiteContext {
         return classLoader;
     }
 
+    public Scheduler getScheduler() {
+        return scheduler;
+    }
+
     @Required
     public void setStoreService(ContentStoreService storeService) {
         this.storeService = storeService;
@@ -226,6 +233,10 @@ public class SiteContext {
         this.classLoader = classLoader;
     }
 
+    public void setScheduler(Scheduler scheduler) {
+        this.scheduler = scheduler;
+    }
+
     public void destroy() throws CrafterException {
         if (applicationContext != null) {
             try {
@@ -239,6 +250,13 @@ public class SiteContext {
                 classLoader.close();
             } catch (Exception e) {
                 throw new CrafterException("Unable to close class loader", e);
+            }
+        }
+        if (scheduler != null) {
+            try {
+                scheduler.shutdown();
+            } catch (SchedulerException e) {
+                throw new CrafterException("Unable to shutdown scheduler", e);
             }
         }
 
