@@ -36,7 +36,8 @@ public class MonitoringController {
 
     @RequestMapping(value = "/log", method = RequestMethod.GET,produces = MimeTypeUtils.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public List<HashMap<String,Object>> logger(@RequestParam final String siteId) {
-        return CircularQueueLogAppender.loggerQueue().getLoggedEvents(siteId);
+    public List<HashMap<String,Object>> logger(@RequestParam final String siteId,@RequestParam final
+                                               long since) {
+        return CircularQueueLogAppender.loggerQueue().getLoggedEvents(siteId,since);
     }
 }
