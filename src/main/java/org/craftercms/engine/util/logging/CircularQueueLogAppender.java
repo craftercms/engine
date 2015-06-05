@@ -44,6 +44,7 @@ public class CircularQueueLogAppender  extends AppenderSkeleton{
                 mappy.put("thread",event.getThreadName());
                 mappy.put("exception",subAppend(event));
                 mappy.put("timestamp",dateFormat.format(new Date(event.getTimeStamp())));
+                mappy.put("timestampm",event.getTimeStamp());
                 buffer.add(mappy);
             }
         }
@@ -82,13 +83,16 @@ public class CircularQueueLogAppender  extends AppenderSkeleton{
         return instance;
     }
 
-    public List<HashMap<String,Object>> getLoggedEvents(final String siteId) {
+    public List<HashMap<String,Object>> getLoggedEvents(final String siteId,final long since) {
+
         final Iterator<HashMap<String,Object>> iter = buffer.iterator();
         final List<HashMap<String,Object>> str= new ArrayList<>();
         while (iter.hasNext()){
             HashMap<String,Object> map = iter.next();
             if(map.get("site").toString().equalsIgnoreCase(siteId)){
-                str.add(map);
+                if(new Date((long)map.get("timestampm")).after(new Date(since))) {
+                    str.add(map);
+                }
             }
         }
         return str;
