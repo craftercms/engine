@@ -3,8 +3,16 @@
     <head>
         <title>Internal Server Error</title>
     </head>
+    <style>
+        .exception{
+            color: #A04431;
+        }
+    </style>
     <body>
         <h1>Oops! A server error has occurred and we were unable to fulfill the request.<br/>
         Please try again. If the error persists, contact the administrator of the site.</h1>
+    <p class="exception">
+        ${exception}
+    </p>
     </body>
 </html>

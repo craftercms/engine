@@ -16,10 +16,16 @@
  */
 package org.craftercms.engine.controller;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
 
 /**
  * Controller used to render status code errors like 404, 500, etc.
@@ -35,6 +41,7 @@ public class ErrorPageRenderController {
     public static final String ERROR_CODE_PATH_VAR = "code";
 
     private String errorViewNamePrefix;
+    private boolean isPreview;
 
     @Required
     public void setErrorViewNamePrefix(String errorViewNamePrefix) {
@@ -42,8 +49,27 @@ public class ErrorPageRenderController {
     }
 
     @RequestMapping(value = "/{" + ERROR_CODE_PATH_VAR + "}")
-    public String render(@PathVariable(ERROR_CODE_PATH_VAR) String code) {
-        return errorViewNamePrefix + code + ".ftl";
+    public ModelAndView render(@PathVariable(ERROR_CODE_PATH_VAR) String code, HttpServletRequest request) {
+        ModelAndView mv = new ModelAndView();
+        mv.setViewName(errorViewNamePrefix + code + ".ftl");
+        if (isPreview) {
+            Exception error = (Exception)request.getServletContext().getAttribute("ex");
+            if (error != null) {
+                try {
+                    StringWriter out = new StringWriter();
+                    error.printStackTrace(new PrintWriter(out));
+                    out.flush();
+                    mv.addObject("exception", out.toString());
+                    out.close();
+                } catch (IOException ex) { // Close fails ?, at least send the original Message.
+                    mv.addObject("exception", ex.toString());
+                }
+            }
+        }
+        return mv;
     }
 
+    public void setIsPreview(final boolean isPreview) {
+        this.isPreview = isPreview;
+    }
 }
