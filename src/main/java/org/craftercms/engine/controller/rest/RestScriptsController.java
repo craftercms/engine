@@ -137,7 +137,7 @@ public class RestScriptsController extends AbstractController {
 
             return Collections.singletonMap(errorMessageModelAttributeName, "REST script not found");
         } catch (Exception e) {
-            logger.error("Execution failed for script " + scriptUrl, e);
+            logger.error("Error executing REST script at " + scriptUrl, e);
 
             HttpStatusCodeAwareException cause = ExceptionUtils.getThrowableOfType(e,
                                                                                    HttpStatusCodeAwareException.class);

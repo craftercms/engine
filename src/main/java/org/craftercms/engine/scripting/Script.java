@@ -16,18 +16,20 @@
  */
 package org.craftercms.engine.scripting;
 
+import java.util.Map;
+
 import org.craftercms.core.util.cache.CachingAwareObject;
 import org.craftercms.engine.exception.ScriptException;
 
-import java.util.Map;
-
 /**
- * Simple interface for scripts in some non-Java language (Groovy, Jython, Javascript, etc) that can be retrieved from the Crafter
- * content store and executed inside the JVM.
+ * Simple interface for scripts in some non-Java language (Groovy, Jython, Javascript, etc) that can be retrieved from
+ * the Crafter content store and executed inside the JVM.
  *
  * @author Alfonso Vásquez
  */
 public interface Script extends CachingAwareObject {
+
+    String getUrl();
 
     Object execute(Map<String, Object> variables) throws ScriptException;
 

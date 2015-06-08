@@ -238,6 +238,8 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
         try {
             script.execute(scriptVariables);
         } catch (Exception e) {
+            logger.error("Error executing page script at " + script.getUrl(), e);
+
             Exception cause = (Exception) ExceptionUtils.getThrowableOfType(e, HttpStatusCodeAwareException.class);
             if (cause != null) {
                 throw cause;

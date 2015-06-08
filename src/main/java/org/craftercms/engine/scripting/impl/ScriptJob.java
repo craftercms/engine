@@ -37,7 +37,7 @@ public class ScriptJob implements Job {
         try {
             scriptFactory.getScript(scriptUrl).execute(scriptVariables);
         } catch (ScriptException e) {
-            throw new JobExecutionException("Unable to execute script at " + scriptUrl, e);
+            throw new JobExecutionException("Error executing script job at " + scriptUrl, e);
         }
     }
 

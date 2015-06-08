@@ -45,7 +45,7 @@ public class ScriptFilterChainImpl implements FilterChain {
             Script script = scriptIterator.next();
 
             if (logger.isDebugEnabled()) {
-                logger.debug("Executing filter script " + script);
+                logger.debug("Executing filter script at " + script.getUrl());
             }
 
             HttpServletRequest httpRequest = (HttpServletRequest)request;
@@ -59,7 +59,7 @@ public class ScriptFilterChainImpl implements FilterChain {
             try {
                 script.execute(variables);
             } catch (ScriptException e) {
-                throw new ServletException("Error while executing filter script " + script, e);
+                throw new ServletException("Error executing filter script at " + script.getUrl(), e);
             }
         } else {
             delegateChain.doFilter(request, response);
