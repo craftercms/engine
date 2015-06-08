@@ -71,39 +71,44 @@ public class PageRenderController extends AbstractController {
     protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
         throws Exception {
         String pageUrl;
-        SiteContext siteContext = SiteContext.getCurrent();
+        SiteContext context = SiteContext.getCurrent();
 
-        if (siteContext.isFallback()) {
-            logger.warn("Rendering fallback page [" + fallbackPageUrl + "]");
+        if (context != null) {
+            if (context.isFallback()) {
+                logger.warn("Rendering fallback page [" + fallbackPageUrl + "]");
 
-            pageUrl = fallbackPageUrl;
-        } else {
-            pageUrl = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-            if (StringUtils.isEmpty(pageUrl)) {
-                throw new IllegalStateException("Required request attribute '" + HandlerMapping
-                    .PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE + "' is not set");
-            }
+                pageUrl = fallbackPageUrl;
+            } else {
+                pageUrl = (String)request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+                if (StringUtils.isEmpty(pageUrl)) {
+                    throw new IllegalStateException(
+                        "Required request attribute '" + HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE +
+                        "' is not set");
+                }
 
-            Script controllerScript = getControllerScript(siteContext, request, pageUrl);
-            if (controllerScript != null) {
-                Map<String, Object> model = new HashMap<>();
-                Map<String, Object> variables = createScriptVariables(request, response, model);
-                String viewName = executeScript(controllerScript, variables);
+                Script controllerScript = getControllerScript(context, request, pageUrl);
+                if (controllerScript != null) {
+                    Map<String, Object> model = new HashMap<>();
+                    Map<String, Object> variables = createScriptVariables(request, response, model);
+                    String viewName = executeScript(controllerScript, variables);
 
-                if (StringUtils.isNotEmpty(viewName)) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Rendering view " + viewName + " returned by script " + controllerScript);
+                    if (StringUtils.isNotEmpty(viewName)) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Rendering view " + viewName + " returned by script " + controllerScript);
+                        }
+
+                        return new ModelAndView(viewName, model);
+                    } else {
+                        return null;
                     }
+                }
 
-                    return new ModelAndView(viewName, model);
-                } else {
-                    return null;
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Rendering page [" + pageUrl + "]");
                 }
             }
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("Rendering page [" + pageUrl + "]");
-            }
+        } else {
+            throw new IllegalStateException("No current site context found");
         }
 
         return new ModelAndView(pageUrl);
@@ -158,7 +163,8 @@ public class PageRenderController extends AbstractController {
         return variables;
     }
 
-    protected String executeScript(Script script, Map<String, Object> scriptVariables) throws Exception {
+    protected String executeScript(Script script, Map<String, Object> scriptVariables)
+        throws Exception {
         try {
             Object result = script.execute(scriptVariables);
             if (result != null) {
@@ -173,6 +179,8 @@ public class PageRenderController extends AbstractController {
                 return null;
             }
         } catch (Exception e) {
+            logger.error("Error executing controller script at " + script.getUrl(), e);
+
             Exception cause = (Exception) ExceptionUtils.getThrowableOfType(e, HttpStatusCodeAwareException.class);
             if (cause != null) {
                 throw cause;

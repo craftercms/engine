@@ -81,6 +81,10 @@ public class StaticAssetsRequestHandler extends WebContentGenerator implements H
         SiteContext context = SiteContext.getCurrent();
         String path = getPath(request, context);
 
+        if (context == null) {
+            throw new IllegalStateException("No current site context found");
+        }
+
         if (logger.isDebugEnabled()) {
             logger.debug("Trying to get content for static asset at [context=" + context + ", path='" + path + "']");
         }

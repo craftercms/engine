@@ -341,6 +341,7 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
                 for (String scriptUrl : scriptUrls) {
                     Script script = scriptFactory.getScript(scriptUrl);
                     scripts.add(script);
+
                     view.addDependencyKey(script.getKey());
                 }
 

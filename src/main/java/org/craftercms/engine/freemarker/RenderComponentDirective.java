@@ -201,22 +201,27 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
             Map<String, Object> model = new HashMap<String, Object>();
             Map<String, Object> scriptVariables = createScriptVariables(component, model);
             SiteContext context = SiteContext.getCurrent();
-            ScriptFactory scriptFactory = context.getScriptFactory();
 
-            if (scriptFactory == null) {
-                throw new IllegalStateException("No script factory associate to current site context '" +
-                                                context.getSiteName() + "'");
-            }
+            if (context != null) {
+                ScriptFactory scriptFactory = context.getScriptFactory();
 
-            for (String scriptUrl : scriptUrls) {
-                Script script;
-                try {
-                    script = scriptFactory.getScript(scriptUrl);
-                } catch (Exception e) {
-                    throw new TemplateException("Unable to load script at '" + scriptUrl + "'", e, env);
+                if (scriptFactory == null) {
+                    throw new IllegalStateException("No script factory associate to current site context '" +
+                                                    context.getSiteName() + "'");
                 }
 
-                executeScript(script, scriptVariables, env);
+                for (String scriptUrl : scriptUrls) {
+                    Script script;
+                    try {
+                        script = scriptFactory.getScript(scriptUrl);
+                    } catch (Exception e) {
+                        throw new TemplateException("Unable to load script at '" + scriptUrl + "'", e, env);
+                    }
+
+                    executeScript(script, scriptVariables, env);
+                }
+            } else {
+                throw new IllegalStateException("No current site context found");
             }
 
             return model;
@@ -245,7 +250,7 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
         try {
             script.execute(scriptVariables);
         } catch (Exception e) {
-            throw new TemplateException("Error while executing component script", e, env);
+            throw new TemplateException("Error executing component script at " + script.getUrl(), e, env);
         }
     }
 

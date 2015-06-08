@@ -17,9 +17,12 @@
 package org.craftercms.engine.service.context;
 
 import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import groovy.lang.GroovyClassLoader;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,13 +31,20 @@ import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.store.impl.filesystem.FileSystemContentStoreAdapter;
 import org.craftercms.core.url.UrlTransformationEngine;
+import org.craftercms.engine.exception.SchedulingException;
 import org.craftercms.engine.exception.SiteContextCreationException;
 import org.craftercms.engine.macro.MacroResolver;
 import org.craftercms.engine.scripting.ScriptFactory;
+import org.craftercms.engine.scripting.ScriptJobResolver;
 import org.craftercms.engine.scripting.impl.GroovyScriptFactory;
 import org.craftercms.engine.service.PreviewOverlayCallback;
 import org.craftercms.engine.util.groovy.ContentStoreGroovyResourceLoader;
 import org.craftercms.engine.util.groovy.ContentStoreResourceConnector;
+import org.craftercms.engine.util.quartz.JobContext;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.SchedulerFactory;
+import org.quartz.impl.StdSchedulerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Required;
@@ -79,6 +89,7 @@ public class SiteContextFactory implements ApplicationContextAware {
     protected ContentStoreService storeService;
     protected MacroResolver macroResolver;
     protected ApplicationContext mainApplicationContext;
+    protected List<ScriptJobResolver> jobResolvers;
 
     public SiteContextFactory() {
         storeType = FileSystemContentStoreAdapter.STORE_TYPE;
@@ -187,6 +198,11 @@ public class SiteContextFactory implements ApplicationContextAware {
         this.macroResolver = macroResolver;
     }
 
+    @Required
+    public void setJobResolvers(List<ScriptJobResolver> jobResolvers) {
+        this.jobResolvers = jobResolvers;
+    }
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.mainApplicationContext = applicationContext;
@@ -222,6 +238,11 @@ public class SiteContextFactory implements ApplicationContextAware {
                 siteContext.setConfig(getConfig(siteContext));
                 siteContext.setApplicationContext(getApplicationContext(siteContext, classLoader));
                 siteContext.setClassLoader(classLoader);
+
+                Scheduler scheduler = getScheduler(siteContext);
+                scheduleJobs(siteContext, scheduler);
+
+                siteContext.setScheduler(scheduler);
             }
 
             return siteContext;
@@ -298,6 +319,46 @@ public class SiteContextFactory implements ApplicationContextAware {
         ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(siteContext);
 
         return new GroovyScriptFactory(resourceConnector, classLoader, groovyGlobalVars);
+    }
+
+    protected Scheduler getScheduler(SiteContext siteContext) {
+        SchedulerFactory schedulerFactory = new StdSchedulerFactory();
+        String siteName = siteContext.getSiteName();
+
+        try {
+            return schedulerFactory.getScheduler();
+        } catch (SchedulerException e) {
+            throw new SchedulingException("Unable to retrieve scheduler for site context '" + siteName + "'", e);
+        }
+    }
+
+    protected void scheduleJobs(SiteContext siteContext, Scheduler scheduler) {
+        List<JobContext> allJobContexts = new ArrayList<>();
+
+        for (ScriptJobResolver jobResolver : jobResolvers) {
+            List<JobContext> jobContexts = jobResolver.resolveJobs(siteContext);
+            if (CollectionUtils.isNotEmpty(jobContexts)) {
+                allJobContexts.addAll(jobContexts);
+            }
+        }
+
+        if (CollectionUtils.isNotEmpty(allJobContexts)) {
+            try {
+                scheduler.start();
+            } catch (SchedulerException e) {
+                throw new SchedulingException("Unable to start scheduler for site context '" +
+                                              siteContext.getSiteName() + "'", e);
+            }
+
+            for (JobContext jobContext : allJobContexts) {
+                try {
+                    scheduler.scheduleJob(jobContext.getJobDetail(), jobContext.getTrigger());
+                } catch (SchedulerException e) {
+                    throw new SchedulingException("Unable to schedule job for site context '" +
+                                                  siteContext.getSiteName() + "'", e);
+                }
+            }
+        }
     }
 
 }

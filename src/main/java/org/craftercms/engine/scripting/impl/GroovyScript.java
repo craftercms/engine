@@ -21,13 +21,18 @@ import org.craftercms.engine.scripting.Script;
 public class GroovyScript extends CachingAwareObjectBase implements Script {
 
     protected GroovyScriptEngine scriptEngine;
-    protected String scriptName;
+    protected String scriptUrl;
     protected Map<String, Object> globalVariables;
 
-    public GroovyScript(GroovyScriptEngine scriptEngine, String scriptName, Map<String, Object> globalVariables) {
+    public GroovyScript(GroovyScriptEngine scriptEngine, String scriptUrl, Map<String, Object> globalVariables) {
         this.scriptEngine = scriptEngine;
-        this.scriptName = scriptName;
+        this.scriptUrl = scriptUrl;
         this.globalVariables = globalVariables;
+    }
+
+    @Override
+    public String getUrl() {
+        return scriptUrl;
     }
 
     @Override
@@ -42,7 +47,7 @@ public class GroovyScript extends CachingAwareObjectBase implements Script {
         }
 
         try {
-            return scriptEngine.run(scriptName, new Binding(allVariables));
+            return scriptEngine.run(scriptUrl, new Binding(allVariables));
         } catch (Exception e) {
             Throwable cause = e.getCause();
             if (e instanceof ResourceException && cause instanceof FileNotFoundException) {
@@ -56,7 +61,7 @@ public class GroovyScript extends CachingAwareObjectBase implements Script {
     @Override
     public String toString() {
         return "GroovyScript{" +
-            "scriptName='" + scriptName + '\'' +
+            "scriptUrl='" + scriptUrl + '\'' +
             '}';
     }
 
