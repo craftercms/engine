@@ -39,6 +39,7 @@
 
     <bean id="crafter.errorPageRenderController" class="org.craftercms.engine.controller.ErrorPageRenderController">
         <property name="errorViewNamePrefix" value="${crafter.engine.error.viewName.prefix}"/>
+        <property name="isPreview" value="${crafter.engine.preview}"/>
     </bean>
 
     <bean id="crafter.monitoringRenderController" class="org.craftercms.engine.controller.MonitoringController">
