@@ -46,14 +46,14 @@
     </bean>
 
     <bean id="crafter.siteContextRestController" class="org.craftercms.engine.controller.rest.SiteContextRestController">
-        <property name="contextRegistry" ref="crafter.siteContextRegistry"/>
+        <property name="contextRegistry" ref="crafter.siteContextManager"/>
     </bean>
 
     <!-- Overwrite CacheRestController from core -->
     <bean id="crafter.cacheRestController" class="org.craftercms.engine.controller.rest.FreeMarkerAwareCacheRestController">
         <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
         <property name="storeService" ref="crafter.contentStoreService"/>
-        <property name="siteContextRegistry" ref="crafter.siteContextRegistry"/>
+        <property name="siteContextManager" ref="crafter.siteContextManager"/>
     </bean>
 
     <util:map id="crafter.urlMappings">

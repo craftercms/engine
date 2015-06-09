@@ -1,6 +1,6 @@
 package org.craftercms.engine.util;
 
-import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.craftercms.engine.service.context.SiteContext;
 
 /**
@@ -16,7 +16,7 @@ public class ConfigUtils {
     /**
      * Returns the configuration from the current site context.
      */
-    public static XMLConfiguration getCurrentConfig() {
+    public static HierarchicalConfiguration getCurrentConfig() {
         SiteContext context = SiteContext.getCurrent();
         if (context != null) {
             return context.getConfig();

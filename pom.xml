@@ -21,9 +21,10 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <servlet.api.version>3.0.1</servlet.api.version>
-        <crafter.search>2.5.0-SNAPSHOT</crafter.search>
-        <crafter.core>2.5.0-SNAPSHOT</crafter.core>
-        <crafter.profile>2.5.0-SNAPSHOT</crafter.profile>
+        <crafter.search.version>2.5.0-SNAPSHOT</crafter.search.version>
+        <crafter.core.version>2.5.0-SNAPSHOT</crafter.core.version>
+        <crafter.profile.version>2.5.0-SNAPSHOT</crafter.profile.version>
+        <crafter.commons.version>2.5.0-SNAPSHOT</crafter.commons.version>
         <spring.version>4.0.3.RELEASE</spring.version>
         <commons.httpclient.version>3.1</commons.httpclient.version>
         <commons.config.version>1.10</commons.config.version>
@@ -71,23 +72,29 @@
         <dependency>
             <groupId>org.craftercms</groupId>
             <artifactId>crafter-core</artifactId>
-            <version>${crafter.core}</version>
+            <version>${crafter.core.version}</version>
         </dependency>
         <dependency>
             <groupId>org.craftercms</groupId>
             <artifactId>crafter-search-client</artifactId>
-            <version>${crafter.search}</version>
+            <version>${crafter.search.version}</version>
         </dependency>
         <dependency>
             <groupId>org.craftercms</groupId>
             <artifactId>crafter-search-api</artifactId>
-            <version>${crafter.search}</version>
+            <version>${crafter.search.version}</version>
         </dependency>
         <dependency>
             <groupId>org.craftercms</groupId>
             <artifactId>crafter-security-provider</artifactId>
-            <version>${crafter.profile}</version>
+            <version>${crafter.profile.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.craftercms</groupId>
+            <artifactId>crafter-commons-mongo</artifactId>
+            <version>${crafter.commons.version}</version>
+        </dependency>
+
         <dependency>
             <!-- TODO: Replace for Apache HttpComponents -->
             <groupId>commons-httpclient</groupId>

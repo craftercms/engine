@@ -7,7 +7,7 @@ import org.craftercms.core.controller.rest.CacheRestController;
 import org.craftercms.core.exception.CacheException;
 import org.craftercms.core.exception.InvalidContextException;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.service.context.SiteContextRegistry;
+import org.craftercms.engine.service.context.SiteContextManager;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -19,16 +19,16 @@ import org.springframework.web.bind.annotation.RequestParam;
  */
 public class FreeMarkerAwareCacheRestController extends CacheRestController {
 
-    protected SiteContextRegistry siteContextRegistry;
+    protected SiteContextManager siteContextManager;
 
     @Required
-    public void setSiteContextRegistry(final SiteContextRegistry siteContextRegistry) {
-        this.siteContextRegistry = siteContextRegistry;
+    public void setSiteContextManager(final SiteContextManager siteContextManager) {
+        this.siteContextManager = siteContextManager;
     }
 
     @Override
     public Map<String, String> clearAllScopes() throws CacheException {
-        Collection<SiteContext> contexts = siteContextRegistry.list();
+        Collection<SiteContext> contexts = siteContextManager.listContexts();
 
         for (SiteContext context : contexts) {
             context.getFreeMarkerConfig().getConfiguration().clearTemplateCache();
@@ -40,7 +40,7 @@ public class FreeMarkerAwareCacheRestController extends CacheRestController {
     @Override
     public Map<String, String> clearScope(@RequestParam(CacheRestController.REQUEST_PARAM_CONTEXT_ID) String contextId)
         throws InvalidContextException, CacheException {
-        Collection<SiteContext> contexts = siteContextRegistry.list();
+        Collection<SiteContext> contexts = siteContextManager.listContexts();
 
         for (SiteContext context : contexts) {
             if (context.getContext().getId().equals(contextId)) {

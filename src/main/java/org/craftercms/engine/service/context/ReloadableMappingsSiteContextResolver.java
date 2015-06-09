@@ -41,7 +41,7 @@ public class ReloadableMappingsSiteContextResolver extends AbstractSiteContextRe
 
     public void reloadMappings() throws CrafterException {
         loadMappings();
-        unregisterSiteContextsWithNoMapping();
+        destroyContextsWithNoMapping();
     }
 
     @Override
@@ -71,11 +71,11 @@ public class ReloadableMappingsSiteContextResolver extends AbstractSiteContextRe
         mappings = newMappings;
     }
 
-    protected void unregisterSiteContextsWithNoMapping() {
+    protected void destroyContextsWithNoMapping() {
         List<SiteContext> contextsToUnregister = new ArrayList<>();
         Collection<Object> currentSiteNames = mappings.values();
 
-        for (SiteContext context : siteContextRegistry.list()) {
+        for (SiteContext context : siteContextManager.listContexts()) {
             String siteName = context.getSiteName();
             if (!siteName.equals(fallbackSiteName) && !currentSiteNames.contains(siteName)) {
                 contextsToUnregister.add(context);
@@ -83,7 +83,7 @@ public class ReloadableMappingsSiteContextResolver extends AbstractSiteContextRe
         }
 
         for (SiteContext context : contextsToUnregister) {
-            siteContextRegistry.unregister(context.getSiteName());
+            siteContextManager.destroyContext(context.getSiteName());
         }
     }
 

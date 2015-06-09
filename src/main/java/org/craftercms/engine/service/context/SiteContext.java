@@ -18,7 +18,7 @@ package org.craftercms.engine.service.context;
 
 import java.net.URLClassLoader;
 
-import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.exception.CrafterException;
 import org.craftercms.core.service.ContentStoreService;
@@ -28,7 +28,6 @@ import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.PreviewOverlayCallback;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
 
@@ -56,7 +55,7 @@ public class SiteContext {
     protected UrlTransformationEngine urlTransformationEngine;
     protected PreviewOverlayCallback overlayCallback;
     protected ScriptFactory scriptFactory;
-    protected XMLConfiguration config;
+    protected HierarchicalConfiguration config;
     protected ConfigurableApplicationContext applicationContext;
     protected URLClassLoader classLoader;
     protected Scheduler scheduler;
@@ -81,156 +80,148 @@ public class SiteContext {
         return storeService;
     }
 
+    public void setStoreService(ContentStoreService storeService) {
+        this.storeService = storeService;
+    }
+
     public String getSiteName() {
         return siteName;
+    }
+
+    public void setSiteName(String siteName) {
+        this.siteName = siteName;
     }
 
     public Context getContext() {
         return context;
     }
 
+    public void setContext(Context context) {
+        this.context = context;
+    }
+
     public boolean isFallback() {
         return fallback;
+    }
+
+    public void setFallback(boolean fallback) {
+        this.fallback = fallback;
     }
 
     public String getStaticAssetsPath() {
         return staticAssetsPath;
     }
 
+    public void setStaticAssetsPath(String staticAssetsPath) {
+        this.staticAssetsPath = staticAssetsPath;
+    }
+
     public String getTemplatesPath() {
         return templatesPath;
+    }
+
+    public void setTemplatesPath(String templatesPath) {
+        this.templatesPath = templatesPath;
     }
 
     public String getRestScriptsPath() {
         return restScriptsPath;
     }
 
-    public String getControllerScriptsPath() {
-        return controllerScriptsPath;
-    }
-
-    public String getConfigPath() {
-        return configPath;
-    }
-
-    public String getApplicationContextPath() {
-        return applicationContextPath;
-    }
-
-    public String getGroovyClassesPath() {
-        return groovyClassesPath;
-    }
-
-    public FreeMarkerConfig getFreeMarkerConfig() {
-        return freeMarkerConfig;
-    }
-
-    public UrlTransformationEngine getUrlTransformationEngine() {
-        return urlTransformationEngine;
-    }
-
-    public PreviewOverlayCallback getOverlayCallback() {
-        return overlayCallback;
-    }
-
-    public ScriptFactory getScriptFactory() {
-        return scriptFactory;
-    }
-
-    public XMLConfiguration getConfig() {
-        return config;
-    }
-
-    public ConfigurableApplicationContext getApplicationContext() {
-        return applicationContext;
-    }
-
-    public URLClassLoader getClassLoader() {
-        return classLoader;
-    }
-
-    public Scheduler getScheduler() {
-        return scheduler;
-    }
-
-    @Required
-    public void setStoreService(ContentStoreService storeService) {
-        this.storeService = storeService;
-    }
-
-    @Required
-    public void setSiteName(String siteName) {
-        this.siteName = siteName;
-    }
-
-    @Required
-    public void setContext(Context context) {
-        this.context = context;
-    }
-
-    @Required
-    public void setFallback(boolean fallback) {
-        this.fallback = fallback;
-    }
-
-    @Required
-    public void setStaticAssetsPath(String staticAssetsPath) {
-        this.staticAssetsPath = staticAssetsPath;
-    }
-
-    @Required
-    public void setTemplatesPath(String templatesPath) {
-        this.templatesPath = templatesPath;
-    }
-
     public void setRestScriptsPath(String restScriptsPath) {
         this.restScriptsPath = restScriptsPath;
+    }
+
+    public String getControllerScriptsPath() {
+        return controllerScriptsPath;
     }
 
     public void setControllerScriptsPath(String controllerScriptsPath) {
         this.controllerScriptsPath = controllerScriptsPath;
     }
 
+    public String getConfigPath() {
+        return configPath;
+    }
+
     public void setConfigPath(String configPath) {
         this.configPath = configPath;
+    }
+
+    public String getApplicationContextPath() {
+        return applicationContextPath;
     }
 
     public void setApplicationContextPath(String applicationContextPath) {
         this.applicationContextPath = applicationContextPath;
     }
 
+    public String getGroovyClassesPath() {
+        return groovyClassesPath;
+    }
+
     public void setGroovyClassesPath(String groovyClassesPath) {
         this.groovyClassesPath = groovyClassesPath;
     }
 
-    @Required
+    public FreeMarkerConfig getFreeMarkerConfig() {
+        return freeMarkerConfig;
+    }
+
     public void setFreeMarkerConfig(FreeMarkerConfig freeMarkerConfig) {
         this.freeMarkerConfig = freeMarkerConfig;
     }
 
-    @Required
+    public UrlTransformationEngine getUrlTransformationEngine() {
+        return urlTransformationEngine;
+    }
+
     public void setUrlTransformationEngine(UrlTransformationEngine urlTransformationEngine) {
         this.urlTransformationEngine = urlTransformationEngine;
+    }
+
+    public PreviewOverlayCallback getOverlayCallback() {
+        return overlayCallback;
     }
 
     public void setOverlayCallback(PreviewOverlayCallback overlayCallback) {
         this.overlayCallback = overlayCallback;
     }
 
+    public ScriptFactory getScriptFactory() {
+        return scriptFactory;
+    }
+
     public void setScriptFactory(ScriptFactory scriptFactory) {
         this.scriptFactory = scriptFactory;
     }
 
-    public void setConfig(XMLConfiguration config) {
+    public HierarchicalConfiguration getConfig() {
+        return config;
+    }
+
+    public void setConfig(HierarchicalConfiguration config) {
         this.config = config;
+    }
+
+    public ConfigurableApplicationContext getApplicationContext() {
+        return applicationContext;
     }
 
     public void setApplicationContext(ConfigurableApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
 
+    public URLClassLoader getClassLoader() {
+        return classLoader;
+    }
+
     public void setClassLoader(URLClassLoader classLoader) {
         this.classLoader = classLoader;
+    }
+
+    public Scheduler getScheduler() {
+        return scheduler;
     }
 
     public void setScheduler(Scheduler scheduler) {
@@ -291,7 +282,6 @@ public class SiteContext {
         return "SiteContext{" +
                "siteName='" + siteName + '\'' +
                ", context=" + context +
-               ", fallback=" + fallback +
                ", staticAssetsPath='" + staticAssetsPath + '\'' +
                ", templatesPath='" + templatesPath + '\'' +
                ", restScriptsPath='" + restScriptsPath + '\'' +

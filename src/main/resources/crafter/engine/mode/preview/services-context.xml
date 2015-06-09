@@ -24,10 +24,8 @@
     <!-- ////////////////////////////////// -->
 
     <bean id="crafter.siteContextResolver" class="org.craftercms.engine.service.context.CookieSiteContextResolver">
-        <property name="siteContextRegistry" ref="crafter.siteContextRegistry"/>
-        <property name="siteContextFactory" ref="crafter.siteContextFactory"/>
+        <property name="siteContextManager" ref="crafter.siteContextManager"/>
         <property name="paramOrCookieName" value="${crafter.engine.request.param.siteName}"/>
-        <property name="fallbackSiteContextFactory" ref="crafter.fallbackSiteContextFactory"/>
         <property name="fallbackSiteName" value="default"/>
     </bean>
 
@@ -38,6 +36,7 @@
         <property name="freeMarkerConfigFactory" ref="crafter.freeMarkerConfigFactory"/>
         <property name="restScriptsPath" value="${crafter.engine.site.default.rest.scripts.path}"/>
         <property name="controllerScriptsPath" value="${crafter.engine.site.default.controller.scripts.path}"/>
+        <property name="configClasspath" value="${crafter.engine.site.default.config.classpath}"/>
         <property name="configPath" value="${crafter.engine.site.default.config.path}"/>
         <property name="applicationContextPath" value="${crafter.engine.site.default.config.appContext.path}"/>
         <property name="groovyClassesPath" value="${crafter.engine.site.default.classes.groovy.path}"/>

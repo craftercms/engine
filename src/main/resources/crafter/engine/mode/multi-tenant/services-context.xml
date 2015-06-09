@@ -25,9 +25,7 @@
 
     <bean id="crafter.siteContextResolver"
           class="org.craftercms.engine.service.context.ReloadableMappingsSiteContextResolver">
-        <property name="siteContextRegistry" ref="crafter.siteContextRegistry" />
-        <property name="siteContextFactory" ref="crafter.siteContextFactory" />
-        <property name="fallbackSiteContextFactory" ref="crafter.fallbackSiteContextFactory" />
+        <property name="siteContextManager" ref="crafter.siteContextManager" />
         <property name="fallbackSiteName" value="default"/>
         <property name="mappingsFile" value="${crafter.engine.site.mappings.file.path}"/>
     </bean>

@@ -18,12 +18,15 @@ package org.craftercms.engine.service.context;
 
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import groovy.lang.GroovyClassLoader;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.commons.configuration.ConfigurationBuilder;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.core.service.Content;
@@ -31,6 +34,9 @@ import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.store.impl.filesystem.FileSystemContentStoreAdapter;
 import org.craftercms.core.url.UrlTransformationEngine;
+import org.craftercms.engine.config.impl.ClasspathXmlConfigurationBuilder;
+import org.craftercms.engine.config.impl.ContentStoreXmlConfigurationBuilder;
+import org.craftercms.engine.config.impl.OverridingCompositeConfigurationBuilder;
 import org.craftercms.engine.exception.SchedulingException;
 import org.craftercms.engine.exception.SiteContextCreationException;
 import org.craftercms.engine.macro.MacroResolver;
@@ -41,6 +47,7 @@ import org.craftercms.engine.service.PreviewOverlayCallback;
 import org.craftercms.engine.util.groovy.ContentStoreGroovyResourceLoader;
 import org.craftercms.engine.util.groovy.ContentStoreResourceConnector;
 import org.craftercms.engine.util.quartz.JobContext;
+import org.craftercms.engine.util.spring.ApacheCommonsConfigPropertySource;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
@@ -76,6 +83,7 @@ public class SiteContextFactory implements ApplicationContextAware {
     protected String templatesPath;
     protected String restScriptsPath;
     protected String controllerScriptsPath;
+    protected String configClasspath;
     protected String configPath;
     protected String applicationContextPath;
     protected String groovyClassesPath;
@@ -140,6 +148,11 @@ public class SiteContextFactory implements ApplicationContextAware {
     @Required
     public void setControllerScriptsPath(final String controllerScriptsPath) {
         this.controllerScriptsPath = controllerScriptsPath;
+    }
+
+    @Required
+    public void setConfigClasspath(String configClasspath) {
+        this.configClasspath = configClasspath;
     }
 
     @Required
@@ -208,7 +221,7 @@ public class SiteContextFactory implements ApplicationContextAware {
         this.mainApplicationContext = applicationContext;
     }
 
-    public SiteContext createContext(String siteName, boolean fallback) {
+    public SiteContext createContext(String siteName) {
         String resolvedRootFolderPath = macroResolver.resolveMacros(rootFolderPath);
 
         Context context = storeService.createContext(storeType, storeServerUrl, username, password,
@@ -219,34 +232,32 @@ public class SiteContextFactory implements ApplicationContextAware {
             siteContext.setStoreService(storeService);
             siteContext.setSiteName(siteName);
             siteContext.setContext(context);
-            siteContext.setFallback(fallback);
             siteContext.setStaticAssetsPath(staticAssetsPath);
             siteContext.setTemplatesPath(templatesPath);
             siteContext.setFreeMarkerConfig(getFreemarkerConfig());
             siteContext.setUrlTransformationEngine(urlTransformationEngine);
             siteContext.setOverlayCallback(overlayCallback);
 
-            if (!fallback) {
-                URLClassLoader classLoader = getClassLoader(siteContext);
+            URLClassLoader classLoader = getClassLoader(siteContext);
+            HierarchicalConfiguration config = getConfig(siteContext);
 
-                siteContext.setRestScriptsPath(restScriptsPath);
-                siteContext.setControllerScriptsPath(controllerScriptsPath);
-                siteContext.setConfigPath(configPath);
-                siteContext.setApplicationContextPath(applicationContextPath);
-                siteContext.setGroovyClassesPath(groovyClassesPath);
-                siteContext.setScriptFactory(getScriptFactory(siteContext, classLoader));
-                siteContext.setConfig(getConfig(siteContext));
-                siteContext.setApplicationContext(getApplicationContext(siteContext, classLoader));
-                siteContext.setClassLoader(classLoader);
+            siteContext.setRestScriptsPath(restScriptsPath);
+            siteContext.setControllerScriptsPath(controllerScriptsPath);
+            siteContext.setConfigPath(configPath);
+            siteContext.setApplicationContextPath(applicationContextPath);
+            siteContext.setGroovyClassesPath(groovyClassesPath);
+            siteContext.setScriptFactory(getScriptFactory(siteContext, classLoader));
+            siteContext.setConfig(config);
+            siteContext.setApplicationContext(getApplicationContext(siteContext, classLoader, config));
+            siteContext.setClassLoader(classLoader);
 
-                Scheduler scheduler = getScheduler(siteContext);
-                scheduleJobs(siteContext, scheduler);
+            Scheduler scheduler = getScheduler(siteContext);
+            scheduleJobs(siteContext, scheduler);
 
-                siteContext.setScheduler(scheduler);
-            }
+            siteContext.setScheduler(scheduler);
 
             return siteContext;
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             // Destroy context if the site context creation failed
             storeService.destroyContext(context);
 
@@ -258,23 +269,16 @@ public class SiteContextFactory implements ApplicationContextAware {
         return freeMarkerConfigFactory.getObject();
     }
 
-    protected XMLConfiguration getConfig(SiteContext siteContext) {
-        Content configContent = storeService.findContent(siteContext.getContext(), configPath);
-        if (configContent != null) {
-            XMLConfiguration config = new XMLConfiguration();
+    protected HierarchicalConfiguration getConfig(SiteContext siteContext) {
+        ConfigurationBuilder configBuilder = new OverridingCompositeConfigurationBuilder(Arrays.asList(
+            new ClasspathXmlConfigurationBuilder(macroResolver.resolveMacros(configClasspath)),
+            new ContentStoreXmlConfigurationBuilder(siteContext, configPath)));
 
-            try {
-                config.load(configContent.getInputStream());
-            } catch (Exception e) {
-                throw new SiteContextCreationException("Unable to load config file at " + configPath, e);
-            }
-
-            logger.info("Configuration loaded from " + configPath + " for site context '" + siteContext.getSiteName() +
-                        "'");
-
-            return config;
-        } else {
-            return null;
+        try {
+            return (HierarchicalConfiguration)configBuilder.getConfiguration();
+        } catch (ConfigurationException e) {
+            throw new SiteContextCreationException("Unable to load configuration for site '" +
+                                                   siteContext.getSiteName() + "'", e);
         }
     }
 
@@ -289,11 +293,14 @@ public class SiteContextFactory implements ApplicationContextAware {
     }
 
     protected ConfigurableApplicationContext getApplicationContext(SiteContext siteContext,
-                                                                   URLClassLoader classLoader) {
+                                                                   URLClassLoader classLoader,
+                                                                   HierarchicalConfiguration config) {
         Content appContextContent = storeService.findContent(siteContext.getContext(), applicationContextPath);
         if (appContextContent != null) {
             GenericApplicationContext appContext = new GenericApplicationContext(mainApplicationContext);
             appContext.setClassLoader(classLoader);
+            appContext.getEnvironment().getPropertySources().addLast(new ApacheCommonsConfigPropertySource(
+                ApacheCommonsConfigPropertySource.class.getSimpleName(), config));
 
             try {
                 XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader(appContext);
@@ -306,7 +313,7 @@ public class SiteContextFactory implements ApplicationContextAware {
                                                        applicationContextPath, e);
             }
 
-            logger.info("Application context loaded from " + applicationContextPath + " for site context '" +
+            logger.info("Application context loaded from " + applicationContextPath + " for site '" +
                         siteContext.getSiteName() + "'");
 
             return appContext;
