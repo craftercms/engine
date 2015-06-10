@@ -16,6 +16,7 @@
  */
 package org.craftercms.engine.service.context;
 
+import java.io.IOException;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,7 +38,6 @@ import org.craftercms.core.url.UrlTransformationEngine;
 import org.craftercms.engine.config.impl.ClasspathXmlConfigurationBuilder;
 import org.craftercms.engine.config.impl.ContentStoreXmlConfigurationBuilder;
 import org.craftercms.engine.config.impl.OverridingCompositeConfigurationBuilder;
-import org.craftercms.engine.exception.SchedulingException;
 import org.craftercms.engine.exception.SiteContextCreationException;
 import org.craftercms.engine.macro.MacroResolver;
 import org.craftercms.engine.scripting.ScriptFactory;
@@ -49,7 +49,6 @@ import org.craftercms.engine.util.groovy.ContentStoreResourceConnector;
 import org.craftercms.engine.util.quartz.JobContext;
 import org.craftercms.engine.util.spring.ApacheCommonsConfigPropertySource;
 import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
 import org.springframework.beans.BeansException;
@@ -60,8 +59,11 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.core.env.MutablePropertySources;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
-import org.xml.sax.InputSource;
 
 /**
  * Factory for creating {@link SiteContext} with common properties. It also uses the {@link MacroResolver} to resolve
@@ -85,6 +87,7 @@ public class SiteContextFactory implements ApplicationContextAware {
     protected String controllerScriptsPath;
     protected String configClasspath;
     protected String configPath;
+    protected String applicationContextClasspath;
     protected String applicationContextPath;
     protected String groovyClassesPath;
     protected Map<String, Object> groovyGlobalVars;
@@ -158,6 +161,11 @@ public class SiteContextFactory implements ApplicationContextAware {
     @Required
     public void setConfigPath(String configPath) {
         this.configPath = configPath;
+    }
+
+    @Required
+    public void setApplicationContextClasspath(String applicationContextClasspath) {
+        this.applicationContextClasspath = applicationContextClasspath;
     }
 
     @Required
@@ -250,11 +258,7 @@ public class SiteContextFactory implements ApplicationContextAware {
             siteContext.setConfig(config);
             siteContext.setApplicationContext(getApplicationContext(siteContext, classLoader, config));
             siteContext.setClassLoader(classLoader);
-
-            Scheduler scheduler = getScheduler(siteContext);
-            scheduleJobs(siteContext, scheduler);
-
-            siteContext.setScheduler(scheduler);
+            siteContext.setScheduler(scheduleJobs(siteContext));
 
             return siteContext;
         } catch (Exception e) {
@@ -285,8 +289,8 @@ public class SiteContextFactory implements ApplicationContextAware {
     protected URLClassLoader getClassLoader(SiteContext siteContext) {
         ContentStoreGroovyResourceLoader resourceLoader = new ContentStoreGroovyResourceLoader(siteContext,
                                                                                                groovyClassesPath);
-        GroovyClassLoader classLoader = new GroovyClassLoader(getClass().getClassLoader());
 
+        GroovyClassLoader classLoader = new GroovyClassLoader(getClass().getClassLoader());
         classLoader.setResourceLoader(resourceLoader);
 
         return classLoader;
@@ -295,51 +299,61 @@ public class SiteContextFactory implements ApplicationContextAware {
     protected ConfigurableApplicationContext getApplicationContext(SiteContext siteContext,
                                                                    URLClassLoader classLoader,
                                                                    HierarchicalConfiguration config) {
-        Content appContextContent = storeService.findContent(siteContext.getContext(), applicationContextPath);
-        if (appContextContent != null) {
-            GenericApplicationContext appContext = new GenericApplicationContext(mainApplicationContext);
-            appContext.setClassLoader(classLoader);
-            appContext.getEnvironment().getPropertySources().addLast(new ApacheCommonsConfigPropertySource(
-                ApacheCommonsConfigPropertySource.class.getSimpleName(), config));
+        try {
+            Resource storeAppContextRes = getContentStoreApplicationContextResource(siteContext);
+            Resource classpathAppContextRes = getClasspathApplicationContextResource();
 
-            try {
+            if (storeAppContextRes != null || classpathAppContextRes != null) {
+                GenericApplicationContext appContext = new GenericApplicationContext(mainApplicationContext);
+                appContext.setClassLoader(classLoader);
+
+                if (config != null) {
+                    MutablePropertySources propertySources = appContext.getEnvironment().getPropertySources();
+                    propertySources.addFirst(new ApacheCommonsConfigPropertySource("siteConfig", config));
+                }
+
                 XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader(appContext);
                 xmlReader.setValidationMode(XmlBeanDefinitionReader.VALIDATION_XSD);
-                xmlReader.loadBeanDefinitions(new InputSource(appContextContent.getInputStream()));
+
+                if (storeAppContextRes != null) {
+                    xmlReader.loadBeanDefinitions(storeAppContextRes);
+                }
+                if (classpathAppContextRes != null) {
+                    xmlReader.loadBeanDefinitions(classpathAppContextRes);
+                }
 
                 appContext.refresh();
-            } catch (Exception e) {
-                throw new SiteContextCreationException("Unable to load application context at " +
-                                                       applicationContextPath, e);
+
+                logger.info("Application context loaded for site '" + siteContext.getSiteName() + "'");
+
+                return appContext;
+            } else {
+                return null;
             }
+        } catch (Exception e) {
+            throw new SiteContextCreationException("Unable to load application context for site '" +
+                                                   siteContext.getSiteName() + "'", e);
+        }
+    }
 
-            logger.info("Application context loaded from " + applicationContextPath + " for site '" +
-                        siteContext.getSiteName() + "'");
-
-            return appContext;
+    protected Resource getContentStoreApplicationContextResource(SiteContext siteContext) throws IOException {
+        Content appContextContent = storeService.findContent(siteContext.getContext(), applicationContextPath);
+        if (appContextContent != null) {
+            return new InputStreamResource(appContextContent.getInputStream());
         } else {
             return null;
         }
     }
 
+    protected Resource getClasspathApplicationContextResource() {
+        return new ClassPathResource(macroResolver.resolveMacros(applicationContextClasspath));
+    }
+
     protected ScriptFactory getScriptFactory(SiteContext siteContext, URLClassLoader classLoader) {
-        ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(siteContext);
-
-        return new GroovyScriptFactory(resourceConnector, classLoader, groovyGlobalVars);
+        return new GroovyScriptFactory(new ContentStoreResourceConnector(siteContext), classLoader, groovyGlobalVars);
     }
 
-    protected Scheduler getScheduler(SiteContext siteContext) {
-        SchedulerFactory schedulerFactory = new StdSchedulerFactory();
-        String siteName = siteContext.getSiteName();
-
-        try {
-            return schedulerFactory.getScheduler();
-        } catch (SchedulerException e) {
-            throw new SchedulingException("Unable to retrieve scheduler for site context '" + siteName + "'", e);
-        }
-    }
-
-    protected void scheduleJobs(SiteContext siteContext, Scheduler scheduler) {
+    protected Scheduler scheduleJobs(SiteContext siteContext) {
         List<JobContext> allJobContexts = new ArrayList<>();
 
         for (ScriptJobResolver jobResolver : jobResolvers) {
@@ -351,21 +365,25 @@ public class SiteContextFactory implements ApplicationContextAware {
 
         if (CollectionUtils.isNotEmpty(allJobContexts)) {
             try {
-                scheduler.start();
-            } catch (SchedulerException e) {
-                throw new SchedulingException("Unable to start scheduler for site context '" +
-                                              siteContext.getSiteName() + "'", e);
-            }
+                SchedulerFactory schedulerFactory = new StdSchedulerFactory();
+                Scheduler scheduler = schedulerFactory.getScheduler();
 
-            for (JobContext jobContext : allJobContexts) {
-                try {
+                for (JobContext jobContext : allJobContexts) {
                     scheduler.scheduleJob(jobContext.getJobDetail(), jobContext.getTrigger());
-                } catch (SchedulerException e) {
-                    throw new SchedulingException("Unable to schedule job for site context '" +
-                                                  siteContext.getSiteName() + "'", e);
                 }
+
+                scheduler.start();
+
+                logger.info("Jobs scheduled for site '" + siteContext.getSiteName() + "'");
+
+                return scheduler;
+            } catch (Exception e) {
+                throw new SiteContextCreationException("Unable to schedule jobs for site '" +
+                                                       siteContext.getSiteName() + "'", e);
             }
         }
+
+        return null;
     }
 
 }

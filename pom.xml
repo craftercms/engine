@@ -30,6 +30,7 @@
         <commons.config.version>1.10</commons.config.version>
         <cglib.version>3.1</cglib.version>
         <groovy.version>2.3.7</groovy.version>
+        <gmongo.version>1.5</gmongo.version>
         <tika.version>1.5</tika.version>
         <junit.version>4.11</junit.version>
         <mockito.version>1.9.5</mockito.version>
@@ -148,6 +149,12 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
             <version>4.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.gmongo</groupId>
+            <artifactId>gmongo</artifactId>
+            <version>1.5</version>
         </dependency>
 
         <!-- Test dependencies -->

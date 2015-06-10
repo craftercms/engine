@@ -218,6 +218,7 @@
         <property name="controllerScriptsPath" value="${crafter.engine.site.default.controller.scripts.path}"/>
         <property name="configClasspath" value="${crafter.engine.site.default.config.classpath}"/>
         <property name="configPath" value="${crafter.engine.site.default.config.path}"/>
+        <property name="applicationContextClasspath" value="${crafter.engine.site.default.config.appContext.classpath}"/>
         <property name="applicationContextPath" value="${crafter.engine.site.default.config.appContext.path}"/>
         <property name="groovyClassesPath" value="${crafter.engine.site.default.classes.groovy.path}"/>
         <property name="urlTransformationEngine" ref="crafter.urlTransformationEngine"/>
@@ -237,6 +238,8 @@
         <property name="controllerScriptsPath" value="/scripts/controllers"/>
         <property name="configClasspath" value="crafter/engine/extension/sites/{siteName}/site.xml"/>
         <property name="configPath" value="/config/site.xml"/>
+        <property name="applicationContextClasspath"
+                  value="crafter/engine/extension/sites/{siteName}/spring/application-context.xml"/>
         <property name="applicationContextPath" value="/config/spring/application-context.xml"/>
         <property name="groovyClassesPath" value="/classes"/>
         <property name="urlTransformationEngine" ref="crafter.urlTransformationEngine"/>
