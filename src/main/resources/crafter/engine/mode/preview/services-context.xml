@@ -36,10 +36,8 @@
         <property name="freeMarkerConfigFactory" ref="crafter.freeMarkerConfigFactory"/>
         <property name="restScriptsPath" value="${crafter.engine.site.default.rest.scripts.path}"/>
         <property name="controllerScriptsPath" value="${crafter.engine.site.default.controller.scripts.path}"/>
-        <property name="configClasspath" value="${crafter.engine.site.default.config.classpath}"/>
-        <property name="configPath" value="${crafter.engine.site.default.config.path}"/>
-        <property name="applicationContextClasspath" value="${crafter.engine.site.default.config.appContext.classpath}"/>
-        <property name="applicationContextPath" value="${crafter.engine.site.default.config.appContext.path}"/>
+        <property name="configPaths" value="${crafter.engine.site.default.config.paths}"/>
+        <property name="applicationContextPaths" value="${crafter.engine.site.default.config.appContext.paths}"/>
         <property name="groovyClassesPath" value="${crafter.engine.site.default.classes.groovy.path}"/>
         <property name="cacheOn" value="false"/>
         <property name="urlTransformationEngine" ref="crafter.urlTransformationEngine"/>

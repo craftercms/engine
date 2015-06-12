@@ -17,6 +17,7 @@
 package org.craftercms.engine.service.context;
 
 import java.net.URLClassLoader;
+import java.util.Arrays;
 
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.craftercms.commons.http.RequestContext;
@@ -48,8 +49,8 @@ public class SiteContext {
     protected String templatesPath;
     protected String restScriptsPath;
     protected String controllerScriptsPath;
-    protected String configPath;
-    protected String applicationContextPath;
+    protected String[] configPaths;
+    protected String[] applicationContextPaths;
     protected String groovyClassesPath;
     protected FreeMarkerConfig freeMarkerConfig;
     protected UrlTransformationEngine urlTransformationEngine;
@@ -140,20 +141,20 @@ public class SiteContext {
         this.controllerScriptsPath = controllerScriptsPath;
     }
 
-    public String getConfigPath() {
-        return configPath;
+    public String[] getConfigPaths() {
+        return configPaths;
     }
 
-    public void setConfigPath(String configPath) {
-        this.configPath = configPath;
+    public void setConfigPaths(String[] configPaths) {
+        this.configPaths = configPaths;
     }
 
-    public String getApplicationContextPath() {
-        return applicationContextPath;
+    public String[] getApplicationContextPaths() {
+        return applicationContextPaths;
     }
 
-    public void setApplicationContextPath(String applicationContextPath) {
-        this.applicationContextPath = applicationContextPath;
+    public void setApplicationContextPaths(String[] applicationContextPaths) {
+        this.applicationContextPaths = applicationContextPaths;
     }
 
     public String getGroovyClassesPath() {
@@ -282,12 +283,13 @@ public class SiteContext {
         return "SiteContext{" +
                "siteName='" + siteName + '\'' +
                ", context=" + context +
+               ", fallback=" + fallback +
                ", staticAssetsPath='" + staticAssetsPath + '\'' +
                ", templatesPath='" + templatesPath + '\'' +
                ", restScriptsPath='" + restScriptsPath + '\'' +
                ", controllerScriptsPath='" + controllerScriptsPath + '\'' +
-               ", configPath='" + configPath + '\'' +
-               ", applicationContextPath='" + applicationContextPath + '\'' +
+               ", configPaths=" + Arrays.toString(configPaths) +
+               ", applicationContextPaths=" + Arrays.toString(applicationContextPaths) +
                ", groovyClassesPath='" + groovyClassesPath + '\'' +
                '}';
     }

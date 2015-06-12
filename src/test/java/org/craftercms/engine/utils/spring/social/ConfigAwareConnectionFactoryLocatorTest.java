@@ -3,8 +3,8 @@ package org.craftercms.engine.utils.spring.social;
 import java.util.Arrays;
 
 import org.craftercms.core.util.cache.CacheTemplate;
-import org.craftercms.engine.config.ConfigurationParser;
-import org.craftercms.engine.config.impl.FacebookConnectionFactoryConfigParser;
+import org.craftercms.engine.util.config.ConfigurationParser;
+import org.craftercms.engine.util.config.impl.FacebookConnectionFactoryConfigParser;
 import org.craftercms.engine.test.utils.CacheTemplateMockUtils;
 import org.craftercms.engine.test.utils.ConfigAwareTestBase;
 import org.craftercms.engine.util.spring.social.ConfigAwareConnectionFactoryLocator;
@@ -19,9 +19,9 @@ import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.connect.FacebookAdapter;
 import org.springframework.social.facebook.connect.FacebookServiceProvider;
 
-import static org.craftercms.engine.config.impl.FacebookConnectionFactoryConfigParser
+import static org.craftercms.engine.util.config.impl.FacebookConnectionFactoryConfigParser
     .FACEBOOK_CONNECTION_FACTORY_APP_ID_KEY;
-import static org.craftercms.engine.config.impl.FacebookConnectionFactoryConfigParser
+import static org.craftercms.engine.util.config.impl.FacebookConnectionFactoryConfigParser
     .FACEBOOK_CONNECTION_FACTORY_APP_SECRET_KEY;
 import static org.craftercms.engine.util.spring.social.ConfigAwareConnectionFactoryLocator.SOCIAL_CONNECTIONS_KEY;
 import static org.junit.Assert.assertEquals;
