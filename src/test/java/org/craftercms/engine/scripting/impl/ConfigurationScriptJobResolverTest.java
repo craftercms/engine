@@ -2,6 +2,7 @@ package org.craftercms.engine.scripting.impl;
 
 import java.util.List;
 
+import org.apache.commons.configuration.XMLConfiguration;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.engine.service.context.SiteContext;
@@ -20,19 +21,17 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link FolderBasedScriptJobResolver}.
+ * Unit tests for {@link ConfigurationScriptJobResolver}.
  *
  * @author avasquez
  */
-public class FolderBasedScriptJobResolverTest {
-
-    private static final String HOURLY_CRON_EXPRESSION = "0 0 * * * ?";
+public class ConfigurationScriptJobResolverTest {
 
     @Mock
     private ContentStoreService storeService;
     @Mock
     private SiteContext siteContext;
-    private FolderBasedScriptJobResolver resolver;
+    private ConfigurationScriptJobResolver resolver;
 
     @Before
     public void setUp() throws Exception {
@@ -41,9 +40,7 @@ public class FolderBasedScriptJobResolverTest {
         setUpStoreService(storeService);
         setUpSiteContext(siteContext, storeService);
 
-        resolver = new FolderBasedScriptJobResolver();
-        resolver.setFolderUrl("/scripts/jobs");
-        resolver.setCronExpression(HOURLY_CRON_EXPRESSION);
+        resolver = new ConfigurationScriptJobResolver();
         resolver.setScriptSuffix(".groovy");
     }
 
@@ -52,15 +49,23 @@ public class FolderBasedScriptJobResolverTest {
         List<JobContext> jobContexts = resolver.resolveJobs(siteContext);
 
         assertNotNull(jobContexts);
-        assertEquals(1, jobContexts.size());
+        assertEquals(2, jobContexts.size());
 
         JobDetailImpl jobDetail = (JobDetailImpl)jobContexts.get(0).getJobDetail();
         CronTrigger trigger = (CronTrigger)jobContexts.get(0).getTrigger();
 
         assertEquals(ScriptJob.class, jobDetail.getJobClass());
+        assertEquals("/scripts/jobs/morejobs/testJob2.groovy",
+                     jobDetail.getJobDataMap().getString(ScriptJob.SCRIPT_URL_DATA_KEY));
+        assertEquals("0 0/15 * * * ?", trigger.getCronExpression());
+
+        jobDetail = (JobDetailImpl)jobContexts.get(1).getJobDetail();
+        trigger = (CronTrigger)jobContexts.get(1).getTrigger();
+
+        assertEquals(ScriptJob.class, jobDetail.getJobClass());
         assertEquals("/scripts/jobs/testJob.groovy",
                      jobDetail.getJobDataMap().getString(ScriptJob.SCRIPT_URL_DATA_KEY));
-        assertEquals(HOURLY_CRON_EXPRESSION, trigger.getCronExpression());
+        assertEquals("0 0/15 * * * ?", trigger.getCronExpression());
     }
 
     private void setUpStoreService(ContentStoreService storeService) {
@@ -68,9 +73,12 @@ public class FolderBasedScriptJobResolverTest {
     }
 
     private void setUpSiteContext(SiteContext siteContext, ContentStoreService storeService) throws Exception {
+        XMLConfiguration config = new XMLConfiguration("config/site.xml");
+
         when(siteContext.getSiteName()).thenReturn("default");
         when(siteContext.getContext()).thenReturn(mock(Context.class));
         when(siteContext.getStoreService()).thenReturn(storeService);
+        when(siteContext.getConfig()).thenReturn(config);
     }
 
 }

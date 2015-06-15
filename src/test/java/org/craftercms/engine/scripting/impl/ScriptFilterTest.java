@@ -41,7 +41,7 @@ public class ScriptFilterTest {
     private ContentStoreService storeService;
     @Mock
     private FilterConfig filterConfig;
-    private SiteContext context;
+    private SiteContext siteContext;
     private ServletContext servletContext;
     private ScriptFilter filter;
 
@@ -52,7 +52,7 @@ public class ScriptFilterTest {
         CacheTemplateMockUtils.setUpWithNoCaching(cacheTemplate);
         ContentStoreServiceMockUtils.setUpGetContentFromClassPath(storeService);
 
-        context = createSiteContext(storeService);
+        siteContext = createSiteContext(storeService);
         servletContext = new MockServletContext();
 
         filter = new ScriptFilter();
@@ -70,7 +70,7 @@ public class ScriptFilterTest {
         FilterChain filterChain = mock(FilterChain.class);
 
         setCurrentRequestContext(request, response);
-        setCurrentSiteContext(context);
+        setCurrentSiteContext(siteContext);
 
         filter.doFilter(request, response, filterChain);
 
@@ -93,7 +93,7 @@ public class ScriptFilterTest {
         FilterChain filterChain = mock(FilterChain.class);
 
         setCurrentRequestContext(request, response);
-        setCurrentSiteContext(context);
+        setCurrentSiteContext(siteContext);
 
         filter.doFilter(request, response, filterChain);
 
@@ -121,8 +121,8 @@ public class ScriptFilterTest {
         return siteContext;
     }
 
-    private ScriptFactory createScriptFactory(SiteContext context) {
-        ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(context);
+    private ScriptFactory createScriptFactory(SiteContext siteContext) {
+        ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(siteContext);
 
         return new GroovyScriptFactory(resourceConnector, Collections.<String, Object>emptyMap());
     }
@@ -131,8 +131,8 @@ public class ScriptFilterTest {
         RequestContext.setCurrent(new RequestContext(request, response));
     }
 
-    private void setCurrentSiteContext(SiteContext context) {
-        SiteContext.setCurrent(context);
+    private void setCurrentSiteContext(SiteContext siteContext) {
+        SiteContext.setCurrent(siteContext);
     }
 
     private void clearCurrentRequestContext() {

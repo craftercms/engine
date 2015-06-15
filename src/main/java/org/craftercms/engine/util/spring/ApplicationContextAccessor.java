@@ -23,24 +23,25 @@ import org.springframework.context.ApplicationContextAware;
 
 /**
  * Bean that provide simple access to the Spring application context's beans: first it uses the site's own context.
- * If not specified, it uses the main context. Used for example to access Spring beans from an FTL or a Groovy script.
+ * If not specified, it uses the default context. Used for example to access Spring beans from an FTL or a Groovy
+ * script.
  *
  * @author Alfonso Vásquez
  */
 public class ApplicationContextAccessor implements ApplicationContextAware {
 
-    private ApplicationContext mainApplicationContext;
+    private ApplicationContext defaultApplicationContext;
 
     public ApplicationContextAccessor() {
     }
 
-    public ApplicationContextAccessor(ApplicationContext mainApplicationContext) {
-        this.mainApplicationContext = mainApplicationContext;
+    public ApplicationContextAccessor(ApplicationContext defaultApplicationContext) {
+        this.defaultApplicationContext = defaultApplicationContext;
     }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.mainApplicationContext = applicationContext;
+        this.defaultApplicationContext = applicationContext;
     }
 
     public Object get(String beanName) {
@@ -48,15 +49,15 @@ public class ApplicationContextAccessor implements ApplicationContextAware {
     }
 
     protected ApplicationContext getApplicationContext() {
-        SiteContext context = SiteContext.getCurrent();
-        if (context != null) {
-            ApplicationContext applicationContext = context.getApplicationContext();
+        SiteContext siteContext = SiteContext.getCurrent();
+        if (siteContext != null) {
+            ApplicationContext applicationContext = siteContext.getApplicationContext();
             if (applicationContext != null) {
                 return applicationContext;
             }
         }
 
-        return mainApplicationContext;
+        return defaultApplicationContext;
     }
 
 }

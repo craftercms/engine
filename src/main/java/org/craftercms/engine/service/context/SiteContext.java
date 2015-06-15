@@ -70,10 +70,10 @@ public class SiteContext {
         }
     }
 
-    public static void setCurrent(SiteContext context) {
+    public static void setCurrent(SiteContext siteContext) {
         RequestContext requestContext = RequestContext.getCurrent();
         if (requestContext != null) {
-            requestContext.getRequest().setAttribute(SITE_CONTEXT_ATTRIBUTE, context);
+            requestContext.getRequest().setAttribute(SITE_CONTEXT_ATTRIBUTE, siteContext);
         }
     }
 
@@ -264,9 +264,9 @@ public class SiteContext {
             return false;
         }
 
-        SiteContext context = (SiteContext) o;
+        SiteContext siteContext = (SiteContext) o;
 
-        if (!siteName.equals(context.siteName)) {
+        if (!siteName.equals(siteContext.siteName)) {
             return false;
         }
 

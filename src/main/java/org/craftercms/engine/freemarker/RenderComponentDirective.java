@@ -200,14 +200,14 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
 
             Map<String, Object> model = new HashMap<String, Object>();
             Map<String, Object> scriptVariables = createScriptVariables(component, model);
-            SiteContext context = SiteContext.getCurrent();
+            SiteContext siteContext = SiteContext.getCurrent();
 
-            if (context != null) {
-                ScriptFactory scriptFactory = context.getScriptFactory();
+            if (siteContext != null) {
+                ScriptFactory scriptFactory = siteContext.getScriptFactory();
 
                 if (scriptFactory == null) {
                     throw new IllegalStateException("No script factory associate to current site context '" +
-                                                    context.getSiteName() + "'");
+                                                    siteContext.getSiteName() + "'");
                 }
 
                 for (String scriptUrl : scriptUrls) {
@@ -234,12 +234,9 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
         Map<String, Object> scriptVariables = new HashMap<String, Object>();
         RequestContext context = RequestContext.getCurrent();
 
-        if (context != null) {
-            GroovyUtils.addCommonVariables(scriptVariables, context.getRequest(), context.getResponse(),
-                                           servletContext);
-        }
-
-        GroovyUtils.addCrafterVariables(scriptVariables, component);
+        GroovyUtils.addCommonVariables(scriptVariables, context.getRequest(), context.getResponse(), servletContext);
+        GroovyUtils.addSecurityVariables(scriptVariables);
+        GroovyUtils.addCrafterModelVariable(scriptVariables, component);
         GroovyUtils.addModelVariable(scriptVariables, model);
 
         return scriptVariables;

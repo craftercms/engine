@@ -20,22 +20,22 @@ import org.springframework.core.io.AbstractResource;
  */
 public class ContentStoreResource extends AbstractResource {
 
-    protected SiteContext context;
+    protected SiteContext siteContext;
     protected String url;
 
-    public ContentStoreResource(SiteContext context, String url) {
-        this.context = context;
+    public ContentStoreResource(SiteContext siteContext, String url) {
+        this.siteContext = siteContext;
         this.url = url;
     }
 
     @Override
     public boolean exists() {
-        return context.getStoreService().exists(context.getContext(), url);
+        return siteContext.getStoreService().exists(siteContext.getContext(), url);
     }
 
     @Override
     public URL getURL() throws IOException {
-        ContentStoreUrlStreamHandler urlStreamHandler = new ContentStoreUrlStreamHandler(context);
+        ContentStoreUrlStreamHandler urlStreamHandler = new ContentStoreUrlStreamHandler(siteContext);
 
         return urlStreamHandler.createUrl(url);
     }
@@ -81,7 +81,7 @@ public class ContentStoreResource extends AbstractResource {
 
     @Override
     public String getDescription() {
-        return context.getSiteName() + ":" + url;
+        return siteContext.getSiteName() + ":" + url;
     }
 
     @Override
@@ -95,7 +95,7 @@ public class ContentStoreResource extends AbstractResource {
     }
 
     public Content getContent() {
-        return context.getStoreService().findContent(context.getContext(), url);
+        return siteContext.getStoreService().findContent(siteContext.getContext(), url);
     }
 
 }

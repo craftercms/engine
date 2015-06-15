@@ -75,15 +75,15 @@ public class ReloadableMappingsSiteContextResolver extends AbstractSiteContextRe
         List<SiteContext> contextsToUnregister = new ArrayList<>();
         Collection<Object> currentSiteNames = mappings.values();
 
-        for (SiteContext context : siteContextManager.listContexts()) {
-            String siteName = context.getSiteName();
+        for (SiteContext siteContext : siteContextManager.listContexts()) {
+            String siteName = siteContext.getSiteName();
             if (!siteName.equals(fallbackSiteName) && !currentSiteNames.contains(siteName)) {
-                contextsToUnregister.add(context);
+                contextsToUnregister.add(siteContext);
             }
         }
 
-        for (SiteContext context : contextsToUnregister) {
-            siteContextManager.destroyContext(context.getSiteName());
+        for (SiteContext siteContext : contextsToUnregister) {
+            siteContextManager.destroyContext(siteContext.getSiteName());
         }
     }
 

@@ -35,7 +35,7 @@ public class ConfigAwareAccessTokenIdResolverTest extends ConfigAwareTestBase {
 
     @Test(expected = ConfigurationException.class)
     public void testGetAccessTokenIdNoConfig() throws Exception {
-        when(context.getConfig()).thenReturn(null);
+        when(siteContext.getConfig()).thenReturn(null);
 
         accessTokenIdResolver.getAccessTokenId();
     }

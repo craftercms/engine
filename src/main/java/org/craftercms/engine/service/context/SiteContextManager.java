@@ -68,35 +68,35 @@ public class SiteContextManager {
     }
 
     public SiteContext getContext(String siteName, boolean fallback) {
-        SiteContext context = contextRegistry.get(siteName);
-        if (context == null) {
+        SiteContext siteContext = contextRegistry.get(siteName);
+        if (siteContext == null) {
             synchronized (this) {
                 // Double check locking, in case the context has been created already by another thread
-                context = contextRegistry.get(siteName);
-                if (context == null) {
+                siteContext = contextRegistry.get(siteName);
+                if (siteContext == null) {
                     if (fallback) {
-                        context = fallbackContextFactory.createContext(siteName);
-                        context.setFallback(true);
+                        siteContext = fallbackContextFactory.createContext(siteName);
+                        siteContext.setFallback(true);
                     } else {
-                        context = contextFactory.createContext(siteName);
+                        siteContext = contextFactory.createContext(siteName);
                     }
 
-                    contextRegistry.put(siteName, context);
+                    contextRegistry.put(siteName, siteContext);
 
-                    logger.info("Site context created: " + context);
+                    logger.info("Site context created: " + siteContext);
                 }
             }
         }
 
-        return context;
+        return siteContext;
     }
 
     public synchronized void destroyContext(String siteName) {
-        SiteContext context = contextRegistry.remove(siteName);
-        if (context != null) {
-            context.destroy();
+        SiteContext siteContext = contextRegistry.remove(siteName);
+        if (siteContext != null) {
+            siteContext.destroy();
 
-            logger.info("Site context destroyed: " + context);
+            logger.info("Site context destroyed: " + siteContext);
         }
     }
 

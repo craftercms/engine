@@ -30,8 +30,8 @@ public class FreeMarkerAwareCacheRestController extends CacheRestController {
     public Map<String, String> clearAllScopes() throws CacheException {
         Collection<SiteContext> contexts = siteContextManager.listContexts();
 
-        for (SiteContext context : contexts) {
-            context.getFreeMarkerConfig().getConfiguration().clearTemplateCache();
+        for (SiteContext siteContext : contexts) {
+            siteContext.getFreeMarkerConfig().getConfiguration().clearTemplateCache();
         }
 
         return super.clearAllScopes();
@@ -42,9 +42,9 @@ public class FreeMarkerAwareCacheRestController extends CacheRestController {
         throws InvalidContextException, CacheException {
         Collection<SiteContext> contexts = siteContextManager.listContexts();
 
-        for (SiteContext context : contexts) {
-            if (context.getContext().getId().equals(contextId)) {
-                context.getFreeMarkerConfig().getConfiguration().clearTemplateCache();
+        for (SiteContext siteContext : contexts) {
+            if (siteContext.getContext().getId().equals(contextId)) {
+                siteContext.getFreeMarkerConfig().getConfiguration().clearTemplateCache();
                 break;
             }
         }

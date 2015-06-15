@@ -94,8 +94,8 @@ public class ScriptFilter implements Filter {
     }
 
     protected List<FilterMapping> getFilterMappings() {
-        final SiteContext context = SiteContext.getCurrent();
-        if (context != null) {
+        final SiteContext siteContext = SiteContext.getCurrent();
+        if (siteContext != null) {
             Callback<List<FilterMapping>> callback = new Callback<List<FilterMapping>>() {
 
                 @Override
@@ -112,10 +112,10 @@ public class ScriptFilter implements Filter {
                                 String excludeStr = filterConfig.getString(EXCLUDE_MAPPINGS_KEY);
 
                                 if (StringUtils.isNotEmpty(scriptUrl) && StringUtils.isNotEmpty(includeStr)) {
-                                    ContentStoreService storeService = context.getStoreService();
-                                    ScriptFactory scriptFactory = context.getScriptFactory();
+                                    ContentStoreService storeService = siteContext.getStoreService();
+                                    ScriptFactory scriptFactory = siteContext.getScriptFactory();
 
-                                    if (!storeService.exists(context.getContext(), scriptUrl)) {
+                                    if (!storeService.exists(siteContext.getContext(), scriptUrl)) {
                                         throw new ConfigurationException("No filter script found at " + scriptUrl);
                                     }
 
@@ -136,7 +136,7 @@ public class ScriptFilter implements Filter {
 
             };
 
-            return cacheTemplate.getObject(context.getContext(), callback, FILTER_MAPPINGS_CACHE_KEY);
+            return cacheTemplate.getObject(siteContext.getContext(), callback, FILTER_MAPPINGS_CACHE_KEY);
         } else {
             return null;
         }

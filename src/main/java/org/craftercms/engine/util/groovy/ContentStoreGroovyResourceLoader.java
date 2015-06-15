@@ -18,13 +18,13 @@ import org.craftercms.engine.util.url.ContentStoreUrlStreamHandler;
  */
 public class ContentStoreGroovyResourceLoader implements GroovyResourceLoader {
 
-    protected SiteContext context;
+    protected SiteContext siteContext;
     protected ContentStoreUrlStreamHandler urlStreamHandler;
     protected String groovyResourcesUrlPrefix;
 
-    public ContentStoreGroovyResourceLoader(SiteContext context, String groovyResourcesUrlPrefix) {
-        this.context = context;
-        this.urlStreamHandler = new ContentStoreUrlStreamHandler(context);
+    public ContentStoreGroovyResourceLoader(SiteContext siteContext, String groovyResourcesUrlPrefix) {
+        this.siteContext = siteContext;
+        this.urlStreamHandler = new ContentStoreUrlStreamHandler(siteContext);
         this.groovyResourcesUrlPrefix = groovyResourcesUrlPrefix;
     }
 
@@ -40,7 +40,7 @@ public class ContentStoreGroovyResourceLoader implements GroovyResourceLoader {
             filename = UrlUtils.appendUrl(groovyResourcesUrlPrefix, filename);
         }
 
-        if (context.getStoreService().exists(context.getContext(), filename)){
+        if (siteContext.getStoreService().exists(siteContext.getContext(), filename)){
             return urlStreamHandler.createUrl(filename);
         } else {
             return null;

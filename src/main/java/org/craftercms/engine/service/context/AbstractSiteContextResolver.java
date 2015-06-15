@@ -57,13 +57,13 @@ public abstract class AbstractSiteContextResolver implements SiteContextResolver
     }
 
     protected SiteContext getContext(String siteName, boolean fallback) {
-        SiteContext context = siteContextManager.getContext(siteName, fallback);
+        SiteContext siteContext = siteContextManager.getContext(siteName, fallback);
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Site context resolved for current request: " + context);
+            logger.debug("Site context resolved for current request: " + siteContext);
         }
 
-        return context;
+        return siteContext;
     }
 
     protected abstract String getSiteName(HttpServletRequest request);

@@ -55,4 +55,15 @@
             <appSecret>c852cb30cda311e488300800200c9a66</appSecret>
         </facebookConnectionFactory>
     </socialConnections>
+
+    <jobs>
+        <jobFolder>
+            <path>/scripts/jobs/morejobs</path>
+            <cronExpression>0 0/15 * * * ?</cronExpression>
+        </jobFolder>
+        <job>
+            <path>/scripts/jobs/testJob.groovy</path>
+            <cronExpression>0 0/15 * * * ?</cronExpression>
+        </job>
+    </jobs>
 </site>

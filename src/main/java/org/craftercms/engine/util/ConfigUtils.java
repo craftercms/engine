@@ -17,9 +17,9 @@ public class ConfigUtils {
      * Returns the configuration from the current site context.
      */
     public static HierarchicalConfiguration getCurrentConfig() {
-        SiteContext context = SiteContext.getCurrent();
-        if (context != null) {
-            return context.getConfig();
+        SiteContext siteContext = SiteContext.getCurrent();
+        if (siteContext != null) {
+            return siteContext.getConfig();
         } else {
             return null;
         }
