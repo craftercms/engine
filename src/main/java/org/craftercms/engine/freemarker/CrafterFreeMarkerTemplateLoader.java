@@ -50,19 +50,19 @@ public class CrafterFreeMarkerTemplateLoader implements TemplateLoader {
 
     @Override
     public Object findTemplateSource(String name) throws IOException {
-        SiteContext context = SiteContext.getCurrent();
-        if (context != null) {
-            String path = getTemplatePath(context, name);
+        SiteContext siteContext = SiteContext.getCurrent();
+        if (siteContext != null) {
+            String path = getTemplatePath(siteContext, name);
 
             if (logger.isDebugEnabled()) {
-                logger.debug("Looking for FreeMarker template at [context=" + context + ", path='" + path + "']");
+                logger.debug("Looking for FreeMarker template at [context=" + siteContext + ", path='" + path + "']");
             }
 
             try {
-                return contentStoreService.getContent(context.getContext(), path);
+                return contentStoreService.getContent(siteContext.getContext(), path);
             } catch (PathNotFoundException e) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Unable to find FreeMarker template at [context=" + context + ", path='" + path +
+                    logger.debug("Unable to find FreeMarker template at [context=" + siteContext + ", path='" + path +
                                  "']");
                 }
 
@@ -87,8 +87,8 @@ public class CrafterFreeMarkerTemplateLoader implements TemplateLoader {
     public void closeTemplateSource(Object templateSource) throws IOException {
     }
 
-    protected String getTemplatePath(SiteContext context, String name) {
-        return UrlUtils.appendUrl(context.getTemplatesPath(), name);
+    protected String getTemplatePath(SiteContext siteContext, String name) {
+        return UrlUtils.appendUrl(siteContext.getTemplatesPath(), name);
     }
 
 }

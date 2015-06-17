@@ -22,9 +22,11 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.configuration.Configuration;
 import org.craftercms.commons.http.HttpUtils;
-import org.craftercms.commons.http.RequestContext;
 import org.craftercms.engine.model.SiteItem;
+import org.craftercms.engine.service.context.SiteContext;
+import org.craftercms.engine.util.spring.ApplicationContextAccessor;
 import org.craftercms.profile.api.Profile;
 import org.craftercms.security.authentication.Authentication;
 import org.craftercms.security.utils.SecurityUtils;
@@ -53,52 +55,86 @@ public class GroovyUtils {
     public static final String VARIABLE_CRAFTER_MODEL = "crafterModel";
     public static final String VARIABLE_AUTH = "authentication";
     public static final String VARIABLE_PROFILE = "profile";
+    public static final String VARIABLE_SITE_CONFIG = "siteConfig";
     public static final String VARIABLE_FILTER_CHAIN = "filterChain";
+    public static final String VARIABLE_APPLICATION_CONTEXT = "applicationContext";
 
     private GroovyUtils() {
     }
 
     public static void addCommonVariables(Map<String, Object> variables, HttpServletRequest request,
-                                          HttpServletResponse response, ServletContext context) {
-        variables.put(VARIABLE_REQUEST_URL, request.getRequestURI());
-        variables.put(VARIABLE_APPLICATION, context);
+                                          HttpServletResponse response, ServletContext servletContext) {
+        variables.put(VARIABLE_APPLICATION, servletContext);
         variables.put(VARIABLE_REQUEST, request);
         variables.put(VARIABLE_RESPONSE, response);
-        variables.put(VARIABLE_PARAMS, HttpUtils.createRequestParamsMap(request));
-        variables.put(VARIABLE_HEADERS, HttpUtils.createHeadersMap(request));
-        variables.put(VARIABLE_COOKIES, HttpUtils.createCookiesMap(request));
-        variables.put(VARIABLE_SESSION, request.getSession(false));
+
+        if (request != null) {
+            variables.put(VARIABLE_REQUEST_URL, request.getRequestURI());
+            variables.put(VARIABLE_PARAMS, HttpUtils.createRequestParamsMap(request));
+            variables.put(VARIABLE_HEADERS, HttpUtils.createHeadersMap(request));
+            variables.put(VARIABLE_COOKIES, HttpUtils.createCookiesMap(request));
+            variables.put(VARIABLE_SESSION, request.getSession(false));
+        } else {
+            variables.put(VARIABLE_REQUEST_URL, null);
+            variables.put(VARIABLE_PARAMS, null);
+            variables.put(VARIABLE_HEADERS, null);
+            variables.put(VARIABLE_COOKIES, null);
+            variables.put(VARIABLE_SESSION, null);
+        }
+
         variables.put(VARIABLE_LOGGER, LOGGER);
+
+        addSiteConfigVariable(variables);
     }
 
     public static void addModelVariable(Map<String, Object> variables, Object model) {
         variables.put(VARIABLE_MODEL, model);
     }
 
+    public static void addCrafterModelVariable(Map<String, Object> variables, SiteItem crafterModel) {
+        variables.put(VARIABLE_CRAFTER_MODEL, crafterModel);
+    }
+
     public static void addSecurityVariables(Map<String, Object> variables) {
-        RequestContext context = RequestContext.getCurrent();
-        Authentication auth = null;
+        Authentication auth = SecurityUtils.getCurrentAuthentication();
         Profile profile = null;
 
-        if (context != null) {
-            auth = SecurityUtils.getAuthentication(context.getRequest());
-            if (auth != null) {
-                profile = auth.getProfile();
-            }
+        if (auth != null) {
+            profile = auth.getProfile();
         }
 
         variables.put(VARIABLE_AUTH, auth);
         variables.put(VARIABLE_PROFILE, profile);
     }
 
-    public static void addCrafterVariables(Map<String, Object> variables, SiteItem crafterModel) {
-        variables.put(VARIABLE_CRAFTER_MODEL, crafterModel);
+    public static void addSiteConfigVariable(Map<String, Object> variables) {
+        SiteContext siteContext = SiteContext.getCurrent();
+        Configuration config = null;
 
-        addSecurityVariables(variables);
+        if (siteContext != null) {
+            config = siteContext.getConfig();
+        }
+
+        variables.put(VARIABLE_SITE_CONFIG, config);
     }
 
     public static void addFilterChainVariable(Map<String, Object> variables, FilterChain filterChain) {
         variables.put(VARIABLE_FILTER_CHAIN, filterChain);
+    }
+
+    public static void addJobVariables(Map<String, Object> variables) {
+        SiteContext siteContext = SiteContext.getCurrent();
+        ApplicationContextAccessor appContext = null;
+
+        if (siteContext != null && siteContext.getApplicationContext() != null) {
+            appContext = new ApplicationContextAccessor();
+            appContext.setApplicationContext(siteContext.getApplicationContext());
+        }
+
+        variables.put(VARIABLE_APPLICATION_CONTEXT, appContext);
+        variables.put(VARIABLE_LOGGER, LOGGER);
+
+        addSiteConfigVariable(variables);
     }
 
 }

@@ -70,16 +70,16 @@ public class RestScriptsController extends AbstractController {
     @Override
     protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
         throws Exception {
-        SiteContext context = SiteContext.getCurrent();
-        ScriptFactory scriptFactory = context.getScriptFactory();
+        SiteContext siteContext = SiteContext.getCurrent();
+        ScriptFactory scriptFactory = siteContext.getScriptFactory();
 
         if (scriptFactory == null) {
             throw new IllegalStateException(
-                "No script factory associate to current site context '" + context.getSiteName() + "'");
+                "No script factory associate to current site context '" + siteContext.getSiteName() + "'");
         }
 
         String serviceUrl = getServiceUrl(request);
-        String scriptUrl = getScriptUrl(scriptFactory, context, request, serviceUrl);
+        String scriptUrl = getScriptUrl(scriptFactory, siteContext, request, serviceUrl);
         Object responseBody = executeScript(scriptFactory, request, response, scriptUrl);
 
         if (response.isCommitted()) {

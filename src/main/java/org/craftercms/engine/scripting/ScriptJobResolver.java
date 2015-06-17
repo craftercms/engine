@@ -16,10 +16,10 @@ public interface ScriptJobResolver {
     /**
      * Resolves any number of script jobs to be scheduled and executed.
      *
-     * @param context   the context used to look up for the scripts
+     * @param siteContext the context used to look up for the scripts
      *
      * @return the details of the jobs to be scheduled
      */
-    List<JobContext> resolveJobs(SiteContext context) throws SchedulingException;
+    List<JobContext> resolveJobs(SiteContext siteContext) throws SchedulingException;
 
 }

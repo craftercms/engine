@@ -2,8 +2,6 @@ package org.craftercms.engine.security;
 
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.engine.test.utils.ConfigAwareTestBase;
-import org.craftercms.profile.api.Profile;
-import org.craftercms.security.authentication.impl.DefaultAuthentication;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -31,7 +29,7 @@ public class ConfigAwareLogoutSuccessHandlerTest extends ConfigAwareTestBase {
 
     @Test
     public void testProcessRequest() throws Exception {
-        handler.handle(RequestContext.getCurrent(), new DefaultAuthentication(null, new Profile()));
+        handler.handle(RequestContext.getCurrent());
 
         assertEquals(config.getString(LOGOUT_SUCCESS_URL_KEY),
                      ((MockHttpServletResponse)RequestContext.getCurrent().getResponse()).getRedirectedUrl());

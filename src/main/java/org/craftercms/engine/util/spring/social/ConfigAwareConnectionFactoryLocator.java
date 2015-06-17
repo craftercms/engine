@@ -8,8 +8,8 @@ import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.SubnodeConfiguration;
 import org.craftercms.commons.lang.Callback;
 import org.craftercms.core.util.cache.CacheTemplate;
-import org.craftercms.engine.config.ConfigurationParser;
-import org.craftercms.engine.config.impl.FacebookConnectionFactoryConfigParser;
+import org.craftercms.engine.util.config.ConfigurationParser;
+import org.craftercms.engine.util.config.impl.FacebookConnectionFactoryConfigParser;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.ConfigUtils;
 import org.springframework.beans.factory.annotation.Required;
@@ -104,9 +104,9 @@ public class ConfigAwareConnectionFactoryLocator implements ConnectionFactoryLoc
 
         };
 
-        SiteContext context = SiteContext.getCurrent();
-        if (context != null) {
-            return cacheTemplate.getObject(context.getContext(), callback, CONNECTION_FACTORY_LOCATOR_CACHE_KEY);
+        SiteContext siteContext = SiteContext.getCurrent();
+        if (siteContext != null) {
+            return cacheTemplate.getObject(siteContext.getContext(), callback, CONNECTION_FACTORY_LOCATOR_CACHE_KEY);
         } else {
             return defaultLocator;
         }

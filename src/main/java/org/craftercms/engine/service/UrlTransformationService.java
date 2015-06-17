@@ -30,22 +30,22 @@ import org.craftercms.engine.service.context.SiteContext;
 public class UrlTransformationService {
 
     public String transform(String transformerName, String url) throws UrlTransformationException {
-        SiteContext context = SiteContext.getCurrent();
-        if (context != null) {
-            return context.getUrlTransformationEngine().transformUrl(context.getContext(), transformerName, url);
+        SiteContext siteContext = SiteContext.getCurrent();
+        if (siteContext != null) {
+            return siteContext.getUrlTransformationEngine().transformUrl(siteContext.getContext(), transformerName, url);
         } else {
             return url;
         }
     }
 
     public String transform(String transformerName, String url, boolean cache) throws UrlTransformationException {
-        SiteContext context = SiteContext.getCurrent();
-        if (context != null) {
+        SiteContext siteContext = SiteContext.getCurrent();
+        if (siteContext != null) {
             CachingOptions cachingOptions = new CachingOptions();
             cachingOptions.setDoCaching(cache);
 
-            return context.getUrlTransformationEngine().transformUrl(context.getContext(), cachingOptions,
-                                                                     transformerName, url);
+            return siteContext.getUrlTransformationEngine().transformUrl(siteContext.getContext(), cachingOptions,
+                                                                         transformerName, url);
         } else {
             return url;
         }

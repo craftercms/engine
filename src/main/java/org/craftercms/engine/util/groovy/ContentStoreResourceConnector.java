@@ -17,8 +17,8 @@ public class ContentStoreResourceConnector implements ResourceConnector {
 
     protected ContentStoreUrlStreamHandler urlStreamHandler;
 
-    public ContentStoreResourceConnector(SiteContext context) {
-        urlStreamHandler = new ContentStoreUrlStreamHandler(context);
+    public ContentStoreResourceConnector(SiteContext siteContext) {
+        urlStreamHandler = new ContentStoreUrlStreamHandler(siteContext);
     }
 
     @Override

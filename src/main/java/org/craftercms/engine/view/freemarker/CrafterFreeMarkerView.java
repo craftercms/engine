@@ -127,9 +127,9 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
      */
     @Override
     protected FreeMarkerConfig autodetectConfiguration() throws BeansException {
-        SiteContext context = SiteContext.getCurrent();
-        if (context != null) {
-            return context.getFreeMarkerConfig();
+        SiteContext siteContext = SiteContext.getCurrent();
+        if (siteContext != null) {
+            return siteContext.getFreeMarkerConfig();
         } else {
             return super.autodetectConfiguration();
         }

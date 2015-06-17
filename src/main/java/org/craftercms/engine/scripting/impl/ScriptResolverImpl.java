@@ -59,9 +59,9 @@ public class ScriptResolverImpl implements ScriptResolver {
     @Override
     public List<String> getScriptUrls(SiteItem item) {
         List<String> scriptUrls = null;
-        SiteContext context = SiteContext.getCurrent();
+        SiteContext siteContext = SiteContext.getCurrent();
 
-        if (context != null) {
+        if (siteContext != null) {
             String contentType = item.getItem().queryDescriptorValue(contentTypeXPathQuery);
 
             if (StringUtils.isNotEmpty(contentType)) {
@@ -69,7 +69,7 @@ public class ScriptResolverImpl implements ScriptResolver {
                 if (StringUtils.isNotEmpty(scriptUrl)) {
                     try {
                         // Check that the script exists. If not, ignore.
-                        if (storeService.exists(context.getContext(), scriptUrl)) {
+                        if (storeService.exists(siteContext.getContext(), scriptUrl)) {
                             if (logger.isDebugEnabled()) {
                                 logger.debug("Script for content type '" + contentType + "' found at " + scriptUrl);
                             }

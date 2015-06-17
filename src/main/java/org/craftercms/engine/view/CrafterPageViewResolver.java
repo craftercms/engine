@@ -266,9 +266,9 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     }
 
     protected View getCachedLocalizedView(final String baseUrl, final Locale locale) {
-        final SiteContext context = SiteContext.getCurrent();
-        if (context != null) {
-            return cacheTemplate.getObject(context.getContext(), cachingOptions, new Callback<View>() {
+        final SiteContext siteContext = SiteContext.getCurrent();
+        if (siteContext != null) {
+            return cacheTemplate.getObject(siteContext.getContext(), cachingOptions, new Callback<View>() {
 
                 @Override
                 public View execute() {
@@ -309,7 +309,7 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
                             view.setDelegatedViewResolver(delegatedViewResolver);
                             view.setUserAgentTemplateDetector(userAgentTemplateDetector);
 
-                            loadScripts(context.getScriptFactory(), page, view);
+                            loadScripts(siteContext.getScriptFactory(), page, view);
 
                             view.addDependencyKey(page.getItem().getKey());
 

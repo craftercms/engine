@@ -79,9 +79,9 @@ public class ConfigAwareUrlAccessRestrictionCheckingProcessor extends UrlAccessR
 
         };
 
-        SiteContext context = SiteContext.getCurrent();
-        if (context != null) {
-            return cacheTemplate.getObject(context.getContext(), callback, URL_RESTRICTIONS_CACHE_KEY);
+        SiteContext siteContext = SiteContext.getCurrent();
+        if (siteContext != null) {
+            return cacheTemplate.getObject(siteContext.getContext(), callback, URL_RESTRICTIONS_CACHE_KEY);
         } else {
             return urlRestrictions;
         }

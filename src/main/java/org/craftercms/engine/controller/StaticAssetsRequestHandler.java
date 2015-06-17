@@ -78,21 +78,22 @@ public class StaticAssetsRequestHandler extends WebContentGenerator implements H
         IOException {
         checkAndPrepare(request, response, true);
 
-        SiteContext context = SiteContext.getCurrent();
-        String path = getPath(request, context);
+        SiteContext siteContext = SiteContext.getCurrent();
+        String path = getPath(request, siteContext);
 
-        if (context == null) {
+        if (siteContext == null) {
             throw new IllegalStateException("No current site context found");
         }
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Trying to get content for static asset at [context=" + context + ", path='" + path + "']");
+            logger.debug("Trying to get content for static asset at [context=" + siteContext + ", path='" + path + "']");
         }
 
-        Content content = getContent(context, path);
+        Content content = getContent(siteContext, path);
         if (content == null) {
             if (logger.isDebugEnabled()) {
-                logger.debug("No static asset found at [context=" + context + ", path='" + path + "'] - returning 404");
+                logger.debug("No static asset found at [context=" + siteContext + ", path='" + path +
+                             "'] - returning 404");
             }
 
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -103,13 +104,13 @@ public class StaticAssetsRequestHandler extends WebContentGenerator implements H
         MediaType mediaType = getMediaType(path);
         if (mediaType != null) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Determined media type '" + mediaType + "' for static asset at [context=" + context +
+                logger.debug("Determined media type '" + mediaType + "' for static asset at [context=" + siteContext +
                     ", path='" + path + "']");
             }
         }
         else {
             if (logger.isDebugEnabled()) {
-                logger.debug("No media type found for static asset at [context=" + context + ", path='" + path +
+                logger.debug("No media type found for static asset at [context=" + siteContext + ", path='" + path +
                     "'] - not sending a content-type header");
             }
         }
@@ -141,7 +142,7 @@ public class StaticAssetsRequestHandler extends WebContentGenerator implements H
         writeContent(response, content);
     }
 
-    protected String getPath(HttpServletRequest request, SiteContext context) {
+    protected String getPath(HttpServletRequest request, SiteContext siteContext) {
         String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         if (StringUtils.isEmpty(path)) {
             throw new IllegalStateException("Required request attribute '" + HandlerMapping
@@ -151,13 +152,13 @@ public class StaticAssetsRequestHandler extends WebContentGenerator implements H
         if (StringUtils.isNotEmpty(staticAssetsPath)) {
             return UrlUtils.appendUrl(staticAssetsPath, path);
         } else {
-            return UrlUtils.appendUrl(context.getStaticAssetsPath(), path);
+            return UrlUtils.appendUrl(siteContext.getStaticAssetsPath(), path);
         }
     }
 
-    protected Content getContent(SiteContext context, String path) {
+    protected Content getContent(SiteContext siteContext, String path) {
         try {
-            return contentStoreService.getContent(context.getContext(), path);
+            return contentStoreService.getContent(siteContext.getContext(), path);
         } catch (PathNotFoundException e) {
             return null;
         }

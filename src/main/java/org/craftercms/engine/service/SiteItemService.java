@@ -67,8 +67,8 @@ public class SiteItemService {
     }
 
     public SiteItem getSiteItem(String url) {
-        SiteContext context = SiteContext.getCurrent();
-        Item item = storeService.findItem(context.getContext(), url);
+        SiteContext siteContext = SiteContext.getCurrent();
+        Item item = storeService.findItem(siteContext.getContext(), url);
 
         if (item != null) {
             return new SiteItem(item, modelValueConverters);
@@ -111,8 +111,8 @@ public class SiteItemService {
             }
         }
 
-        SiteContext context = SiteContext.getCurrent();
-        Tree tree = storeService.findTree(context.getContext(), null, url, depth, compositeFilter, null);
+        SiteContext siteContext = SiteContext.getCurrent();
+        Tree tree = storeService.findTree(siteContext.getContext(), null, url, depth, compositeFilter, null);
 
         if (tree != null) {
             return new SiteItem(tree, modelValueConverters, sortComparator);

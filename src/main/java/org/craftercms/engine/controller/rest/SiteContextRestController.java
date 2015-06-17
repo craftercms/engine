@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.service.context.SiteContextRegistry;
+import org.craftercms.engine.service.context.SiteContextManager;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,10 +27,10 @@ public class SiteContextRestController {
 
     public static final String MODEL_ATTR_ID =  "id";
 
-    private SiteContextRegistry contextRegistry;
+    private SiteContextManager contextRegistry;
 
     @Required
-    public void setContextRegistry(SiteContextRegistry contextRegistry) {
+    public void setContextRegistry(SiteContextManager contextRegistry) {
         this.contextRegistry = contextRegistry;
     }
 
@@ -45,7 +45,7 @@ public class SiteContextRestController {
     public Map<String, String> destroy() {
         String siteName = SiteContext.getCurrent().getSiteName();
 
-        contextRegistry.unregister(siteName);
+        contextRegistry.destroyContext(siteName);
 
         return Collections.singletonMap(RestControllerBase.MESSAGE_MODEL_ATTRIBUTE_NAME,
                                         "Site context for '" + siteName + "' destroyed. Will be recreated on next " +

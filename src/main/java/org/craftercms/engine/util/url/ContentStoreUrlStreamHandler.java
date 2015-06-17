@@ -20,15 +20,15 @@ public class ContentStoreUrlStreamHandler extends URLStreamHandler {
 
     private static final String URL_REGEX = "[^:]+:.+";
 
-    protected SiteContext context;
+    protected SiteContext siteContext;
 
-    public ContentStoreUrlStreamHandler(SiteContext context) {
-        this.context = context;
+    public ContentStoreUrlStreamHandler(SiteContext siteContext) {
+        this.siteContext = siteContext;
     }
 
     public URL createUrl(String filename) throws MalformedURLException {
         if (!filename.matches(URL_REGEX)) {
-            filename = context.getSiteName() + ':' + (!filename.startsWith("/")? "/" : "") + filename;
+            filename = siteContext.getSiteName() + ':' + (!filename.startsWith("/")? "/" : "") + filename;
         }
 
         return new URL(null, filename, this);
@@ -37,7 +37,7 @@ public class ContentStoreUrlStreamHandler extends URLStreamHandler {
     @Override
     protected URLConnection openConnection(URL url) throws IOException {
         try {
-            Content content = context.getStoreService().getContent(context.getContext(), url.getFile());
+            Content content = siteContext.getStoreService().getContent(siteContext.getContext(), url.getFile());
 
             return new ContentStoreUrlConnection(url, content);
         } catch (PathNotFoundException e) {

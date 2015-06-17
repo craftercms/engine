@@ -1,9 +1,9 @@
-package org.craftercms.engine.config.impl;
+package org.craftercms.engine.util.config.impl;
 
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.lang3.StringUtils;
-import org.craftercms.engine.config.ConfigurationParser;
 import org.craftercms.engine.exception.ConfigurationException;
+import org.craftercms.engine.util.config.ConfigurationParser;
 import org.springframework.social.connect.ConnectionFactory;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;

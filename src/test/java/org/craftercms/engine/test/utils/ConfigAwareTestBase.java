@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
 public class ConfigAwareTestBase {
 
     @Mock
-    protected SiteContext context;
+    protected SiteContext siteContext;
     protected XMLConfiguration config;
 
     @Before
@@ -32,7 +32,7 @@ public class ConfigAwareTestBase {
 
         config = new XMLConfiguration("config/site.xml");
 
-        when(context.getConfig()).thenReturn(config);
+        when(siteContext.getConfig()).thenReturn(config);
     }
 
     @After
@@ -41,7 +41,7 @@ public class ConfigAwareTestBase {
     }
 
     private void setCurrentSiteContext() {
-        SiteContext.setCurrent(context);
+        SiteContext.setCurrent(siteContext);
     }
 
     private void setCurrentRequestContext() {
