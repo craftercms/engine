@@ -20,6 +20,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import javax.annotation.PreDestroy;
 
 import org.apache.commons.logging.Log;
@@ -35,12 +37,18 @@ public class SiteContextManager {
 
     private static final Log logger = LogFactory.getLog(SiteContextManager.class);
 
+    protected Lock lock;
     protected Map<String, SiteContext> contextRegistry;
     protected SiteContextFactory contextFactory;
     protected SiteContextFactory fallbackContextFactory;
 
     public SiteContextManager() {
+        lock = new ReentrantLock();
         contextRegistry = new ConcurrentHashMap<>();
+    }
+
+    public Lock getLock() {
+        return lock;
     }
 
     @Required
@@ -70,7 +78,8 @@ public class SiteContextManager {
     public SiteContext getContext(String siteName, boolean fallback) {
         SiteContext siteContext = contextRegistry.get(siteName);
         if (siteContext == null) {
-            synchronized (this) {
+            lock.lock();
+            try {
                 // Double check locking, in case the context has been created already by another thread
                 siteContext = contextRegistry.get(siteName);
                 if (siteContext == null) {
@@ -85,18 +94,25 @@ public class SiteContextManager {
 
                     logger.info("Site context created: " + siteContext);
                 }
+            } finally {
+                lock.unlock();
             }
         }
 
         return siteContext;
     }
 
-    public synchronized void destroyContext(String siteName) {
-        SiteContext siteContext = contextRegistry.remove(siteName);
-        if (siteContext != null) {
-            siteContext.destroy();
+    public void destroyContext(String siteName) {
+        lock.lock();
+        try {
+            SiteContext siteContext = contextRegistry.remove(siteName);
+            if (siteContext != null) {
+                siteContext.destroy();
 
-            logger.info("Site context destroyed: " + siteContext);
+                logger.info("Site context destroyed: " + siteContext);
+            }
+        } finally {
+            lock.unlock();
         }
     }
 

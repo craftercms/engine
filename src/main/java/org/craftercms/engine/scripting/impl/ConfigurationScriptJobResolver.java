@@ -20,16 +20,16 @@ import org.springframework.beans.factory.annotation.Required;
  * {@link ScriptJobResolver} that resolves job based on configuration mappings, like the following:
  *
  * <pre>
- *     <jobs>
- *         <jobFolder>
- *             <path>/scripts/jobs/every15mins</path>
- *             <cronExpression>0 0/15 * * * ?</cronExpression>
- *         </jobFolder>
- *         <job>
- *             <path>/scripts/jobs/myJob.groovy</path>
- *             <cronExpression>0 0/15 * * * ?</cronExpression>
- *         </job>
- *     </jobs>
+ *     &lt;jobs&gt;
+ *         &lt;jobFolder&gt;
+ *             &lt;path&gt;/scripts/jobs/every15mins&lt;/path&gt;
+ *             &lt;cronExpression&gt;0 0/15 * * * ?&lt;/cronExpression&gt;
+ *         &lt;/jobFolder&gt;
+ *         &lt;job&gt;
+ *             &lt;path&gt;/scripts/jobs/myJob.groovy&lt;/path&gt;
+ *             &lt;cronExpression&gt;0 0/15 * * * ?&lt;/cronExpression&gt;
+ *         &lt;/job&gt;
+ *     &lt;/jobs&gt;
  * </pre>
  */
 public class ConfigurationScriptJobResolver implements ScriptJobResolver {
