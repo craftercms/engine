@@ -16,17 +16,22 @@
  */
 package org.craftercms.engine.model;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.craftercms.core.service.Item;
+import org.craftercms.core.service.Tree;
 import org.craftercms.core.util.XmlUtils;
 import org.craftercms.engine.model.converters.ModelValueConverter;
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.craftercms.core.service.Item;
-import org.craftercms.core.service.Tree;
-
-import java.util.*;
 
 /**
  * Basic adapter to a {@link Item}, enhanced with methods that can be easily invoked in template engines like Freemarker.
@@ -48,7 +53,8 @@ public class SiteItem {
         this.modelValueConverters = modelValueConverters;
     }
 
-    public SiteItem(Item item, Map<String, ModelValueConverter<?>> modelValueConverters, Comparator<SiteItem> sortComparator) {
+    public SiteItem(Item item, Map<String, ModelValueConverter<?>> modelValueConverters,
+                    Comparator<SiteItem> sortComparator) {
         this.item = item;
         this.modelValueConverters = modelValueConverters;
         this.sortComparator = sortComparator;

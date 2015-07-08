@@ -16,17 +16,16 @@
  */
 package org.craftercms.engine.view.freemarker;
 
-import freemarker.ext.servlet.AllHttpScopesHashModel;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 import freemarker.template.ObjectWrapper;
 import freemarker.template.SimpleHash;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 /**
  * Like {@link freemarker.ext.servlet.AllHttpScopesHashModel}, but also lookup keys in the Application Context.
@@ -39,8 +38,8 @@ public class AllHttpScopesAndAppContextHashModel extends SimpleHash {
     private ServletContext context;
     private HttpServletRequest request;
 
-    public AllHttpScopesAndAppContextHashModel(ObjectWrapper wrapper, ApplicationContext applicationContext, ServletContext context,
-                                               HttpServletRequest request) {
+    public AllHttpScopesAndAppContextHashModel(ObjectWrapper wrapper, ApplicationContext applicationContext,
+                                               ServletContext context, HttpServletRequest request) {
         super(wrapper);
 
         this.applicationContext = applicationContext;
