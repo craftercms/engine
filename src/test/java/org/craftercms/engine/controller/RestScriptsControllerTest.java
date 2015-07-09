@@ -49,10 +49,11 @@ public class RestScriptsControllerTest {
 
     @Test
     public void testHandleRequest() throws Exception {
-        MockHttpServletRequest request = createRequest("/test.json", storeService);
+        MockHttpServletRequest request = createRequest("/test.json");
         MockHttpServletResponse response = createResponse();
 
         setCurrentRequest(request);
+        setCurrentSiteContext(storeService);
 
         ModelAndView modelAndView = controller.handleRequest(request, response);
 
@@ -64,6 +65,7 @@ public class RestScriptsControllerTest {
         assertEquals("test", responseBody.get("test-cookie"));
 
         removeCurrentRequest();
+        removeCurrentSiteContext();
     }
 
     @Test
@@ -83,10 +85,11 @@ public class RestScriptsControllerTest {
 
     @Test
     public void testRedirect() throws Exception {
-        MockHttpServletRequest request = createRequest("/testRedirect.json", storeService);
+        MockHttpServletRequest request = createRequest("/testRedirect.json");
         MockHttpServletResponse response = createResponse();
 
         setCurrentRequest(request);
+        setCurrentSiteContext(storeService);
 
         ModelAndView modelAndView = controller.handleRequest(request, response);
 
@@ -96,13 +99,15 @@ public class RestScriptsControllerTest {
         assertEquals("/api/1/services/test.json", response.getRedirectedUrl());
 
         removeCurrentRequest();
+        removeCurrentSiteContext();
     }
 
     private void testError(String serviceUrl, int statusCode, String message) throws Exception {
-        MockHttpServletRequest request = createRequest(serviceUrl, storeService);
+        MockHttpServletRequest request = createRequest(serviceUrl);
         MockHttpServletResponse response = createResponse();
 
         setCurrentRequest(request);
+        setCurrentSiteContext(storeService);
 
         ModelAndView modelAndView = controller.handleRequest(request, response);
 
@@ -113,6 +118,7 @@ public class RestScriptsControllerTest {
         assertEquals(message, responseBody.get(RestScriptsController.DEFAULT_ERROR_MESSAGE_MODEL_ATTR_NAME));
 
         removeCurrentRequest();
+        removeCurrentSiteContext();
     }
 
     private ServletContext createServletContext() {
@@ -126,7 +132,7 @@ public class RestScriptsControllerTest {
         return storeService;
     }
 
-    private SiteContext createSiteContext(ContentStoreService storeService) throws Exception {
+    private SiteContext createSiteContext(ContentStoreService storeService) {
         SiteContext siteContext = mock(SiteContext.class);
 
         ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(siteContext);
@@ -142,7 +148,15 @@ public class RestScriptsControllerTest {
         return siteContext;
     }
 
-    private MockHttpServletRequest createRequest(String serviceUrl, ContentStoreService storeService) throws Exception {
+    private void setCurrentSiteContext(ContentStoreService storeService)  {
+        SiteContext.setCurrent(createSiteContext(storeService));
+    }
+
+    private void removeCurrentSiteContext() {
+        SiteContext.clear();
+    }
+
+    private MockHttpServletRequest createRequest(String serviceUrl) {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "http://localhost:8080/api/1/services/" +
                                                                            serviceUrl);
 
@@ -152,7 +166,6 @@ public class RestScriptsControllerTest {
         Cookie testCookie = new Cookie("test-cookie", "test");
         request.setCookies(testCookie);
 
-        request.setAttribute(SiteContext.SITE_CONTEXT_ATTRIBUTE, createSiteContext(storeService));
         request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, serviceUrl);
 
         return request;

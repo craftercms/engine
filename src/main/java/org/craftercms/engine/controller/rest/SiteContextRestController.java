@@ -2,6 +2,7 @@ package org.craftercms.engine.controller.rest;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
 
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.engine.service.context.SiteContext;
@@ -24,6 +25,7 @@ public class SiteContextRestController {
     public static final String URL_ROOT = "/site/context";
     public static final String URL_CONTEXT_ID = "/id";
     public static final String URL_DESTROY = "/destroy";
+    public static final String URL_REBUILD = "/rebuild";
 
     public static final String MODEL_ATTR_ID =  "id";
 
@@ -50,6 +52,28 @@ public class SiteContextRestController {
         return Collections.singletonMap(RestControllerBase.MESSAGE_MODEL_ATTRIBUTE_NAME,
                                         "Site context for '" + siteName + "' destroyed. Will be recreated on next " +
                                         "request");
+    }
+
+    @RequestMapping(value = URL_REBUILD, method = RequestMethod.GET)
+    @ResponseBody
+    public Map<String, String> rebuild() {
+        Lock lock = contextRegistry.getLock();
+        SiteContext siteContext = SiteContext.getCurrent();
+        String siteName = siteContext.getSiteName();
+        boolean fallback = siteContext.isFallback();
+
+        lock.lock();
+        try {
+            contextRegistry.destroyContext(siteName);
+
+            siteContext = contextRegistry.getContext(siteName, fallback);
+            SiteContext.setCurrent(siteContext);
+
+            return Collections.singletonMap(RestControllerBase.MESSAGE_MODEL_ATTRIBUTE_NAME, "Site context for '" +
+                                                                                             siteName + "' rebuilt");
+        } finally {
+            lock.unlock();
+        }
     }
 
 }

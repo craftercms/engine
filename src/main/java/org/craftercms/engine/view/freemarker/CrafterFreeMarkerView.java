@@ -25,7 +25,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import freemarker.ext.beans.BeansWrapper;
-import freemarker.ext.servlet.HttpRequestHashModel;
 import freemarker.ext.servlet.HttpRequestParametersHashModel;
 import freemarker.ext.servlet.HttpSessionHashModel;
 import freemarker.template.SimpleHash;
@@ -35,6 +34,7 @@ import org.craftercms.engine.freemarker.ServletContextHashModel;
 import org.craftercms.engine.scripting.ScriptResolver;
 import org.craftercms.engine.service.SiteItemService;
 import org.craftercms.engine.service.context.SiteContext;
+import org.craftercms.engine.util.freemarker.HttpRequestHashModel;
 import org.craftercms.engine.util.spring.ApplicationContextAccessor;
 import org.craftercms.security.authentication.Authentication;
 import org.craftercms.security.utils.SecurityUtils;
@@ -72,6 +72,7 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     public static final String KEY_PROFILE = "profile";
     public static final String KEY_STATICS = "statics";
     public static final String KEY_ENUMS = "enums";
+    public static final String KEY_SITE_CONTEXT = "siteContext";
     
     protected SiteItemService siteItemService;
     protected String componentTemplateXPathQuery;
@@ -167,6 +168,7 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
 
         templateModel.put(KEY_STATICS, BeansWrapper.getDefaultInstance().getStaticModels());
         templateModel.put(KEY_ENUMS, BeansWrapper.getDefaultInstance().getEnumModels());
+        templateModel.put(KEY_SITE_CONTEXT, SiteContext.getCurrent());
 
         templateModel.putAll(model);
 

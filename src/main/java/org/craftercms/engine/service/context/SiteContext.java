@@ -20,7 +20,6 @@ import java.net.URLClassLoader;
 import java.util.Arrays;
 
 import org.apache.commons.configuration.HierarchicalConfiguration;
-import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.exception.CrafterException;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
@@ -39,7 +38,7 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
  */
 public class SiteContext {
 
-    public static final String SITE_CONTEXT_ATTRIBUTE = "siteContext";
+    private static ThreadLocal<SiteContext> threadLocal = new ThreadLocal<>();
 
     protected ContentStoreService storeService;
     protected String siteName;
@@ -61,20 +60,25 @@ public class SiteContext {
     protected URLClassLoader classLoader;
     protected Scheduler scheduler;
 
+    /**
+     * Returns the context for the current thread.
+     */
     public static SiteContext getCurrent() {
-        RequestContext requestContext = RequestContext.getCurrent();
-        if (requestContext != null) {
-            return (SiteContext)requestContext.getRequest().getAttribute(SITE_CONTEXT_ATTRIBUTE);
-        } else {
-            return null;
-        }
+        return threadLocal.get();
     }
 
-    public static void setCurrent(SiteContext siteContext) {
-        RequestContext requestContext = RequestContext.getCurrent();
-        if (requestContext != null) {
-            requestContext.getRequest().setAttribute(SITE_CONTEXT_ATTRIBUTE, siteContext);
-        }
+    /**
+     * Sets the context for the current thread.
+     */
+    public static void setCurrent(SiteContext current) {
+        threadLocal.set(current);
+    }
+
+    /**
+     * Removes the context from the current thread.
+     */
+    public static void clear() {
+        threadLocal.remove();
     }
 
     public ContentStoreService getStoreService() {

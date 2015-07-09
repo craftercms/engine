@@ -40,7 +40,8 @@ public class GroovyScriptFactoryTest {
     public void setUp() throws Exception {
         storeService = createContentStoreService();
 
-        setCurrentRequest(createRequest(storeService));
+        setCurrentRequest(createRequest());
+        setCurrentSiteContext(createSiteContext(storeService));
 
         classLoader = createGroovyClassLoader();
         globalVars = createGlobalVars(classLoader);
@@ -66,7 +67,7 @@ public class GroovyScriptFactoryTest {
         assertEquals("Hello Alfonso!", result);
     }
 
-    private SiteContext createSiteContext(ContentStoreService storeService) throws Exception {
+    private SiteContext createSiteContext(ContentStoreService storeService) {
         SiteContext siteContext = mock(SiteContext.class);
         when(siteContext.getSiteName()).thenReturn("default");
         when(siteContext.getContext()).thenReturn(mock(Context.class));
@@ -113,9 +114,16 @@ public class GroovyScriptFactoryTest {
         return new GroovyScriptFactory(resourceConnector, parentClassLoader, globalVars);
     }
 
-    private MockHttpServletRequest createRequest(ContentStoreService storeService) throws Exception {
+    private void setCurrentSiteContext(SiteContext siteContext) {
+        SiteContext.setCurrent(siteContext);
+    }
+
+    private void removeCurrentSiteContext() {
+        SiteContext.clear();
+    }
+
+    private MockHttpServletRequest createRequest() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setAttribute(SiteContext.SITE_CONTEXT_ATTRIBUTE, createSiteContext(storeService));
 
         return request;
     }

@@ -38,11 +38,13 @@ public class ScriptResolverImplTest {
         scriptResolver = createScriptResolver(storeService);
 
         setCurrentRequest(createRequest());
+        setCurrentSiteContext(createSiteContext());
     }
 
     @After
     public void tearDown() throws Exception {
         removeCurrentRequest();
+        removeCurrentSiteContext();
     }
 
     @Test
@@ -98,8 +100,7 @@ public class ScriptResolverImplTest {
         ContentStoreService storeService = mock(ContentStoreService.class);
         when(storeService.exists(any(Context.class), eq("/scripts/pages/mypage1.groovy"))).thenReturn(true);
         when(storeService.exists(any(Context.class), eq("/scripts/pages/mypage2.groovy"))).thenReturn(false);
-        when(storeService.exists(any(Context.class), eq("/scripts/pages/mypage3.groovy"))).thenThrow(
-            new CrafterException());
+        when(storeService.exists(any(Context.class), eq("/scripts/pages/mypage3.groovy"))).thenThrow(new CrafterException());
 
         return storeService;
     }
@@ -115,16 +116,23 @@ public class ScriptResolverImplTest {
         return scriptResolver;
     }
 
-    private SiteContext createSiteContext() throws Exception {
+    private SiteContext createSiteContext()  {
         SiteContext siteContext = mock(SiteContext.class);
         when(siteContext.getContext()).thenReturn(mock(Context.class));
 
         return siteContext;
     }
 
-    private MockHttpServletRequest createRequest() throws Exception {
+    private void setCurrentSiteContext(SiteContext siteContext)  {
+        SiteContext.setCurrent(siteContext);
+    }
+
+    private void removeCurrentSiteContext() {
+        SiteContext.clear();
+    }
+
+    private MockHttpServletRequest createRequest()  {
         MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setAttribute(SiteContext.SITE_CONTEXT_ATTRIBUTE, createSiteContext());
 
         return request;
     }

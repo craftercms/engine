@@ -37,14 +37,16 @@ public class SiteContextResolvingFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response,
                          FilterChain chain) throws IOException, ServletException {
         SiteContext siteContext = contextResolver.getContext((HttpServletRequest)request);
-
         if (siteContext == null) {
             throw new CrafterException("No site context was resolved for the current request");
         }
 
         SiteContext.setCurrent(siteContext);
-
-        chain.doFilter(request, response);
+        try {
+            chain.doFilter(request, response);
+        } finally {
+            SiteContext.clear();
+        }
     }
 
     @Override
