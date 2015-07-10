@@ -6,7 +6,7 @@
 	<artifactId>crafter-engine</artifactId>
 	<name>Crafter Engine</name>
 	<packaging>war</packaging>
-	<version>2.4.3-SNAPSHOT</version>
+	<version>2.4.3</version>
 	<parent>
 		<groupId>org.sonatype.oss</groupId>
 		<artifactId>oss-parent</artifactId>
@@ -19,9 +19,9 @@
 	</organization>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<crafter.search>2.4.3-SNAPSHOT</crafter.search>
-		<crafter.core>2.4.3-SNAPSHOT</crafter.core>
-        <crafter.profile>2.4.3-SNAPSHOT</crafter.profile>
+		<crafter.search>2.4.3</crafter.search>
+		<crafter.core>2.4.3</crafter.core>
+        <crafter.profile>2.4.3</crafter.profile>
 	</properties>
 	<licenses>
 		<license>
