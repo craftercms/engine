@@ -138,7 +138,7 @@ public class SiteItem {
             if (item instanceof Tree) {
                 List<Item> treeChildren = ((Tree) item).getChildren();
                 if (CollectionUtils.isNotEmpty(treeChildren)) {
-                    childItems = new ArrayList<SiteItem>(treeChildren.size());
+                    childItems = new ArrayList<>(treeChildren.size());
                     for (Item treeChild : treeChildren) {
                         childItems.add(new SiteItem(treeChild, modelValueConverters, sortComparator));
                     }

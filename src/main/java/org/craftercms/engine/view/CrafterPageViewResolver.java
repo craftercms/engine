@@ -76,7 +76,6 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     protected String forceHttpsXPathQuery;
     protected ScriptResolver scriptResolver;
     protected ViewResolver delegatedViewResolver;
-    protected boolean localizeViews;
     protected UserAgentTemplateDetector userAgentTemplateDetector;
     protected boolean modePreview;
     protected CrafterPageAccessManager accessManager;
@@ -177,10 +176,6 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     @Required
     public void setDelegatedViewResolver(ViewResolver delegatedViewResolver) {
         this.delegatedViewResolver = delegatedViewResolver;
-    }
-
-    public void setLocalizeViews(boolean localizeViews) {
-        this.localizeViews = localizeViews;
     }
 
     @Required

@@ -32,6 +32,7 @@ import org.craftercms.security.authentication.Authentication;
 import org.craftercms.security.utils.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 /**
  * Utility methods for Groovy scripts and classes.
@@ -51,6 +52,7 @@ public class GroovyUtils {
     public static final String VARIABLE_COOKIES = "cookies";
     public static final String VARIABLE_SESSION = "session";
     public static final String VARIABLE_LOGGER = "logger";
+    public static final String VARIABLE_LOCALE = "locale";
     public static final String VARIABLE_MODEL = "model";
     public static final String VARIABLE_CRAFTER_MODEL = "crafterModel";
     public static final String VARIABLE_AUTH = "authentication";
@@ -83,6 +85,7 @@ public class GroovyUtils {
         }
 
         variables.put(VARIABLE_LOGGER, LOGGER);
+        variables.put(VARIABLE_LOCALE, LocaleContextHolder.getLocale());
 
         addSiteConfigVariable(variables);
     }

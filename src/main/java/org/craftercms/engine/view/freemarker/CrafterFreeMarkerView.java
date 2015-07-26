@@ -17,6 +17,7 @@
 package org.craftercms.engine.view.freemarker;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
@@ -41,6 +42,7 @@ import org.craftercms.security.utils.SecurityUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerView;
 
@@ -73,6 +75,9 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     public static final String KEY_STATICS = "statics";
     public static final String KEY_ENUMS = "enums";
     public static final String KEY_SITE_CONTEXT = "siteContext";
+    public static final String KEY_SITE_CONTEXT_CAP = "SiteContext";
+    public static final String KEY_LOCALE = "locale";
+    public static final String KEY_LOCALE_CAP = "Locale";
     
     protected SiteItemService siteItemService;
     protected String componentTemplateXPathQuery;
@@ -144,6 +149,7 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
         HttpSessionHashModel sessionModel = createSessionModel(request, response);
         HttpRequestHashModel requestModel = new HttpRequestHashModel(request, response, getObjectWrapper());
         HttpRequestParametersHashModel requestParamsModel = new HttpRequestParametersHashModel(request);
+        Map<String, String> cookies = createCookieMap(request);
 
         templateModel.put(KEY_APPLICATION_CAP, servletContextHashModel);
         templateModel.put(KEY_APPLICATION, servletContextHashModel);
@@ -155,8 +161,8 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
         templateModel.put(KEY_REQUEST_PARAMS, requestParamsModel);
         templateModel.put(KEY_APP_CONTEXT_CAP, applicationContextAccessor);
         templateModel.put(KEY_APP_CONTEXT, applicationContextAccessor);
-        templateModel.put(KEY_COOKIES_CAP, createCookieMap(request));
-        templateModel.put(KEY_COOKIES, createCookieMap(request));
+        templateModel.put(KEY_COOKIES_CAP, cookies);
+        templateModel.put(KEY_COOKIES, cookies);
 
         Authentication auth = SecurityUtils.getAuthentication(request);
         if (auth != null) {
@@ -166,9 +172,15 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
             templateModel.put(KEY_PROFILE, auth.getProfile());
         }
 
+        SiteContext context = SiteContext.getCurrent();
+        Locale locale = LocaleContextHolder.getLocale();
+
         templateModel.put(KEY_STATICS, BeansWrapper.getDefaultInstance().getStaticModels());
         templateModel.put(KEY_ENUMS, BeansWrapper.getDefaultInstance().getEnumModels());
-        templateModel.put(KEY_SITE_CONTEXT, SiteContext.getCurrent());
+        templateModel.put(KEY_SITE_CONTEXT, context);
+        templateModel.put(KEY_SITE_CONTEXT_CAP, context);
+        templateModel.put(KEY_LOCALE, locale);
+        templateModel.put(KEY_LOCALE_CAP, locale);
 
         templateModel.putAll(model);
 

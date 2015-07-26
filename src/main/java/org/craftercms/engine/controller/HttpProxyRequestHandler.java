@@ -16,6 +16,12 @@
  */
 package org.craftercms.engine.controller;
 
+import java.io.IOException;
+import java.util.Map;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.craftercms.engine.exception.HttpStatusCodeException;
@@ -27,14 +33,9 @@ import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.support.WebContentGenerator;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Map;
-
 /**
- * All requests served by this handler will be proxied through a {@link org.craftercms.engine.http.HttpProxy}, determined by the {proxyName} URI template var.
+ * All requests served by this handler will be proxied through a {@link org.craftercms.engine.http.HttpProxy},
+ * determined by the {proxyName} URI template var.
  *
  * @author Alfonso Vásquez
  */
@@ -64,8 +65,8 @@ public class HttpProxyRequestHandler extends WebContentGenerator implements Http
 
         HttpProxy proxy = proxyRegistry.get(proxyName);
         if (proxy == null) {
-            throw new HttpStatusCodeException(HttpStatus.NOT_FOUND, "Proxy name '" + proxyName + "' in URL doesn't correspond to a " +
-                    "registered proxy");
+            throw new HttpStatusCodeException(HttpStatus.NOT_FOUND, "Proxy name '" + proxyName + "' in URL doesn't " +
+                                                                    "correspond to a registered proxy");
         }
 
         if (METHOD_GET.equals(request.getMethod())) {
@@ -76,15 +77,18 @@ public class HttpProxyRequestHandler extends WebContentGenerator implements Http
     }
 
     protected String getProxyNameUriTemplateVar(HttpServletRequest request) {
-        Map<String, String> uriTemplateVars = (Map<String, String>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+        Map<String, String> uriTemplateVars = (Map<String, String>) request.getAttribute(
+            HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+
         if (MapUtils.isEmpty(uriTemplateVars)) {
-            throw new IllegalStateException("Required request attribute '" + HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE +
-                    "' is not set");
+            throw new IllegalStateException("Required request attribute '" +
+                                            HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE + "' is not set");
         }
 
         String proxyName = uriTemplateVars.get(PROXY_NAME_URI_TEMPLATE_VAR_NAME);
         if (StringUtils.isEmpty(proxyName)) {
-            throw new IllegalStateException("Required URI template var '" + PROXY_NAME_URI_TEMPLATE_VAR_NAME + "' is not set");
+            throw new IllegalStateException("Required URI template var '" + PROXY_NAME_URI_TEMPLATE_VAR_NAME +
+                                            "' is not set");
         }
 
         return proxyName;
@@ -93,8 +97,8 @@ public class HttpProxyRequestHandler extends WebContentGenerator implements Http
     protected String getUrlToProxy(HttpServletRequest request) {
         String url = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         if (StringUtils.isEmpty(url)) {
-            throw new IllegalStateException("Required request attribute '" + HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE +
-                    "' is not set");
+            throw new IllegalStateException("Required request attribute '" +
+                                            HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE + "' is not set");
         }
 
         return url;

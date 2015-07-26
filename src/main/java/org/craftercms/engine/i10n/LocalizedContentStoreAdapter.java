@@ -24,6 +24,7 @@ import org.craftercms.core.service.Content;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.service.Item;
 import org.craftercms.core.store.ContentStoreAdapter;
+import org.craftercms.core.util.cache.impl.CachingAwareList;
 import org.craftercms.engine.util.ConfigUtils;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -53,7 +54,10 @@ public class LocalizedContentStoreAdapter implements ContentStoreAdapter {
     public static final String I10N_LOCALIZED_PATHS_CONFIG_KEY = "i10n.localizedPaths";
     public static final String I10N_MERGE_FOLDERS_CONFIG_KEY = "i10n.mergeFolders";
 
-    public static final String LOCALIZED_PATH_PATTERN_FORMAT = "(%s/)([^/]+)(/.+)?";
+    public static final String LOCALIZED_PATH_PATTERN_FORMAT = "(%s/)([^/.]+)(/.+)?";
+    public static final int BASE_PATH_GROUP = 1;
+    public static final int LOCALE_GROUP = 2;
+    public static final int PATH_SUFFIX_GROUP = 3;
 
     protected ContentStoreAdapter actualAdapter;
 
@@ -66,18 +70,24 @@ public class LocalizedContentStoreAdapter implements ContentStoreAdapter {
     public Context createContext(String id, String storeServerUrl, String username, String password,
                                  String rootFolderPath, boolean cacheOn, int maxAllowedItemsInCache,
                                  boolean ignoreHiddenFiles) throws StoreException, AuthenticationException {
-        return actualAdapter.createContext(id, storeServerUrl, username, password, rootFolderPath, cacheOn,
-                                           maxAllowedItemsInCache, ignoreHiddenFiles);
+        Context context = actualAdapter.createContext(id, storeServerUrl, username, password, rootFolderPath,
+                                                      cacheOn, maxAllowedItemsInCache, ignoreHiddenFiles);
+
+        return new ContextWrapper(this, context);
     }
 
     @Override
     public void destroyContext(Context context) throws InvalidContextException, StoreException,
         AuthenticationException {
+        context = ((ContextWrapper)context).getActualContext();
+
         actualAdapter.destroyContext(context);
     }
 
     @Override
     public boolean exists(Context context, String path) throws InvalidContextException, StoreException {
+        context = ((ContextWrapper)context).getActualContext();
+
         if (localizationEnabled()) {
             List<String> candidatePaths = getCandidatePaths(path);
             if (CollectionUtils.isNotEmpty(candidatePaths)) {
@@ -103,6 +113,8 @@ public class LocalizedContentStoreAdapter implements ContentStoreAdapter {
     @Override
     public Content findContent(Context context, CachingOptions cachingOptions,
                                String path) throws InvalidContextException, StoreException {
+        context = ((ContextWrapper)context).getActualContext();
+
         if (localizationEnabled()) {
             List<String> candidatePaths = getCandidatePaths(path);
             if (CollectionUtils.isNotEmpty(candidatePaths)) {
@@ -129,6 +141,8 @@ public class LocalizedContentStoreAdapter implements ContentStoreAdapter {
     @Override
     public Item findItem(Context context, CachingOptions cachingOptions, String path,
                          boolean withDescriptor) throws InvalidContextException, XmlFileParseException, StoreException {
+        context = ((ContextWrapper)context).getActualContext();
+
         if (localizationEnabled()) {
             List<String> candidatePaths = getCandidatePaths(path);
             if (CollectionUtils.isNotEmpty(candidatePaths)) {
@@ -156,6 +170,8 @@ public class LocalizedContentStoreAdapter implements ContentStoreAdapter {
     public List<Item> findItems(Context context, CachingOptions cachingOptions, String path,
                                 boolean withDescriptor) throws InvalidContextException, XmlFileParseException,
         StoreException {
+        context = ((ContextWrapper)context).getActualContext();
+
         if (localizationEnabled()) {
             List<String> candidatePaths = getCandidatePaths(path);
             if (CollectionUtils.isNotEmpty(candidatePaths)) {
@@ -271,9 +287,10 @@ public class LocalizedContentStoreAdapter implements ContentStoreAdapter {
             return null;
         }
 
-        String basePath = pathMatcher.group(1);
-        String localeStr = pathMatcher.group(2);
-        Locale locale = null;
+        String basePath = pathMatcher.group(BASE_PATH_GROUP);
+        String localeStr = pathMatcher.group(LOCALE_GROUP);
+        String pathSuffix = pathMatcher.group(PATH_SUFFIX_GROUP);
+        Locale locale;
 
         try {
             locale = LocaleUtils.toLocale(localeStr);
@@ -282,26 +299,18 @@ public class LocalizedContentStoreAdapter implements ContentStoreAdapter {
                     logger.debug(localeStr + " is not one of the available locales");
                 }
 
-                locale = null;
+                return null;
             }
         } catch (IllegalArgumentException e) {
             if (logger.isDebugEnabled()) {
                 logger.debug(localeStr + " is not a valid locale");
             }
-        }
 
-        String pathSuffix = pathMatcher.group(3);
-
-        if (StringUtils.isEmpty(pathSuffix) && locale == null) {
-            pathSuffix = "/" + pathMatcher.group(2);
-        }
-
-        if (locale == null || forceCurrentLocale()) {
-            locale = LocaleContextHolder.getLocale();
-        }
-
-        if (locale == null) {
             return null;
+        }
+
+        if (forceCurrentLocale()) {
+            locale = LocaleContextHolder.getLocale();
         }
 
         Locale defaultLocale = getDefaultLocale();
@@ -329,7 +338,7 @@ public class LocalizedContentStoreAdapter implements ContentStoreAdapter {
         } else if (original == null) {
             return overriding;
         } else {
-            List<Item> merged = new ArrayList<>(overriding);
+            List<Item> merged = new CachingAwareList<>(new ArrayList<>(overriding));
 
             for (Item item : original) {
                 if (!containsItem(merged, item)) {
@@ -352,6 +361,57 @@ public class LocalizedContentStoreAdapter implements ContentStoreAdapter {
         });
 
         return idx >= 0;
+    }
+
+    protected static class ContextWrapper implements Context {
+
+        private LocalizedContentStoreAdapter storeAdapter;
+        private Context actualContext;
+
+        public ContextWrapper(LocalizedContentStoreAdapter storeAdapter, Context actualContext) {
+            this.storeAdapter = storeAdapter;
+            this.actualContext = actualContext;
+        }
+
+        public Context getActualContext() {
+            return actualContext;
+        }
+
+        @Override
+        public String getId() {
+            return actualContext.getId();
+        }
+
+        @Override
+        public ContentStoreAdapter getStoreAdapter() {
+            return storeAdapter;
+        }
+
+        @Override
+        public String getStoreServerUrl() {
+            return actualContext.getStoreServerUrl();
+        }
+
+        @Override
+        public String getRootFolderPath() {
+            return actualContext.getRootFolderPath();
+        }
+
+        @Override
+        public boolean isCacheOn() {
+            return actualContext.isCacheOn();
+        }
+
+        @Override
+        public int getMaxAllowedItemsInCache() {
+            return actualContext.getMaxAllowedItemsInCache();
+        }
+
+        @Override
+        public boolean ignoreHiddenFiles() {
+            return actualContext.ignoreHiddenFiles();
+        }
+
     }
 
 }
