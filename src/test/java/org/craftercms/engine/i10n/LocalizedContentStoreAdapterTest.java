@@ -10,13 +10,21 @@ import org.craftercms.core.service.Context;
 import org.craftercms.core.service.Item;
 import org.craftercms.core.store.ContentStoreAdapter;
 import org.craftercms.engine.test.utils.ConfigAwareTestBase;
-import org.craftercms.engine.util.ConfigUtils;
+import org.craftercms.engine.util.config.I10nProperties;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.i18n.LocaleContextHolder;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link LocalizedContentStoreAdapter}.
@@ -141,7 +149,7 @@ public class LocalizedContentStoreAdapterTest extends ConfigAwareTestBase {
         assertEquals("about-us", items.get(1).getName());
         assertEquals("/site/website/en/about-us", items.get(1).getUrl());
 
-        config.setProperty(ConfigUtils.I10N_MERGE_FOLDERS_CONFIG_KEY, false);
+        config.setProperty(I10nProperties.I10N_MERGE_FOLDERS_CONFIG_KEY, false);
 
         items = storeAdapter.findItems(context, cachingOptions, "/site/website/fr_CA", true);
 

@@ -14,13 +14,19 @@ import org.craftercms.engine.util.ConfigUtils;
  */
 public class I10nProperties {
 
+    public static final String I10N_ENABLED_CONFIG_KEY = "i10n.enabled";
+    public static final String I10N_FORCE_CURRENT_LOCALE_CONFIG_KEY = "i10n.forceCurrentLocale";
+    public static final String I10N_LOCALIZED_PATHS_CONFIG_KEY = "i10n.localizedPaths";
+    public static final String I10N_DEFAULT_LOCALE_CONFIG_KEY = "i10n.defaultLocale";
+    public static final String I10N_MERGE_FOLDERS_CONFIG_KEY = "i10n.mergeFolders";
+
     private I10nProperties() {
     }
 
     public static boolean localizationEnabled() {
         Configuration config = ConfigUtils.getCurrentConfig();
         if (config != null) {
-            return config.getBoolean(ConfigUtils.I10N_ENABLED_CONFIG_KEY);
+            return config.getBoolean(I10N_ENABLED_CONFIG_KEY, false);
         } else {
             return false;
         }
@@ -29,7 +35,7 @@ public class I10nProperties {
     public static boolean forceCurrentLocale() {
         Configuration config = ConfigUtils.getCurrentConfig();
         if (config != null) {
-            return config.getBoolean(ConfigUtils.I10N_FORCE_CURRENT_LOCALE_CONFIG_KEY);
+            return config.getBoolean(I10N_FORCE_CURRENT_LOCALE_CONFIG_KEY, false);
         } else {
             return false;
         }
@@ -38,7 +44,7 @@ public class I10nProperties {
     public static  String[] getLocalizedPaths() {
         Configuration config = ConfigUtils.getCurrentConfig();
         if (config != null) {
-            return config.getStringArray(ConfigUtils.I10N_LOCALIZED_PATHS_CONFIG_KEY);
+            return config.getStringArray(I10N_LOCALIZED_PATHS_CONFIG_KEY);
         } else {
             return null;
         }
@@ -47,7 +53,7 @@ public class I10nProperties {
     public static Locale getDefaultLocale() {
         Configuration config = ConfigUtils.getCurrentConfig();
         if (config != null) {
-            String localeStr = config.getString(ConfigUtils.I10N_DEFAULT_LOCALE_CONFIG_KEY);
+            String localeStr = config.getString(I10N_DEFAULT_LOCALE_CONFIG_KEY);
             if (StringUtils.isNotEmpty(localeStr)) {
                 return LocaleUtils.toLocale(localeStr);
             }
@@ -56,12 +62,13 @@ public class I10nProperties {
         return null;
     }
 
-    public static  boolean mergeFolders() {
+    public static boolean mergeFolders() {
         Configuration config = ConfigUtils.getCurrentConfig();
         if (config != null) {
-            return config.getBoolean(ConfigUtils.I10N_MERGE_FOLDERS_CONFIG_KEY);
+            return config.getBoolean(I10N_MERGE_FOLDERS_CONFIG_KEY, false);
         } else {
             return false;
         }
     }
+
 }
