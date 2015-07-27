@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.Predicate;
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -25,11 +24,9 @@ import org.craftercms.core.service.Context;
 import org.craftercms.core.service.Item;
 import org.craftercms.core.store.ContentStoreAdapter;
 import org.craftercms.core.util.cache.impl.CachingAwareList;
-import org.craftercms.engine.util.ConfigUtils;
+import org.craftercms.engine.util.config.I10nProperties;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.i18n.LocaleContextHolder;
-
-import static org.craftercms.engine.i10n.ConfigAwareCookieLocaleResolver.*;
 
 /**
  * {@link ContentStoreAdapter} decorator that uses localized folders to create fallback paths for searching a resource.
@@ -48,11 +45,6 @@ import static org.craftercms.engine.i10n.ConfigAwareCookieLocaleResolver.*;
 public class LocalizedContentStoreAdapter implements ContentStoreAdapter {
 
     public static final Log logger = LogFactory.getLog(LocalizedContentStoreAdapter.class);
-
-    public static final String I10N_ENABLED_CONFIG_KEY = "i10n.enabled";
-    public static final String I10N_FORCE_CURRENT_LOCALE_CONFIG_KEY = "i10n.forceCurrentLocale";
-    public static final String I10N_LOCALIZED_PATHS_CONFIG_KEY = "i10n.localizedPaths";
-    public static final String I10N_MERGE_FOLDERS_CONFIG_KEY = "i10n.mergeFolders";
 
     public static final String LOCALIZED_PATH_PATTERN_FORMAT = "(%s/)([^/.]+)(/.+)?";
     public static final int BASE_PATH_GROUP = 1;
@@ -88,7 +80,7 @@ public class LocalizedContentStoreAdapter implements ContentStoreAdapter {
     public boolean exists(Context context, String path) throws InvalidContextException, StoreException {
         context = ((ContextWrapper)context).getActualContext();
 
-        if (localizationEnabled()) {
+        if (I10nProperties.localizationEnabled()) {
             List<String> candidatePaths = getCandidatePaths(path);
             if (CollectionUtils.isNotEmpty(candidatePaths)) {
                 for (String candidatePath : candidatePaths) {
@@ -115,7 +107,7 @@ public class LocalizedContentStoreAdapter implements ContentStoreAdapter {
                                String path) throws InvalidContextException, StoreException {
         context = ((ContextWrapper)context).getActualContext();
 
-        if (localizationEnabled()) {
+        if (I10nProperties.localizationEnabled()) {
             List<String> candidatePaths = getCandidatePaths(path);
             if (CollectionUtils.isNotEmpty(candidatePaths)) {
                 for (String candidatePath : candidatePaths) {
@@ -143,7 +135,7 @@ public class LocalizedContentStoreAdapter implements ContentStoreAdapter {
                          boolean withDescriptor) throws InvalidContextException, XmlFileParseException, StoreException {
         context = ((ContextWrapper)context).getActualContext();
 
-        if (localizationEnabled()) {
+        if (I10nProperties.localizationEnabled()) {
             List<String> candidatePaths = getCandidatePaths(path);
             if (CollectionUtils.isNotEmpty(candidatePaths)) {
                 for (String candidatePath : candidatePaths) {
@@ -172,10 +164,10 @@ public class LocalizedContentStoreAdapter implements ContentStoreAdapter {
         StoreException {
         context = ((ContextWrapper)context).getActualContext();
 
-        if (localizationEnabled()) {
+        if (I10nProperties.localizationEnabled()) {
             List<String> candidatePaths = getCandidatePaths(path);
             if (CollectionUtils.isNotEmpty(candidatePaths)) {
-                if (mergeFolders()) {
+                if (I10nProperties.mergeFolders()) {
                     if (logger.isDebugEnabled()) {
                         logger.debug("Merging child items of " + candidatePaths);
                     }
@@ -212,56 +204,8 @@ public class LocalizedContentStoreAdapter implements ContentStoreAdapter {
         }
     }
 
-    protected boolean localizationEnabled() {
-        Configuration config = ConfigUtils.getCurrentConfig();
-        if (config != null) {
-            return config.getBoolean(I10N_ENABLED_CONFIG_KEY);
-        } else {
-            return false;
-        }
-    }
-
-    protected boolean forceCurrentLocale() {
-        Configuration config = ConfigUtils.getCurrentConfig();
-        if (config != null) {
-            return config.getBoolean(I10N_FORCE_CURRENT_LOCALE_CONFIG_KEY);
-        } else {
-            return false;
-        }
-    }
-
-    protected String[] getLocalizedPaths() {
-        Configuration config = ConfigUtils.getCurrentConfig();
-        if (config != null) {
-            return config.getStringArray(I10N_LOCALIZED_PATHS_CONFIG_KEY);
-        } else {
-            return null;
-        }
-    }
-
-    protected Locale getDefaultLocale() {
-        Configuration config = ConfigUtils.getCurrentConfig();
-        if (config != null) {
-            String localeStr = config.getString(I10N_DEFAULT_LOCALE_CONFIG_KEY);
-            if (StringUtils.isNotEmpty(localeStr)) {
-                return LocaleUtils.toLocale(localeStr);
-            }
-        }
-
-        return null;
-    }
-
-    protected boolean mergeFolders() {
-        Configuration config = ConfigUtils.getCurrentConfig();
-        if (config != null) {
-            return config.getBoolean(I10N_MERGE_FOLDERS_CONFIG_KEY);
-        } else {
-            return false;
-        }
-    }
-
     protected Matcher getLocalizedPathMatcher(String path) {
-        String[] basePaths = getLocalizedPaths();
+        String[] basePaths = I10nProperties.getLocalizedPaths();
         if (ArrayUtils.isNotEmpty(basePaths)) {
             for (String basePath : basePaths) {
                 Pattern pattern = Pattern.compile(String.format(LOCALIZED_PATH_PATTERN_FORMAT, basePath));
@@ -309,11 +253,11 @@ public class LocalizedContentStoreAdapter implements ContentStoreAdapter {
             return null;
         }
 
-        if (forceCurrentLocale()) {
+        if (I10nProperties.forceCurrentLocale()) {
             locale = LocaleContextHolder.getLocale();
         }
 
-        Locale defaultLocale = getDefaultLocale();
+        Locale defaultLocale = I10nProperties.getDefaultLocale();
         if (defaultLocale == null) {
             defaultLocale = locale;
         }
