@@ -1,13 +1,9 @@
 package org.craftercms.engine.i10n;
 
 import java.util.Locale;
-
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang3.LocaleUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.craftercms.engine.util.ConfigUtils;
+import org.craftercms.engine.util.config.I10nProperties;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 
 /**
@@ -17,28 +13,14 @@ import org.springframework.web.servlet.i18n.CookieLocaleResolver;
  */
 public class ConfigAwareCookieLocaleResolver extends CookieLocaleResolver {
 
-    public static final String I10N_DEFAULT_LOCALE_CONFIG_KEY = "i10n.defaultLocale";
-
     @Override
     protected Locale determineDefaultLocale(HttpServletRequest request) {
-        Locale defaultLocale = getDefaultLocale();
+        Locale defaultLocale = I10nProperties.getDefaultLocale();
         if (defaultLocale != null) {
             return defaultLocale;
         } else {
             return super.determineDefaultLocale(request);
         }
-    }
-
-    protected Locale getDefaultLocale() {
-        Configuration config = ConfigUtils.getCurrentConfig();
-        if (config != null) {
-            String localeStr = config.getString(I10N_DEFAULT_LOCALE_CONFIG_KEY);
-            if (StringUtils.isNotEmpty(localeStr)) {
-                return LocaleUtils.toLocale(localeStr);
-            }
-        }
-
-        return null;
     }
 
 }

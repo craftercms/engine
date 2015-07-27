@@ -22,7 +22,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -34,12 +33,11 @@ import org.craftercms.core.util.ExceptionUtils;
 import org.craftercms.core.util.UrlUtils;
 import org.craftercms.engine.exception.HttpStatusCodeAwareException;
 import org.craftercms.engine.exception.ScriptException;
-import org.craftercms.engine.i10n.LocalizedContentStoreAdapter;
 import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.util.ConfigUtils;
 import org.craftercms.engine.util.GroovyUtils;
+import org.craftercms.engine.util.config.I10nProperties;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.web.servlet.HandlerMapping;
@@ -198,7 +196,7 @@ public class PageRenderController extends AbstractController {
     }
 
     protected ModelAndView doLocalizedRedirect(String pageUrl) {
-        if (localizationEnabled()) {
+        if (I10nProperties.localizationEnabled()) {
             String tmpUrl = StringUtils.stripStart(pageUrl, "/");
             String localeStr = StringUtils.substringBefore(tmpUrl, "/");
             Locale locale = null;
@@ -229,7 +227,7 @@ public class PageRenderController extends AbstractController {
                 suffix = StringUtils.substringAfter(tmpUrl, "/");
             }
 
-            if (currentLocale != null && forceCurrentLocale() && !currentLocale.equals(locale)) {
+            if (currentLocale != null && I10nProperties.forceCurrentLocale() && !currentLocale.equals(locale)) {
                 if (StringUtils.isNotEmpty(suffix)) {
                     suffix = "/" + suffix;
                 }
@@ -239,24 +237,6 @@ public class PageRenderController extends AbstractController {
         }
 
         return new ModelAndView(pageUrl);
-    }
-
-    protected boolean localizationEnabled() {
-        Configuration config = ConfigUtils.getCurrentConfig();
-        if (config != null) {
-            return config.getBoolean(LocalizedContentStoreAdapter.I10N_ENABLED_CONFIG_KEY);
-        } else {
-            return false;
-        }
-    }
-
-    protected boolean forceCurrentLocale() {
-        Configuration config = ConfigUtils.getCurrentConfig();
-        if (config != null) {
-            return config.getBoolean(LocalizedContentStoreAdapter.I10N_FORCE_CURRENT_LOCALE_CONFIG_KEY);
-        } else {
-            return false;
-        }
     }
 
 }
