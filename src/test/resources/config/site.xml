@@ -22,6 +22,14 @@
         </filter>
     </filters>
 
+    <i10n>
+        <enabled>true</enabled>
+        <localizedPaths>/site/website</localizedPaths>
+        <forceCurrentLocale>false</forceCurrentLocale>
+        <defaultLocale>en</defaultLocale>
+        <mergeFolders>true</mergeFolders>
+    </i10n>
+
     <profile>
         <api>
             <accessTokenId>cd287b58-ab9c-457f-a4f0-39ef49f04c69</accessTokenId>

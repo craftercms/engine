@@ -28,7 +28,6 @@ import org.craftercms.commons.http.RequestContext;
 import org.craftercms.commons.lang.Callback;
 import org.craftercms.core.service.CachingOptions;
 import org.craftercms.core.util.cache.CacheTemplate;
-import org.craftercms.core.util.url.ContentBundleUrlParser;
 import org.craftercms.engine.mobile.UserAgentTemplateDetector;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.scripting.Script;
@@ -38,7 +37,6 @@ import org.craftercms.engine.security.CrafterPageAccessManager;
 import org.craftercms.engine.service.SiteItemService;
 import org.craftercms.engine.service.UrlTransformationService;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.util.LocaleUtils;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.Ordered;
 import org.springframework.web.context.support.WebApplicationObjectSupport;
@@ -66,8 +64,6 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     protected String urlTransformerName;
     protected String fullHttpsUrlTransformerName;
     protected UrlTransformationService urlTransformationService;
-    protected String localizedUrlDelimiter;
-    protected ContentBundleUrlParser urlParser;
     protected CacheTemplate cacheTemplate;
     protected CachingOptions cachingOptions;
     protected SiteItemService siteItemService;
@@ -80,7 +76,6 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     protected String forceHttpsXPathQuery;
     protected ScriptResolver scriptResolver;
     protected ViewResolver delegatedViewResolver;
-    protected boolean localizeViews;
     protected UserAgentTemplateDetector userAgentTemplateDetector;
     protected boolean modePreview;
     protected CrafterPageAccessManager accessManager;
@@ -88,7 +83,6 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     public CrafterPageViewResolver() {
         order = 10;
         cacheUrlTransformations = true;
-        localizedUrlDelimiter = "_";
         cachingOptions = CachingOptions.DEFAULT_CACHING_OPTIONS;
     }
 
@@ -123,15 +117,6 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     @Required
     public void setUrlTransformationService(UrlTransformationService urlTransformationService) {
         this.urlTransformationService = urlTransformationService;
-    }
-
-    public void setLocalizedUrlDelimiter(String localizedUrlDelimiter) {
-        this.localizedUrlDelimiter = localizedUrlDelimiter;
-    }
-
-    @Required
-    public void setUrlParser(ContentBundleUrlParser urlParser) {
-        this.urlParser = urlParser;
     }
 
     @Required
@@ -193,10 +178,6 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
         this.delegatedViewResolver = delegatedViewResolver;
     }
 
-    public void setLocalizeViews(boolean localizeViews) {
-        this.localizeViews = localizeViews;
-    }
-
     @Required
     public void setUserAgentTemplateDetector(UserAgentTemplateDetector userAgentTemplateDetector) {
         this.userAgentTemplateDetector = userAgentTemplateDetector;
@@ -231,27 +212,6 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
         return page;
     }
 
-    protected SiteItem getLocalizedPage(String baseUrl, Locale locale) {
-        List<Locale> candidateLocales = LocaleUtils.getLocaleLookupList(locale);
-        for (Locale candidateLocale : candidateLocales) {
-            String localizedUrl = LocaleUtils.getLocalizedUrl(urlParser, baseUrl, candidateLocale,
-                    localizedUrlDelimiter);
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("Retrieving localized Crafter page descriptor at " + localizedUrl + "...");
-            }
-
-            SiteItem page = siteItemService.getSiteItem(localizedUrl);
-            if (page != null) {
-                return page;
-            } else if (logger.isDebugEnabled()) {
-                logger.debug("Localized Crafter page descriptor not found at " + localizedUrl);
-            }
-        }
-
-        return null;
-    }
-
     protected View getRedirectView(String redirectUrl, boolean relative) {
         View view = new RedirectView(redirectUrl, relative, true);
 
@@ -272,13 +232,7 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
 
                 @Override
                 public View execute() {
-                    SiteItem page;
-                    if (localizeViews) {
-                        page = getLocalizedPage(baseUrl, locale);
-                    } else {
-                        page = getPage(baseUrl);
-                    }
-
+                    SiteItem page = getPage(baseUrl);
                     if (page != null) {
                         String disabled = page.getItem().queryDescriptorValue(disabledXPathQuery);
                         if (!modePreview && StringUtils.isNotEmpty(disabled) && Boolean.parseBoolean(disabled)) {

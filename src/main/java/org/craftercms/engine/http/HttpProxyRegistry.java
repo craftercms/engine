@@ -16,10 +16,10 @@
  */
 package org.craftercms.engine.http;
 
-import org.craftercms.core.util.spring.AbstractBeanIdBasedRegistry;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import org.craftercms.core.util.spring.AbstractBeanIdBasedRegistry;
 
 /**
  * {@link AbstractBeanIdBasedRegistry} for {@link HttpProxy}s.
@@ -40,7 +40,7 @@ public class HttpProxyRegistry extends AbstractBeanIdBasedRegistry<HttpProxy> {
 
     @Override
     protected Map<String, HttpProxy> createRegistry() {
-        return new HashMap<String, HttpProxy>();
+        return new HashMap<>();
     }
 
 }
