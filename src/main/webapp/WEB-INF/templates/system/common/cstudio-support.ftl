@@ -1,22 +1,32 @@
 
+<#macro toolSupport>
+   <script src="/studio/static-assets/libs/requirejs/require.js"
+           data-main="/studio/overlayhook?site=NOTUSED&page=NOTUSED&cs.js"></script>
+</#macro>
+
 <#macro cstudioOverlaySupport>
-    <#if siteContext.overlayCallback??>
-        ${siteContext.overlayCallback.render()}
-    </#if>
+   <script src="/studio/static-assets/libs/requirejs/require.js"
+           data-main="/studio/overlayhook?site=NOTUSED&page=NOTUSED&cs.js"></script>
+</#macro>
+
+<#macro iceAttr iceGroup >
+   <#if siteContext.overlayCallback??> data-studio-ice="${iceGroup}" </#if>
 </#macro>
 
 <#macro ice id="" component="" componentPath="">
     <#if siteContext.overlayCallback??>
         <#if id != "">
 			<#if componentPath != "">
-	            <div id='${componentPath}:${id}' class='cstudio-ice'><#nested></div>
+	            <div>NOT-DONE-COMPONENT-ICE</div>
 			<#else>
-	            <div id='${id}' class='cstudio-ice'><#nested></div>
+	            <div data-studio-ice="${id}"><#nested></div>
 			</#if>			
         <#elseif id == "" && componentPath == "">
-            <div id="cstudio-component-${component.key}" class='cstudio-component-ice'><#nested></div>
+            <div>NOT-DONE-COMPONENT-ICE</div>
+            <#nested></div>
         <#elseif id == "" && component == "">
-            <div id="cstudio-component-${componentPath}" class='cstudio-component-ice'><#nested></div>
+            <div>NOT-DONE-COMPONENT-ICE</div>
+            <#nested></div>
         </#if>
     <#else>
         <#nested>
