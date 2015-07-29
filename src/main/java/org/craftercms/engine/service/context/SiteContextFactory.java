@@ -247,7 +247,7 @@ public class SiteContextFactory implements ApplicationContextAware {
             ScriptFactory scriptFactory = getScriptFactory(siteContext, classLoader);
             ConfigurableApplicationContext appContext = getApplicationContext(siteContext, classLoader, config,
                                                                               resolvedAppContextPaths, resourceLoader);
-            Scheduler scheduler = scheduleJobs(siteContext);
+        
 
             siteContext.setConfigPaths(resolvedConfigPaths);
             siteContext.setApplicationContextPaths(resolvedAppContextPaths);
@@ -256,8 +256,8 @@ public class SiteContextFactory implements ApplicationContextAware {
             siteContext.setConfig(config);
             siteContext.setApplicationContext(appContext);
             siteContext.setClassLoader(classLoader);
+            Scheduler scheduler = scheduleJobs(siteContext);
             siteContext.setScheduler(scheduler);
-
             return siteContext;
         } catch (Exception e) {
             // Destroy context if the site context creation failed
