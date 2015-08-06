@@ -46,10 +46,11 @@ public class SchedulingUtils {
     }
 
     public static JobContext createJobContext(SiteContext siteContext, String scriptUrl, String cronExpression) {
-        JobDetail jobDetail = SchedulingUtils.createScriptJob(siteContext, scriptUrl, scriptUrl);
+        JobDetail detail = SchedulingUtils.createScriptJob(siteContext, scriptUrl, scriptUrl);
         Trigger trigger = SchedulingUtils.createCronTrigger("trigger for " + scriptUrl, cronExpression);
+        String description = "Job{url='" + scriptUrl + "', cron='" + cronExpression + "'}";
 
-        return new JobContext(jobDetail, trigger);
+        return new JobContext(detail, trigger, description);
     }
 
 }

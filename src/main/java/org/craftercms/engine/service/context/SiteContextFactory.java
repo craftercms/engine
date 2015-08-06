@@ -256,8 +256,10 @@ public class SiteContextFactory implements ApplicationContextAware {
             siteContext.setConfig(config);
             siteContext.setApplicationContext(appContext);
             siteContext.setClassLoader(classLoader);
+
             Scheduler scheduler = scheduleJobs(siteContext);
             siteContext.setScheduler(scheduler);
+
             return siteContext;
         } catch (Exception e) {
             // Destroy context if the site context creation failed
@@ -353,12 +355,12 @@ public class SiteContextFactory implements ApplicationContextAware {
                 Scheduler scheduler = schedulerFactory.getScheduler();
 
                 for (JobContext jobContext : allJobContexts) {
-                    scheduler.scheduleJob(jobContext.getJobDetail(), jobContext.getTrigger());
+                    scheduler.scheduleJob(jobContext.getDetail(), jobContext.getTrigger());
+
+                    logger.info("Scheduled job: " + jobContext + " for site '" + siteContext.getSiteName() + "'");
                 }
 
                 scheduler.start();
-
-                logger.info("Jobs scheduled for site '" + siteContext.getSiteName() + "'");
 
                 return scheduler;
             }
