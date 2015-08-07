@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -39,7 +40,7 @@ public class ReloadableMappingsSiteContextResolver extends AbstractSiteContextRe
         loadMappings();
     }
 
-    public void reloadMappings() throws CrafterException {
+    public synchronized void reloadMappings() throws CrafterException {
         loadMappings();
         destroyContextsWithNoMapping();
     }
@@ -58,12 +59,21 @@ public class ReloadableMappingsSiteContextResolver extends AbstractSiteContextRe
     }
 
     protected void loadMappings() throws CrafterException {
-        Properties newMappings = new Properties();
+        Properties tmpMappings = new Properties();
 
         try {
-            newMappings.load(mappingsFile.getInputStream());
+            tmpMappings.load(mappingsFile.getInputStream());
         } catch (IOException e) {
             throw new CrafterException("Unable to load domain name to site name mappings from " + mappingsFile, e);
+        }
+
+        Properties newMappings = new Properties();
+
+        for (Map.Entry<Object, Object> entry : tmpMappings.entrySet()) {
+            String trimmedKey = entry.getKey().toString().trim();
+            String trimmedVal = entry.getValue().toString().trim();
+
+            newMappings.setProperty(trimmedKey, trimmedVal);
         }
 
         logger.info("Domain name to site name mappings loaded from " + mappingsFile);

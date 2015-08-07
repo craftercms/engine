@@ -38,6 +38,7 @@ import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.scripting.ScriptJobResolver;
 import org.craftercms.engine.scripting.impl.GroovyScriptFactory;
 import org.craftercms.engine.service.PreviewOverlayCallback;
+import org.craftercms.engine.util.SchedulingUtils;
 import org.craftercms.engine.util.config.impl.MultiConfigurationBuilder;
 import org.craftercms.engine.util.groovy.ContentStoreGroovyResourceLoader;
 import org.craftercms.engine.util.groovy.ContentStoreResourceConnector;
@@ -45,8 +46,6 @@ import org.craftercms.engine.util.quartz.JobContext;
 import org.craftercms.engine.util.spring.ApacheCommonsConfigPropertySource;
 import org.craftercms.engine.util.spring.ContentStoreResourceLoader;
 import org.quartz.Scheduler;
-import org.quartz.SchedulerFactory;
-import org.quartz.impl.StdSchedulerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Required;
@@ -340,6 +339,8 @@ public class SiteContextFactory implements ApplicationContextAware {
     }
 
     protected Scheduler scheduleJobs(SiteContext siteContext) {
+        String siteName = siteContext.getSiteName();
+
         try {
             List<JobContext> allJobContexts = new ArrayList<>();
 
@@ -351,13 +352,12 @@ public class SiteContextFactory implements ApplicationContextAware {
             }
 
             if (CollectionUtils.isNotEmpty(allJobContexts)) {
-                SchedulerFactory schedulerFactory = new StdSchedulerFactory();
-                Scheduler scheduler = schedulerFactory.getScheduler();
+                Scheduler scheduler = SchedulingUtils.createScheduler(siteName + "_scheduler");
 
                 for (JobContext jobContext : allJobContexts) {
                     scheduler.scheduleJob(jobContext.getDetail(), jobContext.getTrigger());
 
-                    logger.info("Scheduled job: " + jobContext + " for site '" + siteContext.getSiteName() + "'");
+                    logger.info("Scheduled job: " + jobContext + " for site '" + siteName + "'");
                 }
 
                 scheduler.start();
@@ -365,11 +365,9 @@ public class SiteContextFactory implements ApplicationContextAware {
                 return scheduler;
             }
         } catch (Exception e) {
-            throw new SiteContextCreationException("Unable to schedule jobs for site '" + siteContext.getSiteName() +
-                                                   "'", e);
+            throw new SiteContextCreationException("Unable to schedule jobs for site '" + siteName + "'", e);
         }
 
         return null;
     }
-
 }
