@@ -1,11 +1,18 @@
 package org.craftercms.engine.util;
 
+import java.util.Properties;
+
 import org.craftercms.engine.scripting.impl.ScriptJob;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.quartz.JobContext;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.SchedulerFactory;
 import org.quartz.Trigger;
+import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.simpl.SimpleThreadPool;
 
 import static org.craftercms.engine.scripting.impl.ScriptJob.SCRIPT_URL_DATA_KEY;
 import static org.craftercms.engine.scripting.impl.ScriptJob.SITE_CONTEXT_DATA_KEY;
@@ -19,6 +26,9 @@ import static org.quartz.TriggerBuilder.newTrigger;
  * @author avasquez
  */
 public class SchedulingUtils {
+
+    private static final String PROP_THREAD_COUNT = "org.quartz.threadPool.threadCount";
+    private static final int DEFAULT_THREAD_COUNT = 10;
 
     private SchedulingUtils() {
     }
@@ -46,10 +56,23 @@ public class SchedulingUtils {
     }
 
     public static JobContext createJobContext(SiteContext siteContext, String scriptUrl, String cronExpression) {
-        JobDetail jobDetail = SchedulingUtils.createScriptJob(siteContext, scriptUrl, scriptUrl);
-        Trigger trigger = SchedulingUtils.createCronTrigger("trigger for " + scriptUrl, cronExpression);
+        String jobName = siteContext.getSiteName() + ":" + scriptUrl;
+        JobDetail detail = SchedulingUtils.createScriptJob(siteContext, jobName, scriptUrl);
+        Trigger trigger = SchedulingUtils.createCronTrigger("trigger for " + jobName, cronExpression);
+        String description = "Job{url='" + scriptUrl + "', cron='" + cronExpression + "'}";
 
-        return new JobContext(jobDetail, trigger);
+        return new JobContext(detail, trigger, description);
+    }
+
+    public static Scheduler createScheduler(String schedulerName) throws SchedulerException {
+        Properties props = new Properties();
+        props.setProperty(StdSchedulerFactory.PROP_SCHED_INSTANCE_NAME, schedulerName);
+        props.setProperty(StdSchedulerFactory.PROP_THREAD_POOL_CLASS, SimpleThreadPool.class.getName());
+        props.setProperty(PROP_THREAD_COUNT, Integer.toString(DEFAULT_THREAD_COUNT));
+
+        SchedulerFactory schedulerFactory = new StdSchedulerFactory(props);
+
+        return schedulerFactory.getScheduler();
     }
 
 }

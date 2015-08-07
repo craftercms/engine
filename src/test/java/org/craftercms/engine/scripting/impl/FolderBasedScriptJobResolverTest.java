@@ -54,7 +54,7 @@ public class FolderBasedScriptJobResolverTest {
         assertNotNull(jobContexts);
         assertEquals(1, jobContexts.size());
 
-        JobDetailImpl jobDetail = (JobDetailImpl)jobContexts.get(0).getJobDetail();
+        JobDetailImpl jobDetail = (JobDetailImpl)jobContexts.get(0).getDetail();
         CronTrigger trigger = (CronTrigger)jobContexts.get(0).getTrigger();
 
         assertEquals(ScriptJob.class, jobDetail.getJobClass());

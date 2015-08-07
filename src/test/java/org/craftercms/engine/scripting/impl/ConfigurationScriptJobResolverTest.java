@@ -51,7 +51,7 @@ public class ConfigurationScriptJobResolverTest {
         assertNotNull(jobContexts);
         assertEquals(2, jobContexts.size());
 
-        JobDetailImpl jobDetail = (JobDetailImpl)jobContexts.get(0).getJobDetail();
+        JobDetailImpl jobDetail = (JobDetailImpl)jobContexts.get(0).getDetail();
         CronTrigger trigger = (CronTrigger)jobContexts.get(0).getTrigger();
 
         assertEquals(ScriptJob.class, jobDetail.getJobClass());
@@ -59,7 +59,7 @@ public class ConfigurationScriptJobResolverTest {
                      jobDetail.getJobDataMap().getString(ScriptJob.SCRIPT_URL_DATA_KEY));
         assertEquals("0 0/15 * * * ?", trigger.getCronExpression());
 
-        jobDetail = (JobDetailImpl)jobContexts.get(1).getJobDetail();
+        jobDetail = (JobDetailImpl)jobContexts.get(1).getDetail();
         trigger = (CronTrigger)jobContexts.get(1).getTrigger();
 
         assertEquals(ScriptJob.class, jobDetail.getJobClass());
