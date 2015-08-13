@@ -19,7 +19,6 @@ package org.craftercms.engine.security;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.craftercms.commons.http.RequestContext;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.profile.api.Profile;
 import org.craftercms.security.annotations.RunIfSecurityEnabled;
@@ -56,15 +55,12 @@ public class CrafterPageAccessManager {
      */
     @RunIfSecurityEnabled
     public void checkAccess(SiteItem page) throws AuthenticationRequiredException, AccessDeniedException {
-        RequestContext context = RequestContext.getCurrent();
         String pageUrl = page.getStoreUrl();
         Profile profile = null;
 
-        if (context != null) {
-            Authentication auth = SecurityUtils.getAuthentication(context.getRequest());
-            if (auth != null) {
-                profile = auth.getProfile();
-            }
+        Authentication auth = SecurityUtils.getCurrentAuthentication();
+        if (auth != null) {
+            profile = auth.getProfile();
         }
 
         List<String> authorizedRoles = getAuthorizedRolesForPage(page);

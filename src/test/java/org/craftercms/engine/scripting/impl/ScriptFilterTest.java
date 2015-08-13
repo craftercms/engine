@@ -128,7 +128,7 @@ public class ScriptFilterTest {
     }
 
     private void setCurrentRequestContext(HttpServletRequest request, HttpServletResponse response) {
-        RequestContext.setCurrent(new RequestContext(request, response));
+        RequestContext.setCurrent(new RequestContext(request, response, null));
     }
 
     private void setCurrentSiteContext(SiteContext siteContext) {
