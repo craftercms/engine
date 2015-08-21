@@ -30,6 +30,12 @@
         <mergeFolders>true</mergeFolders>
     </i10n>
 
+    <targeting>
+        <enabled>true</enabled>
+        <rootFolders>/site/website</rootFolders>
+        <defaultTargetId>en</defaultTargetId>
+    </targeting>
+
     <profile>
         <api>
             <accessTokenId>cd287b58-ab9c-457f-a4f0-39ef49f04c69</accessTokenId>

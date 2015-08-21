@@ -41,7 +41,7 @@ public class I10nProperties {
         }
     }
 
-    public static  String[] getLocalizedPaths() {
+    public static String[] getLocalizedPaths() {
         Configuration config = ConfigUtils.getCurrentConfig();
         if (config != null) {
             return config.getStringArray(I10N_LOCALIZED_PATHS_CONFIG_KEY);

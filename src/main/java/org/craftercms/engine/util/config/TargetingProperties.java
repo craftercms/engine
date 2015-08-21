@@ -1,0 +1,52 @@
+package org.craftercms.engine.util.config;
+
+import org.apache.commons.configuration.Configuration;
+import org.craftercms.engine.util.ConfigUtils;
+
+/**
+ * Created by alfonsovasquez on 13/8/15.
+ */
+public class TargetingProperties {
+
+    public static final String TARGETING_ENABLED_CONFIG_KEY = "targeting.enabled";
+    public static final String AVAILABLE_TARGET_IDS_CONFIG_KEY = "targeting.availableTargetIds";
+    public static final String DEFAULT_TARGET_ID_CONFIG_KEY = "targeting.defaultTargetId";
+    public static final String ROOT_FOLDERS_CONFIG_KEY = "targeting.rootFolders";
+
+    public static boolean getTargetingEnabledy() {
+        Configuration config = ConfigUtils.getCurrentConfig();
+        if (config != null) {
+            return config.getBoolean(TARGETING_ENABLED_CONFIG_KEY, false);
+        } else {
+            return false;
+        }
+    }
+
+    public static String[] getAvailableTargetIds() {
+        Configuration config = ConfigUtils.getCurrentConfig();
+        if (config != null) {
+            return config.getStringArray(AVAILABLE_TARGET_IDS_CONFIG_KEY);
+        } else {
+            return null;
+        }
+    }
+
+    public static String getDefaultTargetId() {
+        Configuration config = ConfigUtils.getCurrentConfig();
+        if (config != null) {
+            return config.getString(DEFAULT_TARGET_ID_CONFIG_KEY);
+        }
+
+        return null;
+    }
+
+    public static String[] getRootFolders() {
+        Configuration config = ConfigUtils.getCurrentConfig();
+        if (config != null) {
+            return config.getStringArray(ROOT_FOLDERS_CONFIG_KEY);
+        } else {
+            return null;
+        }
+    }
+
+}
