@@ -15,20 +15,20 @@ import org.craftercms.core.xml.mergers.MergeableDescriptor;
 import org.craftercms.core.xml.mergers.impl.resolvers.UrlPatternMergeStrategyResolver;
 import org.craftercms.core.xml.mergers.impl.strategies.InheritLevelsMergeStrategy;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.targeting.CandidateUrlsResolver;
+import org.craftercms.engine.targeting.CandidateTargetedUrlsResolver;
 import org.craftercms.engine.targeting.impl.CandidateTargetIdsResolverImpl;
-import org.craftercms.engine.targeting.impl.CandidateUrlsResolverImpl;
+import org.craftercms.engine.targeting.impl.CandidateTargetedUrlsResolverImpl;
 import org.craftercms.engine.targeting.impl.LocaleTargetIdResolver;
-import org.craftercms.engine.targeting.impl.TargetedUrlByFileStrategy;
+import org.craftercms.engine.targeting.impl.TargetedUrlByFolderStrategy;
 import org.dom4j.Document;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
 import static org.craftercms.engine.util.config.TargetingProperties.AVAILABLE_TARGET_IDS_CONFIG_KEY;
 import static org.craftercms.engine.util.config.TargetingProperties.DEFAULT_TARGET_ID_CONFIG_KEY;
 import static org.craftercms.engine.util.config.TargetingProperties.ROOT_FOLDERS_CONFIG_KEY;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyBoolean;
 import static org.mockito.Mockito.anyString;
@@ -40,6 +40,7 @@ import static org.mockito.Mockito.when;
  */
 public class TargetedContentDescriptorMergeStrategyTest {
 
+    private static final String LEVEL_DESCRIPTOR_FILENAME = "crafter-level-descriptor.level.xml";
     private static final String[] ROOT_FOLDERS = { "/site/website" };
     private static final String[] AVAILABLE_TARGET_IDS = { "es_CR", "es", "en" };
     private static final String DEFAULT_TARGET_ID = "en";
@@ -49,8 +50,9 @@ public class TargetedContentDescriptorMergeStrategyTest {
     @Before
     public void setUp() throws Exception {
         mergeStrategy = new TargetedContentDescriptorMergeStrategy();
+        mergeStrategy.setLevelDescriptorFileName(LEVEL_DESCRIPTOR_FILENAME);
         mergeStrategy.setMergeStrategyResolver(createStrategyResolver(mergeStrategy));
-        mergeStrategy.setCandidateUrlsResolver(createCandidateUrlsResolver());
+        mergeStrategy.setCandidateTargetedUrlsResolver(createCandidateUrlsResolver());
 
         setUpCurrentSiteContext();
     }
@@ -66,32 +68,38 @@ public class TargetedContentDescriptorMergeStrategyTest {
         when(item.getDescriptorDom()).thenReturn(mock(Document.class));
 
         ContentStoreAdapter storeAdapter = mock(ContentStoreAdapter.class);
-        when(storeAdapter.findItem(any(Context.class), any(CachingOptions.class), anyString(), anyBoolean()))
-            .thenReturn(item);
+        when(storeAdapter.findItem(any(Context.class), any(CachingOptions.class), anyString(),
+                                   anyBoolean())).thenReturn(item);
 
         Context context = mock(Context.class);
         when(context.getStoreAdapter()).thenReturn(storeAdapter);
 
         List<MergeableDescriptor> descriptors = mergeStrategy.getDescriptors(context,
                                                                              CachingOptions.DEFAULT_CACHING_OPTIONS,
-                                                                             "/site/website/products/index_es_CR.xml",
-                                                                             mock(Document.class), true);
+                                                                             "/site/website/es_CR/products/index.xml",
+                                                                             mock(Document.class), false);
 
         assertNotNull(descriptors);
-        assertEquals(8, descriptors.size());
+        assertEquals(14, descriptors.size());
         assertEquals("/crafter-level-descriptor.level.xml", descriptors.get(0).getUrl());
         assertEquals("/site/crafter-level-descriptor.level.xml", descriptors.get(1).getUrl());
         assertEquals("/site/website/crafter-level-descriptor.level.xml", descriptors.get(2).getUrl());
         assertEquals("/site/website/products/crafter-level-descriptor.level.xml", descriptors.get(3).getUrl());
         assertEquals("/site/website/products/index.xml", descriptors.get(4).getUrl());
-        assertEquals("/site/website/products/index_en.xml", descriptors.get(5).getUrl());
-        assertEquals("/site/website/products/index_es.xml", descriptors.get(6).getUrl());
-        assertEquals("/site/website/products/index_es_CR.xml", descriptors.get(7).getUrl());
+        assertEquals("/site/website/en/crafter-level-descriptor.level.xml", descriptors.get(5).getUrl());
+        assertEquals("/site/website/en/products/crafter-level-descriptor.level.xml", descriptors.get(6).getUrl());
+        assertEquals("/site/website/en/products/index.xml", descriptors.get(7).getUrl());
+        assertEquals("/site/website/es/crafter-level-descriptor.level.xml", descriptors.get(8).getUrl());
+        assertEquals("/site/website/es/products/crafter-level-descriptor.level.xml", descriptors.get(9).getUrl());
+        assertEquals("/site/website/es/products/index.xml", descriptors.get(10).getUrl());
+        assertEquals("/site/website/es_CR/crafter-level-descriptor.level.xml", descriptors.get(11).getUrl());
+        assertEquals("/site/website/es_CR/products/crafter-level-descriptor.level.xml", descriptors.get(12).getUrl());
+        assertEquals("/site/website/es_CR/products/index.xml", descriptors.get(13).getUrl());
     }
 
     private DescriptorMergeStrategyResolver createStrategyResolver(DescriptorMergeStrategy defaultMergeStrategy) {
         InheritLevelsMergeStrategy inheritLevelsMergeStrategy = new InheritLevelsMergeStrategy();
-        inheritLevelsMergeStrategy.setLevelDescriptorFileName("crafter-level-descriptor.level.xml");
+        inheritLevelsMergeStrategy.setLevelDescriptorFileName(LEVEL_DESCRIPTOR_FILENAME);
 
         Map<String, DescriptorMergeStrategy> mappings = new LinkedHashMap<>(2);
         mappings.put("/site/website/products/index.xml", inheritLevelsMergeStrategy);
@@ -103,15 +111,15 @@ public class TargetedContentDescriptorMergeStrategyTest {
         return strategyResolver;
     }
 
-    private CandidateUrlsResolver createCandidateUrlsResolver() {
+    private CandidateTargetedUrlsResolver createCandidateUrlsResolver() {
         LocaleTargetIdResolver targetIdResolver = new LocaleTargetIdResolver();
 
-        TargetedUrlByFileStrategy targetUrlStrategy = new TargetedUrlByFileStrategy();
+        TargetedUrlByFolderStrategy targetUrlStrategy = new TargetedUrlByFolderStrategy();
         targetUrlStrategy.setTargetIdResolver(targetIdResolver);
 
         CandidateTargetIdsResolverImpl candidateTargetIdsResolver = new CandidateTargetIdsResolverImpl();
 
-        CandidateUrlsResolverImpl candidateUrlsResolver = new CandidateUrlsResolverImpl();
+        CandidateTargetedUrlsResolverImpl candidateUrlsResolver = new CandidateTargetedUrlsResolverImpl();
         candidateUrlsResolver.setTargetIdResolver(targetIdResolver);
         candidateUrlsResolver.setTargetedUrlStrategy(targetUrlStrategy);
         candidateUrlsResolver.setCandidateTargetIdsResolver(candidateTargetIdsResolver);

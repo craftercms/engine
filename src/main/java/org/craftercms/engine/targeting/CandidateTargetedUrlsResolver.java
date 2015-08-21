@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Created by alfonsovasquez on 14/8/15.
  */
-public interface CandidateUrlsResolver {
+public interface CandidateTargetedUrlsResolver {
 
     List<String> getUrls(String targetedUrl);
 

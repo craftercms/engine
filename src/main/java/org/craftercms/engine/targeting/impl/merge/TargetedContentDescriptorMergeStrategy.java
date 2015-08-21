@@ -1,8 +1,10 @@
 package org.craftercms.engine.targeting.impl.merge;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Set;
 
 import org.craftercms.core.exception.XmlMergeException;
 import org.craftercms.core.service.CachingOptions;
@@ -11,17 +13,19 @@ import org.craftercms.core.service.Item;
 import org.craftercms.core.xml.mergers.DescriptorMergeStrategy;
 import org.craftercms.core.xml.mergers.DescriptorMergeStrategyResolver;
 import org.craftercms.core.xml.mergers.MergeableDescriptor;
-import org.craftercms.engine.targeting.CandidateUrlsResolver;
+import org.craftercms.core.xml.mergers.impl.strategies.InheritLevelsMergeStrategy;
+import org.craftercms.engine.targeting.CandidateTargetedUrlsResolver;
 import org.dom4j.Document;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Created by alfonsovasquez on 17/8/15.
  */
-public class TargetedContentDescriptorMergeStrategy implements DescriptorMergeStrategy {
+public class TargetedContentDescriptorMergeStrategy extends InheritLevelsMergeStrategy implements
+    DescriptorMergeStrategy {
 
     protected DescriptorMergeStrategyResolver mergeStrategyResolver;
-    protected CandidateUrlsResolver candidateUrlsResolver;
+    protected CandidateTargetedUrlsResolver candidateTargetedUrlsResolver;
 
     @Required
     public void setMergeStrategyResolver(DescriptorMergeStrategyResolver mergeStrategyResolver) {
@@ -29,8 +33,8 @@ public class TargetedContentDescriptorMergeStrategy implements DescriptorMergeSt
     }
 
     @Required
-    public void setCandidateUrlsResolver(CandidateUrlsResolver candidateUrlsResolver) {
-        this.candidateUrlsResolver = candidateUrlsResolver;
+    public void setCandidateTargetedUrlsResolver(CandidateTargetedUrlsResolver candidateTargetedUrlsResolver) {
+        this.candidateTargetedUrlsResolver = candidateTargetedUrlsResolver;
     }
 
     @Override
@@ -44,33 +48,31 @@ public class TargetedContentDescriptorMergeStrategy implements DescriptorMergeSt
     public List<MergeableDescriptor> getDescriptors(Context context, CachingOptions cachingOptions,
                                                     String mainDescriptorUrl, Document mainDescriptorDom,
                                                     boolean mainDescriptorOptional) throws XmlMergeException {
-        List<MergeableDescriptor> results = new ArrayList<>();
-        List<String> candidateUrls = candidateUrlsResolver.getUrls(mainDescriptorUrl);
+        Set<MergeableDescriptor> results = new LinkedHashSet<>();
+        List<String> candidateUrls = candidateTargetedUrlsResolver.getUrls(mainDescriptorUrl);
 
         for (ListIterator<String> iter = candidateUrls.listIterator(candidateUrls.size()); iter.hasPrevious();) {
             String candidateUrl = iter.previous();
             if (!candidateUrl.equals(mainDescriptorUrl)) {
                 Document descriptorDom = getDescriptorDom(context, cachingOptions, candidateUrl);
+
                 if (descriptorDom != null) {
                     DescriptorMergeStrategy mergeStrategy = mergeStrategyResolver.getStrategy(candidateUrl,
                                                                                               descriptorDom);
-                    List<MergeableDescriptor> mergeableDescriptors = mergeStrategy.getDescriptors(context,
-                                                                                                  cachingOptions,
-                                                                                                  candidateUrl,
-                                                                                                  descriptorDom, true);
+                    List<MergeableDescriptor> descriptors = mergeStrategy.getDescriptors(context, cachingOptions,
+                                                                                         candidateUrl, descriptorDom,
+                                                                                         true);
 
-                    for (MergeableDescriptor mergeableDescriptor : mergeableDescriptors) {
-                        if (!results.contains(mergeableDescriptor)) {
-                            results.add(mergeableDescriptor);
-                        }
-                    }
+                    results.addAll(descriptors);
                 }
-            } else {
-                results.add(new MergeableDescriptor(candidateUrl, mainDescriptorOptional));
             }
         }
 
-        return results;
+        List<MergeableDescriptor> descriptors = super.getDescriptors(context, cachingOptions, mainDescriptorUrl,
+                                                                     mainDescriptorDom, mainDescriptorOptional);
+        results.addAll(descriptors);
+
+        return new ArrayList<>(results);
     }
 
     protected Document getDescriptorDom(Context context, CachingOptions cachingOptions, String url) {

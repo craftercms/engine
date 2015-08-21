@@ -42,7 +42,7 @@ public class TargetedUrlByFolderStrategyTest {
 
     @Test
     public void testAsTargetUrl() throws Exception {
-        String targetedUrl = targetedUrlByFileStrategy.asTargetedUrl(NON_TARGETED_URL);
+        String targetedUrl = targetedUrlByFileStrategy.toTargetedUrl(NON_TARGETED_URL);
 
         assertEquals(TARGETED_URL, targetedUrl);
     }

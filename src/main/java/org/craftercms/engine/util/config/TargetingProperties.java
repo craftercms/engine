@@ -12,8 +12,9 @@ public class TargetingProperties {
     public static final String AVAILABLE_TARGET_IDS_CONFIG_KEY = "targeting.availableTargetIds";
     public static final String DEFAULT_TARGET_ID_CONFIG_KEY = "targeting.defaultTargetId";
     public static final String ROOT_FOLDERS_CONFIG_KEY = "targeting.rootFolders";
+    public static final String MERGE_FOLDERS_CONFIG_KEY = "targeting.mergeFolders";
 
-    public static boolean getTargetingEnabledy() {
+    public static boolean isTargetingEnabled() {
         Configuration config = ConfigUtils.getCurrentConfig();
         if (config != null) {
             return config.getBoolean(TARGETING_ENABLED_CONFIG_KEY, false);
@@ -46,6 +47,15 @@ public class TargetingProperties {
             return config.getStringArray(ROOT_FOLDERS_CONFIG_KEY);
         } else {
             return null;
+        }
+    }
+
+    public static boolean isMergeFolders() {
+        Configuration config = ConfigUtils.getCurrentConfig();
+        if (config != null) {
+            return config.getBoolean(MERGE_FOLDERS_CONFIG_KEY, false);
+        } else {
+            return false;
         }
     }
 

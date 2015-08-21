@@ -5,7 +5,7 @@ package org.craftercms.engine.targeting;
  */
 public interface TargetedUrlStrategy {
 
-    String asTargetedUrl(String url);
+    String toTargetedUrl(String url);
 
     TargetedUrlComponents parseTargetedUrl(String targetedUrl);
 

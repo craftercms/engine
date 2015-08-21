@@ -17,13 +17,11 @@
 package org.craftercms.engine.controller;
 
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,13 +35,10 @@ import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.GroovyUtils;
-import org.craftercms.engine.util.config.I10nProperties;
 import org.springframework.beans.factory.annotation.Required;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
-import org.springframework.web.servlet.view.RedirectView;
 
 /**
  * Default controller for rendering Crafter pages. If the site context is the fallback context, a fallback page is
@@ -116,7 +111,7 @@ public class PageRenderController extends AbstractController {
             throw new IllegalStateException("No current site context found");
         }
 
-        return doLocalizedRedirect(pageUrl);
+        return new ModelAndView(pageUrl);
     }
 
     protected Script getControllerScript(SiteContext siteContext, HttpServletRequest request, String pageUrl) {
@@ -195,48 +190,48 @@ public class PageRenderController extends AbstractController {
         }
     }
 
-    protected ModelAndView doLocalizedRedirect(String pageUrl) {
-        if (I10nProperties.localizationEnabled()) {
-            String tmpUrl = StringUtils.stripStart(pageUrl, "/");
-            String localeStr = StringUtils.substringBefore(tmpUrl, "/");
-            Locale locale = null;
-
-            if (StringUtils.isNotEmpty(localeStr)) {
-                try {
-                    locale = LocaleUtils.toLocale(localeStr);
-                    if (!LocaleUtils.isAvailableLocale(locale)) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug(localeStr + " is not one of the available locales");
-                        }
-
-                        locale = null;
-                    }
-                } catch (IllegalArgumentException e) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug(localeStr + " is not a valid locale");
-                    }
-                }
-            }
-
-            Locale currentLocale = LocaleContextHolder.getLocale();
-            String suffix;
-
-            if (locale == null) {
-                suffix = tmpUrl;
-            } else {
-                suffix = StringUtils.substringAfter(tmpUrl, "/");
-            }
-
-            if (currentLocale != null && I10nProperties.forceCurrentLocale() && !currentLocale.equals(locale)) {
-                if (StringUtils.isNotEmpty(suffix)) {
-                    suffix = "/" + suffix;
-                }
-
-                return new ModelAndView(new RedirectView("/" + currentLocale + suffix, true));
-            }
-        }
-
-        return new ModelAndView(pageUrl);
-    }
+//    protected ModelAndView doLocalizedRedirect(String pageUrl) {
+//        if (I10nProperties.localizationEnabled()) {
+//            String tmpUrl = StringUtils.stripStart(pageUrl, "/");
+//            String localeStr = StringUtils.substringBefore(tmpUrl, "/");
+//            Locale locale = null;
+//
+//            if (StringUtils.isNotEmpty(localeStr)) {
+//                try {
+//                    locale = LocaleUtils.toLocale(localeStr);
+//                    if (!LocaleUtils.isAvailableLocale(locale)) {
+//                        if (logger.isDebugEnabled()) {
+//                            logger.debug(localeStr + " is not one of the available locales");
+//                        }
+//
+//                        locale = null;
+//                    }
+//                } catch (IllegalArgumentException e) {
+//                    if (logger.isDebugEnabled()) {
+//                        logger.debug(localeStr + " is not a valid locale");
+//                    }
+//                }
+//            }
+//
+//            Locale currentLocale = LocaleContextHolder.getLocale();
+//            String suffix;
+//
+//            if (locale == null) {
+//                suffix = tmpUrl;
+//            } else {
+//                suffix = StringUtils.substringAfter(tmpUrl, "/");
+//            }
+//
+//            if (currentLocale != null && I10nProperties.forceCurrentLocale() && !currentLocale.equals(locale)) {
+//                if (StringUtils.isNotEmpty(suffix)) {
+//                    suffix = "/" + suffix;
+//                }
+//
+//                return new ModelAndView(new RedirectView("/" + currentLocale + suffix, true));
+//            }
+//        }
+//
+//        return new ModelAndView(pageUrl);
+//    }
 
 }

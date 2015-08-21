@@ -34,6 +34,7 @@
         <enabled>true</enabled>
         <rootFolders>/site/website</rootFolders>
         <defaultTargetId>en</defaultTargetId>
+        <mergeFolders>true</mergeFolders>
     </targeting>
 
     <profile>

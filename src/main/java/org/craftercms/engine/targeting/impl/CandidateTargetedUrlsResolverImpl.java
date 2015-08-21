@@ -4,20 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.craftercms.core.util.UrlUtils;
 import org.craftercms.engine.targeting.CandidateTargetIdsResolver;
-import org.craftercms.engine.targeting.CandidateUrlsResolver;
+import org.craftercms.engine.targeting.CandidateTargetedUrlsResolver;
 import org.craftercms.engine.targeting.TargetIdResolver;
 import org.craftercms.engine.targeting.TargetedUrlComponents;
 import org.craftercms.engine.targeting.TargetedUrlStrategy;
-import org.craftercms.engine.util.config.TargetingProperties;
+import org.craftercms.engine.util.TargetingUtils;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Created by alfonsovasquez on 14/8/15.
  */
-public class CandidateUrlsResolverImpl implements CandidateUrlsResolver {
+public class CandidateTargetedUrlsResolverImpl implements CandidateTargetedUrlsResolver {
 
     protected TargetIdResolver targetIdResolver;
     protected TargetedUrlStrategy targetedUrlStrategy;
@@ -41,14 +41,14 @@ public class CandidateUrlsResolverImpl implements CandidateUrlsResolver {
     @Override
     public List<String> getUrls(String targetedUrl) {
         List<String> candidateUrls = new ArrayList<>();
-        String rootFolder = getMatchingRootFolder(targetedUrl);
+        String rootFolder = TargetingUtils.getMatchingRootFolder(targetedUrl);
 
         if (StringUtils.isNotEmpty(rootFolder)) {
             String relativeTargetedUrl = StringUtils.substringAfter(targetedUrl, rootFolder);
             TargetedUrlComponents urlComp = targetedUrlStrategy.parseTargetedUrl(relativeTargetedUrl);
 
             if (urlComp != null) {
-                String prefix = rootFolder + urlComp.getPrefix();
+                String prefix = UrlUtils.appendUrl(rootFolder, urlComp.getPrefix());
                 String suffix = urlComp.getSuffix();
                 String targetId = urlComp.getTargetId();
                 String defaultTargetId = targetIdResolver.getDefaultTargetId();
@@ -71,19 +71,6 @@ public class CandidateUrlsResolverImpl implements CandidateUrlsResolver {
         }
 
         return candidateUrls;
-    }
-
-    protected String getMatchingRootFolder(String targetedUrl) {
-        String[] targetedRootFolders = TargetingProperties.getRootFolders();
-        if (ArrayUtils.isNotEmpty(targetedRootFolders)) {
-            for (String targetedRootFolder : targetedRootFolders) {
-                if (targetedUrl.startsWith(targetedRootFolder)) {
-                    return targetedRootFolder;
-                }
-            }
-        }
-
-        return null;
     }
 
 }

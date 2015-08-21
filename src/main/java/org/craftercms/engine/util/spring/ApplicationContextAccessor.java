@@ -48,6 +48,10 @@ public class ApplicationContextAccessor implements ApplicationContextAware {
         return getApplicationContext().getBean(beanName);
     }
 
+    public <T> T get(String beanName, Class<T> requiredType) {
+        return getApplicationContext().getBean(beanName, requiredType);
+    }
+
     protected ApplicationContext getApplicationContext() {
         SiteContext siteContext = SiteContext.getCurrent();
         if (siteContext != null) {

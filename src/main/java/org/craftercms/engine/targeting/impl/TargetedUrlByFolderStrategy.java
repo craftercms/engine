@@ -26,7 +26,7 @@ public class TargetedUrlByFolderStrategy extends AbstractTargetedUrlStrategy {
     }
 
     @Override
-    public String asTargetedUrl(String url) {
+    public String toTargetedUrl(String url) {
         Matcher matcher = matchUrl(url);
         if (matcher != null) {
             return url;

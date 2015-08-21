@@ -26,20 +26,20 @@ import static org.mockito.Mockito.when;
 /**
  * Created by alfonsovasquez on 18/8/15.
  */
-public class CandidateUrlsResolverImplTest {
+public class CandidateTargetedUrlsResolverImplTest {
 
     private static final String[] ROOT_FOLDERS = { "/site/website" };
     private static final String DEFAULT_TARGET_ID = "en";
     private static final String CURRENT_TARGET_ID = "es_CR";
     private static final List<String> CANDIDATE_TARGET_IDS = Arrays.asList("es_CR", "es", "en");
     private static final String TARGETED_URL = "/products/index_es_CR.xml";
-    private static final String FULL_TARGETED_URL = "/site/website" + TARGETED_URL;
+    private static final String TARGETED_FULL_URL = ROOT_FOLDERS[0] + TARGETED_URL;
 
-    private CandidateUrlsResolverImpl candidateUrlsResolver;
+    private CandidateTargetedUrlsResolverImpl candidateUrlsResolver;
 
     @Before
     public void setUp() throws Exception {
-        candidateUrlsResolver = new CandidateUrlsResolverImpl();
+        candidateUrlsResolver = new CandidateTargetedUrlsResolverImpl();
         candidateUrlsResolver.setTargetIdResolver(createTargetIdResolver());
         candidateUrlsResolver.setTargetedUrlStrategy(createTargetedUrlStrategy());
         candidateUrlsResolver.setCandidateTargetIdsResolver(createCandidateTargetIdsResolver());
@@ -54,7 +54,7 @@ public class CandidateUrlsResolverImplTest {
 
     @Test
     public void testGetUrls() throws Exception {
-        List<String> urls = candidateUrlsResolver.getUrls(FULL_TARGETED_URL);
+        List<String> urls = candidateUrlsResolver.getUrls(TARGETED_FULL_URL);
 
         assertNotNull(urls);
         assertEquals(4, urls.size());
