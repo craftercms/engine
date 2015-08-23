@@ -9,7 +9,7 @@ public interface TargetIdResolver {
 
     String getCurrentTargetId() throws IllegalStateException;
 
-    String getDefaultTargetId() throws IllegalStateException;
+    String getFallbackTargetId() throws IllegalStateException;
 
     List<String> getAvailableTargetIds() throws IllegalStateException;
 

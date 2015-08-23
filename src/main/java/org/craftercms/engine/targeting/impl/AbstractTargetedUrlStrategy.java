@@ -4,13 +4,22 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.craftercms.engine.targeting.TargetIdResolver;
 import org.craftercms.engine.targeting.TargetedUrlComponents;
 import org.craftercms.engine.targeting.TargetedUrlStrategy;
+import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Created by alfonsovasquez on 13/8/15.
  */
 public abstract class AbstractTargetedUrlStrategy implements TargetedUrlStrategy {
+
+    protected TargetIdResolver targetIdResolver;
+
+    @Required
+    public void setTargetIdResolver(TargetIdResolver targetIdResolver) {
+        this.targetIdResolver = targetIdResolver;
+    }
 
     @Override
     public TargetedUrlComponents parseTargetedUrl(String targetedUrl) {

@@ -32,7 +32,7 @@ public class TargetedUrlByFileStrategyTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        when(targetIdResolver.getDefaultTargetId()).thenReturn(DEFAULT_TARGET_ID);
+        when(targetIdResolver.getFallbackTargetId()).thenReturn(DEFAULT_TARGET_ID);
         when(targetIdResolver.getCurrentTargetId()).thenReturn(CURRENT_TARGET_ID);
         when(targetIdResolver.getAvailableTargetIds()).thenReturn(AVAILABLE_TARGET_IDS);
 

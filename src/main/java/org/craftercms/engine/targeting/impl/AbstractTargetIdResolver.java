@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.craftercms.engine.targeting.TargetIdResolver;
 import org.craftercms.engine.util.config.TargetingProperties;
 
@@ -14,13 +13,8 @@ import org.craftercms.engine.util.config.TargetingProperties;
 public abstract class AbstractTargetIdResolver implements TargetIdResolver {
 
     @Override
-    public String getDefaultTargetId() throws IllegalStateException {
-        String defaultTargetId = TargetingProperties.getDefaultTargetId();
-        if (StringUtils.isNotEmpty(defaultTargetId)) {
-            return defaultTargetId;
-        } else {
-            throw new IllegalStateException("No default target ID specified in the configuration");
-        }
+    public String getFallbackTargetId() throws IllegalStateException {
+        return TargetingProperties.getFallbackTargetId();
     }
 
     @Override

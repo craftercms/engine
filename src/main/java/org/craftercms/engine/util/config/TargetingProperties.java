@@ -10,7 +10,7 @@ public class TargetingProperties {
 
     public static final String TARGETING_ENABLED_CONFIG_KEY = "targeting.enabled";
     public static final String AVAILABLE_TARGET_IDS_CONFIG_KEY = "targeting.availableTargetIds";
-    public static final String DEFAULT_TARGET_ID_CONFIG_KEY = "targeting.defaultTargetId";
+    public static final String FALLBACK_ID_CONFIG_KEY = "targeting.fallbackTargetId";
     public static final String ROOT_FOLDERS_CONFIG_KEY = "targeting.rootFolders";
     public static final String MERGE_FOLDERS_CONFIG_KEY = "targeting.mergeFolders";
 
@@ -32,10 +32,10 @@ public class TargetingProperties {
         }
     }
 
-    public static String getDefaultTargetId() {
+    public static String getFallbackTargetId() {
         Configuration config = ConfigUtils.getCurrentConfig();
         if (config != null) {
-            return config.getString(DEFAULT_TARGET_ID_CONFIG_KEY);
+            return config.getString(FALLBACK_ID_CONFIG_KEY);
         }
 
         return null;

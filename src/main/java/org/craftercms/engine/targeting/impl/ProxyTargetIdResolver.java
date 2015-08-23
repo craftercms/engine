@@ -16,8 +16,8 @@ public class ProxyTargetIdResolver extends AbstractProxyBean<TargetIdResolver> i
     }
 
     @Override
-    public String getDefaultTargetId() throws IllegalStateException {
-        return getBean().getDefaultTargetId();
+    public String getFallbackTargetId() throws IllegalStateException {
+        return getBean().getFallbackTargetId();
     }
 
     @Override

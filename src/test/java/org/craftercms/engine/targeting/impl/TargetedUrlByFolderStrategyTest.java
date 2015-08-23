@@ -32,7 +32,7 @@ public class TargetedUrlByFolderStrategyTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        when(targetIdResolver.getDefaultTargetId()).thenReturn(DEFAULT_TARGET_ID);
+        when(targetIdResolver.getFallbackTargetId()).thenReturn(DEFAULT_TARGET_ID);
         when(targetIdResolver.getCurrentTargetId()).thenReturn(CURRENT_TARGET_ID);
         when(targetIdResolver.getAvailableTargetIds()).thenReturn(AVAILABLE_TARGET_IDS);
 
@@ -51,14 +51,14 @@ public class TargetedUrlByFolderStrategyTest {
     public void testParseUrl() throws Exception {
         TargetedUrlComponents urlComp = targetedUrlByFileStrategy.parseTargetedUrl(TARGETED_URL);
 
-        assertEquals("", urlComp.getPrefix());
+        assertEquals(null, urlComp.getPrefix());
         assertEquals("ame_lat_cr", urlComp.getTargetId());
         assertEquals("/products/index.xml", urlComp.getSuffix());
     }
 
     @Test
     public void testBuildUrl() throws Exception {
-        String targetedUrl = targetedUrlByFileStrategy.buildTargetedUrl("", "ame_lat_cr", "/products/index.xml");
+        String targetedUrl = targetedUrlByFileStrategy.buildTargetedUrl(null, "ame_lat_cr", "/products/index.xml");
 
         assertEquals(TARGETED_URL, targetedUrl);
     }

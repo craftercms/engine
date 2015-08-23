@@ -5,8 +5,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.craftercms.engine.targeting.TargetIdResolver;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Created by alfonsovasquez on 13/8/15.
@@ -20,16 +18,10 @@ public class TargetedUrlByFileStrategy extends AbstractTargetedUrlStrategy {
     public static final int TARGET_ID_GROUP = 2;
     public static final int SUFFIX_GROUP = 3;
 
-    protected TargetIdResolver targetIdResolver;
     protected String targetIdSeparator;
 
     public TargetedUrlByFileStrategy() {
         targetIdSeparator = DEFAULT_TARGET_ID_SEPARATOR;
-    }
-
-    @Required
-    public void setTargetIdResolver(TargetIdResolver targetIdResolver) {
-        this.targetIdResolver = targetIdResolver;
     }
 
     public void setTargetIdSeparator(String targetIdSeparator) {
@@ -39,15 +31,17 @@ public class TargetedUrlByFileStrategy extends AbstractTargetedUrlStrategy {
     @Override
     public String toTargetedUrl(String url) {
         Matcher matcher = matchUrl(url);
-        if (matcher != null) {
-            return url;
-        } else {
-            String urlWithoutExt = FilenameUtils.removeExtension(url);
+        if (matcher == null) {
             String ext = FilenameUtils.getExtension(url);
-            String targetId = targetIdResolver.getCurrentTargetId();
+            if (StringUtils.isNotEmpty(ext)) {
+                String urlWithoutExt = FilenameUtils.removeExtension(url);
+                String targetId = targetIdResolver.getCurrentTargetId();
 
-            return urlWithoutExt + "_" + targetId + "." + ext;
+                return urlWithoutExt + "_" + targetId + "." + ext;
+            }
         }
+
+        return url;
     }
 
     @Override
@@ -67,6 +61,8 @@ public class TargetedUrlByFileStrategy extends AbstractTargetedUrlStrategy {
         if (StringUtils.isNotEmpty(suffix)) {
             targetedUrl += StringUtils.prependIfMissing(suffix, ".");
         }
+
+        targetedUrl = StringUtils.prependIfMissing(targetedUrl, "/");
 
         return targetedUrl;
     }

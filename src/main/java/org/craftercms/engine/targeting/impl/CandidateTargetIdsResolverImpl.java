@@ -25,7 +25,7 @@ public class CandidateTargetIdsResolverImpl implements CandidateTargetIdsResolve
     }
 
     @Override
-    public List<String> getTargetIds(String targetId, String defaultTargetId) {
+    public List<String> getTargetIds(String targetId, String fallbackTargetId) {
         List<String> targetIds = new ArrayList<>();
         String[] targetIdComponents = StringUtils.split(targetId, targetIdSeparator);
 
@@ -37,8 +37,10 @@ public class CandidateTargetIdsResolverImpl implements CandidateTargetIdsResolve
             }
         }
 
-        if (!targetIds.contains(defaultTargetId)) {
-            targetIds.add(defaultTargetId);
+        if (StringUtils.isEmpty(fallbackTargetId)) {
+            targetIds.add("");
+        } else if (!targetIds.contains(fallbackTargetId)) {
+            targetIds.add(fallbackTargetId);
         }
 
         return targetIds;

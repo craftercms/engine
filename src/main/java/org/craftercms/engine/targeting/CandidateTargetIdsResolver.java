@@ -7,6 +7,6 @@ import java.util.List;
  */
 public interface CandidateTargetIdsResolver {
 
-    List<String> getTargetIds(String targetId, String defaultTargetId);
+    List<String> getTargetIds(String targetId, String fallbackTargetId);
 
 }

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="crafter.targetedUrlStrategyBase"
+          class="org.craftercms.engine.targeting.impl.AbstractTargetedUrlStrategy"
+          abstract="true">
+        <property name="targetIdResolver" ref="crafter.proxyTargetIdResolver"/>
+    </bean>
+
+    <bean id="crafter.targetedUrlStrategy"
+          class="org.craftercms.engine.targeting.impl.TargetedUrlByFolderStrategy"
+          parent="crafter.targetedUrlStrategyBase"/>
+
+    <bean id="crafter.proxyTargetedUrlStrategy"
+          class="org.craftercms.engine.targeting.impl.ProxyTargetedUrlStrategy">
+        <property name="applicationContext" ref="crafter.applicationContextAccessor"/>
+        <property name="beanName" value="crafter.targetedUrlStrategy"/>
+    </bean>
+
+    <bean id="crafter.targetIdResolver" class="org.craftercms.engine.targeting.impl.LocaleTargetIdResolver"/>
+
+    <bean id="crafter.proxyTargetIdResolver" class="org.craftercms.engine.targeting.impl.ProxyTargetIdResolver">
+        <property name="applicationContext" ref="crafter.applicationContextAccessor"/>
+        <property name="beanName" value="crafter.targetIdResolver"/>
+    </bean>
+
+    <bean id="crafter.candidateTargetIdsResolver"
+          class="org.craftercms.engine.targeting.impl.CandidateTargetIdsResolverImpl"/>
+
+    <bean id="crafter.candidateTargetedUrlsResolver"
+          class="org.craftercms.engine.targeting.impl.CandidateTargetedUrlsResolverImpl">
+        <property name="targetIdResolver" ref="crafter.proxyTargetIdResolver"/>
+        <property name="targetedUrlStrategy" ref="crafter.proxyTargetedUrlStrategy"/>
+        <property name="candidateTargetIdsResolver" ref="crafter.candidateTargetIdsResolver"/>
+    </bean>
+
+    <bean id="crafter.targetedContentStoreAdapter"
+          class="org.craftercms.engine.targeting.impl.TargetedContentStoreAdapter">
+        <property name="actualAdapter" ref="crafter.contentStoreAdapter.filesystem"/>
+        <property name="candidateTargetedUrlsResolver" ref="crafter.candidateTargetedUrlsResolver"/>
+    </bean>
+
+</beans>

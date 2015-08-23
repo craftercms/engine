@@ -13,17 +13,10 @@ import org.springframework.beans.factory.annotation.Required;
  */
 public class TargetedUrlByFolderStrategy extends AbstractTargetedUrlStrategy {
 
-    public static final String TARGETED_URL_PATTERN_FORMAT = "^/?(%s)(/.+\\.[^.]+)$";
+    public static final String TARGETED_URL_PATTERN_FORMAT = "^/?(%s)(/.+)?$";
 
     public static final int TARGET_ID_GROUP = 1;
     public static final int SUFFIX_GROUP = 2;
-
-    protected TargetIdResolver targetIdResolver;
-
-    @Required
-    public void setTargetIdResolver(TargetIdResolver targetIdResolver) {
-        this.targetIdResolver = targetIdResolver;
-    }
 
     @Override
     public String toTargetedUrl(String url) {
@@ -55,12 +48,14 @@ public class TargetedUrlByFolderStrategy extends AbstractTargetedUrlStrategy {
             targetedUrl = UrlUtils.appendUrl(targetedUrl, suffix);
         }
 
+        targetedUrl = StringUtils.prependIfMissing(targetedUrl, "/");
+
         return targetedUrl;
     }
 
     @Override
     protected String getPrefix(Matcher matcher) {
-        return "";
+        return null;
     }
 
     @Override

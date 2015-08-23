@@ -29,9 +29,9 @@ import static org.mockito.Mockito.when;
 public class CandidateTargetedUrlsResolverImplTest {
 
     private static final String[] ROOT_FOLDERS = { "/site/website" };
-    private static final String DEFAULT_TARGET_ID = "en";
+    private static final String FALLBACK_TARGET_ID = "";
     private static final String CURRENT_TARGET_ID = "es_CR";
-    private static final List<String> CANDIDATE_TARGET_IDS = Arrays.asList("es_CR", "es", "en");
+    private static final List<String> CANDIDATE_TARGET_IDS = Arrays.asList("es_CR", "es");
     private static final String TARGETED_URL = "/products/index_es_CR.xml";
     private static final String TARGETED_FULL_URL = ROOT_FOLDERS[0] + TARGETED_URL;
 
@@ -57,17 +57,15 @@ public class CandidateTargetedUrlsResolverImplTest {
         List<String> urls = candidateUrlsResolver.getUrls(TARGETED_FULL_URL);
 
         assertNotNull(urls);
-        assertEquals(4, urls.size());
+        assertEquals(2, urls.size());
         assertEquals("/site/website/products/index_es_CR.xml", urls.get(0));
         assertEquals("/site/website/products/index_es.xml", urls.get(1));
-        assertEquals("/site/website/products/index_en.xml", urls.get(2));
-        assertEquals("/site/website/products/index.xml", urls.get(3));
     }
 
     private TargetIdResolver createTargetIdResolver() {
         TargetIdResolver targetIdResolver = mock(TargetIdResolver.class);
 
-        when(targetIdResolver.getDefaultTargetId()).thenReturn(DEFAULT_TARGET_ID);
+        when(targetIdResolver.getFallbackTargetId()).thenReturn(FALLBACK_TARGET_ID);
 
         return targetIdResolver;
     }
@@ -98,8 +96,8 @@ public class CandidateTargetedUrlsResolverImplTest {
     private CandidateTargetIdsResolver createCandidateTargetIdsResolver() {
         CandidateTargetIdsResolver candidateTargetIdsResolver = mock(CandidateTargetIdsResolver.class);
 
-        when(candidateTargetIdsResolver.getTargetIds(CURRENT_TARGET_ID, DEFAULT_TARGET_ID))
-            .thenReturn(CANDIDATE_TARGET_IDS);
+        when(candidateTargetIdsResolver.getTargetIds(CURRENT_TARGET_ID,
+                                                     FALLBACK_TARGET_ID)).thenReturn(CANDIDATE_TARGET_IDS);
 
         return candidateTargetIdsResolver;
     }

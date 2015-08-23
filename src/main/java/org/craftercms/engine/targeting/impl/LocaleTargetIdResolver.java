@@ -7,8 +7,6 @@ import java.util.Locale;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.LocaleUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.craftercms.engine.util.config.TargetingProperties;
 import org.springframework.context.i18n.LocaleContextHolder;
 
@@ -16,8 +14,6 @@ import org.springframework.context.i18n.LocaleContextHolder;
  * Created by alfonsovasquez on 13/8/15.
  */
 public class LocaleTargetIdResolver extends AbstractTargetIdResolver {
-
-    private static final Log logger = LogFactory.getLog(LocaleTargetIdResolver.class);
 
     @Override
     public String getCurrentTargetId() throws IllegalStateException {

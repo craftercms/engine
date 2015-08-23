@@ -26,7 +26,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.craftercms.engine.util.config.TargetingProperties.AVAILABLE_TARGET_IDS_CONFIG_KEY;
-import static org.craftercms.engine.util.config.TargetingProperties.DEFAULT_TARGET_ID_CONFIG_KEY;
+import static org.craftercms.engine.util.config.TargetingProperties.FALLBACK_ID_CONFIG_KEY;
 import static org.craftercms.engine.util.config.TargetingProperties.ROOT_FOLDERS_CONFIG_KEY;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.any;
@@ -43,7 +43,7 @@ public class TargetedContentDescriptorMergeStrategyTest {
     private static final String LEVEL_DESCRIPTOR_FILENAME = "crafter-level-descriptor.level.xml";
     private static final String[] ROOT_FOLDERS = { "/site/website" };
     private static final String[] AVAILABLE_TARGET_IDS = { "es_CR", "es", "en" };
-    private static final String DEFAULT_TARGET_ID = "en";
+    private static final String FALLBACK_TARGET_ID = "en";
 
     private TargetedContentDescriptorMergeStrategy mergeStrategy;
 
@@ -80,21 +80,19 @@ public class TargetedContentDescriptorMergeStrategyTest {
                                                                              mock(Document.class), false);
 
         assertNotNull(descriptors);
-        assertEquals(14, descriptors.size());
+        assertEquals(12, descriptors.size());
         assertEquals("/crafter-level-descriptor.level.xml", descriptors.get(0).getUrl());
         assertEquals("/site/crafter-level-descriptor.level.xml", descriptors.get(1).getUrl());
         assertEquals("/site/website/crafter-level-descriptor.level.xml", descriptors.get(2).getUrl());
-        assertEquals("/site/website/products/crafter-level-descriptor.level.xml", descriptors.get(3).getUrl());
-        assertEquals("/site/website/products/index.xml", descriptors.get(4).getUrl());
-        assertEquals("/site/website/en/crafter-level-descriptor.level.xml", descriptors.get(5).getUrl());
-        assertEquals("/site/website/en/products/crafter-level-descriptor.level.xml", descriptors.get(6).getUrl());
-        assertEquals("/site/website/en/products/index.xml", descriptors.get(7).getUrl());
-        assertEquals("/site/website/es/crafter-level-descriptor.level.xml", descriptors.get(8).getUrl());
-        assertEquals("/site/website/es/products/crafter-level-descriptor.level.xml", descriptors.get(9).getUrl());
-        assertEquals("/site/website/es/products/index.xml", descriptors.get(10).getUrl());
-        assertEquals("/site/website/es_CR/crafter-level-descriptor.level.xml", descriptors.get(11).getUrl());
-        assertEquals("/site/website/es_CR/products/crafter-level-descriptor.level.xml", descriptors.get(12).getUrl());
-        assertEquals("/site/website/es_CR/products/index.xml", descriptors.get(13).getUrl());
+        assertEquals("/site/website/en/crafter-level-descriptor.level.xml", descriptors.get(3).getUrl());
+        assertEquals("/site/website/en/products/crafter-level-descriptor.level.xml", descriptors.get(4).getUrl());
+        assertEquals("/site/website/en/products/index.xml", descriptors.get(5).getUrl());
+        assertEquals("/site/website/es/crafter-level-descriptor.level.xml", descriptors.get(6).getUrl());
+        assertEquals("/site/website/es/products/crafter-level-descriptor.level.xml", descriptors.get(7).getUrl());
+        assertEquals("/site/website/es/products/index.xml", descriptors.get(8).getUrl());
+        assertEquals("/site/website/es_CR/crafter-level-descriptor.level.xml", descriptors.get(9).getUrl());
+        assertEquals("/site/website/es_CR/products/crafter-level-descriptor.level.xml", descriptors.get(10).getUrl());
+        assertEquals("/site/website/es_CR/products/index.xml", descriptors.get(11).getUrl());
     }
 
     private DescriptorMergeStrategyResolver createStrategyResolver(DescriptorMergeStrategy defaultMergeStrategy) {
@@ -131,7 +129,7 @@ public class TargetedContentDescriptorMergeStrategyTest {
         HierarchicalConfiguration config = mock(HierarchicalConfiguration.class);
         when(config.getStringArray(ROOT_FOLDERS_CONFIG_KEY)).thenReturn(ROOT_FOLDERS);
         when(config.getStringArray(AVAILABLE_TARGET_IDS_CONFIG_KEY)).thenReturn(AVAILABLE_TARGET_IDS);
-        when(config.getString(DEFAULT_TARGET_ID_CONFIG_KEY)).thenReturn(DEFAULT_TARGET_ID);
+        when(config.getString(FALLBACK_ID_CONFIG_KEY)).thenReturn(FALLBACK_TARGET_ID);
 
         SiteContext siteContext = new SiteContext();
         siteContext.setConfig(config);

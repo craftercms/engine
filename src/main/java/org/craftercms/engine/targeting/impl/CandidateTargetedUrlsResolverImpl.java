@@ -51,8 +51,8 @@ public class CandidateTargetedUrlsResolverImpl implements CandidateTargetedUrlsR
                 String prefix = UrlUtils.appendUrl(rootFolder, urlComp.getPrefix());
                 String suffix = urlComp.getSuffix();
                 String targetId = urlComp.getTargetId();
-                String defaultTargetId = targetIdResolver.getDefaultTargetId();
-                List<String> candidateTargetIds = candidateTargetIdsResolver.getTargetIds(targetId, defaultTargetId);
+                String fallbackTargetId = targetIdResolver.getFallbackTargetId();
+                List<String> candidateTargetIds = candidateTargetIdsResolver.getTargetIds(targetId, fallbackTargetId);
 
                 if (CollectionUtils.isNotEmpty(candidateTargetIds)) {
                     for (String candidateTargetId : candidateTargetIds) {
@@ -61,8 +61,6 @@ public class CandidateTargetedUrlsResolverImpl implements CandidateTargetedUrlsR
                 } else {
                     candidateUrls.add(targetedUrl);
                 }
-
-                candidateUrls.add(targetedUrlStrategy.buildTargetedUrl(prefix, null, suffix));
             } else {
                 candidateUrls.add(targetedUrl);
             }
