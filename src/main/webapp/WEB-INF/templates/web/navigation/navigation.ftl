@@ -8,8 +8,8 @@
     <#list navItems as navItem>
         <#assign navigable = true>
 
-        <#-- Ignore index.xml here since index.xml is used only for folders -->
-        <#if navItem.storeName == "index.xml">
+        <#-- Ignore index*.xml here since index*.xml is used only for folders -->
+        <#if navItem.storeName?matches("index.*\\.xml")>
             <#assign navigable = false>
         </#if>
 

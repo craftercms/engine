@@ -76,7 +76,7 @@
                        value-ref="crafter.contentBundleMergeStrategy"/>
                 <entry key="${crafter.core.merger.strategy.element.value.explicitParent}"
                        value-ref="crafter.explicitParentMergeStrategy"/>
-                <entry key="${crafter.engine.merger.strategy.element.value.targetedContent"
+                <entry key="${crafter.engine.merger.strategy.element.value.targetedContent}"
                        value-ref="crafter.targetedContentMergeStrategy"/>
             </map>
         </property>
