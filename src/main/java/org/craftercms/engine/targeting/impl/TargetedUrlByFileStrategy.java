@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2007-2015 Crafter Software Corporation.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.craftercms.engine.targeting.impl;
 
 import java.util.regex.Matcher;
@@ -7,7 +23,10 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * Created by alfonsovasquez on 13/8/15.
+ * {@link org.craftercms.engine.targeting.TargetedUrlStrategy} implementation that recognizes the target ID in
+ * the file name (e.g. /products/index_es_CR.xml).
+ *
+ * @author avasquez
  */
 public class TargetedUrlByFileStrategy extends AbstractTargetedUrlStrategy {
 
@@ -35,7 +54,7 @@ public class TargetedUrlByFileStrategy extends AbstractTargetedUrlStrategy {
             String ext = FilenameUtils.getExtension(url);
             if (StringUtils.isNotEmpty(ext)) {
                 String urlWithoutExt = FilenameUtils.removeExtension(url);
-                String targetId = targetIdResolver.getCurrentTargetId();
+                String targetId = targetIdManager.getCurrentTargetId();
 
                 return urlWithoutExt + "_" + targetId + "." + ext;
             }
@@ -84,7 +103,7 @@ public class TargetedUrlByFileStrategy extends AbstractTargetedUrlStrategy {
 
     @Override
     protected Pattern getTargetedUrlPattern() {
-        String availableTargetIds = StringUtils.join(targetIdResolver.getAvailableTargetIds(), '|');
+        String availableTargetIds = StringUtils.join(targetIdManager.getAvailableTargetIds(), '|');
         String targetedUrlByFilePattern = String.format(TARGETED_URL_PATTERN_FORMAT, targetIdSeparator,
                                                         availableTargetIds);
 

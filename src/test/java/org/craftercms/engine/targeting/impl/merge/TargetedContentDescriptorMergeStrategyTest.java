@@ -18,7 +18,7 @@ import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.targeting.CandidateTargetedUrlsResolver;
 import org.craftercms.engine.targeting.impl.CandidateTargetIdsResolverImpl;
 import org.craftercms.engine.targeting.impl.CandidateTargetedUrlsResolverImpl;
-import org.craftercms.engine.targeting.impl.LocaleTargetIdResolver;
+import org.craftercms.engine.targeting.impl.LocaleTargetIdManager;
 import org.craftercms.engine.targeting.impl.TargetedUrlByFolderStrategy;
 import org.dom4j.Document;
 import org.junit.After;
@@ -110,15 +110,15 @@ public class TargetedContentDescriptorMergeStrategyTest {
     }
 
     private CandidateTargetedUrlsResolver createCandidateUrlsResolver() {
-        LocaleTargetIdResolver targetIdResolver = new LocaleTargetIdResolver();
+        LocaleTargetIdManager targetIdManager = new LocaleTargetIdManager();
 
         TargetedUrlByFolderStrategy targetUrlStrategy = new TargetedUrlByFolderStrategy();
-        targetUrlStrategy.setTargetIdResolver(targetIdResolver);
+        targetUrlStrategy.setTargetIdManager(targetIdManager);
 
         CandidateTargetIdsResolverImpl candidateTargetIdsResolver = new CandidateTargetIdsResolverImpl();
 
         CandidateTargetedUrlsResolverImpl candidateUrlsResolver = new CandidateTargetedUrlsResolverImpl();
-        candidateUrlsResolver.setTargetIdResolver(targetIdResolver);
+        candidateUrlsResolver.setTargetIdManager(targetIdManager);
         candidateUrlsResolver.setTargetedUrlStrategy(targetUrlStrategy);
         candidateUrlsResolver.setCandidateTargetIdsResolver(candidateTargetIdsResolver);
 

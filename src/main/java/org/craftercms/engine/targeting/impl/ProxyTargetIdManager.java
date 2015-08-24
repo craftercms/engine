@@ -16,36 +16,37 @@
  */
 package org.craftercms.engine.targeting.impl;
 
-import org.craftercms.engine.targeting.TargetedUrlComponents;
-import org.craftercms.engine.targeting.TargetedUrlStrategy;
+import java.util.List;
+
+import org.craftercms.engine.targeting.TargetIdManager;
 import org.craftercms.engine.util.spring.AbstractProxyBean;
 
 /**
- * {@link TargetedUrlStrategy} that proxies to the strategy defined in the site application context, or if not
+ * {@link ProxyTargetIdManager} that proxies to the manager defined in the site application context, or if not
  * defined, to the default one in the general application context.
  *
  * @author avasquez
  */
-public class ProxyTargetedUrlStrategy extends AbstractProxyBean<TargetedUrlStrategy> implements TargetedUrlStrategy {
+public class ProxyTargetIdManager extends AbstractProxyBean<TargetIdManager> implements TargetIdManager {
 
     @Override
-    public String toTargetedUrl(String url) {
-        return getBean().toTargetedUrl(url);
+    public String getCurrentTargetId() throws IllegalStateException {
+        return getBean().getCurrentTargetId();
     }
 
     @Override
-    public TargetedUrlComponents parseTargetedUrl(String targetedUrl) {
-        return getBean().parseTargetedUrl(targetedUrl);
+    public String getFallbackTargetId() throws IllegalStateException {
+        return getBean().getFallbackTargetId();
     }
 
     @Override
-    public String buildTargetedUrl(String prefix, String targetId, String suffix) {
-        return getBean().buildTargetedUrl(prefix, targetId, suffix);
+    public List<String> getAvailableTargetIds() throws IllegalStateException {
+        return getBean().getAvailableTargetIds();
     }
 
     @Override
-    protected Class<? extends TargetedUrlStrategy> getBeanClass() {
-        return TargetedUrlStrategy.class;
+    protected Class<? extends TargetIdManager> getBeanClass() {
+        return TargetIdManager.class;
     }
 
 }

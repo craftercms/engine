@@ -5,11 +5,12 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.craftercms.core.util.UrlUtils;
-import org.craftercms.engine.targeting.TargetIdResolver;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
- * Created by alfonsovasquez on 13/8/15.
+ * {@link org.craftercms.engine.targeting.TargetedUrlStrategy} implementation that recognizes the target ID in
+ * the first folder of the URL name (e.g. /en/products/index.xml).
+ *
+ * @author avasquez
  */
 public class TargetedUrlByFolderStrategy extends AbstractTargetedUrlStrategy {
 
@@ -24,7 +25,7 @@ public class TargetedUrlByFolderStrategy extends AbstractTargetedUrlStrategy {
         if (matcher != null) {
             return url;
         } else {
-            String targetId = targetIdResolver.getCurrentTargetId();
+            String targetId = targetIdManager.getCurrentTargetId();
 
             if (!url.startsWith("/")) {
                 url = "/" + url;
@@ -70,7 +71,7 @@ public class TargetedUrlByFolderStrategy extends AbstractTargetedUrlStrategy {
 
     @Override
     protected Pattern getTargetedUrlPattern() {
-        String availableTargetIds = StringUtils.join(targetIdResolver.getAvailableTargetIds(), '|');
+        String availableTargetIds = StringUtils.join(targetIdManager.getAvailableTargetIds(), '|');
         String targetedUrlByFilePattern = String.format(TARGETED_URL_PATTERN_FORMAT, availableTargetIds);
 
         return Pattern.compile(targetedUrlByFilePattern);

@@ -6,7 +6,7 @@ import java.util.List;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.targeting.CandidateTargetIdsResolver;
-import org.craftercms.engine.targeting.TargetIdResolver;
+import org.craftercms.engine.targeting.TargetIdManager;
 import org.craftercms.engine.targeting.TargetedUrlComponents;
 import org.craftercms.engine.targeting.TargetedUrlStrategy;
 import org.junit.After;
@@ -40,7 +40,7 @@ public class CandidateTargetedUrlsResolverImplTest {
     @Before
     public void setUp() throws Exception {
         candidateUrlsResolver = new CandidateTargetedUrlsResolverImpl();
-        candidateUrlsResolver.setTargetIdResolver(createTargetIdResolver());
+        candidateUrlsResolver.setTargetIdManager(createTargetIdManager());
         candidateUrlsResolver.setTargetedUrlStrategy(createTargetedUrlStrategy());
         candidateUrlsResolver.setCandidateTargetIdsResolver(createCandidateTargetIdsResolver());
 
@@ -62,12 +62,12 @@ public class CandidateTargetedUrlsResolverImplTest {
         assertEquals("/site/website/products/index_es.xml", urls.get(1));
     }
 
-    private TargetIdResolver createTargetIdResolver() {
-        TargetIdResolver targetIdResolver = mock(TargetIdResolver.class);
+    private TargetIdManager createTargetIdManager() {
+        TargetIdManager targetIdManager = mock(TargetIdManager.class);
 
-        when(targetIdResolver.getFallbackTargetId()).thenReturn(FALLBACK_TARGET_ID);
+        when(targetIdManager.getFallbackTargetId()).thenReturn(FALLBACK_TARGET_ID);
 
-        return targetIdResolver;
+        return targetIdManager;
     }
 
     private TargetedUrlStrategy createTargetedUrlStrategy() {

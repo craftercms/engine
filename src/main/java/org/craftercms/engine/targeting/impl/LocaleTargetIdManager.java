@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2007-2015 Crafter Software Corporation.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.craftercms.engine.targeting.impl;
 
 import java.util.ArrayList;
@@ -11,9 +27,13 @@ import org.craftercms.engine.util.config.TargetingProperties;
 import org.springframework.context.i18n.LocaleContextHolder;
 
 /**
- * Created by alfonsovasquez on 13/8/15.
+ * Implementation of {@link org.craftercms.engine.targeting.TargetIdManager} that treats the {@link Locale} as a
+ * target ID. The current target ID is one returned by {@link LocaleContextHolder#getLocale()}, and if no available
+ * target IDs are specified in the site configuration, the available locales of the JVM will be used instead.
+ *
+ * @author avasquez
  */
-public class LocaleTargetIdResolver extends AbstractTargetIdResolver {
+public class LocaleTargetIdManager extends AbstractTargetIdManager {
 
     @Override
     public String getCurrentTargetId() throws IllegalStateException {

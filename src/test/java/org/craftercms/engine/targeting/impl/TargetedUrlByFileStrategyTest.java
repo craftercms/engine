@@ -3,7 +3,7 @@ package org.craftercms.engine.targeting.impl;
 import java.util.Arrays;
 import java.util.List;
 
-import org.craftercms.engine.targeting.TargetIdResolver;
+import org.craftercms.engine.targeting.TargetIdManager;
 import org.craftercms.engine.targeting.TargetedUrlComponents;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,18 +26,18 @@ public class TargetedUrlByFileStrategyTest {
 
     private TargetedUrlByFileStrategy targetedUrlByFileStrategy;
     @Mock
-    private TargetIdResolver targetIdResolver;
+    private TargetIdManager targetIdManager;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        when(targetIdResolver.getFallbackTargetId()).thenReturn(DEFAULT_TARGET_ID);
-        when(targetIdResolver.getCurrentTargetId()).thenReturn(CURRENT_TARGET_ID);
-        when(targetIdResolver.getAvailableTargetIds()).thenReturn(AVAILABLE_TARGET_IDS);
+        when(targetIdManager.getFallbackTargetId()).thenReturn(DEFAULT_TARGET_ID);
+        when(targetIdManager.getCurrentTargetId()).thenReturn(CURRENT_TARGET_ID);
+        when(targetIdManager.getAvailableTargetIds()).thenReturn(AVAILABLE_TARGET_IDS);
 
         targetedUrlByFileStrategy = new TargetedUrlByFileStrategy();
-        targetedUrlByFileStrategy.setTargetIdResolver(targetIdResolver);
+        targetedUrlByFileStrategy.setTargetIdManager(targetIdManager);
     }
 
     @Test

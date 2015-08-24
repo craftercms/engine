@@ -234,15 +234,15 @@ public class TargetedContentStoreAdapterTest extends ConfigAwareTestBase {
     }
 
     private CandidateTargetedUrlsResolver createCandidateTargetedUrlsResolver() {
-        LocaleTargetIdResolver targetIdResolver = new LocaleTargetIdResolver();
+        LocaleTargetIdManager targetIdManager = new LocaleTargetIdManager();
 
         TargetedUrlByFolderStrategy targetUrlStrategy = new TargetedUrlByFolderStrategy();
-        targetUrlStrategy.setTargetIdResolver(targetIdResolver);
+        targetUrlStrategy.setTargetIdManager(targetIdManager);
 
         CandidateTargetIdsResolverImpl candidateTargetIdsResolver = new CandidateTargetIdsResolverImpl();
 
         CandidateTargetedUrlsResolverImpl candidateUrlsResolver = new CandidateTargetedUrlsResolverImpl();
-        candidateUrlsResolver.setTargetIdResolver(targetIdResolver);
+        candidateUrlsResolver.setTargetIdManager(targetIdManager);
         candidateUrlsResolver.setTargetedUrlStrategy(targetUrlStrategy);
         candidateUrlsResolver.setCandidateTargetIdsResolver(candidateTargetIdsResolver);
 

@@ -1,10 +1,28 @@
+/*
+ * Copyright (C) 2007-2015 Crafter Software Corporation.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.craftercms.engine.util.config;
 
 import org.apache.commons.configuration.Configuration;
 import org.craftercms.engine.util.ConfigUtils;
 
 /**
- * Created by alfonsovasquez on 13/8/15.
+ * Site configuration propeties related to content targeting.
+ *
+ * @author avasquez
  */
 public class TargetingProperties {
 
@@ -14,6 +32,9 @@ public class TargetingProperties {
     public static final String ROOT_FOLDERS_CONFIG_KEY = "targeting.rootFolders";
     public static final String MERGE_FOLDERS_CONFIG_KEY = "targeting.mergeFolders";
 
+    /**
+     * Returns trues if targeting is enabled.
+     */
     public static boolean isTargetingEnabled() {
         Configuration config = ConfigUtils.getCurrentConfig();
         if (config != null) {
@@ -23,6 +44,9 @@ public class TargetingProperties {
         }
     }
 
+    /**
+     * Returns the list of available target IDs.
+     */
     public static String[] getAvailableTargetIds() {
         Configuration config = ConfigUtils.getCurrentConfig();
         if (config != null) {
@@ -32,6 +56,10 @@ public class TargetingProperties {
         }
     }
 
+    /**
+     * Returns the fallback target ID. The fallback target ID is used in case none of the resolved candidate targeted
+     * URLs map to existing content.
+     */
     public static String getFallbackTargetId() {
         Configuration config = ConfigUtils.getCurrentConfig();
         if (config != null) {
@@ -41,6 +69,9 @@ public class TargetingProperties {
         return null;
     }
 
+    /**
+     * Returns the folders that will be handled for tageted content.
+     */
     public static String[] getRootFolders() {
         Configuration config = ConfigUtils.getCurrentConfig();
         if (config != null) {
@@ -50,6 +81,10 @@ public class TargetingProperties {
         }
     }
 
+    /**
+     * Returns true if the sub items of folders with the same family of target IDs should be merged (e.g. "en_US" and
+     * "en" are of the same family).
+     */
     public static boolean isMergeFolders() {
         Configuration config = ConfigUtils.getCurrentConfig();
         if (config != null) {

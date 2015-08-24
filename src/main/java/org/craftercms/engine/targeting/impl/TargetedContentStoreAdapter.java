@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2007-2015 Crafter Software Corporation.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.craftercms.engine.targeting.impl;
 
 import java.util.ArrayList;
@@ -23,7 +39,16 @@ import org.craftercms.engine.util.config.TargetingProperties;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
- * Created by alfonsovasquez on 21/8/15.
+ * {@link ContentStoreAdapter} implementation that uses a {@link CandidateTargetedUrlsResolver} to generate candidate
+ * URLs for targeted content lookup. For example, if an item at /site/website/es_CR/products/index.xml is requested,
+ * the adapter might try to find the content first at that URL, then at /site/website/es/products/index.xml and
+ * finally at /site/website/en/products/index.xml
+ *
+ * <p>The adapter is also capable of merging the items of folders that belong to the same family of targeted content,
+ * so for example, the tree of /site/website/es_CR can be the combination of all the items at /site/website/es_CR,
+ * /site/website/es and /site/website/en.</p>
+ *
+ * @author avasquez
  */
 public class TargetedContentStoreAdapter implements ContentStoreAdapter {
 

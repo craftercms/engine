@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2007-2015 Crafter Software Corporation.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.craftercms.engine.targeting.impl;
 
 import java.util.ArrayList;
@@ -8,7 +24,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.craftercms.engine.targeting.CandidateTargetIdsResolver;
 
 /**
- * Created by alfonsovasquez on 14/8/15.
+ * Default implementation of {@link CandidateTargetIdsResolver}, which generates the candidate target IDs by splitting
+ * the original target ID and appending the components again but excluding the last one on each iteration. For example,
+ * if the original target ID is ja_JP_JP and the fallback target ID is en, the the candidate targetd IDs will be:
+ * ja_JP_JP, ja_JP, ja and en.
+ *
+ * @author avasquez
  */
 public class CandidateTargetIdsResolverImpl implements CandidateTargetIdsResolver {
 

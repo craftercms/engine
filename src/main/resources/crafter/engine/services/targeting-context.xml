@@ -6,7 +6,7 @@
     <bean id="crafter.targetedUrlStrategyBase"
           class="org.craftercms.engine.targeting.impl.AbstractTargetedUrlStrategy"
           abstract="true">
-        <property name="targetIdResolver" ref="crafter.proxyTargetIdResolver"/>
+        <property name="targetIdManager" ref="crafter.proxyTargetIdManager"/>
     </bean>
 
     <bean id="crafter.targetedUrlStrategy"
@@ -19,11 +19,11 @@
         <property name="beanName" value="crafter.targetedUrlStrategy"/>
     </bean>
 
-    <bean id="crafter.targetIdResolver" class="org.craftercms.engine.targeting.impl.LocaleTargetIdResolver"/>
+    <bean id="crafter.targetIdManager" class="org.craftercms.engine.targeting.impl.LocaleTargetIdManager"/>
 
-    <bean id="crafter.proxyTargetIdResolver" class="org.craftercms.engine.targeting.impl.ProxyTargetIdResolver">
+    <bean id="crafter.proxyTargetIdManager" class="org.craftercms.engine.targeting.impl.ProxyTargetIdManager">
         <property name="applicationContext" ref="crafter.applicationContextAccessor"/>
-        <property name="beanName" value="crafter.targetIdResolver"/>
+        <property name="beanName" value="crafter.targetIdManager"/>
     </bean>
 
     <bean id="crafter.candidateTargetIdsResolver"
@@ -31,7 +31,7 @@
 
     <bean id="crafter.candidateTargetedUrlsResolver"
           class="org.craftercms.engine.targeting.impl.CandidateTargetedUrlsResolverImpl">
-        <property name="targetIdResolver" ref="crafter.proxyTargetIdResolver"/>
+        <property name="targetIdManager" ref="crafter.proxyTargetIdManager"/>
         <property name="targetedUrlStrategy" ref="crafter.proxyTargetedUrlStrategy"/>
         <property name="candidateTargetIdsResolver" ref="crafter.candidateTargetIdsResolver"/>
     </bean>

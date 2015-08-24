@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2007-2015 Crafter Software Corporation.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.craftercms.engine.targeting.impl;
 
 import java.util.ArrayList;
@@ -8,24 +24,29 @@ import org.apache.commons.lang3.StringUtils;
 import org.craftercms.core.util.UrlUtils;
 import org.craftercms.engine.targeting.CandidateTargetIdsResolver;
 import org.craftercms.engine.targeting.CandidateTargetedUrlsResolver;
-import org.craftercms.engine.targeting.TargetIdResolver;
+import org.craftercms.engine.targeting.TargetIdManager;
 import org.craftercms.engine.targeting.TargetedUrlComponents;
 import org.craftercms.engine.targeting.TargetedUrlStrategy;
 import org.craftercms.engine.util.TargetingUtils;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
- * Created by alfonsovasquez on 14/8/15.
+ * Default implementation of {@link CandidateTargetedUrlsResolverImpl}, that works by first extracting the root folder
+ * URL of the targeted URL, then calling {@link TargetedUrlStrategy#parseTargetedUrl(String)} with the relative URL,
+ * and finally build the candidate targeted URLs based on the candidate target IDs returned by
+ * {@link CandidateTargetIdsResolver#getTargetIds(String, String)}.
+ *
+ * @author avasquez
  */
 public class CandidateTargetedUrlsResolverImpl implements CandidateTargetedUrlsResolver {
 
-    protected TargetIdResolver targetIdResolver;
+    protected TargetIdManager targetIdManager;
     protected TargetedUrlStrategy targetedUrlStrategy;
     protected CandidateTargetIdsResolver candidateTargetIdsResolver;
 
     @Required
-    public void setTargetIdResolver(TargetIdResolver targetIdResolver) {
-        this.targetIdResolver = targetIdResolver;
+    public void setTargetIdManager(TargetIdManager targetIdManager) {
+        this.targetIdManager = targetIdManager;
     }
 
     @Required
@@ -51,7 +72,7 @@ public class CandidateTargetedUrlsResolverImpl implements CandidateTargetedUrlsR
                 String prefix = UrlUtils.appendUrl(rootFolder, urlComp.getPrefix());
                 String suffix = urlComp.getSuffix();
                 String targetId = urlComp.getTargetId();
-                String fallbackTargetId = targetIdResolver.getFallbackTargetId();
+                String fallbackTargetId = targetIdManager.getFallbackTargetId();
                 List<String> candidateTargetIds = candidateTargetIdsResolver.getTargetIds(targetId, fallbackTargetId);
 
                 if (CollectionUtils.isNotEmpty(candidateTargetIds)) {

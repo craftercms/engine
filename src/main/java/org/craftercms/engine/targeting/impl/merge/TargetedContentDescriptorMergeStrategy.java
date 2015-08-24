@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2007-2015 Crafter Software Corporation.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.craftercms.engine.targeting.impl.merge;
 
 import java.util.ArrayList;
@@ -19,7 +35,29 @@ import org.dom4j.Document;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
- * Created by alfonsovasquez on 17/8/15.
+ * {@link DescriptorMergeStrategy} used for merging descriptors of a targeted content hierarchy. The exact descriptors
+ * to merge differ depending on the {@link org.craftercms.engine.targeting.TargetedUrlStrategy} used by the
+ * {@link CandidateTargetedUrlsResolver}, but basically the list consists of the level descriptors in the folder
+ * hierarchy followed by the candidate targeted URLs. For example, assuming we're using the folder targeted URL
+ * strategy, the fallback target ID in the configuration is "en", and that main descriptor URL is
+ * /site/website/es_CR/products/index.xml, the mergeable descriptor list will look like this:
+ *
+ * <ul>
+ *     <li>/crafter-level-descriptor.level.xml</li>
+ *     <li>/site/crafter-level-descriptor.level.xml</li>
+ *     <li>/site/website/crafter-level-descriptor.level.xml</li>
+ *     <li>/site/website/en/crafter-level-descriptor.level.xml</li>
+ *     <li>/site/website/en/products/crafter-level-descriptor.level.xml</li>
+ *     <li>/site/website/en/products/index.xml</li>
+ *     <li>/site/website/es/crafter-level-descriptor.level.xml</li>
+ *     <li>/site/website/es/products/crafter-level-descriptor.level.xml</li>
+ *     <li>/site/website/es/products/index.xml</li>
+ *     <li>/site/website/es_CR/crafter-level-descriptor.level.xml</li>
+ *     <li>/site/website/es_CR/products/crafter-level-descriptor.level.xml</li>
+ *     <li>/site/website/es_CR/products/index.xml</li>
+ * </ul>
+ *
+ * @author avasquez
  */
 public class TargetedContentDescriptorMergeStrategy extends InheritLevelsMergeStrategy implements
     DescriptorMergeStrategy {
