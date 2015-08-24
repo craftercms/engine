@@ -31,7 +31,8 @@ import org.craftercms.core.url.UrlTransformer;
 public class AddIndexIfFolderUrlTransformer implements UrlTransformer {
 
     @Override
-    public String transformUrl(Context context, CachingOptions cachingOptions, String url) throws UrlTransformationException {
+    public String transformUrl(Context context, CachingOptions cachingOptions,
+                               String url) throws UrlTransformationException {
         String extension = FilenameUtils.getExtension(url);
         if (StringUtils.isEmpty(extension)) {
             url = StringUtils.stripEnd(url, "/");

@@ -47,7 +47,7 @@ public class ConfigAwareTestBase {
     private void setCurrentRequestContext() {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/");
         MockHttpServletResponse response = new MockHttpServletResponse();
-        RequestContext context = new RequestContext(request, response);
+        RequestContext context = new RequestContext(request, response, null);
 
         RequestContext.setCurrent(context);
     }

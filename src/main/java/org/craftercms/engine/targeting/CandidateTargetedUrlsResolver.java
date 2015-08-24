@@ -14,31 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.craftercms.engine.util;
+package org.craftercms.engine.targeting;
 
-import org.apache.commons.configuration.HierarchicalConfiguration;
-import org.craftercms.engine.service.context.SiteContext;
+import java.util.List;
 
 /**
- * Configuration related utility methods.
+ * Resolves all the candidate targeted URLs that should be used for a specified target URL when attempting
+ * content resolution.
  *
  * @author avasquez
  */
-public class ConfigUtils {
-
-    private ConfigUtils() {
-    }
+public interface CandidateTargetedUrlsResolver {
 
     /**
-     * Returns the configuration from the current site context.
+     * Resolves all the candidate targeted URLs that should be used for a given targeted URL when attempting
+     * content resolution. For example, if the targeted URL is /products/index_en_US.xml, that candidate
+     * URL list could look like this: /products/index_en_US.xml, /products/index_en.xml, and /products/index.xml.
+     *
+     * @param targetedUrl the targeted URL used to generate the candidate URLs
+     *
+     * @return the list of candidate targeted URLs.
      */
-    public static HierarchicalConfiguration getCurrentConfig() {
-        SiteContext siteContext = SiteContext.getCurrent();
-        if (siteContext != null) {
-            return siteContext.getConfig();
-        } else {
-            return null;
-        }
-    }
+    List<String> getUrls(String targetedUrl);
 
 }

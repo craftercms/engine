@@ -1,17 +1,27 @@
-package org.craftercms.engine.i10n;
+/*
+ * Copyright (C) 2007-2015 Crafter Software Corporation.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.craftercms.engine.targeting.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.Predicate;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.LocaleUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.core.exception.AuthenticationException;
@@ -24,34 +34,33 @@ import org.craftercms.core.service.Context;
 import org.craftercms.core.service.Item;
 import org.craftercms.core.store.ContentStoreAdapter;
 import org.craftercms.core.util.cache.impl.CachingAwareList;
-import org.craftercms.engine.util.config.I10nProperties;
+import org.craftercms.engine.targeting.CandidateTargetedUrlsResolver;
+import org.craftercms.engine.util.config.TargetingProperties;
 import org.springframework.beans.factory.annotation.Required;
-import org.springframework.context.i18n.LocaleContextHolder;
 
 /**
- * {@link ContentStoreAdapter} decorator that uses localized folders to create fallback paths for searching a resource.
- * For example, if there's a request for /site/website/th_TH_TH/index.xml, the decorator will try to find the
- * resource at /site/website/th_TH/index.xml, at /site/website/th/index.xml, and if en is the default locale, at
- * /site/website/en/index.xml. If there's a locale in {@link LocaleContextHolder}, and the {@code forceCurrentLocale}
- * configuration property is set to true, it will be used instead of the locale specified in the path.
+ * {@link ContentStoreAdapter} implementation that uses a {@link CandidateTargetedUrlsResolver} to generate candidate
+ * URLs for targeted content lookup. For example, if an item at /site/website/es_CR/products/index.xml is requested,
+ * the adapter might try to find the content first at that URL, then at /site/website/es/products/index.xml and
+ * finally at /site/website/en/products/index.xml
  *
- * <p>If searching for a folder's children, and the configuration property {@code mergeFolders} is set, the child
- * items of the fallback folders will be added to the result. For example, if looking for the children of folder
- * /site/website/th_TH_TH, all items that are under /site/website/th_TH, /site/website/th and /site/website/en, and
- * are not already present, will be added.</p>
+ * <p>The adapter is also capable of merging the items of folders that belong to the same family of targeted content,
+ * so for example, the tree of /site/website/es_CR can be the combination of all the items at /site/website/es_CR,
+ * /site/website/es and /site/website/en.</p>
  *
  * @author avasquez
  */
-public class LocalizedContentStoreAdapter implements ContentStoreAdapter {
+public class TargetedContentStoreAdapter implements ContentStoreAdapter {
 
-    public static final Log logger = LogFactory.getLog(LocalizedContentStoreAdapter.class);
-
-    public static final String LOCALIZED_PATH_PATTERN_FORMAT = "(%s/)([^/.]+)(/.+)?";
-    public static final int BASE_PATH_GROUP = 1;
-    public static final int LOCALE_GROUP = 2;
-    public static final int PATH_SUFFIX_GROUP = 3;
+    public static final Log logger = LogFactory.getLog(TargetedContentStoreAdapter.class);
 
     protected ContentStoreAdapter actualAdapter;
+    protected CandidateTargetedUrlsResolver candidateTargetedUrlsResolver;
+
+    @Required
+    public void setCandidateTargetedUrlsResolver(CandidateTargetedUrlsResolver candidateTargetedUrlsResolver) {
+        this.candidateTargetedUrlsResolver = candidateTargetedUrlsResolver;
+    }
 
     @Required
     public void setActualAdapter(ContentStoreAdapter actualAdapter) {
@@ -69,8 +78,8 @@ public class LocalizedContentStoreAdapter implements ContentStoreAdapter {
     }
 
     @Override
-    public void destroyContext(Context context) throws InvalidContextException, StoreException,
-        AuthenticationException {
+    public void destroyContext(
+        Context context) throws InvalidContextException, StoreException, AuthenticationException {
         context = ((ContextWrapper)context).getActualContext();
 
         actualAdapter.destroyContext(context);
@@ -80,13 +89,13 @@ public class LocalizedContentStoreAdapter implements ContentStoreAdapter {
     public boolean exists(Context context, String path) throws InvalidContextException, StoreException {
         context = ((ContextWrapper)context).getActualContext();
 
-        if (I10nProperties.localizationEnabled()) {
-            List<String> candidatePaths = getCandidatePaths(path);
+        if (TargetingProperties.isTargetingEnabled()) {
+            List<String> candidatePaths = candidateTargetedUrlsResolver.getUrls(path);
             if (CollectionUtils.isNotEmpty(candidatePaths)) {
                 for (String candidatePath : candidatePaths) {
                     if (actualAdapter.exists(context, candidatePath)) {
                         if (logger.isDebugEnabled()) {
-                            logger.debug("Localized version of " + path + " found at " + candidatePath);
+                            logger.debug("Targeted of " + path + " found at " + candidatePath);
                         }
 
                         return true;
@@ -107,14 +116,14 @@ public class LocalizedContentStoreAdapter implements ContentStoreAdapter {
                                String path) throws InvalidContextException, StoreException {
         context = ((ContextWrapper)context).getActualContext();
 
-        if (I10nProperties.localizationEnabled()) {
-            List<String> candidatePaths = getCandidatePaths(path);
+        if (TargetingProperties.isTargetingEnabled()) {
+            List<String> candidatePaths = candidateTargetedUrlsResolver.getUrls(path);
             if (CollectionUtils.isNotEmpty(candidatePaths)) {
                 for (String candidatePath : candidatePaths) {
                     Content content = actualAdapter.findContent(context, cachingOptions, candidatePath);
                     if (content != null) {
                         if (logger.isDebugEnabled()) {
-                            logger.debug("Localized version of " + path + " found at " + candidatePath);
+                            logger.debug("Targeted version of " + path + " found at " + candidatePath);
                         }
 
                         return content;
@@ -135,14 +144,14 @@ public class LocalizedContentStoreAdapter implements ContentStoreAdapter {
                          boolean withDescriptor) throws InvalidContextException, XmlFileParseException, StoreException {
         context = ((ContextWrapper)context).getActualContext();
 
-        if (I10nProperties.localizationEnabled()) {
-            List<String> candidatePaths = getCandidatePaths(path);
+        if (TargetingProperties.isTargetingEnabled()) {
+            List<String> candidatePaths = candidateTargetedUrlsResolver.getUrls(path);
             if (CollectionUtils.isNotEmpty(candidatePaths)) {
                 for (String candidatePath : candidatePaths) {
                     Item item = actualAdapter.findItem(context, cachingOptions, candidatePath, withDescriptor);
                     if (item != null) {
                         if (logger.isDebugEnabled()) {
-                            logger.debug("Localized version of " + path + " found at " + candidatePath);
+                            logger.debug("Targeted version of " + path + " found at " + candidatePath);
                         }
 
                         return item;
@@ -164,10 +173,10 @@ public class LocalizedContentStoreAdapter implements ContentStoreAdapter {
         StoreException {
         context = ((ContextWrapper)context).getActualContext();
 
-        if (I10nProperties.localizationEnabled()) {
-            List<String> candidatePaths = getCandidatePaths(path);
+        if (TargetingProperties.isTargetingEnabled()) {
+            List<String> candidatePaths = candidateTargetedUrlsResolver.getUrls(path);
             if (CollectionUtils.isNotEmpty(candidatePaths)) {
-                if (I10nProperties.mergeFolders()) {
+                if (TargetingProperties.isMergeFolders()) {
                     if (logger.isDebugEnabled()) {
                         logger.debug("Merging child items of " + candidatePaths);
                     }
@@ -187,7 +196,7 @@ public class LocalizedContentStoreAdapter implements ContentStoreAdapter {
                                                                    withDescriptor);
                         if (CollectionUtils.isNotEmpty(items)) {
                             if (logger.isDebugEnabled()) {
-                                logger.debug("Localized version of " + path + " found at " + candidatePath);
+                                logger.debug("Targeted version of " + path + " found at " + candidatePath);
                             }
 
                             return items;
@@ -202,78 +211,6 @@ public class LocalizedContentStoreAdapter implements ContentStoreAdapter {
         } else {
             return actualAdapter.findItems(context, cachingOptions, path, withDescriptor);
         }
-    }
-
-    protected Matcher getLocalizedPathMatcher(String path) {
-        String[] basePaths = I10nProperties.getLocalizedPaths();
-        if (ArrayUtils.isNotEmpty(basePaths)) {
-            for (String basePath : basePaths) {
-                Pattern pattern = Pattern.compile(String.format(LOCALIZED_PATH_PATTERN_FORMAT, basePath));
-                Matcher matcher = pattern.matcher(path);
-
-                if (matcher.matches()) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug(path + " matches localized path pattern " + pattern);
-                    }
-
-                    return matcher;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    protected List<String> getCandidatePaths(String path) {
-        Matcher pathMatcher = getLocalizedPathMatcher(path);
-
-        if (pathMatcher == null) {
-            return null;
-        }
-
-        String basePath = pathMatcher.group(BASE_PATH_GROUP);
-        String localeStr = pathMatcher.group(LOCALE_GROUP);
-        String pathSuffix = pathMatcher.group(PATH_SUFFIX_GROUP);
-        Locale locale;
-
-        try {
-            locale = LocaleUtils.toLocale(localeStr);
-            if (!LocaleUtils.isAvailableLocale(locale)) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug(localeStr + " is not one of the available locales");
-                }
-
-                return null;
-            }
-        } catch (IllegalArgumentException e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(localeStr + " is not a valid locale");
-            }
-
-            return null;
-        }
-
-        if (I10nProperties.forceCurrentLocale()) {
-            locale = LocaleContextHolder.getLocale();
-        }
-
-        Locale defaultLocale = I10nProperties.getDefaultLocale();
-        if (defaultLocale == null) {
-            defaultLocale = locale;
-        }
-
-        List<Locale> candidateLocales = LocaleUtils.localeLookupList(locale, defaultLocale);
-        List<String> candidatePaths = new ArrayList<>(candidateLocales.size());
-
-        for (Locale candidateLocale : candidateLocales) {
-            candidatePaths.add(basePath + candidateLocale + (StringUtils.isNotEmpty(pathSuffix)? pathSuffix: ""));
-        }
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("Candidate paths for " + path + ": " + candidatePaths);
-        }
-
-        return candidatePaths;
     }
 
     protected List<Item> mergeItems(List<Item> overriding, List<Item> original) {
@@ -309,10 +246,10 @@ public class LocalizedContentStoreAdapter implements ContentStoreAdapter {
 
     protected static class ContextWrapper implements Context {
 
-        private LocalizedContentStoreAdapter storeAdapter;
+        private TargetedContentStoreAdapter storeAdapter;
         private Context actualContext;
 
-        public ContextWrapper(LocalizedContentStoreAdapter storeAdapter, Context actualContext) {
+        public ContextWrapper(TargetedContentStoreAdapter storeAdapter, Context actualContext) {
             this.storeAdapter = storeAdapter;
             this.actualContext = actualContext;
         }

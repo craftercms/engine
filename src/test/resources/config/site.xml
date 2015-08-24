@@ -22,13 +22,15 @@
         </filter>
     </filters>
 
-    <i10n>
+    <defaultLocale>en</defaultLocale>
+
+    <targeting>
         <enabled>true</enabled>
-        <localizedPaths>/site/website</localizedPaths>
-        <forceCurrentLocale>false</forceCurrentLocale>
-        <defaultLocale>en</defaultLocale>
+        <rootFolders>/site/website</rootFolders>
+        <availableTargetIds>en,ja,ja_JP,ja_JP_JP</availableTargetIds>
+        <fallbackTargetId>en</fallbackTargetId>
         <mergeFolders>true</mergeFolders>
-    </i10n>
+    </targeting>
 
     <profile>
         <api>

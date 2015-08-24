@@ -74,6 +74,6 @@
     </bean>
 
     <!-- This needs to be named localeResolver so that the DispatcherServlet can find it -->
-    <bean id="localeResolver" class="org.craftercms.engine.i10n.ConfigAwareCookieLocaleResolver" />
+    <bean id="localeResolver" class="org.craftercms.engine.targeting.impl.ConfigAwareCookieLocaleResolver" />
 
 </beans>
