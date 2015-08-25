@@ -43,7 +43,6 @@ public class GroovyUtils {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(GroovyUtils.class);
 
-    public static final String VARIABLE_REQUEST_URL = "requestUrl";
     public static final String VARIABLE_APPLICATION = "application";
     public static final String VARIABLE_REQUEST = "request";
     public static final String VARIABLE_RESPONSE = "response";
@@ -71,13 +70,11 @@ public class GroovyUtils {
         variables.put(VARIABLE_RESPONSE, response);
 
         if (request != null) {
-            variables.put(VARIABLE_REQUEST_URL, request.getRequestURI());
             variables.put(VARIABLE_PARAMS, HttpUtils.createRequestParamsMap(request));
             variables.put(VARIABLE_HEADERS, HttpUtils.createHeadersMap(request));
             variables.put(VARIABLE_COOKIES, HttpUtils.createCookiesMap(request));
             variables.put(VARIABLE_SESSION, request.getSession(false));
         } else {
-            variables.put(VARIABLE_REQUEST_URL, null);
             variables.put(VARIABLE_PARAMS, null);
             variables.put(VARIABLE_HEADERS, null);
             variables.put(VARIABLE_COOKIES, null);
