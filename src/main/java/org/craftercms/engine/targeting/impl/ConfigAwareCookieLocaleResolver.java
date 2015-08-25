@@ -36,7 +36,7 @@ public class ConfigAwareCookieLocaleResolver extends CookieLocaleResolver {
 
     @Override
     protected Locale determineDefaultLocale(HttpServletRequest request) {
-        Locale defaultLocale = getDefaultLocale();
+        Locale defaultLocale = getDefaultLocaleFromConfig();
         if (defaultLocale != null) {
             return defaultLocale;
         } else {
@@ -44,17 +44,22 @@ public class ConfigAwareCookieLocaleResolver extends CookieLocaleResolver {
         }
     }
 
-    protected Locale getDefaultLocale() {
+    protected Locale getDefaultLocaleFromConfig() {
         Configuration config = ConfigUtils.getCurrentConfig();
-        Locale defaultLocale = LocaleUtils.toLocale(config.getString(DEFAULT_LOCALE_CONFIG_KEY));
+        if (config != null) {
+            Locale defaultLocale = LocaleUtils.toLocale(config.getString(DEFAULT_LOCALE_CONFIG_KEY));
+            if (defaultLocale != null && !LocaleUtils.isAvailableLocale(defaultLocale)) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug(defaultLocale + " is not one of the available locales");
+                }
 
-        if (defaultLocale != null && !LocaleUtils.isAvailableLocale(defaultLocale)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(defaultLocale + " is not one of the available locales");
+                return null;
             }
-        }
 
-        return defaultLocale;
+            return defaultLocale;
+        } else {
+            return null;
+        }
     }
 
 }
