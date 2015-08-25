@@ -29,6 +29,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.util.ExceptionUtils;
 import org.craftercms.core.util.cache.CachingAwareObject;
 import org.craftercms.engine.exception.HttpStatusCodeAwareException;
@@ -51,10 +52,12 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
 
     private static final Log logger = LogFactory.getLog(CrafterPageView.class);
 
+    public static final String PAGE_URL_ATTRIBUTE_NAME = "pageUrl";
+
     public static final String DEFAULT_CONTENT_TYPE = "text/html;charset=UTF-8";
     public static final String DEFAULT_CHARSET = "UTF-8";
 
-    public static final String KEY_PAGE_MODEL = "model";
+    public static final String KEY_MODEL = "model";
     public static final String KEY_MODE_PREVIEW = "modePreview";
 
     protected transient String scope;
@@ -148,7 +151,7 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
     @Override
     public void addDependencyKeys(Collection<Object> dependencyKeys) {
         if (this.dependencyKeys == null) {
-            this.dependencyKeys = new ArrayList<Object>();
+            this.dependencyKeys = new ArrayList<>();
         }
 
         this.dependencyKeys.addAll(dependencyKeys);
@@ -157,7 +160,7 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
     @Override
     public void addDependencyKey(Object dependencyKey) {
         if (dependencyKeys == null) {
-            dependencyKeys = new ArrayList<Object>();
+            dependencyKeys = new ArrayList<>();
         }
 
         dependencyKeys.add(dependencyKey);
@@ -201,6 +204,8 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        RequestContext.getCurrent().getRequest().setAttribute(PAGE_URL_ATTRIBUTE_NAME, page.getStoreUrl());
+
         String mimeType = getMimeType();
         if (StringUtils.isNotEmpty(mimeType)) {
             setContentType(MediaType.parseMediaType(mimeType).toString() + ";charset=" + DEFAULT_CHARSET);
@@ -228,7 +233,7 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
             }
         }
 
-        model.put(KEY_PAGE_MODEL, page);
+        model.put(KEY_MODEL, page);
         model.put(KEY_MODE_PREVIEW, modePreview);
 
         renderActualView(getPageViewName(), model, request, response);
@@ -251,7 +256,7 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
 
     protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response,
                                                         Map<String, Object> model) {
-        Map<String, Object> scriptVariables = new HashMap<String, Object>();
+        Map<String, Object> scriptVariables = new HashMap<>();
         GroovyUtils.addCommonVariables(scriptVariables, request, response, getServletContext());
         GroovyUtils.addSecurityVariables(scriptVariables);
         GroovyUtils.addCrafterModelVariable(scriptVariables, page);

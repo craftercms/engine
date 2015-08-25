@@ -29,6 +29,7 @@ import freemarker.ext.beans.BeansWrapper;
 import freemarker.ext.servlet.HttpRequestParametersHashModel;
 import freemarker.ext.servlet.HttpSessionHashModel;
 import freemarker.template.SimpleHash;
+import freemarker.template.TemplateHashModel;
 import org.apache.commons.lang.ArrayUtils;
 import org.craftercms.engine.freemarker.RenderComponentDirective;
 import org.craftercms.engine.freemarker.ServletContextHashModel;
@@ -72,7 +73,9 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     public static final String KEY_AUTH = "authentication";
     public static final String KEY_PROFILE_CAP = "Profile";
     public static final String KEY_PROFILE = "profile";
+    public static final String KEY_STATICS_CAP = "Statics";
     public static final String KEY_STATICS = "statics";
+    public static final String KEY_ENUMS_CAP = "Enums";
     public static final String KEY_ENUMS = "enums";
     public static final String KEY_SITE_CONTEXT = "siteContext";
     public static final String KEY_SITE_CONTEXT_CAP = "SiteContext";
@@ -144,8 +147,8 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     @Override
     protected SimpleHash buildTemplateModel(final Map<String, Object> model, final HttpServletRequest request,
                                             final HttpServletResponse response) {
-        AllHttpScopesAndAppContextHashModel templateModel = new AllHttpScopesAndAppContextHashModel(getObjectWrapper(),
-                getApplicationContext(), getServletContext(), request);
+        AllHttpScopesAndAppContextHashModel templateModel = new AllHttpScopesAndAppContextHashModel(
+            getObjectWrapper(), getApplicationContext(), getServletContext(), request);
         HttpSessionHashModel sessionModel = createSessionModel(request, response);
         HttpRequestHashModel requestModel = new HttpRequestHashModel(request, response, getObjectWrapper());
         HttpRequestParametersHashModel requestParamsModel = new HttpRequestParametersHashModel(request);
@@ -175,12 +178,17 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
         SiteContext context = SiteContext.getCurrent();
         Locale locale = LocaleContextHolder.getLocale();
 
-        templateModel.put(KEY_STATICS, BeansWrapper.getDefaultInstance().getStaticModels());
-        templateModel.put(KEY_ENUMS, BeansWrapper.getDefaultInstance().getEnumModels());
-        templateModel.put(KEY_SITE_CONTEXT, context);
+        TemplateHashModel staticModels = BeansWrapper.getDefaultInstance().getStaticModels();
+        TemplateHashModel enumModels = BeansWrapper.getDefaultInstance().getEnumModels();
+
+        templateModel.put(KEY_STATICS_CAP, staticModels);
+        templateModel.put(KEY_STATICS, staticModels);
+        templateModel.put(KEY_ENUMS_CAP, enumModels);
+        templateModel.put(KEY_ENUMS, enumModels);
         templateModel.put(KEY_SITE_CONTEXT_CAP, context);
-        templateModel.put(KEY_LOCALE, locale);
+        templateModel.put(KEY_SITE_CONTEXT, context);
         templateModel.put(KEY_LOCALE_CAP, locale);
+        templateModel.put(KEY_LOCALE, locale);
 
         templateModel.putAll(model);
 
@@ -227,4 +235,5 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     	 
     	 return cookieMap;
     }
+
 }

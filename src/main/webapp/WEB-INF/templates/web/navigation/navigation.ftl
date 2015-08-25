@@ -25,7 +25,7 @@
         </#if>
 
         <#if navigable>
-            <#if model.storeUrl?starts_with(navItem.storeUrl)>
+            <#if Request.pageUrl?starts_with(navItem.storeUrl)>
                 <#assign active = true>
             <#else>
                 <#assign active = false>

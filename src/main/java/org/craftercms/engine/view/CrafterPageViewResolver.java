@@ -202,7 +202,6 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
 
     protected SiteItem getPage(String url) {
         SiteItem page = siteItemService.getSiteItem(url);
-
         if (page == null) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Crafter page descriptor not found at " + url);
@@ -225,14 +224,14 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
         return getRedirectView(fullHttpsUrl, false);
     }
 
-    protected View getCachedLocalizedView(final String baseUrl, final Locale locale) {
+    protected View getCachedLocalizedView(final String url, final Locale locale) {
         final SiteContext siteContext = SiteContext.getCurrent();
         if (siteContext != null) {
             return cacheTemplate.getObject(siteContext.getContext(), cachingOptions, new Callback<View>() {
 
                 @Override
                 public View execute() {
-                    SiteItem page = getPage(baseUrl);
+                    SiteItem page = getPage(url);
                     if (page != null) {
                         String disabled = page.getItem().queryDescriptorValue(disabledXPathQuery);
                         if (!modePreview && StringUtils.isNotEmpty(disabled) && Boolean.parseBoolean(disabled)) {
@@ -275,7 +274,7 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
                     }
                 }
 
-            }, baseUrl, locale, PAGE_CONST_KEY_ELEM);
+            }, url, locale, PAGE_CONST_KEY_ELEM);
         } else {
             // Return null to continue with the ViewResolverChain
             return null;
