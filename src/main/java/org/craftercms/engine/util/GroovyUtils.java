@@ -124,14 +124,14 @@ public class GroovyUtils {
 
     public static void addJobVariables(Map<String, Object> variables) {
         SiteContext siteContext = SiteContext.getCurrent();
-        ApplicationContextAccessor appContext = null;
 
         if (siteContext != null && siteContext.getApplicationContext() != null) {
-            appContext = new ApplicationContextAccessor();
+            ApplicationContextAccessor appContext = new ApplicationContextAccessor();
             appContext.setApplicationContext(siteContext.getApplicationContext());
+
+            variables.put(VARIABLE_APPLICATION_CONTEXT, appContext);
         }
 
-        variables.put(VARIABLE_APPLICATION_CONTEXT, appContext);
         variables.put(VARIABLE_LOGGER, LOGGER);
 
         addSiteConfigVariable(variables);
