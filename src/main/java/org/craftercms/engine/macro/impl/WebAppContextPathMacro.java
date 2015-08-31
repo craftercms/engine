@@ -42,12 +42,11 @@ public class WebAppContextPathMacro extends AbstractMacro implements ServletCont
 
     @Override
     protected String getMacroValue(String str) {
-        if (servletContext == null) {
-            throw new IllegalStateException("No ServletContext was set. Are you sure you're running in " +
-                                            "a servlet environment?");
+        if (servletContext != null) {
+            return StringUtils.stripEnd(servletContext.getContextPath(), "/");
+        } else {
+            return null;
         }
-
-        return StringUtils.stripEnd(servletContext.getContextPath(), "/");
     }
 
 }

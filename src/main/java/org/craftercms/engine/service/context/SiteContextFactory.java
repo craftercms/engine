@@ -18,6 +18,7 @@ package org.craftercms.engine.service.context;
 
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -68,8 +69,11 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
  */
 public class SiteContextFactory implements ApplicationContextAware {
 
+    public static final String DEFAULT_SITE_NAME_MACRO_NAME = "siteName";
+
     private static final Log logger = LogFactory.getLog(SiteContextFactory.class);
 
+    protected String siteNameMacroName;
     protected String storeType;
     protected String storeServerUrl;
     protected String username;
@@ -95,6 +99,7 @@ public class SiteContextFactory implements ApplicationContextAware {
     protected List<ScriptJobResolver> jobResolvers;
 
     public SiteContextFactory() {
+        siteNameMacroName = DEFAULT_SITE_NAME_MACRO_NAME;
         storeType = FileSystemContentStoreAdapter.STORE_TYPE;
         storeServerUrl = null;
         username = null;
@@ -102,6 +107,10 @@ public class SiteContextFactory implements ApplicationContextAware {
         cacheOn = Context.DEFAULT_CACHE_ON;
         maxAllowedItemsInCache = Context.DEFAULT_MAX_ALLOWED_ITEMS_IN_CACHE;
         ignoreHiddenFiles = Context.DEFAULT_IGNORE_HIDDEN_FILES;
+    }
+
+    public void setSiteNameMacroName(String siteNameMacroName) {
+        this.siteNameMacroName = siteNameMacroName;
     }
 
     public void setStoreType(String storeType) {
@@ -212,11 +221,13 @@ public class SiteContextFactory implements ApplicationContextAware {
     }
 
     public SiteContext createContext(String siteName) {
-        String resolvedRootFolderPath = macroResolver.resolveMacros(rootFolderPath);
+        Map<String, String> macroValues = Collections.singletonMap(siteNameMacroName, siteName);
+        String resolvedRootFolderPath = macroResolver.resolveMacros(rootFolderPath, macroValues);
 
         Context context = storeService.createContext(storeType, storeServerUrl, username, password,
                                                      resolvedRootFolderPath, cacheOn, maxAllowedItemsInCache,
                                                      ignoreHiddenFiles);
+
         try {
             SiteContext siteContext = new SiteContext();
             siteContext.setStoreService(storeService);
@@ -232,12 +243,12 @@ public class SiteContextFactory implements ApplicationContextAware {
 
             String[] resolvedConfigPaths = new String[configPaths.length];
             for (int i = 0; i < configPaths.length; i++) {
-                resolvedConfigPaths[i] = macroResolver.resolveMacros(configPaths[i]);
+                resolvedConfigPaths[i] = macroResolver.resolveMacros(configPaths[i], macroValues);
             }
 
             String[] resolvedAppContextPaths = new String[applicationContextPaths.length];
             for (int i = 0; i < applicationContextPaths.length; i++) {
-                resolvedAppContextPaths[i] = macroResolver.resolveMacros(applicationContextPaths[i]);
+                resolvedAppContextPaths[i] = macroResolver.resolveMacros(applicationContextPaths[i], macroValues);
             }
 
             ResourceLoader resourceLoader = new ContentStoreResourceLoader(siteContext);
@@ -246,7 +257,6 @@ public class SiteContextFactory implements ApplicationContextAware {
             ScriptFactory scriptFactory = getScriptFactory(siteContext, classLoader);
             ConfigurableApplicationContext appContext = getApplicationContext(siteContext, classLoader, config,
                                                                               resolvedAppContextPaths, resourceLoader);
-        
 
             siteContext.setConfigPaths(resolvedConfigPaths);
             siteContext.setApplicationContextPaths(resolvedAppContextPaths);

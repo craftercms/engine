@@ -16,8 +16,6 @@
  */
 package org.craftercms.engine.macro.impl;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.http.RequestContext;
@@ -46,16 +44,10 @@ public class RequestParamMacro extends AbstractMacro {
 
     @Override
     protected String getMacroValue(String str) {
-        HttpServletRequest request = RequestContext.getCurrent().getRequest();
-        String requestParamValue = request.getParameter(requestParamName);
-
-        if (requestParamValue != null) {
-            return requestParamValue;
+        RequestContext requestContext = RequestContext.getCurrent();
+        if (requestContext != null) {
+            return requestContext.getRequest().getParameter(requestParamName);
         } else {
-            if (logger.isDebugEnabled()) {
-                logger.debug("No request param or default value found for macro " + getName());
-            }
-
             return null;
         }
     }

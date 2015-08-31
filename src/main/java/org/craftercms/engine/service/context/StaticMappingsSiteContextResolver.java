@@ -1,5 +1,7 @@
 package org.craftercms.engine.service.context;
 
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
@@ -22,6 +24,11 @@ public class StaticMappingsSiteContextResolver extends AbstractSiteContextResolv
     @Required
     public void setMappings(Map<String, String> mappings) {
         this.mappings = mappings;
+    }
+
+    @Override
+    protected Collection<String> getSiteList() {
+        return new LinkedHashSet<>(mappings.values());
     }
 
     @Override

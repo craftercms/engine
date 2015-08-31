@@ -16,9 +16,9 @@
  */
 package org.craftercms.engine.macro.impl;
 
-import org.craftercms.engine.macro.Macro;
-
 import javax.annotation.PostConstruct;
+
+import org.craftercms.engine.macro.Macro;
 
 /**
  * Abstract {@link org.craftercms.engine.macro.Macro} that provides a macro name attribute to hold the macro name (when the macro's name
@@ -42,11 +42,9 @@ public abstract class AbstractMacro implements Macro {
 
     @Override
     public String resolve(String str) {
-        if (str.contains(getName())) {
-            String macroValue = getMacroValue(str);
-            if (macroValue != null) {
-                str = str.replace(getName(), macroValue);
-            }
+        String macroValue = getMacroValue(str);
+        if (macroValue != null) {
+            str = str.replace(getName(), macroValue);
         }
 
         return str;

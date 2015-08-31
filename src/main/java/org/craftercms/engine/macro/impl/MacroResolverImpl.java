@@ -16,14 +16,17 @@
  */
 package org.craftercms.engine.macro.impl;
 
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.collections4.MapUtils;
 import org.craftercms.engine.macro.Macro;
 import org.craftercms.engine.macro.MacroResolver;
 import org.springframework.beans.factory.annotation.Required;
 
-import java.util.List;
-
 /**
- * Default implementation of {@link org.craftercms.engine.macro.MacroResolver}. Uses a chain of {@link org.craftercms.engine.macro.Macro}s to resolve the macros.
+ * Default implementation of {@link org.craftercms.engine.macro.MacroResolver}. Uses a chain of {@link Macro}s to
+ * resolve the macros. After that, the specified additional macro values are replaced.
  *
  * @author Alfonso Vásquez
  */
@@ -36,13 +39,28 @@ public class MacroResolverImpl implements MacroResolver {
         this.macros = macros;
     }
 
+
     @Override
-    public String resolveMacros(String path) {
+    public String resolveMacros(String str) {
+        return resolveMacros(str, null);
+    }
+
+    @Override
+    public String resolveMacros(String str, Map<String, ?> macroValues) {
         for (Macro macro : macros) {
-            path = macro.resolve(path);
+            str = macro.resolve(str);
         }
 
-        return path;
+        if (MapUtils.isNotEmpty(macroValues)) {
+            for (Map.Entry<String, ?> entry : macroValues.entrySet()) {
+                String macroName = "{" + entry.getKey() + "}";
+                Object macroValue = entry.getValue();
+
+                str = str.replace(macroName, macroValue.toString());
+            }
+        }
+
+        return str;
     }
 
 }

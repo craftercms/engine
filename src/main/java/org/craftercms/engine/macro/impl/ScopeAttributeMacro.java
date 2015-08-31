@@ -51,11 +51,17 @@ public class ScopeAttributeMacro extends AbstractMacro {
 
     @Override
     protected String getMacroValue(String str) {
-        HttpServletRequest request = RequestContext.getCurrent().getRequest();
-        if (requestScope) {
-            return (String)request.getAttribute(attributeName);
+        RequestContext requestContext = RequestContext.getCurrent();
+        if (requestContext != null) {
+            HttpServletRequest request = requestContext.getRequest();
+
+            if (requestScope) {
+                return (String)request.getAttribute(attributeName);
+            } else {
+                return (String)request.getSession().getAttribute(attributeName);
+            }
         } else {
-            return (String)request.getSession().getAttribute(attributeName);
+            return null;
         }
     }
 

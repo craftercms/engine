@@ -47,17 +47,15 @@ public class CookieMacro extends AbstractMacro {
 
     @Override
     protected String getMacroValue(String str) {
-        Cookie cookie = HttpUtils.getCookie(cookieName, RequestContext.getCurrent().getRequest());
-
-        if (cookie != null) {
-            return cookie.getValue();
-        } else {
-            if (logger.isDebugEnabled()) {
-                logger.debug("No cookie or default value found for macro  " + getName());
+        RequestContext requestContext = RequestContext.getCurrent();
+        if (requestContext != null) {
+            Cookie cookie = HttpUtils.getCookie(cookieName, requestContext.getRequest());
+            if (cookie != null) {
+                return cookie.getValue();
             }
-
-            return null;
         }
+
+        return null;
     }
 
 }
