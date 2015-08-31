@@ -16,6 +16,8 @@
  */
 package org.craftercms.engine.macro;
 
+import java.util.Map;
+
 /**
  * Resolves the macros in the given string.
  *
@@ -25,6 +27,23 @@ package org.craftercms.engine.macro;
  */
 public interface MacroResolver {
 
-    public String resolveMacros(String str);
+    /**
+     * Resolve the macros found in the string.
+     *
+     * @param str           the string with the macros
+     *
+     * @return the resolved string
+     */
+    String resolveMacros(String str);
+
+    /**
+     * Resolve the macros found in the string.
+     *
+     * @param str           the string with the macros
+     * @param macroValues   additional macros values
+     *
+     * @return the resolved string
+     */
+    String resolveMacros(String str, Map<String, ?> macroValues);
 
 }

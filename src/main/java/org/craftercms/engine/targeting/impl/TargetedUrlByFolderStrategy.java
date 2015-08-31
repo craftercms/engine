@@ -14,7 +14,7 @@ import org.craftercms.core.util.UrlUtils;
  */
 public class TargetedUrlByFolderStrategy extends AbstractTargetedUrlStrategy {
 
-    public static final String TARGETED_URL_PATTERN_FORMAT = "^/?(%s)(/.+)?$";
+    public static final String TARGETED_URL_REGEX_FORMAT = "^/?(%s)(/.+)?$";
 
     public static final int TARGET_ID_GROUP = 1;
     public static final int SUFFIX_GROUP = 2;
@@ -72,7 +72,7 @@ public class TargetedUrlByFolderStrategy extends AbstractTargetedUrlStrategy {
     @Override
     protected Pattern getTargetedUrlPattern() {
         String availableTargetIds = StringUtils.join(targetIdManager.getAvailableTargetIds(), '|');
-        String targetedUrlByFilePattern = String.format(TARGETED_URL_PATTERN_FORMAT, availableTargetIds);
+        String targetedUrlByFilePattern = String.format(TARGETED_URL_REGEX_FORMAT, availableTargetIds);
 
         return Pattern.compile(targetedUrlByFilePattern);
     }

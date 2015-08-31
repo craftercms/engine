@@ -293,6 +293,11 @@ public class TargetedContentStoreAdapter implements ContentStoreAdapter {
             return actualContext.ignoreHiddenFiles();
         }
 
+        @Override
+        public String toString() {
+            return actualContext.toString();
+        }
+
     }
 
 }

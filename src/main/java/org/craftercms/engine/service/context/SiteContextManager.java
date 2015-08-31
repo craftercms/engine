@@ -75,6 +75,10 @@ public class SiteContextManager {
         return contextRegistry.values();
     }
 
+    public SiteContext createContext(String siteName, boolean fallback) {
+        return getContext(siteName, fallback);
+    }
+
     public SiteContext getContext(String siteName, boolean fallback) {
         SiteContext siteContext = contextRegistry.get(siteName);
         if (siteContext == null) {
@@ -83,6 +87,10 @@ public class SiteContextManager {
                 // Double check locking, in case the context has been created already by another thread
                 siteContext = contextRegistry.get(siteName);
                 if (siteContext == null) {
+                    logger.info("==================================================");
+                    logger.info("<Creating site context: " + siteName + ">");
+                    logger.info("==================================================");
+
                     if (fallback) {
                         siteContext = fallbackContextFactory.createContext(siteName);
                         siteContext.setFallback(true);
@@ -93,6 +101,9 @@ public class SiteContextManager {
                     contextRegistry.put(siteName, siteContext);
 
                     logger.info("Site context created: " + siteContext);
+                    logger.info("==================================================");
+                    logger.info("</Creating site context: " + siteName + ">");
+                    logger.info("==================================================");
                 }
             } finally {
                 lock.unlock();

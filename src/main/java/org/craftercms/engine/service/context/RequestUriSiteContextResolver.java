@@ -1,5 +1,6 @@
 package org.craftercms.engine.service.context;
 
+import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
@@ -18,8 +19,14 @@ public class RequestUriSiteContextResolver extends AbstractSiteContextResolver {
 
     private static final Log logger = LogFactory.getLog(RequestUriSiteContextResolver.class);
 
-    private String siteNameRegex;
-    private int siteNameRegexGroup;
+    protected SiteListResolver siteListResolver;
+    protected String siteNameRegex;
+    protected int siteNameRegexGroup;
+
+    @Required
+    public void setSiteListResolver(SiteListResolver siteListResolver) {
+        this.siteListResolver = siteListResolver;
+    }
 
     @Required
     public void setSiteNameRegex(String siteNameRegex) {
@@ -29,6 +36,11 @@ public class RequestUriSiteContextResolver extends AbstractSiteContextResolver {
     @Required
     public void setSiteNameRegexGroup(int siteNameRegexGroup) {
         this.siteNameRegexGroup = siteNameRegexGroup;
+    }
+
+    @Override
+    protected Collection<String> getSiteList() {
+        return siteListResolver.getSiteList();
     }
 
     @Override

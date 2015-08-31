@@ -33,16 +33,21 @@ public class RequestUriMacro extends AbstractMacro {
 
     @Override
     protected String getMacroValue(String str) {
-        String requestUri = RequestContext.getCurrent().getRequest().getRequestURI();
+        RequestContext requestContext = RequestContext.getCurrent();
+        if (requestContext != null) {
+            String requestUri = requestContext.getRequest().getRequestURI();
 
-        if (!requestUri.startsWith("/")) {
-            requestUri = "/" + requestUri;
-        }
-        if (!requestUri.equals("/")) {
-            requestUri = StringUtils.stripEnd(requestUri, "/");
-        }
+            if (!requestUri.startsWith("/")) {
+                requestUri = "/" + requestUri;
+            }
+            if (!requestUri.equals("/")) {
+                requestUri = StringUtils.stripEnd(requestUri, "/");
+            }
 
-        return requestUri;
+            return requestUri;
+        } else {
+            return null;
+        }
     }
 
 }

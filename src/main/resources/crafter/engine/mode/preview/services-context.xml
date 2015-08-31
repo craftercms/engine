@@ -23,10 +23,15 @@
     <!--									-->
     <!-- ////////////////////////////////// -->
 
-    <bean id="crafter.siteContextResolver" class="org.craftercms.engine.service.context.CookieSiteContextResolver">
-        <property name="siteContextManager" ref="crafter.siteContextManager"/>
+    <bean id="crafter.siteListResolver" class="org.craftercms.engine.service.context.FolderScanningSiteListResolver">
+        <property name="siteRootFolderPath" value="${crafter.engine.site.default.rootFolder.path}"/>
+        <property name="macroResolver" ref="crafter.macroResolver"/>
+    </bean>
+
+    <bean id="crafter.siteContextResolver" class="org.craftercms.engine.service.context.CookieSiteContextResolver"
+          parent="crafter.siteContextResolverBase">
+        <property name="siteListResolver" ref="crafter.siteListResolver"/>
         <property name="paramOrCookieName" value="${crafter.engine.request.param.siteName}"/>
-        <property name="fallbackSiteName" value="default"/>
     </bean>
 
     <bean id="crafter.siteContextFactory" class="org.craftercms.engine.service.context.SiteContextFactory">

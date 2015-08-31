@@ -1,5 +1,6 @@
 package org.craftercms.engine.service.context;
 
+import java.util.Collection;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -18,7 +19,13 @@ public class CookieSiteContextResolver extends AbstractSiteContextResolver {
 
     private static final Log logger = LogFactory.getLog(CookieSiteContextResolver.class);
 
-    private String paramOrCookieName;
+    protected SiteListResolver siteListResolver;
+    protected String paramOrCookieName;
+
+    @Required
+    public void setSiteListResolver(SiteListResolver siteListResolver) {
+        this.siteListResolver = siteListResolver;
+    }
 
     @Required
     public void setParamOrCookieName(String paramOrCookieName) {
@@ -26,7 +33,12 @@ public class CookieSiteContextResolver extends AbstractSiteContextResolver {
     }
 
     @Override
-    public String getSiteName(HttpServletRequest request) {
+    protected Collection<String> getSiteList() {
+        return siteListResolver.getSiteList();
+    }
+
+    @Override
+    protected String getSiteName(HttpServletRequest request) {
         String siteName = request.getParameter(paramOrCookieName);
         if (StringUtils.isEmpty(siteName)) {
             siteName = HttpUtils.getCookieValue(paramOrCookieName, request);

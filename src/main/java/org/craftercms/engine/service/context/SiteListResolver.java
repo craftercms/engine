@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2013 Crafter Software Corporation.
+ * Copyright (C) 2007-2015 Crafter Software Corporation.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,19 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.craftercms.engine.macro;
+package org.craftercms.engine.service.context;
+
+import java.util.Collection;
 
 /**
- * Represents a specific macro, and resolves any appearance of the macro in a string. A macro is a substring of the
- * form {macro} that represents a placeholder for a defined value or instruction. For example, the {webapp.path}
- * macro can be replaced for the path of the web app exploded dir.
+ * Resolves the entire list of sites.
  *
- * @author Alfonso Vásquez
+ * @author avasquez
  */
-public interface Macro {
+public interface SiteListResolver {
 
-    String getName();
-
-    String resolve(String str);
+    /**
+     * Returns the entire list of sites.
+     */
+    Collection<String> getSiteList();
 
 }

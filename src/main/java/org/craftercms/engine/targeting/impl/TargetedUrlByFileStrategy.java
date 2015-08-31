@@ -31,7 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 public class TargetedUrlByFileStrategy extends AbstractTargetedUrlStrategy {
 
     public static final String DEFAULT_TARGET_ID_SEPARATOR = "_";
-    public static final String TARGETED_URL_PATTERN_FORMAT = "^(.+)%s(%s)(\\.[^.]+)$";
+    public static final String TARGETED_URL_REGEX_FORMAT = "^(.+)%s(%s)(\\.[^.]+)$";
 
     public static final int PREFIX_GROUP = 1;
     public static final int TARGET_ID_GROUP = 2;
@@ -104,7 +104,7 @@ public class TargetedUrlByFileStrategy extends AbstractTargetedUrlStrategy {
     @Override
     protected Pattern getTargetedUrlPattern() {
         String availableTargetIds = StringUtils.join(targetIdManager.getAvailableTargetIds(), '|');
-        String targetedUrlByFilePattern = String.format(TARGETED_URL_PATTERN_FORMAT, targetIdSeparator,
+        String targetedUrlByFilePattern = String.format(TARGETED_URL_REGEX_FORMAT, targetIdSeparator,
                                                         availableTargetIds);
 
         return Pattern.compile(targetedUrlByFilePattern);

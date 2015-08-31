@@ -3,9 +3,11 @@ package org.craftercms.engine.service.context;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
@@ -36,13 +38,28 @@ public class ReloadableMappingsSiteContextResolver extends AbstractSiteContextRe
     }
 
     @PostConstruct
-    public void init() {
+    public void init() throws Exception {
         loadMappings();
+
+        super.init();
     }
 
     public synchronized void reloadMappings() throws CrafterException {
         loadMappings();
         destroyContextsWithNoMapping();
+        createContexts();
+    }
+
+    @Override
+    protected Collection<String> getSiteList() {
+        Collection<Object> siteNames = mappings.values();
+        Set<String> result = new LinkedHashSet<>(siteNames.size());
+
+        for (Object siteName : siteNames) {
+            result.add(siteName.toString());
+        }
+
+        return result;
     }
 
     @Override
@@ -83,11 +100,11 @@ public class ReloadableMappingsSiteContextResolver extends AbstractSiteContextRe
 
     protected void destroyContextsWithNoMapping() {
         List<SiteContext> contextsToUnregister = new ArrayList<>();
-        Collection<Object> currentSiteNames = mappings.values();
+        Collection<Object> siteNames = mappings.values();
 
         for (SiteContext siteContext : siteContextManager.listContexts()) {
             String siteName = siteContext.getSiteName();
-            if (!siteName.equals(fallbackSiteName) && !currentSiteNames.contains(siteName)) {
+            if (!siteName.equals(fallbackSiteName) && !siteNames.contains(siteName)) {
                 contextsToUnregister.add(siteContext);
             }
         }

@@ -1,5 +1,7 @@
 package org.craftercms.engine.service.context;
 
+import java.util.Collection;
+import java.util.Collections;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Required;
@@ -17,6 +19,11 @@ public class DefaultSiteContextResolver extends AbstractSiteContextResolver {
     @Required
     public void setDefaultSiteName(String defaultSiteName) {
         this.defaultSiteName = defaultSiteName;
+    }
+
+    @Override
+    protected Collection<String> getSiteList() {
+        return Collections.singleton(defaultSiteName);
     }
 
     @Override
