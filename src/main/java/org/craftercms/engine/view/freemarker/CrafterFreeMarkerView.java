@@ -30,6 +30,7 @@ import freemarker.ext.servlet.HttpRequestParametersHashModel;
 import freemarker.ext.servlet.HttpSessionHashModel;
 import freemarker.template.SimpleHash;
 import freemarker.template.TemplateHashModel;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.ArrayUtils;
 import org.craftercms.engine.freemarker.RenderComponentDirective;
 import org.craftercms.engine.freemarker.ServletContextHashModel;
@@ -79,6 +80,8 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     public static final String KEY_ENUMS = "enums";
     public static final String KEY_SITE_CONTEXT = "siteContext";
     public static final String KEY_SITE_CONTEXT_CAP = "SiteContext";
+    public static final String KEY_SITE_CONFIG = "siteConfig";
+    public static final String KEY_SITE_CONFIG_CAP = "SiteConfig";
     public static final String KEY_LOCALE = "locale";
     public static final String KEY_LOCALE_CAP = "Locale";
     
@@ -175,9 +178,9 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
             templateModel.put(KEY_PROFILE, auth.getProfile());
         }
 
-        SiteContext context = SiteContext.getCurrent();
+        SiteContext siteContext = SiteContext.getCurrent();
+        Configuration siteConfig = siteContext.getConfig();
         Locale locale = LocaleContextHolder.getLocale();
-
         TemplateHashModel staticModels = BeansWrapper.getDefaultInstance().getStaticModels();
         TemplateHashModel enumModels = BeansWrapper.getDefaultInstance().getEnumModels();
 
@@ -185,10 +188,15 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
         templateModel.put(KEY_STATICS, staticModels);
         templateModel.put(KEY_ENUMS_CAP, enumModels);
         templateModel.put(KEY_ENUMS, enumModels);
-        templateModel.put(KEY_SITE_CONTEXT_CAP, context);
-        templateModel.put(KEY_SITE_CONTEXT, context);
+        templateModel.put(KEY_SITE_CONTEXT_CAP, siteContext);
+        templateModel.put(KEY_SITE_CONTEXT, siteContext);
         templateModel.put(KEY_LOCALE_CAP, locale);
         templateModel.put(KEY_LOCALE, locale);
+
+        if (siteConfig != null) {
+            templateModel.put(KEY_SITE_CONFIG, siteConfig);
+            templateModel.put(KEY_SITE_CONFIG_CAP, siteConfig);
+        }
 
         templateModel.putAll(model);
 

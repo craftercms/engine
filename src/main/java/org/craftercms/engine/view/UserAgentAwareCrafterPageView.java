@@ -10,18 +10,18 @@ import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.servlet.View;
 
 public class UserAgentAwareCrafterPageView extends CrafterPageView {
-	
-	protected UserAgentTemplateDetector userAgentTemplateDetector;
-	
-	@Required
-	public void setUserAgentTemplateDetector(UserAgentTemplateDetector userAgentTemplateDetector) {
-		this.userAgentTemplateDetector = userAgentTemplateDetector;
-	}
-	
-	@Override
-	protected void renderActualView(String pageViewName, Map<String, Object> model, HttpServletRequest request,
+
+    protected UserAgentTemplateDetector userAgentTemplateDetector;
+
+    @Required
+    public void setUserAgentTemplateDetector(UserAgentTemplateDetector userAgentTemplateDetector) {
+        this.userAgentTemplateDetector = userAgentTemplateDetector;
+    }
+
+    @Override
+    protected void renderActualView(String pageViewName, Map<String, Object> model, HttpServletRequest request,
                                     HttpServletResponse response) throws Exception {
-    	String userAgentSpecificPageViewName = userAgentTemplateDetector.resolveAgentTemplate(request, pageViewName);
+        String userAgentSpecificPageViewName = userAgentTemplateDetector.resolveAgentTemplate(request, pageViewName);
         View actualView = delegatedViewResolver.resolveViewName(userAgentSpecificPageViewName, locale);
         if (actualView == null) {
             actualView = delegatedViewResolver.resolveViewName(pageViewName, locale);
@@ -31,6 +31,6 @@ public class UserAgentAwareCrafterPageView extends CrafterPageView {
         }
 
         actualView.render(model, request, response);
-	}
+    }
 
 }

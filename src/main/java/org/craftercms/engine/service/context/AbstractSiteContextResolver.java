@@ -83,7 +83,11 @@ public abstract class AbstractSiteContextResolver implements SiteContextResolver
         Collection<String> siteNames = getSiteList();
         if (CollectionUtils.isNotEmpty(siteNames)) {
             for (String siteName : siteNames) {
-                siteContextManager.createContext(siteName, false);
+                try {
+                    siteContextManager.createContext(siteName, false);
+                } catch (Exception e) {
+                    logger.error("Unable to create site context for site '" + siteName + "'", e);
+                }
             }
         }
 
