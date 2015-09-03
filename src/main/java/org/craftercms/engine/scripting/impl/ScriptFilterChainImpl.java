@@ -59,7 +59,12 @@ public class ScriptFilterChainImpl implements FilterChain {
             try {
                 script.execute(variables);
             } catch (ScriptException e) {
-                throw new ServletException("Error executing filter script at " + script.getUrl(), e);
+                Throwable cause = e.getCause();
+                if (cause instanceof ServletException) {
+                    throw (ServletException)cause;
+                } else {
+                    throw new ServletException("Error executing filter script at " + script.getUrl(), cause);
+                }
             }
         } else {
             delegateChain.doFilter(request, response);

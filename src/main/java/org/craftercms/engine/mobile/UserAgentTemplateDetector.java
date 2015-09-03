@@ -1,12 +1,12 @@
 package org.craftercms.engine.mobile;
 
-import org.apache.commons.lang.StringUtils;
-
-import javax.servlet.http.HttpServletRequest;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang.StringUtils;
 
 public class UserAgentTemplateDetector {
 	
@@ -53,8 +53,7 @@ public class UserAgentTemplateDetector {
 					templateFile = userAgent.getTemplatePrefix() + templateFile;
 				}
 			}
-		} 
-		else { // get agent from header
+		} else { // get agent from header
 			String agent = request.getHeader(agentHeaderName);
 			if (StringUtils.isEmpty(agent)) {
 				agent = request.getHeader("User-Agent");
