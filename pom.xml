@@ -6,7 +6,7 @@
 	<artifactId>crafter-engine</artifactId>
 	<name>Crafter Engine</name>
 	<packaging>war</packaging>
-	<version>2.4.4</version>
+	<version>2.4.5-SNAPSHOT</version>
 	<parent>
 		<groupId>org.sonatype.oss</groupId>
 		<artifactId>oss-parent</artifactId>
