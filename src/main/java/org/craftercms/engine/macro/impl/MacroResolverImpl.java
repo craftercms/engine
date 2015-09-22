@@ -47,10 +47,6 @@ public class MacroResolverImpl implements MacroResolver {
 
     @Override
     public String resolveMacros(String str, Map<String, ?> macroValues) {
-        for (Macro macro : macros) {
-            str = macro.resolve(str);
-        }
-
         if (MapUtils.isNotEmpty(macroValues)) {
             for (Map.Entry<String, ?> entry : macroValues.entrySet()) {
                 String macroName = "{" + entry.getKey() + "}";
@@ -58,6 +54,10 @@ public class MacroResolverImpl implements MacroResolver {
 
                 str = str.replace(macroName, macroValue.toString());
             }
+        }
+
+        for (Macro macro : macros) {
+            str = macro.resolve(str);
         }
 
         return str;

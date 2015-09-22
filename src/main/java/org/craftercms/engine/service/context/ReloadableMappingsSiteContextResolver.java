@@ -1,10 +1,8 @@
 package org.craftercms.engine.service.context;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -46,8 +44,7 @@ public class ReloadableMappingsSiteContextResolver extends AbstractSiteContextRe
 
     public synchronized void reloadMappings() throws CrafterException {
         loadMappings();
-        destroyContextsWithNoMapping();
-        createContexts();
+        refreshContexts();
     }
 
     @Override
@@ -96,22 +93,6 @@ public class ReloadableMappingsSiteContextResolver extends AbstractSiteContextRe
         logger.info("Domain name to site name mappings loaded from " + mappingsFile);
 
         mappings = newMappings;
-    }
-
-    protected void destroyContextsWithNoMapping() {
-        List<SiteContext> contextsToUnregister = new ArrayList<>();
-        Collection<Object> siteNames = mappings.values();
-
-        for (SiteContext siteContext : siteContextManager.listContexts()) {
-            String siteName = siteContext.getSiteName();
-            if (!siteName.equals(fallbackSiteName) && !siteNames.contains(siteName)) {
-                contextsToUnregister.add(siteContext);
-            }
-        }
-
-        for (SiteContext siteContext : contextsToUnregister) {
-            siteContextManager.destroyContext(siteContext.getSiteName());
-        }
     }
 
 }

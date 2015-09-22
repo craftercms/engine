@@ -84,15 +84,6 @@
 
     <!-- ////////////////////////////////// -->
     <!--								 	-->
-    <!--			 Scheduling				-->
-    <!--									-->
-    <!-- ////////////////////////////////// -->
-
-    <task:annotation-driven scheduler="crafter.scheduler"/>
-    <task:scheduler id="crafter.scheduler" pool-size="${crafter.engine.scheduler.threads.pool.size}"/>
-
-    <!-- ////////////////////////////////// -->
-    <!--								 	-->
     <!--			 Filters				-->
     <!--									-->
     <!-- ////////////////////////////////// -->
@@ -170,18 +161,12 @@
 
     <bean id="crafter.requestUriMacro" class="org.craftercms.engine.macro.impl.RequestUriMacro"/>
 
-    <bean id="crafter.siteNameRequestAttributeMacro" class="org.craftercms.engine.macro.impl.ScopeAttributeMacro">
-        <property name="attributeName" value="siteName"/>
-        <property name="requestScope" value="true"/>
-    </bean>
-
     <bean id="crafter.macroResolver" class="org.craftercms.engine.macro.impl.MacroResolverImpl">
         <property name="macros">
             <list>
                 <ref bean="crafter.webAppPathMacro"/>
                 <ref bean="crafter.webAppContextPathMacro"/>
                 <ref bean="crafter.requestUriMacro"/>
-                <ref bean="crafter.siteNameRequestAttributeMacro"/>
             </list>
         </property>
     </bean>

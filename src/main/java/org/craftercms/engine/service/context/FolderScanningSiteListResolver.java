@@ -17,7 +17,6 @@
 package org.craftercms.engine.service.context;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,7 +38,7 @@ import org.springframework.core.io.ResourceLoader;
  * the folder where all the sites reside and the site folder format. Then, iterates through the children of the
  * folder looking for site folders that match the format, extracting the site names from the folder name. To better
  * illustrate, here's an example:
- *
+ * <p/>
  * <p>Suppose the site root folder path is file:/opt/websites/{siteName}app. The sites
  * folder, or basically the folder that contains all sites, is resolved to /opt/websites. The children of this folder
  * are brochureapp, corporateapp and plutonapp. By using the {siteName}app site name format, the site names are
@@ -60,8 +59,8 @@ public class FolderScanningSiteListResolver implements SiteListResolver, Resourc
     protected MacroResolver macroResolver;
     protected ResourceLoader resourceLoader;
 
+    protected String sitesFolderPath;
     protected Pattern siteFolderNamePattern;
-    protected File sitesFolder;
 
     public FolderScanningSiteListResolver() {
         this.siteNameMacroName = SiteContextFactory.DEFAULT_SITE_NAME_MACRO_NAME;
@@ -87,7 +86,7 @@ public class FolderScanningSiteListResolver implements SiteListResolver, Resourc
     }
 
     @PostConstruct
-    public void init() throws Exception {
+    public void init() {
         String siteRootFolderPathRegex = String.format(SITE_ROOT_FOLDER_PATH_REGEX, siteNameMacroName);
 
         if (!File.separator.equals("/")) {
@@ -98,24 +97,13 @@ public class FolderScanningSiteListResolver implements SiteListResolver, Resourc
         Matcher siteRootFolderPathMatcher = siteRootFolderPathPattern.matcher(siteRootFolderPath);
 
         if (siteRootFolderPathMatcher.matches()) {
+            sitesFolderPath = siteRootFolderPathMatcher.group(SITES_FOLDER_PATH_GROUP);
+            sitesFolderPath = macroResolver.resolveMacros(sitesFolderPath);
+
             String siteFolderNameFormat = siteRootFolderPathMatcher.group(SITE_FOLDER_NAME_FORMAT_GROUP);
             String siteFolderNameRegex = siteFolderNameFormat.replace("{" + siteNameMacroName + "}", "(.+)");
 
             siteFolderNamePattern = Pattern.compile(siteFolderNameRegex);
-
-            String sitesFolderPath = siteRootFolderPathMatcher.group(SITES_FOLDER_PATH_GROUP);
-            sitesFolderPath = macroResolver.resolveMacros(sitesFolderPath);
-
-            try {
-                sitesFolder = resourceLoader.getResource(sitesFolderPath).getFile();
-                if (sitesFolder.exists()) {
-                    logger.info("Sites folder resolved to " + sitesFolder.getAbsolutePath());
-                } else {
-                    throw new FileNotFoundException("Sites folder " + sitesFolderPath + " doesn't exist");
-                }
-            } catch (IOException e) {
-                throw new IOException("Unable to retrieve sites folder " + sitesFolderPath, e);
-            }
         } else {
             throw new IllegalStateException("The site root folder path " + siteRootFolderPath + " doesn't match " +
                                             "the regex " + siteRootFolderPathRegex);
@@ -125,20 +113,43 @@ public class FolderScanningSiteListResolver implements SiteListResolver, Resourc
     @Override
     public Collection<String> getSiteList() {
         List<String> siteNames = new ArrayList<>();
-        File[] files = sitesFolder.listFiles();
+        File sitesFolder = getSitesFolder();
 
-        if (ArrayUtils.isNotEmpty(files)) {
-            for (File file : files){
-                if (file.isDirectory()) {
-                    Matcher siteFolderNameMatcher = siteFolderNamePattern.matcher(file.getName());
-                    if (siteFolderNameMatcher.matches()) {
-                        siteNames.add(siteFolderNameMatcher.group(1));
+        if (sitesFolder != null) {
+            File[] files = sitesFolder.listFiles();
+
+            if (ArrayUtils.isNotEmpty(files)) {
+                for (File file : files) {
+                    if (file.isDirectory()) {
+                        Matcher siteFolderNameMatcher = siteFolderNamePattern.matcher(file.getName());
+                        if (siteFolderNameMatcher.matches()) {
+                            siteNames.add(siteFolderNameMatcher.group(1));
+                        }
                     }
                 }
             }
         }
 
         return siteNames;
+    }
+
+    protected File getSitesFolder() {
+        try {
+            File sitesFolder = resourceLoader.getResource(sitesFolderPath).getFile();
+            if (sitesFolder.exists()) {
+                logger.info("Sites folder resolved to " + sitesFolder.getAbsolutePath());
+
+                return sitesFolder;
+            } else {
+                logger.error("Sites folder " + sitesFolderPath + " doesn't exist");
+
+                return null;
+            }
+        } catch (IOException e) {
+            logger.error("Unable to retrieve sites folder " + sitesFolderPath, e);
+
+            return null;
+        }
     }
 
 }
