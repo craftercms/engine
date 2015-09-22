@@ -63,10 +63,7 @@ public class SiteContextManager {
 
     @PreDestroy
     public void destroy() {
-        for (Iterator<SiteContext> iter = contextRegistry.values().iterator(); iter.hasNext();) {
-            iter.next().destroy();
-            iter.remove();
-        }
+        destroyAllContexts();
 
         logger.info("All site contexts have been destroyed");
     }
@@ -121,6 +118,22 @@ public class SiteContextManager {
                 siteContext.destroy();
 
                 logger.info("Site context destroyed: " + siteContext);
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public void destroyAllContexts() {
+        lock.lock();
+        try {
+            for (Iterator<SiteContext> iter = contextRegistry.values().iterator(); iter.hasNext();) {
+                SiteContext siteContext = iter.next();
+                siteContext.destroy();
+
+                logger.info("Site context destroyed: " + siteContext);
+
+                iter.remove();
             }
         } finally {
             lock.unlock();

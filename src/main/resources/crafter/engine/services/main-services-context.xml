@@ -84,15 +84,6 @@
 
     <!-- ////////////////////////////////// -->
     <!--								 	-->
-    <!--			 Scheduling				-->
-    <!--									-->
-    <!-- ////////////////////////////////// -->
-
-    <task:annotation-driven scheduler="crafter.scheduler"/>
-    <task:scheduler id="crafter.scheduler" pool-size="${crafter.engine.scheduler.threads.pool.size}"/>
-
-    <!-- ////////////////////////////////// -->
-    <!--								 	-->
     <!--			 Filters				-->
     <!--									-->
     <!-- ////////////////////////////////// -->

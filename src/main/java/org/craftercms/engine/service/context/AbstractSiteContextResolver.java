@@ -1,6 +1,8 @@
 package org.craftercms.engine.service.context;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
@@ -50,8 +52,15 @@ public abstract class AbstractSiteContextResolver implements SiteContextResolver
     @PostConstruct
     public void init() throws Exception {
         if (createContextsOnStartup) {
-            createContexts();
+            createContextsForNewSites(getSiteList());
         }
+    }
+
+    public void refreshContexts() {
+        Collection<String> siteNames = getSiteList();
+
+        destroyContextsForRemovedSites(siteNames);
+        createContextsForNewSites(siteNames);
     }
 
     @Override
@@ -75,15 +84,15 @@ public abstract class AbstractSiteContextResolver implements SiteContextResolver
         return getContext(siteName, fallback);
     }
 
-    protected void createContexts() {
+    protected void createContextsForNewSites(Collection<String> siteNames) {
         logger.info("==================================================");
         logger.info("<CREATING SITE CONTEXTS>");
         logger.info("==================================================");
 
-        Collection<String> siteNames = getSiteList();
         if (CollectionUtils.isNotEmpty(siteNames)) {
             for (String siteName : siteNames) {
                 try {
+                    // If the site context doesn't exist (it's new), it will be created
                     siteContextManager.createContext(siteName, false);
                 } catch (Exception e) {
                     logger.error("Unable to create site context for site '" + siteName + "'", e);
@@ -93,6 +102,33 @@ public abstract class AbstractSiteContextResolver implements SiteContextResolver
 
         logger.info("==================================================");
         logger.info("</CREATING SITE CONTEXTS>");
+        logger.info("==================================================");
+    }
+
+    protected void destroyContextsForRemovedSites(Collection<String> siteNames) {
+        logger.info("==================================================");
+        logger.info("<DESTROYING SITE CONTEXTS>");
+        logger.info("==================================================");
+
+        if (CollectionUtils.isNotEmpty(siteNames)) {
+            List<SiteContext> contextsToDestroy = new ArrayList<>();
+
+            for (SiteContext siteContext : siteContextManager.listContexts()) {
+                String siteName = siteContext.getSiteName();
+                if (!siteName.equals(fallbackSiteName) && !siteNames.contains(siteName)) {
+                    contextsToDestroy.add(siteContext);
+                }
+            }
+
+            for (SiteContext siteContext : contextsToDestroy) {
+                siteContextManager.destroyContext(siteContext.getSiteName());
+            }
+        } else {
+            siteContextManager.destroyAllContexts();
+        }
+
+        logger.info("==================================================");
+        logger.info("</DESTROYING SITE CONTEXTS>");
         logger.info("==================================================");
     }
 
