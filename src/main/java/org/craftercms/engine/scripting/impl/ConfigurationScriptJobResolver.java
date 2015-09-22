@@ -49,13 +49,16 @@ public class ConfigurationScriptJobResolver implements ScriptJobResolver {
     @Override
     public List<JobContext> resolveJobs(SiteContext siteContext) throws SchedulingException {
         HierarchicalConfiguration config = siteContext.getConfig();
-        List<JobContext> jobContexts = null;
+        List<JobContext> jobContexts = new ArrayList<>();
 
         if (config != null) {
             List<HierarchicalConfiguration> jobFoldersConfig = config.configurationsAt(JOB_FOLDER_KEY);
             if (CollectionUtils.isNotEmpty(jobFoldersConfig)) {
                 for (HierarchicalConfiguration jobFolderConfig : jobFoldersConfig) {
-                    jobContexts = getJobsUnderFolder(siteContext, jobFolderConfig);
+                    List<JobContext> folderJobContexts = getJobsUnderFolder(siteContext, jobFolderConfig);
+                    if (CollectionUtils.isNotEmpty(folderJobContexts)) {
+                        jobContexts.addAll(folderJobContexts);
+                    }
                 }
             }
 
@@ -64,10 +67,6 @@ public class ConfigurationScriptJobResolver implements ScriptJobResolver {
                 for (HierarchicalConfiguration jobConfig : jobsConfig) {
                     JobContext jobContext = getJob(siteContext, jobConfig);
                     if (jobContext != null) {
-                        if (jobContexts == null) {
-                            jobContexts = new ArrayList<>();
-                        }
-
                         jobContexts.add(jobContext);
                     }
                 }
