@@ -88,11 +88,6 @@ public class FolderScanningSiteListResolver implements SiteListResolver, Resourc
     @PostConstruct
     public void init() {
         String siteRootFolderPathRegex = String.format(SITE_ROOT_FOLDER_PATH_REGEX, siteNameMacroName);
-
-        if (!File.separator.equals("/")) {
-            siteRootFolderPathRegex = siteRootFolderPathRegex.replaceAll("/", File.separator);
-        }
-
         Pattern siteRootFolderPathPattern = Pattern.compile(siteRootFolderPathRegex);
         Matcher siteRootFolderPathMatcher = siteRootFolderPathPattern.matcher(siteRootFolderPath);
 
