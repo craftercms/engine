@@ -31,6 +31,15 @@
     </listener>
 
     <filter>
+        <filter-name>characterEncodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+    </filter>
+
+    <filter>
         <filter-name>crafter.requestContextBindingFilter</filter-name>
         <filter-class>org.craftercms.commons.http.RequestContextBindingFilter</filter-class>
     </filter>
@@ -54,6 +63,11 @@
         <filter-name>crafter.scriptFilter</filter-name>
         <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
     </filter>
+
+    <filter-mapping>
+        <filter-name>characterEncodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
     	
     <filter-mapping>
     	<filter-name>crafter.requestContextBindingFilter</filter-name>
