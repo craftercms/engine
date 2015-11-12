@@ -13,6 +13,7 @@
         <property name="transformers">
             <map>
                 <entry key="renderUrlToStoreUrl" value-ref="crafter.renderUrlToStoreUrlTransformer"/>
+                <entry key="renderUrlToTargetedStoreUrl" value-ref="crafter.renderUrlToTargetedStoreUrlTransformer"/>
                 <entry key="storeUrlToRenderUrl" value-ref="crafter.storeUrlToRenderUrlTransformer"/>
                 <entry key="storeUrlToFullRenderUrl" value-ref="crafter.storeUrlToFullRenderUrlTransformer"/>
                 <entry key="toWebAppRelativeUrl" value-ref="crafter.addContextPathUrlTransformer"/>
@@ -24,6 +25,16 @@
     </bean>
 
     <bean id="crafter.renderUrlToStoreUrlTransformer" class="org.craftercms.core.url.impl.UrlTransformerPipeline">
+        <constructor-arg>
+            <list>
+                <ref bean="crafter.addIndexIfFolderUrlTransformer"/>
+                <ref bean="crafter.replacePageExtWithDescriptorExtUrlTransformer"/>
+                <ref bean="crafter.addPageDescriptorsPathUrlTransformer"/>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="crafter.renderUrlToTargetedStoreUrlTransformer" class="org.craftercms.core.url.impl.UrlTransformerPipeline">
         <constructor-arg>
             <list>
                 <ref bean="crafter.addIndexIfFolderUrlTransformer"/>

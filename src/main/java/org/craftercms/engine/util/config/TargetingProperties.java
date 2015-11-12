@@ -31,6 +31,7 @@ public class TargetingProperties {
     public static final String FALLBACK_ID_CONFIG_KEY = "targeting.fallbackTargetId";
     public static final String ROOT_FOLDERS_CONFIG_KEY = "targeting.rootFolders";
     public static final String MERGE_FOLDERS_CONFIG_KEY = "targeting.mergeFolders";
+    public static final String REDIRECT_TO_TARGETED_URL = "targeting.redirectToTargetedUrl";
 
     /**
      * Returns trues if targeting is enabled.
@@ -89,6 +90,18 @@ public class TargetingProperties {
         Configuration config = ConfigUtils.getCurrentConfig();
         if (config != null) {
             return config.getBoolean(MERGE_FOLDERS_CONFIG_KEY, false);
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Returns true if the request should be redirected when the targeted URL is different from the current URL.
+     */
+    public static boolean isRedirectToTargetedUrl() {
+        Configuration config = ConfigUtils.getCurrentConfig();
+        if (config != null) {
+            return config.getBoolean(REDIRECT_TO_TARGETED_URL, false);
         } else {
             return false;
         }
