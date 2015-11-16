@@ -19,9 +19,7 @@ import org.junit.Test;
 import org.springframework.context.i18n.LocaleContextHolder;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyBoolean;
@@ -74,7 +72,7 @@ public class TargetedContentStoreAdapterTest extends ConfigAwareTestBase {
 
         exists = storeAdapter.exists(context, "/site/website/index.xml");
 
-        assertFalse(exists);
+        assertTrue(exists);
 
         exists = storeAdapter.exists(context, "/static-assets/css/main.css");
 
@@ -96,7 +94,7 @@ public class TargetedContentStoreAdapterTest extends ConfigAwareTestBase {
 
         content = storeAdapter.findContent(context, cachingOptions, "/site/website/index.xml");
 
-        assertNull(content);
+        assertNotNull(content);
 
         content = storeAdapter.findContent(context, cachingOptions, "/static-assets/css/main.css");
 
@@ -128,7 +126,9 @@ public class TargetedContentStoreAdapterTest extends ConfigAwareTestBase {
 
         item = storeAdapter.findItem(context, cachingOptions, "/site/website/index.xml", true);
 
-        assertNull(item);
+        assertNotNull(item);
+        assertEquals("index.xml", item.getName());
+        assertEquals("/site/website/index.xml", item.getUrl());
 
         item = storeAdapter.findItem(context, cachingOptions, "/static-assets/css/main.css", true);
 
@@ -173,6 +173,10 @@ public class TargetedContentStoreAdapterTest extends ConfigAwareTestBase {
     private ContentStoreAdapter createActualAdapter() {
         ContentStoreAdapter adapter = mock(ContentStoreAdapter.class);
 
+        Item idx = new Item();
+        idx.setName("index.xml");
+        idx.setUrl("/site/website/index.xml");
+
         Item en = new Item();
         en.setName("en");
         en.setUrl("/site/website/en");
@@ -194,18 +198,31 @@ public class TargetedContentStoreAdapterTest extends ConfigAwareTestBase {
         frIdx.setUrl("/site/website/ja/index.xml");
 
         when(adapter.exists(any(Context.class),
+                            eq("/site/website/index.xml"))).thenReturn(true);
+
+        when(adapter.exists(any(Context.class),
                             eq("/site/website/en"))).thenReturn(true);
 
-        when(adapter.exists(any(Context.class), eq("/site/website/en/index.xml"))).thenReturn(true);
+        when(adapter.exists(any(Context.class),
+                            eq("/site/website/en/index.xml"))).thenReturn(true);
 
-        when(adapter.exists(any(Context.class), eq("/static-assets/css/main.css"))).thenReturn(true);
+        when(adapter.exists(any(Context.class),
+                            eq("/static-assets/css/main.css"))).thenReturn(true);
+
+        when(adapter.findContent(any(Context.class),
+                                 any(CachingOptions.class),
+                                 eq("/site/website/index.xml"))).thenReturn(mock(Content.class));
 
         when(adapter.findContent(any(Context.class),
                                  any(CachingOptions.class),
                                  eq("/site/website/en/index.xml"))).thenReturn(mock(Content.class));
 
-        when(adapter.findContent(any(Context.class), any(CachingOptions.class), eq("/static-assets/css/main.css")))
-            .thenReturn(mock(Content.class));
+        when(adapter.findContent(any(Context.class),
+                                 any(CachingOptions.class),
+                                 eq("/static-assets/css/main.css"))).thenReturn(mock(Content.class));
+
+        when(adapter.findItem(any(Context.class), any(CachingOptions.class), eq("/site/website/index.xml"),
+                              anyBoolean())).thenReturn(idx);
 
         when(adapter.findItem(any(Context.class),
                               any(CachingOptions.class),
@@ -217,7 +234,9 @@ public class TargetedContentStoreAdapterTest extends ConfigAwareTestBase {
                               eq("/site/website/en/index.xml"),
                               anyBoolean())).thenReturn(enIdx);
 
-        when(adapter.findItem(any(Context.class), any(CachingOptions.class), eq("/static-assets/css/main.css"),
+        when(adapter.findItem(any(Context.class),
+                              any(CachingOptions.class),
+                              eq("/static-assets/css/main.css"),
                               anyBoolean())).thenReturn(mainCss);
 
         when(adapter.findItems(any(Context.class),

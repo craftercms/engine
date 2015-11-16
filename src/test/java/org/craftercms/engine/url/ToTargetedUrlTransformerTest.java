@@ -12,7 +12,9 @@ import static org.craftercms.engine.util.config.TargetingProperties.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Created by alfonsovasquez on 21/8/15.
+ * Unit tests for {@link ToTargetedUrlTransformer}.
+ *
+ * @author avasquez
  */
 public class ToTargetedUrlTransformerTest {
 
@@ -21,6 +23,7 @@ public class ToTargetedUrlTransformerTest {
     private static final String TARGETED_URL = "/products/index_es_CR.xml";
     private static final String NON_TARGETED_FULL_URL = ROOT_FOLDERS[0] + NON_TARGETED_URL;
     private static final String TARGETED_FULL_URL = ROOT_FOLDERS[0] + TARGETED_URL;
+    private static final String EXCLUDED_FULL_URL = ROOT_FOLDERS[0] + "/index.xml";
 
     private ToTargetedUrlTransformer urlTransformer;
 
@@ -43,6 +46,11 @@ public class ToTargetedUrlTransformerTest {
 
         assertNotNull(url);
         assertEquals(TARGETED_FULL_URL, url);
+
+        url = urlTransformer.transformUrl(null, null, EXCLUDED_FULL_URL);
+
+        assertNotNull(url);
+        assertEquals(EXCLUDED_FULL_URL, url);
     }
 
     private TargetedUrlStrategy createTargetedUrlStrategy() {
@@ -57,6 +65,7 @@ public class ToTargetedUrlTransformerTest {
         HierarchicalConfiguration config = mock(HierarchicalConfiguration.class);
         when(config.getBoolean(TARGETING_ENABLED_CONFIG_KEY, false)).thenReturn(true);
         when(config.getStringArray(ROOT_FOLDERS_CONFIG_KEY)).thenReturn(ROOT_FOLDERS);
+        when(config.getStringArray(EXCLUDE_PATTERNS_CONFIG_KEY)).thenReturn(new String[] {"/site/website/index\\.xml"});
 
         SiteContext siteContext = new SiteContext();
         siteContext.setConfig(config);
