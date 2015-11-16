@@ -27,6 +27,7 @@
     <targeting>
         <enabled>true</enabled>
         <rootFolders>/site/website</rootFolders>
+        <excludePatterns>/site/website/index\.xml</excludePatterns>
         <availableTargetIds>en,ja,ja_JP,ja_JP_JP</availableTargetIds>
         <fallbackTargetId>en</fallbackTargetId>
         <mergeFolders>true</mergeFolders>

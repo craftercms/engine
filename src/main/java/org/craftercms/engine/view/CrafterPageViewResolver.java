@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.http.RequestContext;
@@ -37,6 +37,7 @@ import org.craftercms.engine.security.CrafterPageAccessManager;
 import org.craftercms.engine.service.SiteItemService;
 import org.craftercms.engine.service.UrlTransformationService;
 import org.craftercms.engine.service.context.SiteContext;
+import org.craftercms.engine.util.config.TargetingProperties;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.Ordered;
 import org.springframework.web.context.support.WebApplicationObjectSupport;
@@ -61,8 +62,9 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
 
     protected int order;
     protected boolean cacheUrlTransformations;
-    protected String urlTransformerName;
-    protected String fullHttpsUrlTransformerName;
+    protected String renderUrlToStoreUrlTransformerName;
+    protected String storeUrlToRenderUrlTransformerName;
+    protected String toFullHttpsUrlTransformerName;
     protected UrlTransformationService urlTransformationService;
     protected CacheTemplate cacheTemplate;
     protected CachingOptions cachingOptions;
@@ -105,13 +107,18 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     }
 
     @Required
-    public void setUrlTransformerName(String urlTransformerName) {
-        this.urlTransformerName = urlTransformerName;
+    public void setRenderUrlToStoreUrlTransformerName(String renderUrlToStoreUrlTransformerName) {
+        this.renderUrlToStoreUrlTransformerName = renderUrlToStoreUrlTransformerName;
     }
 
     @Required
-    public void setFullHttpsUrlTransformerName(String fullHttpsUrlTransformerName) {
-        this.fullHttpsUrlTransformerName = fullHttpsUrlTransformerName;
+    public void setStoreUrlToRenderUrlTransformerName(String storeUrlToRenderUrlTransformerName) {
+        this.storeUrlToRenderUrlTransformerName = storeUrlToRenderUrlTransformerName;
+    }
+
+    @Required
+    public void setToFullHttpsUrlTransformerName(String toFullHttpsUrlTransformerName) {
+        this.toFullHttpsUrlTransformerName = toFullHttpsUrlTransformerName;
     }
 
     @Required
@@ -189,12 +196,23 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     }
 
     @Override
-    public View resolveViewName(String viewName, Locale locale) throws Exception {
-        String url = urlTransformationService.transform(urlTransformerName, viewName, cacheUrlTransformations);
-        View view = getCachedLocalizedView(url, locale);
+    public View resolveViewName(String renderUrl, Locale locale) throws Exception {
+        String storeUrl = urlTransformationService.transform(renderUrlToStoreUrlTransformerName, renderUrl,
+                                                             cacheUrlTransformations);
+        View view = getCachedLocalizedView(storeUrl, locale);
 
-        if (view instanceof CrafterPageView) {
-            accessManager.checkAccess(((CrafterPageView) view).getPage());
+        if (view != null) {
+            if (TargetingProperties.getRedirectToTargetedUrlConfigKey()) {
+                String targetedRenderUrl = urlTransformationService.transform(storeUrlToRenderUrlTransformerName,
+                                                                              storeUrl, cacheUrlTransformations);
+                if (!targetedRenderUrl.equals(renderUrl)) {
+                    return getRedirectView(targetedRenderUrl, true);
+                }
+            }
+
+            if (view instanceof CrafterPageView) {
+                accessManager.checkAccess(((CrafterPageView)view).getPage());
+            }
         }
 
         return view;
@@ -219,7 +237,7 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
 
     protected View getCurrentPageHttpsRedirectView() {
         String currentUrl = RequestContext.getCurrent().getRequest().getRequestURI();
-        String fullHttpsUrl = urlTransformationService.transform(fullHttpsUrlTransformerName, currentUrl);
+        String fullHttpsUrl = urlTransformationService.transform(toFullHttpsUrlTransformerName, currentUrl);
 
         return getRedirectView(fullHttpsUrl, false);
     }

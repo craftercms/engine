@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.LocaleUtils;
 import org.craftercms.engine.util.config.TargetingProperties;
@@ -53,7 +54,11 @@ public class LocaleTargetIdManager extends AbstractTargetIdManager {
             List<String> availableLocaleStrs = new ArrayList<>(availableLocales.size());
 
             for (Locale locale : availableLocales) {
-                availableLocaleStrs.add(locale.toString());
+                String localeStr = locale.toString();
+                // Ignore empty ROOT locale
+                if (StringUtils.isNotEmpty(localeStr)) {
+                    availableLocaleStrs.add(localeStr);
+                }
             }
 
             return availableLocaleStrs;

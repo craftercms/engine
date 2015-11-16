@@ -38,7 +38,7 @@ public interface TargetIdManager {
      * <p>
      * For example, if the candidate targeted URLs are /site/website/index_es_CR.xml and /site/website/index_es.xml,
      * and the fallback target ID is "en", then /site/website/index_en.xml is added to the list of candidate URLs,
-     * but if an empty or null string is the fallback target ID instead, /site/website/index/xml is the last candidate
+     * but if an empty or null string is the fallback target ID instead, /site/website/index.xml is the last candidate
      * URL.
      * </p>
      */
