@@ -202,7 +202,7 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
         View view = getCachedLocalizedView(storeUrl, locale);
 
         if (view != null) {
-            if (TargetingProperties.isRedirectToTargetedUrl()) {
+            if (TargetingProperties.getRedirectToTargetedUrlConfigKey()) {
                 String targetedRenderUrl = urlTransformationService.transform(storeUrlToRenderUrlTransformerName,
                                                                               storeUrl, cacheUrlTransformations);
                 if (!targetedRenderUrl.equals(renderUrl)) {

@@ -17,6 +17,7 @@
 package org.craftercms.engine.util;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.craftercms.commons.lang.RegexUtils;
 import org.craftercms.engine.util.config.TargetingProperties;
 
 /**
@@ -47,6 +48,22 @@ public class TargetingUtils {
         }
 
         return null;
+    }
+
+    /**
+     * Returns true if the path should be excluded or ignored for targeting.
+     *
+     * @param path  the path
+     *
+     * @return true if the path should be excluded
+     */
+    public static boolean excludePath(String path) {
+        String[] excludePatterns = TargetingProperties.getExcludePatterns();
+        if (ArrayUtils.isNotEmpty(excludePatterns)) {
+            return RegexUtils.matchesAny(path, excludePatterns);
+        } else {
+            return false;
+        }
     }
 
 }

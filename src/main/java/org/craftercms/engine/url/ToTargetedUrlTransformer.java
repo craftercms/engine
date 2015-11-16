@@ -44,7 +44,7 @@ public class ToTargetedUrlTransformer implements UrlTransformer {
     @Override
     public String transformUrl(Context context, CachingOptions cachingOptions,
                                String url) throws UrlTransformationException {
-        if (TargetingProperties.isTargetingEnabled()) {
+        if (TargetingProperties.isTargetingEnabled() && !TargetingUtils.excludePath(url)) {
             String rootFolder = TargetingUtils.getMatchingRootFolder(url);
             if (StringUtils.isNotEmpty(rootFolder)) {
                 String relativeUrl = StringUtils.substringAfter(url, rootFolder);
