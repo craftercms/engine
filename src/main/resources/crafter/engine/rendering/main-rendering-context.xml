@@ -25,10 +25,30 @@
         <property name="messageConverters" ref="crafter.messageConverters"/>
     </bean>
 
-    <bean id="crafter.contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean"/>
+    <bean id="crafter.contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+        <property name="favorPathExtension" value="true"/>
+        <property name="defaultContentType" value="application/json"/>
+        <property name="mediaTypes">
+            <map>
+                <entry key="xml" value="application/xml"/>
+                <entry key="json" value="application/json"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="crafter.jsonMsgConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+        <property name="objectMapper" ref="crafter.coreObjectMapper"/>
+    </bean>
+
+    <bean id="crafter.xmlMsgConverter" class="org.springframework.http.converter.xml.MarshallingHttpMessageConverter">
+        <constructor-arg ref="crafter.xmlMarshaller"/>
+    </bean>
 
     <!-- Use the default message converters, overwrite if need to specify new message converters -->
-    <util:list id="crafter.messageConverters"/>
+    <util:list id="crafter.messageConverters">
+        <ref bean="crafter.jsonMsgConverter"/>
+        <ref bean="crafter.xmlMsgConverter"/>
+    </util:list>
 
     <!-- ////////////////////////////////// -->
     <!--								 	-->
