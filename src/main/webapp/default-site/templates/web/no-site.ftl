@@ -14,7 +14,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta http-equiv="refresh" content="10; url=/studio">
   
-  <title>Crafter CMS Preview: NO SITE SET</title>
+  <title>Crafter CMS: NO SITE SET</title>
   <meta name="description" content="">
   <meta name="author" content="">
 
@@ -39,56 +39,59 @@
 
 <body>
   <div id="container">
-  	<div id="side-col">
-		<header>
-			<a class="logo" href="#"><img src="/static-assets/img/crafter-logo-transparent.png" alt="Crafter WEM by Crafter Software"   /></a>
-			<nav>
-				<ul>
-					<li class="active"><span>Crafter CMS</span></li>
-					<li><a href="http://http://www.craftersoftware.com/products"><span>Overview &amp; Features</span></a></li>
-					<li><a href="http://www.craftercms.org/downloads"><span>Download</span></a></li>
-					<li><a href="http://wiki.craftersoftware.com/display/CRAFTER/Crafter+CMS+Tutorials"><span>Tutorials &amp; Screencasts</span></a></li>
-					
-					<li><a href="http://wiki.craftersoftware.com/display/CRAFTER/C2.5+Setup+Guide"><span>Installation and Setup</span></a></li>
-					<li><a href="http://wiki.craftersoftware.com"><span>Manuals and Documentation</span></a></li>
-					<li><a href="http://craftercms.org"><span>Our Contributors</span></a></li>
-					<li><a href="http://craftersoftware.com/about/partners"><span>Professional Services</span></a></li>
-          <li><a href="http://www.craftersoftware.com"><span>Crafter Software</span></a></li>
-					<li><a href="http://www.alfresco.com"><span>Alfresco</span></a></li>
+    <div id="side-col">
+    <header>
+      <a class="logo" href="#"><img src="/static-assets/img/crafter-logo-transparent.png" alt="Crafter CMS by Crafter Software"   /></a>
+      <nav>
+        <ul>
+          <li class="active"><span>Crafter CMS</span></li>
+          <li><a href="/studio"><span>Crafter Studio</span></a></li>
+          <li><a href="http://www.craftersoftware.com/products"><span>Overview &amp; Features</span></a></li>
+          <li><a href="http://www.craftercms.org/downloads"><span>Download</span></a></li>
+          <li><a href="http://www.craftersoftware.com/resources"><span>Tutorials &amp; Screencasts</span></a></li>
+          
+          <li><a href="http://wiki.craftercms.org"><span>Installation and Setup</span></a></li>
+          <li><a href="http://wiki.craftercms.org"><span>Manuals and Documentation</span></a></li>
+          <li><a href="http://www.craftersoftware.com/about/partners"><span>Professional Services</span></a></li>
 
-				</ul>
-			</nav>
-		</header>
-		<aside>
+        </ul>
+      </nav>
+    </header>
+    <aside>
 
 
 
-		</aside>
-	</div>    
+    </aside>
+  </div>    
     <div id="main" role="main">
-    	<section class="intro bgOpaque">
-			<h1>Welcome to Crafter CMS</h1>
-			<p>Crafter CMS is an award-winning, open source Web Experience Management system built on top of Alfresco, the world's leading open platform for content management.  Crafter CMS consists of two major applications: Crafter Studio for content authoring, management, and publishing, and Crafter Engine for content delivery of dynamic website applications.</p> </section>
-    	<section class="features bgOpaque">
-    		<h1>OOPS! No Site is Set!</h1>
-    		<p>To preview pages you must log in to Crafter Studio, select the site you want to look at and then browse to the page you want to preview.<br/><br/>
-    		You will be redirected in a few seconds to Crafter Studio</p>
-    	</section>
-    	<nav>
-			<ul>
-				<!--li class="active">Overivew &amp; Features</li>
-				<li><a href="#">Tutorials &amp; Screencasts</a></li>
-				<li><a href="#">FAQs</a></li>
-				<li><a href="#">Our Contributors</a></li-->
-			</ul>
-		</nav>
+    
+    <section class="intro bgOpaque">
+      <h1>Welcome to Crafter CMS</h1>
+      <p>Crafter CMS is an award-winning, open source enterprise Web Experience Management system built.  Crafter CMS consists of two major applications: Crafter Studio for content authoring, management, and publishing, and Crafter Engine for content delivery of dynamic website applications.</p> 
+    </section>
+
+    <section class="features bgOpaque">
+        <h1>OOPS! No Site is Set!</h1>
+        <p>To preview pages you must log in to Crafter Studio, select the site you want to look at and then browse to the page you want to preview.<br/><br/>
+        You will be redirected in a few seconds to Crafter Studio.</p>
+    </section>
+      
+
+      <nav>
+      <ul>
+        <!--li class="active">Overivew &amp; Features</li>
+        <li><a href="#">Tutorials &amp; Screencasts</a></li>
+        <li><a href="#">FAQs</a></li>
+        <li><a href="#">Our Contributors</a></li-->
+      </ul>
+    </nav>
     </div>
     
   </div> <!--! end of #container -->
   <footer>
-  	<p>Copyright &copy; 2007 - 2015, Crafter Software Corporation. All rights reserved.<br />
-  	Crafter WEM is free and open source software licensed under the GNU General Public License (GPL) version 3.0 	
-  	</p>
+    <p>Copyright &copy; 2007 - 2015, Crafter Software Corporation. All rights reserved.<br />
+    Crafter CMS is free and open source software licensed under the GNU General Public License (GPL) version 3.0  
+    </p>
   </footer>
 
   <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
