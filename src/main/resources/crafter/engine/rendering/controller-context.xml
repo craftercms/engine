@@ -50,6 +50,10 @@
         <property name="contextRegistry" ref="crafter.siteContextManager"/>
     </bean>
 
+    <bean id="crafter.siteCacheRestController" class="org.craftercms.engine.controller.rest.SiteCacheRestController">
+        <property name="cacheService" ref="crafter.cacheService"/>
+    </bean>
+
     <!-- Overwrite CacheRestController from core -->
     <bean id="crafter.cacheRestController" class="org.craftercms.engine.controller.rest.FreeMarkerAwareCacheRestController">
         <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
