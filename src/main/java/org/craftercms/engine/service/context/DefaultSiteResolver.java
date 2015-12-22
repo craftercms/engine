@@ -7,12 +7,12 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
- * {@link org.craftercms.engine.service.context.SiteContextResolver} that resolves always the current site name
- * to a default site name.
+ * {@link org.craftercms.engine.service.context.SiteResolver} that resolves always the current site name to a default
+ * site name.
  *
  * @author avasquez
  */
-public class DefaultSiteContextResolver extends AbstractSiteContextResolver {
+public class DefaultSiteResolver implements SiteListResolver, SiteResolver {
 
     private String defaultSiteName;
 
@@ -22,12 +22,12 @@ public class DefaultSiteContextResolver extends AbstractSiteContextResolver {
     }
 
     @Override
-    protected Collection<String> getSiteList() {
+    public Collection<String> getSiteList() {
         return Collections.singleton(defaultSiteName);
     }
 
     @Override
-    protected String getSiteName(HttpServletRequest request) {
+    public String getSiteName(HttpServletRequest request) {
         return defaultSiteName;
     }
 

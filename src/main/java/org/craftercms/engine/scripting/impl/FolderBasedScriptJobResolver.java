@@ -3,6 +3,8 @@ package org.craftercms.engine.scripting.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.ServletContext;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.craftercms.engine.exception.SchedulingException;
 import org.craftercms.engine.scripting.ScriptJobResolver;
@@ -11,6 +13,7 @@ import org.craftercms.engine.util.ContentStoreUtils;
 import org.craftercms.engine.util.SchedulingUtils;
 import org.craftercms.engine.util.quartz.JobContext;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.web.context.ServletContextAware;
 
 /**
  * Folder based {@link ScriptJobResolver}, which resolves all scripts under a certain folder, and creates a trigger
@@ -19,11 +22,12 @@ import org.springframework.beans.factory.annotation.Required;
  *
  * @author avasquez
  */
-public class FolderBasedScriptJobResolver implements ScriptJobResolver {
+public class FolderBasedScriptJobResolver implements ScriptJobResolver, ServletContextAware {
 
     protected String folderUrl;
     protected String cronExpression;
     protected String scriptSuffix;
+    protected ServletContext servletContext;
 
     @Required
     public void setFolderUrl(String folderUrl) {
@@ -41,6 +45,11 @@ public class FolderBasedScriptJobResolver implements ScriptJobResolver {
     }
 
     @Override
+    public void setServletContext(ServletContext servletContext) {
+        this.servletContext = servletContext;
+    }
+
+    @Override
     public List<JobContext> resolveJobs(SiteContext siteContext) throws SchedulingException {
         List<String> scriptUrls = ContentStoreUtils.findChildrenUrl(siteContext.getStoreService(),
                                                                     siteContext.getContext(), folderUrl);
@@ -53,7 +62,8 @@ public class FolderBasedScriptJobResolver implements ScriptJobResolver {
                         jobContexts = new ArrayList<>();
                     }
 
-                    jobContexts.add(SchedulingUtils.createJobContext(siteContext, scriptUrl, cronExpression));
+                    jobContexts.add(SchedulingUtils.createJobContext(siteContext, scriptUrl, cronExpression,
+                                                                     servletContext));
                 }
             }
         }

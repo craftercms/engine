@@ -156,9 +156,7 @@ public class PageRenderController extends AbstractController {
     protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response,
                                                         Map<String, Object> model) {
         Map<String, Object> variables = new HashMap<String, Object>();
-        GroovyUtils.addCommonVariables(variables, request, response, getServletContext());
-        GroovyUtils.addSecurityVariables(variables);
-        GroovyUtils.addModelVariable(variables, model);
+        GroovyUtils.addControllerScriptVariables(variables, request, response, getServletContext(), model);
 
         return variables;
     }
@@ -189,49 +187,5 @@ public class PageRenderController extends AbstractController {
             }
         }
     }
-
-//    protected ModelAndView doLocalizedRedirect(String pageUrl) {
-//        if (I10nProperties.localizationEnabled()) {
-//            String tmpUrl = StringUtils.stripStart(pageUrl, "/");
-//            String localeStr = StringUtils.substringBefore(tmpUrl, "/");
-//            Locale locale = null;
-//
-//            if (StringUtils.isNotEmpty(localeStr)) {
-//                try {
-//                    locale = LocaleUtils.toLocale(localeStr);
-//                    if (!LocaleUtils.isAvailableLocale(locale)) {
-//                        if (logger.isDebugEnabled()) {
-//                            logger.debug(localeStr + " is not one of the available locales");
-//                        }
-//
-//                        locale = null;
-//                    }
-//                } catch (IllegalArgumentException e) {
-//                    if (logger.isDebugEnabled()) {
-//                        logger.debug(localeStr + " is not a valid locale");
-//                    }
-//                }
-//            }
-//
-//            Locale currentLocale = LocaleContextHolder.getLocale();
-//            String suffix;
-//
-//            if (locale == null) {
-//                suffix = tmpUrl;
-//            } else {
-//                suffix = StringUtils.substringAfter(tmpUrl, "/");
-//            }
-//
-//            if (currentLocale != null && I10nProperties.forceCurrentLocale() && !currentLocale.equals(locale)) {
-//                if (StringUtils.isNotEmpty(suffix)) {
-//                    suffix = "/" + suffix;
-//                }
-//
-//                return new ModelAndView(new RedirectView("/" + currentLocale + suffix, true));
-//            }
-//        }
-//
-//        return new ModelAndView(pageUrl);
-//    }
 
 }

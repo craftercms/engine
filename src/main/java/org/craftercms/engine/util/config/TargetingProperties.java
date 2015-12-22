@@ -111,7 +111,7 @@ public class TargetingProperties {
     /**
      * Returns true if the request should be redirected when the targeted URL is different from the current URL.
      */
-    public static boolean getRedirectToTargetedUrlConfigKey() {
+    public static boolean isRedirectToTargetedUrl() {
         Configuration config = ConfigUtils.getCurrentConfig();
         if (config != null) {
             return config.getBoolean(REDIRECT_TO_TARGETED_URL_CONFIG_KEY, false);

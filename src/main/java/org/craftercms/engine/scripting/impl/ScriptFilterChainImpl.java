@@ -52,9 +52,7 @@ public class ScriptFilterChainImpl implements FilterChain {
             HttpServletResponse httpResponse = (HttpServletResponse)response;
             Map<String, Object> variables = new HashMap<>();
 
-            GroovyUtils.addCommonVariables(variables, httpRequest, httpResponse, servletContext);
-            GroovyUtils.addSecurityVariables(variables);
-            GroovyUtils.addFilterChainVariable(variables, this);
+            GroovyUtils.addFilterScriptVariables(variables, httpRequest, httpResponse, servletContext, this);
 
             try {
                 script.execute(variables);

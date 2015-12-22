@@ -3,6 +3,8 @@ package org.craftercms.engine.scripting.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
+
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.GroovyUtils;
@@ -20,12 +22,14 @@ public class ScriptJob implements Job {
 
     public static final String SITE_CONTEXT_DATA_KEY = "siteContext";
     public static final String SCRIPT_URL_DATA_KEY = "scriptUrl";
+    public static final String SERVLET_CONTEXT_DATA_KEY = "servletContext";
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
         JobDataMap dataMap = context.getJobDetail().getJobDataMap();
         String scriptUrl = dataMap.getString(SCRIPT_URL_DATA_KEY);
         SiteContext siteContext = (SiteContext)dataMap.get(SITE_CONTEXT_DATA_KEY);
+        ServletContext servletContext = (ServletContext)dataMap.get(SERVLET_CONTEXT_DATA_KEY);
         ScriptFactory scriptFactory = siteContext.getScriptFactory();
 
         if (scriptFactory == null) {
@@ -36,7 +40,7 @@ public class ScriptJob implements Job {
         SiteContext.setCurrent(siteContext);
         try {
             Map<String, Object> variables = new HashMap<>();
-            GroovyUtils.addJobVariables(variables);
+            GroovyUtils.addJobScriptVariables(variables, servletContext);
 
             scriptFactory.getScript(scriptUrl).execute(variables);
         } catch (Exception e) {

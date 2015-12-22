@@ -231,15 +231,13 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
     }
 
     protected Map<String, Object> createScriptVariables(SiteItem component, Map<String, Object> model) {
-        Map<String, Object> scriptVariables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<String, Object>();
         RequestContext context = RequestContext.getCurrent();
 
-        GroovyUtils.addCommonVariables(scriptVariables, context.getRequest(), context.getResponse(), servletContext);
-        GroovyUtils.addSecurityVariables(scriptVariables);
-        GroovyUtils.addCrafterModelVariable(scriptVariables, component);
-        GroovyUtils.addModelVariable(scriptVariables, model);
+        GroovyUtils.addComponentScriptVariables(variables, context.getRequest(), context.getResponse(),
+                                                servletContext, component, model);
 
-        return scriptVariables;
+        return variables;
     }
 
     protected void executeScript(Script script, Map<String, Object> scriptVariables, Environment env)

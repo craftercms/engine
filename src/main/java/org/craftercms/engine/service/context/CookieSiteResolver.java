@@ -1,6 +1,5 @@
 package org.craftercms.engine.service.context;
 
-import java.util.Collection;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -10,22 +9,16 @@ import org.craftercms.commons.http.HttpUtils;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
- * {@link org.craftercms.engine.service.context.SiteContextResolver} that resolves the current site name from a
- * cookie or request param.
+ * {@link org.craftercms.engine.service.context.SiteResolver} that resolves the current site name from a cookie or
+ * request param.
  *
  * @author avasquez
  */
-public class CookieSiteContextResolver extends AbstractSiteContextResolver {
+public class CookieSiteResolver implements SiteResolver {
 
-    private static final Log logger = LogFactory.getLog(CookieSiteContextResolver.class);
+    private static final Log logger = LogFactory.getLog(CookieSiteResolver.class);
 
-    protected SiteListResolver siteListResolver;
     protected String paramOrCookieName;
-
-    @Required
-    public void setSiteListResolver(SiteListResolver siteListResolver) {
-        this.siteListResolver = siteListResolver;
-    }
 
     @Required
     public void setParamOrCookieName(String paramOrCookieName) {
@@ -33,12 +26,7 @@ public class CookieSiteContextResolver extends AbstractSiteContextResolver {
     }
 
     @Override
-    protected Collection<String> getSiteList() {
-        return siteListResolver.getSiteList();
-    }
-
-    @Override
-    protected String getSiteName(HttpServletRequest request) {
+    public String getSiteName(HttpServletRequest request) {
         String siteName = request.getParameter(paramOrCookieName);
         if (StringUtils.isEmpty(siteName)) {
             siteName = HttpUtils.getCookieValue(paramOrCookieName, request);

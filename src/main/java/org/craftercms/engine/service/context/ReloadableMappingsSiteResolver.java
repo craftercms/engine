@@ -9,6 +9,7 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.core.exception.CrafterException;
@@ -16,18 +17,20 @@ import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.io.Resource;
 
 /**
- * {@link org.craftercms.engine.service.context.SiteContextResolver} that resolves the current site name from a mapping
+ * {@link org.craftercms.engine.service.context.SiteResolver} that resolves the current site name from a mapping
  * of the request domain name to site name. These mappings are dynamic in that anytime while Engine is running they
  * can change (ones can be added and others removed). The {@link #reloadMappings()} method then can be called to
  * reload the mappings.
  *
  * @author avasquez
  */
-public class ReloadableMappingsSiteContextResolver extends AbstractSiteContextResolver {
+public class ReloadableMappingsSiteResolver implements SiteListResolver, SiteResolver {
 
-    private static final Log logger = LogFactory.getLog(ReloadableMappingsSiteContextResolver.class);
+    private static final Log logger = LogFactory.getLog(ReloadableMappingsSiteResolver.class);
 
     protected Resource mappingsFile;
+    protected SiteContextManager siteContextManager;
+
     protected volatile Properties mappings;
 
     @Required
@@ -35,20 +38,30 @@ public class ReloadableMappingsSiteContextResolver extends AbstractSiteContextRe
         this.mappingsFile = mappingsFile;
     }
 
+    @Required
+    public void setSiteContextManager(SiteContextManager siteContextManager) {
+        this.siteContextManager = siteContextManager;
+    }
+
     @PostConstruct
     public void init() throws Exception {
         loadMappings();
-
-        super.init();
     }
 
     public synchronized void reloadMappings() throws CrafterException {
+        Collection<String> oldSiteList = getSiteList();
+
         loadMappings();
-        refreshContexts();
+
+        Collection<String> newSiteList = getSiteList();
+        Collection<String> sitesToDestroy = CollectionUtils.subtract(oldSiteList, newSiteList);
+
+        siteContextManager.destroyContexts(sitesToDestroy);
+        siteContextManager.createContexts(newSiteList);
     }
 
     @Override
-    protected Collection<String> getSiteList() {
+    public Collection<String> getSiteList() {
         Collection<Object> siteNames = mappings.values();
         Set<String> result = new LinkedHashSet<>(siteNames.size());
 
@@ -60,7 +73,7 @@ public class ReloadableMappingsSiteContextResolver extends AbstractSiteContextRe
     }
 
     @Override
-    protected String getSiteName(HttpServletRequest request) {
+    public String getSiteName(HttpServletRequest request) {
         String domainName = request.getServerName();
 
         if (mappings.containsKey(domainName)) {
