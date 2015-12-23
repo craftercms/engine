@@ -56,6 +56,7 @@ public class GroovyUtils {
     public static final String VARIABLE_CRAFTER_MODEL = "crafterModel";
     public static final String VARIABLE_AUTH = "authentication";
     public static final String VARIABLE_PROFILE = "profile";
+    public static final String VARIABLE_SITE_CONTEXT = "siteContext";
     public static final String VARIABLE_SITE_CONFIG = "siteConfig";
     public static final String VARIABLE_FILTER_CHAIN = "filterChain";
     public static final String VARIABLE_APPLICATION_CONTEXT = "applicationContext";
@@ -63,8 +64,65 @@ public class GroovyUtils {
     private GroovyUtils() {
     }
 
-    public static void addCommonVariables(Map<String, Object> variables, HttpServletRequest request,
-                                          HttpServletResponse response, ServletContext servletContext) {
+    public static void addRestScriptVariables(Map<String, Object> variables, HttpServletRequest request,
+                                              HttpServletResponse response, ServletContext servletContext) {
+        addCommonVariables(variables, request, response, servletContext);
+        addSecurityVariables(variables);
+    }
+
+    public static void addPageScriptVariables(Map<String, Object> variables, HttpServletRequest request,
+                                              HttpServletResponse response, ServletContext servletContext,
+                                              SiteItem page, Map<String, Object> model) {
+        addCommonVariables(variables, request, response, servletContext);
+        addSecurityVariables(variables);
+        addCrafterModelVariable(variables, page);
+        addModelVariable(variables, model);
+    }
+
+    public static void addComponentScriptVariables(Map<String, Object> variables, HttpServletRequest request,
+                                                   HttpServletResponse response, ServletContext servletContext,
+                                                   SiteItem component, Map<String, Object> model) {
+        addCommonVariables(variables, request, response, servletContext);
+        addSecurityVariables(variables);
+        addCrafterModelVariable(variables, component);
+        addModelVariable(variables, model);
+    }
+
+    public static void addControllerScriptVariables(Map<String, Object> variables, HttpServletRequest request,
+                                                    HttpServletResponse response, ServletContext servletContext,
+                                                    Map<String, Object> model) {
+        addCommonVariables(variables, request, response, servletContext);
+        addSecurityVariables(variables);
+        addModelVariable(variables, model);
+    }
+
+    public static void addFilterScriptVariables(Map<String, Object> variables, HttpServletRequest request,
+                                                HttpServletResponse response, ServletContext servletContext,
+                                                FilterChain filterChain) {
+        addCommonVariables(variables, request, response, servletContext);
+        addSecurityVariables(variables);
+        addFilterChainVariable(variables, filterChain);
+    }
+
+    public static void addJobScriptVariables(Map<String, Object> variables, ServletContext servletContext) {
+        SiteContext siteContext = SiteContext.getCurrent();
+
+        if (siteContext != null && siteContext.getApplicationContext() != null) {
+            ApplicationContextAccessor appContext = new ApplicationContextAccessor();
+            appContext.setApplicationContext(siteContext.getApplicationContext());
+
+            variables.put(VARIABLE_APPLICATION_CONTEXT, appContext);
+        }
+
+        variables.put(VARIABLE_APPLICATION, servletContext);
+        variables.put(VARIABLE_LOGGER, LOGGER);
+
+        addSiteContextVariable(variables);
+        addSiteConfigVariable(variables);
+    }
+
+    private static void addCommonVariables(Map<String, Object> variables, HttpServletRequest request,
+                                           HttpServletResponse response, ServletContext servletContext) {
         variables.put(VARIABLE_APPLICATION, servletContext);
         variables.put(VARIABLE_REQUEST, request);
         variables.put(VARIABLE_RESPONSE, response);
@@ -84,18 +142,19 @@ public class GroovyUtils {
         variables.put(VARIABLE_LOGGER, LOGGER);
         variables.put(VARIABLE_LOCALE, LocaleContextHolder.getLocale());
 
+        addSiteContextVariable(variables);
         addSiteConfigVariable(variables);
     }
 
-    public static void addModelVariable(Map<String, Object> variables, Object model) {
+    private static void addModelVariable(Map<String, Object> variables, Object model) {
         variables.put(VARIABLE_MODEL, model);
     }
 
-    public static void addCrafterModelVariable(Map<String, Object> variables, SiteItem crafterModel) {
+    private static void addCrafterModelVariable(Map<String, Object> variables, SiteItem crafterModel) {
         variables.put(VARIABLE_CRAFTER_MODEL, crafterModel);
     }
 
-    public static void addSecurityVariables(Map<String, Object> variables) {
+    private static void addSecurityVariables(Map<String, Object> variables) {
         Authentication auth = SecurityUtils.getCurrentAuthentication();
         Profile profile = null;
 
@@ -107,7 +166,11 @@ public class GroovyUtils {
         variables.put(VARIABLE_PROFILE, profile);
     }
 
-    public static void addSiteConfigVariable(Map<String, Object> variables) {
+    private static void addSiteContextVariable(Map<String, Object> variables) {
+        variables.put(VARIABLE_SITE_CONTEXT, SiteContext.getCurrent());
+    }
+
+    private static void addSiteConfigVariable(Map<String, Object> variables) {
         SiteContext siteContext = SiteContext.getCurrent();
         Configuration config = null;
 
@@ -118,23 +181,8 @@ public class GroovyUtils {
         variables.put(VARIABLE_SITE_CONFIG, config);
     }
 
-    public static void addFilterChainVariable(Map<String, Object> variables, FilterChain filterChain) {
+    private static void addFilterChainVariable(Map<String, Object> variables, FilterChain filterChain) {
         variables.put(VARIABLE_FILTER_CHAIN, filterChain);
-    }
-
-    public static void addJobVariables(Map<String, Object> variables) {
-        SiteContext siteContext = SiteContext.getCurrent();
-
-        if (siteContext != null && siteContext.getApplicationContext() != null) {
-            ApplicationContextAccessor appContext = new ApplicationContextAccessor();
-            appContext.setApplicationContext(siteContext.getApplicationContext());
-
-            variables.put(VARIABLE_APPLICATION_CONTEXT, appContext);
-        }
-
-        variables.put(VARIABLE_LOGGER, LOGGER);
-
-        addSiteConfigVariable(variables);
     }
 
 }

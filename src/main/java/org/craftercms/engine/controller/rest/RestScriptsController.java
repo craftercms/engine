@@ -117,11 +117,10 @@ public class RestScriptsController extends AbstractController {
     }
 
     protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response) {
-        Map<String, Object> scriptVariables = new HashMap<String, Object>();
-        GroovyUtils.addCommonVariables(scriptVariables, request, response, getServletContext());
-        GroovyUtils.addSecurityVariables(scriptVariables);
+        Map<String, Object> variables = new HashMap<String, Object>();
+        GroovyUtils.addRestScriptVariables(variables, request, response, getServletContext());
 
-        return scriptVariables;
+        return variables;
     }
 
     protected Object executeScript(ScriptFactory scriptFactory, HttpServletRequest request,

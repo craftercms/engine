@@ -10,14 +10,14 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
- * {@link org.craftercms.engine.service.context.SiteContextResolver} that resolves the current site name from a
- * set of static mappings, where the mapping key is a domain name, and the value is the site name.
+ * {@link org.craftercms.engine.service.context.SiteResolver} that resolves the current site name from a set of
+ * static mappings, where the mapping key is a domain name, and the value is the site name.
  *
  * @author avasquez
  */
-public class StaticMappingsSiteContextResolver extends AbstractSiteContextResolver {
+public class StaticMappingsSiteResolver implements SiteListResolver, SiteResolver {
 
-    private static final Log logger = LogFactory.getLog(StaticMappingsSiteContextResolver.class);
+    private static final Log logger = LogFactory.getLog(StaticMappingsSiteResolver.class);
 
     private Map<String, String> mappings;
 
@@ -27,12 +27,12 @@ public class StaticMappingsSiteContextResolver extends AbstractSiteContextResolv
     }
 
     @Override
-    protected Collection<String> getSiteList() {
+    public Collection<String> getSiteList() {
         return new LinkedHashSet<>(mappings.values());
     }
 
     @Override
-    protected String getSiteName(HttpServletRequest request) {
+    public String getSiteName(HttpServletRequest request) {
         String domainName = request.getServerName();
 
         if (mappings.containsKey(domainName)) {

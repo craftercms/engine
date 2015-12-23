@@ -18,6 +18,8 @@ package org.craftercms.engine.util;
 
 import java.util.Properties;
 
+import javax.servlet.ServletContext;
+
 import org.craftercms.engine.scripting.impl.ScriptJob;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.quartz.JobContext;
@@ -30,8 +32,7 @@ import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.simpl.SimpleThreadPool;
 
-import static org.craftercms.engine.scripting.impl.ScriptJob.SCRIPT_URL_DATA_KEY;
-import static org.craftercms.engine.scripting.impl.ScriptJob.SITE_CONTEXT_DATA_KEY;
+import static org.craftercms.engine.scripting.impl.ScriptJob.*;
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
@@ -58,10 +59,12 @@ public class SchedulingUtils {
         return trigger;
     }
 
-    public static JobDetail createScriptJob(SiteContext siteContext, String jobName, String scriptUrl) {
+    public static JobDetail createScriptJob(SiteContext siteContext, String jobName, String scriptUrl,
+                                            ServletContext servletContext) {
         JobDataMap dataMap = new JobDataMap();
         dataMap.put(SITE_CONTEXT_DATA_KEY, siteContext);
         dataMap.put(SCRIPT_URL_DATA_KEY, scriptUrl);
+        dataMap.put(SERVLET_CONTEXT_DATA_KEY, servletContext);
 
         JobDetail job = newJob(ScriptJob.class)
             .withIdentity(jobName)
@@ -71,9 +74,10 @@ public class SchedulingUtils {
         return job;
     }
 
-    public static JobContext createJobContext(SiteContext siteContext, String scriptUrl, String cronExpression) {
+    public static JobContext createJobContext(SiteContext siteContext, String scriptUrl, String cronExpression,
+                                              ServletContext servletContext) {
         String jobName = siteContext.getSiteName() + ":" + scriptUrl;
-        JobDetail detail = SchedulingUtils.createScriptJob(siteContext, jobName, scriptUrl);
+        JobDetail detail = SchedulingUtils.createScriptJob(siteContext, jobName, scriptUrl, servletContext);
         Trigger trigger = SchedulingUtils.createCronTrigger("trigger for " + jobName, cronExpression);
         String description = "Job{url='" + scriptUrl + "', cron='" + cronExpression + "'}";
 

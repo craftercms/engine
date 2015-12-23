@@ -19,8 +19,10 @@ package org.craftercms.engine.service.context;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.servlet.ServletContext;
 
 import groovy.lang.GroovyClassLoader;
 import org.apache.commons.collections4.CollectionUtils;
@@ -39,6 +41,7 @@ import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.scripting.ScriptJobResolver;
 import org.craftercms.engine.scripting.impl.GroovyScriptFactory;
 import org.craftercms.engine.service.PreviewOverlayCallback;
+import org.craftercms.engine.util.GroovyUtils;
 import org.craftercms.engine.util.SchedulingUtils;
 import org.craftercms.engine.util.config.impl.MultiConfigurationBuilder;
 import org.craftercms.engine.util.groovy.ContentStoreGroovyResourceLoader;
@@ -58,6 +61,7 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
 
 /**
@@ -67,12 +71,13 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
  *
  * @author Alfonso Vásquez
  */
-public class SiteContextFactory implements ApplicationContextAware {
+public class SiteContextFactory implements ApplicationContextAware, ServletContextAware {
 
     public static final String DEFAULT_SITE_NAME_MACRO_NAME = "siteName";
 
     private static final Log logger = LogFactory.getLog(SiteContextFactory.class);
 
+    protected ServletContext servletContext;
     protected String siteNameMacroName;
     protected String storeType;
     protected String storeServerUrl;
@@ -81,6 +86,7 @@ public class SiteContextFactory implements ApplicationContextAware {
     protected String rootFolderPath;
     protected String staticAssetsPath;
     protected String templatesPath;
+    protected String initScriptPath;
     protected String restScriptsPath;
     protected String controllerScriptsPath;
     protected String[] configPaths;
@@ -107,6 +113,11 @@ public class SiteContextFactory implements ApplicationContextAware {
         cacheOn = Context.DEFAULT_CACHE_ON;
         maxAllowedItemsInCache = Context.DEFAULT_MAX_ALLOWED_ITEMS_IN_CACHE;
         ignoreHiddenFiles = Context.DEFAULT_IGNORE_HIDDEN_FILES;
+    }
+
+    @Override
+    public void setServletContext(ServletContext servletContext) {
+        this.servletContext = servletContext;
     }
 
     public void setSiteNameMacroName(String siteNameMacroName) {
@@ -142,6 +153,11 @@ public class SiteContextFactory implements ApplicationContextAware {
     @Required
     public void setTemplatesPath(String templatesPath) {
         this.templatesPath = templatesPath;
+    }
+
+    @Required
+    public void setInitScriptPath(String initScriptPath) {
+        this.initScriptPath = initScriptPath;
     }
 
     @Required
@@ -266,6 +282,8 @@ public class SiteContextFactory implements ApplicationContextAware {
             siteContext.setApplicationContext(appContext);
             siteContext.setClassLoader(classLoader);
 
+            executeInitScript(siteContext, scriptFactory);
+
             Scheduler scheduler = scheduleJobs(siteContext);
             siteContext.setScheduler(scheduler);
 
@@ -280,10 +298,20 @@ public class SiteContextFactory implements ApplicationContextAware {
 
     protected HierarchicalConfiguration getConfig(SiteContext siteContext, String[] configPaths,
                                                   ResourceLoader resourceLoader) {
-        ConfigurationBuilder builder = new MultiConfigurationBuilder(configPaths, resourceLoader);
-
+        String siteName = siteContext.getSiteName();
         try {
-            return (HierarchicalConfiguration)builder.getConfiguration();
+            logger.info("--------------------------------------------------");
+            logger.info("<Loading configuration for site: " + siteName + ">");
+            logger.info("--------------------------------------------------");
+
+            ConfigurationBuilder builder = new MultiConfigurationBuilder(configPaths, resourceLoader);
+            HierarchicalConfiguration config = (HierarchicalConfiguration)builder.getConfiguration();
+
+            logger.info("--------------------------------------------------");
+            logger.info("</Loading configuration for site: " + siteName + ">");
+            logger.info("--------------------------------------------------");
+
+            return config;
         } catch (ConfigurationException e) {
             throw new SiteContextCreationException("Unable to load configuration for site '" +
                                                    siteContext.getSiteName() + "'", e);
@@ -315,6 +343,12 @@ public class SiteContextFactory implements ApplicationContextAware {
             }
 
             if (CollectionUtils.isNotEmpty(resources)) {
+                String siteName = siteContext.getSiteName();
+
+                logger.info("--------------------------------------------------");
+                logger.info("<Loading application context for site: " + siteName + ">");
+                logger.info("--------------------------------------------------");
+
                 GenericApplicationContext appContext = new GenericApplicationContext(mainApplicationContext);
                 appContext.setClassLoader(classLoader);
 
@@ -333,6 +367,10 @@ public class SiteContextFactory implements ApplicationContextAware {
                 appContext.refresh();
 
                 logger.info("Application context loaded for site '" + siteContext.getSiteName() + "'");
+
+                logger.info("--------------------------------------------------");
+                logger.info("</Loading application context for site: " + siteName + ">");
+                logger.info("--------------------------------------------------");
 
                 return appContext;
             } else {
@@ -364,6 +402,10 @@ public class SiteContextFactory implements ApplicationContextAware {
             if (CollectionUtils.isNotEmpty(allJobContexts)) {
                 Scheduler scheduler = SchedulingUtils.createScheduler(siteName + "_scheduler");
 
+                logger.info("--------------------------------------------------");
+                logger.info("<Scheduling job scripts for site: " + siteName + ">");
+                logger.info("--------------------------------------------------");
+
                 for (JobContext jobContext : allJobContexts) {
                     scheduler.scheduleJob(jobContext.getDetail(), jobContext.getTrigger());
 
@@ -372,12 +414,43 @@ public class SiteContextFactory implements ApplicationContextAware {
 
                 scheduler.start();
 
+                logger.info("--------------------------------------------------");
+                logger.info("</Scheduling job scripts for site: " + siteName + ">");
+                logger.info("--------------------------------------------------");
+
                 return scheduler;
             }
         } catch (Exception e) {
-            throw new SiteContextCreationException("Unable to schedule jobs for site '" + siteName + "'", e);
+            logger.error("Unable to schedule jobs for site '" + siteName + "'", e);
         }
 
         return null;
     }
+
+    protected void executeInitScript(SiteContext siteContext, ScriptFactory scriptFactory) {
+        if (storeService.exists(siteContext.getContext(), initScriptPath)) {
+            String siteName = siteContext.getSiteName();
+
+            SiteContext.setCurrent(siteContext);
+            try {
+                Map<String, Object> variables = new HashMap<>();
+                GroovyUtils.addJobScriptVariables(variables, servletContext);
+
+                logger.info("--------------------------------------------------");
+                logger.info("<Executing init script for site: " + siteName + ">");
+                logger.info("--------------------------------------------------");
+
+                scriptFactory.getScript(initScriptPath).execute(variables);
+
+                logger.info("--------------------------------------------------");
+                logger.info("</Executing init script for site: " + siteName + ">");
+                logger.info("--------------------------------------------------");
+            } catch (Exception e) {
+                logger.error("Error executing init script for site '" + siteName + "'", e);
+            } finally {
+                SiteContext.clear();
+            }
+        }
+    }
+
 }

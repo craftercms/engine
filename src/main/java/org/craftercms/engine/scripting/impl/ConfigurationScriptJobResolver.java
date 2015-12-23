@@ -3,6 +3,8 @@ package org.craftercms.engine.scripting.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.ServletContext;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.lang3.StringUtils;
@@ -15,6 +17,7 @@ import org.craftercms.engine.util.ContentStoreUtils;
 import org.craftercms.engine.util.SchedulingUtils;
 import org.craftercms.engine.util.quartz.JobContext;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.web.context.ServletContextAware;
 
 /**
  * {@link ScriptJobResolver} that resolves job based on configuration mappings, like the following:
@@ -32,7 +35,7 @@ import org.springframework.beans.factory.annotation.Required;
  *     &lt;/jobs&gt;
  * </pre>
  */
-public class ConfigurationScriptJobResolver implements ScriptJobResolver {
+public class ConfigurationScriptJobResolver implements ScriptJobResolver, ServletContextAware {
 
     public static final String JOB_FOLDER_KEY = "jobs.jobFolder";
     public static final String JOB_KEY = "jobs.job";
@@ -40,10 +43,16 @@ public class ConfigurationScriptJobResolver implements ScriptJobResolver {
     public static final String CRON_EXPRESSION_KEY = "cronExpression";
 
     protected String scriptSuffix;
+    protected ServletContext servletContext;
 
     @Required
     public void setScriptSuffix(String scriptSuffix) {
         this.scriptSuffix = scriptSuffix;
+    }
+
+    @Override
+    public void setServletContext(ServletContext servletContext) {
+        this.servletContext = servletContext;
     }
 
     @Override
@@ -92,7 +101,8 @@ public class ConfigurationScriptJobResolver implements ScriptJobResolver {
                             jobContexts = new ArrayList<>();
                         }
 
-                        jobContexts.add(SchedulingUtils.createJobContext(siteContext, scriptPath, cronExpression));
+                        jobContexts.add(SchedulingUtils.createJobContext(siteContext, scriptPath, cronExpression,
+                                                                         servletContext));
                     }
                 }
             }
@@ -107,7 +117,7 @@ public class ConfigurationScriptJobResolver implements ScriptJobResolver {
 
         if (StringUtils.isNotEmpty(scriptPath) && StringUtils.isNotEmpty(cronExpression)) {
             if (siteContext.getStoreService().exists(siteContext.getContext(), scriptPath)) {
-                return SchedulingUtils.createJobContext(siteContext, scriptPath, cronExpression);
+                return SchedulingUtils.createJobContext(siteContext, scriptPath, cronExpression, servletContext);
             } else {
                 throw new SchedulingException("Script job " + scriptPath + " for site '" + siteContext.getSiteName() +
                                               "' not found");

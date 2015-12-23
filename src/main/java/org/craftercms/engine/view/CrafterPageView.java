@@ -256,13 +256,10 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
 
     protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response,
                                                         Map<String, Object> model) {
-        Map<String, Object> scriptVariables = new HashMap<>();
-        GroovyUtils.addCommonVariables(scriptVariables, request, response, getServletContext());
-        GroovyUtils.addSecurityVariables(scriptVariables);
-        GroovyUtils.addCrafterModelVariable(scriptVariables, page);
-        GroovyUtils.addModelVariable(scriptVariables, model);
+        Map<String, Object> variables = new HashMap<>();
+        GroovyUtils.addPageScriptVariables(variables, request, response, getServletContext(), page, model);
 
-        return scriptVariables;
+        return variables;
     }
 
     protected String getPageViewName() throws RenderingException {

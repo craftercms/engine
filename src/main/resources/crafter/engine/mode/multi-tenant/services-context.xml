@@ -23,10 +23,9 @@
     <!--									-->
     <!-- ////////////////////////////////// -->
 
-    <bean id="crafter.siteContextResolver"
-          class="org.craftercms.engine.service.context.ReloadableMappingsSiteContextResolver"
-          parent="crafter.siteContextResolverBase">
+    <bean id="crafter.siteResolver" class="org.craftercms.engine.service.context.ReloadableMappingsSiteResolver">
         <property name="mappingsFile" value="${crafter.engine.site.mappings.file.path}"/>
+        <property name="siteContextManager" ref="crafter.siteContextManager"/>
     </bean>
 
     <bean id="crafter.tenantsResolver" class="org.craftercms.engine.util.tenant.SiteNameTenantResolver"/>

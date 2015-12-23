@@ -24,6 +24,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import javax.annotation.PreDestroy;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Required;
@@ -64,16 +65,115 @@ public class SiteContextManager {
     @PreDestroy
     public void destroy() {
         destroyAllContexts();
-
-        logger.info("All site contexts have been destroyed");
     }
 
     public Collection<SiteContext> listContexts() {
         return contextRegistry.values();
     }
 
+    public void createContexts(Collection<String> siteNames) {
+        logger.info("==================================================");
+        logger.info("<CREATING SITE CONTEXTS>");
+        logger.info("==================================================");
+
+        if (CollectionUtils.isNotEmpty(siteNames)) {
+            for (String siteName : siteNames) {
+                try {
+                    // If the site context doesn't exist (it's new), it will be created
+                    createContext(siteName, false);
+                } catch (Exception e) {
+                    logger.error("Error creating site context for site '" + siteName + "'", e);
+                }
+            }
+        }
+
+        logger.info("==================================================");
+        logger.info("</CREATING SITE CONTEXTS>");
+        logger.info("==================================================");
+    }
+
     public SiteContext createContext(String siteName, boolean fallback) {
         return getContext(siteName, fallback);
+    }
+
+    public void destroyAllContexts() {
+        logger.info("==================================================");
+        logger.info("<DESTROYING SITE CONTEXTS>");
+        logger.info("==================================================");
+
+        lock.lock();
+        try {
+            for (Iterator<SiteContext> iter = contextRegistry.values().iterator(); iter.hasNext();) {
+                SiteContext siteContext = iter.next();
+                String siteName = siteContext.getSiteName();
+
+                logger.info("==================================================");
+                logger.info("<Destroying site context: " + siteName + ">");
+                logger.info("==================================================");
+
+                try {
+                    siteContext.destroy();
+
+                    logger.info("Site context destroyed: " + siteContext);
+                } catch (Exception e) {
+                    logger.error("Error destroying site context for site '" + siteName + "'", e);
+                }
+
+                logger.info("==================================================");
+                logger.info("</Destroying site context: " + siteName + ">");
+                logger.info("==================================================");
+
+                iter.remove();
+            }
+        } finally {
+            lock.unlock();
+        }
+
+        logger.info("==================================================");
+        logger.info("</DESTROYING SITE CONTEXTS>");
+        logger.info("==================================================");
+    }
+
+    protected void destroyContexts(Collection<String> siteNames) {
+        logger.info("==================================================");
+        logger.info("<DESTROYING SITE CONTEXTS>");
+        logger.info("==================================================");
+
+        if (CollectionUtils.isNotEmpty(siteNames)) {
+            for (String siteName : siteNames) {
+                logger.info("==================================================");
+                logger.info("<Destroying site context: " + siteName + ">");
+                logger.info("==================================================");
+
+                try {
+                    destroyContext(siteName);
+                } catch (Exception e) {
+                    logger.error("Error destroying site context for site '" + siteName + "'", e);
+                }
+
+                logger.info("==================================================");
+                logger.info("</Destroying site context: " + siteName + ">");
+                logger.info("==================================================");
+            }
+        }
+
+        logger.info("==================================================");
+        logger.info("</DESTROYING SITE CONTEXTS>");
+        logger.info("==================================================");
+    }
+
+    public void destroyContext(String siteName) {
+        lock.lock();
+        try {
+            SiteContext siteContext = contextRegistry.remove(siteName);
+            if (siteContext != null) {
+                siteContext.destroy();
+
+                logger.info("Site context destroyed: " + siteContext);
+            }
+        } finally {
+            lock.unlock();
+        }
     }
 
     public SiteContext getContext(String siteName, boolean fallback) {
@@ -108,36 +208,6 @@ public class SiteContextManager {
         }
 
         return siteContext;
-    }
-
-    public void destroyContext(String siteName) {
-        lock.lock();
-        try {
-            SiteContext siteContext = contextRegistry.remove(siteName);
-            if (siteContext != null) {
-                siteContext.destroy();
-
-                logger.info("Site context destroyed: " + siteContext);
-            }
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    public void destroyAllContexts() {
-        lock.lock();
-        try {
-            for (Iterator<SiteContext> iter = contextRegistry.values().iterator(); iter.hasNext();) {
-                SiteContext siteContext = iter.next();
-                siteContext.destroy();
-
-                logger.info("Site context destroyed: " + siteContext);
-
-                iter.remove();
-            }
-        } finally {
-            lock.unlock();
-        }
     }
 
 }
