@@ -13,12 +13,12 @@ public class ExtendedLog4jConfigListener extends Log4jConfigListener {
 
     @Override
     public void contextInitialized(final ServletContextEvent event) {
-        try{
+        try {
             super.contextInitialized(event);
-        } catch (IllegalArgumentException ex){
-            Logger log = LoggerFactory.getLogger(ExtendedLog4jConfigListener.class);
-            log.info("File classpath:crafter/engine/extension/log4j-override.xml was not found, going with built-in " +
-                     "log4j settings");
+        } catch (IllegalArgumentException ex) {
+            Logger logger = LoggerFactory.getLogger(ExtendedLog4jConfigListener.class);
+            logger.info("File classpath:crafter/engine/extension/log4j-override.xml was not found, going with " +
+                        "built-in log4j settings");
         }
     }
 

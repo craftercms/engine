@@ -23,7 +23,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.http.HttpUtils;
-import org.craftercms.engine.controller.ErrorPageRenderController;
 import org.craftercms.engine.http.ExceptionHandler;
 
 /**
@@ -35,11 +34,15 @@ public class DefaultExceptionHandler implements ExceptionHandler {
 
     private static final Log logger = LogFactory.getLog(DefaultExceptionHandler.class);
 
+    public static final String EXCEPTION_ATTRIBUTE = "exception";
+
     @Override
     public boolean handle(HttpServletRequest request, HttpServletResponse response, Exception ex) throws IOException {
         logger.error(request.getMethod() + " " + HttpUtils.getFullRequestUri(request, true) + " failed", ex);
-        request.getServletContext().setAttribute("ex",ex);
+
+        request.setAttribute(EXCEPTION_ATTRIBUTE, ex);
         response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
         return true;
     }
 
