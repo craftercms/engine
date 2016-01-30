@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.configuration.Configuration;
 import org.craftercms.commons.http.HttpUtils;
 import org.craftercms.engine.model.SiteItem;
+import org.craftercms.engine.scripting.impl.GroovyScript;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.spring.ApplicationContextAccessor;
 import org.craftercms.profile.api.Profile;
@@ -35,13 +36,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.i18n.LocaleContextHolder;
 
 /**
- * Utility methods for Groovy scripts and classes.
+ * Utility methods for Groovy scripts.
  *
  * @author Alfonso Vásquez
  */
-public class GroovyUtils {
+public class GroovyScriptUtils {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(GroovyUtils.class);
+    public static final Logger GROOVY_SCRIPT_LOGGER = LoggerFactory.getLogger(GroovyScript.class);
 
     public static final String VARIABLE_APPLICATION = "application";
     public static final String VARIABLE_REQUEST = "request";
@@ -61,7 +62,7 @@ public class GroovyUtils {
     public static final String VARIABLE_FILTER_CHAIN = "filterChain";
     public static final String VARIABLE_APPLICATION_CONTEXT = "applicationContext";
 
-    private GroovyUtils() {
+    private GroovyScriptUtils() {
     }
 
     public static void addRestScriptVariables(Map<String, Object> variables, HttpServletRequest request,
@@ -115,7 +116,7 @@ public class GroovyUtils {
         }
 
         variables.put(VARIABLE_APPLICATION, servletContext);
-        variables.put(VARIABLE_LOGGER, LOGGER);
+        variables.put(VARIABLE_LOGGER, GROOVY_SCRIPT_LOGGER);
 
         addSiteContextVariable(variables);
         addSiteConfigVariable(variables);
@@ -139,7 +140,7 @@ public class GroovyUtils {
             variables.put(VARIABLE_SESSION, null);
         }
 
-        variables.put(VARIABLE_LOGGER, LOGGER);
+        variables.put(VARIABLE_LOGGER, GROOVY_SCRIPT_LOGGER);
         variables.put(VARIABLE_LOCALE, LocaleContextHolder.getLocale());
 
         addSiteContextVariable(variables);

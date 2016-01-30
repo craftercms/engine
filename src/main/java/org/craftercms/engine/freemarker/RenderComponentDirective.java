@@ -45,7 +45,7 @@ import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.scripting.ScriptResolver;
 import org.craftercms.engine.service.SiteItemService;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.util.GroovyUtils;
+import org.craftercms.engine.util.GroovyScriptUtils;
 import org.craftercms.engine.view.CrafterPageView;
 import org.dom4j.Element;
 import org.dom4j.Node;
@@ -234,8 +234,8 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
         Map<String, Object> variables = new HashMap<String, Object>();
         RequestContext context = RequestContext.getCurrent();
 
-        GroovyUtils.addComponentScriptVariables(variables, context.getRequest(), context.getResponse(),
-                                                servletContext, component, model);
+        GroovyScriptUtils.addComponentScriptVariables(variables, context.getRequest(), context.getResponse(),
+                                                      servletContext, component, model);
 
         return variables;
     }

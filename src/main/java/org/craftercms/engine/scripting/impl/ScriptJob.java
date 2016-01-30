@@ -7,7 +7,7 @@ import javax.servlet.ServletContext;
 
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.util.GroovyUtils;
+import org.craftercms.engine.util.GroovyScriptUtils;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -40,7 +40,7 @@ public class ScriptJob implements Job {
         SiteContext.setCurrent(siteContext);
         try {
             Map<String, Object> variables = new HashMap<>();
-            GroovyUtils.addJobScriptVariables(variables, servletContext);
+            GroovyScriptUtils.addJobScriptVariables(variables, servletContext);
 
             scriptFactory.getScript(scriptUrl).execute(variables);
         } catch (Exception e) {

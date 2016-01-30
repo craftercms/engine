@@ -16,7 +16,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.engine.exception.ScriptException;
 import org.craftercms.engine.scripting.Script;
-import org.craftercms.engine.util.GroovyUtils;
+import org.craftercms.engine.util.GroovyScriptUtils;
 
 /**
  * {@link FilterChain} implementation that executes a chain of scripts, before delegating to the actual servlet
@@ -52,7 +52,7 @@ public class ScriptFilterChainImpl implements FilterChain {
             HttpServletResponse httpResponse = (HttpServletResponse)response;
             Map<String, Object> variables = new HashMap<>();
 
-            GroovyUtils.addFilterScriptVariables(variables, httpRequest, httpResponse, servletContext, this);
+            GroovyScriptUtils.addFilterScriptVariables(variables, httpRequest, httpResponse, servletContext, this);
 
             try {
                 script.execute(variables);

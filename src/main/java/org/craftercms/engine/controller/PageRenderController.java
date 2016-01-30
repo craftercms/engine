@@ -34,7 +34,7 @@ import org.craftercms.engine.exception.ScriptException;
 import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.util.GroovyUtils;
+import org.craftercms.engine.util.GroovyScriptUtils;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
@@ -156,7 +156,7 @@ public class PageRenderController extends AbstractController {
     protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response,
                                                         Map<String, Object> model) {
         Map<String, Object> variables = new HashMap<String, Object>();
-        GroovyUtils.addControllerScriptVariables(variables, request, response, getServletContext(), model);
+        GroovyScriptUtils.addControllerScriptVariables(variables, request, response, getServletContext(), model);
 
         return variables;
     }

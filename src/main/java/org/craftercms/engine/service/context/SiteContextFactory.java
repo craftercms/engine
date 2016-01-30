@@ -41,7 +41,7 @@ import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.scripting.ScriptJobResolver;
 import org.craftercms.engine.scripting.impl.GroovyScriptFactory;
 import org.craftercms.engine.service.PreviewOverlayCallback;
-import org.craftercms.engine.util.GroovyUtils;
+import org.craftercms.engine.util.GroovyScriptUtils;
 import org.craftercms.engine.util.SchedulingUtils;
 import org.craftercms.engine.util.config.impl.MultiConfigurationBuilder;
 import org.craftercms.engine.util.groovy.ContentStoreGroovyResourceLoader;
@@ -434,7 +434,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             SiteContext.setCurrent(siteContext);
             try {
                 Map<String, Object> variables = new HashMap<>();
-                GroovyUtils.addJobScriptVariables(variables, servletContext);
+                GroovyScriptUtils.addJobScriptVariables(variables, servletContext);
 
                 logger.info("--------------------------------------------------");
                 logger.info("<Executing init script for site: " + siteName + ">");
