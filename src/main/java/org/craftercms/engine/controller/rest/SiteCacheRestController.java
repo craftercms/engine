@@ -39,13 +39,14 @@ public class SiteCacheRestController {
     @ResponseBody
     public Map<String, String> clear() {
         SiteContext siteContext = SiteContext.getCurrent();
+        String siteName = siteContext.getSiteName();
 
         // Clear content cache
         cacheService.clearScope(siteContext.getContext());
         // Clear Freemarker cache
         siteContext.getFreeMarkerConfig().getConfiguration().clearTemplateCache();
 
-        String msg = "Content cache and Freemarker cache have been cleared for site '" + siteContext.getSiteName() + "'";
+        String msg = "Content cache and Freemarker cache have been cleared for site '" + siteName + "'";
 
         logger.info(msg);
 

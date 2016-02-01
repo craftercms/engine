@@ -30,6 +30,12 @@
 
     <bean id="crafter.tenantsResolver" class="org.craftercms.engine.util.tenant.SiteNameTenantResolver"/>
 
+    <!-- ////////////////////////////////// -->
+    <!--								 	-->
+    <!--			 Security				-->
+    <!--									-->
+    <!-- ////////////////////////////////// -->
+
     <bean id="crafter.accessTokenIdResolver" class="org.craftercms.engine.security.ConfigAwareAccessTokenIdResolver"/>
 
 </beans>

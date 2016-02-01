@@ -28,6 +28,7 @@ import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.PreviewOverlayCallback;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
+import org.slf4j.MDC;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
 
@@ -37,6 +38,8 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
  * @author Alfonso Vásquez
  */
 public class SiteContext {
+
+    private static final String SITE_NAME_MDC_KEY = "siteName";
 
     private static ThreadLocal<SiteContext> threadLocal = new ThreadLocal<>();
 
@@ -72,12 +75,16 @@ public class SiteContext {
      */
     public static void setCurrent(SiteContext current) {
         threadLocal.set(current);
+
+        MDC.put(SITE_NAME_MDC_KEY, current.getSiteName());
     }
 
     /**
      * Removes the context from the current thread.
      */
     public static void clear() {
+        MDC.remove(SITE_NAME_MDC_KEY);
+
         threadLocal.remove();
     }
 

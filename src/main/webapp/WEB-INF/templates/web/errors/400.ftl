@@ -2,8 +2,14 @@
 <html>
 <head>
     <title>Bad Request</title>
+
+    <style>
+        body {
+            font-family: sans-serif; color: #222;
+        }
+    </style>
 </head>
 <body>
-<h2>The request is invalid.</h2>
+    <h2>The request is invalid.</h2>
 </body>
 </html>

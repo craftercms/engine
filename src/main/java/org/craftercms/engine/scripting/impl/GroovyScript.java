@@ -12,6 +12,7 @@ import org.craftercms.core.util.cache.impl.CachingAwareObjectBase;
 import org.craftercms.engine.exception.ScriptException;
 import org.craftercms.engine.exception.ScriptNotFoundException;
 import org.craftercms.engine.scripting.Script;
+import org.slf4j.MDC;
 
 /**
  * Runs a script through the {@link groovy.util.GroovyScriptEngine}.
@@ -19,6 +20,8 @@ import org.craftercms.engine.scripting.Script;
  * @author Alfonso Vásquez
  */
 public class GroovyScript extends CachingAwareObjectBase implements Script {
+
+    private static final String SCRIPT_URL_MDC_KEY = "scriptUrl";
 
     protected GroovyScriptEngine scriptEngine;
     protected String scriptUrl;
@@ -46,7 +49,8 @@ public class GroovyScript extends CachingAwareObjectBase implements Script {
             allVariables.putAll(variables);
         }
 
-        try {
+        MDC.put(SCRIPT_URL_MDC_KEY, scriptUrl);
+        try  {
             return scriptEngine.run(scriptUrl, new Binding(allVariables));
         } catch (Exception e) {
             Throwable cause = e.getCause();
@@ -55,6 +59,8 @@ public class GroovyScript extends CachingAwareObjectBase implements Script {
             } else {
                 throw new ScriptException(e.getMessage(), e);
             }
+        } finally {
+            MDC.remove(SCRIPT_URL_MDC_KEY);
         }
     }
 

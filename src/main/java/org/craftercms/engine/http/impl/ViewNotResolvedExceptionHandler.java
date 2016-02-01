@@ -16,16 +16,16 @@
  */
 package org.craftercms.engine.http.impl;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.craftercms.engine.http.ExceptionHandler;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.craftercms.engine.http.ExceptionHandler;
 
 /**
  * Handles {@link javax.servlet.ServletException}s that are thrown when a view can't be resolved.
@@ -35,8 +35,8 @@ import java.util.regex.Pattern;
 public class ViewNotResolvedExceptionHandler implements ExceptionHandler {
 
     private static final Log logger = LogFactory.getLog(ViewNotResolvedExceptionHandler.class);
-    private static final Pattern viewNotResolvedMsgPattern = Pattern.compile("Could not resolve view with name '(.+)' in servlet " +
-            "with name '(.+)'");
+    private static final Pattern viewNotResolvedMsgPattern = Pattern.compile("Could not resolve view with name " +
+                                                                             "'(.+)' in servlet with name '(.+)'");
 
     @Override
     public boolean handle(HttpServletRequest request, HttpServletResponse response, Exception ex) throws IOException {

@@ -2,6 +2,12 @@
 <html>
     <head>
         <title>Page Not Found</title>
+
+        <style>
+            body {
+                font-family: sans-serif; color: #222;
+            }
+        </style>
     </head>
     <body>
         <h2>Oops! The requested page can't be found.</h2>

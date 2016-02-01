@@ -2,6 +2,12 @@
 <html>
     <head>
         <title>Access denied</title>
+
+        <style>
+            body {
+                font-family: sans-serif; color: #222;
+            }
+        </style>
     </head>
     <body>
         <h2>The user doesn't have enough rights to access the page.</h2>

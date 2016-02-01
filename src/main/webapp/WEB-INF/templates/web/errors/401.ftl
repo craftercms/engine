@@ -2,6 +2,12 @@
 <html>
     <head>
         <title>Authentication required</title>
+
+        <style>
+            body {
+                font-family: sans-serif; color: #222;
+            }
+        </style>
     </head>
     <body>
         <h2>The user couldn't be authenticated correctly.</h2>

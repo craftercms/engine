@@ -39,7 +39,6 @@
 
     <bean id="crafter.errorPageRenderController" class="org.craftercms.engine.controller.ErrorPageRenderController">
         <property name="errorViewNamePrefix" value="${crafter.engine.error.viewName.prefix}"/>
-        <property name="isPreview" value="${crafter.engine.preview}"/>
     </bean>
 
     <bean id="crafter.monitoringRenderController" class="org.craftercms.engine.controller.MonitoringController">
@@ -48,6 +47,10 @@
 
     <bean id="crafter.siteContextRestController" class="org.craftercms.engine.controller.rest.SiteContextRestController">
         <property name="contextRegistry" ref="crafter.siteContextManager"/>
+    </bean>
+
+    <bean id="crafter.siteContentStoreRestController" class="org.craftercms.engine.controller.rest.SiteContentStoreRestController">
+        <property name="wrappedController" ref="crafter.contentStoreRestController"/>
     </bean>
 
     <bean id="crafter.siteCacheRestController" class="org.craftercms.engine.controller.rest.SiteCacheRestController">
