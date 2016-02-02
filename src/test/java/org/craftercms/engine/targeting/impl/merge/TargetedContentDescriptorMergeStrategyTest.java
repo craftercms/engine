@@ -40,6 +40,7 @@ import static org.mockito.Mockito.when;
  */
 public class TargetedContentDescriptorMergeStrategyTest {
 
+    private static final String SITE_NAME = "test";
     private static final String LEVEL_DESCRIPTOR_FILENAME = "crafter-level-descriptor.level.xml";
     private static final String[] ROOT_FOLDERS = { "/site/website" };
     private static final String[] AVAILABLE_TARGET_IDS = { "es_CR", "es", "en" };
@@ -132,6 +133,7 @@ public class TargetedContentDescriptorMergeStrategyTest {
         when(config.getString(FALLBACK_ID_CONFIG_KEY)).thenReturn(FALLBACK_TARGET_ID);
 
         SiteContext siteContext = new SiteContext();
+        siteContext.setSiteName(SITE_NAME);
         siteContext.setConfig(config);
 
         SiteContext.setCurrent(siteContext);

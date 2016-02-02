@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
  */
 public class CandidateTargetedUrlsResolverImplTest {
 
+    private static final String SITE_NAME = "test";
     private static final String[] ROOT_FOLDERS = { "/site/website" };
     private static final String FALLBACK_TARGET_ID = "";
     private static final String CURRENT_TARGET_ID = "es_CR";
@@ -107,6 +108,7 @@ public class CandidateTargetedUrlsResolverImplTest {
         when(config.getStringArray(ROOT_FOLDERS_CONFIG_KEY)).thenReturn(ROOT_FOLDERS);
 
         SiteContext context = new SiteContext();
+        context.setSiteName(SITE_NAME);
         context.setConfig(config);
 
         SiteContext.setCurrent(context);

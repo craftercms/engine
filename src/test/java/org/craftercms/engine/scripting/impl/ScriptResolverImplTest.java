@@ -118,6 +118,7 @@ public class ScriptResolverImplTest {
 
     private SiteContext createSiteContext()  {
         SiteContext siteContext = mock(SiteContext.class);
+        when(siteContext.getSiteName()).thenReturn("test");
         when(siteContext.getContext()).thenReturn(mock(Context.class));
 
         return siteContext;
