@@ -18,6 +18,7 @@ import static org.mockito.Mockito.*;
  */
 public class ToTargetedUrlTransformerTest {
 
+    private static final String SITE_NAME = "test";
     private static final String[] ROOT_FOLDERS = { "/site/website" };
     private static final String NON_TARGETED_URL = "/products/index.xml";
     private static final String TARGETED_URL = "/products/index_es_CR.xml";
@@ -68,6 +69,7 @@ public class ToTargetedUrlTransformerTest {
         when(config.getStringArray(EXCLUDE_PATTERNS_CONFIG_KEY)).thenReturn(new String[] {"/site/website/index\\.xml"});
 
         SiteContext siteContext = new SiteContext();
+        siteContext.setSiteName(SITE_NAME);
         siteContext.setConfig(config);
 
         SiteContext.setCurrent(siteContext);

@@ -27,6 +27,8 @@ public class ConfigAwareTestBase {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
+        when(siteContext.getSiteName()).thenReturn("test");
+
         setCurrentRequestContext();
         setCurrentSiteContext();
 
