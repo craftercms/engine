@@ -12,7 +12,7 @@ import org.apache.log4j.spi.LoggingEvent;
  *
  * @author avasquez
  */
-public class MDCKeyExistsFilter extends Filter {
+public class MdcKeyExistsFilter extends Filter {
 
     private String key;
     private boolean acceptIfKeyExists;

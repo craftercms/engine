@@ -28,7 +28,7 @@
             <list>
                 <value>classpath:crafter/core/core.properties</value>
                 <value>classpath:crafter/engine/server-config.properties</value>
-                <value>classpath*:crafter/engine/extension/server-config.properties</value>
+                <value>${crafter.engine.extension.base}/server-config.properties</value>
             </list>
         </property>
         <property name="ignoreUnresolvablePlaceholders" value="true"/>
@@ -418,6 +418,6 @@
         <property name="textEncryptor" ref="crafter.textEncryptor"/>
     </bean>
 
-    <import resource="classpath*:crafter/engine/extension/services-context.xml"/>
+    <import resource="${crafter.engine.extension.base}/services-context.xml"/>
 
 </beans>
