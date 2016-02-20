@@ -62,12 +62,12 @@
             <list>
                 <value>classpath:crafter/core/core.properties</value>
                 <value>classpath:crafter/engine/server-config.properties</value>
-                <value>classpath*:crafter/engine/extension/server-config.properties</value>
+                <value>${crafter.engine.extension.base}/server-config.properties</value>
             </list>
         </property>
         <property name="ignoreUnresolvablePlaceholders" value="true" />
     </bean>
 
-    <import resource="classpath*:crafter/engine/extension/rendering-context.xml"/>
+    <import resource="${crafter.engine.extension.base}/rendering-context.xml"/>
 
 </beans>

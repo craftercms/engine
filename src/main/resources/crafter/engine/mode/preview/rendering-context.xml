@@ -14,7 +14,7 @@
                 <value>classpath:crafter/security/security.properties</value>
                 <value>classpath:crafter/engine/server-config.properties</value>
                 <value>classpath:crafter/engine/mode/preview/server-config.properties</value>
-                <value>classpath*:crafter/engine/extension/server-config.properties</value>
+                <value>${crafter.engine.extension.base}/server-config.properties</value>
             </list>
         </property>
         <property name="ignoreUnresolvablePlaceholders" value="true" />
