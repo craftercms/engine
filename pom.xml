@@ -21,6 +21,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <servlet.api.version>3.0.1</servlet.api.version>
+        <javax.mail.version>1.4.7</javax.mail.version>
         <crafter.search.version>2.5.1-SNAPSHOT</crafter.search.version>
         <crafter.core.version>2.5.1-SNAPSHOT</crafter.core.version>
         <crafter.profile.version>2.5.1-SNAPSHOT</crafter.profile.version>
@@ -71,7 +72,7 @@
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
-            <version>1.4.7</version>
+            <version>${javax.mail.version}</version>
         </dependency>
         <dependency>
             <groupId>org.craftercms</groupId>

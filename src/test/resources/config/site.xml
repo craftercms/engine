@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
+    <!-- Filter properties -->
     <filters>
         <filter>
             <script>/scripts/filters/testFilter1.groovy</script>
@@ -22,8 +23,10 @@
         </filter>
     </filters>
 
+    <!-- Locale properties -->
     <defaultLocale>en</defaultLocale>
 
+    <!-- Content targeting properties -->
     <targeting>
         <enabled>true</enabled>
         <rootFolders>/site/website</rootFolders>
@@ -33,12 +36,14 @@
         <mergeFolders>true</mergeFolders>
     </targeting>
 
+    <!-- Profile properties -->
     <profile>
         <api>
             <accessTokenId>cd287b58-ab9c-457f-a4f0-39ef49f04c69</accessTokenId>
         </api>
     </profile>
 
+    <!-- Security properties -->
     <security>
         <login>
             <formUrl>/signin</formUrl>
@@ -60,6 +65,7 @@
         </urlRestrictions>
     </security>
 
+    <!-- Social properties -->
     <socialConnections>
         <facebookConnectionFactory>
             <appId>000000000000000</appId>
@@ -67,6 +73,7 @@
         </facebookConnectionFactory>
     </socialConnections>
 
+    <!-- Job properties -->
     <jobs>
         <jobFolder>
             <path>/scripts/jobs/morejobs</path>
