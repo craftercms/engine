@@ -39,8 +39,8 @@ public class RequestUriSiteResolver implements SiteResolver {
 
         if (matcher.matches()) {
             siteName = matcher.group(siteNameRegexGroup);
-        } else {
-            logger.warn("Unable to match request URI " + requestUri + " to regex " + siteNameRegex);
+        } else if (logger.isDebugEnabled()) {
+            logger.debug("Unable to match request URI " + requestUri + " to regex " + siteNameRegex);
         }
 
         return siteName;

@@ -30,8 +30,8 @@ public class CookieSiteResolver implements SiteResolver {
         String siteName = request.getParameter(paramOrCookieName);
         if (StringUtils.isEmpty(siteName)) {
             siteName = HttpUtils.getCookieValue(paramOrCookieName, request);
-            if (StringUtils.isEmpty(siteName)) {
-                logger.warn("No '" + paramOrCookieName + "' request param or cookie found");
+            if (StringUtils.isEmpty(siteName) && logger.isDebugEnabled()) {
+                logger.debug("No '" + paramOrCookieName + "' request param or cookie found");
             }
         }
 

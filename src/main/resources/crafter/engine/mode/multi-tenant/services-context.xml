@@ -23,9 +23,28 @@
     <!--									-->
     <!-- ////////////////////////////////// -->
 
-    <bean id="crafter.siteResolver" class="org.craftercms.engine.service.context.ReloadableMappingsSiteResolver">
+    <bean id="crafter.mappingsSiteResolver" class="org.craftercms.engine.service.context.ReloadableMappingsSiteResolver">
         <property name="mappingsFile" value="${crafter.engine.site.mappings.file.path}"/>
         <property name="siteContextManager" ref="crafter.siteContextManager"/>
+    </bean>
+
+    <bean id="crafter.cookieSiteResolver" class="org.craftercms.engine.service.context.CookieSiteResolver">
+        <property name="paramOrCookieName" value="${crafter.engine.request.param.siteName}"/>
+    </bean>
+
+    <bean id="crafter.siteResolver" class="org.craftercms.engine.service.context.SiteResolverChain">
+        <property name="chain">
+            <list>
+                <ref bean="crafter.mappingsSiteResolver"/>
+                <ref bean="crafter.cookieSiteResolver"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="crafter.siteContextsBootstrap" class="org.craftercms.engine.service.context.SiteContextsBootstrap">
+        <property name="createContextsOnStartup" value="${crafter.engine.site.context.createOnStartup}"/>
+        <property name="siteContextManager" ref="crafter.siteContextManager"/>
+        <property name="siteListResolver" ref="crafter.mappingsSiteResolver"/>
     </bean>
 
     <bean id="crafter.tenantsResolver" class="org.craftercms.engine.util.tenant.SiteNameTenantResolver"/>
