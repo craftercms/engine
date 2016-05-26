@@ -26,12 +26,15 @@ public class TargetedUrlByFolderStrategy extends AbstractTargetedUrlStrategy {
             return url;
         } else {
             String targetId = targetIdManager.getCurrentTargetId();
+            if (StringUtils.isNotEmpty(targetId)) {
+                if (!url.startsWith("/")) {
+                    url = "/" + url;
+                }
 
-            if (!url.startsWith("/")) {
-                url = "/" + url;
+                return "/" + targetId + url;
+            } else {
+                return url;
             }
-
-            return "/" + targetId + url;
         }
     }
 

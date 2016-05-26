@@ -84,7 +84,6 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
 
     public CrafterPageViewResolver() {
         order = 10;
-        cacheUrlTransformations = true;
         cachingOptions = CachingOptions.DEFAULT_CACHING_OPTIONS;
     }
 

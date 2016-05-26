@@ -26,7 +26,7 @@ import java.util.List;
 public interface TargetIdManager {
 
     /**
-     * Returns the target ID for the current request.
+     * Returns the target ID for the current request, or null or empty if there's no target ID.
      */
     String getCurrentTargetId() throws IllegalStateException;
 

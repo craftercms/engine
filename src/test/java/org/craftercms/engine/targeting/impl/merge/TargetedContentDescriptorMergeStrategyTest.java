@@ -36,7 +36,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Created by alfonsovasquez on 19/8/15.
+ * Unit tests for {@link TargetedContentDescriptorMergeStrategy}.
+ *
+ * @author avasquez
  */
 public class TargetedContentDescriptorMergeStrategyTest {
 

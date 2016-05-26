@@ -14,7 +14,9 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Created by alfonsovasquez on 17/8/15.
+ * Unit tests for {@link TargetedUrlByFileStrategy}.
+ *
+ * @author avasquez
  */
 public class TargetedUrlByFileStrategyTest {
 
@@ -22,9 +24,10 @@ public class TargetedUrlByFileStrategyTest {
     private static final String DEFAULT_TARGET_ID = "ame";
     private static final String CURRENT_TARGET_ID = "ame_lat_cr";
     private static final String NON_TARGETED_URL = "/products/index.xml";
-    private static final String TARGETED_URL = "/products/index_ame_lat_cr.xml";
+    private static final String TARGETED_URL1 = "/products/index_ame_lat_cr.xml";
+    private static final String TARGETED_URL2 = NON_TARGETED_URL;
 
-    private TargetedUrlByFileStrategy targetedUrlByFileStrategy;
+    private TargetedUrlByFileStrategy targetedUrlStrategy;
     @Mock
     private TargetIdManager targetIdManager;
 
@@ -36,20 +39,29 @@ public class TargetedUrlByFileStrategyTest {
         when(targetIdManager.getCurrentTargetId()).thenReturn(CURRENT_TARGET_ID);
         when(targetIdManager.getAvailableTargetIds()).thenReturn(AVAILABLE_TARGET_IDS);
 
-        targetedUrlByFileStrategy = new TargetedUrlByFileStrategy();
-        targetedUrlByFileStrategy.setTargetIdManager(targetIdManager);
+        targetedUrlStrategy = new TargetedUrlByFileStrategy();
+        targetedUrlStrategy.setTargetIdManager(targetIdManager);
     }
 
     @Test
-    public void testAsTargetUrl() throws Exception {
-        String targetedUrl = targetedUrlByFileStrategy.toTargetedUrl(NON_TARGETED_URL);
+    public void testToTargetUrl() throws Exception {
+        String targetedUrl = targetedUrlStrategy.toTargetedUrl(NON_TARGETED_URL);
 
-        assertEquals(TARGETED_URL, targetedUrl);
+        assertEquals(TARGETED_URL1, targetedUrl);
+    }
+
+    @Test
+    public void testToTargetUrlWithNoCurrentTargetId() throws Exception {
+        when(targetIdManager.getCurrentTargetId()).thenReturn(null);
+
+        String targetedUrl = targetedUrlStrategy.toTargetedUrl(NON_TARGETED_URL);
+
+        assertEquals(TARGETED_URL2, targetedUrl);
     }
 
     @Test
     public void testParseUrl() throws Exception {
-        TargetedUrlComponents urlComp = targetedUrlByFileStrategy.parseTargetedUrl(TARGETED_URL);
+        TargetedUrlComponents urlComp = targetedUrlStrategy.parseTargetedUrl(TARGETED_URL1);
 
         assertEquals("/products/index", urlComp.getPrefix());
         assertEquals("ame_lat_cr", urlComp.getTargetId());
@@ -58,9 +70,9 @@ public class TargetedUrlByFileStrategyTest {
 
     @Test
     public void testBuildUrl() throws Exception {
-        String targetedUrl = targetedUrlByFileStrategy.buildTargetedUrl("/products/index", "ame_lat_cr", ".xml");
+        String targetedUrl = targetedUrlStrategy.buildTargetedUrl("/products/index", "ame_lat_cr", ".xml");
 
-        assertEquals(TARGETED_URL, targetedUrl);
+        assertEquals(TARGETED_URL1, targetedUrl);
     }
 
 }
