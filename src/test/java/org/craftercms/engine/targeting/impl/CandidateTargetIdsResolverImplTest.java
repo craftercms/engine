@@ -8,7 +8,9 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * Created by alfonsovasquez on 17/8/15.
+ * Unit tests for {@link CandidateTargetIdsResolverImpl}.
+ *
+ * @author avasquez
  */
 public class CandidateTargetIdsResolverImplTest {
 

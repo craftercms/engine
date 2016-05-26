@@ -79,7 +79,9 @@ public class ReloadableMappingsSiteResolver implements SiteListResolver, SiteRes
         if (mappings.containsKey(domainName)) {
             return (String)mappings.get(domainName);
         } else {
-            logger.warn("No site mapping found for domain name " + domainName);
+            if (logger.isDebugEnabled()) {
+                logger.warn("No site mapping found for domain name " + domainName);
+            }
 
             return null;
         }

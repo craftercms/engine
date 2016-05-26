@@ -28,7 +28,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Created by alfonsovasquez on 21/8/15.
+ * Unit tests for {@link TargetedContentStoreAdapter}.
+ *
+ * @author avasquez
  */
 public class TargetedContentStoreAdapterTest extends ConfigAwareTestBase {
 

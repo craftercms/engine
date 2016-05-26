@@ -50,6 +50,7 @@ public class GroovyScript extends CachingAwareObjectBase implements Script {
         }
 
         MDC.put(SCRIPT_URL_MDC_KEY, scriptUrl);
+
         try  {
             return scriptEngine.run(scriptUrl, new Binding(allVariables));
         } catch (Exception e) {

@@ -42,7 +42,7 @@ public class LocaleTargetIdManager extends AbstractTargetIdManager {
         if (currentLocale != null) {
             return currentLocale.toString();
         } else {
-            throw new IllegalStateException("No locale associated with the current thread");
+            return null;
         }
     }
 

@@ -38,7 +38,9 @@ public class StaticMappingsSiteResolver implements SiteListResolver, SiteResolve
         if (mappings.containsKey(domainName)) {
             return mappings.get(domainName);
         } else {
-            logger.warn("No site mapping found for domain name " + domainName);
+            if (logger.isDebugEnabled()) {
+                logger.debug("No site mapping found for domain name " + domainName);
+            }
 
             return null;
         }

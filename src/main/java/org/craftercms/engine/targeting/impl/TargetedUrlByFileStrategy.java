@@ -56,7 +56,9 @@ public class TargetedUrlByFileStrategy extends AbstractTargetedUrlStrategy {
                 String urlWithoutExt = FilenameUtils.removeExtension(url);
                 String targetId = targetIdManager.getCurrentTargetId();
 
-                return urlWithoutExt + "_" + targetId + "." + ext;
+                return urlWithoutExt +
+                       (StringUtils.isNotEmpty(targetId)? targetIdSeparator + targetId : "") +
+                       "." + ext;
             }
         }
 

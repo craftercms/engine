@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.configuration.HierarchicalConfiguration;
+import org.apache.commons.lang3.StringUtils;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.targeting.CandidateTargetIdsResolver;
 import org.craftercms.engine.targeting.TargetIdManager;
@@ -24,7 +25,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Created by alfonsovasquez on 18/8/15.
+ * Unit tests for {@link CandidateTargetedUrlsResolverImpl}.
+ *
+ * @author avasquez
  */
 public class CandidateTargetedUrlsResolverImplTest {
 
@@ -32,9 +35,11 @@ public class CandidateTargetedUrlsResolverImplTest {
     private static final String[] ROOT_FOLDERS = { "/site/website" };
     private static final String FALLBACK_TARGET_ID = "";
     private static final String CURRENT_TARGET_ID = "es_CR";
-    private static final List<String> CANDIDATE_TARGET_IDS = Arrays.asList("es_CR", "es");
-    private static final String TARGETED_URL = "/products/index_es_CR.xml";
-    private static final String TARGETED_FULL_URL = ROOT_FOLDERS[0] + TARGETED_URL;
+    private static final List<String> CANDIDATE_TARGET_IDS = Arrays.asList("es_CR", "es", "");
+    private static final String TARGETED_URL1 = "/products/index_es_CR.xml";
+    private static final String TARGETED_URL2 = "/products/index.xml";
+    private static final String TARGETED_FULL_URL1 = ROOT_FOLDERS[0] + TARGETED_URL1;
+    private static final String TARGETED_FULL_URL2 = ROOT_FOLDERS[0] + TARGETED_URL2;
 
     private CandidateTargetedUrlsResolverImpl candidateUrlsResolver;
 
@@ -55,12 +60,19 @@ public class CandidateTargetedUrlsResolverImplTest {
 
     @Test
     public void testGetUrls() throws Exception {
-        List<String> urls = candidateUrlsResolver.getUrls(TARGETED_FULL_URL);
+        List<String> urls = candidateUrlsResolver.getUrls(TARGETED_FULL_URL1);
 
         assertNotNull(urls);
-        assertEquals(2, urls.size());
+        assertEquals(3, urls.size());
         assertEquals("/site/website/products/index_es_CR.xml", urls.get(0));
         assertEquals("/site/website/products/index_es.xml", urls.get(1));
+        assertEquals("/site/website/products/index.xml", urls.get(2));
+
+        urls = candidateUrlsResolver.getUrls(TARGETED_FULL_URL2);
+
+        assertNotNull(urls);
+        assertEquals(1, urls.size());
+        assertEquals("/site/website/products/index.xml", urls.get(0));
     }
 
     private TargetIdManager createTargetIdManager() {
@@ -79,14 +91,17 @@ public class CandidateTargetedUrlsResolverImplTest {
         urlComp.setTargetId(CURRENT_TARGET_ID);
         urlComp.setSuffix(".xml");
 
-        when(urlStrategy.parseTargetedUrl(TARGETED_URL)).thenReturn(urlComp);
+        when(urlStrategy.parseTargetedUrl(TARGETED_URL1)).thenReturn(urlComp);
         doAnswer(new Answer<String>() {
 
             @Override
             public String answer(InvocationOnMock invocation) throws Throwable {
                 Object[] args = invocation.getArguments();
+                String prefix = (String)args[0];
+                String targetId = (String)args[1];
+                String suffix = (String)args[2];
 
-                return "" + args[0] + (args[1] != null? "_" + args[1] : "") + args[2];
+                return "" + prefix + (StringUtils.isNotEmpty(targetId)? "_" + targetId : "") + suffix;
             }
 
         }).when(urlStrategy).buildTargetedUrl(anyString(), anyString(), anyString());
