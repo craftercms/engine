@@ -23,7 +23,6 @@ import java.io.Reader;
 import freemarker.cache.TemplateLoader;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.craftercms.core.exception.PathNotFoundException;
 import org.craftercms.core.service.Content;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
@@ -58,16 +57,15 @@ public class CrafterFreeMarkerTemplateLoader implements TemplateLoader {
                 logger.debug("Looking for FreeMarker template at [context=" + siteContext + ", path='" + path + "']");
             }
 
-            try {
-                return contentStoreService.getContent(siteContext.getContext(), path);
-            } catch (PathNotFoundException e) {
+            Content content = contentStoreService.findContent(siteContext.getContext(), path);
+            if (content == null) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Unable to find FreeMarker template at [context=" + siteContext + ", path='" + path +
                                  "']");
                 }
-
-                return null;
             }
+
+            return content;
         } else {
             return null;
         }

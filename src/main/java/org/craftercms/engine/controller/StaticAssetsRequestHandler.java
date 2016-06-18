@@ -26,7 +26,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.http.HttpUtils;
-import org.craftercms.core.exception.PathNotFoundException;
 import org.craftercms.core.service.Content;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
@@ -157,11 +156,7 @@ public class StaticAssetsRequestHandler extends WebContentGenerator implements H
     }
 
     protected Content getContent(SiteContext siteContext, String path) {
-        try {
-            return contentStoreService.getContent(siteContext.getContext(), path);
-        } catch (PathNotFoundException e) {
-            return null;
-        }
+        return contentStoreService.findContent(siteContext.getContext(), path);
     }
 
     protected MediaType getMediaType(String path) {
