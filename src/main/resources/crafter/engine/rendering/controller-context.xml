@@ -42,7 +42,7 @@
     </bean>
 
     <bean id="crafter.monitoringRenderController" class="org.craftercms.engine.controller.MonitoringController">
-        <property name="statusViewNamePrefix" value="${crafter.engine.monitoring.viewName.prefix}"/>
+        <property name="statusMessage" value="${crafter.search.monitoring.statusMessage}"/>
     </bean>
 
     <bean id="crafter.siteContextRestController" class="org.craftercms.engine.controller.rest.SiteContextRestController">

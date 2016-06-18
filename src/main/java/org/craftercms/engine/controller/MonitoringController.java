@@ -1,14 +1,13 @@
 package org.craftercms.engine.controller;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.craftercms.engine.util.logging.CircularQueueLogAppender;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.MimeType;
-import org.springframework.util.MimeTypeUtils;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,22 +21,23 @@ public class MonitoringController {
 
     public static final String ACTION_PATH_VAR = "action";
 
-    private String statusViewNamePrefix;
+    private String statusMessage;
 
     @Required
-    public void setStatusViewNamePrefix(String statusViewNamePrefix) {
-        this.statusViewNamePrefix = statusViewNamePrefix;
+    public void setStatusMessage(String statusMessage) {
+        this.statusMessage = statusMessage;
     }
 
-    @RequestMapping(value = "/{" + ACTION_PATH_VAR + "}", method = RequestMethod.GET)
-    public String render(@PathVariable(ACTION_PATH_VAR) String action) {
-        return statusViewNamePrefix + action + ".ftl";
-    }
-
-    @RequestMapping(value = "/log", method = RequestMethod.GET,produces = MimeTypeUtils.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/status", method = RequestMethod.GET)
     @ResponseBody
-    public List<HashMap<String,Object>> logger(@RequestParam final String siteId,@RequestParam final
-                                               long since) {
+    public Map<String, String> getStatus() {
+        return Collections.singletonMap("status", statusMessage);
+    }
+
+    @RequestMapping(value = "/log", method = RequestMethod.GET)
+    @ResponseBody
+    public List<HashMap<String,Object>> logger(@RequestParam String siteId, @RequestParam long since) {
         return CircularQueueLogAppender.loggerQueue().getLoggedEvents(siteId,since);
     }
+
 }
