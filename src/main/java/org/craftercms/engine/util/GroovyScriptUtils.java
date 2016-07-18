@@ -53,8 +53,12 @@ public class GroovyScriptUtils {
     public static final String VARIABLE_SESSION = "session";
     public static final String VARIABLE_LOGGER = "logger";
     public static final String VARIABLE_LOCALE = "locale";
+    @Deprecated
     public static final String VARIABLE_MODEL = "model";
+    public static final String VARIABLE_TEMPLATE_MODEL = "templateModel";
+    @Deprecated
     public static final String VARIABLE_CRAFTER_MODEL = "crafterModel";
+    public static final String VARIABLE_CONTENT_MODEL = "contentModel";
     public static final String VARIABLE_AUTH = "authentication";
     public static final String VARIABLE_PROFILE = "profile";
     public static final String VARIABLE_SITE_CONTEXT = "siteContext";
@@ -76,8 +80,8 @@ public class GroovyScriptUtils {
                                               SiteItem page, Map<String, Object> model) {
         addCommonVariables(variables, request, response, servletContext);
         addSecurityVariables(variables);
-        addCrafterModelVariable(variables, page);
-        addModelVariable(variables, model);
+        addContentModelVariable(variables, page);
+        addTemplateModelVariable(variables, model);
     }
 
     public static void addComponentScriptVariables(Map<String, Object> variables, HttpServletRequest request,
@@ -85,8 +89,8 @@ public class GroovyScriptUtils {
                                                    SiteItem component, Map<String, Object> model) {
         addCommonVariables(variables, request, response, servletContext);
         addSecurityVariables(variables);
-        addCrafterModelVariable(variables, component);
-        addModelVariable(variables, model);
+        addContentModelVariable(variables, component);
+        addTemplateModelVariable(variables, model);
     }
 
     public static void addControllerScriptVariables(Map<String, Object> variables, HttpServletRequest request,
@@ -94,7 +98,7 @@ public class GroovyScriptUtils {
                                                     Map<String, Object> model) {
         addCommonVariables(variables, request, response, servletContext);
         addSecurityVariables(variables);
-        addModelVariable(variables, model);
+        addTemplateModelVariable(variables, model);
     }
 
     public static void addFilterScriptVariables(Map<String, Object> variables, HttpServletRequest request,
@@ -147,12 +151,14 @@ public class GroovyScriptUtils {
         addSiteConfigVariable(variables);
     }
 
-    private static void addModelVariable(Map<String, Object> variables, Object model) {
+    private static void addTemplateModelVariable(Map<String, Object> variables, Object model) {
         variables.put(VARIABLE_MODEL, model);
+        variables.put(VARIABLE_TEMPLATE_MODEL, model);
     }
 
-    private static void addCrafterModelVariable(Map<String, Object> variables, SiteItem crafterModel) {
-        variables.put(VARIABLE_CRAFTER_MODEL, crafterModel);
+    private static void addContentModelVariable(Map<String, Object> variables, SiteItem siteItem) {
+        variables.put(VARIABLE_CRAFTER_MODEL, siteItem);
+        variables.put(VARIABLE_CONTENT_MODEL, siteItem);
     }
 
     private static void addSecurityVariables(Map<String, Object> variables) {
