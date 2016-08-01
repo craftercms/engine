@@ -3,7 +3,7 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="crafter.urlTransformationService" class="org.craftercms.engine.service.UrlTransformationService"/>
+    <bean id="crafter.urlTransformationService" class="org.craftercms.engine.service.impl.UrlTransformationServiceImpl"/>
 
     <!-- Alias defined so that calling the SpEL expressions don't get too big  when using the bean -->
     <alias name="crafter.urlTransformationService" alias="urlTransformationService"/>

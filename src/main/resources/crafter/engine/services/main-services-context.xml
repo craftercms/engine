@@ -128,7 +128,7 @@
         <constructor-arg value="${crafter.core.merger.strategy.inheritLevels.levelDescriptor.name}"/>
     </bean>
 
-    <bean id="crafter.siteItemService" class="org.craftercms.engine.service.SiteItemService">
+    <bean id="crafter.siteItemService" class="org.craftercms.engine.service.impl.SiteItemServiceImpl">
         <property name="storeService" ref="crafter.contentStoreService"/>
         <property name="modelValueConverters">
             <map>

@@ -1,0 +1,3 @@
+moduleName = dom4j-module
+moduleVersion = 1.0
+extensionClasses = org.craftercms.engine.util.groovy.Dom4jExtension

@@ -16,39 +16,17 @@
  */
 package org.craftercms.engine.service;
 
-import org.craftercms.core.exception.UrlTransformationException;
-import org.craftercms.core.service.CachingOptions;
 import org.craftercms.core.url.UrlTransformationEngine;
-import org.craftercms.engine.service.context.SiteContext;
 
 /**
- * Simple wrapper to a {@link UrlTransformationEngine} that uses the {@link UrlTransformationEngine} of the current
- * context.
+ * Transforms a URL, based on the current site's {@link UrlTransformationEngine}.
  *
  * @author Alfonso Vásquez
  */
-public class UrlTransformationService {
+public interface UrlTransformationService {
 
-    public String transform(String transformerName, String url) throws UrlTransformationException {
-        SiteContext siteContext = SiteContext.getCurrent();
-        if (siteContext != null) {
-            return siteContext.getUrlTransformationEngine().transformUrl(siteContext.getContext(), transformerName, url);
-        } else {
-            return url;
-        }
-    }
+    String transform(String transformerName, String url);
 
-    public String transform(String transformerName, String url, boolean cache) throws UrlTransformationException {
-        SiteContext siteContext = SiteContext.getCurrent();
-        if (siteContext != null) {
-            CachingOptions cachingOptions = new CachingOptions();
-            cachingOptions.setDoCaching(cache);
-
-            return siteContext.getUrlTransformationEngine().transformUrl(siteContext.getContext(), cachingOptions,
-                                                                         transformerName, url);
-        } else {
-            return url;
-        }
-    }
+    String transform(String transformerName, String url, boolean cache);
 
 }

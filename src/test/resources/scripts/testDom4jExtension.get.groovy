@@ -1,0 +1,1 @@
+return document.root.collection.item[1].text;
