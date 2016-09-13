@@ -16,7 +16,6 @@
  */
 package org.craftercms.engine.model;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,6 +29,7 @@ import freemarker.template.TemplateModelException;
 import freemarker.template.TemplateNodeModel;
 import freemarker.template.TemplateScalarModel;
 import freemarker.template.TemplateSequenceModel;
+import org.craftercms.core.util.XmlUtils;
 import org.craftercms.engine.freemarker.CrafterObjectWrapper;
 import org.dom4j.Attribute;
 import org.dom4j.Branch;
@@ -77,13 +77,9 @@ public class Dom4jNodeModel implements TemplateNodeModel, TemplateSequenceModel,
 
     @Override
     public TemplateModel get(String key) throws TemplateModelException {
-        Object result = node.selectObject(key);
+        Object result = XmlUtils.selectObject(node, key);
         if (result != null) {
-            if ((result instanceof Collection) && ((Collection) result).isEmpty()) {
-                return null;
-            } else {
-                return wrapper.wrap(result);
-            }
+            return wrapper.wrap(result);
         } else {
             return null;
         }

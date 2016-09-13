@@ -20,7 +20,7 @@ import org.apache.commons.configuration.Configuration;
 import org.craftercms.engine.util.ConfigUtils;
 
 /**
- * Site configuration propeties related to content targeting.
+ * Site configuration properties related to content targeting.
  *
  * @author avasquez
  */
@@ -66,9 +66,9 @@ public class TargetingProperties {
         Configuration config = ConfigUtils.getCurrentConfig();
         if (config != null) {
             return config.getString(FALLBACK_ID_CONFIG_KEY);
+        } else {
+            return null;
         }
-
-        return null;
     }
 
     /**

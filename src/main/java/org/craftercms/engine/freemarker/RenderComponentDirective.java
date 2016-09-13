@@ -266,10 +266,11 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
         }
     }
 
-    protected SimpleHash getComponentModel(SiteItem component, Map<String, Object> scriptsModel)
-        throws TemplateException {
+    protected SimpleHash getComponentModel(SiteItem component,
+                                           Map<String, Object> scriptsModel) throws TemplateException {
         SimpleHash componentModel = modelFactory.getObject();
         componentModel.put(KEY_COMPONENT_MODEL, component);
+
         if (MapUtils.isNotEmpty(scriptsModel)) {
             componentModel.putAll(scriptsModel);
         }

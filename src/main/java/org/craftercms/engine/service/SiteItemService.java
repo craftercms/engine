@@ -16,109 +16,32 @@
  */
 package org.craftercms.engine.service;
 
-import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
-import org.craftercms.core.service.ContentStoreService;
-import org.craftercms.core.service.Item;
+import org.craftercms.core.processors.ItemProcessor;
 import org.craftercms.core.service.ItemFilter;
-import org.craftercms.core.service.Tree;
-import org.craftercms.core.service.impl.CompositeItemFilter;
 import org.craftercms.engine.model.SiteItem;
-import org.craftercms.engine.model.converters.ModelValueConverter;
-import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.service.filter.ExcludeByNameItemFilter;
-import org.craftercms.engine.service.filter.ExpectedNodeValueItemFilter;
-import org.craftercms.engine.service.filter.IncludeByNameItemFilter;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
- * Service for accessing {@link org.craftercms.engine.model.SiteItem}s.
+ * Service for accessing {@link org.craftercms.engine.model.SiteItem}s of the current site.
  *
  * @author Alfonso Vásquez
  */
-public class SiteItemService {
+public interface SiteItemService {
 
-    protected ContentStoreService storeService;
-    protected Map<String, ModelValueConverter<?>> modelValueConverters;
-    protected List<ItemFilter> defaultFilters;
-    protected Comparator<SiteItem> sortComparator;
+    SiteItem getSiteItem(String url);
 
-    @Required
-    public void setStoreService(ContentStoreService storeService) {
-        this.storeService = storeService;
-    }
+    SiteItem getSiteTree(String url, int depth);
 
-    @Required
-    public void setModelValueConverters(Map<String, ModelValueConverter<?>> modelValueConverters) {
-        this.modelValueConverters = modelValueConverters;
-    }
+    SiteItem getSiteTree(String url, int depth, String includeByNameRegex, String excludeByNameRegex);
 
-    public void setDefaultFilters(List<ItemFilter> defaultFilters) {
-        this.defaultFilters = defaultFilters;
-    }
+    @Deprecated
+    SiteItem getSiteTree(String url, int depth, String includeByNameRegex, String excludeByNameRegex,
+                         String[]... nodeXPathAndExpectedValuePairs);
 
-    public void setSortComparator(Comparator<SiteItem> sortComparator) {
-        this.sortComparator = sortComparator;
-    }
+    SiteItem getSiteTree(String url, int depth, String includeByNameRegex, String excludeByNameRegex,
+                         Map<String, String> nodeXPathAndExpectedValuePairs);
 
-    public SiteItem getSiteItem(String url) {
-        SiteContext siteContext = SiteContext.getCurrent();
-        Item item = storeService.findItem(siteContext.getContext(), url);
-
-        if (item != null) {
-            return new SiteItem(item, modelValueConverters);
-        } else {
-            return null;
-        }
-    }
-
-    public SiteItem getSiteTree(String url, int depth)  {
-        return getSiteTree(url, depth, null, null, null);
-    }
-
-    public SiteItem getSiteTree(String url, int depth, String includeByNameRegex, String excludeByNameRegex) {
-        return getSiteTree(url, depth, includeByNameRegex, excludeByNameRegex, null);
-    }
-
-    public SiteItem getSiteTree(String url, int depth, String includeByNameRegex, String excludeByNameRegex,
-                                String[]... nodeXPathAndExpectedValuePairs) {
-        CompositeItemFilter compositeFilter = new CompositeItemFilter();
-
-        if (CollectionUtils.isNotEmpty(defaultFilters)) {
-            for (ItemFilter defaultFilter : defaultFilters) {
-                compositeFilter.addFilter(defaultFilter);
-            }
-        }
-
-        if (StringUtils.isNotEmpty(includeByNameRegex)) {
-            compositeFilter.addFilter(new IncludeByNameItemFilter(includeByNameRegex));
-        }
-        if (StringUtils.isNotEmpty(excludeByNameRegex)) {
-            compositeFilter.addFilter(new ExcludeByNameItemFilter(excludeByNameRegex));
-        }
-
-        if (ArrayUtils.isNotEmpty(nodeXPathAndExpectedValuePairs)) {
-            for (String[] nodeXPathAndExpectedValuePair : nodeXPathAndExpectedValuePairs) {
-                String nodeXPathQuery = nodeXPathAndExpectedValuePair[0];
-                String expectedNodeValueRegex = nodeXPathAndExpectedValuePair[1];
-
-                compositeFilter.addFilter(new ExpectedNodeValueItemFilter(nodeXPathQuery, expectedNodeValueRegex));
-            }
-        }
-
-        SiteContext siteContext = SiteContext.getCurrent();
-        Tree tree = storeService.findTree(siteContext.getContext(), null, url, depth, compositeFilter, null);
-
-        if (tree != null) {
-            return new SiteItem(tree, modelValueConverters, sortComparator);
-        } else {
-            return null;
-        }
-    }
+    SiteItem getSiteTree(String url, int depth, ItemFilter filter, ItemProcessor processor);
 
 }
