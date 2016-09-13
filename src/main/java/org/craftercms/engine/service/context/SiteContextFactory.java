@@ -366,8 +366,6 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
 
                 appContext.refresh();
 
-                logger.info("Application context loaded for site '" + siteContext.getSiteName() + "'");
-
                 logger.info("--------------------------------------------------");
                 logger.info("</Loading application context for site: " + siteName + ">");
                 logger.info("--------------------------------------------------");

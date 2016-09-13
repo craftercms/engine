@@ -16,23 +16,32 @@
  */
 package org.craftercms.engine.macro.impl;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpSession;
 
 import org.craftercms.commons.http.RequestContext;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.web.context.ServletContextAware;
 
 /**
- * Represents a macro that can be an attribute from the request or session scope.
+ * Represents a macro that can be an attribute from the servlet context, session or request scope.
  *
  * @author Alfonso Vásquez
  */
-public class ScopeAttributeMacro extends AbstractMacro {
+public class ScopeAttributeMacro extends AbstractMacro implements ServletContextAware {
+
+    public enum Scope {
+        SERVLET_CONTEXT,
+        SESSION,
+        REQUEST
+    }
 
     private String attributeName;
-    private boolean requestScope;
+    private Scope scope;
+    private ServletContext servletContext;
 
     public ScopeAttributeMacro() {
-        requestScope = true;
+        scope = Scope.REQUEST;
     }
 
     @Required
@@ -40,8 +49,13 @@ public class ScopeAttributeMacro extends AbstractMacro {
         this.attributeName = attributeName;
     }
 
-    public void setRequestScope(boolean requestScope) {
-        this.requestScope = requestScope;
+    public void setScope(Scope scope) {
+        this.scope = scope;
+    }
+
+    @Override
+    public void setServletContext(ServletContext servletContext) {
+        this.servletContext = servletContext;
     }
 
     @Override
@@ -51,18 +65,39 @@ public class ScopeAttributeMacro extends AbstractMacro {
 
     @Override
     protected String getMacroValue(String str) {
+        switch (scope) {
+            case SERVLET_CONTEXT:
+                return getServletContextAttribute();
+            case SESSION:
+                return getSessionAttribute();
+            default:
+                return getRequestAttribute();
+        }
+    }
+
+    private String getServletContextAttribute() {
+        return (String)servletContext.getAttribute(attributeName);
+    }
+
+    private String getSessionAttribute() {
         RequestContext requestContext = RequestContext.getCurrent();
         if (requestContext != null) {
-            HttpServletRequest request = requestContext.getRequest();
-
-            if (requestScope) {
-                return (String)request.getAttribute(attributeName);
-            } else {
-                return (String)request.getSession().getAttribute(attributeName);
+            HttpSession session = requestContext.getRequest().getSession();
+            if (session != null) {
+                return (String)session.getAttribute(attributeName);
             }
-        } else {
-            return null;
         }
+
+        return null;
+    }
+
+    private String getRequestAttribute() {
+        RequestContext requestContext = RequestContext.getCurrent();
+        if (requestContext != null) {
+            return (String)requestContext.getRequest().getAttribute(attributeName);
+        }
+
+        return null;
     }
 
 }

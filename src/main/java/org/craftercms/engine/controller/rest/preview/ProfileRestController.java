@@ -46,6 +46,7 @@ public class ProfileRestController {
 
     @RequestMapping(value = "/get", method = RequestMethod.GET)
     @ResponseBody
+    @SuppressWarnings("unchecked")
     public Map<String, String> getProfile(HttpSession session) {
         Map<String, String> profile = (Map<String, String>) session.getAttribute(PROFILE_SESSION_ATTRIBUTE);
         if (profile == null || StringUtils.isEmpty(profile.get("username"))) {

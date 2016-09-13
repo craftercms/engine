@@ -16,9 +16,10 @@
  */
 package org.craftercms.engine.model.sorting;
 
-import org.craftercms.engine.model.SiteItem;
-
 import java.util.Comparator;
+
+import org.craftercms.engine.model.SiteItem;
+import org.craftercms.engine.util.config.CommonProperties;
 
 /**
  * Compares two {@link SiteItem}s through the "orderDefault_f" model value.
@@ -36,7 +37,7 @@ public class OrderDefaultComparator implements Comparator<SiteItem> {
         Float modelValue2 = null;
 
         if (siteItem1.isFolder()) {
-            siteItem1 = siteItem1.getChildItem("index.xml");
+            siteItem1 = siteItem1.getChildItem(CommonProperties.getIndexFileName());
             if (siteItem1 != null) {
                 modelValue1 = (Float) siteItem1.get(ORDER_DEFAULT_VALUE_KEY);
             }
@@ -45,7 +46,7 @@ public class OrderDefaultComparator implements Comparator<SiteItem> {
         }
 
         if (siteItem2.isFolder()) {
-            siteItem2 = siteItem2.getChildItem("index.xml");
+            siteItem2 = siteItem2.getChildItem(CommonProperties.getIndexFileName());
             if (siteItem2 != null) {
                 modelValue2 = (Float) siteItem2.get(ORDER_DEFAULT_VALUE_KEY);
             }

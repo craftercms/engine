@@ -20,12 +20,14 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.craftercms.commons.lang.Callback;
+import org.craftercms.commons.lang.UrlUtils;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.service.Item;
 import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.core.util.cache.impl.CachingAwareList;
 import org.craftercms.engine.service.context.SiteContext;
+import org.craftercms.engine.util.config.CommonProperties;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
@@ -70,9 +72,10 @@ public class BreadcrumbBuilder {
 
             @Override
             public List<BreadcrumbItem> execute() {
+                String indexFileName = CommonProperties.getIndexFileName();
                 CachingAwareList<BreadcrumbItem> breadcrumb = new CachingAwareList<BreadcrumbItem>();
                 String breadcrumbUrl = StringUtils.substringBeforeLast(StringUtils.substringAfter(url, homePath),
-                                                                       "/index.xml");
+                                                                       indexFileName);
                 String[] breadcrumbUrlComponents = breadcrumbUrl.split("/");
                 String currentUrl = homePath;
 
@@ -81,7 +84,7 @@ public class BreadcrumbBuilder {
                         currentUrl += "/" + breadcrumbUrlComponent;
                     }
 
-                    Item item = storeService.getItem(context, currentUrl + "/index.xml");
+                    Item item = storeService.getItem(context, UrlUtils.concat(currentUrl, indexFileName));
                     String breadcrumbName = item.queryDescriptorValue(breadcrumbNameXPathQuery);
                     if (StringUtils.isEmpty(breadcrumbName)) {
                         if (StringUtils.isNotEmpty(breadcrumbUrlComponent)) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2013 Crafter Software Corporation.
+ * Copyright (C) 2007-2016 Crafter Software Corporation.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +16,7 @@
  */
 package org.craftercms.engine.url;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
-import org.craftercms.commons.lang.UrlUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.craftercms.core.exception.UrlTransformationException;
 import org.craftercms.core.service.CachingOptions;
 import org.craftercms.core.service.Context;
@@ -26,21 +24,14 @@ import org.craftercms.core.url.UrlTransformer;
 import org.craftercms.engine.util.config.CommonProperties;
 
 /**
- * If the url corresponds to a folder (no extension), it adds index.xml.
- *
- * @author Alfonso Vásquez
+ * Created by alfonsovasquez on 7/9/16.
  */
-public class AddIndexIfFolderUrlTransformer implements UrlTransformer {
+public class RemoveIndexUrlTransformer implements UrlTransformer {
 
     @Override
     public String transformUrl(Context context, CachingOptions cachingOptions,
                                String url) throws UrlTransformationException {
-        String extension = FilenameUtils.getExtension(url);
-        if (StringUtils.isEmpty(extension)) {
-            url = UrlUtils.concat(url, CommonProperties.getIndexFileName());
-        }
-
-        return url;
+        return StringUtils.removeEnd(url, CommonProperties.getIndexFileName());
     }
 
 }

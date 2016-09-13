@@ -53,7 +53,7 @@
     </#list>
 </#macro>
 
-<#macro renderNavigation navTreeUrl levels includeByNameRegex = "" excludeByNameRegex = "" nodeXPathAndExpectedValuePairs = [["*/placeInNav", "true"]] ns = mainNavMacros>
+<#macro renderNavigation navTreeUrl levels includeByNameRegex = "" excludeByNameRegex = "" nodeXPathAndExpectedValuePairs = {"*/placeInNav": "true"} ns = mainNavMacros>
     <#assign navTree = siteItemService.getSiteTree(navTreeUrl, levels + 1, includeByNameRegex, excludeByNameRegex, nodeXPathAndExpectedValuePairs)>
     <@renderNavigationLevel 1, levels, navTree, ns />
 </#macro>

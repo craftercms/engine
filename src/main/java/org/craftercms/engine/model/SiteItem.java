@@ -17,7 +17,6 @@
 package org.craftercms.engine.model;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -41,17 +40,12 @@ import org.dom4j.Element;
  */
 public class SiteItem {
 
-    private static Log logger = LogFactory.getLog(SiteItem.class);
+    private static final Log logger = LogFactory.getLog(SiteItem.class);
 
     protected Item item;
     protected List<SiteItem> childItems;
     protected Map<String, ModelValueConverter<?>> modelValueConverters;
     protected Comparator<SiteItem> sortComparator;
-
-    public SiteItem(Item item, Map<String, ModelValueConverter<?>> modelValueConverters) {
-        this.item = item;
-        this.modelValueConverters = modelValueConverters;
-    }
 
     public SiteItem(Item item, Map<String, ModelValueConverter<?>> modelValueConverters,
                     Comparator<SiteItem> sortComparator) {
@@ -84,13 +78,9 @@ public class SiteItem {
         return item.getProperties();
     }
 
-    public Object get(String xPathQuery) {
+    public Object get(String xpathExpression) {
         if (getDom() != null) {
-            Object result = getDom().getRootElement().selectObject(xPathQuery);
-            if ((result != null) && (result instanceof Collection) && ((Collection) result).isEmpty()) {
-                result = null;
-            }
-
+            Object result = XmlUtils.selectObject(getDom().getRootElement(), xpathExpression);
             if (result instanceof Element) {
                 return convertModelValue((Element) result);
             } else {
@@ -101,33 +91,33 @@ public class SiteItem {
         }
     }
 
-    public String queryValue(String xPathQuery) {
+    public String queryValue(String xpathExpression) {
         if (getDom() != null) {
-            return XmlUtils.selectSingleNodeValue(getDom().getRootElement(), xPathQuery);
+            return XmlUtils.selectSingleNodeValue(getDom().getRootElement(), xpathExpression);
         } else {
             return null;
         }
     }
 
-    public List<String> queryValues(String xPathQuery) {
+    public List<String> queryValues(String xpathExpression) {
         if (getDom() != null) {
-            return XmlUtils.selectNodeValues(getDom().getRootElement(), xPathQuery);
+            return XmlUtils.selectNodeValues(getDom().getRootElement(), xpathExpression);
         } else {
             return null;
         }
     }
 
-    public String queryValue(String xPathQuery, Map<String, String> namespaceUris) {
+    public String queryValue(String xpathExpression, Map<String, String> namespaceUris) {
         if (getDom() != null) {
-            return XmlUtils.selectSingleNodeValue(getDom().getRootElement(), xPathQuery, namespaceUris);
+            return XmlUtils.selectSingleNodeValue(getDom().getRootElement(), xpathExpression, namespaceUris);
         } else {
             return null;
         }
     }
 
-    public List<String> queryValues(String xPathQuery, Map<String, String> namespaceUris) {
+    public List<String> queryValues(String xpathExpression, Map<String, String> namespaceUris) {
         if (getDom() != null) {
-            return XmlUtils.selectNodeValues(getDom().getRootElement(), xPathQuery, namespaceUris);
+            return XmlUtils.selectNodeValues(getDom().getRootElement(), xpathExpression, namespaceUris);
         } else {
             return null;
         }
@@ -140,7 +130,7 @@ public class SiteItem {
                 if (CollectionUtils.isNotEmpty(treeChildren)) {
                     childItems = new ArrayList<>(treeChildren.size());
                     for (Item treeChild : treeChildren) {
-                        childItems.add(new SiteItem(treeChild, modelValueConverters, sortComparator));
+                        childItems.add(createItemWrapper(treeChild));
                     }
 
                     if (sortComparator != null) {
@@ -204,6 +194,10 @@ public class SiteItem {
         }
 
         return element;
+    }
+
+    protected SiteItem createItemWrapper(Item item) {
+        return new SiteItem(item, modelValueConverters, sortComparator);
     }
 
 }
