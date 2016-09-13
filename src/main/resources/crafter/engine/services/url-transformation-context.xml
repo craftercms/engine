@@ -82,10 +82,7 @@
         <property name="prefix" value="${crafter.engine.site.default.descriptors.pages.path}"/>
     </bean>
 
-    <bean id="crafter.removeIndexUrlTransformer"
-          class="org.craftercms.core.url.impl.RemovePrefixAndSuffixUrlTransformer">
-        <property name="suffix" value="/index.xml"/>
-    </bean>
+    <bean id="crafter.removeIndexUrlTransformer" class="org.craftercms.engine.url.RemoveIndexUrlTransformer"/>
 
     <bean id="crafter.removePageDescriptorsPathUrlTransformer"
           class="org.craftercms.core.url.impl.RemovePrefixAndSuffixUrlTransformer">
