@@ -60,7 +60,6 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
     @Deprecated
     public static final String KEY_MODEL = "model";
     public static final String KEY_CONTENT_MODEL = "contentModel";
-    public static final String KEY_MODE_PREVIEW = "modePreview";
 
     protected transient String scope;
     protected transient Object key;
@@ -237,7 +236,6 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
 
         model.put(KEY_MODEL, page);
         model.put(KEY_CONTENT_MODEL, page);
-        model.put(KEY_MODE_PREVIEW, modePreview);
 
         renderActualView(getPageViewName(), model, request, response);
     }

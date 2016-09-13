@@ -123,9 +123,7 @@ public class GroovyScriptFactoryTest {
     }
 
     private MockHttpServletRequest createRequest() throws Exception {
-        MockHttpServletRequest request = new MockHttpServletRequest();
-
-        return request;
+        return new MockHttpServletRequest();
     }
 
     private void setCurrentRequest(HttpServletRequest request) {

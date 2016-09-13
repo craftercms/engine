@@ -10,6 +10,8 @@ import org.apache.commons.configuration.ConfigurationBuilder;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.configuration.tree.OverrideCombiner;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
@@ -21,6 +23,8 @@ import org.springframework.core.io.ResourceLoader;
  * @author avasquez
  */
 public class MultiConfigurationBuilder implements ConfigurationBuilder {
+
+    private static final Log logger = LogFactory.getLog(MultiConfigurationBuilder.class);
 
     protected String[] configPaths;
     protected ResourceLoader resourceLoader;
@@ -35,12 +39,16 @@ public class MultiConfigurationBuilder implements ConfigurationBuilder {
         List<Configuration> configs = new ArrayList<>();
 
         // Last configurations should be loaded and added first so that they have greater priority.
+        logger.info("Loading XML configurations in the order in which the properties will be resolved");
+
         for (int i = configPaths.length - 1; i >= 0; i--) {
             try {
                 Resource resource = resourceLoader.getResource(configPaths[i]);
                 if (resource.exists()) {
                     XMLConfiguration config = new XMLConfiguration();
                     config.load(resource.getInputStream());
+
+                    logger.info("XML configuration loaded from " + resource);
 
                     configs.add(config);
                 }

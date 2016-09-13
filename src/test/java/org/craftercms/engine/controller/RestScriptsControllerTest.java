@@ -102,6 +102,7 @@ public class RestScriptsControllerTest {
         removeCurrentSiteContext();
     }
 
+    @SuppressWarnings("unchecked")
     private void testError(String serviceUrl, int statusCode, String message) throws Exception {
         MockHttpServletRequest request = createRequest(serviceUrl);
         MockHttpServletResponse response = createResponse();
