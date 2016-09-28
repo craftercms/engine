@@ -18,14 +18,13 @@ package org.craftercms.engine.service.impl;
 
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.craftercms.core.processors.ItemProcessor;
+import org.craftercms.core.service.Content;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Item;
 import org.craftercms.core.service.ItemFilter;
@@ -49,7 +48,6 @@ public class SiteItemServiceImpl implements SiteItemService {
 
     protected ContentStoreService storeService;
     protected Map<String, ModelValueConverter<?>> modelValueConverters;
-    protected List<ItemFilter> defaultFilters;
     protected Comparator<SiteItem> sortComparator;
 
     @Required
@@ -62,19 +60,13 @@ public class SiteItemServiceImpl implements SiteItemService {
         this.modelValueConverters = modelValueConverters;
     }
 
-    public void setDefaultFilters(List<ItemFilter> defaultFilters) {
-        this.defaultFilters = defaultFilters;
-    }
-
     public void setSortComparator(Comparator<SiteItem> sortComparator) {
         this.sortComparator = sortComparator;
     }
 
     @Override
     public SiteItem getSiteItem(String url) {
-        SiteContext siteContext = SiteContext.getCurrent();
-        Item item = storeService.findItem(siteContext.getContext(), url);
-
+        Item item = storeService.findItem(getCurrentSiteContext().getContext(), url);
         if (item != null) {
             return createItemWrapper(item);
         } else {
@@ -84,16 +76,33 @@ public class SiteItemServiceImpl implements SiteItemService {
 
     @Override
     public SiteItem getSiteTree(String url, int depth)  {
-        return getSiteTree(url, depth, null, null, (Map<String, String>)null);
+        return getSiteTree(url, depth, null, (ItemProcessor)null);
     }
 
+    @Override
+    public SiteItem getSiteTree(String url, int depth, ItemFilter filter, ItemProcessor processor) {
+        Tree tree = storeService.findTree(getCurrentSiteContext().getContext(), null, url, depth, filter, processor);
+
+        if (tree != null) {
+            return createItemWrapper(tree);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public Content getRawContent(String url) {
+        return storeService.findContent(getCurrentSiteContext().getContext(), url);
+    }
+
+    @Deprecated
     @Override
     public SiteItem getSiteTree(String url, int depth, String includeByNameRegex, String excludeByNameRegex) {
         return getSiteTree(url, depth, includeByNameRegex, excludeByNameRegex, (Map<String, String>)null);
     }
 
-    @Override
     @Deprecated
+    @Override
     public SiteItem getSiteTree(String url, int depth, String includeByNameRegex, String excludeByNameRegex,
                                 String[]... nodeXPathAndExpectedValuePairs) {
         Map<String, String> nodeXPathAndExpectedValuePairMap = null;
@@ -112,16 +121,11 @@ public class SiteItemServiceImpl implements SiteItemService {
         return getSiteTree(url, depth, includeByNameRegex, excludeByNameRegex, nodeXPathAndExpectedValuePairMap);
     }
 
+    @Deprecated
     @Override
     public SiteItem getSiteTree(String url, int depth, String includeByNameRegex, String excludeByNameRegex,
                                 Map<String, String> nodeXPathAndExpectedValuePairs) {
         CompositeItemFilter compositeFilter = new CompositeItemFilter();
-
-        if (CollectionUtils.isNotEmpty(defaultFilters)) {
-            for (ItemFilter defaultFilter : defaultFilters) {
-                compositeFilter.addFilter(defaultFilter);
-            }
-        }
 
         if (StringUtils.isNotEmpty(includeByNameRegex)) {
             compositeFilter.addFilter(new IncludeByNameItemFilter(includeByNameRegex));
@@ -139,19 +143,13 @@ public class SiteItemServiceImpl implements SiteItemService {
         return getSiteTree(url, depth, compositeFilter, null);
     }
 
-    @Override
-    public SiteItem getSiteTree(String url, int depth, ItemFilter filter, ItemProcessor processor) {
+    protected SiteContext getCurrentSiteContext() {
         SiteContext siteContext = SiteContext.getCurrent();
         if (siteContext == null) {
             throw new IllegalStateException("No current site context found");
         }
 
-        Tree tree = storeService.findTree(siteContext.getContext(), null, url, depth, filter, processor);
-        if (tree != null) {
-            return createItemWrapper(tree);
-        } else {
-            return null;
-        }
+        return siteContext;
     }
 
     protected SiteItem createItemWrapper(Item item) {
