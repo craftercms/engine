@@ -277,6 +277,13 @@
                             <Build-On>${timestamp}</Build-On>
                         </manifestEntries>
                     </archive>
+                    <webResources>
+                        <resource>
+                            <directory>src/main/generated-resources/</directory>
+                            <filtering>true</filtering>
+                            <targetPath>WEB-INF/templates/system/common</targetPath>
+                        </resource>
+                    </webResources>
                 </configuration>
             </plugin>
         </plugins>
