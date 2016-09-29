@@ -18,9 +18,11 @@ package org.craftercms.engine.service.impl;
 
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.craftercms.core.processors.ItemProcessor;
@@ -47,12 +49,18 @@ import org.springframework.beans.factory.annotation.Required;
 public class SiteItemServiceImpl implements SiteItemService {
 
     protected ContentStoreService storeService;
+    protected List<ItemFilter> defaultFilters;
     protected Map<String, ModelValueConverter<?>> modelValueConverters;
     protected Comparator<SiteItem> sortComparator;
 
     @Required
     public void setStoreService(ContentStoreService storeService) {
         this.storeService = storeService;
+    }
+
+    @Required
+    public void setDefaultFilters(List<ItemFilter> defaultFilters) {
+        this.defaultFilters = defaultFilters;
     }
 
     @Required
@@ -66,7 +74,7 @@ public class SiteItemServiceImpl implements SiteItemService {
 
     @Override
     public SiteItem getSiteItem(String url) {
-        Item item = storeService.findItem(getCurrentSiteContext().getContext(), url);
+        Item item = storeService.findItem(getSiteContext().getContext(), url);
         if (item != null) {
             return createItemWrapper(item);
         } else {
@@ -81,8 +89,15 @@ public class SiteItemServiceImpl implements SiteItemService {
 
     @Override
     public SiteItem getSiteTree(String url, int depth, ItemFilter filter, ItemProcessor processor) {
-        Tree tree = storeService.findTree(getCurrentSiteContext().getContext(), null, url, depth, filter, processor);
+        CompositeItemFilter compositeFilter = new CompositeItemFilter();
 
+        if (CollectionUtils.isNotEmpty(defaultFilters)) {
+            for (ItemFilter defaultFilter : defaultFilters) {
+                compositeFilter.addFilter(defaultFilter);
+            }
+        }
+
+        Tree tree = storeService.findTree(getSiteContext().getContext(), null, url, depth, filter, processor);
         if (tree != null) {
             return createItemWrapper(tree);
         } else {
@@ -92,7 +107,7 @@ public class SiteItemServiceImpl implements SiteItemService {
 
     @Override
     public Content getRawContent(String url) {
-        return storeService.findContent(getCurrentSiteContext().getContext(), url);
+        return storeService.findContent(getSiteContext().getContext(), url);
     }
 
     @Deprecated
@@ -127,6 +142,12 @@ public class SiteItemServiceImpl implements SiteItemService {
                                 Map<String, String> nodeXPathAndExpectedValuePairs) {
         CompositeItemFilter compositeFilter = new CompositeItemFilter();
 
+        if (CollectionUtils.isNotEmpty(defaultFilters)) {
+            for (ItemFilter defaultFilter : defaultFilters) {
+                compositeFilter.addFilter(defaultFilter);
+            }
+        }
+
         if (StringUtils.isNotEmpty(includeByNameRegex)) {
             compositeFilter.addFilter(new IncludeByNameItemFilter(includeByNameRegex));
         }
@@ -140,10 +161,15 @@ public class SiteItemServiceImpl implements SiteItemService {
             }
         }
 
-        return getSiteTree(url, depth, compositeFilter, null);
+        Tree tree = storeService.findTree(getSiteContext().getContext(), null, url, depth, compositeFilter, null);
+        if (tree != null) {
+            return createItemWrapper(tree);
+        } else {
+            return null;
+        }
     }
 
-    protected SiteContext getCurrentSiteContext() {
+    protected SiteContext getSiteContext() {
         SiteContext siteContext = SiteContext.getCurrent();
         if (siteContext == null) {
             throw new IllegalStateException("No current site context found");
