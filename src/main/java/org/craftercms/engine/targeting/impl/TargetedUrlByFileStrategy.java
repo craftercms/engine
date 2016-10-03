@@ -48,6 +48,11 @@ public class TargetedUrlByFileStrategy extends AbstractTargetedUrlStrategy {
     }
 
     @Override
+    public boolean isFileNameBasedStrategy() {
+        return true;
+    }
+
+    @Override
     public String toTargetedUrl(String url) {
         Matcher matcher = matchUrl(url);
         if (matcher == null) {

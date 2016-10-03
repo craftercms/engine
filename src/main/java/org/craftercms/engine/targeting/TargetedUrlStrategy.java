@@ -24,6 +24,11 @@ package org.craftercms.engine.targeting;
 public interface TargetedUrlStrategy {
 
     /**
+     * Returns true if the strategy is based on the name of the file.
+     */
+    boolean isFileNameBasedStrategy();
+
+    /**
      * Returns the specified URL as a targeted URL (if it's not already a targeted URL) using the current target ID.
      * For example, if the specified URL is /products/index.xml, the current target ID is "en_US", and the strategy
      * handles targeted URLs by file name, then the resulting targeted URL is /products/index_en_US.xml.
