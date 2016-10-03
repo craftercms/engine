@@ -20,6 +20,11 @@ public class TargetedUrlByFolderStrategy extends AbstractTargetedUrlStrategy {
     public static final int SUFFIX_GROUP = 2;
 
     @Override
+    public boolean isFileNameBasedStrategy() {
+        return false;
+    }
+
+    @Override
     public String toTargetedUrl(String url) {
         Matcher matcher = matchUrl(url);
         if (matcher != null) {

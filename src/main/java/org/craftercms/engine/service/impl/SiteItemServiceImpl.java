@@ -89,9 +89,15 @@ public class SiteItemServiceImpl implements SiteItemService {
 
     @Override
     public SiteItem getSiteTree(String url, int depth, ItemFilter filter, ItemProcessor processor) {
-        CompositeItemFilter compositeFilter = new CompositeItemFilter();
-
         if (CollectionUtils.isNotEmpty(defaultFilters)) {
+            CompositeItemFilter compositeFilter;
+
+            if (filter instanceof CompositeItemFilter) {
+                compositeFilter = (CompositeItemFilter)filter;
+            } else {
+                compositeFilter = new CompositeItemFilter(filter);
+            }
+
             for (ItemFilter defaultFilter : defaultFilters) {
                 compositeFilter.addFilter(defaultFilter);
             }
