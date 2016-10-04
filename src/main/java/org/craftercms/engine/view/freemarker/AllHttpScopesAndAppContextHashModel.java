@@ -24,8 +24,8 @@ import freemarker.template.ObjectWrapper;
 import freemarker.template.SimpleHash;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
+import org.craftercms.engine.util.spring.ApplicationContextAccessor;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.context.ApplicationContext;
 
 /**
  * Like {@link freemarker.ext.servlet.AllHttpScopesHashModel}, but also lookup keys in the Application Context.
@@ -34,15 +34,16 @@ import org.springframework.context.ApplicationContext;
  */
 public class AllHttpScopesAndAppContextHashModel extends SimpleHash {
 
-    private ApplicationContext applicationContext;
+    private ApplicationContextAccessor applicationContextAccessor;
     private ServletContext context;
     private HttpServletRequest request;
 
-    public AllHttpScopesAndAppContextHashModel(ObjectWrapper wrapper, ApplicationContext applicationContext,
+    public AllHttpScopesAndAppContextHashModel(ObjectWrapper wrapper,
+                                               ApplicationContextAccessor applicationContextAccessor,
                                                ServletContext context, HttpServletRequest request) {
         super(wrapper);
 
-        this.applicationContext = applicationContext;
+        this.applicationContextAccessor = applicationContextAccessor;
         this.context = context;
         this.request = request;
     }
@@ -78,7 +79,7 @@ public class AllHttpScopesAndAppContextHashModel extends SimpleHash {
 
         // Lookup in application context
         try {
-            return wrap(applicationContext.getBean(key));
+            return wrap(applicationContextAccessor.get(key));
         } catch (NoSuchBeanDefinitionException e) {
         }
 

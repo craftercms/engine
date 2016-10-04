@@ -37,9 +37,7 @@
     <bean id="crafter.renderUrlToTargetedStoreUrlTransformer" class="org.craftercms.core.url.impl.UrlTransformerPipeline">
         <constructor-arg>
             <list>
-                <ref bean="crafter.addIndexIfFolderUrlTransformer"/>
-                <ref bean="crafter.replacePageExtWithDescriptorExtUrlTransformer"/>
-                <ref bean="crafter.addPageDescriptorsPathUrlTransformer"/>
+                <ref bean="crafter.renderUrlToStoreUrlTransformer"/>
                 <ref bean="crafter.toTargetedUrlTransformer"/>
             </list>
         </constructor-arg>
