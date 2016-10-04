@@ -151,7 +151,7 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     protected SimpleHash buildTemplateModel(final Map<String, Object> model, final HttpServletRequest request,
                                             final HttpServletResponse response) {
         AllHttpScopesAndAppContextHashModel templateModel = new AllHttpScopesAndAppContextHashModel(
-            getObjectWrapper(), getApplicationContext(), getServletContext(), request);
+            getObjectWrapper(), applicationContextAccessor, getServletContext(), request);
         HttpSessionHashModel sessionModel = createSessionModel(request, response);
         HttpRequestHashModel requestModel = new HttpRequestHashModel(request, response, getObjectWrapper());
         HttpRequestParametersHashModel requestParamsModel = new HttpRequestParametersHashModel(request);

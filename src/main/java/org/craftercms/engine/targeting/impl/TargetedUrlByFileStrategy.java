@@ -48,6 +48,11 @@ public class TargetedUrlByFileStrategy extends AbstractTargetedUrlStrategy {
     }
 
     @Override
+    public boolean isFileNameBasedStrategy() {
+        return true;
+    }
+
+    @Override
     public String toTargetedUrl(String url) {
         Matcher matcher = matchUrl(url);
         if (matcher == null) {
@@ -57,7 +62,7 @@ public class TargetedUrlByFileStrategy extends AbstractTargetedUrlStrategy {
                 String targetId = targetIdManager.getCurrentTargetId();
 
                 return urlWithoutExt +
-                       (StringUtils.isNotEmpty(targetId)? targetIdSeparator + targetId : "") +
+                       (StringUtils.isNotEmpty(targetId)? targetIdSeparator + targetId: "") +
                        "." + ext;
             }
         }
