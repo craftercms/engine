@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2013 Crafter Software Corporation.
+ * Copyright (C) 2007-2016 Crafter Software Corporation.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,59 +14,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.craftercms.engine.service.filter;
+package org.craftercms.engine.navigation.impl;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.craftercms.core.service.Item;
 import org.craftercms.core.service.ItemFilter;
 
 /**
- * {@link ItemFilter} that rejects an item if its name matches any one of a list of regexes.
- *
- * @author Alfonso Vásquez
+ * Created by alfonsovasquez on 8/10/16.
  */
-public class ExcludeByNameItemFilter implements ItemFilter {
-
-    private String[] excludeRegexes;
-
-    public ExcludeByNameItemFilter(String excludeRegex) {
-        excludeRegexes = new String[1];
-        excludeRegexes[0] = excludeRegex;
-    }
-
-    public ExcludeByNameItemFilter(String[] excludeRegexes) {
-        this.excludeRegexes = excludeRegexes;
-    }
+public class RejectDuplicatesItemFilter implements ItemFilter {
 
     @Override
     public boolean runBeforeProcessing() {
-        return true;
+        return false;
     }
 
     @Override
     public boolean runAfterProcessing() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean accepts(Item item, List<Item> acceptedItems, List<Item> rejectedItems,
                            boolean runningBeforeProcessing) {
-        for (String regex : excludeRegexes) {
-            if (item.getName().matches(regex)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "ExcludeByNameItemFilter[" +
-                "excludeRegexes=" + (excludeRegexes == null ? null : Arrays.asList(excludeRegexes)) +
-                ']';
+        return !acceptedItems.contains(item);
     }
 
 }

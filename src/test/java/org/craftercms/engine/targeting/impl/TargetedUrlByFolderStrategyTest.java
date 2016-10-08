@@ -45,7 +45,7 @@ public class TargetedUrlByFolderStrategyTest {
 
     @Test
     public void testToTargetUrl() throws Exception {
-        String targetedUrl = targetedUrlStrategy.toTargetedUrl(NON_TARGETED_URL);
+        String targetedUrl = targetedUrlStrategy.toTargetedUrl(NON_TARGETED_URL, false);
 
         assertEquals(TARGETED_URL1, targetedUrl);
     }
@@ -54,7 +54,7 @@ public class TargetedUrlByFolderStrategyTest {
     public void testToTargetUrlWithNoCurrentTargetId() throws Exception {
         when(targetIdManager.getCurrentTargetId()).thenReturn(null);
 
-        String targetedUrl = targetedUrlStrategy.toTargetedUrl(NON_TARGETED_URL);
+        String targetedUrl = targetedUrlStrategy.toTargetedUrl(NON_TARGETED_URL, false);
 
         assertEquals(TARGETED_URL2, targetedUrl);
     }

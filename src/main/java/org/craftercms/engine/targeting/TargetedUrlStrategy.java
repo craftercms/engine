@@ -38,11 +38,14 @@ public interface TargetedUrlStrategy {
      *     since most targeted URLs are handled using a regex.
      * </p>
      *
-     * @param url the URL to transform to a targeted URL
+     * @param url                   the URL to transform to a targeted URL
+     * @param forceCurrentTargetId  true if the URL should be forced to contain the current target ID (e.g the URL
+     *                              is /products/index_fr.xml but the current target ID is en, then the URL will be
+     *                              transformed to /products/index_en.xml)
      *
      * @return the targeted URL version of the URL.
      */
-    String toTargetedUrl(String url);
+    String toTargetedUrl(String url, boolean forceCurrentTargetId);
 
     /**
      * Parses the specified targeted URL, extracting it's components. For example, if the specified URL is
