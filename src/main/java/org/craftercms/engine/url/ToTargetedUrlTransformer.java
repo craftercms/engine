@@ -35,10 +35,15 @@ import org.springframework.beans.factory.annotation.Required;
 public class ToTargetedUrlTransformer implements UrlTransformer {
 
     protected TargetedUrlStrategy targetedUrlStrategy;
+    protected boolean forceCurrentTargetId;
 
     @Required
     public void setTargetedUrlStrategy(TargetedUrlStrategy targetedUrlStrategy) {
         this.targetedUrlStrategy = targetedUrlStrategy;
+    }
+
+    public void setForceCurrentTargetId(boolean forceCurrentTargetId) {
+        this.forceCurrentTargetId = forceCurrentTargetId;
     }
 
     @Override
@@ -48,7 +53,7 @@ public class ToTargetedUrlTransformer implements UrlTransformer {
             String rootFolder = TargetingUtils.getMatchingRootFolder(url);
             if (StringUtils.isNotEmpty(rootFolder)) {
                 String relativeUrl = StringUtils.substringAfter(url, rootFolder);
-                String targetedUrl = targetedUrlStrategy.toTargetedUrl(relativeUrl);
+                String targetedUrl = targetedUrlStrategy.toTargetedUrl(relativeUrl, forceCurrentTargetId);
 
                 return UrlUtils.appendUrl(rootFolder, targetedUrl);
             }

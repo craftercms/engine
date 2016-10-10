@@ -57,7 +57,7 @@ public class ToTargetedUrlTransformerTest {
     private TargetedUrlStrategy createTargetedUrlStrategy() {
         TargetedUrlStrategy urlStrategy = mock(TargetedUrlStrategy.class);
 
-        when(urlStrategy.toTargetedUrl(NON_TARGETED_URL)).thenReturn(TARGETED_URL);
+        when(urlStrategy.toTargetedUrl(NON_TARGETED_URL, false)).thenReturn(TARGETED_URL);
 
         return urlStrategy;
     }

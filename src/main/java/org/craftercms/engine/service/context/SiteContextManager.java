@@ -27,14 +27,19 @@ import javax.annotation.PreDestroy;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.craftercms.engine.event.SiteContextCreatedEvent;
+import org.craftercms.engine.event.SiteContextDestroyedEvent;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationEvent;
 
 /**
  * Registry and lifecycle manager of {@link SiteContext}s.
  *
  * @author Alfonso Vásquez
  */
-public class SiteContextManager {
+public class SiteContextManager implements ApplicationContextAware {
 
     private static final Log logger = LogFactory.getLog(SiteContextManager.class);
 
@@ -42,6 +47,7 @@ public class SiteContextManager {
     protected Map<String, SiteContext> contextRegistry;
     protected SiteContextFactory contextFactory;
     protected SiteContextFactory fallbackContextFactory;
+    protected ApplicationContext applicationContext;
 
     public SiteContextManager() {
         lock = new ReentrantLock();
@@ -60,6 +66,11 @@ public class SiteContextManager {
     @Required
     public void setFallbackContextFactory(SiteContextFactory fallbackContextFactory) {
         this.fallbackContextFactory = fallbackContextFactory;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
     }
 
     @PreDestroy
@@ -112,9 +123,7 @@ public class SiteContextManager {
                 logger.info("==================================================");
 
                 try {
-                    siteContext.destroy();
-
-                    logger.info("Site context destroyed: " + siteContext);
+                    destroyContext(siteContext);
                 } catch (Exception e) {
                     logger.error("Error destroying site context for site '" + siteName + "'", e);
                 }
@@ -167,9 +176,7 @@ public class SiteContextManager {
         try {
             SiteContext siteContext = contextRegistry.remove(siteName);
             if (siteContext != null) {
-                siteContext.destroy();
-
-                logger.info("Site context destroyed: " + siteContext);
+                destroyContext(siteContext);
             }
         } finally {
             lock.unlock();
@@ -195,6 +202,8 @@ public class SiteContextManager {
                         siteContext = contextFactory.createContext(siteName);
                     }
 
+                    publishEvent(new SiteContextCreatedEvent(siteContext, this), siteContext);
+
                     contextRegistry.put(siteName, siteContext);
 
                     logger.info("Site context created: " + siteContext);
@@ -208,6 +217,23 @@ public class SiteContextManager {
         }
 
         return siteContext;
+    }
+
+    protected void destroyContext(SiteContext siteContext) {
+        publishEvent(new SiteContextDestroyedEvent(siteContext, this), siteContext);
+
+        siteContext.destroy();
+
+        logger.info("Site context destroyed: " + siteContext);
+    }
+
+    protected void publishEvent(ApplicationEvent event, SiteContext siteContext) {
+        ApplicationContext siteApplicationContext = siteContext.getApplicationContext();
+        if (siteApplicationContext != null) {
+            siteApplicationContext.publishEvent(event);
+        } else {
+            applicationContext.publishEvent(event);
+        }
     }
 
 }

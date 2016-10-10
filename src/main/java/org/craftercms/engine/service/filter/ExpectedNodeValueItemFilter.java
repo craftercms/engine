@@ -16,6 +16,8 @@
  */
 package org.craftercms.engine.service.filter;
 
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.craftercms.core.service.Item;
 import org.craftercms.core.service.ItemFilter;
@@ -46,7 +48,8 @@ public class ExpectedNodeValueItemFilter implements ItemFilter {
     }
 
     @Override
-    public boolean accepts(Item item, boolean runningBeforeProcessing) {
+    public boolean accepts(Item item, List<Item> acceptedItems, List<Item> rejectedItems,
+                           boolean runningBeforeProcessing) {
         // If the item doesn't have a descriptor, don't run the filter.
         if (item.getDescriptorDom() != null) {
             String result = item.queryDescriptorValue(nodeXPathQuery);
