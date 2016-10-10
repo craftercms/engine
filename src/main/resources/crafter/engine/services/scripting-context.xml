@@ -25,6 +25,7 @@
     <util:map id="crafter.restScriptsVariables">
         <entry key="siteItemService" value-ref="crafter.siteItemService"/>
         <entry key="urlTransformationService" value-ref="crafter.urlTransformationService"/>
+        <entry key="navTreeBuilder" value-ref="crafter.navTreeBuilder"/>
         <entry key="searchService" value-ref="crafter.searchService"/>
         <entry key="applicationContext" value-ref="crafter.applicationContextAccessor"/>
         <entry key="globalProperties" value-ref="crafter.propertyResolver"/>

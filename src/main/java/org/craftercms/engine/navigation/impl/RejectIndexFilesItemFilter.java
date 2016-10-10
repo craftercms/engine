@@ -16,6 +16,8 @@
  */
 package org.craftercms.engine.navigation.impl;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.craftercms.core.service.Item;
 import org.craftercms.core.service.ItemFilter;
@@ -23,15 +25,17 @@ import org.craftercms.engine.targeting.TargetedUrlComponents;
 import org.craftercms.engine.targeting.TargetedUrlStrategy;
 import org.craftercms.engine.util.config.CommonProperties;
 import org.craftercms.engine.util.config.TargetingProperties;
+import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Created by alfonsovasquez on 28/9/16.
  */
-public class IgnoreIndexFilesItemFilter implements ItemFilter {
+public class RejectIndexFilesItemFilter implements ItemFilter {
 
     protected TargetedUrlStrategy targetedUrlStrategy;
 
-    public IgnoreIndexFilesItemFilter(TargetedUrlStrategy targetedUrlStrategy) {
+    @Required
+    public void setTargetedUrlStrategy(TargetedUrlStrategy targetedUrlStrategy) {
         this.targetedUrlStrategy = targetedUrlStrategy;
     }
 
@@ -46,7 +50,8 @@ public class IgnoreIndexFilesItemFilter implements ItemFilter {
     }
 
     @Override
-    public boolean accepts(Item item, boolean runningBeforeProcessing) {
+    public boolean accepts(Item item, List<Item> acceptedItems, List<Item> rejectedItems,
+                           boolean runningBeforeProcessing) {
         String indexFileName = CommonProperties.getIndexFileName();
         String itemFileName = item.getName();
 

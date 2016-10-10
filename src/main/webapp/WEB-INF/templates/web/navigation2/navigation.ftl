@@ -1,6 +1,6 @@
 <#import "/templates/web/navigation2/nav-macros.ftl" as navMacros/>
 
-<#macro renderNavigation url depth includeRoot navMacrosNs = navMacros>
+<#macro renderNavigation url depth includeRoot = false navMacrosNs = navMacros>
     <#assign navTree = navTreeBuilder.getNavTree(url, depth, Request.pageUrl)/>
 
     <#if includeRoot>
@@ -15,7 +15,7 @@
 
 <#macro renderNavigationItems navItems currDepth navMacrosNs>
     <#list navItems as navItem>
-        <#assign subItems = navItems.subItems/>
+        <#assign subItems = navItem.subItems/>
         <#if currDepth == 1>
             <#if (subItems?size > 0)>
                 <@navMacrosNs.renderNavItemWithSubItems navItem>

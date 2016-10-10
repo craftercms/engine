@@ -41,15 +41,29 @@ public abstract class AbstractTargetedUrlStrategy implements TargetedUrlStrategy
     }
 
     @Override
+    public String toTargetedUrl(String url, boolean forceCurrentTargetId) {
+        Matcher matcher = matchUrl(url);
+        if (matcher == null) {
+            String currentTargetId = targetIdManager.getCurrentTargetId();
+
+            return doToTargetedUrl(url, currentTargetId);
+        } else if (forceCurrentTargetId) {
+            String currentTargetId = targetIdManager.getCurrentTargetId();
+            TargetedUrlComponents urlComponents = getTargetedUrlComponents(matcher);
+
+            if (!currentTargetId.equals(urlComponents.getTargetId())) {
+                return buildTargetedUrl(urlComponents.getPrefix(), currentTargetId, urlComponents.getSuffix());
+            }
+        }
+
+        return url;
+    }
+
+    @Override
     public TargetedUrlComponents parseTargetedUrl(String targetedUrl) {
         Matcher matcher = matchUrl(targetedUrl);
         if (matcher != null) {
-            TargetedUrlComponents urlComp = new TargetedUrlComponents();
-            urlComp.setPrefix(getPrefix(matcher));
-            urlComp.setTargetId(getTargetId(matcher));
-            urlComp.setSuffix(getSuffix(matcher));
-
-            return urlComp;
+            return getTargetedUrlComponents(matcher);
         } else {
             return null;
         }
@@ -83,6 +97,15 @@ public abstract class AbstractTargetedUrlStrategy implements TargetedUrlStrategy
         }
     }
 
+    protected TargetedUrlComponents getTargetedUrlComponents(Matcher matcher) {
+        TargetedUrlComponents urlComp = new TargetedUrlComponents();
+        urlComp.setPrefix(getPrefix(matcher));
+        urlComp.setTargetId(getTargetId(matcher));
+        urlComp.setSuffix(getSuffix(matcher));
+
+        return urlComp;
+    }
+
     protected abstract String getPrefix(Matcher matcher);
 
     protected abstract String getTargetId(Matcher matcher);
@@ -90,5 +113,7 @@ public abstract class AbstractTargetedUrlStrategy implements TargetedUrlStrategy
     protected abstract String getSuffix(Matcher matcher);
 
     protected abstract Pattern getTargetedUrlPattern();
+
+    protected abstract String doToTargetedUrl(String url, String currentTargetId);
 
 }

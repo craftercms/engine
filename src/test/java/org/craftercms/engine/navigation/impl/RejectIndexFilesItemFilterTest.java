@@ -17,6 +17,8 @@
 package org.craftercms.engine.navigation.impl;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import org.apache.commons.configuration.XMLConfiguration;
 import org.craftercms.core.service.Item;
@@ -38,9 +40,9 @@ import static org.mockito.Mockito.when;
 /**
  * Created by alfonsovasquez on 29/9/16.
  */
-public class IgnoreIndexFilesItemFilterTest {
+public class RejectIndexFilesItemFilterTest {
 
-    private IgnoreIndexFilesItemFilter filter;
+    private RejectIndexFilesItemFilter filter;
 
     @Before
     public void setUp() throws Exception {
@@ -51,30 +53,35 @@ public class IgnoreIndexFilesItemFilterTest {
 
     @Test
     public void testFilter() throws Exception {
+        List<Item> emptyItemList = Collections.emptyList();
+
         Item item = new Item();
         item.setName("index.xml");
 
-        boolean accepted = filter.accepts(item, true);
+        boolean accepted = filter.accepts(item, emptyItemList, emptyItemList, true);
         assertFalse(accepted);
 
         item.setName("index_en.xml");
 
-        accepted = filter.accepts(item, true);
+        accepted = filter.accepts(item, emptyItemList, emptyItemList, true);
         assertFalse(accepted);
 
         item.setName("index_en_US.xml");
 
-        accepted = filter.accepts(item, true);
+        accepted = filter.accepts(item, emptyItemList, emptyItemList, true);
         assertFalse(accepted);
 
         item.setName("about-us");
 
-        accepted = filter.accepts(item, true);
+        accepted = filter.accepts(item, emptyItemList, emptyItemList, true);
         assertTrue(accepted);
     }
 
-    private IgnoreIndexFilesItemFilter createFilter(TargetedUrlStrategy strategy) {
-        return new IgnoreIndexFilesItemFilter(strategy);
+    private RejectIndexFilesItemFilter createFilter(TargetedUrlStrategy strategy) {
+        RejectIndexFilesItemFilter filter = new RejectIndexFilesItemFilter();
+        filter.setTargetedUrlStrategy(strategy);
+
+        return filter;
     }
 
     private TargetedUrlStrategy createTargetedUrlStrategy() {
