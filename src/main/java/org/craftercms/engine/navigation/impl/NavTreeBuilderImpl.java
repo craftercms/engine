@@ -32,6 +32,7 @@ import org.craftercms.engine.navigation.NavTreeBuilder;
 import org.craftercms.engine.service.SiteItemService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Created by alfonsovasquez on 19/9/16.
@@ -45,6 +46,7 @@ public class NavTreeBuilderImpl implements NavTreeBuilder {
     protected ItemProcessor processor;
     protected Converter<SiteItem, NavItem> itemConverter;
 
+    @Required
     public void setSiteItemService(SiteItemService siteItemService) {
         this.siteItemService = siteItemService;
     }
@@ -65,6 +67,7 @@ public class NavTreeBuilderImpl implements NavTreeBuilder {
         processor = new ItemProcessorPipeline(processors);
     }
 
+    @Required
     public void setItemConverter(Converter<SiteItem, NavItem> itemConverter) {
         this.itemConverter = itemConverter;
     }

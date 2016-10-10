@@ -34,8 +34,8 @@ public class ProxyTargetedUrlStrategy extends AbstractProxyBean<TargetedUrlStrat
     }
 
     @Override
-    public String toTargetedUrl(String url) {
-        return getBean().toTargetedUrl(url);
+    public String toTargetedUrl(String url, boolean forceCurrentTargetId) {
+        return getBean().toTargetedUrl(url, forceCurrentTargetId);
     }
 
     @Override
