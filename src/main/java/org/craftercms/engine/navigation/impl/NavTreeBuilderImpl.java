@@ -44,7 +44,7 @@ public class NavTreeBuilderImpl implements NavTreeBuilder {
     protected SiteItemService siteItemService;
     protected ItemFilter filter;
     protected ItemProcessor processor;
-    protected Converter<SiteItem, NavItem> itemConverter;
+    protected Converter<SiteItem, NavItem> defaultItemConverter;
 
     @Required
     public void setSiteItemService(SiteItemService siteItemService) {
@@ -68,32 +68,43 @@ public class NavTreeBuilderImpl implements NavTreeBuilder {
     }
 
     @Required
-    public void setItemConverter(Converter<SiteItem, NavItem> itemConverter) {
-        this.itemConverter = itemConverter;
+    public void setDefaultItemConverter(Converter<SiteItem, NavItem> defaultItemConverter) {
+        this.defaultItemConverter = defaultItemConverter;
     }
 
     @Override
     public NavItem getNavTree(String url, int depth, String currentPageUrl) {
-        SiteItem treeRoot = siteItemService.getSiteTree(url, depth, filter, processor);
-
-        return getNavItem(treeRoot, currentPageUrl);
+        return getNavTree(url, depth, currentPageUrl, null);
     }
 
-    protected NavItem getNavItem(SiteItem siteItem, String currentPageUrl) {
+    @Override
+    public NavItem getNavTree(String url, int depth, String currentPageUrl,
+                              Converter<SiteItem, NavItem> itemConverter) {
+        if (itemConverter == null) {
+            itemConverter = defaultItemConverter;
+        }
+
+        SiteItem treeRoot = siteItemService.getSiteTree(url, depth, filter, processor);
+
+        return getNavItem(treeRoot, currentPageUrl, itemConverter);
+    }
+
+    protected NavItem getNavItem(SiteItem siteItem, String currentPageUrl, Converter<SiteItem, NavItem> itemConverter) {
         NavItem navItem = itemConverter.convert(siteItem);
-        navItem.setSubItems(getNavSubItems(siteItem, currentPageUrl));
+        navItem.setSubItems(getNavSubItems(siteItem, currentPageUrl, itemConverter));
         navItem.setActive(currentPageUrl.startsWith(siteItem.getStoreUrl()));
 
         return navItem;
     }
 
-    protected List<NavItem> getNavSubItems(SiteItem siteItem, String currentPageUrl) {
+    protected List<NavItem> getNavSubItems(SiteItem siteItem, String currentPageUrl,
+                                           Converter<SiteItem, NavItem> itemConverter) {
         List<SiteItem> childItems = siteItem.getChildItems();
         if (CollectionUtils.isNotEmpty(childItems)) {
             List<NavItem> navSubItems = new ArrayList<>();
 
             for (SiteItem childItem : childItems) {
-                NavItem navSubItem = getNavItem(childItem, currentPageUrl);
+                NavItem navSubItem = getNavItem(childItem, currentPageUrl, itemConverter);
                 if (!navSubItems.contains(navSubItem)) {
                     navSubItems.add(navSubItem);
                 }

@@ -16,27 +16,11 @@
  */
 package org.craftercms.engine.util.config;
 
-import org.apache.commons.configuration.Configuration;
-import org.craftercms.engine.util.ConfigUtils;
-
 /**
  * Common site configuration properties.
  *
  * @author avasquez
  */
 public class CommonProperties {
-
-    public static final String INDEX_FILE_NAME_CONFIG_KEY = "indexFileName";
-
-    public static final String DEFAULT_INDEX_FILE_NAME = "index.xml";
-
-    public static final String getIndexFileName() {
-        Configuration config = ConfigUtils.getCurrentConfig();
-        if (config != null) {
-            return config.getString(INDEX_FILE_NAME_CONFIG_KEY, DEFAULT_INDEX_FILE_NAME);
-        } else {
-            return DEFAULT_INDEX_FILE_NAME;
-        }
-    }
 
 }

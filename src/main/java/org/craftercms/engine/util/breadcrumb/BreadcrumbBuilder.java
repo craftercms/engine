@@ -26,8 +26,8 @@ import org.craftercms.core.service.Context;
 import org.craftercms.core.service.Item;
 import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.core.util.cache.impl.CachingAwareList;
+import org.craftercms.engine.properties.SiteProperties;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.util.config.CommonProperties;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
@@ -72,7 +72,7 @@ public class BreadcrumbBuilder {
 
             @Override
             public List<BreadcrumbItem> execute() {
-                String indexFileName = CommonProperties.getIndexFileName();
+                String indexFileName = SiteProperties.getIndexFileName();
                 CachingAwareList<BreadcrumbItem> breadcrumb = new CachingAwareList<BreadcrumbItem>();
                 String breadcrumbUrl = StringUtils.substringBeforeLast(StringUtils.substringAfter(url, homePath),
                                                                        indexFileName);

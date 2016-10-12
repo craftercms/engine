@@ -24,7 +24,7 @@ import java.util.Locale;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.LocaleUtils;
-import org.craftercms.engine.util.config.TargetingProperties;
+import org.craftercms.engine.properties.SiteProperties;
 import org.springframework.context.i18n.LocaleContextHolder;
 
 /**
@@ -48,7 +48,7 @@ public class LocaleTargetIdManager extends AbstractTargetIdManager {
 
     @Override
     public List<String> getAvailableTargetIds() {
-        String[] availableTargetIds = TargetingProperties.getAvailableTargetIds();
+        String[] availableTargetIds = SiteProperties.getAvailableTargetIds();
         if (ArrayUtils.isEmpty(availableTargetIds)) {
             List<Locale> availableLocales = LocaleUtils.availableLocaleList();
             List<String> availableLocaleStrs = new ArrayList<>(availableLocales.size());

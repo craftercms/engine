@@ -21,7 +21,7 @@ import org.craftercms.core.exception.UrlTransformationException;
 import org.craftercms.core.service.CachingOptions;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.url.UrlTransformer;
-import org.craftercms.engine.util.config.CommonProperties;
+import org.craftercms.engine.properties.SiteProperties;
 
 /**
  * Created by alfonsovasquez on 7/9/16.
@@ -31,7 +31,7 @@ public class RemoveIndexUrlTransformer implements UrlTransformer {
     @Override
     public String transformUrl(Context context, CachingOptions cachingOptions,
                                String url) throws UrlTransformationException {
-        return StringUtils.removeEnd(url, CommonProperties.getIndexFileName());
+        return StringUtils.removeEnd(url, SiteProperties.getIndexFileName());
     }
 
 }

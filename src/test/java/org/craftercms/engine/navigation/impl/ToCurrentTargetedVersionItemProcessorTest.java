@@ -8,7 +8,7 @@ import org.craftercms.engine.service.context.SiteContext;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.craftercms.engine.util.config.TargetingProperties.TARGETING_ENABLED_CONFIG_KEY;
+import static org.craftercms.engine.properties.SiteProperties.TARGETING_ENABLED_CONFIG_KEY;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
