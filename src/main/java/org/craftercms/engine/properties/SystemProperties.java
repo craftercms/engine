@@ -25,11 +25,11 @@ import org.apache.commons.lang.StringUtils;
  */
 public class SystemProperties {
 
-    public static final String PREVIEW_PROPERTY_NAME = "crafter.modePreview";
+    public static final String MODE_PREVIEW_PROPERTY_NAME = "crafter.modePreview";
     public static final String ENVIRONMENT_PROPERTY_NAME = "crafter.environment";
 
-    public static boolean isPreview() {
-        String value = System.getProperty(PREVIEW_PROPERTY_NAME);
+    public static boolean isModePreview() {
+        String value = System.getProperty(MODE_PREVIEW_PROPERTY_NAME);
         if (StringUtils.isNotEmpty(value)) {
             return Boolean.valueOf(value);
         } else {

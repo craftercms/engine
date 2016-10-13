@@ -38,6 +38,8 @@
         <entry key="textEncryptor" value-ref="crafter.textEncryptor"/>
         <entry key="connectionFactoryLocator" value-ref="crafter.connectionFactoryLocator"/>
         <entry key="providerLoginSupport" value-ref="crafter.providerLoginSupport"/>
+        <entry key="modePreview" value="#{T(java.lang.Boolean).valueOf(${crafter.engine.preview})}"/>
+        <entry key="environment" value="${crafter.engine.environment}"/>
     </util:map>
 
 </beans>

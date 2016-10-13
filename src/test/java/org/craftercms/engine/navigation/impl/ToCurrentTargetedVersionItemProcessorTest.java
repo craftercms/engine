@@ -22,7 +22,6 @@ public class ToCurrentTargetedVersionItemProcessorTest {
     private static final String INDEX_EN_URL = "/site/website/index_en.xml";
     private static final String INDEX_EN_US_URL = "/site/website/index_en_US.xml";
     private static final String INDEX_FR_URL = "/site/website/index_fr.xml";
-    private static final String XML = "<page><file-name>index_en.xml</file-name></page>";
 
     private ToCurrentTargetedVersionItemProcessor processor;
 
