@@ -76,7 +76,7 @@ public class ScopeAttributeMacro extends AbstractMacro implements ServletContext
     }
 
     private String getServletContextAttribute() {
-        return (String)servletContext.getAttribute(attributeName);
+        return getAttributeAsString(servletContext.getAttribute(attributeName));
     }
 
     private String getSessionAttribute() {
@@ -84,7 +84,7 @@ public class ScopeAttributeMacro extends AbstractMacro implements ServletContext
         if (requestContext != null) {
             HttpSession session = requestContext.getRequest().getSession();
             if (session != null) {
-                return (String)session.getAttribute(attributeName);
+                return getAttributeAsString(session.getAttribute(attributeName));
             }
         }
 
@@ -94,10 +94,18 @@ public class ScopeAttributeMacro extends AbstractMacro implements ServletContext
     private String getRequestAttribute() {
         RequestContext requestContext = RequestContext.getCurrent();
         if (requestContext != null) {
-            return (String)requestContext.getRequest().getAttribute(attributeName);
+            return getAttributeAsString(requestContext.getRequest().getAttribute(attributeName));
         }
 
         return null;
+    }
+
+    private String getAttributeAsString(Object attribute) {
+        if (attribute != null) {
+            return attribute.toString();
+        } else {
+            return null;
+        }
     }
 
 }
