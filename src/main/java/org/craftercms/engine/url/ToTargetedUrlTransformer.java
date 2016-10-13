@@ -24,7 +24,7 @@ import org.craftercms.core.url.UrlTransformer;
 import org.craftercms.core.util.UrlUtils;
 import org.craftercms.engine.targeting.TargetedUrlStrategy;
 import org.craftercms.engine.util.TargetingUtils;
-import org.craftercms.engine.util.config.TargetingProperties;
+import org.craftercms.engine.properties.SiteProperties;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
@@ -49,7 +49,7 @@ public class ToTargetedUrlTransformer implements UrlTransformer {
     @Override
     public String transformUrl(Context context, CachingOptions cachingOptions,
                                String url) throws UrlTransformationException {
-        if (TargetingProperties.isTargetingEnabled() && !TargetingUtils.excludePath(url)) {
+        if (SiteProperties.isTargetingEnabled() && !TargetingUtils.excludePath(url)) {
             String rootFolder = TargetingUtils.getMatchingRootFolder(url);
             if (StringUtils.isNotEmpty(rootFolder)) {
                 String relativeUrl = StringUtils.substringAfter(url, rootFolder);

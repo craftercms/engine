@@ -12,7 +12,7 @@ import org.craftercms.core.service.Item;
 import org.craftercms.core.store.ContentStoreAdapter;
 import org.craftercms.engine.targeting.CandidateTargetedUrlsResolver;
 import org.craftercms.engine.test.utils.ConfigAwareTestBase;
-import org.craftercms.engine.util.config.TargetingProperties;
+import org.craftercms.engine.properties.SiteProperties;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -162,7 +162,7 @@ public class TargetedContentStoreAdapterTest extends ConfigAwareTestBase {
         assertEquals("about-us", items.get(1).getName());
         assertEquals("/site/website/en/about-us", items.get(1).getUrl());
 
-        config.setProperty(TargetingProperties.MERGE_FOLDERS_CONFIG_KEY, false);
+        config.setProperty(SiteProperties.MERGE_FOLDERS_CONFIG_KEY, false);
 
         items = storeAdapter.findItems(context, cachingOptions, "/site/website/ja_JP_JP", true);
 

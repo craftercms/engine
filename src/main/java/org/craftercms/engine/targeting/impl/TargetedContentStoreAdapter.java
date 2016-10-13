@@ -36,7 +36,7 @@ import org.craftercms.core.store.ContentStoreAdapter;
 import org.craftercms.core.util.cache.impl.CachingAwareList;
 import org.craftercms.engine.targeting.CandidateTargetedUrlsResolver;
 import org.craftercms.engine.util.TargetingUtils;
-import org.craftercms.engine.util.config.TargetingProperties;
+import org.craftercms.engine.properties.SiteProperties;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
@@ -90,7 +90,7 @@ public class TargetedContentStoreAdapter implements ContentStoreAdapter {
     public boolean exists(Context context, String path) throws InvalidContextException, StoreException {
         context = ((ContextWrapper)context).getActualContext();
 
-        if (TargetingProperties.isTargetingEnabled() && !TargetingUtils.excludePath(path)) {
+        if (SiteProperties.isTargetingEnabled() && !TargetingUtils.excludePath(path)) {
             List<String> candidatePaths = candidateTargetedUrlsResolver.getUrls(path);
             if (CollectionUtils.isNotEmpty(candidatePaths)) {
                 for (String candidatePath : candidatePaths) {
@@ -117,7 +117,7 @@ public class TargetedContentStoreAdapter implements ContentStoreAdapter {
                                String path) throws InvalidContextException, StoreException {
         context = ((ContextWrapper)context).getActualContext();
 
-        if (TargetingProperties.isTargetingEnabled() && !TargetingUtils.excludePath(path)) {
+        if (SiteProperties.isTargetingEnabled() && !TargetingUtils.excludePath(path)) {
             List<String> candidatePaths = candidateTargetedUrlsResolver.getUrls(path);
             if (CollectionUtils.isNotEmpty(candidatePaths)) {
                 for (String candidatePath : candidatePaths) {
@@ -145,7 +145,7 @@ public class TargetedContentStoreAdapter implements ContentStoreAdapter {
                          boolean withDescriptor) throws InvalidContextException, XmlFileParseException, StoreException {
         context = ((ContextWrapper)context).getActualContext();
 
-        if (TargetingProperties.isTargetingEnabled() && !TargetingUtils.excludePath(path)) {
+        if (SiteProperties.isTargetingEnabled() && !TargetingUtils.excludePath(path)) {
             List<String> candidatePaths = candidateTargetedUrlsResolver.getUrls(path);
             if (CollectionUtils.isNotEmpty(candidatePaths)) {
                 for (String candidatePath : candidatePaths) {
@@ -174,10 +174,10 @@ public class TargetedContentStoreAdapter implements ContentStoreAdapter {
         StoreException {
         context = ((ContextWrapper)context).getActualContext();
 
-        if (TargetingProperties.isTargetingEnabled() && !TargetingUtils.excludePath(path)) {
+        if (SiteProperties.isTargetingEnabled() && !TargetingUtils.excludePath(path)) {
             List<String> candidatePaths = candidateTargetedUrlsResolver.getUrls(path);
             if (CollectionUtils.isNotEmpty(candidatePaths)) {
-                if (TargetingProperties.isMergeFolders()) {
+                if (SiteProperties.isMergeFolders()) {
                     if (logger.isDebugEnabled()) {
                         logger.debug("Merging child items of " + candidatePaths);
                     }

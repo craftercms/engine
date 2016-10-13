@@ -9,7 +9,7 @@
 
     <#assign subItems = navTree.subItems/>
     <#if (subItems?size > 0)>
-        <@renderNavigationItems subItems 1 navMacros/>
+        <@renderNavigationItems subItems 1 navMacrosNs/>
     </#if>
 </#macro>
 

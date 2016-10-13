@@ -14,17 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.craftercms.engine.util.config;
+package org.craftercms.engine.properties;
 
 import org.apache.commons.configuration.Configuration;
 import org.craftercms.engine.util.ConfigUtils;
 
 /**
- * Site configuration properties related to content targeting.
+ * Properties specific of the current site.
  *
  * @author avasquez
  */
-public class TargetingProperties {
+public class SiteProperties {
 
     public static final String TARGETING_ENABLED_CONFIG_KEY = "targeting.enabled";
     public static final String AVAILABLE_TARGET_IDS_CONFIG_KEY = "targeting.availableTargetIds";
@@ -33,6 +33,9 @@ public class TargetingProperties {
     public static final String EXCLUDE_PATTERNS_CONFIG_KEY = "targeting.excludePatterns";
     public static final String MERGE_FOLDERS_CONFIG_KEY = "targeting.mergeFolders";
     public static final String REDIRECT_TO_TARGETED_URL_CONFIG_KEY = "targeting.redirectToTargetedUrl";
+    public static final String INDEX_FILE_NAME_CONFIG_KEY = "indexFileName";
+
+    public static final String DEFAULT_INDEX_FILE_NAME = "index.xml";
 
     /**
      * Returns trues if targeting is enabled.
@@ -117,6 +120,19 @@ public class TargetingProperties {
             return config.getBoolean(REDIRECT_TO_TARGETED_URL_CONFIG_KEY, false);
         } else {
             return false;
+        }
+    }
+
+    /**
+     * Returns the name of the index file name in the configuration, or {@link #DEFAULT_INDEX_FILE_NAME} if not in
+     * configuration.
+     */
+    public static final String getIndexFileName() {
+        Configuration config = ConfigUtils.getCurrentConfig();
+        if (config != null) {
+            return config.getString(INDEX_FILE_NAME_CONFIG_KEY, DEFAULT_INDEX_FILE_NAME);
+        } else {
+            return DEFAULT_INDEX_FILE_NAME;
         }
     }
 

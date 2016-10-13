@@ -16,7 +16,7 @@ import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import static org.craftercms.engine.util.config.TargetingProperties.ROOT_FOLDERS_CONFIG_KEY;
+import static org.craftercms.engine.properties.SiteProperties.ROOT_FOLDERS_CONFIG_KEY;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.anyString;

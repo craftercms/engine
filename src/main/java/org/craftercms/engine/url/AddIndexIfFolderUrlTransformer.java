@@ -23,7 +23,7 @@ import org.craftercms.core.exception.UrlTransformationException;
 import org.craftercms.core.service.CachingOptions;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.url.UrlTransformer;
-import org.craftercms.engine.util.config.CommonProperties;
+import org.craftercms.engine.properties.SiteProperties;
 
 /**
  * If the url corresponds to a folder (no extension), it adds index.xml.
@@ -37,7 +37,7 @@ public class AddIndexIfFolderUrlTransformer implements UrlTransformer {
                                String url) throws UrlTransformationException {
         String extension = FilenameUtils.getExtension(url);
         if (StringUtils.isEmpty(extension)) {
-            url = UrlUtils.concat(url, CommonProperties.getIndexFileName());
+            url = UrlUtils.concat(url, SiteProperties.getIndexFileName());
         }
 
         return url;

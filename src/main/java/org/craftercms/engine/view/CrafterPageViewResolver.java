@@ -37,7 +37,7 @@ import org.craftercms.engine.security.CrafterPageAccessManager;
 import org.craftercms.engine.service.SiteItemService;
 import org.craftercms.engine.service.UrlTransformationService;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.util.config.TargetingProperties;
+import org.craftercms.engine.properties.SiteProperties;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.Ordered;
 import org.springframework.web.context.support.WebApplicationObjectSupport;
@@ -201,7 +201,7 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
         View view = getCachedLocalizedView(storeUrl, locale);
 
         if (view != null) {
-            if (TargetingProperties.isRedirectToTargetedUrl()) {
+            if (SiteProperties.isRedirectToTargetedUrl()) {
                 String targetedRenderUrl = urlTransformationService.transform(storeUrlToRenderUrlTransformerName,
                                                                               storeUrl, cacheUrlTransformations);
                 if (!targetedRenderUrl.equals(renderUrl)) {

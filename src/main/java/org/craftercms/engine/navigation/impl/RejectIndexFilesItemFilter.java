@@ -23,8 +23,7 @@ import org.craftercms.core.service.Item;
 import org.craftercms.core.service.ItemFilter;
 import org.craftercms.engine.targeting.TargetedUrlComponents;
 import org.craftercms.engine.targeting.TargetedUrlStrategy;
-import org.craftercms.engine.util.config.CommonProperties;
-import org.craftercms.engine.util.config.TargetingProperties;
+import org.craftercms.engine.properties.SiteProperties;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
@@ -52,12 +51,12 @@ public class RejectIndexFilesItemFilter implements ItemFilter {
     @Override
     public boolean accepts(Item item, List<Item> acceptedItems, List<Item> rejectedItems,
                            boolean runningBeforeProcessing) {
-        String indexFileName = CommonProperties.getIndexFileName();
+        String indexFileName = SiteProperties.getIndexFileName();
         String itemFileName = item.getName();
 
         if (indexFileName.equals(itemFileName)) {
             return false;
-        } else if (TargetingProperties.isTargetingEnabled() && targetedUrlStrategy.isFileNameBasedStrategy()) {
+        } else if (SiteProperties.isTargetingEnabled() && targetedUrlStrategy.isFileNameBasedStrategy()) {
             TargetedUrlComponents targetedFileNameComponents = targetedUrlStrategy.parseTargetedUrl(itemFileName);
             if (targetedFileNameComponents != null) {
                 String prefix = targetedFileNameComponents.getPrefix();

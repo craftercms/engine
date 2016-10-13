@@ -25,9 +25,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.craftercms.engine.util.config.TargetingProperties.AVAILABLE_TARGET_IDS_CONFIG_KEY;
-import static org.craftercms.engine.util.config.TargetingProperties.FALLBACK_ID_CONFIG_KEY;
-import static org.craftercms.engine.util.config.TargetingProperties.ROOT_FOLDERS_CONFIG_KEY;
+import static org.craftercms.engine.properties.SiteProperties.AVAILABLE_TARGET_IDS_CONFIG_KEY;
+import static org.craftercms.engine.properties.SiteProperties.FALLBACK_ID_CONFIG_KEY;
+import static org.craftercms.engine.properties.SiteProperties.ROOT_FOLDERS_CONFIG_KEY;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyBoolean;
