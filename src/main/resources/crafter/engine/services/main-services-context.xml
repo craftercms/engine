@@ -76,7 +76,7 @@
           class="org.craftercms.engine.util.servlet.ServletContextAttributesBootstrap">
         <property name="attributes">
             <map>
-                <entry key="modePreview" value="${crafter.engine.preview}"/>
+                <entry key="modePreview" value="#{T(java.lang.Boolean).valueOf(${crafter.engine.preview})}"/>
                 <entry key="environment" value="${crafter.engine.environment}"/>
             </map>
         </property>
