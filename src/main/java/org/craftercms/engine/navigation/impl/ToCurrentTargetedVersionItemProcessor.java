@@ -8,7 +8,7 @@ import org.craftercms.core.service.Context;
 import org.craftercms.core.service.Item;
 import org.craftercms.core.url.UrlTransformationEngine;
 import org.craftercms.engine.targeting.TargetIdManager;
-import org.craftercms.engine.util.config.TargetingProperties;
+import org.craftercms.engine.properties.SiteProperties;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
@@ -44,7 +44,7 @@ public class ToCurrentTargetedVersionItemProcessor implements ItemProcessor {
     @Override
     public Item process(Context context, CachingOptions cachingOptions, Item item) throws ItemProcessingException {
         // Don't do this for folders, since for them this will be done by the FolderToIndexItemProcessor
-        if (!item.isFolder() && TargetingProperties.isTargetingEnabled()) {
+        if (!item.isFolder() && SiteProperties.isTargetingEnabled()) {
             String url = item.getUrl();
             String targetedUrl = urlTransformationEngine.transformUrl(context, cachingOptions,
                                                                       toCurrentTargetedUrlTransformerName, url);

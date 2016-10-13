@@ -29,9 +29,9 @@ import org.craftercms.engine.targeting.impl.TargetedUrlByFileStrategy;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.craftercms.engine.util.config.CommonProperties.DEFAULT_INDEX_FILE_NAME;
-import static org.craftercms.engine.util.config.CommonProperties.INDEX_FILE_NAME_CONFIG_KEY;
-import static org.craftercms.engine.util.config.TargetingProperties.TARGETING_ENABLED_CONFIG_KEY;
+import static org.craftercms.engine.properties.SiteProperties.DEFAULT_INDEX_FILE_NAME;
+import static org.craftercms.engine.properties.SiteProperties.INDEX_FILE_NAME_CONFIG_KEY;
+import static org.craftercms.engine.properties.SiteProperties.TARGETING_ENABLED_CONFIG_KEY;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;

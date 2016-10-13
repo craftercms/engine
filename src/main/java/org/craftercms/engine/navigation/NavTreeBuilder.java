@@ -16,11 +16,16 @@
  */
 package org.craftercms.engine.navigation;
 
+import org.craftercms.commons.converters.Converter;
+import org.craftercms.engine.model.SiteItem;
+
 /**
  * Created by alfonsovasquez on 19/9/16.
  */
 public interface NavTreeBuilder {
 
     NavItem getNavTree(String url, int depth, String currentPageUrl);
+
+    NavItem getNavTree(String url, int depth, String currentPageUrl, Converter<SiteItem, NavItem> itemConverter);
 
 }
