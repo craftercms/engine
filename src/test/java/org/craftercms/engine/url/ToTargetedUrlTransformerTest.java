@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
-import static org.craftercms.engine.util.config.TargetingProperties.*;
+import static org.craftercms.engine.properties.SiteProperties.*;
 import static org.mockito.Mockito.*;
 
 /**
