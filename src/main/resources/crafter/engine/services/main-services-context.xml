@@ -7,8 +7,7 @@
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
-       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
-       http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
     <import resource="classpath:crafter/core/core-context.xml"/>
     <import resource="classpath:crafter/engine/services/security-context.xml"/>
@@ -28,6 +27,7 @@
             <list>
                 <value>classpath:crafter/core/core.properties</value>
                 <value>classpath:crafter/engine/server-config.properties</value>
+                <value>${crafter.engine.extension.base}/overlay-config.properties</value>
                 <value>${crafter.engine.extension.base}/server-config.properties</value>
             </list>
         </property>
@@ -68,16 +68,6 @@
             <map>
                 <entry key="crafter.modePreview" value="${crafter.engine.preview}"/>
                 <entry key="crafter.environment" value="${crafter.engine.environment}"/>
-            </map>
-        </property>
-    </bean>
-
-    <bean id="crafter.servletContextAttributesBootstrap"
-          class="org.craftercms.engine.util.servlet.ServletContextAttributesBootstrap">
-        <property name="attributes">
-            <map>
-                <entry key="modePreview" value="#{T(java.lang.Boolean).valueOf(${crafter.engine.preview})}"/>
-                <entry key="environment" value="${crafter.engine.environment}"/>
             </map>
         </property>
     </bean>
@@ -199,14 +189,14 @@
         <property name="scope" value="REQUEST"/>
     </bean>
 
-    <bean id="crafter.modePreviewContextAttributeMacro" class="org.craftercms.engine.macro.impl.ScopeAttributeMacro">
-        <property name="attributeName" value="modePreview"/>
-        <property name="scope" value="SERVLET_CONTEXT"/>
+    <bean id="crafter.modePreviewContextAttributeMacro" class="org.craftercms.engine.macro.impl.FixedValueMacro">
+        <property name="macroName" value="modePreview"/>
+        <property name="macroValue" value="${crafter.engine.preview}"/>
     </bean>
 
-    <bean id="crafter.environmentContextAttributeMacro" class="org.craftercms.engine.macro.impl.ScopeAttributeMacro">
-        <property name="attributeName" value="environment"/>
-        <property name="scope" value="SERVLET_CONTEXT"/>
+    <bean id="crafter.environmentContextAttributeMacro" class="org.craftercms.engine.macro.impl.FixedValueMacro">
+        <property name="macroName" value="crafterEnv"/>
+        <property name="macroValue" value="${crafter.engine.environment}"/>
     </bean>
 
     <bean id="crafter.macroResolver" class="org.craftercms.engine.macro.impl.MacroResolverImpl">
@@ -433,6 +423,8 @@
         <entry key="breadcrumbBuilder" value-ref="crafter.breadcrumbBuilder"/>
         <entry key="globalProperties" value-ref="crafter.propertyResolver"/>
         <entry key="tenantsResolver" value-ref="crafter.tenantsResolver"/>
+        <entry key="modePreview" value="#{T(java.lang.Boolean).valueOf(${crafter.engine.preview})}"/>
+        <entry key="crafterEnv" value="${crafter.engine.environment}"/>
     </util:map>
 
     <bean id="crafter.freeMarkerConfigFactory"
@@ -525,6 +517,7 @@
         <property name="filters" ref="crafter.navTreeFilters"/>
     </bean>
 
+    <import resource="${crafter.engine.extension.base}/services-overlay-context.xml"/>
     <import resource="${crafter.engine.extension.base}/services-context.xml"/>
 
 </beans>

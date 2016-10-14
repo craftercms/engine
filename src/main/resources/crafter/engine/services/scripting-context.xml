@@ -39,7 +39,7 @@
         <entry key="connectionFactoryLocator" value-ref="crafter.connectionFactoryLocator"/>
         <entry key="providerLoginSupport" value-ref="crafter.providerLoginSupport"/>
         <entry key="modePreview" value="#{T(java.lang.Boolean).valueOf(${crafter.engine.preview})}"/>
-        <entry key="environment" value="${crafter.engine.environment}"/>
+        <entry key="crafterEnv" value="${crafter.engine.environment}"/>
     </util:map>
 
 </beans>
