@@ -27,6 +27,7 @@
             <list>
                 <value>classpath:crafter/core/core.properties</value>
                 <value>classpath:crafter/engine/server-config.properties</value>
+                <value>${crafter.engine.extension.base}/overlay-config.properties</value>
                 <value>${crafter.engine.extension.base}/server-config.properties</value>
             </list>
         </property>
@@ -516,6 +517,7 @@
         <property name="filters" ref="crafter.navTreeFilters"/>
     </bean>
 
+    <import resource="${crafter.engine.extension.base}/services-overlay-context.xml"/>
     <import resource="${crafter.engine.extension.base}/services-context.xml"/>
 
 </beans>
