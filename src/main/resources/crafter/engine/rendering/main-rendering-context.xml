@@ -12,6 +12,25 @@
     <import resource="classpath:crafter/engine/rendering/controller-context.xml" />
     <import resource="classpath:crafter/engine/rendering/view-context.xml" />
 
+    <!-- ////////////////////////////////// -->
+    <!--								 	-->
+    <!--			Properties				-->
+    <!--									-->
+    <!-- ////////////////////////////////// -->
+
+    <bean name="crafter.properties" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+        <property name="order" value="0"/>
+        <property name="locations">
+            <list>
+                <value>classpath:crafter/core/core.properties</value>
+                <value>classpath:crafter/engine/server-config.properties</value>
+                <value>${crafter.engine.extension.base}/overlay-config.properties</value>
+                <value>${crafter.engine.extension.base}/server-config.properties</value>
+            </list>
+        </property>
+        <property name="ignoreUnresolvablePlaceholders" value="true" />
+    </bean>
+
     <!--
     Activates various annotations to be detected in bean classes: Spring's @Required and @Autowired, as well as JSR
     250's @PostConstruct, @PreDestroy and @Resource (if available), JAX-WS's @WebServiceRef (if available), EJB3's @EJB
@@ -50,24 +69,7 @@
         <ref bean="crafter.xmlMsgConverter"/>
     </util:list>
 
-    <!-- ////////////////////////////////// -->
-    <!--								 	-->
-    <!--			Properties				-->
-    <!--									-->
-    <!-- ////////////////////////////////// -->
-
-    <bean name="crafter.properties" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
-        <property name="order" value="0"/>
-        <property name="locations">
-            <list>
-                <value>classpath:crafter/core/core.properties</value>
-                <value>classpath:crafter/engine/server-config.properties</value>
-                <value>${crafter.engine.extension.base}/server-config.properties</value>
-            </list>
-        </property>
-        <property name="ignoreUnresolvablePlaceholders" value="true" />
-    </bean>
-
+    <import resource="${crafter.engine.extension.base}/rendering-overlay-context.xml"/>
     <import resource="${crafter.engine.extension.base}/rendering-context.xml"/>
 
 </beans>
