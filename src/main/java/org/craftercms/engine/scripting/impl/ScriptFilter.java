@@ -76,7 +76,7 @@ public class ScriptFilter implements Filter {
             List<Script> scripts = new ArrayList<>();
 
             for (FilterMapping mapping : filterMappings) {
-                if (!excludeRequest(mapping.exclude, requestUri) && includeRequest(mapping.include, requestUri)) {
+                if (!excludeRequest(requestUri, mapping.excludes) && includeRequest(requestUri, mapping.includes)) {
                     scripts.add(mapping.script);
                 }
             }
@@ -108,10 +108,10 @@ public class ScriptFilter implements Filter {
                         if (CollectionUtils.isNotEmpty(filtersConfig)) {
                             for (HierarchicalConfiguration filterConfig : filtersConfig) {
                                 String scriptUrl = filterConfig.getString(SCRIPT_KEY);
-                                String includeStr = filterConfig.getString(INCLUDE_MAPPINGS_KEY);
-                                String excludeStr = filterConfig.getString(EXCLUDE_MAPPINGS_KEY);
+                                String[] includes = filterConfig.getStringArray(INCLUDE_MAPPINGS_KEY);
+                                String[] excludes = filterConfig.getStringArray(EXCLUDE_MAPPINGS_KEY);
 
-                                if (StringUtils.isNotEmpty(scriptUrl) && StringUtils.isNotEmpty(includeStr)) {
+                                if (StringUtils.isNotEmpty(scriptUrl) && ArrayUtils.isNotEmpty(includes)) {
                                     ContentStoreService storeService = siteContext.getStoreService();
                                     ScriptFactory scriptFactory = siteContext.getScriptFactory();
 
@@ -121,8 +121,8 @@ public class ScriptFilter implements Filter {
 
                                     FilterMapping mapping = new FilterMapping();
                                     mapping.script = scriptFactory.getScript(scriptUrl);
-                                    mapping.include = StringUtils.split(includeStr, ',');
-                                    mapping.exclude = StringUtils.split(excludeStr, ',');
+                                    mapping.includes = includes;
+                                    mapping.excludes = excludes;
 
                                     mappings.add(mapping);
                                     mappings.addDependencyKey(mapping.script.getKey());
@@ -142,7 +142,7 @@ public class ScriptFilter implements Filter {
         }
     }
 
-    protected boolean excludeRequest(String[] excludes, String requestUri) {
+    protected boolean excludeRequest(String requestUri, String[] excludes) {
         if (ArrayUtils.isNotEmpty(excludes)) {
             for (String uriPattern : excludes) {
                 if (pathMatcher.match(uriPattern, requestUri)) {
@@ -154,7 +154,7 @@ public class ScriptFilter implements Filter {
         return false;
     }
 
-    protected boolean includeRequest(String[] includes, String requestUri) {
+    protected boolean includeRequest(String requestUri, String[] includes) {
         if (ArrayUtils.isNotEmpty(includes)) {
             for (String uriPattern : includes) {
                 if (pathMatcher.match(uriPattern, requestUri)) {
@@ -169,8 +169,8 @@ public class ScriptFilter implements Filter {
     protected static class FilterMapping {
 
         private Script script;
-        private String[] include;
-        private String[] exclude;
+        private String[] includes;
+        private String[] excludes;
 
     }
 
