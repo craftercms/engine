@@ -19,7 +19,7 @@
         <#if currDepth == 1>
             <#if (subItems?size > 0)>
                 <@navMacrosNs.renderNavItemWithSubItems navItem>
-                    <@renderNavigationItems subItems, currDepth + 1, navMacros/>
+                    <@renderNavigationItems subItems, currDepth + 1, navMacrosNs/>
                 </@navMacrosNs.renderNavItemWithSubItems>
             <#else>
                 <@navMacrosNs.renderNavItem navItem/>
@@ -27,7 +27,7 @@
         <#else>
             <#if (subItems?size > 0)>
                 <@navMacrosNs.renderNavSubItemWithSubItems navItem>
-                    <@renderNavigationItems subItems, currDepth + 1, navMacros/>
+                    <@renderNavigationItems subItems, currDepth + 1, navMacrosNs/>
                 </@navMacrosNs.renderNavSubItemWithSubItems>
             <#else>
                 <@navMacrosNs.renderNavSubItem navItem/>
