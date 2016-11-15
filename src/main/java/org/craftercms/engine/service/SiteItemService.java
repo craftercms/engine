@@ -38,6 +38,14 @@ public interface SiteItemService {
     SiteItem getSiteItem(String url);
 
     /**
+     * Returns the site item for the given URL
+     *
+     * @param url       the URL of the item
+     * @param processor a processor for the item
+     */
+    SiteItem getSiteItem(String url, ItemProcessor processor);
+
+    /**
      * Returns the site tree for the given URL. The item is expected to be a folder.
      *
      * @param url   the URL of the folder
