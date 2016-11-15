@@ -120,6 +120,16 @@ public class SiteItemServiceImpl implements SiteItemService {
             filter = compositeFilter;
         }
 
+        if (CollectionUtils.isNotEmpty(defaultProcessors)) {
+            ItemProcessorPipeline processorPipeline = new ItemProcessorPipeline(new ArrayList<>(defaultProcessors));
+
+            if (processor != null) {
+                processorPipeline.addProcessor(processor);
+            }
+
+            processor = processorPipeline;
+        }
+
         Tree tree = storeService.findTree(getSiteContext().getContext(), null, url, depth, filter, processor);
         if (tree != null) {
             return createItemWrapper(tree);
