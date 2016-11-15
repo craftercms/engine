@@ -16,6 +16,7 @@
  */
 package org.craftercms.engine.service.impl;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +27,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.craftercms.core.processors.ItemProcessor;
+import org.craftercms.core.processors.impl.ItemProcessorPipeline;
 import org.craftercms.core.service.Content;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Item;
@@ -50,6 +52,7 @@ public class SiteItemServiceImpl implements SiteItemService {
 
     protected ContentStoreService storeService;
     protected List<ItemFilter> defaultFilters;
+    protected List<ItemProcessor> defaultProcessors;
     protected Map<String, ModelValueConverter<?>> modelValueConverters;
     protected Comparator<SiteItem> sortComparator;
 
@@ -58,9 +61,12 @@ public class SiteItemServiceImpl implements SiteItemService {
         this.storeService = storeService;
     }
 
-    @Required
     public void setDefaultFilters(List<ItemFilter> defaultFilters) {
         this.defaultFilters = defaultFilters;
+    }
+
+    public void setDefaultProcessors(List<ItemProcessor> defaultProcessors) {
+        this.defaultProcessors = defaultProcessors;
     }
 
     @Required
@@ -74,7 +80,22 @@ public class SiteItemServiceImpl implements SiteItemService {
 
     @Override
     public SiteItem getSiteItem(String url) {
-        Item item = storeService.findItem(getSiteContext().getContext(), url);
+        return getSiteItem(url, null);
+    }
+
+    @Override
+    public SiteItem getSiteItem(String url, ItemProcessor processor) {
+        if (CollectionUtils.isNotEmpty(defaultProcessors)) {
+            ItemProcessorPipeline processorPipeline = new ItemProcessorPipeline(new ArrayList<>(defaultProcessors));
+
+            if (processor != null) {
+                processorPipeline.addProcessor(processor);
+            }
+
+            processor = processorPipeline;
+        }
+
+        Item item = storeService.findItem(getSiteContext().getContext(), null, url, processor);
         if (item != null) {
             return createItemWrapper(item);
         } else {
@@ -90,15 +111,23 @@ public class SiteItemServiceImpl implements SiteItemService {
     @Override
     public SiteItem getSiteTree(String url, int depth, ItemFilter filter, ItemProcessor processor) {
         if (CollectionUtils.isNotEmpty(defaultFilters)) {
-            CompositeItemFilter compositeFilter = new CompositeItemFilter();
+            CompositeItemFilter compositeFilter = new CompositeItemFilter(new ArrayList<>(defaultFilters));
 
-            for (ItemFilter defaultFilter : defaultFilters) {
-                compositeFilter.addFilter(defaultFilter);
+            if (filter != null) {
+                compositeFilter.addFilter(filter);
             }
 
-            compositeFilter.addFilter(filter);
-
             filter = compositeFilter;
+        }
+
+        if (CollectionUtils.isNotEmpty(defaultProcessors)) {
+            ItemProcessorPipeline processorPipeline = new ItemProcessorPipeline(new ArrayList<>(defaultProcessors));
+
+            if (processor != null) {
+                processorPipeline.addProcessor(processor);
+            }
+
+            processor = processorPipeline;
         }
 
         Tree tree = storeService.findTree(getSiteContext().getContext(), null, url, depth, filter, processor);
