@@ -14,24 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.craftercms.engine.url;
+package org.craftercms.engine.navigation;
 
-import org.apache.commons.lang3.StringUtils;
-import org.craftercms.core.exception.UrlTransformationException;
-import org.craftercms.core.service.CachingOptions;
-import org.craftercms.core.service.Context;
-import org.craftercms.core.url.UrlTransformer;
-import org.craftercms.engine.properties.SiteProperties;
+import org.craftercms.commons.converters.Converter;
+import org.craftercms.engine.model.SiteItem;
 
 /**
- * Created by alfonsovasquez on 7/9/16.
+ * Created by alfonsovasquez on 19/9/16.
  */
-public class RemoveIndexUrlTransformer implements UrlTransformer {
+public interface NavTreeBuilder {
 
-    @Override
-    public String transformUrl(Context context, CachingOptions cachingOptions,
-                               String url) throws UrlTransformationException {
-        return StringUtils.removeEnd(url, SiteProperties.getIndexFileName());
-    }
+    NavItem getNavTree(String url, int depth, String currentPageUrl);
+
+    NavItem getNavTree(String url, int depth, String currentPageUrl, Converter<SiteItem, NavItem> itemConverter);
 
 }

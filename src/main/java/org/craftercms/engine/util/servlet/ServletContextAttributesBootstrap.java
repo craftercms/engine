@@ -12,7 +12,7 @@ import org.springframework.web.context.ServletContextAware;
  *
  * @author avasquez
  */
-public class ServletContextAttributesInitializer implements ServletContextAware {
+public class ServletContextAttributesBootstrap implements ServletContextAware {
 
     private ServletContext servletContext;
     private Map<String, Object> attributes;

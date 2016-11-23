@@ -14,24 +14,36 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.craftercms.engine.url;
+package org.craftercms.engine.macro.impl;
 
-import org.apache.commons.lang3.StringUtils;
-import org.craftercms.core.exception.UrlTransformationException;
-import org.craftercms.core.service.CachingOptions;
-import org.craftercms.core.service.Context;
-import org.craftercms.core.url.UrlTransformer;
-import org.craftercms.engine.properties.SiteProperties;
+import org.springframework.beans.factory.annotation.Required;
 
 /**
- * Created by alfonsovasquez on 7/9/16.
+ * Created by alfonsovasquez on 14/10/16.
  */
-public class RemoveIndexUrlTransformer implements UrlTransformer {
+public class FixedValueMacro extends AbstractMacro {
+
+    private String macroName;
+    private String macroValue;
+
+    @Required
+    public void setMacroName(String macroName) {
+        this.macroName = macroName;
+    }
+
+    @Required
+    public void setMacroValue(String macroValue) {
+        this.macroValue = macroValue;
+    }
 
     @Override
-    public String transformUrl(Context context, CachingOptions cachingOptions,
-                               String url) throws UrlTransformationException {
-        return StringUtils.removeEnd(url, SiteProperties.getIndexFileName());
+    protected String createMacroName() {
+        return "{" + macroName + "}";
+    }
+
+    @Override
+    protected String getMacroValue(String str) {
+        return macroValue;
     }
 
 }

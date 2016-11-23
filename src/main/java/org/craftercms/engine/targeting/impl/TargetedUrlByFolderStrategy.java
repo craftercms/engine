@@ -20,22 +20,8 @@ public class TargetedUrlByFolderStrategy extends AbstractTargetedUrlStrategy {
     public static final int SUFFIX_GROUP = 2;
 
     @Override
-    public String toTargetedUrl(String url) {
-        Matcher matcher = matchUrl(url);
-        if (matcher != null) {
-            return url;
-        } else {
-            String targetId = targetIdManager.getCurrentTargetId();
-            if (StringUtils.isNotEmpty(targetId)) {
-                if (!url.startsWith("/")) {
-                    url = "/" + url;
-                }
-
-                return "/" + targetId + url;
-            } else {
-                return url;
-            }
-        }
+    public boolean isFileNameBasedStrategy() {
+        return false;
     }
 
     @Override
@@ -78,6 +64,15 @@ public class TargetedUrlByFolderStrategy extends AbstractTargetedUrlStrategy {
         String targetedUrlByFilePattern = String.format(TARGETED_URL_REGEX_FORMAT, availableTargetIds);
 
         return Pattern.compile(targetedUrlByFilePattern);
+    }
+
+    @Override
+    protected String doToTargetedUrl(String url, String currentTargetId) {
+        if (StringUtils.isNotEmpty(currentTargetId)) {
+            return buildTargetedUrl("", currentTargetId, url);
+        } else {
+            return url;
+        }
     }
 
 }

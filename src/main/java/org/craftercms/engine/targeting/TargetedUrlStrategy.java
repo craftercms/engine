@@ -24,6 +24,11 @@ package org.craftercms.engine.targeting;
 public interface TargetedUrlStrategy {
 
     /**
+     * Returns true if the strategy is based on the name of the file.
+     */
+    boolean isFileNameBasedStrategy();
+
+    /**
      * Returns the specified URL as a targeted URL (if it's not already a targeted URL) using the current target ID.
      * For example, if the specified URL is /products/index.xml, the current target ID is "en_US", and the strategy
      * handles targeted URLs by file name, then the resulting targeted URL is /products/index_en_US.xml.
@@ -33,11 +38,14 @@ public interface TargetedUrlStrategy {
      *     since most targeted URLs are handled using a regex.
      * </p>
      *
-     * @param url the URL to transform to a targeted URL
+     * @param url                   the URL to transform to a targeted URL
+     * @param forceCurrentTargetId  true if the URL should be forced to contain the current target ID (e.g the URL
+     *                              is /products/index_fr.xml but the current target ID is en, then the URL will be
+     *                              transformed to /products/index_en.xml)
      *
      * @return the targeted URL version of the URL.
      */
-    String toTargetedUrl(String url);
+    String toTargetedUrl(String url, boolean forceCurrentTargetId);
 
     /**
      * Parses the specified targeted URL, extracting it's components. For example, if the specified URL is

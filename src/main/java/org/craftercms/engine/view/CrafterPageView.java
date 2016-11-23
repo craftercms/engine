@@ -29,7 +29,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.util.ExceptionUtils;
 import org.craftercms.core.util.cache.CachingAwareObject;
 import org.craftercms.engine.exception.HttpStatusCodeAwareException;
@@ -205,8 +204,6 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        RequestContext.getCurrent().getRequest().setAttribute(PAGE_URL_ATTRIBUTE_NAME, page.getStoreUrl());
-
         String mimeType = getMimeType();
         if (StringUtils.isNotEmpty(mimeType)) {
             setContentType(MediaType.parseMediaType(mimeType).toString() + ";charset=" + DEFAULT_CHARSET);
@@ -218,6 +215,7 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
     @Override
     protected void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request,
                                            HttpServletResponse response) throws Exception {
+        request.setAttribute(PAGE_URL_ATTRIBUTE_NAME, page.getStoreUrl());
 
         Map<String, Object> scriptVariables = createScriptVariables(request, response, model);
 

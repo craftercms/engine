@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.craftercms.engine.targeting.TargetIdManager;
-import org.craftercms.engine.util.config.TargetingProperties;
+import org.craftercms.engine.properties.SiteProperties;
 
 /**
  * {@link TargetIdManager} base class, that provides basic implementations of {@link #getFallbackTargetId()} and
@@ -36,7 +36,7 @@ public abstract class AbstractTargetIdManager implements TargetIdManager {
      */
     @Override
     public String getFallbackTargetId() throws IllegalStateException {
-        return TargetingProperties.getFallbackTargetId();
+        return SiteProperties.getFallbackTargetId();
     }
 
     /**
@@ -45,7 +45,7 @@ public abstract class AbstractTargetIdManager implements TargetIdManager {
      */
     @Override
     public List<String> getAvailableTargetIds() {
-        String[] availableTargetIds = TargetingProperties.getAvailableTargetIds();
+        String[] availableTargetIds = SiteProperties.getAvailableTargetIds();
         if (ArrayUtils.isNotEmpty(availableTargetIds)) {
             return Arrays.asList(availableTargetIds);
         } else {

@@ -24,7 +24,7 @@ import org.craftercms.core.url.UrlTransformer;
 import org.craftercms.core.util.UrlUtils;
 import org.craftercms.engine.targeting.TargetedUrlStrategy;
 import org.craftercms.engine.util.TargetingUtils;
-import org.craftercms.engine.util.config.TargetingProperties;
+import org.craftercms.engine.properties.SiteProperties;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
@@ -35,20 +35,25 @@ import org.springframework.beans.factory.annotation.Required;
 public class ToTargetedUrlTransformer implements UrlTransformer {
 
     protected TargetedUrlStrategy targetedUrlStrategy;
+    protected boolean forceCurrentTargetId;
 
     @Required
     public void setTargetedUrlStrategy(TargetedUrlStrategy targetedUrlStrategy) {
         this.targetedUrlStrategy = targetedUrlStrategy;
     }
 
+    public void setForceCurrentTargetId(boolean forceCurrentTargetId) {
+        this.forceCurrentTargetId = forceCurrentTargetId;
+    }
+
     @Override
     public String transformUrl(Context context, CachingOptions cachingOptions,
                                String url) throws UrlTransformationException {
-        if (TargetingProperties.isTargetingEnabled() && !TargetingUtils.excludePath(url)) {
+        if (SiteProperties.isTargetingEnabled() && !TargetingUtils.excludePath(url)) {
             String rootFolder = TargetingUtils.getMatchingRootFolder(url);
             if (StringUtils.isNotEmpty(rootFolder)) {
                 String relativeUrl = StringUtils.substringAfter(url, rootFolder);
-                String targetedUrl = targetedUrlStrategy.toTargetedUrl(relativeUrl);
+                String targetedUrl = targetedUrlStrategy.toTargetedUrl(relativeUrl, forceCurrentTargetId);
 
                 return UrlUtils.appendUrl(rootFolder, targetedUrl);
             }

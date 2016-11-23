@@ -18,7 +18,7 @@ package org.craftercms.engine.util;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.craftercms.commons.lang.RegexUtils;
-import org.craftercms.engine.util.config.TargetingProperties;
+import org.craftercms.engine.properties.SiteProperties;
 
 /**
  * Utility methods for content targeting.
@@ -38,7 +38,7 @@ public class TargetingUtils {
      * @return the root folder that matches the targeted URL
      */
     public static String getMatchingRootFolder(String targetedUrl) {
-        String[] targetedRootFolders = TargetingProperties.getRootFolders();
+        String[] targetedRootFolders = SiteProperties.getRootFolders();
         if (ArrayUtils.isNotEmpty(targetedRootFolders)) {
             for (String targetedRootFolder : targetedRootFolders) {
                 if (targetedUrl.startsWith(targetedRootFolder)) {
@@ -58,7 +58,7 @@ public class TargetingUtils {
      * @return true if the path should be excluded
      */
     public static boolean excludePath(String path) {
-        String[] excludePatterns = TargetingProperties.getExcludePatterns();
+        String[] excludePatterns = SiteProperties.getExcludePatterns();
         if (ArrayUtils.isNotEmpty(excludePatterns)) {
             return RegexUtils.matchesAny(path, excludePatterns);
         } else {

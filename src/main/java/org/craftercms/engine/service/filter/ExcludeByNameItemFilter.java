@@ -16,10 +16,11 @@
  */
 package org.craftercms.engine.service.filter;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.craftercms.core.service.Item;
 import org.craftercms.core.service.ItemFilter;
-
-import java.util.Arrays;
 
 /**
  * {@link ItemFilter} that rejects an item if its name matches any one of a list of regexes.
@@ -50,7 +51,8 @@ public class ExcludeByNameItemFilter implements ItemFilter {
     }
 
     @Override
-    public boolean accepts(Item item, boolean runningBeforeProcessing) {
+    public boolean accepts(Item item, List<Item> acceptedItems, List<Item> rejectedItems,
+                           boolean runningBeforeProcessing) {
         for (String regex : excludeRegexes) {
             if (item.getName().matches(regex)) {
                 return false;

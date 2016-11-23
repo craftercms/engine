@@ -62,7 +62,9 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
 
     private static final Log logger = LogFactory.getLog(RenderComponentDirective.class);
 
-    public static final String KEY_COMPONENT_MODEL = "model";
+    @Deprecated
+    public static final String KEY_MODEL = "model";
+    public static final String KEY_CONTENT_MODEL = "contentModel";
 
     public static final String COMPONENT_PARAM_NAME = "component";
     public static final String COMPONENT_PATH_PARAM_NAME = "componentPath";
@@ -269,7 +271,8 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
     protected SimpleHash getComponentModel(SiteItem component,
                                            Map<String, Object> scriptsModel) throws TemplateException {
         SimpleHash componentModel = modelFactory.getObject();
-        componentModel.put(KEY_COMPONENT_MODEL, component);
+        componentModel.put(KEY_MODEL, component);
+        componentModel.put(KEY_CONTENT_MODEL, component);
 
         if (MapUtils.isNotEmpty(scriptsModel)) {
             componentModel.putAll(scriptsModel);

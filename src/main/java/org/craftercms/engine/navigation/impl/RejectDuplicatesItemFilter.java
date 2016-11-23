@@ -14,29 +14,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.craftercms.engine.util.config;
+package org.craftercms.engine.navigation.impl;
 
-import org.apache.commons.configuration.Configuration;
-import org.craftercms.engine.util.ConfigUtils;
+import java.util.List;
+
+import org.craftercms.core.service.Item;
+import org.craftercms.core.service.ItemFilter;
 
 /**
- * Common site configuration properties.
- *
- * @author avasquez
+ * Created by alfonsovasquez on 8/10/16.
  */
-public class CommonProperties {
+public class RejectDuplicatesItemFilter implements ItemFilter {
 
-    public static final String INDEX_FILE_NAME_CONFIG_KEY = "indexFileName";
+    @Override
+    public boolean runBeforeProcessing() {
+        return false;
+    }
 
-    public static final String DEFAULT_INDEX_FILE_NAME = "index.xml";
+    @Override
+    public boolean runAfterProcessing() {
+        return true;
+    }
 
-    public static final String getIndexFileName() {
-        Configuration config = ConfigUtils.getCurrentConfig();
-        if (config != null) {
-            return config.getString(INDEX_FILE_NAME_CONFIG_KEY, DEFAULT_INDEX_FILE_NAME);
-        } else {
-            return DEFAULT_INDEX_FILE_NAME;
-        }
+    @Override
+    public boolean accepts(Item item, List<Item> acceptedItems, List<Item> rejectedItems,
+                           boolean runningBeforeProcessing) {
+        return !acceptedItems.contains(item);
     }
 
 }

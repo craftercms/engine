@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
-import static org.craftercms.engine.util.config.TargetingProperties.*;
+import static org.craftercms.engine.properties.SiteProperties.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -57,7 +57,7 @@ public class ToTargetedUrlTransformerTest {
     private TargetedUrlStrategy createTargetedUrlStrategy() {
         TargetedUrlStrategy urlStrategy = mock(TargetedUrlStrategy.class);
 
-        when(urlStrategy.toTargetedUrl(NON_TARGETED_URL)).thenReturn(TARGETED_URL);
+        when(urlStrategy.toTargetedUrl(NON_TARGETED_URL, false)).thenReturn(TARGETED_URL);
 
         return urlStrategy;
     }

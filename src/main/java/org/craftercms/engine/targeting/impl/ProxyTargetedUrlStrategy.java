@@ -29,8 +29,13 @@ import org.craftercms.engine.util.spring.AbstractProxyBean;
 public class ProxyTargetedUrlStrategy extends AbstractProxyBean<TargetedUrlStrategy> implements TargetedUrlStrategy {
 
     @Override
-    public String toTargetedUrl(String url) {
-        return getBean().toTargetedUrl(url);
+    public boolean isFileNameBasedStrategy() {
+        return getBean().isFileNameBasedStrategy();
+    }
+
+    @Override
+    public String toTargetedUrl(String url, boolean forceCurrentTargetId) {
+        return getBean().toTargetedUrl(url, forceCurrentTargetId);
     }
 
     @Override
