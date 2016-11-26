@@ -20,7 +20,10 @@ package org.craftercms.engine.util.breadcrumb;
  * Represents a breadcrumb part or component
  *
  * @author Alfonso Vásquez
+ *
+ * @deprecated Please use instead {@link org.craftercms.engine.navigation.NavBreadcrumbBuilder}.
  */
+@Deprecated
 public class BreadcrumbItem {
 
     private String url;

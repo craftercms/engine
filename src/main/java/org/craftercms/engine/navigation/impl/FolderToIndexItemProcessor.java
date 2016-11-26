@@ -27,7 +27,9 @@ import org.craftercms.engine.targeting.TargetIdManager;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
- * Created by alfonsovasquez on 8/10/16.
+ * {@link ItemProcessor} that modifies the a folder item to include the descriptor DOM of it's index file.
+ *
+ * @author avasquez
  */
 public class FolderToIndexItemProcessor implements ItemProcessor {
 
