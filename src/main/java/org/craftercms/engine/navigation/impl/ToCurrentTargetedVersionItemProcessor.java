@@ -12,7 +12,11 @@ import org.craftercms.engine.properties.SiteProperties;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
- * Created by alfonsovasquez on 8/10/16.
+ * {@link ItemProcessor} that converts the item to the current targeted item (e.g. if the current target ID is en_US, then index.xml
+ * might be converted to index_en_US.xml, or to index_en.xml if it the former doesn't exist).
+ *
+ * <b>WARNING:</b> this processor will probably generate the same item for different URLs, so it's good to use the
+ * {@link RejectDuplicatesItemFilter} in conjunction with this processor.
  */
 public class ToCurrentTargetedVersionItemProcessor implements ItemProcessor {
 

@@ -20,12 +20,34 @@ import org.craftercms.commons.converters.Converter;
 import org.craftercms.engine.model.SiteItem;
 
 /**
- * Created by alfonsovasquez on 19/9/16.
+ * Creates navigation trees that facilitate the rendering of navigation.
+ *
+ * @author avasquez
  */
 public interface NavTreeBuilder {
 
+    /**
+     * Returns the navigation tree with the specified depth for the specified store URL.
+     *
+     * @param url               the root folder of the tree
+     * @param depth             the depth of the tree
+     * @param currentPageUrl    the URL of the current page (used to determine the active URLs).
+     *
+     * @return the navigation tree
+     */
     NavItem getNavTree(String url, int depth, String currentPageUrl);
 
+    /**
+     * Returns the navigation tree with the specified depth for the specified store URL.
+     *
+     * @param url               the root folder of the tree
+     * @param depth             the depth of the tree
+     * @param currentPageUrl    the URL of the current page (used to determine the active URLs).
+     * @param itemConverter     the converter that should be used to convert from {@link SiteItem}s to the actual
+     *                          {@link NavItem}s
+     *
+     * @return the navigation tree
+     */
     NavItem getNavTree(String url, int depth, String currentPageUrl, Converter<SiteItem, NavItem> itemConverter);
 
 }

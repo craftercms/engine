@@ -136,7 +136,7 @@
     <!--									-->
     <!-- ////////////////////////////////// -->
 
-    <bean id="crafter.excludeLevelDescriptorItemFilter" 
+    <bean id="crafter.excludeLevelDescriptorItemFilter"
           class="org.craftercms.engine.service.filter.ExcludeByNameItemFilter">
         <constructor-arg value="${crafter.core.merger.strategy.inheritLevels.levelDescriptor.name}"/>
     </bean>
@@ -368,19 +368,6 @@
 
     <!-- ////////////////////////////////// -->
     <!--								 	-->
-    <!--			 Navigation    			-->
-    <!--									-->
-    <!-- ////////////////////////////////// -->
-
-    <bean id="crafter.breadcrumbBuilder" class="org.craftercms.engine.util.breadcrumb.BreadcrumbBuilder">
-        <property name="storeService" ref="crafter.contentStoreService"/>
-        <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
-        <property name="homePath" value="${crafter.engine.site.default.descriptors.pages.path}"/>
-        <property name="breadcrumbNameXPathQuery" value="${crafter.engine.page.navLabel.xpathQuery}"/>
-    </bean>
-
-    <!-- ////////////////////////////////// -->
-    <!--								 	-->
     <!--		FreeMarker Config			-->
     <!--									-->
     <!-- ////////////////////////////////// -->
@@ -419,6 +406,7 @@
         <entry key="siteItemService" value-ref="crafter.siteItemService"/>
         <entry key="urlTransformationService" value-ref="crafter.urlTransformationService"/>
         <entry key="navTreeBuilder" value-ref="crafter.navTreeBuilder"/>
+        <entry key="navBreadcrumbBuilder" value-ref="crafter.navBreadcrumbBuilder"/>
         <entry key="searchService" value-ref="crafter.searchService"/>
         <entry key="breadcrumbBuilder" value-ref="crafter.breadcrumbBuilder"/>
         <entry key="globalProperties" value-ref="crafter.propertyResolver"/>
@@ -461,6 +449,14 @@
     <!--		     Navigation 			-->
     <!--									-->
     <!-- ////////////////////////////////// -->
+
+    <!-- Deprecated -->
+    <bean id="crafter.breadcrumbBuilder" class="org.craftercms.engine.util.breadcrumb.BreadcrumbBuilder">
+        <property name="storeService" ref="crafter.contentStoreService"/>
+        <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
+        <property name="homePath" value="${crafter.engine.site.default.descriptors.pages.path}"/>
+        <property name="breadcrumbNameXPathQuery" value="${crafter.engine.page.navLabel.xpathQuery}"/>
+    </bean>
 
     <bean id="crafter.navItemConverter" class="org.craftercms.engine.navigation.impl.DefaultItemConverter">
         <property name="navLabelXPath" value="${crafter.engine.page.navLabel.xpathQuery}"/>
@@ -515,6 +511,12 @@
         <property name="defaultItemConverter" ref="crafter.navItemConverter"/>
         <property name="processors" ref="crafter.navTreeProcessors"/>
         <property name="filters" ref="crafter.navTreeFilters"/>
+    </bean>
+
+    <bean id="crafter.navBreadcrumbBuilder" class="org.craftercms.engine.navigation.impl.NavBreadcrumbBuilderImpl">
+        <property name="siteItemService" ref="crafter.siteItemService"/>
+        <property name="defaultItemConverter" ref="crafter.navItemConverter"/>
+        <property name="processors" ref="crafter.navTreeProcessors"/>
     </bean>
 
     <import resource="${crafter.engine.extension.base}/services-overlay-context.xml"/>

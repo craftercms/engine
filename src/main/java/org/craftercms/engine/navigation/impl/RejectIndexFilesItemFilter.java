@@ -27,7 +27,9 @@ import org.craftercms.engine.properties.SiteProperties;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
- * Created by alfonsovasquez on 28/9/16.
+ * {@link ItemFilter} that rejects all indexes, including targeted ones (e.g index_en.xml, index_es_CR.xml).
+ *
+ * @author avasquez
  */
 public class RejectIndexFilesItemFilter implements ItemFilter {
 
