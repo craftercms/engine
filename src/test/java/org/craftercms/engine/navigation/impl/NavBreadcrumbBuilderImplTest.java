@@ -1,12 +1,25 @@
+/*
+ * Copyright (C) 2007-2016 Crafter Software Corporation.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.craftercms.engine.navigation.impl;
 
 import java.util.List;
 
 import org.craftercms.commons.converters.Converter;
-import org.craftercms.commons.lang.Callback;
-import org.craftercms.core.service.Context;
 import org.craftercms.core.service.Item;
-import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.navigation.NavItem;
 import org.craftercms.engine.service.SiteItemService;
@@ -18,14 +31,15 @@ import org.mockito.stubbing.Answer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.anyVararg;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Created by alfonsovasquez on 24/11/16.
+ * Unit tests for {@link NavBreadcrumbBuilderImpl}.
+ *
+ * @author avasquez
  */
 public class NavBreadcrumbBuilderImplTest {
 
@@ -34,7 +48,6 @@ public class NavBreadcrumbBuilderImplTest {
     @Before
     public void setUp() throws Exception {
         navBreadcrumbBuilder = new NavBreadcrumbBuilderImpl();
-        navBreadcrumbBuilder.setCacheTemplate(getCacheTemplate());
         navBreadcrumbBuilder.setSiteItemService(getSiteItemService());
         navBreadcrumbBuilder.setDefaultItemConverter(getItemConverter());
 
@@ -98,20 +111,6 @@ public class NavBreadcrumbBuilderImplTest {
         }).when(converter).convert(any(SiteItem.class));
 
         return converter;
-    }
-
-    protected CacheTemplate getCacheTemplate() {
-        CacheTemplate cacheTemplate = mock(CacheTemplate.class);
-        doAnswer(new Answer() {
-
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                return ((Callback)invocation.getArguments()[1]).execute();
-            }
-
-        }).when(cacheTemplate).getObject(any(Context.class), any(Callback.class), anyVararg());
-
-        return cacheTemplate;
     }
 
     private void setUpCurrentSiteContext() {

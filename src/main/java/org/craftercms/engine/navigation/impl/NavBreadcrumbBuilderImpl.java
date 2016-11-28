@@ -20,18 +20,16 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.craftercms.commons.converters.Converter;
-import org.craftercms.commons.lang.Callback;
 import org.craftercms.commons.lang.UrlUtils;
 import org.craftercms.core.processors.ItemProcessor;
 import org.craftercms.core.processors.impl.ItemProcessorPipeline;
-import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.core.util.cache.impl.CachingAwareList;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.navigation.NavBreadcrumbBuilder;
 import org.craftercms.engine.navigation.NavItem;
 import org.craftercms.engine.properties.SiteProperties;
 import org.craftercms.engine.service.SiteItemService;
-import org.craftercms.engine.service.context.SiteContext;
+import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Default implementation of {@link NavBreadcrumbBuilderImpl}.
@@ -42,15 +40,11 @@ public class NavBreadcrumbBuilderImpl implements NavBreadcrumbBuilder {
 
     public static final String BREADCRUMB_CONST_KEY_ELEM = "breadcrumb";
 
-    protected CacheTemplate cacheTemplate;
     protected SiteItemService siteItemService;
     protected ItemProcessor processor;
     protected Converter<SiteItem, NavItem> defaultItemConverter;
 
-    public void setCacheTemplate(CacheTemplate cacheTemplate) {
-        this.cacheTemplate = cacheTemplate;
-    }
-
+    @Required
     public void setSiteItemService(SiteItemService siteItemService) {
         this.siteItemService = siteItemService;
     }
@@ -73,24 +67,7 @@ public class NavBreadcrumbBuilderImpl implements NavBreadcrumbBuilder {
     }
 
     @Override
-    public List<NavItem> getBreadcrumb(final String url, final String root,
-                                       final Converter<SiteItem, NavItem> itemConverter) {
-        SiteContext siteContext = SiteContext.getCurrent();
-        if (siteContext != null) {
-            return cacheTemplate.getObject(siteContext.getContext(), new Callback<List<NavItem>>() {
-
-                @Override
-                public List<NavItem> execute() {
-                    return doBuildBreadcrumb(url, root, itemConverter);
-                }
-
-            }, url, root, itemConverter, BREADCRUMB_CONST_KEY_ELEM);
-        } else {
-            return null;
-        }
-    }
-
-    protected List<NavItem> doBuildBreadcrumb(String url, String root, Converter<SiteItem, NavItem> itemConverter) {
+    public List<NavItem> getBreadcrumb(String url, String root, Converter<SiteItem, NavItem> itemConverter) {
         if (itemConverter == null) {
             itemConverter = defaultItemConverter;
         }
