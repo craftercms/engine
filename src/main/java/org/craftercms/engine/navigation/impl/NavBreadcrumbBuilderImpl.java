@@ -16,6 +16,7 @@
  */
 package org.craftercms.engine.navigation.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -23,7 +24,6 @@ import org.craftercms.commons.converters.Converter;
 import org.craftercms.commons.lang.UrlUtils;
 import org.craftercms.core.processors.ItemProcessor;
 import org.craftercms.core.processors.impl.ItemProcessorPipeline;
-import org.craftercms.core.util.cache.impl.CachingAwareList;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.navigation.NavBreadcrumbBuilder;
 import org.craftercms.engine.navigation.NavItem;
@@ -72,7 +72,7 @@ public class NavBreadcrumbBuilderImpl implements NavBreadcrumbBuilder {
             itemConverter = defaultItemConverter;
         }
 
-        CachingAwareList<NavItem> breadcrumb = new CachingAwareList<>();
+        List<NavItem> breadcrumb = new ArrayList<>();
         String breadcrumbUrl = extractBreadcrumbUrl(url, root);
         String[] breadcrumbUrlComponents = breadcrumbUrl.split("/");
         String currentUrl = root;
@@ -84,7 +84,6 @@ public class NavBreadcrumbBuilderImpl implements NavBreadcrumbBuilder {
             NavItem navItem = itemConverter.convert(siteItem);
 
             breadcrumb.add(navItem);
-            breadcrumb.addDependencyKey(siteItem.getItem().getKey());
         }
 
         return breadcrumb;
