@@ -35,7 +35,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
- * Created by alfonsovasquez on 19/9/16.
+ * Default implementation of {@link NavTreeBuilderImpl}.
+ *
+ * @author avasquez
  */
 public class NavTreeBuilderImpl implements NavTreeBuilder {
 

@@ -34,7 +34,10 @@ import org.springframework.beans.factory.annotation.Required;
  * Helper class to create navigation breadcrumbs.
  *
  * @author Alfonso Vásquez
+ *
+ * @deprecated Please use instead {@link org.craftercms.engine.navigation.NavBreadcrumbBuilder}.
  */
+@Deprecated
 public class BreadcrumbBuilder {
 
     public static final String BREADCRUMB_CONST_KEY_ELEM = "breadcrumb";

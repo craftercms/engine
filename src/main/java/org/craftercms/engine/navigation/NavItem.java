@@ -19,7 +19,10 @@ package org.craftercms.engine.navigation;
 import java.util.List;
 
 /**
- * Created by alfonsovasquez on 19/9/16.
+ * Represents a navigation item with label, rendering URL, a flag that indicates that it's an active item (is part of the current
+ * request) and sub navigation items when applicable.
+ *
+ * @author avasquez
  */
 public class NavItem {
 

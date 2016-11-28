@@ -22,7 +22,10 @@ import org.craftercms.core.service.Item;
 import org.craftercms.core.service.ItemFilter;
 
 /**
- * Created by alfonsovasquez on 8/10/16.
+ * Simple {@link ItemFilter} that checks the accepted items list to check if the same item is not already there (some processors can
+ * generate the same item twice for different URLs). If the item is already there, it's rejected.
+ *
+ * @author avasquez
  */
 public class RejectDuplicatesItemFilter implements ItemFilter {
 

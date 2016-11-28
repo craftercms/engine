@@ -25,7 +25,10 @@ import org.craftercms.engine.service.UrlTransformationService;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
- * Created by alfonsovasquez on 19/9/16.
+ * Default converter from {@link SiteItem} to {@link NavItem}. To generate the URL, it uses a URL transformer, and to generate the
+ * navigation label it uses the nav label element in the content, the internal name element or the file name, in that order.
+ *
+ * @author avasquez
  */
 public class DefaultItemConverter implements Converter<SiteItem, NavItem> {
 
@@ -79,6 +82,16 @@ public class DefaultItemConverter implements Converter<SiteItem, NavItem> {
 
     protected String getNavigationUrl(SiteItem siteItem) {
         return urlTransformationService.transform(storeUrlToRenderUrlTransformerName, siteItem.getStoreUrl());
+    }
+
+    @Override
+    public String toString() {
+        return "DefaultItemConverter{" +
+               "navLabelXPath='" + navLabelXPath + '\'' +
+               ", internalNameXPath='" + internalNameXPath + '\'' +
+               ", storeUrlToRenderUrlTransformerName='" + storeUrlToRenderUrlTransformerName + '\'' +
+               ", urlTransformationService=" + urlTransformationService +
+               '}';
     }
 
 }
