@@ -32,6 +32,7 @@ import freemarker.template.SimpleHash;
 import freemarker.template.TemplateHashModel;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.ArrayUtils;
+import org.craftercms.engine.freemarker.ExecuteControllerDirective;
 import org.craftercms.engine.freemarker.RenderComponentDirective;
 import org.craftercms.engine.freemarker.ServletContextHashModel;
 import org.craftercms.engine.scripting.ScriptResolver;
@@ -57,6 +58,7 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerView;
 public class CrafterFreeMarkerView extends FreeMarkerView {
 
     public static final String RENDER_COMPONENT_DIRECTIVE_NAME = "renderComponent";
+    public static final String EXECUTE_CONTROLLER_DIRECTIVE_NAME = "executeController";
 
     public static final String KEY_APPLICATION_CAP = "Application";
     public static final String KEY_APPLICATION = "application";
@@ -216,7 +218,11 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
         renderComponentDirective.setScriptResolver(componentScriptResolver);
         renderComponentDirective.setServletContext(getServletContext());
 
+        ExecuteControllerDirective executeControllerDirective = new ExecuteControllerDirective();
+        executeControllerDirective.setServletContext(getServletContext());
+
         templateModel.put(RENDER_COMPONENT_DIRECTIVE_NAME, renderComponentDirective);
+        templateModel.put(EXECUTE_CONTROLLER_DIRECTIVE_NAME, executeControllerDirective);
 
         return templateModel;
     }

@@ -236,14 +236,22 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
         Map<String, Object> variables = new HashMap<String, Object>();
         RequestContext context = RequestContext.getCurrent();
 
-        GroovyScriptUtils.addComponentScriptVariables(variables, context.getRequest(), context.getResponse(),
-                                                      servletContext, component, model);
+        if (context != null) {
+            GroovyScriptUtils.addSiteItemScriptVariables(variables, context.getRequest(), context.getResponse(),
+                                                         servletContext, component, model);
+        } else {
+            throw new IllegalStateException("No current request context found");
+        }
 
         return variables;
     }
 
     protected void executeScript(Script script, Map<String, Object> scriptVariables, Environment env)
         throws TemplateException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Executing component script at " + script.getUrl());
+        }
+
         try {
             script.execute(scriptVariables);
         } catch (Exception e) {
