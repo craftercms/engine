@@ -75,30 +75,22 @@ public class GroovyScriptUtils {
         addSecurityVariables(variables);
     }
 
-    public static void addPageScriptVariables(Map<String, Object> variables, HttpServletRequest request,
-                                              HttpServletResponse response, ServletContext servletContext,
-                                              SiteItem page, Map<String, Object> model) {
+    public static void addSiteItemScriptVariables(Map<String, Object> variables, HttpServletRequest request,
+                                                  HttpServletResponse response, ServletContext servletContext,
+                                                  SiteItem item, Object templateModel) {
         addCommonVariables(variables, request, response, servletContext);
         addSecurityVariables(variables);
-        addContentModelVariable(variables, page);
-        addTemplateModelVariable(variables, model);
+        addContentModelVariable(variables, item);
+        addTemplateModelVariable(variables, templateModel);
     }
 
-    public static void addComponentScriptVariables(Map<String, Object> variables, HttpServletRequest request,
-                                                   HttpServletResponse response, ServletContext servletContext,
-                                                   SiteItem component, Map<String, Object> model) {
-        addCommonVariables(variables, request, response, servletContext);
-        addSecurityVariables(variables);
-        addContentModelVariable(variables, component);
-        addTemplateModelVariable(variables, model);
-    }
 
     public static void addControllerScriptVariables(Map<String, Object> variables, HttpServletRequest request,
                                                     HttpServletResponse response, ServletContext servletContext,
-                                                    Map<String, Object> model) {
+                                                    Object templateModel) {
         addCommonVariables(variables, request, response, servletContext);
         addSecurityVariables(variables);
-        addTemplateModelVariable(variables, model);
+        addTemplateModelVariable(variables, templateModel);
     }
 
     public static void addFilterScriptVariables(Map<String, Object> variables, HttpServletRequest request,
