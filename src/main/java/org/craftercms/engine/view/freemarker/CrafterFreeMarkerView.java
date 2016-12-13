@@ -58,7 +58,7 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerView;
 public class CrafterFreeMarkerView extends FreeMarkerView {
 
     public static final String RENDER_COMPONENT_DIRECTIVE_NAME = "renderComponent";
-    public static final String EXECUTE_CONTROLLER_DIRECTIVE_NAME = "executeController";
+    public static final String EXECUTE_CONTROLLER_DIRECTIVE_NAME = "controller";
 
     public static final String KEY_APPLICATION_CAP = "Application";
     public static final String KEY_APPLICATION = "application";
