@@ -81,9 +81,12 @@ public class NavBreadcrumbBuilderImpl implements NavBreadcrumbBuilder {
             currentUrl = UrlUtils.concat(currentUrl, breadcrumbUrlComponent);
 
             SiteItem siteItem = siteItemService.getSiteItem(currentUrl, processor);
-            NavItem navItem = itemConverter.convert(siteItem);
-
-            breadcrumb.add(navItem);
+            if (siteItem != null) {
+                NavItem navItem = itemConverter.convert(siteItem);
+                if (navItem != null) {
+                    breadcrumb.add(navItem);
+                }
+            }
         }
 
         return breadcrumb;
