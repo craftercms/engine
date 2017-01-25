@@ -26,7 +26,8 @@ import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Default converter from {@link SiteItem} to {@link NavItem}. To generate the URL, it uses a URL transformer, and to generate the
- * navigation label it uses the nav label element in the content, the internal name element or the file name, in that order.
+ * navigation label it uses the nav label element in the content, the internal name element or the file name, in that order. If the
+ * {@link SiteItem} has no content, null is returned (items with no content, like folders with no index.xml, should not be navigable).
  *
  * @author avasquez
  */
@@ -59,9 +60,13 @@ public class DefaultItemConverter implements Converter<SiteItem, NavItem> {
 
     @Override
     public NavItem convert(SiteItem siteItem) {
-        NavItem navItem = new NavItem();
-        navItem.setLabel(getNavigationLabel(siteItem));
-        navItem.setUrl(getNavigationUrl(siteItem));
+        NavItem navItem = null;
+
+        if (siteItem.getDom() != null) {
+            navItem = new NavItem();
+            navItem.setLabel(getNavigationLabel(siteItem));
+            navItem.setUrl(getNavigationUrl(siteItem));
+        }
 
         return navItem;
     }
