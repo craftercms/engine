@@ -82,8 +82,7 @@ public class PageRenderController extends AbstractController {
                 pageUrl = (String)request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
                 if (StringUtils.isEmpty(pageUrl)) {
                     throw new IllegalStateException(
-                        "Required request attribute '" + HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE +
-                        "' is not set");
+                        "Required request attribute '" + HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE + "' is not set");
                 }
 
                 Script controllerScript = getControllerScript(siteContext, request, pageUrl);
