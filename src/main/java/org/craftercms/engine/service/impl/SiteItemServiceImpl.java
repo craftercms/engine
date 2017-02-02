@@ -24,8 +24,11 @@ import java.util.Map;
 
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.Predicate;
+import org.apache.commons.collections4.PredicateUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.craftercms.commons.converters.Converter;
 import org.craftercms.core.processors.ItemProcessor;
 import org.craftercms.core.processors.impl.ItemProcessorPipeline;
 import org.craftercms.core.service.Content;
@@ -35,7 +38,6 @@ import org.craftercms.core.service.ItemFilter;
 import org.craftercms.core.service.Tree;
 import org.craftercms.core.service.impl.CompositeItemFilter;
 import org.craftercms.engine.model.SiteItem;
-import org.craftercms.engine.model.converters.ModelValueConverter;
 import org.craftercms.engine.service.SiteItemService;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.service.filter.ExcludeByNameItemFilter;
@@ -51,14 +53,19 @@ import org.springframework.beans.factory.annotation.Required;
 public class SiteItemServiceImpl implements SiteItemService {
 
     protected ContentStoreService storeService;
+    protected List<Predicate<Item>> defaultPredicates;
     protected List<ItemFilter> defaultFilters;
     protected List<ItemProcessor> defaultProcessors;
-    protected Map<String, ModelValueConverter<?>> modelValueConverters;
+    protected Map<String, Converter<String, ?>> modelValueConverters;
     protected Comparator<SiteItem> sortComparator;
 
     @Required
     public void setStoreService(ContentStoreService storeService) {
         this.storeService = storeService;
+    }
+
+    public void setDefaultPredicates(List<Predicate<Item>> defaultPredicates) {
+        this.defaultPredicates = defaultPredicates;
     }
 
     public void setDefaultFilters(List<ItemFilter> defaultFilters) {
@@ -70,12 +77,17 @@ public class SiteItemServiceImpl implements SiteItemService {
     }
 
     @Required
-    public void setModelValueConverters(Map<String, ModelValueConverter<?>> modelValueConverters) {
+    public void setModelValueConverters(Map<String, Converter<String, ?>> modelValueConverters) {
         this.modelValueConverters = modelValueConverters;
     }
 
     public void setSortComparator(Comparator<SiteItem> sortComparator) {
         this.sortComparator = sortComparator;
+    }
+
+    @Override
+    public Content getRawContent(String url) {
+        return storeService.findContent(getSiteContext().getContext(), url);
     }
 
     @Override
@@ -85,6 +97,20 @@ public class SiteItemServiceImpl implements SiteItemService {
 
     @Override
     public SiteItem getSiteItem(String url, ItemProcessor processor) {
+        return getSiteItem(url, processor, null);
+    }
+
+    @Override
+    public SiteItem getSiteItem(String url, ItemProcessor processor, Predicate<Item> predicate) {
+        if (CollectionUtils.isNotEmpty(defaultPredicates)) {
+            List<Predicate<Item>> predicates = new ArrayList<>(defaultPredicates);
+
+            if (predicate != null) {
+                predicates.add(predicate);
+            }
+
+            predicate = PredicateUtils.allPredicate(predicates);
+        }
         if (CollectionUtils.isNotEmpty(defaultProcessors)) {
             ItemProcessorPipeline processorPipeline = new ItemProcessorPipeline(new ArrayList<>(defaultProcessors));
 
@@ -96,7 +122,7 @@ public class SiteItemServiceImpl implements SiteItemService {
         }
 
         Item item = storeService.findItem(getSiteContext().getContext(), null, url, processor);
-        if (item != null) {
+        if (item != null && (predicate == null || predicate.evaluate(item))) {
             return createItemWrapper(item);
         } else {
             return null;
@@ -136,11 +162,6 @@ public class SiteItemServiceImpl implements SiteItemService {
         } else {
             return null;
         }
-    }
-
-    @Override
-    public Content getRawContent(String url) {
-        return storeService.findContent(getSiteContext().getContext(), url);
     }
 
     @Deprecated

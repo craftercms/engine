@@ -74,6 +74,23 @@
 
     <!-- ////////////////////////////////// -->
     <!--								 	-->
+    <!--			 Converters 			-->
+    <!--									-->
+    <!-- ////////////////////////////////// -->
+
+    <bean id="crafter.stringToIntegerConverter" class="org.craftercms.commons.converters.impl.StringToIntegerConverter"/>
+    <bean id="crafter.stringToLongConverter" class="org.craftercms.commons.converters.impl.StringToLongConverter"/>
+    <bean id="crafter.stringToBooleanConverter" class="org.craftercms.commons.converters.impl.StringToBooleanConverter"/>
+    <bean id="crafter.stringToFloatConverter" class="org.craftercms.commons.converters.impl.StringToFloatConverter"/>
+    <bean id="crafter.stringToDoubleConverter" class="org.craftercms.commons.converters.impl.StringToDoubleConverter"/>
+
+    <bean id="crafter.stringToUtcDateConverter" class="org.craftercms.commons.converters.impl.StringToDateConverter">
+        <property name="datePattern" value="${crafter.engine.model.datetime.pattern}"/>
+        <property name="timeZone" value="UTC"/>
+    </bean>
+
+    <!-- ////////////////////////////////// -->
+    <!--								 	-->
     <!--		      Merging 			    -->
     <!--									-->
     <!-- ////////////////////////////////// -->
@@ -136,36 +153,62 @@
     <!--									-->
     <!-- ////////////////////////////////// -->
 
+    <bean id="crafter.disabledItemPredicate" class="org.craftercms.engine.util.predicates.DisabledItemPredicate">
+        <property name="disabledXPathQuery" value="${crafter.engine.model.disabled.xpathQuery}"/>
+    </bean>
+
+    <bean id="crafter.expiredItemPredicate" class="org.craftercms.engine.util.predicates.ExpiredItemPredicate">
+        <property name="expiredXPathQuery" value="${crafter.engine.model.expired.xpathQuery}"/>
+        <property name="dateConverter" ref="crafter.stringToUtcDateConverter"/>
+    </bean>
+
+    <bean id="crafter.expiredDtItemPredicate" class="org.craftercms.engine.util.predicates.ExpiredItemPredicate">
+        <property name="expiredXPathQuery" value="${crafter.engine.model.expiredDt.xpathQuery}"/>
+        <property name="dateConverter" ref="crafter.stringToUtcDateConverter"/>
+    </bean>
+
     <bean id="crafter.excludeLevelDescriptorItemFilter" 
           class="org.craftercms.engine.service.filter.ExcludeByNameItemFilter">
         <constructor-arg value="${crafter.core.merger.strategy.inheritLevels.levelDescriptor.name}"/>
     </bean>
 
+    <bean id="crafter.excludeDisabledItemFilter" class="org.craftercms.engine.util.predicates.PredicateBasedFilter">
+        <constructor-arg ref="crafter.disabledItemPredicate"/>
+    </bean>
+
+    <bean id="crafter.excludeExpiredItemFilter" class="org.craftercms.engine.util.predicates.PredicateBasedFilter">
+        <constructor-arg ref="crafter.expiredItemPredicate"/>
+    </bean>
+
+    <bean id="crafter.excludeExpiredDtItemFilter" class="org.craftercms.engine.util.predicates.PredicateBasedFilter">
+        <constructor-arg ref="crafter.expiredDtItemPredicate"/>
+    </bean>
+
     <bean id="crafter.siteItemService" class="org.craftercms.engine.service.impl.SiteItemServiceImpl">
         <property name="storeService" ref="crafter.contentStoreService"/>
-        <property name="modelValueConverters">
-            <map>
-                <entry key="i">
-                    <bean class="org.craftercms.engine.model.converters.IntegerConverter"/>
-                </entry>
-                <entry key="l">
-                    <bean class="org.craftercms.engine.model.converters.LongConverter"/>
-                </entry>
-                <entry key="b">
-                    <bean class="org.craftercms.engine.model.converters.BooleanConverter"/>
-                </entry>
-                <entry key="f">
-                    <bean class="org.craftercms.engine.model.converters.FloatConverter"/>
-                </entry>
-                <entry key="d">
-                    <bean class="org.craftercms.engine.model.converters.DoubleConverter"/>
-                </entry>
-            </map>
+        <property name="defaultPredicates">
+            <list>
+                <ref bean="crafter.disabledItemPredicate"/>
+                <ref bean="crafter.expiredItemPredicate"/>
+                <ref bean="crafter.expiredDtItemPredicate"/>
+            </list>
         </property>
         <property name="defaultFilters">
             <list>
                 <ref bean="crafter.excludeLevelDescriptorItemFilter"/>
+                <ref bean="crafter.excludeDisabledItemFilter"/>
+                <ref bean="crafter.excludeExpiredItemFilter"/>
+                <ref bean="crafter.excludeExpiredDtItemFilter"/>
             </list>
+        </property>
+        <property name="modelValueConverters">
+            <map>
+                <entry key="i" value-ref="crafter.stringToIntegerConverter"/>
+                <entry key="l" value-ref="crafter.stringToLongConverter"/>
+                <entry key="b" value-ref="crafter.stringToBooleanConverter"/>
+                <entry key="f" value-ref="crafter.stringToFloatConverter"/>
+                <entry key="d" value-ref="crafter.stringToDoubleConverter"/>
+            </map>
         </property>
         <property name="sortComparator">
             <bean class="org.craftercms.engine.model.sorting.OrderDefaultComparator"/>
