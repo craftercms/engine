@@ -88,18 +88,19 @@ public class BreadcrumbBuilder {
                     }
 
                     Item item = storeService.getItem(context, UrlUtils.concat(currentUrl, indexFileName));
-                    String breadcrumbName = item.queryDescriptorValue(breadcrumbNameXPathQuery);
-                    if (StringUtils.isEmpty(breadcrumbName)) {
-                        if (StringUtils.isNotEmpty(breadcrumbUrlComponent)) {
-                            breadcrumbName = StringUtils.capitalize(
-                                breadcrumbUrlComponent.replace("-", " ").replace(".xml", ""));
-                        } else {
-                            breadcrumbName = HOME_BREADCRUMB_NAME;
+                    if (item != null && item.getDescriptorDom() != null) {
+                        String breadcrumbName = item.queryDescriptorValue(breadcrumbNameXPathQuery);
+                        if (StringUtils.isEmpty(breadcrumbName)) {
+                            if (StringUtils.isNotEmpty(breadcrumbUrlComponent)) {
+                                breadcrumbName = StringUtils.capitalize(breadcrumbUrlComponent.replace("-", " ").replace(".xml", ""));
+                            } else {
+                                breadcrumbName = HOME_BREADCRUMB_NAME;
+                            }
                         }
-                    }
 
-                    breadcrumb.add(new BreadcrumbItem(currentUrl, breadcrumbName));
-                    breadcrumb.addDependencyKey(item.getKey());
+                        breadcrumb.add(new BreadcrumbItem(currentUrl, breadcrumbName));
+                        breadcrumb.addDependencyKey(item.getKey());
+                    }
                 }
 
                 return breadcrumb;
