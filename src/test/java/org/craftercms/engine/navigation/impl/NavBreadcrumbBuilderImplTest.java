@@ -24,6 +24,7 @@ import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.navigation.NavItem;
 import org.craftercms.engine.service.SiteItemService;
 import org.craftercms.engine.service.context.SiteContext;
+import org.dom4j.Document;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
@@ -67,6 +68,15 @@ public class NavBreadcrumbBuilderImplTest {
         assertEquals("About Us", breadcrumb.get(1).getLabel());
         assertEquals("/en/about-us/leadership-team", breadcrumb.get(2).getUrl());
         assertEquals("Leadership Team", breadcrumb.get(2).getLabel());
+
+        breadcrumb = navBreadcrumbBuilder.getBreadcrumb("/site/website/en_US/products/flagship", "/site/website/en_US");
+
+        assertNotNull(breadcrumb);
+        assertEquals(2, breadcrumb.size());
+        assertEquals("/en_US", breadcrumb.get(0).getUrl());
+        assertEquals("Home", breadcrumb.get(0).getLabel());
+        assertEquals("/en_US/products/flagship", breadcrumb.get(1).getUrl());
+        assertEquals("Flagship", breadcrumb.get(1).getLabel());
     }
 
     protected SiteItemService getSiteItemService() {
@@ -74,21 +84,35 @@ public class NavBreadcrumbBuilderImplTest {
         when(enUsItem.getStoreUrl()).thenReturn("/site/website/en_US");
         when(enUsItem.get("navLabel")).thenReturn("Home");
         when(enUsItem.getItem()).thenReturn(mock(Item.class));
+        when(enUsItem.getDom()).thenReturn(mock(Document.class));
 
         SiteItem aboutUsItem = mock(SiteItem.class);
         when(aboutUsItem.getStoreUrl()).thenReturn("/site/website/en/about-us");
         when(aboutUsItem.get("navLabel")).thenReturn("About Us");
         when(aboutUsItem.getItem()).thenReturn(mock(Item.class));
+        when(aboutUsItem.getDom()).thenReturn(mock(Document.class));
 
         SiteItem leadershipTeamItem = mock(SiteItem.class);
         when(leadershipTeamItem.getStoreUrl()).thenReturn("/site/website/en/about-us/leadership-team");
         when(leadershipTeamItem.get("navLabel")).thenReturn("Leadership Team");
         when(leadershipTeamItem.getItem()).thenReturn(mock(Item.class));
+        when(leadershipTeamItem.getDom()).thenReturn(mock(Document.class));
+
+        SiteItem productsItem = mock(SiteItem.class);
+        when(productsItem.getStoreUrl()).thenReturn("/site/website/en_US/products");
+
+        SiteItem flagshipProductItem = mock(SiteItem.class);
+        when(flagshipProductItem.getStoreUrl()).thenReturn("/site/website/en_US/products/flagship");
+        when(flagshipProductItem.get("navLabel")).thenReturn("Flagship");
+        when(flagshipProductItem.getItem()).thenReturn(mock(Item.class));
+        when(flagshipProductItem.getDom()).thenReturn(mock(Document.class));
 
         SiteItemService siteItemService = mock(SiteItemService.class);
         when(siteItemService.getSiteItem("/site/website/en_US", null)).thenReturn(enUsItem);
         when(siteItemService.getSiteItem("/site/website/en_US/about-us", null)).thenReturn(aboutUsItem);
         when(siteItemService.getSiteItem("/site/website/en_US/about-us/leadership-team", null)).thenReturn(leadershipTeamItem);
+        when(siteItemService.getSiteItem("/site/website/en_US/products", null)).thenReturn(productsItem);
+        when(siteItemService.getSiteItem("/site/website/en_US/products/flagship", null)).thenReturn(flagshipProductItem);
 
         return siteItemService;
     }
@@ -100,10 +124,13 @@ public class NavBreadcrumbBuilderImplTest {
             @Override
             public NavItem answer(InvocationOnMock invocation) throws Throwable {
                 SiteItem siteItem = (SiteItem)invocation.getArguments()[0];
-                NavItem navItem = new NavItem();
+                NavItem navItem = null;
 
-                navItem.setUrl(siteItem.getStoreUrl().replace("/site/website", ""));
-                navItem.setLabel((String)siteItem.get("navLabel"));
+                if (siteItem.getDom() != null) {
+                    navItem = new NavItem();
+                    navItem.setUrl(siteItem.getStoreUrl().replace("/site/website", ""));
+                    navItem.setLabel((String)siteItem.get("navLabel"));
+                }
 
                 return navItem;
             }
