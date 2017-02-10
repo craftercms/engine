@@ -18,8 +18,10 @@ package org.craftercms.engine.service;
 
 import java.util.Map;
 
+import org.apache.commons.collections4.Predicate;
 import org.craftercms.core.processors.ItemProcessor;
 import org.craftercms.core.service.Content;
+import org.craftercms.core.service.Item;
 import org.craftercms.core.service.ItemFilter;
 import org.craftercms.engine.model.SiteItem;
 
@@ -29,6 +31,13 @@ import org.craftercms.engine.model.SiteItem;
  * @author Alfonso Vásquez
  */
 public interface SiteItemService {
+
+    /**
+     * Returns the raw content of a site item.
+     *
+     * @param url   the URL of the item
+     */
+    Content getRawContent(String url);
 
     /**
      * Returns the site item for the given URL
@@ -44,6 +53,15 @@ public interface SiteItemService {
      * @param processor a processor for the item
      */
     SiteItem getSiteItem(String url, ItemProcessor processor);
+
+    /**
+     * Returns the site item for the given URL
+     *
+     * @param url       the URL of the item
+     * @param processor a processor for the item
+     * @param predicate a predicate used to check if the item should be returned or not
+     */
+    SiteItem getSiteItem(String url, ItemProcessor processor, Predicate<Item> predicate);
 
     /**
      * Returns the site tree for the given URL. The item is expected to be a folder.
@@ -62,13 +80,6 @@ public interface SiteItemService {
      * @param processor a processor for the tree items
      */
     SiteItem getSiteTree(String url, int depth, ItemFilter filter, ItemProcessor processor);
-
-    /**
-     * Returns the raw content of a site item.
-     *
-     * @param url   the URL of the item
-     */
-    Content getRawContent(String url);
 
     /**
      * Returns the site tree for the given URL. The item is expected to be a folder.

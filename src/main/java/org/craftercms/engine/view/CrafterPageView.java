@@ -66,7 +66,6 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
     protected transient Long cachingTime;
 
     protected SiteItem page;
-    protected boolean modePreview;
     protected Locale locale;
     protected SiteItemService siteItemService;
     protected String pageViewNameXPathQuery;
@@ -86,11 +85,6 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
     @Required
     public void setLocale(Locale locale) {
         this.locale = locale;
-    }
-
-    @Required
-    public void setModePreview(boolean modePreview) {
-        this.modePreview = modePreview;
     }
 
     @Required

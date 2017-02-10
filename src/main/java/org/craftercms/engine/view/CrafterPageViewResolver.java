@@ -79,7 +79,6 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     protected ScriptResolver scriptResolver;
     protected ViewResolver delegatedViewResolver;
     protected UserAgentTemplateDetector userAgentTemplateDetector;
-    protected boolean modePreview;
     protected CrafterPageAccessManager accessManager;
 
     public CrafterPageViewResolver() {
@@ -94,11 +93,6 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
 
     public void setOrder(int order) {
         this.order = order;
-    }
-
-    @Required
-    public void setModePreview(boolean modePreview) {
-        this.modePreview = modePreview;
     }
 
     public void setCacheUrlTransformations(boolean cacheUrlTransformations) {
@@ -250,13 +244,6 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
                 public View execute() {
                     SiteItem page = getPage(url);
                     if (page != null) {
-                        String disabled = page.getItem().queryDescriptorValue(disabledXPathQuery);
-                        if (!modePreview && StringUtils.isNotEmpty(disabled) && Boolean.parseBoolean(disabled)) {
-                            // when a page is disabled it acts as if it does not exist this rule does not apply in
-                            // preview because we want authors to see the page
-                            return null;
-                        }
-
                         String redirectUrl = page.getItem().queryDescriptorValue(redirectUrlXPathQuery);
                         String contentType = page.getItem().queryDescriptorValue(contentTypeXPathQuery);
                         String forceHttps = page.getItem().queryDescriptorValue(forceHttpsXPathQuery);
@@ -271,7 +258,6 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
                             UserAgentAwareCrafterPageView view = new UserAgentAwareCrafterPageView();
                             view.setServletContext(getServletContext());
                             view.setPage(page);
-                            view.setModePreview(modePreview);
                             view.setLocale(locale);
                             view.setSiteItemService(siteItemService);
                             view.setPageViewNameXPathQuery(pageViewNameXPathQuery);

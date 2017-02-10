@@ -25,10 +25,10 @@ import java.util.Map;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.craftercms.commons.converters.Converter;
 import org.craftercms.core.service.Item;
 import org.craftercms.core.service.Tree;
 import org.craftercms.core.util.XmlUtils;
-import org.craftercms.engine.model.converters.ModelValueConverter;
 import org.dom4j.Document;
 import org.dom4j.Element;
 
@@ -44,10 +44,10 @@ public class SiteItem {
 
     protected Item item;
     protected List<SiteItem> childItems;
-    protected Map<String, ModelValueConverter<?>> modelValueConverters;
+    protected Map<String, Converter<String, ?>> modelValueConverters;
     protected Comparator<SiteItem> sortComparator;
 
-    public SiteItem(Item item, Map<String, ModelValueConverter<?>> modelValueConverters,
+    public SiteItem(Item item,Map<String, Converter<String, ?>> modelValueConverters,
                     Comparator<SiteItem> sortComparator) {
         this.item = item;
         this.modelValueConverters = modelValueConverters;
@@ -178,7 +178,7 @@ public class SiteItem {
 
         if (converterIdSuffixSepIdx >= 0) {
             String converterId = name.substring(converterIdSuffixSepIdx + 1);
-            ModelValueConverter<?> converter = modelValueConverters.get(converterId);
+            Converter<String, ?> converter = modelValueConverters.get(converterId);
 
             if (converter != null) {
                 if (logger.isDebugEnabled()) {

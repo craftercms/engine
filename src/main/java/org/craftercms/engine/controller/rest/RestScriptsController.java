@@ -112,8 +112,7 @@ public class RestScriptsController extends AbstractController {
         String baseUrl = UrlUtils.appendUrl(siteContext.getRestScriptsPath(),
                                             FilenameUtils.removeExtension(serviceUrl));
 
-        return String.format(SCRIPT_URL_FORMAT, baseUrl, request.getMethod().toLowerCase(),
-                             scriptFactory.getScriptFileExtension());
+        return String.format(SCRIPT_URL_FORMAT, baseUrl, request.getMethod().toLowerCase(), scriptFactory.getScriptFileExtension());
     }
 
     protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response) {
@@ -138,8 +137,7 @@ public class RestScriptsController extends AbstractController {
         } catch (Exception e) {
             logger.error("Error executing REST script at " + scriptUrl, e);
 
-            HttpStatusCodeAwareException cause = ExceptionUtils.getThrowableOfType(e,
-                                                                                   HttpStatusCodeAwareException.class);
+            HttpStatusCodeAwareException cause = ExceptionUtils.getThrowableOfType(e, HttpStatusCodeAwareException.class);
             String errorMsg;
 
             if (cause != null) {
