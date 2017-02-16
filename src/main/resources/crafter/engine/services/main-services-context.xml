@@ -404,8 +404,12 @@
     <!--									-->
     <!-- ////////////////////////////////// -->
 
-    <bean id="crafter.searchService" class="org.craftercms.search.service.impl.SolrRestClientSearchService">
-        <property name="serverUrl" value="${crafter.engine.search.server.url}"/>
+    <bean id="crafter.searchService" class="org.craftercms.engine.search.SiteAwareSearchService">
+        <property name="actualSearchService">
+            <bean class="org.craftercms.search.service.impl.SolrRestClientSearchService">
+                <property name="serverUrl" value="${crafter.engine.search.server.url}"/>
+            </bean>
+        </property>
     </bean>
 
     <!-- ////////////////////////////////// -->
