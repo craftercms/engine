@@ -33,14 +33,13 @@ import org.springframework.beans.factory.annotation.Required;
 /**
  * {@link SearchService} wrapper that forces all operations to use an index ID based on the current site. If a method
  * is called with no index ID, one is created by appending the current site name + a separator + a default index
- * suffix. If an index ID is provided, then the actual, final index ID is formed by appending the current site name +
- * a separator + the provided index ID as a suffix.
+ * suffix. If an index ID is provided, then the actual, final index ID is formed by appending the current site name + a
+ * separator + the provided index ID as a suffix.
  *
  * @author avasquez
  */
 public class SiteAwareSearchService implements SearchService, QueryFactory<Query> {
 
-    public static final String DEFAULT_DEFAULT_INDEX_ID_SUFFIX = "default";
     public static final String DEFAULT_INDEX_ID_SEPARATOR = "-";
 
     protected String defaultIndexIdSuffix;
@@ -49,7 +48,6 @@ public class SiteAwareSearchService implements SearchService, QueryFactory<Query
     protected SearchService actualSearchService;
 
     public SiteAwareSearchService() {
-        defaultIndexIdSuffix = DEFAULT_DEFAULT_INDEX_ID_SUFFIX;
         indexIdSeparator = DEFAULT_INDEX_ID_SEPARATOR;
     }
 
@@ -163,8 +161,10 @@ public class SiteAwareSearchService implements SearchService, QueryFactory<Query
 
         if (StringUtils.isNotEmpty(indexIdSuffix)) {
             actualIndexId = getCurrentSiteName() + indexIdSeparator + indexIdSuffix;
-        } else {
+        } else if (StringUtils.isNotEmpty(defaultIndexIdSuffix)) {
             actualIndexId = getCurrentSiteName() + indexIdSeparator + defaultIndexIdSuffix;
+        } else {
+            actualIndexId = getCurrentSiteName();
         }
 
         return actualIndexId;
