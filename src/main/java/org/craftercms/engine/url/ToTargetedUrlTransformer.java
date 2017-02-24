@@ -21,7 +21,7 @@ import org.craftercms.core.exception.UrlTransformationException;
 import org.craftercms.core.service.CachingOptions;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.url.UrlTransformer;
-import org.craftercms.core.util.UrlUtils;
+import org.craftercms.commons.lang.UrlUtils;
 import org.craftercms.engine.targeting.TargetedUrlStrategy;
 import org.craftercms.engine.util.TargetingUtils;
 import org.craftercms.engine.properties.SiteProperties;
@@ -55,7 +55,7 @@ public class ToTargetedUrlTransformer implements UrlTransformer {
                 String relativeUrl = StringUtils.substringAfter(url, rootFolder);
                 String targetedUrl = targetedUrlStrategy.toTargetedUrl(relativeUrl, forceCurrentTargetId);
 
-                return UrlUtils.appendUrl(rootFolder, targetedUrl);
+                return UrlUtils.concat(rootFolder, targetedUrl);
             }
         }
 

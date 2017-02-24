@@ -27,7 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.core.util.ExceptionUtils;
-import org.craftercms.core.util.UrlUtils;
+import org.craftercms.commons.lang.UrlUtils;
 import org.craftercms.engine.exception.HttpStatusCodeAwareException;
 import org.craftercms.engine.exception.ScriptNotFoundException;
 import org.craftercms.engine.scripting.ScriptFactory;
@@ -109,7 +109,7 @@ public class RestScriptsController extends AbstractController {
 
     protected String getScriptUrl(ScriptFactory scriptFactory, SiteContext siteContext, HttpServletRequest request,
                                   String serviceUrl) {
-        String baseUrl = UrlUtils.appendUrl(siteContext.getRestScriptsPath(),
+        String baseUrl = UrlUtils.concat(siteContext.getRestScriptsPath(),
                                             FilenameUtils.removeExtension(serviceUrl));
 
         return String.format(SCRIPT_URL_FORMAT, baseUrl, request.getMethod().toLowerCase(),

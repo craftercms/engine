@@ -5,7 +5,7 @@ import java.net.URL;
 
 import groovy.lang.GroovyResourceLoader;
 import org.apache.commons.lang3.StringUtils;
-import org.craftercms.core.util.UrlUtils;
+import org.craftercms.commons.lang.UrlUtils;
 import org.craftercms.engine.scripting.impl.GroovyScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.url.ContentStoreUrlStreamHandler;
@@ -37,7 +37,7 @@ public class ContentStoreGroovyResourceLoader implements GroovyResourceLoader {
             filename += "." + GroovyScriptFactory.GROOVY_FILE_EXTENSION;
         }
         if (StringUtils.isNotEmpty(groovyResourcesUrlPrefix)) {
-            filename = UrlUtils.appendUrl(groovyResourcesUrlPrefix, filename);
+            filename = UrlUtils.concat(groovyResourcesUrlPrefix, filename);
         }
 
         if (siteContext.getStoreService().exists(siteContext.getContext(), filename)){
