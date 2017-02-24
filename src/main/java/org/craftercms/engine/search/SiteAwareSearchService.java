@@ -17,6 +17,7 @@
 package org.craftercms.engine.search;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -93,67 +94,78 @@ public class SiteAwareSearchService implements SearchService, QueryFactory<Query
     }
 
     @Override
-    public String update(String site, String id, String xml, boolean ignoreRootInFieldNames) throws SearchException {
-        return actualSearchService.update(getActualIndexId(null), site, id, xml, ignoreRootInFieldNames);
+    public void update(String site, String id, String xml, boolean ignoreRootInFieldNames) throws SearchException {
+        actualSearchService.update(getActualIndexId(null), site, id, xml, ignoreRootInFieldNames);
     }
 
     @Override
-    public String update(String indexId, String site, String id, String xml,
+    public void update(String indexId, String site, String id, String xml,
                          boolean ignoreRootInFieldNames) throws SearchException {
-        return actualSearchService.update(getActualIndexId(indexId), site, id, xml, ignoreRootInFieldNames);
+        actualSearchService.update(getActualIndexId(indexId), site, id, xml, ignoreRootInFieldNames);
     }
 
     @Override
-    public String delete(String site, String id) throws SearchException {
-        return actualSearchService.delete(getActualIndexId(null), site, id);
+    public void delete(String site, String id) throws SearchException {
+        actualSearchService.delete(getActualIndexId(null), site, id);
     }
 
     @Override
-    public String delete(String indexId, String site, String id) throws SearchException {
-        return actualSearchService.delete(getActualIndexId(indexId), site, id);
+    public void delete(String indexId, String site, String id) throws SearchException {
+        actualSearchService.delete(getActualIndexId(indexId), site, id);
     }
 
     @Override
-    public String updateDocument(String site, String id, File document) throws SearchException {
-        throw new UnsupportedOperationException("Use updateFile methods");
+    public void updateContent(String site, String id, File file) throws SearchException {
+        actualSearchService.updateContent(getActualIndexId(null), site, id, file);
     }
 
     @Override
-    public String updateDocument(String site, String id, File document,
-                                 Map<String, String> additionalFields) throws SearchException {
-        throw new UnsupportedOperationException("Use updateFile methods");
+    public void updateContent(String indexId, String site, String id, File file) throws SearchException {
+        actualSearchService.updateContent(getActualIndexId(indexId), site, id, file);
     }
 
     @Override
-    public String updateFile(String site, String id, File file) throws SearchException {
-        return actualSearchService.updateFile(getActualIndexId(null), site, id, file);
-    }
-
-    @Override
-    public String updateFile(String indexId, String site, String id, File file) throws SearchException {
-        return actualSearchService.updateFile(getActualIndexId(indexId), site, id, file);
-    }
-
-    @Override
-    public String updateFile(String site, String id, File file,
+    public void updateContent(String site, String id, File file,
                              Map<String, List<String>> additionalFields) throws SearchException {
-        return actualSearchService.updateFile(getActualIndexId(null), site, id, file, additionalFields);
+        actualSearchService.updateContent(getActualIndexId(null), site, id, file, additionalFields);
     }
 
     @Override
-    public String updateFile(String indexId, String site, String id, File file,
+    public void updateContent(String indexId, String site, String id, File file,
                              Map<String, List<String>> additionalFields) throws SearchException {
-        return actualSearchService.updateFile(getActualIndexId(indexId), site, id, file, additionalFields);
+        actualSearchService.updateContent(getActualIndexId(indexId), site, id, file, additionalFields);
     }
 
     @Override
-    public String commit() throws SearchException {
-        return actualSearchService.commit(getActualIndexId(null));
+    public void updateContent(String site, String id, InputStream content) throws SearchException {
+        actualSearchService.updateContent(getActualIndexId(null), site, id, content);
     }
 
     @Override
-    public String commit(String indexId) throws SearchException {
-        return actualSearchService.commit(getActualIndexId(indexId));
+    public void updateContent(String indexId, String site, String id, InputStream content) throws SearchException {
+        actualSearchService.updateContent(getActualIndexId(indexId), site, id, content);
+    }
+
+    @Override
+    public void updateContent(String site, String id, InputStream content,
+                              Map<String, List<String>> additionalFields) throws SearchException {
+        actualSearchService.updateContent(getActualIndexId(null), site, id, content, additionalFields);
+    }
+
+    @Override
+    public void updateContent(String indexId, String site, String id, InputStream content,
+                              Map<String, List<String>> additionalFields) throws SearchException {
+        actualSearchService.updateContent(getActualIndexId(indexId), site, id, content, additionalFields);
+    }
+
+    @Override
+    public void commit() throws SearchException {
+        actualSearchService.commit(getActualIndexId(null));
+    }
+
+    @Override
+    public void commit(String indexId) throws SearchException {
+        actualSearchService.commit(getActualIndexId(indexId));
     }
 
     protected String getActualIndexId(String indexIdSuffix) {

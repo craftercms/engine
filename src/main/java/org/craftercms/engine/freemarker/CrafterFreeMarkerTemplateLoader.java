@@ -23,10 +23,10 @@ import java.io.Reader;
 import freemarker.cache.TemplateLoader;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.craftercms.commons.lang.UrlUtils;
 import org.craftercms.core.service.Content;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
-import org.craftercms.core.util.UrlUtils;
 import org.craftercms.engine.service.context.SiteContext;
 import org.springframework.beans.factory.annotation.Required;
 
@@ -86,7 +86,7 @@ public class CrafterFreeMarkerTemplateLoader implements TemplateLoader {
     }
 
     protected String getTemplatePath(SiteContext siteContext, String name) {
-        return UrlUtils.appendUrl(siteContext.getTemplatesPath(), name);
+        return UrlUtils.concat(siteContext.getTemplatesPath(), name);
     }
 
 }
