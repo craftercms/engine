@@ -18,6 +18,7 @@ package org.craftercms.engine.freemarker;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
@@ -34,11 +35,12 @@ import freemarker.template.TemplateModel;
 import freemarker.template.utility.DeepUnwrap;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.http.RequestContext;
-import org.craftercms.core.util.UrlUtils;
+import org.craftercms.commons.lang.UrlUtils;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.scripting.ScriptFactory;
@@ -170,10 +172,12 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
         Object unwrappedCurrentPage = DeepUnwrap.unwrap(env.getVariable(CrafterPageView.KEY_CONTENT_MODEL));
         if (unwrappedCurrentPage != null && unwrappedCurrentPage instanceof SiteItem) {
             SiteItem currentPage = (SiteItem) unwrappedCurrentPage;
+            String basePath = FilenameUtils.getFullPath(currentPage.getStoreUrl());
+            URI baseUri = URI.create(basePath);
 
             try {
-                componentPath = UrlUtils.resolveRelative(currentPage.getStoreUrl(), componentPath);
-            } catch (URISyntaxException e) {
+                componentPath = baseUri.resolve(componentPath).toString();
+            } catch (IllegalArgumentException e) {
                 throw new TemplateException("Invalid relative component URL " + componentPath, e, env);
             }
         }

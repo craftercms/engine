@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.craftercms.core.util.UrlUtils;
+import org.craftercms.commons.lang.UrlUtils;
 import org.craftercms.engine.targeting.CandidateTargetIdsResolver;
 import org.craftercms.engine.targeting.CandidateTargetedUrlsResolver;
 import org.craftercms.engine.targeting.TargetIdManager;
@@ -69,7 +69,7 @@ public class CandidateTargetedUrlsResolverImpl implements CandidateTargetedUrlsR
             TargetedUrlComponents urlComp = targetedUrlStrategy.parseTargetedUrl(relativeTargetedUrl);
 
             if (urlComp != null) {
-                String prefix = UrlUtils.appendUrl(rootFolder, urlComp.getPrefix());
+                String prefix = UrlUtils.concat(rootFolder, urlComp.getPrefix());
                 String suffix = urlComp.getSuffix();
                 String targetId = urlComp.getTargetId();
                 String fallbackTargetId = targetIdManager.getFallbackTargetId();

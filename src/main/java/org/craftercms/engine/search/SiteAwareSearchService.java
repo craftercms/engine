@@ -17,6 +17,7 @@
 package org.craftercms.engine.search;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -146,6 +147,28 @@ public class SiteAwareSearchService implements SearchService, QueryFactory<Query
     public String updateFile(String indexId, String site, String id, File file,
                              Map<String, List<String>> additionalFields) throws SearchException {
         return actualSearchService.updateFile(getActualIndexId(indexId), site, id, file, additionalFields);
+    }
+
+    @Override
+    public String updateFile(String site, String id, InputStream content) throws SearchException {
+        return actualSearchService.updateFile(getActualIndexId(null), site, id, content);
+    }
+
+    @Override
+    public String updateFile(String indexId, String site, String id, InputStream content) throws SearchException {
+        return actualSearchService.updateFile(getActualIndexId(indexId), site, id, content);
+    }
+
+    @Override
+    public String updateFile(String site, String id, InputStream content,
+                             Map<String, List<String>> additionalFields) throws SearchException {
+        return actualSearchService.updateFile(getActualIndexId(null), site, id, content, additionalFields);
+    }
+
+    @Override
+    public String updateFile(String indexId, String site, String id, InputStream content,
+                             Map<String, List<String>> additionalFields) throws SearchException {
+        return actualSearchService.updateFile(getActualIndexId(null), site, id, content);
     }
 
     @Override
