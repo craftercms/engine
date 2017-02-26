@@ -25,10 +25,10 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.craftercms.commons.lang.UrlUtils;
 import org.craftercms.core.exception.CrafterException;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.util.ExceptionUtils;
-import org.craftercms.core.util.UrlUtils;
 import org.craftercms.engine.exception.HttpStatusCodeAwareException;
 import org.craftercms.engine.exception.ScriptException;
 import org.craftercms.engine.scripting.Script;
@@ -147,7 +147,7 @@ public class PageRenderController extends AbstractController {
         String pageUrlNoExt = FilenameUtils.removeExtension(pageUrl);
         String controllerScriptsPath = siteContext.getControllerScriptsPath();
 
-        String baseUrl = UrlUtils.appendUrl(controllerScriptsPath, pageUrlNoExt);
+        String baseUrl = UrlUtils.concat(controllerScriptsPath, pageUrlNoExt);
 
         return String.format(SCRIPT_URL_FORMAT, baseUrl, method, scriptFactory.getScriptFileExtension());
     }

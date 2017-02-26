@@ -26,10 +26,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.http.HttpUtils;
+import org.craftercms.commons.lang.UrlUtils;
 import org.craftercms.core.service.Content;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
-import org.craftercms.core.util.UrlUtils;
 import org.craftercms.engine.service.context.SiteContext;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.http.MediaType;
@@ -149,9 +149,9 @@ public class StaticAssetsRequestHandler extends WebContentGenerator implements H
         }
 
         if (StringUtils.isNotEmpty(staticAssetsPath)) {
-            return UrlUtils.appendUrl(staticAssetsPath, path);
+            return UrlUtils.concat(staticAssetsPath, path);
         } else {
-            return UrlUtils.appendUrl(siteContext.getStaticAssetsPath(), path);
+            return UrlUtils.concat(siteContext.getStaticAssetsPath(), path);
         }
     }
 

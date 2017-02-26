@@ -4,7 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.craftercms.core.util.UrlUtils;
+import org.craftercms.commons.lang.UrlUtils;
 
 /**
  * {@link org.craftercms.engine.targeting.TargetedUrlStrategy} implementation that recognizes the target ID in
@@ -29,13 +29,13 @@ public class TargetedUrlByFolderStrategy extends AbstractTargetedUrlStrategy {
         String targetedUrl = "";
 
         if (StringUtils.isNotEmpty(prefix)) {
-            targetedUrl = UrlUtils.appendUrl(targetedUrl, prefix);
+            targetedUrl = UrlUtils.concat(targetedUrl, prefix);
         }
         if (StringUtils.isNotEmpty(targetId)) {
-            targetedUrl = UrlUtils.appendUrl(targetedUrl, targetId);
+            targetedUrl = UrlUtils.concat(targetedUrl, targetId);
         }
         if (StringUtils.isNotEmpty(suffix)) {
-            targetedUrl = UrlUtils.appendUrl(targetedUrl, suffix);
+            targetedUrl = UrlUtils.concat(targetedUrl, suffix);
         }
 
         targetedUrl = StringUtils.prependIfMissing(targetedUrl, "/");
