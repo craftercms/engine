@@ -75,6 +75,7 @@ public class SiteAwareSearchService implements SearchService, QueryFactory<Query
     }
 
     @PostConstruct
+    @SuppressWarnings("unchecked")
     public void init() {
         if (actualQueryFactory == null && actualSearchService instanceof QueryFactory) {
             actualQueryFactory = (QueryFactory)actualSearchService;
