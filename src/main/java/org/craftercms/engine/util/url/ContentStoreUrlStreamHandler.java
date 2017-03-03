@@ -19,6 +19,7 @@ import org.craftercms.engine.service.context.SiteContext;
 public class ContentStoreUrlStreamHandler extends URLStreamHandler {
 
     private static final String URL_REGEX = "[^:]+:.+";
+    private static final String URL_SCHEME = "site";
 
     protected SiteContext siteContext;
 
@@ -28,7 +29,7 @@ public class ContentStoreUrlStreamHandler extends URLStreamHandler {
 
     public URL createUrl(String filename) throws MalformedURLException {
         if (!filename.matches(URL_REGEX)) {
-            filename = siteContext.getSiteName() + ':' + (!filename.startsWith("/")? "/" : "") + filename;
+            filename = URL_SCHEME + ':' + (!filename.startsWith("/")? "/" : "") + filename;
         }
 
         return new URL(null, filename, this);
@@ -41,9 +42,9 @@ public class ContentStoreUrlStreamHandler extends URLStreamHandler {
 
             return new ContentStoreUrlConnection(url, content);
         } catch (PathNotFoundException e) {
-            throw new FileNotFoundException("No script found at '" + url.getFile() + "' in content store");
+            throw new FileNotFoundException("No content found at '" + url.getFile() + "' in content store");
         } catch (Exception e) {
-            throw new IOException("Error retrieving script at '" + url.getFile() + "' in content store", e);
+            throw new IOException("Error retrieving content at '" + url.getFile() + "' in content store", e);
         }
     }
 
