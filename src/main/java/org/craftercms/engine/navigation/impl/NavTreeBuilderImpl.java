@@ -93,10 +93,14 @@ public class NavTreeBuilderImpl implements NavTreeBuilder {
 
     protected NavItem getNavItem(SiteItem siteItem, String currentPageUrl, Converter<SiteItem, NavItem> itemConverter) {
         NavItem navItem = itemConverter.convert(siteItem);
-        navItem.setSubItems(getNavSubItems(siteItem, currentPageUrl, itemConverter));
-        navItem.setActive(currentPageUrl.startsWith(siteItem.getStoreUrl()));
+        if (navItem != null) {
+            navItem.setSubItems(getNavSubItems(siteItem, currentPageUrl, itemConverter));
+            navItem.setActive(currentPageUrl.startsWith(siteItem.getStoreUrl()));
 
-        return navItem;
+            return navItem;
+        } else {
+            return null;
+        }
     }
 
     protected List<NavItem> getNavSubItems(SiteItem siteItem, String currentPageUrl,
@@ -107,7 +111,7 @@ public class NavTreeBuilderImpl implements NavTreeBuilder {
 
             for (SiteItem childItem : childItems) {
                 NavItem navSubItem = getNavItem(childItem, currentPageUrl, itemConverter);
-                if (!navSubItems.contains(navSubItem)) {
+                if (navSubItem != null && !navSubItems.contains(navSubItem)) {
                     navSubItems.add(navSubItem);
                 }
             }
