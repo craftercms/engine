@@ -10,7 +10,7 @@ import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.service.Item;
 import org.craftercms.engine.model.SiteItem;
-import org.craftercms.engine.scripting.ScriptResolver;
+import org.craftercms.engine.scripting.SiteItemScriptResolver;
 import org.craftercms.engine.service.context.SiteContext;
 import org.junit.After;
 import org.junit.Before;
@@ -27,10 +27,10 @@ import static org.mockito.Mockito.when;
 /**
  * @author Alfonso Vásquez
  */
-public class ScriptResolverImplTest {
+public class SiteItemScriptResolverImplTest {
 
     private ContentStoreService storeService;
-    private ScriptResolver scriptResolver;
+    private SiteItemScriptResolver scriptResolver;
 
     @Before
     public void setUp() throws Exception {
@@ -105,8 +105,8 @@ public class ScriptResolverImplTest {
         return storeService;
     }
 
-    private ScriptResolver createScriptResolver(ContentStoreService storeService) {
-        ScriptResolverImpl scriptResolver = new ScriptResolverImpl();
+    private SiteItemScriptResolver createScriptResolver(ContentStoreService storeService) {
+        SiteItemScriptResolverImpl scriptResolver = new SiteItemScriptResolverImpl();
         scriptResolver.setContentTypePattern("^/page/(.+)$");
         scriptResolver.setContentTypeXPathQuery("*/content-type");
         scriptResolver.setScriptUrlFormat("/scripts/pages/%s.groovy");

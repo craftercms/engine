@@ -12,18 +12,18 @@ import org.apache.commons.logging.LogFactory;
 import org.craftercms.core.exception.CrafterException;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.engine.model.SiteItem;
-import org.craftercms.engine.scripting.ScriptResolver;
+import org.craftercms.engine.scripting.SiteItemScriptResolver;
 import org.craftercms.engine.service.context.SiteContext;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
- * Default implementation of {@link org.craftercms.engine.scripting.ScriptResolver}.
+ * Default implementation of {@link SiteItemScriptResolver}.
  *
  * @author Alfonso Vásquez
  */
-public class ScriptResolverImpl implements ScriptResolver {
+public class SiteItemScriptResolverImpl implements SiteItemScriptResolver {
 
-    private static final Log logger = LogFactory.getLog(ScriptResolverImpl.class);
+    private static final Log logger = LogFactory.getLog(SiteItemScriptResolverImpl.class);
 
     protected ContentStoreService storeService;
     protected String contentTypeXPathQuery;

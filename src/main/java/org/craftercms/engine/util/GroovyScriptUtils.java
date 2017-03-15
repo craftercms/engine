@@ -48,6 +48,7 @@ public class GroovyScriptUtils {
     public static final String VARIABLE_REQUEST = "request";
     public static final String VARIABLE_RESPONSE = "response";
     public static final String VARIABLE_PARAMS = "params";
+    public static final String VARIABLE_PATH_VARS = "pathVars";
     public static final String VARIABLE_HEADERS = "headers";
     public static final String VARIABLE_COOKIES = "cookies";
     public static final String VARIABLE_SESSION = "session";
