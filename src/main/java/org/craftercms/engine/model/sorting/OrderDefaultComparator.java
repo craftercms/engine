@@ -33,35 +33,30 @@ public class OrderDefaultComparator implements Comparator<SiteItem> {
 
     @Override
     public int compare(SiteItem siteItem1, SiteItem siteItem2) {
-        Float modelValue1 = null;
-        Float modelValue2 = null;
+        Float orderDefault1 = getOrderDefault(siteItem1);
+        Float orderDefault2 = getOrderDefault(siteItem2);
 
-        if (siteItem1.isFolder()) {
-            siteItem1 = siteItem1.getChildItem(SiteProperties.getIndexFileName());
-            if (siteItem1 != null) {
-                modelValue1 = (Float) siteItem1.get(ORDER_DEFAULT_VALUE_KEY);
+        if (orderDefault1 == null) {
+            orderDefault1 = DEFAULT_ORDER_DEFAULT_VALUE;
+        }
+        if (orderDefault2 == null) {
+            orderDefault2 = DEFAULT_ORDER_DEFAULT_VALUE;
+        }
+
+        return orderDefault1.compareTo(orderDefault2);
+    }
+
+    protected Float getOrderDefault(SiteItem siteItem) {
+        Float value = (Float) siteItem.get(ORDER_DEFAULT_VALUE_KEY);
+
+        if (value == null && siteItem.isFolder()) {
+            siteItem = siteItem.getChildItem(SiteProperties.getIndexFileName());
+            if (siteItem != null) {
+                value = (Float) siteItem.get(ORDER_DEFAULT_VALUE_KEY);
             }
-        } else {
-            modelValue1 = (Float) siteItem1.get(ORDER_DEFAULT_VALUE_KEY);
         }
 
-        if (siteItem2.isFolder()) {
-            siteItem2 = siteItem2.getChildItem(SiteProperties.getIndexFileName());
-            if (siteItem2 != null) {
-                modelValue2 = (Float) siteItem2.get(ORDER_DEFAULT_VALUE_KEY);
-            }
-        } else {
-            modelValue2 = (Float) siteItem2.get(ORDER_DEFAULT_VALUE_KEY);
-        }
-
-        if (modelValue1 == null) {
-            modelValue1 = DEFAULT_ORDER_DEFAULT_VALUE;
-        }
-        if (modelValue2 == null) {
-            modelValue2 = DEFAULT_ORDER_DEFAULT_VALUE;
-        }
-
-        return modelValue1.compareTo(modelValue2);
+        return value;
     }
 
 }

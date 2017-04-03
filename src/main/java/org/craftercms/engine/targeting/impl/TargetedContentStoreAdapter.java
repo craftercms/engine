@@ -69,11 +69,11 @@ public class TargetedContentStoreAdapter implements ContentStoreAdapter {
     }
 
     @Override
-    public Context createContext(String id, String storeServerUrl, String username, String password,
-                                 String rootFolderPath, boolean cacheOn, int maxAllowedItemsInCache,
+    public Context createContext(String id, String storeServerUrl, String username, String password, String rootFolderPath,
+                                 boolean mergingOn, boolean cacheOn, int maxAllowedItemsInCache,
                                  boolean ignoreHiddenFiles) throws StoreException, AuthenticationException {
         Context context = actualAdapter.createContext(id, storeServerUrl, username, password, rootFolderPath,
-                                                      cacheOn, maxAllowedItemsInCache, ignoreHiddenFiles);
+                                                      mergingOn, cacheOn, maxAllowedItemsInCache, ignoreHiddenFiles);
 
         return new ContextWrapper(this, context);
     }
@@ -277,6 +277,11 @@ public class TargetedContentStoreAdapter implements ContentStoreAdapter {
         @Override
         public String getRootFolderPath() {
             return actualContext.getRootFolderPath();
+        }
+
+        @Override
+        public boolean isMergingOn() {
+            return actualContext.isMergingOn();
         }
 
         @Override
