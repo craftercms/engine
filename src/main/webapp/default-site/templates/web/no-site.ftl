@@ -12,7 +12,6 @@
   <!-- Use the .htaccess and remove these lines to avoid edge case issues.
        More info: h5bp.com/b/378 -->
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <meta http-equiv="refresh" content="10; url=/studio">
   
   <title>Crafter CMS: NO SITE SET</title>
   <meta name="description" content="">
@@ -49,11 +48,8 @@
           <li><a href="http://www.craftersoftware.com/products"><span>Overview &amp; Features</span></a></li>
           <li><a href="http://www.craftercms.org/downloads"><span>Download</span></a></li>
           <li><a href="http://www.craftersoftware.com/resources"><span>Tutorials &amp; Screencasts</span></a></li>
-          
-          <li><a href="http://wiki.craftercms.org"><span>Installation and Setup</span></a></li>
-          <li><a href="http://wiki.craftercms.org"><span>Manuals and Documentation</span></a></li>
+          <li><a href="http://docs.craftercms.org"><span>Documentation</span></a></li>
           <li><a href="http://www.craftersoftware.com/about/partners"><span>Professional Services</span></a></li>
-
         </ul>
       </nav>
     </header>
@@ -71,9 +67,8 @@
     </section>
 
     <section class="features bgOpaque">
-        <h1>OOPS! No Site is Set!</h1>
-        <p>To preview pages you must log in to Crafter Studio, select the site you want to look at and then browse to the page you want to preview.<br/><br/>
-        You will be redirected in a few seconds to Crafter Studio.</p>
+        <h1>No Site is Set!</h1>
+        <p>Crafter Engine has no sites configured for this domain.</p>
     </section>
       
 
@@ -89,7 +84,7 @@
     
   </div> <!--! end of #container -->
   <footer>
-    <p>Copyright &copy; 2007 - 2015, Crafter Software Corporation. All rights reserved.<br />
+    <p>Copyright &copy; 2007 - 2017, Crafter Software Corporation. All rights reserved.<br />
     Crafter CMS is free and open source software licensed under the GNU General Public License (GPL) version 3.0  
     </p>
   </footer>
@@ -100,7 +95,7 @@
 
   <!-- scripts concatenated and minified via ant build script-->
   <script defer src="/static-assets/js/plugins.js"></script>
-  <script defer src="/static-assets/js/script1.js"></script>
+  <script defer src="/static-assets/js/script.js"></script>
   <!-- end scripts-->
   
 </body>
