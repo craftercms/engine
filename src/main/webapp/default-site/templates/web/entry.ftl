@@ -13,7 +13,7 @@
        More info: h5bp.com/b/378 -->
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-  <title></title>
+  <title>Crafter CMS</title>
   <meta name="description" content="">
   <meta name="author" content="">
 
@@ -43,17 +43,13 @@
 			<a class="logo" href="#"><img src="/static-assets/img/crafter-logo-transparent.png" alt="Crafter CMS by Crafter Software" /></a>
 			<nav>
 				<ul>
-	         <li class="active"><span>Crafter CMS</span></li>
-          <li><a href="http://http://www.craftersoftware.com/products"><span>Overview &amp; Features</span></a></li>
-          <li><a href="http://www.craftercms.org/downloads"><span>Download</span></a></li>
-          <li><a href="http://wiki.craftersoftware.com/display/CRAFTER/Crafter+CMS+Tutorials"><span>Tutorials &amp; Screencasts</span></a></li>
-          
-          <li><a href="http://wiki.craftersoftware.com/display/CRAFTER/C2.5+Setup+Guide"><span>Installation and Setup</span></a></li>
-          <li><a href="http://wiki.craftersoftware.com"><span>Manuals and Documentation</span></a></li>
-          <li><a href="http://craftercms.org"><span>Our Contributors</span></a></li>
-          <li><a href="http://craftersoftware.com/about/partners"><span>Professional Services</span></a></li>
-          <li><a href="http://www.craftersoftware.com"><span>Crafter Software</span></a></li>
-          <li><a href="http://www.alfresco.com"><span>Alfresco</span></a></li>
+                    <li class="active"><span>Crafter CMS</span></li>
+                    <li><a href="/studio"><span>Crafter Studio</span></a></li>
+                    <li><a href="http://www.craftersoftware.com/products"><span>Overview &amp; Features</span></a></li>
+                    <li><a href="http://www.craftercms.org/downloads"><span>Download</span></a></li>
+                    <li><a href="http://www.craftersoftware.com/resources"><span>Tutorials &amp; Screencasts</span></a></li>
+                    <li><a href="http://docs.craftercms.org"><span>Documentation</span></a></li>
+                    <li><a href="http://www.craftersoftware.com/about/partners"><span>Professional Services</span></a></li>
 				</ul>
 			</nav>
 		</header>
@@ -90,7 +86,7 @@
     
   </div> <!--! end of #container -->
   <footer>
-  	<p>Copyright &copy; 2007 - 2015, Crafter Software Corporation. All rights reserved.<br />
+  	<p>Copyright &copy; 2007 - 2017, Crafter Software Corporation. All rights reserved.<br />
   	Crafter WEM is free and open source software licensed under the GNU General Public License (GPL) version 3.0 	
   	</p>
   </footer>
