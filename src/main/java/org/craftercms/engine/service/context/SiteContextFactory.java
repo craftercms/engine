@@ -93,6 +93,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected String[] applicationContextPaths;
     protected String groovyClassesPath;
     protected Map<String, Object> groovyGlobalVars;
+    protected boolean mergingOn;
     protected boolean cacheOn;
     protected int maxAllowedItemsInCache;
     protected boolean ignoreHiddenFiles;
@@ -110,6 +111,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         storeServerUrl = null;
         username = null;
         password = null;
+        mergingOn = Context.DEFAULT_MERGING_ON;
         cacheOn = Context.DEFAULT_CACHE_ON;
         maxAllowedItemsInCache = Context.DEFAULT_MAX_ALLOWED_ITEMS_IN_CACHE;
         ignoreHiddenFiles = Context.DEFAULT_IGNORE_HIDDEN_FILES;
@@ -190,6 +192,10 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         this.groovyGlobalVars = groovyGlobalVars;
     }
 
+    public void setMergingOn(boolean mergingOn) {
+        this.mergingOn = mergingOn;
+    }
+
     public void setCacheOn(boolean cacheOn) {
         this.cacheOn = cacheOn;
     }
@@ -240,9 +246,8 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         Map<String, String> macroValues = Collections.singletonMap(siteNameMacroName, siteName);
         String resolvedRootFolderPath = macroResolver.resolveMacros(rootFolderPath, macroValues);
 
-        Context context = storeService.createContext(storeType, storeServerUrl, username, password,
-                                                     resolvedRootFolderPath, cacheOn, maxAllowedItemsInCache,
-                                                     ignoreHiddenFiles);
+        Context context = storeService.createContext(storeType, storeServerUrl, username, password, resolvedRootFolderPath,
+                                                     mergingOn, cacheOn, maxAllowedItemsInCache, ignoreHiddenFiles);
 
         try {
             SiteContext siteContext = new SiteContext();

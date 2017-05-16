@@ -19,7 +19,6 @@ package org.craftercms.engine.freemarker;
 import java.io.IOException;
 import java.io.Writer;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +39,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.http.RequestContext;
-import org.craftercms.core.util.UrlUtils;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.scripting.ScriptFactory;
@@ -50,7 +48,6 @@ import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.GroovyScriptUtils;
 import org.craftercms.engine.view.CrafterPageView;
 import org.dom4j.Element;
-import org.dom4j.Node;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Required;
 
@@ -70,6 +67,7 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
 
     public static final String COMPONENT_PARAM_NAME = "component";
     public static final String COMPONENT_PATH_PARAM_NAME = "componentPath";
+    public static final String ADDITIONAL_MODEL_PARAM_NAME = "additionalModel";
 
     protected ServletContext servletContext;
     protected SiteItemService siteItemService;
@@ -120,10 +118,12 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
         this.scriptResolver = scriptResolver;
     }
 
-    public void execute(Environment env, Map params, TemplateModel[] loopVars, TemplateDirectiveBody body)
-        throws TemplateException {
+    @SuppressWarnings("unchecked")
+    public void execute(Environment env, Map params, TemplateModel[] loopVars, TemplateDirectiveBody body) throws TemplateException {
         TemplateModel componentParam = (TemplateModel) params.get(COMPONENT_PARAM_NAME);
         TemplateModel componentPathParam = (TemplateModel) params.get(COMPONENT_PATH_PARAM_NAME);
+        TemplateModel additionalModelParam = (TemplateModel) params.get(ADDITIONAL_MODEL_PARAM_NAME);
+        Map<String, Object> additionalModel = null;
         SiteItem component;
 
         if (componentParam == null && componentPathParam == null) {
@@ -135,43 +135,35 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
             component = getComponentFromPath(componentPathParam, env);
         }
 
-        Map<String, Object> scriptsModel = executeScripts(component, env);
-        SimpleHash model = getComponentModel(component, scriptsModel);
-        Template template = getComponentTemplate(component, env);
+        if (additionalModelParam != null) {
+            additionalModel = unwrap(ADDITIONAL_MODEL_PARAM_NAME, additionalModelParam, Map.class, env);
+        }
+
+        Map<String, Object> templateModel = executeScripts(component, additionalModel, env);
+        SimpleHash model = getFullModel(component, templateModel, additionalModel);
+        Template template = getTemplate(component, env);
         Writer output = env.getOut();
 
         processComponentTemplate(template, model, output, env);
     }
 
     protected SiteItem getComponentFromNode(TemplateModel componentParam, Environment env) throws TemplateException {
-        Object unwrappedComponentParam = DeepUnwrap.unwrap(componentParam);
-        if (!(unwrappedComponentParam instanceof Node)) {
-            throw new TemplateException("Param '" + COMPONENT_PARAM_NAME + " of unexpected type: expected: " +
-                                        Node.class.getName() + ", actual: " +
-                                        unwrappedComponentParam.getClass().getName(), env);
-        }
+        Element includeElementParent = unwrap(COMPONENT_PARAM_NAME, componentParam, Element.class, env);
+        Element includeElement = includeElementParent.element(includeElementName);
+        String componentPath = includeElement.getTextTrim();
 
-        Element includeElement = ((Element) unwrappedComponentParam).element(includeElementName);
-        String componentUrl = includeElement.getTextTrim();
-
-        return getComponent(componentUrl, env);
+        return getComponent(componentPath, env);
     }
 
-    protected SiteItem getComponentFromPath(TemplateModel componentPathParam, Environment env)
-        throws TemplateException {
-        Object unwrappedComponentPathParam = DeepUnwrap.unwrap(componentPathParam);
-        if (!(unwrappedComponentPathParam instanceof String)) {
-            throw new TemplateException("Param '" + COMPONENT_PATH_PARAM_NAME + " of unexpected type: expected: " +
-                    String.class.getName() + ", actual: " + unwrappedComponentPathParam.getClass().getName(), env);
-        }
+    protected SiteItem getComponentFromPath(TemplateModel componentPathParam, Environment env) throws TemplateException {
+        String componentPath = unwrap(COMPONENT_PATH_PARAM_NAME, componentPathParam, String.class, env);
 
-        return getComponent(((String) unwrappedComponentPathParam), env);
+        return getComponent(componentPath, env);
     }
 
     protected SiteItem getComponent(String componentPath, Environment env) throws TemplateException {
-        Object unwrappedCurrentPage = DeepUnwrap.unwrap(env.getVariable(CrafterPageView.KEY_CONTENT_MODEL));
-        if (unwrappedCurrentPage != null && unwrappedCurrentPage instanceof SiteItem) {
-            SiteItem currentPage = (SiteItem) unwrappedCurrentPage;
+        SiteItem currentPage = unwrap(KEY_CONTENT_MODEL, env.getVariable(CrafterPageView.KEY_CONTENT_MODEL), SiteItem.class, env);
+        if (currentPage != null) {
             String basePath = FilenameUtils.getFullPath(currentPage.getStoreUrl());
             URI baseUri = URI.create(basePath);
 
@@ -186,8 +178,7 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
         try {
            component = siteItemService.getSiteItem(componentPath);
         } catch (Exception e) {
-            throw new TemplateException("Unable to load component " + componentPath +
-                                        " from the underlying repository", e, env);
+            throw new TemplateException("Unable to load component " + componentPath + " from the underlying repository", e, env);
         }
 
         if (component == null) {
@@ -197,15 +188,16 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
         return component;
     }
 
-    protected Map<String, Object> executeScripts(SiteItem component, Environment env) throws TemplateException {
+    protected Map<String, Object> executeScripts(SiteItem component, Map<String, Object> additionalModel,
+                                                 Environment env) throws TemplateException {
         List<String> scriptUrls = scriptResolver.getScriptUrls(component);
         if (CollectionUtils.isNotEmpty(scriptUrls)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Scripts associated to component " + component.getStoreUrl() + ": " + scriptUrls);
             }
 
-            Map<String, Object> model = new HashMap<String, Object>();
-            Map<String, Object> scriptVariables = createScriptVariables(component, model);
+            Map<String, Object> templateModel = new HashMap<>();
+            Map<String, Object> scriptVariables = createScriptVariables(component, templateModel, additionalModel);
             SiteContext siteContext = SiteContext.getCurrent();
 
             if (siteContext != null) {
@@ -230,19 +222,24 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
                 throw new IllegalStateException("No current site context found");
             }
 
-            return model;
+            return templateModel;
         } else {
             return null;
         }
     }
 
-    protected Map<String, Object> createScriptVariables(SiteItem component, Map<String, Object> model) {
-        Map<String, Object> variables = new HashMap<String, Object>();
+    protected Map<String, Object> createScriptVariables(SiteItem component, Map<String, Object> templateModel,
+                                                        Map<String, Object> additionalModel) {
+        Map<String, Object> variables = new HashMap<>();
         RequestContext context = RequestContext.getCurrent();
 
         if (context != null) {
-            GroovyScriptUtils.addSiteItemScriptVariables(variables, context.getRequest(), context.getResponse(),
-                                                         servletContext, component, model);
+            GroovyScriptUtils.addSiteItemScriptVariables(variables, context.getRequest(), context.getResponse(), servletContext,
+                                                         component, templateModel);
+
+            if (MapUtils.isNotEmpty(additionalModel)) {
+                variables.putAll(additionalModel);
+            }
         } else {
             throw new IllegalStateException("No current request context found");
         }
@@ -263,7 +260,7 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
         }
     }
 
-    protected Template getComponentTemplate(SiteItem component, Environment env) throws TemplateException {
+    protected Template getTemplate(SiteItem component, Environment env) throws TemplateException {
         try {
             return env.getTemplateForInclusion(getComponentTemplateName(component, env), null, true);
         } catch (IOException e) {
@@ -280,17 +277,20 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
         }
     }
 
-    protected SimpleHash getComponentModel(SiteItem component,
-                                           Map<String, Object> scriptsModel) throws TemplateException {
-        SimpleHash componentModel = modelFactory.getObject();
-        componentModel.put(KEY_MODEL, component);
-        componentModel.put(KEY_CONTENT_MODEL, component);
+    protected SimpleHash getFullModel(SiteItem component, Map<String, Object> templateModel,
+                                      Map<String, Object> additionalModel) throws TemplateException {
+        SimpleHash model = modelFactory.getObject();
+        model.put(KEY_MODEL, component);
+        model.put(KEY_CONTENT_MODEL, component);
 
-        if (MapUtils.isNotEmpty(scriptsModel)) {
-            componentModel.putAll(scriptsModel);
+        if (MapUtils.isNotEmpty(templateModel)) {
+            model.putAll(templateModel);
+        }
+        if (MapUtils.isNotEmpty(additionalModel)) {
+            model.putAll(additionalModel);
         }
 
-        return componentModel;
+        return model;
     }
 
     protected void processComponentTemplate(Template template, SimpleHash model, Writer output, Environment env)
@@ -299,6 +299,20 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
             template.process(model, output);
         } catch (IOException e) {
             throw new TemplateException("I/O exception while processing the component template", e, env);
+        }
+    }
+
+    protected <T> T unwrap(String name, TemplateModel value, Class<T> expectedClass, Environment env) throws TemplateException {
+        if (value != null) {
+            Object unwrappedValue = DeepUnwrap.unwrap(value);
+            try {
+                return expectedClass.cast(unwrappedValue);
+            } catch (ClassCastException e) {
+                throw new TemplateException("Model value '" + name + "' of unexpected type: expected: " + expectedClass.getName() +
+                                            ", actual: " + unwrappedValue.getClass().getName(), env);
+            }
+        } else {
+            return null;
         }
     }
 
