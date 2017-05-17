@@ -25,7 +25,9 @@
         <property name="urlMap" ref="crafter.urlMappings"/>
     </bean>
 
-    <bean id="crafter.restScriptsController" class="org.craftercms.engine.controller.rest.RestScriptsController"/>
+    <bean id="crafter.restScriptsController" class="org.craftercms.engine.controller.rest.RestScriptsController">
+        <property name="urlTemplateScanner" ref="crafter.scriptUrlTemplateScanner"/>
+    </bean>
 
     <bean id="crafter.staticAssetsRequestHandler" class="org.craftercms.engine.controller.StaticAssetsRequestHandler">
         <property name="contentStoreService" ref="crafter.contentStoreService"/>

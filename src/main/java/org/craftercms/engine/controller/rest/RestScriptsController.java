@@ -18,24 +18,29 @@ package org.craftercms.engine.controller.rest;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.lang.UrlUtils;
+import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.util.ExceptionUtils;
 import org.craftercms.engine.exception.HttpStatusCodeAwareException;
 import org.craftercms.engine.exception.ScriptNotFoundException;
 import org.craftercms.engine.scripting.ScriptFactory;
+import org.craftercms.engine.scripting.ScriptUrlTemplateScanner;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.GroovyScriptUtils;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
+import org.springframework.web.util.UriTemplate;
 
 /**
  * Controller for REST script requests.
@@ -53,6 +58,7 @@ public class RestScriptsController extends AbstractController {
 
     protected String responseBodyModelAttributeName;
     protected String errorMessageModelAttributeName;
+    protected ScriptUrlTemplateScanner urlTemplateScanner;
 
     public RestScriptsController() {
         responseBodyModelAttributeName = DEFAULT_RESPONSE_BODY_MODEL_ATTR_NAME;
@@ -65,6 +71,10 @@ public class RestScriptsController extends AbstractController {
 
     public void setErrorMessageModelAttributeName(String errorMessageModelAttributeName) {
         this.errorMessageModelAttributeName = errorMessageModelAttributeName;
+    }
+
+    public void setUrlTemplateScanner(ScriptUrlTemplateScanner urlTemplateScanner) {
+        this.urlTemplateScanner = urlTemplateScanner;
     }
 
     @Override
@@ -80,7 +90,11 @@ public class RestScriptsController extends AbstractController {
 
         String serviceUrl = getServiceUrl(request);
         String scriptUrl = getScriptUrl(scriptFactory, siteContext, request, serviceUrl);
-        Object responseBody = executeScript(scriptFactory, request, response, scriptUrl);
+        Map<String, Object> scriptVariables = createScriptVariables(request, response);
+
+        scriptUrl = parseScriptUrlForVariables(siteContext, scriptUrl, scriptVariables);
+
+        Object responseBody = executeScript(scriptFactory, scriptVariables, request, response, scriptUrl);
 
         if (response.isCommitted()) {
             // If response has been already committed by the script, just return null
@@ -107,6 +121,28 @@ public class RestScriptsController extends AbstractController {
         return url;
     }
 
+    protected String parseScriptUrlForVariables(SiteContext siteContext, String scriptUrl,
+                                                Map<String, Object> variables) {
+        ContentStoreService storeService = siteContext.getStoreService();
+        if (!storeService.exists(siteContext.getContext(), scriptUrl) && urlTemplateScanner != null) {
+            List<UriTemplate> urlTemplates = urlTemplateScanner.scan(siteContext);
+            if (CollectionUtils.isNotEmpty(urlTemplates)) {
+                for (UriTemplate template : urlTemplates) {
+                    if (template.matches(scriptUrl)) {
+                        Map<String, String> pathVars = template.match(scriptUrl);
+                        String actualScriptUrl = template.toString();
+
+                        variables.put(GroovyScriptUtils.VARIABLE_PATH_VARS, pathVars);
+
+                        return actualScriptUrl;
+                    }
+                }
+            }
+        }
+
+        return scriptUrl;
+    }
+
     protected String getScriptUrl(ScriptFactory scriptFactory, SiteContext siteContext, HttpServletRequest request,
                                   String serviceUrl) {
         String baseUrl = UrlUtils.concat(siteContext.getRestScriptsPath(), FilenameUtils.removeExtension(serviceUrl));
@@ -121,10 +157,8 @@ public class RestScriptsController extends AbstractController {
         return variables;
     }
 
-    protected Object executeScript(ScriptFactory scriptFactory, HttpServletRequest request,
-                                   HttpServletResponse response, String scriptUrl) {
-        Map<String, Object> scriptVariables = createScriptVariables(request, response);
-
+    protected Object executeScript(ScriptFactory scriptFactory, Map<String, Object> scriptVariables,
+                                   HttpServletRequest request, HttpServletResponse response, String scriptUrl) {
         try {
             return scriptFactory.getScript(scriptUrl).execute(scriptVariables);
         } catch (ScriptNotFoundException e) {

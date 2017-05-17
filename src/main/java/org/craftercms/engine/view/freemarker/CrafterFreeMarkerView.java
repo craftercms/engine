@@ -35,7 +35,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.craftercms.engine.freemarker.ExecuteControllerDirective;
 import org.craftercms.engine.freemarker.RenderComponentDirective;
 import org.craftercms.engine.freemarker.ServletContextHashModel;
-import org.craftercms.engine.scripting.ScriptResolver;
+import org.craftercms.engine.scripting.SiteItemScriptResolver;
 import org.craftercms.engine.service.SiteItemService;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.freemarker.HttpRequestHashModel;
@@ -92,7 +92,7 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     protected String componentTemplateNamePrefix;
     protected String componentTemplateNameSuffix;
     protected String componentIncludeElementName;
-    protected ScriptResolver componentScriptResolver;
+    protected SiteItemScriptResolver componentScriptResolver;
 
     protected ServletContextHashModel servletContextHashModel;
     protected ApplicationContextAccessor applicationContextAccessor;
@@ -131,7 +131,7 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     }
 
     @Required
-    public void setComponentScriptResolver(ScriptResolver componentScriptResolver) {
+    public void setComponentScriptResolver(SiteItemScriptResolver componentScriptResolver) {
         this.componentScriptResolver = componentScriptResolver;
     }
 

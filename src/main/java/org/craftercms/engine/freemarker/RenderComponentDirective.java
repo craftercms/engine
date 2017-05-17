@@ -42,7 +42,7 @@ import org.craftercms.commons.http.RequestContext;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.scripting.ScriptFactory;
-import org.craftercms.engine.scripting.ScriptResolver;
+import org.craftercms.engine.scripting.SiteItemScriptResolver;
 import org.craftercms.engine.service.SiteItemService;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.GroovyScriptUtils;
@@ -76,7 +76,7 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
     protected String templateNamePrefix;
     protected String templateNameSuffix;
     protected String includeElementName;
-    protected ScriptResolver scriptResolver;
+    protected SiteItemScriptResolver scriptResolver;
 
     @Required
     public void setServletContext(ServletContext servletContext) {
@@ -114,7 +114,7 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
     }
 
     @Required
-    public void setScriptResolver(ScriptResolver scriptResolver) {
+    public void setScriptResolver(SiteItemScriptResolver scriptResolver) {
         this.scriptResolver = scriptResolver;
     }
 

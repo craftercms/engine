@@ -32,7 +32,7 @@ import org.craftercms.engine.mobile.UserAgentTemplateDetector;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.scripting.ScriptFactory;
-import org.craftercms.engine.scripting.ScriptResolver;
+import org.craftercms.engine.scripting.SiteItemScriptResolver;
 import org.craftercms.engine.security.CrafterPageAccessManager;
 import org.craftercms.engine.service.SiteItemService;
 import org.craftercms.engine.service.UrlTransformationService;
@@ -76,7 +76,7 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     protected String disabledXPathQuery;
     protected String mimeTypeXPathQuery;
     protected String forceHttpsXPathQuery;
-    protected ScriptResolver scriptResolver;
+    protected SiteItemScriptResolver scriptResolver;
     protected ViewResolver delegatedViewResolver;
     protected UserAgentTemplateDetector userAgentTemplateDetector;
     protected CrafterPageAccessManager accessManager;
@@ -164,7 +164,7 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     }
 
     @Required
-    public void setScriptResolver(ScriptResolver scriptResolver) {
+    public void setScriptResolver(SiteItemScriptResolver scriptResolver) {
         this.scriptResolver = scriptResolver;
     }
 
