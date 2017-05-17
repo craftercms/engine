@@ -29,6 +29,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.lang.UrlUtils;
+import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.util.ExceptionUtils;
 import org.craftercms.engine.exception.HttpStatusCodeAwareException;
 import org.craftercms.engine.exception.ScriptNotFoundException;
@@ -122,7 +123,8 @@ public class RestScriptsController extends AbstractController {
 
     protected String parseScriptUrlForVariables(SiteContext siteContext, String scriptUrl,
                                                 Map<String, Object> variables) {
-        if (urlTemplateScanner != null) {
+        ContentStoreService storeService = siteContext.getStoreService();
+        if (!storeService.exists(siteContext.getContext(), scriptUrl) && urlTemplateScanner != null) {
             List<UriTemplate> urlTemplates = urlTemplateScanner.scan(siteContext);
             if (CollectionUtils.isNotEmpty(urlTemplates)) {
                 for (UriTemplate template : urlTemplates) {
