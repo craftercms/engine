@@ -43,9 +43,7 @@
         <property name="errorViewNamePrefix" value="${crafter.engine.error.viewName.prefix}"/>
     </bean>
 
-    <bean id="crafter.monitoringRenderController" class="org.craftercms.engine.controller.MonitoringController">
-        <property name="statusMessage" value="${crafter.engine.monitoring.statusMessage}"/>
-    </bean>
+    <bean id="crafter.monitoringRenderController" class="org.craftercms.engine.controller.MonitoringController"/>
 
     <bean id="crafter.siteContextRestController" class="org.craftercms.engine.controller.rest.SiteContextRestController">
         <property name="contextRegistry" ref="crafter.siteContextManager"/>
