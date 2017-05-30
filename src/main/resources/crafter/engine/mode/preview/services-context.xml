@@ -67,11 +67,6 @@
 
     <bean id="crafter.httpProxyRegistry" class="org.craftercms.engine.http.HttpProxyRegistry"/>
 
-    <bean id="crafter.proxy.authoring" class="org.craftercms.engine.http.impl.AlfrescoHttpProxy">
-        <property name="alfrescoTicketCookieName" value="${crafter.engine.proxy.authoring.ticketCookieName}"/>
-        <property name="baseServiceUrl" value="${crafter.engine.proxy.authoring.baseServiceUrl}"/>
-    </bean>
-
     <bean id="crafter.authoringOverlayCallback" class="org.craftercms.engine.service.PreviewOverlayCallback">
         <property name="scriptFormat" value="${crafter.engine.proxy.authoring.callback.preview.script.format}"/>
         <property name="previewServerJsScriptSources"
