@@ -24,34 +24,34 @@ public class MonitoringController {
     private static final Logger logger = LoggerFactory.getLogger(MonitoringController.class);
 
     public final static String URL_ROOT = "/api/1/monitoring";
-    public final static String MEMORY_TARGET_URL = "/memory";
-    public final static String STATUS_TARGET_URL = "/status";
-    public final static String VERSION_TARGET_URL = "/version";
-    public final static String LOG_TARGET_URL = "/log";
+    public final static String MEMORY_URL = "/memory";
+    public final static String STATUS_URL = "/status";
+    public final static String VERSION_URL = "/version";
+    public final static String LOG_URL = "/log";
 
-    @GetMapping(MEMORY_TARGET_URL)
+    @GetMapping(MEMORY_URL)
     public ResponseEntity<List<MemoryMonitor>> getMemoryStats() {
         return new ResponseEntity<>(MemoryMonitor.getMemoryStats(), HttpStatus.OK);
     }
 
 
-    @GetMapping(STATUS_TARGET_URL)
+    @GetMapping(STATUS_URL)
     public ResponseEntity<StatusMonitor> getCurrentStatus() {
         return new ResponseEntity<>(StatusMonitor.getCurrentStatus(), HttpStatus.OK);
     }
 
-    @GetMapping(VERSION_TARGET_URL)
+    @GetMapping(VERSION_URL)
     public ResponseEntity<VersionMonitor> getCurrentVersion() throws Exception {
         try {
             return new ResponseEntity<>(VersionMonitor.getVersion(this.getClass()), HttpStatus.OK);
         } catch (IOException e) {
             logger.error("Unable to read manifest file", e);
-            throw new Exception("Unable to read manifest file");
+            throw new IOException("Unable to read manifest file", e);
         }
     }
 
-    @GetMapping(LOG_TARGET_URL)
-    public List<HashMap<String,Object>> getAppLogger(@RequestParam String site, @RequestParam long since) {
+    @GetMapping(LOG_URL)
+    public List<HashMap<String,Object>> getLoggedEvents(@RequestParam String site, @RequestParam long since) {
         return CircularQueueLogAppender.loggerQueue().getLoggedEvents(site, since);
     }
 
