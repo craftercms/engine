@@ -59,8 +59,8 @@
     <div id="main" role="main">
     	<section class="intro bgOpaque">
 			<h1>Welcome to Crafter CMS</h1>
-			<p>Crafter CMS is an award-winning, open source Web Experience Management platform.  Crafter CMS consists of two major applications: Crafter Studio for content authoring, management, and publishing, and Crafter Engine for content delivery of dynamic website applications.</p>
-			<p><b>If you are seeing this home page you are running the default site for Crafter Engine. Click <a href="#">here</a> to learn how to configure Crafter Engine for preview and production modes.</b></section>
+			<p>Crafter CMS is an award-winning open source CMS built from the ground up as a modern platform for crafting high performance digital experiences through targeted delivery of personalized content..</p>
+			<p><b>If you are seeing this home page you are running the default site for Crafter Engine.</b></section>
     	<section class="features bgOpaque">
     		<h2>Features</h2>
     		<ul>
