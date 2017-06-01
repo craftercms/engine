@@ -62,8 +62,7 @@ public class FolderBasedScriptJobResolver implements ScriptJobResolver, ServletC
                         jobContexts = new ArrayList<>();
                     }
 
-                    jobContexts.add(SchedulingUtils.createJobContext(siteContext, scriptUrl, cronExpression,
-                                                                     servletContext));
+                    jobContexts.add(SchedulingUtils.createJobContext(siteContext, scriptUrl, cronExpression, servletContext));
                 }
             }
         }

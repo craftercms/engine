@@ -63,7 +63,7 @@
     
     <section class="intro bgOpaque">
       <h1>Welcome to Crafter CMS</h1>
-      <p>Crafter CMS is an award-winning, open source enterprise Web Experience Management system built.  Crafter CMS consists of two major applications: Crafter Studio for content authoring, management, and publishing, and Crafter Engine for content delivery of dynamic website applications.</p> 
+      <p>Crafter CMS is an award-winning open source CMS built from the ground up as a modern platform for crafting high performance digital experiences through targeted delivery of personalized content.</p>
     </section>
 
     <section class="features bgOpaque">
