@@ -13,7 +13,6 @@ notifications:
   slack: craftersoftware:7YiSb41ZG5rfMgiAY7Qgprc7
 env:
   global:
-    - secure: "NgdLjonllmhDvky+YE7+CK6ubchE+/dxOJD582neVUeZWF4HIsieiDIYjUxf8FpjqVPAlenjnFerLaEeoIN5wn7X8rqGAZFo9Nw5zuc7fE2BXevEFlnxAWH5f8cpHUFc+jBKZctlCtZ5t64m7jXY6QyxMBwDZGURx+hI/PwUcE0="
     - secure: "OOqd7HDGtfcJGPZ53d3gPcbPIO9CN/Ed0WHKaAxfg6uN4+8173COZBQd0b99Vs8C91iPHnMDnXi0YZEV+MJcoPNLGKdzK6wn7bhZgWmEn72x5DBRDWPuxQVIPHpjm80l+n76VFSmCSrO7VlkzQkb2nw2UbHudATqAhhwHo0XlzM="
     - secure: "D4QQtkjmQ2LHESmxRuw3VVIvutGhspYsppNQaf+5cOktukeWV/9Wcw0QblzCRDY/EifP9JkCSiDyPW1JmluVcTDjZ7cdCylFz1XpWKDdhT4LiMvaRDHNuIzp2z6wVa9APHhmyf16swXbtFpfgxuv8JFf+nE3mVFRYezYqLMrSBg="
 before_install: "git clone -b travis `git config --get remote.origin.url` target/travis"
