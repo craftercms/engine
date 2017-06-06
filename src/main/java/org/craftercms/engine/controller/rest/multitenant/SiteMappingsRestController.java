@@ -3,6 +3,8 @@ package org.craftercms.engine.controller.rest.multitenant;
 import java.util.Collections;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.engine.service.context.ReloadableMappingsSiteResolver;
 import org.craftercms.engine.service.context.SiteResolver;
@@ -33,12 +35,14 @@ public class SiteMappingsRestController {
 
     @RequestMapping(value = URL_RELOAD, method = RequestMethod.GET)
     @ResponseBody
-    public Map<String, String> reloadMappings() {
+    public Map<String, String> reloadMappings(HttpServletResponse response) {
         if (siteResolver instanceof ReloadableMappingsSiteResolver) {
             ((ReloadableMappingsSiteResolver)siteResolver).reloadMappings();
 
             return Collections.singletonMap(RestControllerBase.MESSAGE_MODEL_ATTRIBUTE_NAME, "Mappings reloaded");
         } else{
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
             return Collections.singletonMap(RestControllerBase.MESSAGE_MODEL_ATTRIBUTE_NAME,
                                             "The current resolver is not a " +
                                             ReloadableMappingsSiteResolver.class.getSimpleName() +

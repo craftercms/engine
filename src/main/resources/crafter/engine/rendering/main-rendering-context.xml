@@ -42,6 +42,7 @@
     <bean id="crafter.annotationDrivenConfigCustomizer" class="org.craftercms.engine.util.spring.mvc.AnnotationDrivenConfigCustomizer">
         <property name="contentNegotiationManager" ref="crafter.contentNegotiationManager"/>
         <property name="messageConverters" ref="crafter.messageConverters"/>
+        <property name="interceptors" ref="crafter.interceptors"/>
     </bean>
 
     <bean id="crafter.contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
@@ -54,6 +55,13 @@
             </map>
         </property>
     </bean>
+
+    <!-- ////////////////////////////////// -->
+    <!--								 	-->
+    <!--		Message Converters 			-->
+    <!--									-->
+    <!-- ////////////////////////////////// -->
+
 
     <bean id="crafter.jsonMsgConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
         <property name="objectMapper" ref="crafter.coreObjectMapper"/>
@@ -68,6 +76,30 @@
         <ref bean="crafter.jsonMsgConverter"/>
         <ref bean="crafter.xmlMsgConverter"/>
     </util:list>
+
+    <!-- ////////////////////////////////// -->
+    <!--								 	-->
+    <!--			 Locale 				-->
+    <!--									-->
+    <!-- ////////////////////////////////// -->
+
+
+    <bean id="crafter.localeChangeInterceptor" class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
+        <property name="paramName" value="locale"/>
+    </bean>
+
+    <util:list id="crafter.interceptors">
+        <ref bean="crafter.localeChangeInterceptor"/>
+    </util:list>
+
+    <!-- ////////////////////////////////// -->
+    <!--								 	-->
+    <!--			 Locale 				-->
+    <!--									-->
+    <!-- ////////////////////////////////// -->
+
+    <!-- This needs to be named localeResolver so that the DispatcherServlet can find it -->
+    <bean id="localeResolver" class="org.craftercms.engine.targeting.impl.ConfigAwareCookieLocaleResolver" />
 
     <import resource="${crafter.engine.extension.base}/rendering-overlay-context.xml"/>
     <import resource="${crafter.engine.extension.base}/rendering-context.xml"/>

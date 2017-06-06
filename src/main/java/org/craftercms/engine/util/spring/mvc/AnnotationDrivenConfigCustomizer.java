@@ -23,6 +23,7 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.accept.ContentNegotiationManager;
 import org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +38,7 @@ public class AnnotationDrivenConfigCustomizer implements BeanPostProcessor {
 
     private ContentNegotiationManager contentNegotiationManager;
     private List<HttpMessageConverter<?>> messageConverters;
-    private boolean replaceMessageConverters;
+    private List<Object> interceptors;
 
     public void setContentNegotiationManager(ContentNegotiationManager contentNegotiationManager) {
         this.contentNegotiationManager = contentNegotiationManager;
@@ -47,8 +48,8 @@ public class AnnotationDrivenConfigCustomizer implements BeanPostProcessor {
         this.messageConverters = messageConverters;
     }
 
-    public void setReplaceMessageConverters(boolean replaceMessageConverters) {
-        this.replaceMessageConverters = replaceMessageConverters;
+    public void setInterceptors(List<Object> interceptors) {
+        this.interceptors = interceptors;
     }
 
     @Override
@@ -59,7 +60,15 @@ public class AnnotationDrivenConfigCustomizer implements BeanPostProcessor {
                 adapter.setContentNegotiationManager(contentNegotiationManager);
             }
             if (CollectionUtils.isNotEmpty(messageConverters)) {
-                adapter.setMessageConverters(getMessageConverters(adapter.getMessageConverters()));
+                List<HttpMessageConverter<?>> mergedConverters = new ArrayList<>(messageConverters);
+                mergedConverters.addAll(adapter.getMessageConverters());
+
+                adapter.setMessageConverters(mergedConverters);
+            }
+        } else if (bean instanceof RequestMappingHandlerMapping) {
+            RequestMappingHandlerMapping mapping = (RequestMappingHandlerMapping) bean;
+            if (CollectionUtils.isNotEmpty(interceptors)) {
+                mapping.setInterceptors(interceptors.toArray(new Object[interceptors.size()]));
             }
         } else if (bean instanceof ExceptionHandlerExceptionResolver) {
             ExceptionHandlerExceptionResolver exceptionResolver = (ExceptionHandlerExceptionResolver) bean;
@@ -67,7 +76,10 @@ public class AnnotationDrivenConfigCustomizer implements BeanPostProcessor {
                 exceptionResolver.setContentNegotiationManager(contentNegotiationManager);
             }
             if (CollectionUtils.isNotEmpty(messageConverters)) {
-                exceptionResolver.setMessageConverters(getMessageConverters(exceptionResolver.getMessageConverters()));
+                List<HttpMessageConverter<?>> mergedConverters = new ArrayList<>(messageConverters);
+                mergedConverters.addAll(exceptionResolver.getMessageConverters());
+
+                exceptionResolver.setMessageConverters(mergedConverters);
             }
         }
 
@@ -77,17 +89,6 @@ public class AnnotationDrivenConfigCustomizer implements BeanPostProcessor {
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         return bean;
-    }
-
-    private List<HttpMessageConverter<?>> getMessageConverters(List<HttpMessageConverter<?>> originalMessageConverters) {
-        if (replaceMessageConverters) {
-            return messageConverters;
-        } else {
-            List<HttpMessageConverter<?>> mergedConverters = new ArrayList<>(messageConverters);
-            mergedConverters.addAll(originalMessageConverters);
-
-            return mergedConverters;
-        }
     }
 
 }

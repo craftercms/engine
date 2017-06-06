@@ -10,7 +10,7 @@
                 <value>classpath:crafter/core/core.properties</value>
                 <value>classpath:crafter/security/security.properties</value>
                 <value>classpath:crafter/engine/server-config.properties</value>
-                <value>classpath:crafter/engine/mode/multi-tenant/server-config.properties</value>
+                <value>classpath:crafter/engine/mode/multi-tenant/mapped/server-config.properties</value>
                 <value>${crafter.engine.extension.base}/overlay-config.properties</value>
                 <value>${crafter.engine.extension.base}/server-config.properties</value>
             </list>
@@ -48,13 +48,13 @@
         <property name="siteListResolver" ref="crafter.mappingsSiteResolver"/>
     </bean>
 
-    <bean id="crafter.tenantsResolver" class="org.craftercms.engine.util.tenant.SiteNameTenantResolver"/>
-
     <!-- ////////////////////////////////// -->
     <!--								 	-->
     <!--			 Security				-->
     <!--									-->
     <!-- ////////////////////////////////// -->
+
+    <bean id="crafter.tenantsResolver" class="org.craftercms.engine.util.tenant.SiteNameTenantResolver"/>
 
     <bean id="crafter.accessTokenIdResolver" class="org.craftercms.engine.security.ConfigAwareAccessTokenIdResolver"/>
 

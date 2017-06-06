@@ -17,11 +17,7 @@
 
     <bean id="crafter.mainHandlerMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
         <property name="order" value="#{T(org.springframework.core.Ordered).LOWEST_PRECEDENCE}"/>
-        <property name="interceptors">
-            <list>
-                <ref bean="crafter.localeChangeInterceptor" />
-            </list>
-        </property>
+        <property name="interceptors" ref="crafter.interceptors"/>
         <property name="urlMap" ref="crafter.urlMappings"/>
     </bean>
 
@@ -72,18 +68,5 @@
         <entry key="/static-assets/**" value-ref="crafter.staticAssetsRequestHandler"/>
         <entry key="/*" value-ref="crafter.pageRenderController"/>
     </util:map>
-
-    <!-- ////////////////////////////////// -->
-    <!--								 	-->
-    <!--			 Locale 				-->
-    <!--									-->
-    <!-- ////////////////////////////////// -->
-
-    <bean id="crafter.localeChangeInterceptor" class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
-        <property name="paramName" value="locale"/>
-    </bean>
-
-    <!-- This needs to be named localeResolver so that the DispatcherServlet can find it -->
-    <bean id="localeResolver" class="org.craftercms.engine.targeting.impl.ConfigAwareCookieLocaleResolver" />
 
 </beans>

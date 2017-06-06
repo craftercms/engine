@@ -50,7 +50,7 @@ public class FolderScanningSiteListResolver implements SiteListResolver, Resourc
 
     private static final Log logger = LogFactory.getLog(FolderScanningSiteListResolver.class);
 
-    public static final String SITE_ROOT_FOLDER_PATH_REGEX = "^(([^:]+:)?(.+?/))([^/]*\\{%s\\}[^/]*)(/.+)?$";
+    public static final String SITE_ROOT_FOLDER_PATH_REGEX = "^(([^:]+:)?(.+?/))([^/]*\\{%s\\}[^/]*)(/.*)?$";
     public static final int SITES_FOLDER_PATH_GROUP = 1;
     public static final int SITE_FOLDER_NAME_FORMAT_GROUP = 4;
 
