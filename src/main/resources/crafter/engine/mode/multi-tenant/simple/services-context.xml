@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean name="crafter.properties" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+        <property name="order" value="0"/>
+        <property name="locations">
+            <list>
+                <value>classpath:crafter/core/core.properties</value>
+                <value>classpath:crafter/security/security.properties</value>
+                <value>classpath:crafter/engine/server-config.properties</value>
+                <value>classpath:crafter/engine/mode/multi-tenant/simple/server-config.properties</value>
+                <value>${crafter.engine.extension.base}/overlay-config.properties</value>
+                <value>${crafter.engine.extension.base}/server-config.properties</value>
+            </list>
+        </property>
+        <property name="ignoreUnresolvablePlaceholders" value="true" />
+    </bean>
+
+    <!-- ////////////////////////////////// -->
+    <!--								 	-->
+    <!--			 Contexts				-->
+    <!--									-->
+    <!-- ////////////////////////////////// -->
+
+    <bean id="crafter.siteListResolver" class="org.craftercms.engine.service.context.FolderScanningSiteListResolver">
+        <property name="siteRootFolderPath" value="${crafter.engine.site.default.rootFolder.path}"/>
+        <property name="macroResolver" ref="crafter.macroResolver"/>
+    </bean>
+
+    <bean id="crafter.siteResolver" class="org.craftercms.engine.service.context.CookieSiteResolver">
+        <property name="paramOrCookieName" value="${crafter.engine.request.param.siteName}"/>
+    </bean>
+
+    <bean id="crafter.siteContextsBootstrap" class="org.craftercms.engine.service.context.SiteContextsBootstrap">
+        <property name="createContextsOnStartup" value="${crafter.engine.site.context.createOnStartup}"/>
+        <property name="siteContextManager" ref="crafter.siteContextManager"/>
+        <property name="siteListResolver" ref="crafter.siteListResolver"/>
+    </bean>
+
+    <!-- ////////////////////////////////// -->
+    <!--								 	-->
+    <!--			 Security				-->
+    <!--									-->
+    <!-- ////////////////////////////////// -->
+
+    <bean id="crafter.tenantsResolver" class="org.craftercms.engine.util.tenant.SiteNameTenantResolver"/>
+
+    <bean id="crafter.accessTokenIdResolver" class="org.craftercms.engine.security.ConfigAwareAccessTokenIdResolver"/>
+
+</beans>

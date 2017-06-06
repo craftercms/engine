@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
     <bean name="crafter.properties" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
         <property name="order" value="0"/>
@@ -10,7 +13,7 @@
                 <value>classpath:crafter/core/core.properties</value>
                 <value>classpath:crafter/security/security.properties</value>
                 <value>classpath:crafter/engine/server-config.properties</value>
-                <value>classpath:crafter/engine/mode/multi-tenant/server-config.properties</value>
+                <value>classpath:crafter/engine/mode/multi-tenant/simple/server-config.properties</value>
                 <value>${crafter.engine.extension.base}/overlay-config.properties</value>
                 <value>${crafter.engine.extension.base}/server-config.properties</value>
             </list>
@@ -18,15 +21,13 @@
         <property name="ignoreUnresolvablePlaceholders" value="true" />
     </bean>
 
-    <!-- ////////////////////////////////// -->
-    <!--								 	-->
-    <!--			Controllers				-->
-    <!--									-->
-    <!-- ////////////////////////////////// -->
-
-    <bean id="crafter.siteMappingsRestController"
-          class="org.craftercms.engine.controller.rest.multitenant.SiteMappingsRestController">
-        <property name="siteResolver" ref="crafter.mappingsSiteResolver"/>
+    <bean id="crafter.siteCookieChangeInterceptor" class="org.craftercms.engine.servlet.interceptor.SiteCookieChangeInterceptor">
+        <property name="cookieName" value="${crafter.engine.request.param.siteName}"/>
     </bean>
+
+    <util:list id="crafter.interceptors">
+        <ref bean="crafter.siteCookieChangeInterceptor"/>
+        <ref bean="crafter.localeChangeInterceptor"/>
+    </util:list>
 
 </beans>
