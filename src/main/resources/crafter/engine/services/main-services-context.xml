@@ -183,23 +183,23 @@
         <constructor-arg ref="crafter.expiredDtItemPredicate"/>
     </bean>
 
+    <util:list id="crafter.defaultItemPredicates">
+        <ref bean="crafter.disabledItemPredicate"/>
+        <ref bean="crafter.expiredItemPredicate"/>
+        <ref bean="crafter.expiredDtItemPredicate"/>
+    </util:list>
+
+    <util:list id="crafter.defaultItemFilters">
+        <ref bean="crafter.excludeLevelDescriptorItemFilter"/>
+        <ref bean="crafter.excludeDisabledItemFilter"/>
+        <ref bean="crafter.excludeExpiredItemFilter"/>
+        <ref bean="crafter.excludeExpiredDtItemFilter"/>
+    </util:list>
+
     <bean id="crafter.siteItemService" class="org.craftercms.engine.service.impl.SiteItemServiceImpl">
         <property name="storeService" ref="crafter.contentStoreService"/>
-        <property name="defaultPredicates">
-            <list>
-                <ref bean="crafter.disabledItemPredicate"/>
-                <ref bean="crafter.expiredItemPredicate"/>
-                <ref bean="crafter.expiredDtItemPredicate"/>
-            </list>
-        </property>
-        <property name="defaultFilters">
-            <list>
-                <ref bean="crafter.excludeLevelDescriptorItemFilter"/>
-                <ref bean="crafter.excludeDisabledItemFilter"/>
-                <ref bean="crafter.excludeExpiredItemFilter"/>
-                <ref bean="crafter.excludeExpiredDtItemFilter"/>
-            </list>
-        </property>
+        <property name="defaultPredicates" ref="crafter.defaultItemPredicates"/>
+        <property name="defaultFilters" ref="crafter.defaultItemFilters"/>
         <property name="modelValueConverters">
             <map>
                 <entry key="i" value-ref="crafter.stringToIntegerConverter"/>
