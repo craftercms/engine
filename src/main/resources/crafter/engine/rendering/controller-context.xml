@@ -25,7 +25,8 @@
         <property name="urlTemplateScanner" ref="crafter.scriptUrlTemplateScanner"/>
     </bean>
 
-    <bean id="crafter.staticAssetsRequestHandler" class="org.craftercms.engine.controller.StaticAssetsRequestHandler">
+    <bean id="crafter.staticAssetsRequestHandler" class="org.craftercms.engine.controller.StaticAssetsRequestHandler"
+            init-method="init">
         <property name="contentStoreService" ref="crafter.contentStoreService"/>
         <property name="disableCaching" value="${crafter.engine.staticAssets.disableCaching}"/>
     </bean>

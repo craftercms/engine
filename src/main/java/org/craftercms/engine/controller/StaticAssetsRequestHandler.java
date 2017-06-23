@@ -17,35 +17,31 @@
 package org.craftercms.engine.controller;
 
 import java.io.IOException;
-import javax.servlet.ServletException;
+import java.io.InputStream;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.craftercms.commons.http.HttpUtils;
 import org.craftercms.commons.lang.UrlUtils;
 import org.craftercms.core.service.Content;
 import org.craftercms.core.service.ContentStoreService;
-import org.craftercms.core.service.Context;
 import org.craftercms.engine.service.context.SiteContext;
 import org.springframework.beans.factory.annotation.Required;
-import org.springframework.http.MediaType;
-import org.springframework.util.FileCopyUtils;
-import org.springframework.web.HttpRequestHandler;
-import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.core.io.AbstractResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.CacheControl;
 import org.springframework.web.servlet.HandlerMapping;
-import org.springframework.web.servlet.support.WebContentGenerator;
+import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 
 /**
- * Request handler to render static assets. Similar to {@link org.springframework.web.servlet.resource.ResourceHttpRequestHandler}, but
- * instead of using Spring Resources, it uses the {@link ContentStoreService#getContent(Context, String)}.
+ * Request handler to render static assets using the {@link ContentStoreService} as source.
  *
  * @author Alfonso Vásquez
+ * @author Jose Ross
  */
-public class StaticAssetsRequestHandler extends WebContentGenerator implements HttpRequestHandler {
+public class StaticAssetsRequestHandler extends ResourceHttpRequestHandler {
 
     private static final Log logger = LogFactory.getLog(StaticAssetsRequestHandler.class);
 
@@ -53,9 +49,10 @@ public class StaticAssetsRequestHandler extends WebContentGenerator implements H
     private String staticAssetsPath;
     private boolean disableCaching;
 
-    public StaticAssetsRequestHandler() {
-        super(METHOD_GET, METHOD_HEAD);
-
+    protected void init() {
+        if(disableCaching) {
+            setCacheControl(CacheControl.noCache());
+        }
         setRequireSession(false);
     }
 
@@ -73,12 +70,10 @@ public class StaticAssetsRequestHandler extends WebContentGenerator implements H
     }
 
     @Override
-    public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-        IOException {
-        checkAndPrepare(request, response, true);
+    protected Resource getResource(final HttpServletRequest request) {
 
         SiteContext siteContext = SiteContext.getCurrent();
-        String path = getPath(request, siteContext);
+        final String path = getPath(request, siteContext);
 
         if (siteContext == null) {
             throw new IllegalStateException("No current site context found");
@@ -88,57 +83,47 @@ public class StaticAssetsRequestHandler extends WebContentGenerator implements H
             logger.debug("Trying to get content for static asset at [context=" + siteContext + ", path='" + path + "']");
         }
 
-        Content content = getContent(siteContext, path);
+        final Content content = getContent(siteContext, path);
         if (content == null) {
             if (logger.isDebugEnabled()) {
                 logger.debug("No static asset found at [context=" + siteContext + ", path='" + path +
-                             "'] - returning 404");
+                    "'] - returning 404");
+            }
+            return null;
+        }
+
+        return toResource(content, path);
+    }
+
+    protected Resource toResource(Content content, String path) {
+        return new AbstractResource() {
+
+            @Override
+            public String getFilename() {
+                return FilenameUtils.getName(path);
             }
 
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-
-            return;
-        }
-
-        MediaType mediaType = getMediaType(path);
-        if (mediaType != null) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Determined media type '" + mediaType + "' for static asset at [context=" + siteContext +
-                    ", path='" + path + "']");
-            }
-        }
-        else {
-            if (logger.isDebugEnabled()) {
-                logger.debug("No media type found for static asset at [context=" + siteContext + ", path='" + path +
-                    "'] - not sending a content-type header");
-            }
-        }
-
-        if ((new ServletWebRequest(request, response)).checkNotModified(content.getLastModified())) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Static asset not modified - returning 304");
+            @Override
+            public long lastModified() throws IOException {
+                return content.getLastModified();
             }
 
-            return;
-        }
-
-        setHeaders(response, content, mediaType);
-
-        if (disableCaching) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Caching disabled on client");
+            @Override
+            public long contentLength() throws IOException {
+                return content.getLength();
             }
 
-            HttpUtils.disableCaching(response);
-        }
+            @Override
+            public String getDescription() {
+                return null;
+            }
 
-        if (METHOD_HEAD.equals(request.getMethod())) {
-            logger.trace("HEAD request - skipping content");
+            @Override
+            public InputStream getInputStream() throws IOException {
+                return content.getInputStream();
+            }
 
-            return;
-        }
-
-        writeContent(response, content);
+        };
     }
 
     protected String getPath(HttpServletRequest request, SiteContext siteContext) {
@@ -159,21 +144,6 @@ public class StaticAssetsRequestHandler extends WebContentGenerator implements H
         return contentStoreService.findContent(siteContext.getContext(), path);
     }
 
-    protected MediaType getMediaType(String path) {
-        String mimeType = getServletContext().getMimeType(FilenameUtils.getName(path));
 
-        return (StringUtils.isNotEmpty(mimeType)? MediaType.parseMediaType(mimeType) : null);
-    }
-
-    protected void setHeaders(HttpServletResponse response, Content content, MediaType mediaType) throws IOException {
-        response.setContentLength((int) content.getLength());
-        if (mediaType != null) {
-            response.setContentType(mediaType.toString());
-        }
-    }
-
-    protected void writeContent(HttpServletResponse response, Content content) throws IOException {
-        FileCopyUtils.copy(content.getInputStream(), response.getOutputStream());
-    }
 
 }
