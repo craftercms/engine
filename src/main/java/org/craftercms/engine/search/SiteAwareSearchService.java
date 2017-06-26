@@ -39,14 +39,13 @@ import org.springframework.beans.factory.annotation.Required;
  *
  * @author avasquez
  */
-public class SiteAwareSearchService implements SearchService, QueryFactory<Query> {
+public class SiteAwareSearchService implements SearchService<Query> {
 
     public static final String DEFAULT_INDEX_ID_SEPARATOR = "-";
 
     protected String defaultIndexIdSuffix;
     protected String indexIdSeparator;
-    protected QueryFactory<Query> actualQueryFactory;
-    protected SearchService actualSearchService;
+    protected SearchService<Query> actualSearchService;
 
     public SiteAwareSearchService() {
         indexIdSeparator = DEFAULT_INDEX_ID_SEPARATOR;
@@ -60,10 +59,6 @@ public class SiteAwareSearchService implements SearchService, QueryFactory<Query
         this.indexIdSeparator = indexIdSeparator;
     }
 
-    public void setActualQueryFactory(QueryFactory<Query> actualQueryFactory) {
-        this.actualQueryFactory = actualQueryFactory;
-    }
-
     @Required
     public void setActualSearchService(SearchService actualSearchService) {
         this.actualSearchService = actualSearchService;
@@ -71,17 +66,12 @@ public class SiteAwareSearchService implements SearchService, QueryFactory<Query
 
     @Override
     public Query createQuery() {
-        return actualQueryFactory.createQuery();
+        return actualSearchService.createQuery();
     }
 
-    @PostConstruct
-    @SuppressWarnings("unchecked")
-    public void init() {
-        if (actualQueryFactory == null && actualSearchService instanceof QueryFactory) {
-            actualQueryFactory = (QueryFactory)actualSearchService;
-        } else if (actualQueryFactory == null) {
-            throw new IllegalStateException("No actualQueryFactory provided");
-        }
+    @Override
+    public Query createQuery(Map<String, String[]> params) {
+        return actualSearchService.createQuery(params);
     }
 
     @Override
