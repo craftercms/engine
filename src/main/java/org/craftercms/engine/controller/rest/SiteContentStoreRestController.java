@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 
@@ -72,12 +73,14 @@ public class SiteContentStoreRestController {
 
     @ExceptionHandler(PathNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseBody
     public Map<String, Object>  handlePathNotFoundException(HttpServletRequest request, PathNotFoundException e) {
         return handleException(request, e);
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseBody
     public Map<String, Object> handleException(HttpServletRequest request, Exception e) {
         logger.error("Request for " + request.getRequestURI() + " failed", e);
 
