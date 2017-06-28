@@ -49,40 +49,32 @@ public class PreviewCurrentAuthenticationResolvingProcessor extends CurrentAuthe
             request.getSession(true).getAttribute(ProfileRestController.PROFILE_SESSION_ATTRIBUTE);
 
         if (MapUtils.isNotEmpty(attributes)) {
-            if (!"anonymous".equalsIgnoreCase(attributes.get("username"))) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Non-anonymous persona set: " + attributes);
-                }
-
-                Profile profile = new Profile();
-                profile.setUsername(attributes.get("username"));
-                profile.setEnabled(true);
-                profile.setCreatedOn(new Date());
-                profile.setLastModified(new Date());
-                profile.setTenant("preview");
-
-                String rolesStr = attributes.get("roles");
-                if (rolesStr != null) {
-                    String[] roles = rolesStr.split(",");
-                    profile.getRoles().addAll(Arrays.asList(roles));
-                }
-
-                Map<String, Object> attributesNoUsernameNoRoles = new HashMap<String, Object>(attributes);
-                attributesNoUsernameNoRoles.remove("username");
-                attributesNoUsernameNoRoles.remove("roles");
-
-                profile.setAttributes(attributesNoUsernameNoRoles);
-
-                SecurityUtils.setAuthentication(request, new PersonaAuthentication(profile));
-
-                processorChain.processRequest(context);
-            } else {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Anonymous persona set. Trying to resolve authentication normally");
-                }
-
-                super.processRequest(context, processorChain);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Non-anonymous persona set: " + attributes);
             }
+
+            Profile profile = new Profile();
+            profile.setUsername("preview");
+            profile.setEnabled(true);
+            profile.setCreatedOn(new Date());
+            profile.setLastModified(new Date());
+            profile.setTenant("preview");
+
+            String rolesStr = attributes.get("roles");
+            if (rolesStr != null) {
+                String[] roles = rolesStr.split(",");
+                profile.getRoles().addAll(Arrays.asList(roles));
+            }
+
+            Map<String, Object> attributesNoUsernameNoRoles = new HashMap<String, Object>(attributes);
+            attributesNoUsernameNoRoles.remove("username");
+            attributesNoUsernameNoRoles.remove("roles");
+
+            profile.setAttributes(attributesNoUsernameNoRoles);
+
+            SecurityUtils.setAuthentication(request, new PersonaAuthentication(profile));
+
+            processorChain.processRequest(context);
         } else {
             if (logger.isDebugEnabled()) {
                 logger.debug("No persona set. Trying to resolve authentication normally");
