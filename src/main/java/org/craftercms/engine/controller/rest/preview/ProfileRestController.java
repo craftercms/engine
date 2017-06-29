@@ -49,10 +49,8 @@ public class ProfileRestController {
     @SuppressWarnings("unchecked")
     public Map<String, String> getProfile(HttpSession session) {
         Map<String, String> profile = (Map<String, String>) session.getAttribute(PROFILE_SESSION_ATTRIBUTE);
-        if (profile == null || StringUtils.isEmpty(profile.get("username"))) {
+        if (profile == null) {
             profile = new HashMap<>();
-            profile.put("username", "anonymous");
-
             session.setAttribute(PROFILE_SESSION_ATTRIBUTE, profile);
         }
 
@@ -72,7 +70,7 @@ public class ProfileRestController {
 
         session.setAttribute(PROFILE_SESSION_ATTRIBUTE, profile);
 
-        return Collections.singletonMap("username", profile.get("username"));
+        return profile;
     }
 
 }
