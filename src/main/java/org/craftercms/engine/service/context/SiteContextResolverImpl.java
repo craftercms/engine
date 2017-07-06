@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.craftercms.core.exception.RootFolderNotFoundException;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
@@ -56,9 +57,20 @@ public class SiteContextResolverImpl implements SiteContextResolver {
             logger.warn("Unable to resolve a site name for the request. Using fallback site");
         }
 
+        SiteContext context;
+        try {
+            context = getContext(siteName, fallback);
+        } catch (RootFolderNotFoundException e) {
+            logger.error("Cannot resolve root folder for site '" + siteName + "'. Using fallback site", e);
+
+            siteName = fallbackSiteName;
+            fallback = true;
+            context = getContext(siteName, fallback);
+        }
+
         request.setAttribute(SITE_NAME_ATTRIBUTE, siteName);
 
-        return getContext(siteName, fallback);
+        return context;
     }
 
     protected SiteContext getContext(String siteName, boolean fallback) {
