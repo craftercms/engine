@@ -27,6 +27,7 @@ import javax.annotation.PreDestroy;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.craftercms.core.exception.RootFolderNotFoundException;
 import org.craftercms.engine.event.SiteContextCreatedEvent;
 import org.craftercms.engine.event.SiteContextDestroyedEvent;
 import org.springframework.beans.factory.annotation.Required;
@@ -150,19 +151,11 @@ public class SiteContextManager implements ApplicationContextAware {
 
         if (CollectionUtils.isNotEmpty(siteNames)) {
             for (String siteName : siteNames) {
-                logger.info("==================================================");
-                logger.info("<Destroying site context: " + siteName + ">");
-                logger.info("==================================================");
-
                 try {
                     destroyContext(siteName);
                 } catch (Exception e) {
                     logger.error("Error destroying site context for site '" + siteName + "'", e);
                 }
-
-                logger.info("==================================================");
-                logger.info("</Destroying site context: " + siteName + ">");
-                logger.info("==================================================");
             }
         }
 
@@ -176,7 +169,15 @@ public class SiteContextManager implements ApplicationContextAware {
         try {
             SiteContext siteContext = contextRegistry.remove(siteName);
             if (siteContext != null) {
+                logger.info("==================================================");
+                logger.info("<Destroying site context: " + siteName + ">");
+                logger.info("==================================================");
+
                 destroyContext(siteContext);
+
+                logger.info("==================================================");
+                logger.info("</Destroying site context: " + siteName + ">");
+                logger.info("==================================================");
             }
         } finally {
             lock.unlock();
@@ -211,8 +212,18 @@ public class SiteContextManager implements ApplicationContextAware {
                     logger.info("</Creating site context: " + siteName + ">");
                     logger.info("==================================================");
                 }
+            } catch (RootFolderNotFoundException e) {
+                logger.error("Cannot resolve root folder for site '" + siteName + "'", e);
             } finally {
                 lock.unlock();
+            }
+        } else {
+            if (!siteContext.isValid()) {
+                logger.error("Site context " + siteContext + " is not valid anymore");
+
+                destroyContext(siteName);
+
+                siteContext = null;
             }
         }
 

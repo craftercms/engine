@@ -43,34 +43,34 @@ public class SiteContextResolverImpl implements SiteContextResolver {
 
     @Override
     public SiteContext getContext(HttpServletRequest request) {
-        String siteName = StringUtils.lowerCase(siteResolver.getSiteName(request));
         boolean fallback = false;
+        String siteName = StringUtils.lowerCase(siteResolver.getSiteName(request));
 
         if (StringUtils.isNotEmpty(siteName)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Site name resolved for current request: '" + siteName + "'");
             }
         } else {
-            siteName = fallbackSiteName;
             fallback = true;
+            siteName = fallbackSiteName;
 
             logger.warn("Unable to resolve a site name for the request. Using fallback site");
         }
 
-        SiteContext context;
-        try {
-            context = getContext(siteName, fallback);
-        } catch (RootFolderNotFoundException e) {
-            logger.error("Cannot resolve root folder for site '" + siteName + "'. Using fallback site", e);
+        SiteContext siteContext = getContext(siteName, fallback);
+        if (siteContext == null && !fallback) {
+            logger.warn("Unable to retrieve context for site name '" + siteName + "'. Using fallback site");
 
-            siteName = fallbackSiteName;
-            fallback = true;
-            context = getContext(siteName, fallback);
+            siteContext = getContext(fallbackSiteName, true);
+        }
+
+        if (siteContext == null) {
+            throw new IllegalStateException("Unable to resolve to a context for site name '" + siteName + "'");
         }
 
         request.setAttribute(SITE_NAME_ATTRIBUTE, siteName);
 
-        return context;
+        return siteContext;
     }
 
     protected SiteContext getContext(String siteName, boolean fallback) {
