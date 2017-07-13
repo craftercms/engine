@@ -240,6 +240,10 @@ public class SiteContext {
         this.scheduler = scheduler;
     }
 
+    public boolean isValid() throws CrafterException {
+        return storeService.validate(context);
+    }
+
     public void destroy() throws CrafterException {
         if (applicationContext != null) {
             try {

@@ -79,6 +79,11 @@ public class TargetedContentStoreAdapter implements ContentStoreAdapter {
     }
 
     @Override
+    public boolean validate(Context context) throws StoreException, AuthenticationException {
+        return actualAdapter.validate(((ContextWrapper)context).getActualContext());
+    }
+
+    @Override
     public void destroyContext(
         Context context) throws InvalidContextException, StoreException, AuthenticationException {
         context = ((ContextWrapper)context).getActualContext();

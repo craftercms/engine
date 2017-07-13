@@ -77,8 +77,7 @@ public class BreadcrumbBuilder {
             public List<BreadcrumbItem> execute() {
                 String indexFileName = SiteProperties.getIndexFileName();
                 CachingAwareList<BreadcrumbItem> breadcrumb = new CachingAwareList<BreadcrumbItem>();
-                String breadcrumbUrl = StringUtils.substringBeforeLast(StringUtils.substringAfter(url, homePath),
-                                                                       indexFileName);
+                String breadcrumbUrl = StringUtils.substringBeforeLast(StringUtils.substringAfter(url, homePath), indexFileName);
                 String[] breadcrumbUrlComponents = breadcrumbUrl.split("/");
                 String currentUrl = homePath;
 
