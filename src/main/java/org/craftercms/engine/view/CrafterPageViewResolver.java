@@ -251,8 +251,16 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
                         if (StringUtils.isNotEmpty(contentType) &&
                             StringUtils.equalsIgnoreCase(redirectContentType, contentType) &&
                             StringUtils.isNotEmpty(redirectUrl)) {
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("Redirecting page @ " + url + " to URL " + redirectUrl);
+                            }
+
                             return getRedirectView(redirectUrl, true);
                         } else if (StringUtils.isNotEmpty(forceHttps) && Boolean.parseBoolean(forceHttps)) {
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("Forcing HTTPS on page @ " + url);
+                            }
+
                             return getCurrentPageHttpsRedirectView();
                         } else {
                             UserAgentAwareCrafterPageView view = new UserAgentAwareCrafterPageView();

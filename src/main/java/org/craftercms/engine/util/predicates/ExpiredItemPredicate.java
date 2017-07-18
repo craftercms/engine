@@ -20,6 +20,8 @@ import java.util.Date;
 
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.converters.Converter;
 import org.craftercms.core.service.Item;
 import org.springframework.beans.factory.annotation.Required;
@@ -30,6 +32,8 @@ import org.springframework.beans.factory.annotation.Required;
  * @author avasquez
  */
 public class ExpiredItemPredicate implements Predicate<Item> {
+
+    private static final Log logger = LogFactory.getLog(ExpiredItemPredicate.class);
 
     protected String expiredXPathQuery;
     protected Converter<String, Date> dateConverter;
@@ -51,7 +55,13 @@ public class ExpiredItemPredicate implements Predicate<Item> {
             Date expiredDate = dateConverter.convert(expired);
             Date now = new Date();
 
-            return now.before(expiredDate);
+            if (now.before(expiredDate)) {
+                return true;
+            } else {
+                logger.info("Item " + item.getDescriptorUrl() + " has expired");
+
+                return false;
+            }
         } else {
             return true;
         }
