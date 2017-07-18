@@ -43,6 +43,8 @@ public class DisabledItemPredicate implements Predicate<Item> {
     public boolean evaluate(Item item) {
         String disabled = item.queryDescriptorValue(disabledXPathQuery);
         if (StringUtils.isNotEmpty(disabled) && Boolean.parseBoolean(disabled)) {
+            logger.info("Item " + item.getDescriptorUrl() + " is disabled");
+
             return false;
         } else {
             return true;
