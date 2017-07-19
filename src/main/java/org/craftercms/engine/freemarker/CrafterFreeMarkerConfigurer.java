@@ -17,8 +17,10 @@
 package org.craftercms.engine.freemarker;
 
 import java.io.IOException;
+import java.util.List;
 
 import freemarker.cache.CacheStorage;
+import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
@@ -70,6 +72,12 @@ public class CrafterFreeMarkerConfigurer extends FreeMarkerConfigurer {
         }
 
         return super.getTemplateLoaderForPath(templateLoaderPath);
+    }
+
+    @Override
+    protected void postProcessTemplateLoaders(List<TemplateLoader> templateLoaders) {
+        // Overwrote to get rid of the log.info
+        templateLoaders.add(new ClassTemplateLoader(FreeMarkerConfigurer.class, ""));
     }
 
 }
