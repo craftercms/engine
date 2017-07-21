@@ -29,11 +29,11 @@
     
     <appender name="circularQueueLogAppender"
               class="org.craftercms.engine.util.logging.CircularQueueLogAppender">
+        <param name="maxQueueSize" value="100"/>
+        <param name="dateFormat" value="yyyy-MM-dd'T'HH:mm:ss.SSSZ"/>
         <layout class="org.apache.log4j.PatternLayout">
             <param name="conversionPattern" value="[%p] %d{ISO8601} | %m" />
         </layout>
-        <param name="maxQueueSize" value="100"/>
-        <param name="dateFormat" value="yyyy-MM-dd'T'HH:mm:ss.SSSZ"/>
     </appender>
 
     <!-- Application Loggers -->
