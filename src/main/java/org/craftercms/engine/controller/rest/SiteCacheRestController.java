@@ -48,7 +48,7 @@ public class SiteCacheRestController {
 
         String msg = "Content cache and Freemarker cache have been cleared for site '" + siteName + "'";
 
-        logger.info(msg);
+        logger.debug(msg);
 
         return Collections.singletonMap(RestControllerBase.MESSAGE_MODEL_ATTRIBUTE_NAME, msg);
     }
