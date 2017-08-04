@@ -115,7 +115,7 @@ public class ScriptFilterTest {
         when(siteContext.getSiteName()).thenReturn("default");
         when(siteContext.getContext()).thenReturn(mock(Context.class));
         when(siteContext.getStoreService()).thenReturn(storeService);
-        when(siteContext.getConfig()).thenReturn(new XMLConfiguration("config/site.xml"));
+        when(siteContext.getConfig()).thenReturn(new XMLConfiguration("config/site-config.xml"));
         when(siteContext.getScriptFactory()).thenReturn(scriptFactory);
 
         return siteContext;

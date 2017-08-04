@@ -73,7 +73,7 @@ public class ConfigurationScriptJobResolverTest {
     }
 
     private void setUpSiteContext(SiteContext siteContext, ContentStoreService storeService) throws Exception {
-        XMLConfiguration config = new XMLConfiguration("config/site.xml");
+        XMLConfiguration config = new XMLConfiguration("config/site-config.xml");
 
         when(siteContext.getSiteName()).thenReturn("default");
         when(siteContext.getContext()).thenReturn(mock(Context.class));

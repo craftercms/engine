@@ -98,7 +98,7 @@ public class GroovyScriptFactoryTest {
         context.setClassLoader(classLoader);
 
         XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader(context);
-        xmlReader.loadBeanDefinitions(new ClassPathResource("config/spring/application-context.xml"));
+        xmlReader.loadBeanDefinitions(new ClassPathResource("config/application-context.xml"));
 
         context.refresh();
 

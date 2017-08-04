@@ -32,7 +32,7 @@ public class ConfigAwareTestBase {
         setCurrentRequestContext();
         setCurrentSiteContext();
 
-        config = new XMLConfiguration("config/site.xml");
+        config = new XMLConfiguration("config/site-config.xml");
 
         when(siteContext.getConfig()).thenReturn(config);
     }
