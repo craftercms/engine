@@ -17,17 +17,14 @@
 package org.craftercms.engine.search;
 
 import java.io.File;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.lang3.StringUtils;
+import org.craftercms.core.service.Content;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.search.exception.SearchException;
 import org.craftercms.search.service.Query;
-import org.craftercms.search.service.QueryFactory;
 import org.craftercms.search.service.SearchService;
 import org.springframework.beans.factory.annotation.Required;
 
@@ -128,23 +125,23 @@ public class SiteAwareSearchService implements SearchService<Query> {
     }
 
     @Override
-    public void updateContent(String site, String id, InputStream content) throws SearchException {
+    public void updateContent(String site, String id, Content content) throws SearchException {
         actualSearchService.updateContent(getActualIndexId(null), site, id, content);
     }
 
     @Override
-    public void updateContent(String indexId, String site, String id, InputStream content) throws SearchException {
+    public void updateContent(String indexId, String site, String id, Content content) throws SearchException {
         actualSearchService.updateContent(getActualIndexId(indexId), site, id, content);
     }
 
     @Override
-    public void updateContent(String site, String id, InputStream content,
+    public void updateContent(String site, String id, Content content,
                               Map<String, List<String>> additionalFields) throws SearchException {
         actualSearchService.updateContent(getActualIndexId(null), site, id, content, additionalFields);
     }
 
     @Override
-    public void updateContent(String indexId, String site, String id, InputStream content,
+    public void updateContent(String indexId, String site, String id, Content content,
                               Map<String, List<String>> additionalFields) throws SearchException {
         actualSearchService.updateContent(getActualIndexId(indexId), site, id, content, additionalFields);
     }

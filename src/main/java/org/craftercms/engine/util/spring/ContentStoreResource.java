@@ -94,7 +94,7 @@ public class ContentStoreResource extends AbstractResource {
         }
     }
 
-    public Content getContent() {
+    protected Content getContent() {
         return siteContext.getStoreService().findContent(siteContext.getContext(), url);
     }
 
