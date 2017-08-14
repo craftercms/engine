@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.configuration.HierarchicalConfiguration;
-import org.apache.commons.configuration.SubnodeConfiguration;
+import org.apache.commons.configuration2.HierarchicalConfiguration;
+import org.apache.commons.configuration2.SubnodeConfiguration;
 import org.craftercms.commons.lang.Callback;
 import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.engine.util.config.ConfigurationParser;
@@ -79,7 +79,7 @@ public class ConfigAwareConnectionFactoryLocator implements ConnectionFactoryLoc
 
                 if (config != null) {
                     try {
-                        SubnodeConfiguration socialConnectionsConfig = config.configurationAt(SOCIAL_CONNECTIONS_KEY);
+                        HierarchicalConfiguration socialConnectionsConfig = config.configurationAt(SOCIAL_CONNECTIONS_KEY);
                         for (ConfigurationParser<?> parser : configParsers) {
                             ConnectionFactory<?> factory = (ConnectionFactory<?>)parser.parse(socialConnectionsConfig);
                             if (factory != null) {

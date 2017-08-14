@@ -345,6 +345,7 @@
         <property name="macroResolver" ref="crafter.macroResolver"/>
         <property name="groovyGlobalVars" ref="crafter.restScriptsVariables"/>
         <property name="jobResolvers" ref="crafter.scriptJobResolvers"/>
+        <property name="textEncryptor" ref="crafter.textEncryptor"/>
     </bean>
 
     <bean id="crafter.fallbackSiteContextFactory" class="org.craftercms.engine.service.context.SiteContextFactory">
@@ -367,6 +368,7 @@
         <property name="macroResolver" ref="crafter.macroResolver"/>
         <property name="groovyGlobalVars" ref="crafter.restScriptsVariables"/>
         <property name="jobResolvers" ref="crafter.scriptJobResolvers"/>
+        <property name="textEncryptor" ref="crafter.textEncryptor"/>
     </bean>
 
     <!-- ////////////////////////////////// -->

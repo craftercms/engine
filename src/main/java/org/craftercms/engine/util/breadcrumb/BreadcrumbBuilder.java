@@ -18,7 +18,7 @@ package org.craftercms.engine.util.breadcrumb;
 
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.craftercms.commons.lang.Callback;
 import org.craftercms.commons.lang.UrlUtils;
 import org.craftercms.core.service.ContentStoreService;

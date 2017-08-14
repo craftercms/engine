@@ -17,7 +17,7 @@
 package org.craftercms.engine.url;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.craftercms.commons.lang.UrlUtils;
 import org.craftercms.core.exception.UrlTransformationException;
 import org.craftercms.core.service.CachingOptions;

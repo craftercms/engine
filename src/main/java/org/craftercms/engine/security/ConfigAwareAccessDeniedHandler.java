@@ -1,6 +1,6 @@
 package org.craftercms.engine.security;
 
-import org.apache.commons.configuration.HierarchicalConfiguration;
+import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.craftercms.engine.util.ConfigUtils;
 import org.craftercms.security.authorization.impl.AccessDeniedHandlerImpl;
 

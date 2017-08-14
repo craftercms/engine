@@ -16,7 +16,7 @@
  */
 package org.craftercms.engine.macro.impl;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.craftercms.commons.http.RequestContext;
 
 /**

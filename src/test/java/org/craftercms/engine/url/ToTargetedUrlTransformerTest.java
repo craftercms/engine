@@ -1,6 +1,6 @@
 package org.craftercms.engine.url;
 
-import org.apache.commons.configuration.HierarchicalConfiguration;
+import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.targeting.TargetedUrlStrategy;
 import org.junit.After;

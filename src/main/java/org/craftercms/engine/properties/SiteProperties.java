@@ -16,7 +16,7 @@
  */
 package org.craftercms.engine.properties;
 
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration2.Configuration;
 import org.craftercms.engine.util.ConfigUtils;
 
 /**
