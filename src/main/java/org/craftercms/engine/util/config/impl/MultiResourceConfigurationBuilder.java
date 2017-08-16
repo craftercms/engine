@@ -2,7 +2,6 @@ package org.craftercms.engine.util.config.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +16,6 @@ import org.apache.commons.configuration2.event.EventType;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.configuration2.interpol.Lookup;
 import org.apache.commons.configuration2.tree.OverrideCombiner;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.config.DecryptionLookup;
@@ -107,10 +105,12 @@ public class MultiResourceConfigurationBuilder implements ConfigurationBuilder<H
 
     @Override
     public <E extends Event> void addEventListener(EventType<E> eventType, EventListener<? super E> listener) {
+        // Not used
     }
 
     @Override
     public <E extends Event> boolean removeEventListener(EventType<E> eventType, EventListener<? super E> listener) {
+        // Not used
         return false;
     }
 }
