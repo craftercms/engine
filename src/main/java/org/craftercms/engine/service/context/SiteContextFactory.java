@@ -26,11 +26,14 @@ import javax.servlet.ServletContext;
 
 import groovy.lang.GroovyClassLoader;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.configuration.ConfigurationBuilder;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.HierarchicalConfiguration;
+import org.apache.commons.configuration2.HierarchicalConfiguration;
+import org.apache.commons.configuration2.builder.ConfigurationBuilder;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.craftercms.commons.crypto.TextEncryptor;
+import org.craftercms.commons.crypto.impl.NoOpTextEncryptor;
+import org.craftercms.commons.spring.ApacheCommonsConfiguration2PropertySource;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.store.impl.filesystem.FileSystemContentStoreAdapter;
@@ -43,11 +46,10 @@ import org.craftercms.engine.scripting.impl.GroovyScriptFactory;
 import org.craftercms.engine.service.PreviewOverlayCallback;
 import org.craftercms.engine.util.GroovyScriptUtils;
 import org.craftercms.engine.util.SchedulingUtils;
-import org.craftercms.engine.util.config.impl.MultiConfigurationBuilder;
+import org.craftercms.engine.util.config.impl.MultiResourceConfigurationBuilder;
 import org.craftercms.engine.util.groovy.ContentStoreGroovyResourceLoader;
 import org.craftercms.engine.util.groovy.ContentStoreResourceConnector;
 import org.craftercms.engine.util.quartz.JobContext;
-import org.craftercms.engine.util.spring.ApacheCommonsConfigPropertySource;
 import org.craftercms.engine.util.spring.ContentStoreResourceLoader;
 import org.quartz.Scheduler;
 import org.springframework.beans.BeansException;
@@ -104,6 +106,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected MacroResolver macroResolver;
     protected ApplicationContext mainApplicationContext;
     protected List<ScriptJobResolver> jobResolvers;
+    protected TextEncryptor textEncryptor;
 
     public SiteContextFactory() {
         siteNameMacroName = DEFAULT_SITE_NAME_MACRO_NAME;
@@ -237,6 +240,11 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         this.jobResolvers = jobResolvers;
     }
 
+    @Required
+    public void setTextEncryptor(TextEncryptor textEncryptor) {
+        this.textEncryptor = textEncryptor;
+    }
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.mainApplicationContext = applicationContext;
@@ -273,7 +281,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             }
 
             ResourceLoader resourceLoader = new ContentStoreResourceLoader(siteContext);
-            HierarchicalConfiguration config = getConfig(siteContext, resolvedConfigPaths, resourceLoader);
+            HierarchicalConfiguration<?> config = getConfig(siteContext, resolvedConfigPaths, resourceLoader);
             URLClassLoader classLoader = getClassLoader(siteContext);
             ScriptFactory scriptFactory = getScriptFactory(siteContext, classLoader);
             ConfigurableApplicationContext appContext = getApplicationContext(siteContext, classLoader, config,
@@ -309,8 +317,15 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             logger.info("<Loading configuration for site: " + siteName + ">");
             logger.info("--------------------------------------------------");
 
-            ConfigurationBuilder builder = new MultiConfigurationBuilder(configPaths, resourceLoader);
-            HierarchicalConfiguration config = (HierarchicalConfiguration)builder.getConfiguration();
+            ConfigurationBuilder<HierarchicalConfiguration> builder;
+
+            if (textEncryptor instanceof NoOpTextEncryptor) {
+                builder = new MultiResourceConfigurationBuilder(configPaths, resourceLoader);
+            } else {
+                builder = new MultiResourceConfigurationBuilder(configPaths, resourceLoader, textEncryptor);
+            }
+
+            HierarchicalConfiguration config = builder.getConfiguration();
 
             logger.info("--------------------------------------------------");
             logger.info("</Loading configuration for site: " + siteName + ">");
@@ -318,8 +333,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
 
             return config;
         } catch (ConfigurationException e) {
-            throw new SiteContextCreationException("Unable to load configuration for site '" +
-                                                   siteContext.getSiteName() + "'", e);
+            throw new SiteContextCreationException("Unable to load configuration for site '" + siteContext.getSiteName() + "'", e);
         }
     }
 
@@ -359,7 +373,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
 
                 if (config != null) {
                     MutablePropertySources propertySources = appContext.getEnvironment().getPropertySources();
-                    propertySources.addFirst(new ApacheCommonsConfigPropertySource("siteConfig", config));
+                    propertySources.addFirst(new ApacheCommonsConfiguration2PropertySource("siteConfig", config));
                 }
 
                 XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(appContext);

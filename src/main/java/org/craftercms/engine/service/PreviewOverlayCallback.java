@@ -1,6 +1,6 @@
 package org.craftercms.engine.service;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.engine.macro.MacroResolver;
 import org.craftercms.engine.mobile.UserAgentTemplateDetector;

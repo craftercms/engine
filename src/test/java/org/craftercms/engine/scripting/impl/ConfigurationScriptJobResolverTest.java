@@ -2,11 +2,13 @@ package org.craftercms.engine.scripting.impl;
 
 import java.util.List;
 
-import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.commons.configuration2.XMLConfiguration;
+import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.test.utils.ContentStoreServiceMockUtils;
+import org.craftercms.engine.util.ConfigUtils;
 import org.craftercms.engine.util.quartz.JobContext;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.quartz.CronTrigger;
 import org.quartz.impl.JobDetailImpl;
+import org.springframework.core.io.ClassPathResource;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -73,7 +76,8 @@ public class ConfigurationScriptJobResolverTest {
     }
 
     private void setUpSiteContext(SiteContext siteContext, ContentStoreService storeService) throws Exception {
-        XMLConfiguration config = new XMLConfiguration("config/site-config.xml");
+        XMLConfiguration config = ConfigUtils.readXmlConfiguration(new ClassPathResource("config/site-config.xml"), ',');
+        config.setListDelimiterHandler(new DefaultListDelimiterHandler(','));
 
         when(siteContext.getSiteName()).thenReturn("default");
         when(siteContext.getContext()).thenReturn(mock(Context.class));

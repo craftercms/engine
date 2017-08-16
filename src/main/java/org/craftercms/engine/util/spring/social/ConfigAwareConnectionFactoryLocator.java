@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.configuration.HierarchicalConfiguration;
-import org.apache.commons.configuration.SubnodeConfiguration;
+import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.craftercms.commons.lang.Callback;
 import org.craftercms.core.util.cache.CacheTemplate;
-import org.craftercms.engine.util.config.ConfigurationParser;
-import org.craftercms.engine.util.config.impl.FacebookConnectionFactoryConfigParser;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.ConfigUtils;
+import org.craftercms.engine.util.config.ConfigurationParser;
+import org.craftercms.engine.util.config.impl.FacebookConnectionFactoryConfigParser;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.social.connect.ConnectionFactory;
 import org.springframework.social.connect.ConnectionFactoryLocator;
@@ -79,7 +78,7 @@ public class ConfigAwareConnectionFactoryLocator implements ConnectionFactoryLoc
 
                 if (config != null) {
                     try {
-                        SubnodeConfiguration socialConnectionsConfig = config.configurationAt(SOCIAL_CONNECTIONS_KEY);
+                        HierarchicalConfiguration socialConnectionsConfig = config.configurationAt(SOCIAL_CONNECTIONS_KEY);
                         for (ConfigurationParser<?> parser : configParsers) {
                             ConnectionFactory<?> factory = (ConnectionFactory<?>)parser.parse(socialConnectionsConfig);
                             if (factory != null) {

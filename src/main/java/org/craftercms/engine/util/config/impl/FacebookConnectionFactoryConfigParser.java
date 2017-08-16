@@ -1,6 +1,6 @@
 package org.craftercms.engine.util.config.impl;
 
-import org.apache.commons.configuration.HierarchicalConfiguration;
+import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.craftercms.engine.exception.ConfigurationException;
 import org.craftercms.engine.util.config.ConfigurationParser;

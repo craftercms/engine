@@ -60,22 +60,17 @@ public class ConfigAwareConnectionFactoryLocatorTest extends ConfigAwareTestBase
         FacebookConnectionFactoryStub factory = (FacebookConnectionFactoryStub)locator.getConnectionFactory("facebook");
 
         assertNotNull(factory);
-        assertEquals(config.getString(
-            SOCIAL_CONNECTIONS_KEY + "." + FACEBOOK_CONNECTION_FACTORY_APP_ID_KEY), factory.appId);
-        assertEquals(config.getString(
-            SOCIAL_CONNECTIONS_KEY + "." + FACEBOOK_CONNECTION_FACTORY_APP_SECRET_KEY), factory.appSecret);
+        assertEquals(config.getString(SOCIAL_CONNECTIONS_KEY + "." + FACEBOOK_CONNECTION_FACTORY_APP_ID_KEY), factory.appId);
+        assertEquals(config.getString(SOCIAL_CONNECTIONS_KEY + "." + FACEBOOK_CONNECTION_FACTORY_APP_SECRET_KEY), factory.appSecret);
     }
 
     @Test
     public void testGetConnectionFactoryWithApiType() throws Exception {
-        FacebookConnectionFactoryStub factory = (FacebookConnectionFactoryStub)locator.getConnectionFactory(
-            Facebook.class);
+        FacebookConnectionFactoryStub factory = (FacebookConnectionFactoryStub)locator.getConnectionFactory(Facebook.class);
 
         assertNotNull(factory);
-        assertEquals(config.getString(
-            SOCIAL_CONNECTIONS_KEY + "." + FACEBOOK_CONNECTION_FACTORY_APP_ID_KEY), factory.appId);
-        assertEquals(config.getString(
-            SOCIAL_CONNECTIONS_KEY + "." + FACEBOOK_CONNECTION_FACTORY_APP_SECRET_KEY), factory.appSecret);
+        assertEquals(config.getString(SOCIAL_CONNECTIONS_KEY + "." + FACEBOOK_CONNECTION_FACTORY_APP_ID_KEY), factory.appId);
+        assertEquals(config.getString(SOCIAL_CONNECTIONS_KEY + "." + FACEBOOK_CONNECTION_FACTORY_APP_SECRET_KEY), factory.appSecret);
     }
 
     private static class FacebookConnectionFactoryStub extends ConnectionFactory<Facebook> {

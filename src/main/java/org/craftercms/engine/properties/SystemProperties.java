@@ -16,7 +16,7 @@
  */
 package org.craftercms.engine.properties;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Global properties of the Engine instance, in other words, properties that are common to all sites.

@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.commons.configuration2.XMLConfiguration;
 import org.craftercms.core.service.Item;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.targeting.TargetIdManager;

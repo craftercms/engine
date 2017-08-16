@@ -6,7 +6,7 @@ import java.util.List;
 import javax.servlet.ServletContext;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.configuration.HierarchicalConfiguration;
+import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;

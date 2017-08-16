@@ -1,6 +1,6 @@
 package org.craftercms.engine.navigation.impl;
 
-import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.commons.configuration2.XMLConfiguration;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Item;
 import org.craftercms.core.url.UrlTransformationEngine;

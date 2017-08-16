@@ -24,7 +24,7 @@
         <crafter.commons.version>3.0.1-SNAPSHOT</crafter.commons.version>
         <spring.version>4.3.7.RELEASE</spring.version>
         <commons.httpclient.version>3.1</commons.httpclient.version>
-        <commons.config.version>1.10</commons.config.version>
+        <commons.configuration.version>2.1</commons.configuration.version>
         <commons.collections.version>4.1</commons.collections.version>
         <log4j.version>1.2.17</log4j.version>
         <cglib.version>3.1</cglib.version>
@@ -123,9 +123,9 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>commons-configuration</groupId>
-            <artifactId>commons-configuration</artifactId>
-            <version>${commons.config.version}</version>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-configuration2</artifactId>
+            <version>${commons.configuration.version}</version>
         </dependency>
         <dependency>
             <groupId>cglib</groupId>

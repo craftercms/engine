@@ -22,7 +22,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration2.Configuration;
 import org.craftercms.commons.http.HttpUtils;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.scripting.impl.GroovyScript;

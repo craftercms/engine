@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.configuration.HierarchicalConfiguration;
+import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.craftercms.commons.lang.Callback;
 import org.craftercms.core.util.cache.CacheTemplate;
