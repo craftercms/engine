@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
+    <!-- General properties -->
+    <indexFileName>index.xml</indexFileName>
+    <defaultLocale>en</defaultLocale>
+
     <!-- Filter properties -->
     <filters>
         <filter>
@@ -23,9 +27,6 @@
         </filter>
     </filters>
 
-    <!-- Locale properties -->
-    <defaultLocale>en</defaultLocale>
-
     <!-- Content targeting properties -->
     <targeting>
         <enabled>true</enabled>
@@ -34,6 +35,7 @@
         <availableTargetIds>en,ja,ja_JP,ja_JP_JP</availableTargetIds>
         <fallbackTargetId>en</fallbackTargetId>
         <mergeFolders>true</mergeFolders>
+        <redirectToTargetedUrl>false</redirectToTargetedUrl>
     </targeting>
 
     <!-- Profile properties -->
