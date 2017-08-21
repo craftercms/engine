@@ -25,3 +25,8 @@ Thumbs.db
 
 # Maven build overlays #
 overlays
+
+# Eclipse
+.classpath
+.project
+.settings/
