@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
+    <!-- General properties -->
+    <indexFileName>index.xml</indexFileName>
+    <defaultLocale>en</defaultLocale>
+
     <!-- Filter properties -->
     <filters>
         <filter>
@@ -23,17 +27,15 @@
         </filter>
     </filters>
 
-    <!-- Locale properties -->
-    <defaultLocale>en</defaultLocale>
-
     <!-- Content targeting properties -->
     <targeting>
         <enabled>true</enabled>
         <rootFolders>/site/website</rootFolders>
         <excludePatterns>/site/website/index\.xml</excludePatterns>
-        <availableTargetIds>en,ja,ja_JP,ja_JP_JP</availableTargetIds>
+        <availableTargetIds>en,ja,ja_jp,ja_jp_jp</availableTargetIds>
         <fallbackTargetId>en</fallbackTargetId>
         <mergeFolders>true</mergeFolders>
+        <redirectToTargetedUrl>false</redirectToTargetedUrl>
     </targeting>
 
     <!-- Profile properties -->

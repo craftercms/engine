@@ -430,8 +430,7 @@
     </bean>
 
     <!-- Declared with scope="prototype" so that a new one is created for every SiteContext -->
-    <bean id="crafter.freeMarkerConfig" class="org.craftercms.engine.freemarker.CrafterFreeMarkerConfigurer"
-          scope="prototype">
+    <bean id="crafter.freeMarkerConfig" class="org.craftercms.engine.freemarker.CrafterFreeMarkerConfigurer" scope="prototype">
         <property name="templateExceptionHandler" ref="crafter.crafterTemplateExceptionHandler"/>
         <property name="templateLoaderPaths" value="WEB-INF"/>
         <property name="defaultEncoding" value="UTF-8"/>

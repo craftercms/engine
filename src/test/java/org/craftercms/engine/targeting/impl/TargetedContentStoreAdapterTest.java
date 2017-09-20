@@ -64,11 +64,11 @@ public class TargetedContentStoreAdapterTest extends ConfigAwareTestBase {
 
         assertTrue(exists);
 
-        exists = storeAdapter.exists(context, "/site/website/ja_JP_JP");
+        exists = storeAdapter.exists(context, "/site/website/ja_jp_jp");
 
         assertTrue(exists);
 
-        exists = storeAdapter.exists(context, "/site/website/ja_JP_JP/index.xml");
+        exists = storeAdapter.exists(context, "/site/website/ja_jp_jp/index.xml");
 
         assertTrue(exists);
 
@@ -90,7 +90,7 @@ public class TargetedContentStoreAdapterTest extends ConfigAwareTestBase {
 
         assertNotNull(content);
 
-        content = storeAdapter.findContent(context, cachingOptions, "/site/website/ja_JP_JP/index.xml");
+        content = storeAdapter.findContent(context, cachingOptions, "/site/website/ja_jp_jp/index.xml");
 
         assertNotNull(content);
 
@@ -114,13 +114,13 @@ public class TargetedContentStoreAdapterTest extends ConfigAwareTestBase {
         assertEquals("en", item.getName());
         assertEquals("/site/website/en", item.getUrl());
 
-        item = storeAdapter.findItem(context, cachingOptions, "/site/website/ja_JP_JP", true);
+        item = storeAdapter.findItem(context, cachingOptions, "/site/website/ja_jp_jp", true);
 
         assertNotNull(item);
         assertEquals("en", item.getName());
         assertEquals("/site/website/en", item.getUrl());
 
-        item = storeAdapter.findItem(context, cachingOptions, "/site/website/ja_JP_JP/index.xml", true);
+        item = storeAdapter.findItem(context, cachingOptions, "/site/website/ja_jp_jp/index.xml", true);
 
         assertNotNull(item);
         assertEquals("index.xml", item.getName());
@@ -153,7 +153,7 @@ public class TargetedContentStoreAdapterTest extends ConfigAwareTestBase {
         assertEquals("about-us", items.get(1).getName());
         assertEquals("/site/website/en/about-us", items.get(1).getUrl());
 
-        items = storeAdapter.findItems(context, cachingOptions, "/site/website/ja_JP_JP", true);
+        items = storeAdapter.findItems(context, cachingOptions, "/site/website/ja_jp_jp", true);
 
         assertNotNull(items);
         assertEquals(2, items.size());
@@ -164,7 +164,7 @@ public class TargetedContentStoreAdapterTest extends ConfigAwareTestBase {
 
         config.setProperty(SiteProperties.MERGE_FOLDERS_CONFIG_KEY, false);
 
-        items = storeAdapter.findItems(context, cachingOptions, "/site/website/ja_JP_JP", true);
+        items = storeAdapter.findItems(context, cachingOptions, "/site/website/ja_jp_jp", true);
 
         assertNotNull(items);
         assertEquals(1, items.size());

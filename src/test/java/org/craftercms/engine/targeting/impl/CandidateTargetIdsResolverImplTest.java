@@ -23,12 +23,12 @@ public class CandidateTargetIdsResolverImplTest {
 
     @Test
     public void testGetTargetIds() throws Exception {
-        List<String> targetIds = candidateTargetIdsResolver.getTargetIds("ja_JP_JP", "en");
+        List<String> targetIds = candidateTargetIdsResolver.getTargetIds("ja_jp_jp", "en");
 
         assertNotNull(targetIds);
         assertEquals(4, targetIds.size());
-        assertEquals("ja_JP_JP", targetIds.get(0));
-        assertEquals("ja_JP", targetIds.get(1));
+        assertEquals("ja_jp_jp", targetIds.get(0));
+        assertEquals("ja_jp", targetIds.get(1));
         assertEquals("ja", targetIds.get(2));
         assertEquals("en", targetIds.get(3));
     }

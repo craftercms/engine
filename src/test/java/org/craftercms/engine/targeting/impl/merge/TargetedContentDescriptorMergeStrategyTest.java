@@ -45,7 +45,7 @@ public class TargetedContentDescriptorMergeStrategyTest {
     private static final String SITE_NAME = "test";
     private static final String LEVEL_DESCRIPTOR_FILENAME = "crafter-level-descriptor.level.xml";
     private static final String[] ROOT_FOLDERS = { "/site/website" };
-    private static final String[] AVAILABLE_TARGET_IDS = { "es_CR", "es", "en" };
+    private static final String[] AVAILABLE_TARGET_IDS = { "es_cr", "es", "en" };
     private static final String FALLBACK_TARGET_ID = "en";
 
     private TargetedContentDescriptorMergeStrategy mergeStrategy;
@@ -79,7 +79,7 @@ public class TargetedContentDescriptorMergeStrategyTest {
 
         List<MergeableDescriptor> descriptors = mergeStrategy.getDescriptors(context,
                                                                              CachingOptions.DEFAULT_CACHING_OPTIONS,
-                                                                             "/site/website/es_CR/products/index.xml",
+                                                                             "/site/website/es_cr/products/index.xml",
                                                                              mock(Document.class), false);
 
         assertNotNull(descriptors);
@@ -93,9 +93,9 @@ public class TargetedContentDescriptorMergeStrategyTest {
         assertEquals("/site/website/es/crafter-level-descriptor.level.xml", descriptors.get(6).getUrl());
         assertEquals("/site/website/es/products/crafter-level-descriptor.level.xml", descriptors.get(7).getUrl());
         assertEquals("/site/website/es/products/index.xml", descriptors.get(8).getUrl());
-        assertEquals("/site/website/es_CR/crafter-level-descriptor.level.xml", descriptors.get(9).getUrl());
-        assertEquals("/site/website/es_CR/products/crafter-level-descriptor.level.xml", descriptors.get(10).getUrl());
-        assertEquals("/site/website/es_CR/products/index.xml", descriptors.get(11).getUrl());
+        assertEquals("/site/website/es_cr/crafter-level-descriptor.level.xml", descriptors.get(9).getUrl());
+        assertEquals("/site/website/es_cr/products/crafter-level-descriptor.level.xml", descriptors.get(10).getUrl());
+        assertEquals("/site/website/es_cr/products/index.xml", descriptors.get(11).getUrl());
     }
 
     private DescriptorMergeStrategyResolver createStrategyResolver(DescriptorMergeStrategy defaultMergeStrategy) {

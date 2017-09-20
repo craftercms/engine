@@ -124,8 +124,7 @@ public class SiteProperties {
     }
 
     /**
-     * Returns the name of the index file name in the configuration, or {@link #DEFAULT_INDEX_FILE_NAME} if not in
-     * configuration.
+     * Returns the name of a page's index file, or {@link #DEFAULT_INDEX_FILE_NAME} if not in configuration.
      */
     public static final String getIndexFileName() {
         Configuration config = ConfigUtils.getCurrentConfig();
