@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -190,22 +191,26 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
 
     @Override
     public View resolveViewName(String renderUrl, Locale locale) throws Exception {
-        String storeUrl = urlTransformationService.transform(renderUrlToStoreUrlTransformerName, renderUrl,
-                                                             cacheUrlTransformations);
+        String storeUrl = urlTransformationService.transform(renderUrlToStoreUrlTransformerName, renderUrl, cacheUrlTransformations);
         View view = getCachedLocalizedView(storeUrl, locale);
 
-        if (view != null) {
+        if (view != null && view instanceof CrafterPageView) {
+            CrafterPageView pageView = (CrafterPageView)view;
+
             if (SiteProperties.isRedirectToTargetedUrl()) {
-                String targetedRenderUrl = urlTransformationService.transform(storeUrlToRenderUrlTransformerName,
-                                                                              storeUrl, cacheUrlTransformations);
-                if (!targetedRenderUrl.equals(renderUrl)) {
-                    return getRedirectView(targetedRenderUrl, true);
+                String finalStoreUrl = pageView.getPage().getStoreUrl();
+                String finalRenderUrl = urlTransformationService.transform(storeUrlToRenderUrlTransformerName, finalStoreUrl,
+                                                                           cacheUrlTransformations);
+
+                renderUrl = FilenameUtils.normalizeNoEndSeparator(renderUrl);
+                finalRenderUrl = FilenameUtils.normalizeNoEndSeparator(finalRenderUrl);
+
+                if (!renderUrl.equals(finalRenderUrl)) {
+                    return getRedirectView(finalRenderUrl, true);
                 }
             }
 
-            if (view instanceof CrafterPageView) {
-                accessManager.checkAccess(((CrafterPageView)view).getPage());
-            }
+            accessManager.checkAccess(pageView.getPage());
         }
 
         return view;
@@ -238,53 +243,48 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     protected View getCachedLocalizedView(final String url, final Locale locale) {
         final SiteContext siteContext = SiteContext.getCurrent();
         if (siteContext != null) {
-            return cacheTemplate.getObject(siteContext.getContext(), cachingOptions, new Callback<View>() {
+            return cacheTemplate.getObject(siteContext.getContext(), cachingOptions, () -> {
+                SiteItem page = getPage(url);
+                if (page != null) {
+                    String redirectUrl = page.getItem().queryDescriptorValue(redirectUrlXPathQuery);
+                    String contentType = page.getItem().queryDescriptorValue(contentTypeXPathQuery);
+                    String forceHttps = page.getItem().queryDescriptorValue(forceHttpsXPathQuery);
 
-                @Override
-                public View execute() {
-                    SiteItem page = getPage(url);
-                    if (page != null) {
-                        String redirectUrl = page.getItem().queryDescriptorValue(redirectUrlXPathQuery);
-                        String contentType = page.getItem().queryDescriptorValue(contentTypeXPathQuery);
-                        String forceHttps = page.getItem().queryDescriptorValue(forceHttpsXPathQuery);
-
-                        if (StringUtils.isNotEmpty(contentType) &&
-                            StringUtils.equalsIgnoreCase(redirectContentType, contentType) &&
-                            StringUtils.isNotEmpty(redirectUrl)) {
-                            if (logger.isDebugEnabled()) {
-                                logger.debug("Redirecting page @ " + url + " to URL " + redirectUrl);
-                            }
-
-                            return getRedirectView(redirectUrl, true);
-                        } else if (StringUtils.isNotEmpty(forceHttps) && Boolean.parseBoolean(forceHttps)) {
-                            if (logger.isDebugEnabled()) {
-                                logger.debug("Forcing HTTPS on page @ " + url);
-                            }
-
-                            return getCurrentPageHttpsRedirectView();
-                        } else {
-                            UserAgentAwareCrafterPageView view = new UserAgentAwareCrafterPageView();
-                            view.setServletContext(getServletContext());
-                            view.setPage(page);
-                            view.setLocale(locale);
-                            view.setSiteItemService(siteItemService);
-                            view.setPageViewNameXPathQuery(pageViewNameXPathQuery);
-                            view.setMimeTypeXPathQuery(mimeTypeXPathQuery);
-                            view.setDelegatedViewResolver(delegatedViewResolver);
-                            view.setUserAgentTemplateDetector(userAgentTemplateDetector);
-
-                            loadScripts(siteContext.getScriptFactory(), page, view);
-
-                            view.addDependencyKey(page.getItem().getKey());
-
-                            return applyLifecycleMethods(page.getStoreUrl(), view);
+                    if (StringUtils.isNotEmpty(contentType) &&
+                        StringUtils.equalsIgnoreCase(redirectContentType, contentType) &&
+                        StringUtils.isNotEmpty(redirectUrl)) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Redirecting page @ " + url + " to URL " + redirectUrl);
                         }
-                    } else {
-                        // Return null to continue with the ViewResolverChain
-                        return null;
-                    }
-                }
 
+                        return getRedirectView(redirectUrl, true);
+                    } else if (StringUtils.isNotEmpty(forceHttps) && Boolean.parseBoolean(forceHttps)) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Forcing HTTPS on page @ " + url);
+                        }
+
+                        return getCurrentPageHttpsRedirectView();
+                    } else {
+                        UserAgentAwareCrafterPageView view = new UserAgentAwareCrafterPageView();
+                        view.setServletContext(getServletContext());
+                        view.setPage(page);
+                        view.setLocale(locale);
+                        view.setSiteItemService(siteItemService);
+                        view.setPageViewNameXPathQuery(pageViewNameXPathQuery);
+                        view.setMimeTypeXPathQuery(mimeTypeXPathQuery);
+                        view.setDelegatedViewResolver(delegatedViewResolver);
+                        view.setUserAgentTemplateDetector(userAgentTemplateDetector);
+
+                        loadScripts(siteContext.getScriptFactory(), page, view);
+
+                        view.addDependencyKey(page.getItem().getKey());
+
+                        return applyLifecycleMethods(page.getStoreUrl(), view);
+                    }
+                } else {
+                    // Return null to continue with the ViewResolverChain
+                    return null;
+                }
             }, url, locale, PAGE_CONST_KEY_ELEM);
         } else {
             // Return null to continue with the ViewResolverChain

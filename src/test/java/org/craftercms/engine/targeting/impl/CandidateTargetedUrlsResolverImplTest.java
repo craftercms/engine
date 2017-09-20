@@ -34,9 +34,9 @@ public class CandidateTargetedUrlsResolverImplTest {
     private static final String SITE_NAME = "test";
     private static final String[] ROOT_FOLDERS = { "/site/website" };
     private static final String FALLBACK_TARGET_ID = "";
-    private static final String CURRENT_TARGET_ID = "es_CR";
-    private static final List<String> CANDIDATE_TARGET_IDS = Arrays.asList("es_CR", "es", "");
-    private static final String TARGETED_URL1 = "/products/index_es_CR.xml";
+    private static final String CURRENT_TARGET_ID = "es_cr";
+    private static final List<String> CANDIDATE_TARGET_IDS = Arrays.asList("es_cr", "es", "");
+    private static final String TARGETED_URL1 = "/products/index_es_cr.xml";
     private static final String TARGETED_URL2 = "/products/index.xml";
     private static final String TARGETED_FULL_URL1 = ROOT_FOLDERS[0] + TARGETED_URL1;
     private static final String TARGETED_FULL_URL2 = ROOT_FOLDERS[0] + TARGETED_URL2;
@@ -64,7 +64,7 @@ public class CandidateTargetedUrlsResolverImplTest {
 
         assertNotNull(urls);
         assertEquals(3, urls.size());
-        assertEquals("/site/website/products/index_es_CR.xml", urls.get(0));
+        assertEquals("/site/website/products/index_es_cr.xml", urls.get(0));
         assertEquals("/site/website/products/index_es.xml", urls.get(1));
         assertEquals("/site/website/products/index.xml", urls.get(2));
 

@@ -30,7 +30,8 @@ import org.springframework.context.i18n.LocaleContextHolder;
 /**
  * Implementation of {@link org.craftercms.engine.targeting.TargetIdManager} that treats the {@link Locale} as a
  * target ID. The current target ID is one returned by {@link LocaleContextHolder#getLocale()}, and if no available
- * target IDs are specified in the site configuration, the available locales of the JVM will be used instead.
+ * target IDs are specified in the site configuration, the available locales of the JVM will be used instead. The locales
+ * are always converted lower case.
  *
  * @author avasquez
  */
@@ -40,7 +41,7 @@ public class LocaleTargetIdManager extends AbstractTargetIdManager {
     public String getCurrentTargetId() throws IllegalStateException {
         Locale currentLocale = LocaleContextHolder.getLocale();
         if (currentLocale != null) {
-            return currentLocale.toString();
+            return StringUtils.lowerCase(currentLocale.toString());
         } else {
             return null;
         }
@@ -57,7 +58,7 @@ public class LocaleTargetIdManager extends AbstractTargetIdManager {
                 String localeStr = locale.toString();
                 // Ignore empty ROOT locale
                 if (StringUtils.isNotEmpty(localeStr)) {
-                    availableLocaleStrs.add(localeStr);
+                    availableLocaleStrs.add(StringUtils.lowerCase(localeStr));
                 }
             }
 
