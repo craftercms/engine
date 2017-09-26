@@ -24,7 +24,7 @@ public class SiteAwareCORSFilter extends OncePerRequestFilter {
     private static final Logger logger = LoggerFactory.getLogger(SiteAwareCORSFilter.class);
 
     public static final String CONFIG_KEY = "cors";
-    public static final String ENABLE_KEY = "[@enable]";
+    public static final String ENABLE_KEY = "enable";
     public static final String MAX_AGE_KEY = "accessControlMaxAge";
     public static final String ALLOW_ORIGIN_KEY = "accessControlAllowOrigin";
     public static final String ALLOW_METHODS_KEY = "accessControlAllowMethods";
@@ -41,8 +41,7 @@ public class SiteAwareCORSFilter extends OncePerRequestFilter {
         try {
             HierarchicalConfiguration corsConfig = config.configurationAt(CONFIG_KEY);
             if (corsConfig != null) {
-                boolean enable = corsConfig.getBoolean(ENABLE_KEY, false);
-                return !enable;
+                return !corsConfig.getBoolean(ENABLE_KEY, false);
             }
         } catch (Exception e) {
             logger.debug("Site '{}' has no CORS configuration", siteContext.getSiteName());
