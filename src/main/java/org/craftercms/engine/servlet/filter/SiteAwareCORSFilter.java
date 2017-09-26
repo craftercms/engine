@@ -31,6 +31,12 @@ public class SiteAwareCORSFilter extends OncePerRequestFilter {
     public static final String ALLOW_HEADERS_KEY = "accessControlAllowHeaders";
     public static final String ALLOW_CREDENTIALS_KEY = "accessControlAllowCredentials";
 
+    public static final String MAX_AGE_DEFAULT = "86400";
+    public static final String ALLOW_ORIGIN_DEFAULT = "*";
+    public static final String ALLOW_METHODS_DEFAULT = "GET, POST, OPTIONS";
+    public static final String ALLOW_HEADERS_DEFAULT = "Content-Type";
+    public static final String ALLOW_CREDENTIALS_DEFAULT = "true";
+
     /**
      * Exclude requests for sites that have no configuration or it is marked as disabled.
      */
@@ -57,13 +63,13 @@ public class SiteAwareCORSFilter extends OncePerRequestFilter {
                                     final FilterChain filterChain) throws ServletException, IOException {
         SiteContext siteContext = SiteContext.getCurrent();
         HierarchicalConfiguration corsConfig = siteContext.getConfig().configurationAt(CONFIG_KEY);
-        HttpServletResponseWrapper responseWrapper = new HttpServletResponseWrapper(response);
-        responseWrapper.setHeader(CORSFilter.ALLOW_ORIGIN, corsConfig.getString(ALLOW_ORIGIN_KEY));
-        responseWrapper.setHeader(CORSFilter.ALLOW_CREDENTIALS, corsConfig.getString(ALLOW_CREDENTIALS_KEY));
-        responseWrapper.setHeader(CORSFilter.ALLOW_METHODS, corsConfig.getString(ALLOW_METHODS_KEY));
-        responseWrapper.setHeader(CORSFilter.ALLOW_HEADERS, corsConfig.getString(ALLOW_HEADERS_KEY));
-        responseWrapper.setHeader(CORSFilter.MAX_AGE, corsConfig.getString(MAX_AGE_KEY));
-        filterChain.doFilter(request, responseWrapper);
+        response.setHeader(CORSFilter.ALLOW_ORIGIN, corsConfig.getString(ALLOW_ORIGIN_KEY, ALLOW_ORIGIN_DEFAULT));
+        response.setHeader(CORSFilter.ALLOW_CREDENTIALS, corsConfig.getString(ALLOW_CREDENTIALS_KEY,
+            ALLOW_CREDENTIALS_DEFAULT));
+        response.setHeader(CORSFilter.ALLOW_METHODS, corsConfig.getString(ALLOW_METHODS_KEY, ALLOW_METHODS_DEFAULT));
+        response.setHeader(CORSFilter.ALLOW_HEADERS, corsConfig.getString(ALLOW_HEADERS_KEY, ALLOW_HEADERS_DEFAULT));
+        response.setHeader(CORSFilter.MAX_AGE, corsConfig.getString(MAX_AGE_KEY, MAX_AGE_DEFAULT));
+        filterChain.doFilter(request, response);
     }
 
 }
