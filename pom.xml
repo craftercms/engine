@@ -110,6 +110,11 @@
             <artifactId>crafter-commons-mongo</artifactId>
             <version>${crafter.commons.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.craftercms</groupId>
+            <artifactId>crafter-commons-aws</artifactId>
+            <version>${crafter.commons.version}</version>
+        </dependency>
 
         <dependency>
             <!-- TODO: Replace for Apache HttpComponents -->
@@ -186,12 +191,6 @@
             <groupId>rome</groupId>
             <artifactId>rome</artifactId>
             <version>${rome.version}</version>
-        </dependency>
-        <!-- AWS SDK -->
-        <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-s3</artifactId>
-            <version>${aws.sdk.version}</version>
         </dependency>
 
         <!-- Test dependencies -->
