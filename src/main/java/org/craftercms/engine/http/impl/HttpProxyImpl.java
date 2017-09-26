@@ -82,15 +82,15 @@ public class HttpProxyImpl implements HttpProxy {
 
     protected void proxyRequest(String url, boolean isGet, HttpServletRequest request, HttpServletResponse response)
             throws HttpProxyException {
-        url = createTargetUrl(url, request);
+        String targetUrl = createTargetUrl(url, request);
 
         HttpRequestBase httpRequest = null;
         CloseableHttpResponse httpResponse = null;
         try {
             if (isGet) {
-                httpRequest = createGetRequest(url, request);
+                httpRequest = createGetRequest(targetUrl, request);
             } else {
-                httpRequest = createPostRequest(url, request);
+                httpRequest = createPostRequest(targetUrl, request);
             }
 
             if (logger.isDebugEnabled()) {
@@ -115,7 +115,7 @@ public class HttpProxyImpl implements HttpProxy {
             if (httpRequest != null) {
                 errorMsg = "Error while proxying to " + getRequestDescription(httpRequest);
             } else {
-                errorMsg = "Error while proxing to " + (isGet? "GET[" : "POST[") + url + "]";
+                errorMsg = "Error while proxing to " + (isGet? "GET[" : "POST[") + targetUrl + "]";
             }
 
             logger.error(errorMsg, e);
