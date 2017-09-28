@@ -16,13 +16,21 @@
  */
 package org.craftercms.engine.http.impl;
 
-import org.apache.commons.httpclient.*;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
-import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.Header;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.craftercms.engine.exception.HttpProxyException;
 import org.craftercms.engine.http.HttpProxy;
 import org.springframework.beans.factory.annotation.Required;
@@ -44,10 +52,13 @@ public class HttpProxyImpl implements HttpProxy {
     private static final Log logger = LogFactory.getLog(HttpProxyImpl.class);
 
     private String baseServiceUrl;
-    private HttpClient httpClient;
+    private CloseableHttpClient httpClient;
 
     public HttpProxyImpl() {
-        httpClient = new HttpClient(new MultiThreadedHttpConnectionManager());
+        httpClient = HttpClientBuilder
+                        .create()
+                        .setConnectionManager(new PoolingHttpClientConnectionManager())
+                        .build();
     }
 
     @Required
@@ -55,81 +66,84 @@ public class HttpProxyImpl implements HttpProxy {
         this.baseServiceUrl = StringUtils.stripEnd(baseServiceUrl, "/");
     }
 
-    public void setHttpClient(HttpClient httpClient) {
+    public void setHttpClient(CloseableHttpClient httpClient) {
         this.httpClient = httpClient;
     }
 
     @Override
     public void proxyGet(String url, HttpServletRequest request, HttpServletResponse response) throws HttpProxyException {
-        proxyMethod(url, true, request, response);
+        proxyRequest(url, true, request, response);
     }
 
     @Override
     public void proxyPost(String url, HttpServletRequest request, HttpServletResponse response) {
-        proxyMethod(url, false, request, response);
+        proxyRequest(url, false, request, response);
     }
 
-    protected void proxyMethod(String url, boolean isGet, HttpServletRequest request, HttpServletResponse response)
+    protected void proxyRequest(String url, boolean isGet, HttpServletRequest request, HttpServletResponse response)
             throws HttpProxyException {
-        url = createTargetUrl(url, request);
+        String targetUrl = createTargetUrl(url, request);
 
-        HttpMethod httpMethod = null;
+        HttpRequestBase httpRequest = null;
+        CloseableHttpResponse httpResponse = null;
         try {
             if (isGet) {
-                httpMethod = createGetMethod(url, request);
+                httpRequest = createGetRequest(targetUrl, request);
             } else {
-                httpMethod = createPostMethod(url, request);
+                httpRequest = createPostRequest(targetUrl, request);
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("Proxying to " + getMethodDescription(httpMethod));
+                logger.debug("Proxying to " + getRequestDescription(httpRequest));
             }
 
-            int status = httpClient.executeMethod(httpMethod);
-            response.setStatus(status);
+            httpResponse = httpClient.execute(httpRequest);
+            response.setStatus(httpResponse.getStatusLine().getStatusCode());
+            String responseBody = IOUtils.toString(httpResponse.getEntity().getContent());
 
-            if (status >= 400 && logger.isDebugEnabled()) {
-                logger.debug("Received error response from " + getMethodDescription(httpMethod) + ": status = " + httpMethod
-                        .getStatusText() + ", response body = \n" + httpMethod.getResponseBodyAsString());
+            if (httpResponse.getStatusLine().getStatusCode() >= 400 && logger.isDebugEnabled()) {
+                logger.debug("Received error response from " + getRequestDescription(httpRequest) + ": status = " +
+                    httpResponse.getStatusLine().getReasonPhrase() + ", response body = \n" +
+                    responseBody);
             }
 
-            copyMethodResponseHeadersToResponse(httpMethod, response);
-            copyMethodResponseBodyToResponse(httpMethod, response);
+            copyActualResponseHeaders(httpRequest, response);
+            copyActualResponseBody(responseBody, response);
         } catch (Exception e) {
             String errorMsg;
 
-            if (httpMethod != null) {
-                errorMsg = "Error while proxying to " + getMethodDescription(httpMethod);
+            if (httpRequest != null) {
+                errorMsg = "Error while proxying to " + getRequestDescription(httpRequest);
             } else {
-                errorMsg = "Error while proxing to " + (isGet? "GET[" : "POST[") + url + "]";
+                errorMsg = "Error while proxing to " + (isGet? "GET[" : "POST[") + targetUrl + "]";
             }
 
             logger.error(errorMsg, e);
 
             throw new HttpProxyException(errorMsg, e);
         } finally {
-            if (httpMethod != null) {
-                httpMethod.releaseConnection();
+            if (httpRequest != null) {
+                httpRequest.releaseConnection();
             }
         }
     }
 
-    protected HttpMethod createGetMethod(String url, HttpServletRequest request) {
-        GetMethod getMethod = new GetMethod(url);
-        copyRequestHeadersToMethod(getMethod, request);
+    protected HttpRequestBase createGetRequest(String url, HttpServletRequest request) {
+        HttpGet getRequest = new HttpGet(url);
+        copyOriginalHeaders(getRequest, request);
 
-        return getMethod;
+        return getRequest;
     }
 
-    protected HttpMethod createPostMethod(String url, HttpServletRequest request) throws IOException {
-        PostMethod postMethod = new PostMethod(url);
-        copyRequestHeadersToMethod(postMethod, request);
-        copyRequestBodyToMethod(postMethod, request);
+    protected HttpRequestBase createPostRequest(String url, HttpServletRequest request) throws IOException {
+        HttpPost postRequest = new HttpPost(url);
+        copyOriginalHeaders(postRequest, request);
+        copyOriginalRequestBody(postRequest, request);
 
-        return postMethod;
+        return postRequest;
     }
 
-    protected void copyRequestHeadersToMethod(HttpMethod httpMethod, HttpServletRequest request) {
+    protected void copyOriginalHeaders(HttpUriRequest httpRequest, HttpServletRequest request) {
         Enumeration headerNames = request.getHeaderNames();
         if (headerNames != null) {
             while (headerNames.hasMoreElements()) {
@@ -137,33 +151,33 @@ public class HttpProxyImpl implements HttpProxy {
                 String headerValue = request.getHeader(headerName);
 
                 if (logger.isTraceEnabled()) {
-                    logger.trace(getMethodDescription(httpMethod) + " copying request header " + headerName + ": " + headerValue);
+                    logger.trace(getRequestDescription(httpRequest) + " copying request header " + headerName + ": " + headerValue);
                 }
 
-                httpMethod.addRequestHeader(headerName, headerValue);
+                httpRequest.addHeader(headerName, headerValue);
             }
         }
     }
 
-    protected void copyRequestBodyToMethod(PostMethod httpMethod, HttpServletRequest request) throws IOException {
+    protected void copyOriginalRequestBody(HttpPost httpRequest, HttpServletRequest request) throws IOException {
         int contentLength = request.getContentLength();
         if (contentLength > 0) {
             String contentType = request.getContentType();
             InputStream content = request.getInputStream();
 
-            httpMethod.setRequestEntity(new InputStreamRequestEntity(content, contentLength, contentType));
+            httpRequest.setEntity(new InputStreamEntity(content, contentLength, ContentType.create(contentType)));
         }
     }
 
-    protected void copyMethodResponseHeadersToResponse(HttpMethod httpMethod, HttpServletResponse response) {
-        Header[] headers = httpMethod.getResponseHeaders();
+    protected void copyActualResponseHeaders(HttpUriRequest httpRequest, HttpServletResponse response) {
+        Header[] headers = httpRequest.getAllHeaders();
         for (Header header : headers) {
             String headerName = header.getName();
             String headerValue = header.getValue();
             
             if (!headerName.equals("Transfer-Encoding") && !header.equals("chunked")) {
                 if (logger.isTraceEnabled()) {
-                    logger.trace(getMethodDescription(httpMethod) + " copying response header " + headerName + ": " +  headerValue);
+                    logger.trace(getRequestDescription(httpRequest) + " copying response header " + headerName + ": " +  headerValue);
                 }
 
                 if (response.containsHeader(headerName)) {
@@ -175,13 +189,12 @@ public class HttpProxyImpl implements HttpProxy {
         }
     }
 
-    protected void copyMethodResponseBodyToResponse(HttpMethod httpMethod, HttpServletResponse response) throws IOException {
-        byte[] responseBody = httpMethod.getResponseBody();
+    protected void copyActualResponseBody(String responseBody, HttpServletResponse response) throws
+        IOException {
         if (responseBody != null) {
-            response.setContentLength(responseBody.length);
-
+            response.setContentLength(responseBody.length());
             OutputStream out = response.getOutputStream();
-            out.write(responseBody);
+            out.write(responseBody.getBytes());
             out.flush();
         }
     }
@@ -210,12 +223,8 @@ public class HttpProxyImpl implements HttpProxy {
         return queryString;
     }
 
-    private String getMethodDescription(HttpMethod httpMethod) {
-        try {
-            return httpMethod.getName() + "[" + httpMethod.getURI() + "]";
-        } catch (URIException e) {
-            return httpMethod.getName() + "[" + httpMethod.getPath() + "]";
-        }
+    private String getRequestDescription(HttpUriRequest httpRequest) {
+        return httpRequest.getMethod() + "[" + httpRequest.getURI() + "]";
     }
 
 }
