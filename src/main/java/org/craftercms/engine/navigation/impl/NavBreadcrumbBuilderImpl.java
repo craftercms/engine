@@ -84,6 +84,7 @@ public class NavBreadcrumbBuilderImpl implements NavBreadcrumbBuilder {
             if (siteItem != null) {
                 NavItem navItem = itemConverter.convert(siteItem);
                 if (navItem != null) {
+                    navItem.setActive(url.equals(siteItem.getItem().getDescriptorUrl()));
                     breadcrumb.add(navItem);
                 }
             }
