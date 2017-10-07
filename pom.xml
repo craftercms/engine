@@ -8,7 +8,7 @@
     <description>Crafter Content Delivery Engine</description>
     <url>https://github.com/craftercms/engine</url>
     <packaging>war</packaging>
-    <version>2.5.7</version>
+    <version>2.5.8-SNAPSHOT</version>     
     <organization> 
         <name>CrafterCMS</name>
         <url>http://craftercms.org</url>
