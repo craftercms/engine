@@ -71,6 +71,10 @@
         <level value="info" />
     </logger>
 
+    <logger name="org.mongodb.driver">
+        <level value="warn" />
+    </logger>
+
     <!-- Root Logger -->
     <root>
         <priority value="info" />
