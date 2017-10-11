@@ -9,6 +9,7 @@ import org.springframework.web.util.Log4jConfigListener;
 /**
  * Create a simple way to override Log4j.xml files
  */
+@SuppressWarnings("deprecation")
 public class ExtendedLog4jConfigListener extends Log4jConfigListener {
 
     @Override

@@ -41,6 +41,7 @@ public class ConfigAwareUrlAccessRestrictionCheckingProcessor extends UrlAccessR
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected Map<String, Expression> getUrlRestrictions() {
         Callback<Map<String, Expression>> callback = new Callback<Map<String, Expression>>() {
 

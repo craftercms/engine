@@ -150,6 +150,7 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     protected SimpleHash buildTemplateModel(final Map<String, Object> model, final HttpServletRequest request,
                                             final HttpServletResponse response) {
         AllHttpScopesAndAppContextHashModel templateModel = new AllHttpScopesAndAppContextHashModel(

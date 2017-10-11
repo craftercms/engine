@@ -29,6 +29,7 @@ public class CircularQueueLogAppender extends AppenderSkeleton {
     private String dateFormatString;
 
     @Override
+    @SuppressWarnings("unchecked")
     protected void append(final LoggingEvent event) {
         final SiteContext ctx = SiteContext.getCurrent();
         if (ctx != null) {
@@ -80,6 +81,7 @@ public class CircularQueueLogAppender extends AppenderSkeleton {
         return instance;
     }
 
+    @SuppressWarnings("unchecked")
     public List<HashMap<String, Object>> getLoggedEvents(final String siteId, final long since) {
 
         final Iterator<HashMap<String, Object>> iter = buffer.iterator();

@@ -24,7 +24,7 @@ public class BeanDefinitionUtils {
      *
      * @param applicationContext    the current application context
      * @param beanName
-     * @return
+     * @return the bean definition
      */
     public static BeanDefinition createBeanDefinitionFromOriginal(ApplicationContext applicationContext,
                                                                   String beanName) {

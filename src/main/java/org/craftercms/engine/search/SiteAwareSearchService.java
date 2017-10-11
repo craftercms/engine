@@ -57,7 +57,7 @@ public class SiteAwareSearchService implements SearchService<Query> {
     }
 
     @Required
-    public void setActualSearchService(SearchService actualSearchService) {
+    public void setActualSearchService(SearchService<Query> actualSearchService) {
         this.actualSearchService = actualSearchService;
     }
 

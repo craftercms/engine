@@ -56,6 +56,7 @@ public class ConfigurationScriptJobResolver implements ScriptJobResolver, Servle
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<JobContext> resolveJobs(SiteContext siteContext) throws SchedulingException {
         HierarchicalConfiguration config = siteContext.getConfig();
         List<JobContext> jobContexts = new ArrayList<>();
