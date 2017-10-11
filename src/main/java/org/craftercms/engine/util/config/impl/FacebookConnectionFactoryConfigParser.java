@@ -9,8 +9,7 @@ import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 
 /**
- * Parses a configuration for the properties of a {@link org.springframework.social.facebook.connect
- * .FacebookConnectionFactory}.
+ * Parses a configuration for the properties of a {@link org.springframework.social.facebook.connect.FacebookConnectionFactory}.
  *
  * @author avasquez
  */
