@@ -58,7 +58,8 @@ public class HttpProxyRequestHandler extends WebContentGenerator implements Http
 
     @Override
     public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        checkAndPrepare(request, response, false);
+        checkRequest(request);
+        prepareResponse(response);
 
         String proxyName = getProxyNameUriTemplateVar(request);
         String proxyUrl = getUrlToProxy(request);
@@ -76,6 +77,7 @@ public class HttpProxyRequestHandler extends WebContentGenerator implements Http
         }
     }
 
+    @SuppressWarnings("unchecked")
     protected String getProxyNameUriTemplateVar(HttpServletRequest request) {
         Map<String, String> uriTemplateVars = (Map<String, String>) request.getAttribute(
             HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);

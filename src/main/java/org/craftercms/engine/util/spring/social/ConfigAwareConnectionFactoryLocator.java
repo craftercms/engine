@@ -17,10 +17,11 @@ import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.social.connect.support.ConnectionFactoryRegistry;
 
 /**
- * {@link org.springframework.social.connect.ConnectionFactoryLocator} that resolves {@link org.springframework.social
- * .connect.ConnectionFactory}s according to the current site. Basically, each site has it's own connection registry,
- * which is used to find the corresponding {@code ConnectionFactory} for the site. The registry is created from the
- * site configuration. If there's no site configuration for connections, the default locator is used.
+ * {@link org.springframework.social.connect.ConnectionFactoryLocator} that resolves
+ * {@link org.springframework.social.connect.ConnectionFactory}s according to the current site. Basically, each site
+ * has it's own connection registry, which is used to find the corresponding {@code ConnectionFactory} for the site.
+ * The registry is created from the site configuration. If there's no site configuration for connections, the default
+ * locator is used.
  *
  * @author avasquez
  */

@@ -93,6 +93,7 @@ public class ScriptFilter implements Filter {
     public void destroy() {
     }
 
+    @SuppressWarnings("unchecked")
     protected List<FilterMapping> getFilterMappings() {
         final SiteContext siteContext = SiteContext.getCurrent();
         if (siteContext != null) {

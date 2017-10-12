@@ -30,6 +30,7 @@ import org.craftercms.engine.model.Dom4jNodeModel;
  *
  * @author Alfonso Vásquez
  */
+@SuppressWarnings("deprecation")
 public class CrafterObjectWrapper extends DefaultObjectWrapper {
 
     @Override

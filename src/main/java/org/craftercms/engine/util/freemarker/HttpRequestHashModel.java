@@ -90,20 +90,20 @@ public class HttpRequestHashModel implements TemplateHashModelEx {
     }
 
     public TemplateCollectionModel keys() {
-        ArrayList keys = new ArrayList();
+        ArrayList<String> keys = new ArrayList<>();
 
-        for (Enumeration enumeration = request.getAttributeNames(); enumeration.hasMoreElements();) {
+        for (Enumeration<String> enumeration = request.getAttributeNames(); enumeration.hasMoreElements();) {
             keys.add(enumeration.nextElement());
         }
 
-        return new SimpleCollection(keys.iterator());
+        return new SimpleCollection(keys.iterator(), wrapper);
     }
 
     public TemplateCollectionModel values() {
-        ArrayList values = new ArrayList();
+        ArrayList<Object> values = new ArrayList<>();
 
-        for (Enumeration enumeration = request.getAttributeNames(); enumeration.hasMoreElements();) {
-            values.add(request.getAttribute((String)enumeration.nextElement()));
+        for (Enumeration<String> enumeration = request.getAttributeNames(); enumeration.hasMoreElements();) {
+            values.add(request.getAttribute(enumeration.nextElement()));
         }
 
         return new SimpleCollection(values.iterator(), wrapper);
