@@ -98,6 +98,8 @@
         <property name="authenticationManager" ref="crafter.authenticationManager"/>
     </bean>
 
+    <bean id="crafter.tenantsResolver" class="org.craftercms.engine.util.tenant.SiteNameTenantResolver"/>
+
     <!-- ////////////////////////////////// -->
     <!--								 	-->
     <!--		FreeMarker Config			-->
