@@ -62,7 +62,6 @@ public class ConfigUtils {
         Parameters params = new Parameters();
         FileBasedConfigurationBuilder<XMLConfiguration> builder = new FileBasedConfigurationBuilder<>(XMLConfiguration.class);
 
-
         try {
             XMLBuilderParameters xmlParams = params
                 .xml()
