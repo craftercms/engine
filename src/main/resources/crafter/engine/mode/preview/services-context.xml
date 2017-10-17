@@ -117,6 +117,7 @@
                 <prop key="output_encoding">UTF-8</prop>
                 <prop key="object_wrapper">org.craftercms.engine.freemarker.CrafterObjectWrapper</prop>
                 <prop key="datetime_format">${crafter.engine.model.datetime.pattern}</prop>
+                <prop key="time_zone">${crafter.engine.model.datetime.timeZone}</prop>
             </props>
         </property>
         <property name="freemarkerVariables" ref="crafter.freemarkerVariables"/>
