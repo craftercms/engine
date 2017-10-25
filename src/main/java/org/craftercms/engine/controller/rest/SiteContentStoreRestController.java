@@ -32,9 +32,7 @@ import static org.craftercms.core.controller.rest.ContentStoreRestController.* ;
  */
 @Controller
 @RequestMapping(RestControllerBase.REST_BASE_URI + SiteContentStoreRestController.URL_ROOT)
-public class SiteContentStoreRestController {
-
-    private static final Log logger = LogFactory.getLog(RestControllerBase.class);
+public class SiteContentStoreRestController extends RestControllerBase {
 
     public static final String URL_ROOT = "/site/content_store";
 
@@ -69,22 +67,6 @@ public class SiteContentStoreRestController {
                                        @RequestParam(value = REQUEST_PARAM_TREE_DEPTH, required = false)
                                        Integer depth) {
         return wrappedController.getTree(request, response, getCurrentContextId(), url, depth);
-    }
-
-    @ExceptionHandler(PathNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ResponseBody
-    public Map<String, Object>  handlePathNotFoundException(HttpServletRequest request, PathNotFoundException e) {
-        return handleException(request, e);
-    }
-
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ResponseBody
-    public Map<String, Object> handleException(HttpServletRequest request, Exception e) {
-        logger.error("Request for " + request.getRequestURI() + " failed", e);
-
-        return Collections.<String, Object>singletonMap(MESSAGE_MODEL_ATTRIBUTE_NAME, e.getMessage());
     }
 
     protected String getCurrentContextId() {
