@@ -43,6 +43,11 @@
                 <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
                 <property name="metadataFileExtension" value="${crafter.core.store.metadataFile.extension}"/>
                 <property name="descriptorFileExtension" value="${crafter.core.store.descriptorFile.extension}"/>
+                <property name="pathValidator">
+                    <bean class="org.craftercms.commons.validation.validators.impl.SecurePathValidator">
+                        <constructor-arg value="path"/>
+                    </bean>
+                </property>
             </bean>
         </property>
         <property name="candidateTargetedUrlsResolver" ref="crafter.candidateTargetedUrlsResolver"/>
