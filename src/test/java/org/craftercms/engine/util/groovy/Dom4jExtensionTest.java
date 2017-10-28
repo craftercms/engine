@@ -43,7 +43,9 @@ public class Dom4jExtensionTest {
     @Test
     public void testExtension() throws Exception {
         SAXReader reader = new SAXReader();
-
+        reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        reader.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        reader.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
         Map<String, Object> vars = new HashMap<>(1);
         vars.put("document", reader.read(new StringReader(XML)));
 
