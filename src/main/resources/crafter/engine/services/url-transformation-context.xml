@@ -59,6 +59,7 @@
         <constructor-arg>
             <list>
                 <ref bean="crafter.removeIndexUrlTransformer"/>
+                <ref bean="crafter.removeTrailingSlash"/>
                 <ref bean="crafter.removePageDescriptorsPathUrlTransformer"/>
                 <ref bean="crafter.replaceDescriptorExtWithPageExtUrlTransformer"/>
                 <ref bean="crafter.toServletRelativeUrlTransfomerPipeline"/>
@@ -89,6 +90,11 @@
     </bean>
 
     <bean id="crafter.removeIndexUrlTransformer" class="org.craftercms.engine.url.RemoveIndexUrlTransformer"/>
+
+    <bean id="crafter.removeTrailingSlash"
+          class="org.craftercms.core.url.impl.RemovePrefixAndSuffixUrlTransformer">
+        <property name="suffix" value="/"/>
+    </bean>
 
     <bean id="crafter.removePageDescriptorsPathUrlTransformer"
           class="org.craftercms.core.url.impl.RemovePrefixAndSuffixUrlTransformer">
