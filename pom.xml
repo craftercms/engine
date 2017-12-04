@@ -8,7 +8,7 @@
     <description>Crafter Content Delivery Engine</description>
     <url>https://github.com/craftercms/engine</url>
     <packaging>war</packaging>
-    <version>3.0.2-SNAPSHOT</version>
+    <version>3.0.2</version>
     <organization>
         <name>CrafterCMS</name>
         <url>http://craftercms.org</url>
@@ -18,10 +18,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <servlet.api.version>3.0.1</servlet.api.version>
         <javax.mail.version>1.4.7</javax.mail.version>
-        <crafter.search.version>3.0.2-SNAPSHOT</crafter.search.version>
-        <crafter.core.version>3.0.2-SNAPSHOT</crafter.core.version>
-        <crafter.profile.version>3.0.2-SNAPSHOT</crafter.profile.version>
-        <crafter.commons.version>3.0.2-SNAPSHOT</crafter.commons.version>
+        <crafter.search.version>3.0.2</crafter.search.version>
+        <crafter.core.version>3.0.2</crafter.core.version>
+        <crafter.profile.version>3.0.2</crafter.profile.version>
+        <crafter.commons.version>3.0.2</crafter.commons.version>
         <spring.version>4.3.7.RELEASE</spring.version>
         <httpcomponents.version>4.5.2</httpcomponents.version>
         <commons.configuration.version>2.1</commons.configuration.version>
