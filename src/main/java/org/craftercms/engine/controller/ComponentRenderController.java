@@ -41,7 +41,7 @@ public class ComponentRenderController {
         this.renderComponentViewName = renderComponentViewName;
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST})
     protected ModelAndView render(@RequestParam("path") String path) throws Exception {
         return new ModelAndView(renderComponentViewName, COMPONENT_PATH_MODEL_NAME, path);
     }
