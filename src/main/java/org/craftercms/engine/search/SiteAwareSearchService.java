@@ -17,13 +17,13 @@
 package org.craftercms.engine.search;
 
 import java.io.File;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
+import org.craftercms.core.service.Content;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.search.exception.SearchException;
 import org.craftercms.search.service.Query;
@@ -74,6 +74,11 @@ public class SiteAwareSearchService implements SearchService, QueryFactory<Query
     @Override
     public Query createQuery() {
         return actualQueryFactory.createQuery();
+    }
+
+    @Override
+    public Query createQuery(Map<String, String[]> map) {
+        return actualQueryFactory.createQuery(map);
     }
 
     @PostConstruct
@@ -150,23 +155,23 @@ public class SiteAwareSearchService implements SearchService, QueryFactory<Query
     }
 
     @Override
-    public String updateFile(String site, String id, InputStream content) throws SearchException {
+    public String updateFile(String site, String id, Content content) throws SearchException {
         return actualSearchService.updateFile(getActualIndexId(null), site, id, content);
     }
 
     @Override
-    public String updateFile(String indexId, String site, String id, InputStream content) throws SearchException {
+    public String updateFile(String indexId, String site, String id, Content content) throws SearchException {
         return actualSearchService.updateFile(getActualIndexId(indexId), site, id, content);
     }
 
     @Override
-    public String updateFile(String site, String id, InputStream content,
+    public String updateFile(String site, String id, Content content,
                              Map<String, List<String>> additionalFields) throws SearchException {
         return actualSearchService.updateFile(getActualIndexId(null), site, id, content, additionalFields);
     }
 
     @Override
-    public String updateFile(String indexId, String site, String id, InputStream content,
+    public String updateFile(String indexId, String site, String id, Content content,
                              Map<String, List<String>> additionalFields) throws SearchException {
         return actualSearchService.updateFile(getActualIndexId(null), site, id, content);
     }
