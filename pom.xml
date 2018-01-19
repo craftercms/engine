@@ -8,7 +8,7 @@
     <description>Crafter Content Delivery Engine</description>
     <url>https://github.com/craftercms/engine</url>
     <packaging>war</packaging>
-    <version>3.0.3</version>
+    <version>3.0.4</version>
     <organization>
         <name>CrafterCMS</name>
         <url>http://craftercms.org</url>
@@ -18,13 +18,14 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <servlet.api.version>3.0.1</servlet.api.version>
         <javax.mail.version>1.4.7</javax.mail.version>
-        <crafter.search.version>3.0.2</crafter.search.version>
-        <crafter.core.version>3.0.2</crafter.core.version>
-        <crafter.profile.version>3.0.2</crafter.profile.version>
-        <crafter.commons.version>3.0.2</crafter.commons.version>
+        <crafter.search.version>${project.version}</crafter.search.version>
+        <crafter.core.version>${project.version}</crafter.core.version>
+        <crafter.profile.version>${project.version}</crafter.profile.version>
+        <crafter.commons.version>${project.version}</crafter.commons.version>
         <spring.version>4.3.7.RELEASE</spring.version>
         <httpcomponents.version>4.5.2</httpcomponents.version>
         <commons.configuration.version>2.1</commons.configuration.version>
+        <commons.lang.version>3.5</commons.lang.version>
         <commons.collections.version>4.1</commons.collections.version>
         <log4j.version>1.2.17</log4j.version>
         <cglib.version>3.1</cglib.version>
@@ -158,6 +159,12 @@
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>${log4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons.lang.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
