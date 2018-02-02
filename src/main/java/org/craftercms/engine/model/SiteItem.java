@@ -19,6 +19,7 @@ package org.craftercms.engine.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +30,7 @@ import org.craftercms.commons.converters.Converter;
 import org.craftercms.core.service.Item;
 import org.craftercms.core.service.Tree;
 import org.craftercms.core.util.XmlUtils;
+import org.craftercms.engine.properties.SiteProperties;
 import org.dom4j.Document;
 import org.dom4j.Element;
 
@@ -181,11 +183,13 @@ public class SiteItem {
             Converter<String, ?> converter = modelValueConverters.get(converterId);
 
             if (converter != null) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Converting value of <" + name + "> @ " + this + " with converter " + converter);
-                }
+                if (!converter.getTargetClass().equals(Date.class) || !SiteProperties.isDisableFullModelTypeConversion()) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Converting value of <" + name + "> @ " + this + " with converter " + converter);
+                    }
 
-                return converter.convert(element.getText());
+                    return converter.convert(element.getText());
+                }
             } else {
                 if (logger.isDebugEnabled()) {
                     logger.debug("No converter found for '" + converterId + "' (<" + name + "> @ " + this + ")");

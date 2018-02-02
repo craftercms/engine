@@ -59,6 +59,16 @@ public class DefaultItemConverter implements Converter<SiteItem, NavItem> {
     }
 
     @Override
+    public Class<?> getSourceClass() {
+        return SiteItem.class;
+    }
+
+    @Override
+    public Class<?> getTargetClass() {
+        return NavItem.class;
+    }
+
+    @Override
     public NavItem convert(SiteItem siteItem) {
         NavItem navItem = null;
 

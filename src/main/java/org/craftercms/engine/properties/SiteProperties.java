@@ -34,6 +34,7 @@ public class SiteProperties {
     public static final String MERGE_FOLDERS_CONFIG_KEY = "targeting.mergeFolders";
     public static final String REDIRECT_TO_TARGETED_URL_CONFIG_KEY = "targeting.redirectToTargetedUrl";
     public static final String INDEX_FILE_NAME_CONFIG_KEY = "indexFileName";
+    public static final String DISABLE_FULL_MODEL_TYPE_CONVERSION = "compatibility.disableFullModelTypeConversion";
 
     public static final String DEFAULT_INDEX_FILE_NAME = "index.xml";
 
@@ -132,6 +133,26 @@ public class SiteProperties {
             return config.getString(INDEX_FILE_NAME_CONFIG_KEY, DEFAULT_INDEX_FILE_NAME);
         } else {
             return DEFAULT_INDEX_FILE_NAME;
+        }
+    }
+
+    /**
+     * Returns true if full content model type conversion should be disabled.
+     *
+     * Up to and including version 2:
+     * Crafter Engine, in the FreeMarker host only, converts model elements based on a suffix type hint, but only for the first level in
+     * the model, and not for _dt. For example, for contentModel.myvalue_i Integer is returned, but for contentModel.repeater.myvalue_i
+     * and contentModel.date_dt a String is returned. In the Groovy host no type of conversion was performed.
+     *
+     * In version 3 onwards, Crafter Engine converts elements with any suffix type hints (including _dt) at at any level in the content
+     * model and for both Freemarker and Groovy hosts.
+     */
+    public static boolean isDisableFullModelTypeConversion() {
+        Configuration config = ConfigUtils.getCurrentConfig();
+        if (config != null) {
+            return config.getBoolean(DISABLE_FULL_MODEL_TYPE_CONVERSION, false);
+        } else {
+            return false;
         }
     }
 
