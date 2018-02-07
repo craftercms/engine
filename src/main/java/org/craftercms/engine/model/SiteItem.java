@@ -19,18 +19,14 @@ package org.craftercms.engine.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.converters.Converter;
 import org.craftercms.core.service.Item;
 import org.craftercms.core.service.Tree;
 import org.craftercms.core.util.XmlUtils;
-import org.craftercms.engine.properties.SiteProperties;
 import org.dom4j.Document;
 import org.dom4j.Element;
 
@@ -42,17 +38,14 @@ import org.dom4j.Element;
  */
 public class SiteItem {
 
-    private static final Log logger = LogFactory.getLog(SiteItem.class);
-
     protected Item item;
     protected List<SiteItem> childItems;
-    protected Map<String, Converter<String, ?>> modelValueConverters;
+    protected Converter<Element, Object> modelFieldConverter;
     protected Comparator<SiteItem> sortComparator;
 
-    public SiteItem(Item item,Map<String, Converter<String, ?>> modelValueConverters,
-                    Comparator<SiteItem> sortComparator) {
+    public SiteItem(Item item, Converter<Element, Object> modelFieldConverter, Comparator<SiteItem> sortComparator) {
         this.item = item;
-        this.modelValueConverters = modelValueConverters;
+        this.modelFieldConverter = modelFieldConverter;
         this.sortComparator = sortComparator;
     }
 
@@ -84,7 +77,7 @@ public class SiteItem {
         if (getDom() != null) {
             Object result = XmlUtils.selectObject(getDom().getRootElement(), xpathExpression);
             if (result instanceof Element) {
-                return convertModelValue((Element) result);
+                return modelFieldConverter.convert((Element) result);
             } else {
                 return result;
             }
@@ -174,34 +167,8 @@ public class SiteItem {
         return items;
     }
 
-    protected Object convertModelValue(Element element) {
-        String name = element.getName();
-        int converterIdSuffixSepIdx = name.lastIndexOf("_");
-
-        if (converterIdSuffixSepIdx >= 0) {
-            String converterId = name.substring(converterIdSuffixSepIdx + 1);
-            Converter<String, ?> converter = modelValueConverters.get(converterId);
-
-            if (converter != null) {
-                if (!converter.getTargetClass().equals(Date.class) || !SiteProperties.isDisableFullModelTypeConversion()) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Converting value of <" + name + "> @ " + this + " with converter " + converter);
-                    }
-
-                    return converter.convert(element.getText());
-                }
-            } else {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("No converter found for '" + converterId + "' (<" + name + "> @ " + this + ")");
-                }
-            }
-        }
-
-        return element;
-    }
-
     protected SiteItem createItemWrapper(Item item) {
-        return new SiteItem(item, modelValueConverters, sortComparator);
+        return new SiteItem(item, modelFieldConverter, sortComparator);
     }
 
 }
