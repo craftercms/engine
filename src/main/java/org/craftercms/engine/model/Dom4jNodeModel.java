@@ -31,6 +31,7 @@ import freemarker.template.TemplateScalarModel;
 import freemarker.template.TemplateSequenceModel;
 import org.craftercms.core.util.XmlUtils;
 import org.craftercms.engine.freemarker.CrafterObjectWrapper;
+import org.craftercms.engine.util.ContentModelUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Branch;
 import org.dom4j.Element;
@@ -41,24 +42,10 @@ import org.dom4j.Node;
  *
  * @author Alfonso Vásquez
  */
-public class Dom4jNodeModel implements TemplateNodeModel, TemplateSequenceModel, TemplateHashModel,
-    AdapterTemplateModel, TemplateScalarModel {
-
-    public static final ModelFactory FACTORY = new ModelFactory() {
-
-        public TemplateModel create(Object object, ObjectWrapper wrapper) {
-            return new Dom4jNodeModel((Node) object, wrapper);
-        }
-
-    };
+public class Dom4jNodeModel implements TemplateNodeModel, TemplateSequenceModel, TemplateHashModel, AdapterTemplateModel, TemplateScalarModel {
 
     private Node node;
     private ObjectWrapper wrapper;
-
-    public Dom4jNodeModel(Node node) {
-        this.node = node;
-        this.wrapper = new CrafterObjectWrapper();
-    }
 
     public Dom4jNodeModel(Node node, ObjectWrapper wrapper) {
         this.node = node;

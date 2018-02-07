@@ -29,6 +29,7 @@ import org.craftercms.engine.service.PreviewOverlayCallback;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.slf4j.MDC;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
 
@@ -59,6 +60,7 @@ public class SiteContext {
     protected PreviewOverlayCallback overlayCallback;
     protected ScriptFactory scriptFactory;
     protected HierarchicalConfiguration config;
+    protected ApplicationContext globalApplicationContext;
     protected ConfigurableApplicationContext applicationContext;
     protected URLClassLoader classLoader;
     protected Scheduler scheduler;
@@ -214,6 +216,14 @@ public class SiteContext {
 
     public void setConfig(HierarchicalConfiguration config) {
         this.config = config;
+    }
+
+    public ApplicationContext getGlobalApplicationContext() {
+        return globalApplicationContext;
+    }
+
+    public void setGlobalApplicationContext(ApplicationContext globalApplicationContext) {
+        this.globalApplicationContext = globalApplicationContext;
     }
 
     public ConfigurableApplicationContext getApplicationContext() {
