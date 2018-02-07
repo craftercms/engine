@@ -19,7 +19,6 @@ package org.craftercms.engine.model;
 import java.util.Collections;
 import java.util.List;
 
-import freemarker.ext.util.ModelFactory;
 import freemarker.template.AdapterTemplateModel;
 import freemarker.template.ObjectWrapper;
 import freemarker.template.SimpleSequence;
@@ -30,8 +29,6 @@ import freemarker.template.TemplateNodeModel;
 import freemarker.template.TemplateScalarModel;
 import freemarker.template.TemplateSequenceModel;
 import org.craftercms.core.util.XmlUtils;
-import org.craftercms.engine.freemarker.CrafterObjectWrapper;
-import org.craftercms.engine.util.ContentModelUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Branch;
 import org.dom4j.Element;

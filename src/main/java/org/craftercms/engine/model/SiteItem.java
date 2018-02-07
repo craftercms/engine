@@ -19,18 +19,14 @@ package org.craftercms.engine.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.converters.Converter;
 import org.craftercms.core.service.Item;
 import org.craftercms.core.service.Tree;
 import org.craftercms.core.util.XmlUtils;
-import org.craftercms.engine.properties.SiteProperties;
 import org.dom4j.Document;
 import org.dom4j.Element;
 
