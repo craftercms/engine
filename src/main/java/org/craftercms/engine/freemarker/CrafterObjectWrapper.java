@@ -16,7 +16,6 @@
  */
 package org.craftercms.engine.freemarker;
 
-import freemarker.ext.util.ModelFactory;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
