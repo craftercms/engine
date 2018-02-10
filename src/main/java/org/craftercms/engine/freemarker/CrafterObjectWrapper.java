@@ -16,30 +16,37 @@
  */
 package org.craftercms.engine.freemarker;
 
-import freemarker.ext.util.ModelFactory;
 import freemarker.template.DefaultObjectWrapper;
+import freemarker.template.TemplateModel;
+import freemarker.template.TemplateModelException;
+import org.craftercms.engine.properties.SiteProperties;
+import org.craftercms.engine.util.ContentModelUtils;
+import org.dom4j.Element;
 import org.dom4j.Node;
 import org.craftercms.engine.model.Dom4jNodeModel;
 
 /**
- * Extends {@link freemarker.template.DefaultObjectWrapper} to define {@link freemarker.ext.util.ModelFactory}s for the following classes:
- *
- * <ul>
- *     <li>{@link org.dom4j.Node}</li>
- * </ul>
+ * Extends {@link freemarker.template.DefaultObjectWrapper} to wrap Dom4j {@cod Node}s. If it's an {@code Element}, then the element will
+ * be attempted to be converted based on the content model field conversion algorithm.
  *
  * @author Alfonso Vásquez
  */
-@SuppressWarnings("deprecation")
 public class CrafterObjectWrapper extends DefaultObjectWrapper {
 
     @Override
-    protected ModelFactory getModelFactory(Class clazz) {
-        if (Node.class.isAssignableFrom(clazz)){
-            return Dom4jNodeModel.FACTORY;
+    public TemplateModel wrap(Object obj) throws TemplateModelException {
+        if (obj instanceof Element && !SiteProperties.isDisableFullModelTypeConversion()) {
+            Object result = ContentModelUtils.convertField((Element)obj);
+            if (result instanceof Node) {
+                return new Dom4jNodeModel((Node)obj, this);
+            } else {
+                return super.wrap(result);
+            }
+        } else if (obj instanceof Node) {
+            return new Dom4jNodeModel((Node)obj, this);
+        } else {
+            return super.wrap(obj);
         }
-
-        return super.getModelFactory(clazz);
     }
 
 }

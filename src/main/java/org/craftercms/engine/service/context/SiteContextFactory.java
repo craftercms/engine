@@ -104,7 +104,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected PreviewOverlayCallback overlayCallback;
     protected ContentStoreService storeService;
     protected MacroResolver macroResolver;
-    protected ApplicationContext mainApplicationContext;
+    protected ApplicationContext globalApplicationContext;
     protected List<ScriptJobResolver> jobResolvers;
     protected TextEncryptor textEncryptor;
 
@@ -247,7 +247,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.mainApplicationContext = applicationContext;
+        this.globalApplicationContext = applicationContext;
     }
 
     public SiteContext createContext(String siteName) {
@@ -292,6 +292,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             siteContext.setGroovyClassesPath(groovyClassesPath);
             siteContext.setScriptFactory(scriptFactory);
             siteContext.setConfig(config);
+            siteContext.setGlobalApplicationContext(globalApplicationContext);
             siteContext.setApplicationContext(appContext);
             siteContext.setClassLoader(classLoader);
 
@@ -368,7 +369,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
                 logger.info("<Loading application context for site: " + siteName + ">");
                 logger.info("--------------------------------------------------");
 
-                GenericApplicationContext appContext = new GenericApplicationContext(mainApplicationContext);
+                GenericApplicationContext appContext = new GenericApplicationContext(globalApplicationContext);
                 appContext.setClassLoader(classLoader);
 
                 if (config != null) {

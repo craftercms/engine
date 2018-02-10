@@ -82,10 +82,27 @@
     <bean id="crafter.stringToBooleanConverter" class="org.craftercms.commons.converters.impl.StringToBooleanConverter"/>
     <bean id="crafter.stringToFloatConverter" class="org.craftercms.commons.converters.impl.StringToFloatConverter"/>
     <bean id="crafter.stringToDoubleConverter" class="org.craftercms.commons.converters.impl.StringToDoubleConverter"/>
+    <bean id="crafter.stringToStringConverter" class="org.craftercms.commons.converters.impl.StringToStringConverter"/>
 
     <bean id="crafter.stringToUtcDateConverter" class="org.craftercms.commons.converters.impl.StringToDateConverter">
         <property name="datePattern" value="${crafter.engine.model.datetime.pattern}"/>
         <property name="timeZone" value="${crafter.engine.model.datetime.timeZone}"/>
+    </bean>
+
+    <bean id="crafter.contentModelFieldConverter" class="org.craftercms.engine.util.converters.ElementSuffixBasedConverter">
+        <property name="suffixMappedConverters">
+            <map>
+                <entry key="i" value-ref="crafter.stringToIntegerConverter"/>
+                <entry key="l" value-ref="crafter.stringToLongConverter"/>
+                <entry key="b" value-ref="crafter.stringToBooleanConverter"/>
+                <entry key="f" value-ref="crafter.stringToFloatConverter"/>
+                <entry key="d" value-ref="crafter.stringToDoubleConverter"/>
+                <entry key="dt" value-ref="crafter.stringToUtcDateConverter"/>
+                <entry key="s" value-ref="crafter.stringToStringConverter"/>
+                <entry key="t" value-ref="crafter.stringToStringConverter"/>
+                <entry key="html" value-ref="crafter.stringToStringConverter"/>
+            </map>
+        </property>
     </bean>
 
     <!-- ////////////////////////////////// -->
@@ -203,16 +220,7 @@
         <property name="storeService" ref="crafter.contentStoreService"/>
         <property name="defaultPredicates" ref="crafter.defaultItemPredicates"/>
         <property name="defaultFilters" ref="crafter.defaultItemFilters"/>
-        <property name="modelValueConverters">
-            <map>
-                <entry key="i" value-ref="crafter.stringToIntegerConverter"/>
-                <entry key="l" value-ref="crafter.stringToLongConverter"/>
-                <entry key="b" value-ref="crafter.stringToBooleanConverter"/>
-                <entry key="f" value-ref="crafter.stringToFloatConverter"/>
-                <entry key="d" value-ref="crafter.stringToDoubleConverter"/>
-                <entry key="dt" value-ref="crafter.stringToUtcDateConverter"/>
-            </map>
-        </property>
+        <property name="modelFieldConverter" ref="crafter.contentModelFieldConverter"/>
         <property name="sortComparator">
             <bean class="org.craftercms.engine.model.sorting.OrderDefaultComparator"/>
         </property>
