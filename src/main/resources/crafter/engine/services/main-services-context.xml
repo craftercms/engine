@@ -420,7 +420,7 @@
 
     <bean id="crafter.searchService" class="org.craftercms.engine.search.SiteAwareSearchService">
         <property name="actualSearchService">
-            <bean class="org.craftercms.search.service.impl.SolrRestClientSearchService">
+            <bean class="org.craftercms.search.service.impl.v2.SolrRestClientSearchService">
                 <property name="serverUrl" value="${crafter.engine.search.server.url}"/>
             </bean>
         </property>
