@@ -84,7 +84,7 @@
     
   </div> <!--! end of #container -->
   <footer>
-    <p>Copyright &copy; 2007 - 2017, Crafter Software Corporation. All rights reserved.<br />
+    <p>Copyright &copy; 2007 - ${.now?string('yyyy')}, Crafter Software Corporation. All rights reserved.<br />
     Crafter CMS is free and open source software licensed under the GNU General Public License (GPL) version 3.0  
     </p>
   </footer>
