@@ -54,6 +54,11 @@
         <property name="cacheService" ref="crafter.cacheService"/>
     </bean>
 
+    <bean id="crafter.siteNavigationRestController" class="org.craftercms.engine.controller.rest.SiteNavigationController">
+        <property name="navTreeBuilder" ref="crafter.navTreeBuilder"/>
+        <property name="navBreadcrumbBuilder" ref="crafter.navBreadcrumbBuilder"/>
+    </bean>
+
     <!-- Overwrite CacheRestController from core -->
     <bean id="crafter.cacheRestController" class="org.craftercms.engine.controller.rest.FreeMarkerAwareCacheRestController">
         <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
