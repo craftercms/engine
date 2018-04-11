@@ -29,7 +29,7 @@ import org.craftercms.engine.model.SiteItem;
 public interface NavBreadcrumbBuilder {
 
     /**
-     * Returns the navigation items that for the breadcrumb for the specified store URL.
+     * Returns the navigation items that form the breadcrumb for the specified store URL.
      *
      * @param url   the current URL used to build the breadcrumb
      * @param root  the root URL, basically the starting point of the breadcrumb
@@ -39,7 +39,7 @@ public interface NavBreadcrumbBuilder {
     List<NavItem> getBreadcrumb(String url, String root);
 
     /**
-     * Returns the navigation items that for the breadcrumb for the specified store URL.
+     * Returns the navigation items that form the breadcrumb for the specified store URL.
      *
      * @param url           the current URL used to build the breadcrumb
      * @param root          the root URL, basically the starting point of the breadcrumb
