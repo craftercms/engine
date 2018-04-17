@@ -59,6 +59,10 @@
         <property name="navBreadcrumbBuilder" ref="crafter.navBreadcrumbBuilder"/>
     </bean>
 
+    <bean id="crafter.siteUrlRestController" class="org.craftercms.engine.controller.rest.SiteUrlController">
+        <property name="urlTransformationService" ref="crafter.urlTransformationService"/>
+    </bean>
+
     <!-- Overwrite CacheRestController from core -->
     <bean id="crafter.cacheRestController" class="org.craftercms.engine.controller.rest.FreeMarkerAwareCacheRestController">
         <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
