@@ -47,6 +47,7 @@ public class SiteScheduledJobsController extends RestControllerBase {
     public static final String URL_LIST = "/list";
 
     @GetMapping(URL_LIST)
+    @SuppressWarnings("unchecked")
     public List<Map<String, String>> listScheduledJobs() throws SchedulerException {
         List<Map<String, String>> jobs = new LinkedList<>();
         SiteContext siteContext = SiteContext.getCurrent();
