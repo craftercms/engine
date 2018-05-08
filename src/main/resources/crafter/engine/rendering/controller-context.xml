@@ -59,6 +59,9 @@
         <property name="navBreadcrumbBuilder" ref="crafter.navBreadcrumbBuilder"/>
     </bean>
 
+    <bean id="crafter.siteScheduledJobsController"
+          class="org.craftercms.engine.controller.rest.SiteScheduledJobsController"/>
+
     <bean id="crafter.siteUrlRestController" class="org.craftercms.engine.controller.rest.SiteUrlController">
         <property name="urlTransformationService" ref="crafter.urlTransformationService"/>
     </bean>
