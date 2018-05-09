@@ -26,8 +26,8 @@ import org.dom4j.Node;
 import org.craftercms.engine.model.Dom4jNodeModel;
 
 /**
- * Extends {@link freemarker.template.DefaultObjectWrapper} to wrap Dom4j {@cod Node}s. If it's an {@code Element}, then the element will
- * be attempted to be converted based on the content model field conversion algorithm.
+ * Extends {@link freemarker.template.DefaultObjectWrapper} to wrap Dom4j {@code Node}s. If it's an {@code Element},
+ * then the element will be attempted to be converted based on the content model field conversion algorithm.
  *
  * @author Alfonso Vásquez
  */
