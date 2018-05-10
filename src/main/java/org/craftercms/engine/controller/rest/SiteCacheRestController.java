@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.craftercms.core.cache.CacheStatistics;
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.core.service.CacheService;
 import org.craftercms.engine.service.context.SiteContext;
@@ -27,6 +28,7 @@ public class SiteCacheRestController {
 
     public static final String URL_ROOT = "/site/cache";
     public static final String URL_CLEAR = "/clear";
+    public static final String URL_STATS = "/statistics";
 
     protected CacheService cacheService;
 
@@ -51,6 +53,13 @@ public class SiteCacheRestController {
         logger.debug(msg);
 
         return Collections.singletonMap(RestControllerBase.MESSAGE_MODEL_ATTRIBUTE_NAME, msg);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = URL_STATS, method = RequestMethod.GET)
+    public CacheStatistics getStatistics() {
+        SiteContext siteContext = SiteContext.getCurrent();
+        return cacheService.getStatistics(siteContext.getContext());
     }
 
 }
