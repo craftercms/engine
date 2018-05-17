@@ -17,6 +17,7 @@
 package org.craftercms.engine.navigation;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a navigation item with label, rendering URL, a flag that indicates that it's an active item (is part of the current
@@ -30,6 +31,7 @@ public class NavItem {
     protected String url;
     protected boolean active;
     protected List<NavItem> subItems;
+    protected Map<String, String> attributes;
 
     public String getLabel() {
         return label;
@@ -61,6 +63,14 @@ public class NavItem {
 
     public void setSubItems(List<NavItem> subItems) {
         this.subItems = subItems;
+    }
+
+    public Map<String, String> getAttributes() {
+        return attributes;
+    }
+
+    public void setAttributes(final Map<String, String> attributes) {
+        this.attributes = attributes;
     }
 
     @Override
@@ -95,6 +105,7 @@ public class NavItem {
                ", url='" + url + '\'' +
                ", active=" + active +
                ", subItems=" + subItems +
+               ", attributes=" + attributes +
                '}';
     }
 

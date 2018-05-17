@@ -52,15 +52,17 @@ public class SiteScheduledJobsController extends RestControllerBase {
         List<Map<String, String>> jobs = new LinkedList<>();
         SiteContext siteContext = SiteContext.getCurrent();
         Scheduler scheduler = siteContext.getScheduler();
-        List<String> groups = scheduler.getJobGroupNames();
-        for(String group : groups) {
-            Set<JobKey> keys = scheduler.getJobKeys(GroupMatcher.jobGroupEquals(group));
-            for(JobKey key: keys) {
-                List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(key);
-                Map<String, String> job = new HashMap<>();
-                job.put("name", key.getName());
-                job.put("nextFireTime", triggers.get(0).getNextFireTime().toInstant().toString());
-                jobs.add(job);
+        if(scheduler != null) {
+            List<String> groups = scheduler.getJobGroupNames();
+            for (String group : groups) {
+                Set<JobKey> keys = scheduler.getJobKeys(GroupMatcher.jobGroupEquals(group));
+                for (JobKey key : keys) {
+                    List<Trigger> triggers = (List<Trigger>)scheduler.getTriggersOfJob(key);
+                    Map<String, String> job = new HashMap<>();
+                    job.put("name", key.getName());
+                    job.put("nextFireTime", triggers.get(0).getNextFireTime().toInstant().toString());
+                    jobs.add(job);
+                }
             }
         }
         return jobs;
