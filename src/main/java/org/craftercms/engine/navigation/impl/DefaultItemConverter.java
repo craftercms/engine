@@ -16,18 +16,16 @@
  */
 package org.craftercms.engine.navigation.impl;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.craftercms.commons.converters.Converter;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.navigation.NavItem;
+import org.craftercms.engine.properties.SiteProperties;
 import org.craftercms.engine.service.UrlTransformationService;
-import org.craftercms.engine.service.context.SiteContext;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
@@ -38,9 +36,7 @@ import org.springframework.beans.factory.annotation.Required;
  * @author avasquez
  */
 public class DefaultItemConverter implements Converter<SiteItem, NavItem> {
-
-    public static final String KEY_NAV_ADDITIONAL_FIELDS = "navigation.additionalFields";
-
+    
     protected String navLabelXPath;
     protected String internalNameXPath;
     protected String storeUrlToRenderUrlTransformerName;
@@ -109,20 +105,15 @@ public class DefaultItemConverter implements Converter<SiteItem, NavItem> {
     }
 
     protected Map<String, String> getAdditionalAttributes(SiteItem siteItem) {
-        SiteContext siteContext = SiteContext.getCurrent();
-        Configuration siteConfig = siteContext.getConfig();
-        if(siteConfig != null && siteConfig.containsKey(KEY_NAV_ADDITIONAL_FIELDS)) {
-            Map<String, String> attrs = new HashMap<>();
-            String[] fields = siteConfig.getStringArray(KEY_NAV_ADDITIONAL_FIELDS);
-            for (String field : fields) {
-                String value = siteItem.queryValue(field);
-                if(value != null) {
-                    attrs.put(field, value);
-                }
+        Map<String, String> attrs = new HashMap<>();
+        String[] fields = SiteProperties.getNavigationAdditionalFields();
+        for (String field : fields) {
+            String value = siteItem.queryValue(field);
+            if(value != null) {
+                attrs.put(field, value);
             }
-            return attrs;
         }
-        return Collections.emptyMap();
+        return attrs;
     }
 
     @Override
