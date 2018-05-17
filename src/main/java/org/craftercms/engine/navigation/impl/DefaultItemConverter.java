@@ -16,11 +16,15 @@
  */
 package org.craftercms.engine.navigation.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.craftercms.commons.converters.Converter;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.navigation.NavItem;
+import org.craftercms.engine.properties.SiteProperties;
 import org.craftercms.engine.service.UrlTransformationService;
 import org.springframework.beans.factory.annotation.Required;
 
@@ -32,7 +36,7 @@ import org.springframework.beans.factory.annotation.Required;
  * @author avasquez
  */
 public class DefaultItemConverter implements Converter<SiteItem, NavItem> {
-
+    
     protected String navLabelXPath;
     protected String internalNameXPath;
     protected String storeUrlToRenderUrlTransformerName;
@@ -76,6 +80,7 @@ public class DefaultItemConverter implements Converter<SiteItem, NavItem> {
             navItem = new NavItem();
             navItem.setLabel(getNavigationLabel(siteItem));
             navItem.setUrl(getNavigationUrl(siteItem));
+            navItem.setAttributes(getAdditionalAttributes(siteItem));
         }
 
         return navItem;
@@ -97,6 +102,18 @@ public class DefaultItemConverter implements Converter<SiteItem, NavItem> {
 
     protected String getNavigationUrl(SiteItem siteItem) {
         return urlTransformationService.transform(storeUrlToRenderUrlTransformerName, siteItem.getStoreUrl());
+    }
+
+    protected Map<String, String> getAdditionalAttributes(SiteItem siteItem) {
+        Map<String, String> attrs = new HashMap<>();
+        String[] fields = SiteProperties.getNavigationAdditionalFields();
+        for (String field : fields) {
+            String value = siteItem.queryValue(field);
+            if(value != null) {
+                attrs.put(field, value);
+            }
+        }
+        return attrs;
     }
 
     @Override
