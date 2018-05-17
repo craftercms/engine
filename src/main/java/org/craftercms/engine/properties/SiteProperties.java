@@ -34,8 +34,8 @@ public class SiteProperties {
     public static final String MERGE_FOLDERS_CONFIG_KEY = "targeting.mergeFolders";
     public static final String REDIRECT_TO_TARGETED_URL_CONFIG_KEY = "targeting.redirectToTargetedUrl";
     public static final String INDEX_FILE_NAME_CONFIG_KEY = "indexFileName";
-    public static final String DISABLE_FULL_MODEL_TYPE_CONVERSION = "compatibility.disableFullModelTypeConversion";
-    public static final String NAVIGATION_ADDITIONAL_FIELDS = "navigation.additionalFields";
+    public static final String DISABLE_FULL_MODEL_TYPE_CONVERSION_CONFIG_KEY = "compatibility.disableFullModelTypeConversion";
+    public static final String NAVIGATION_ADDITIONAL_FIELDS_CONFIG_KEY = "navigation.additionalFields";
 
     public static final String DEFAULT_INDEX_FILE_NAME = "index.xml";
 
@@ -151,7 +151,7 @@ public class SiteProperties {
     public static boolean isDisableFullModelTypeConversion() {
         Configuration config = ConfigUtils.getCurrentConfig();
         if (config != null) {
-            return config.getBoolean(DISABLE_FULL_MODEL_TYPE_CONVERSION, false);
+            return config.getBoolean(DISABLE_FULL_MODEL_TYPE_CONVERSION_CONFIG_KEY, false);
         } else {
             return false;
         }
@@ -162,8 +162,8 @@ public class SiteProperties {
      */
     public static String[] getNavigationAdditionalFields() {
         Configuration config = ConfigUtils.getCurrentConfig();
-        if(config != null && config.containsKey(NAVIGATION_ADDITIONAL_FIELDS)) {
-            return config.getStringArray(NAVIGATION_ADDITIONAL_FIELDS);
+        if(config != null && config.containsKey(NAVIGATION_ADDITIONAL_FIELDS_CONFIG_KEY)) {
+            return config.getStringArray(NAVIGATION_ADDITIONAL_FIELDS_CONFIG_KEY);
         } else {
             return new String[] {};
         }
