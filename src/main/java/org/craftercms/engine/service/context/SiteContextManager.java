@@ -27,6 +27,10 @@ import javax.annotation.PreDestroy;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.craftercms.commons.entitlements.exception.EntitlementException;
+import org.craftercms.commons.entitlements.model.EntitlementType;
+import org.craftercms.commons.entitlements.model.Module;
+import org.craftercms.commons.entitlements.validator.EntitlementValidator;
 import org.craftercms.core.exception.RootFolderNotFoundException;
 import org.craftercms.engine.event.SiteContextCreatedEvent;
 import org.craftercms.engine.event.SiteContextDestroyedEvent;
@@ -44,15 +48,23 @@ public class SiteContextManager implements ApplicationContextAware {
 
     private static final Log logger = LogFactory.getLog(SiteContextManager.class);
 
+    protected String fallbackSite;
+
     protected Lock lock;
     protected Map<String, SiteContext> contextRegistry;
     protected SiteContextFactory contextFactory;
     protected SiteContextFactory fallbackContextFactory;
     protected ApplicationContext applicationContext;
+    protected EntitlementValidator entitlementValidator;
 
     public SiteContextManager() {
         lock = new ReentrantLock();
         contextRegistry = new ConcurrentHashMap<>();
+    }
+
+    @Required
+    public void setFallbackSite(final String fallbackSite) {
+        this.fallbackSite = fallbackSite;
     }
 
     public Lock getLock() {
@@ -67,6 +79,11 @@ public class SiteContextManager implements ApplicationContextAware {
     @Required
     public void setFallbackContextFactory(SiteContextFactory fallbackContextFactory) {
         this.fallbackContextFactory = fallbackContextFactory;
+    }
+
+    @Required
+    public void setEntitlementValidator(final EntitlementValidator entitlementValidator) {
+        this.entitlementValidator = entitlementValidator;
     }
 
     @Override
@@ -187,6 +204,16 @@ public class SiteContextManager implements ApplicationContextAware {
     public SiteContext getContext(String siteName, boolean fallback) {
         SiteContext siteContext = contextRegistry.get(siteName);
         if (siteContext == null) {
+            if(!fallbackSite.equals(siteName)) {
+                try {
+                    entitlementValidator.validateEntitlement(Module.ENGINE, EntitlementType.SITE,
+                        (int) contextRegistry.entrySet().stream()
+                                                        .filter(entry -> !fallbackSite.equals(entry.getKey()))
+                                                        .count(), 1);
+                } catch (EntitlementException e) {
+                    return null;
+                }
+            }
             lock.lock();
             try {
                 // Double check locking, in case the context has been created already by another thread

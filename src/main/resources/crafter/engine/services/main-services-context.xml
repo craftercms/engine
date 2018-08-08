@@ -13,6 +13,7 @@
     <import resource="classpath:crafter/engine/services/scripting-context.xml"/>
     <import resource="classpath:crafter/engine/services/url-transformation-context.xml"/>
     <import resource="classpath:crafter/engine/services/targeting-context.xml"/>
+    <import resource="classpath:crafter/entitlements/entitlements-context.xml"/>
 
     <!-- ////////////////////////////////// -->
     <!--								 	-->
@@ -322,7 +323,7 @@
     <bean id="crafter.siteContextResolver" class="org.craftercms.engine.service.context.SiteContextResolverImpl">
         <property name="siteResolver" ref="crafter.siteResolver"/>
         <property name="siteContextManager" ref="crafter.siteContextManager"/>
-        <property name="fallbackSiteName" value="default"/>
+        <property name="fallbackSiteName" value="${crafter.engine.site.fallback.name}"/>
     </bean>
 
     <bean id="crafter.siteResolver" class="org.craftercms.engine.service.context.DefaultSiteResolver">
@@ -330,8 +331,10 @@
     </bean>
 
     <bean id="crafter.siteContextManager" class="org.craftercms.engine.service.context.SiteContextManager">
+        <property name="fallbackSite" value="${crafter.engine.site.fallback.name}"/>
         <property name="fallbackContextFactory" ref="crafter.fallbackSiteContextFactory"/>
         <property name="contextFactory" ref="crafter.siteContextFactory"/>
+        <property name="entitlementValidator" ref="crafter.entitlementValidator"/>
     </bean>
 
     <bean id="crafter.siteContextsBootstrap" class="org.craftercms.engine.service.context.SiteContextsBootstrap">
@@ -578,6 +581,16 @@
         <property name="siteItemService" ref="crafter.siteItemService"/>
         <property name="defaultItemConverter" ref="crafter.navItemConverter"/>
         <property name="processors" ref="crafter.navTreeProcessors"/>
+    </bean>
+
+    <!-- ////////////////////////////////// -->
+    <!--								 	-->
+    <!--		    Entitlements  			-->
+    <!--									-->
+    <!-- ////////////////////////////////// -->
+    <bean id="crafter.entitlementsProvider" class="org.craftercms.engine.entitlement.EngineEntitlementUsageProvider">
+        <property name="fallbackSite" value="${crafter.engine.site.fallback.name}"/>
+        <property name="siteContextManager" ref="crafter.siteContextManager"/>
     </bean>
 
     <import resource="${crafter.engine.extension.base}/services-overlay-context.xml"/>
