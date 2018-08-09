@@ -36,7 +36,7 @@
         <mockito.version>1.9.5</mockito.version>
         <rome.version>1.0</rome.version>
         <java.version>1.8</java.version>
-        <bouncycastle.version>1.59</bouncycastle.version>
+        <bouncycastle.version>1.60</bouncycastle.version>
     </properties>
 
     <licenses>
