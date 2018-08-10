@@ -150,9 +150,15 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
     protected SiteItem getComponentFromNode(TemplateModel componentParam, Environment env) throws TemplateException {
         Element includeElementParent = unwrap(COMPONENT_PARAM_NAME, componentParam, Element.class, env);
         Element includeElement = includeElementParent.element(includeElementName);
-        String componentPath = includeElement.getTextTrim();
 
-        return getComponent(componentPath, env);
+        if (includeElement != null) {
+            String componentPath = includeElement.getTextTrim();
+
+            return getComponent(componentPath, env);
+        } else {
+            throw new IllegalStateException("No '" + includeElementName + "' element found under component " +
+                                            includeElementParent.getUniquePath());
+        }
     }
 
     protected SiteItem getComponentFromPath(TemplateModel componentPathParam, Environment env) throws TemplateException {
