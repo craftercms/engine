@@ -17,7 +17,11 @@
 
 package org.craftercms.engine.entitlement;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.craftercms.commons.entitlements.model.Entitlement;
+import org.craftercms.commons.entitlements.model.EntitlementType;
 import org.craftercms.commons.entitlements.model.Module;
 import org.craftercms.commons.entitlements.usage.EntitlementUsageProvider;
 import org.craftercms.engine.service.context.SiteContextManager;
@@ -30,7 +34,7 @@ import static org.craftercms.commons.entitlements.model.Module.ENGINE;
  *
  * @author joseross
  */
-public class EngineEntitlementUsageProvider implements EntitlementUsageProvider<Entitlement> {
+public class EngineEntitlementUsageProvider implements EntitlementUsageProvider {
 
     /**
      * Name of the default site.
@@ -64,14 +68,17 @@ public class EngineEntitlementUsageProvider implements EntitlementUsageProvider<
      * {@inheritDoc}
      */
     @Override
-    public Entitlement getCurrentUsage() {
-        Entitlement usage = new Entitlement(ENGINE);
-        int total = (int) siteContextManager.listContexts()
+    public List<Entitlement> getCurrentUsage() {
+        Entitlement sites = new Entitlement();
+        int totalSites = (int) siteContextManager.listContexts()
                                             .stream()
                                             .filter(context -> !fallbackSite.equals(context.getSiteName()))
                                             .count();
-        usage.setNumberOfSites(total);
-        return usage;
+
+        sites.setType(EntitlementType.SITE);
+        sites.setValue(totalSites);
+
+        return Collections.singletonList(sites);
     }
 
 }
