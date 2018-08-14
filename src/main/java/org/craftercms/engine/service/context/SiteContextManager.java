@@ -48,8 +48,6 @@ public class SiteContextManager implements ApplicationContextAware {
 
     private static final Log logger = LogFactory.getLog(SiteContextManager.class);
 
-    protected String fallbackSite;
-
     protected Lock lock;
     protected Map<String, SiteContext> contextRegistry;
     protected SiteContextFactory contextFactory;
@@ -60,11 +58,6 @@ public class SiteContextManager implements ApplicationContextAware {
     public SiteContextManager() {
         lock = new ReentrantLock();
         contextRegistry = new ConcurrentHashMap<>();
-    }
-
-    @Required
-    public void setFallbackSite(final String fallbackSite) {
-        this.fallbackSite = fallbackSite;
     }
 
     public Lock getLock() {
@@ -204,12 +197,12 @@ public class SiteContextManager implements ApplicationContextAware {
     public SiteContext getContext(String siteName, boolean fallback) {
         SiteContext siteContext = contextRegistry.get(siteName);
         if (siteContext == null) {
-            if(!fallbackSite.equals(siteName)) {
+            if(!fallback) {
                 try {
-                    entitlementValidator.validateEntitlement(Module.ENGINE, EntitlementType.SITE,
-                        (int) contextRegistry.entrySet().stream()
-                                                        .filter(entry -> !fallbackSite.equals(entry.getKey()))
-                                                        .count(), 1);
+                    int totalSites = (int) contextRegistry.values().stream()
+                                            .filter(context -> !context.isFallback())
+                                            .count();
+                    entitlementValidator.validateEntitlement(Module.ENGINE, EntitlementType.SITE, totalSites, 1);
                 } catch (EntitlementException e) {
                     return null;
                 }

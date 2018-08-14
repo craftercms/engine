@@ -37,19 +37,9 @@ import static org.craftercms.commons.entitlements.model.Module.ENGINE;
 public class EngineEntitlementUsageProvider implements EntitlementUsageProvider {
 
     /**
-     * Name of the default site.
-     */
-    protected String fallbackSite;
-
-    /**
      * Current {@link SiteContextManager} instance.
      */
     protected SiteContextManager siteContextManager;
-
-    @Required
-    public void setFallbackSite(final String fallbackSite) {
-        this.fallbackSite = fallbackSite;
-    }
 
     @Required
     public void setSiteContextManager(final SiteContextManager siteContextManager) {
@@ -72,7 +62,7 @@ public class EngineEntitlementUsageProvider implements EntitlementUsageProvider 
         Entitlement sites = new Entitlement();
         int totalSites = (int) siteContextManager.listContexts()
                                             .stream()
-                                            .filter(context -> !fallbackSite.equals(context.getSiteName()))
+                                            .filter(context -> !context.isFallback())
                                             .count();
 
         sites.setType(EntitlementType.SITE);
