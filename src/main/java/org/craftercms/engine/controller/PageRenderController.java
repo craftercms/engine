@@ -31,6 +31,7 @@ import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.util.ExceptionUtils;
 import org.craftercms.engine.exception.HttpStatusCodeAwareException;
 import org.craftercms.engine.exception.ScriptException;
+import org.craftercms.engine.properties.SiteProperties;
 import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
@@ -100,6 +101,16 @@ public class PageRenderController extends AbstractController {
                     } else {
                         return null;
                     }
+                }
+
+                if (SiteProperties.isSpaEnabled()) {
+                    String viewName = SiteProperties.getSpaViewName();
+
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("SPA mode enabled. Returning default view: " + viewName);
+                    }
+
+                    return new ModelAndView(viewName);
                 }
 
                 if (logger.isDebugEnabled()) {

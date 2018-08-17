@@ -13,6 +13,7 @@
     <import resource="classpath:crafter/engine/services/scripting-context.xml"/>
     <import resource="classpath:crafter/engine/services/url-transformation-context.xml"/>
     <import resource="classpath:crafter/engine/services/targeting-context.xml"/>
+    <import resource="classpath:crafter/entitlements/entitlements-context.xml"/>
 
     <!-- ////////////////////////////////// -->
     <!--								 	-->
@@ -332,6 +333,7 @@
     <bean id="crafter.siteContextManager" class="org.craftercms.engine.service.context.SiteContextManager">
         <property name="fallbackContextFactory" ref="crafter.fallbackSiteContextFactory"/>
         <property name="contextFactory" ref="crafter.siteContextFactory"/>
+        <property name="entitlementValidator" ref="crafter.entitlementValidator"/>
     </bean>
 
     <bean id="crafter.siteContextsBootstrap" class="org.craftercms.engine.service.context.SiteContextsBootstrap">
@@ -578,6 +580,15 @@
         <property name="siteItemService" ref="crafter.siteItemService"/>
         <property name="defaultItemConverter" ref="crafter.navItemConverter"/>
         <property name="processors" ref="crafter.navTreeProcessors"/>
+    </bean>
+
+    <!-- ////////////////////////////////// -->
+    <!--								 	-->
+    <!--		    Entitlements  			-->
+    <!--									-->
+    <!-- ////////////////////////////////// -->
+    <bean id="crafter.entitlementsProvider" class="org.craftercms.engine.entitlement.EngineEntitlementUsageProvider">
+        <property name="siteContextManager" ref="crafter.siteContextManager"/>
     </bean>
 
     <import resource="${crafter.engine.extension.base}/services-overlay-context.xml"/>

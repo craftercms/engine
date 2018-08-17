@@ -26,6 +26,19 @@ import org.craftercms.engine.util.ConfigUtils;
  */
 public class SiteProperties {
 
+    public static final String INDEX_FILE_NAME_CONFIG_KEY = "indexFileName";
+    public static final String DISABLE_FULL_MODEL_TYPE_CONVERSION_CONFIG_KEY = "compatibility.disableFullModelTypeConversion";
+    public static final String NAVIGATION_ADDITIONAL_FIELDS_CONFIG_KEY = "navigation.additionalFields";
+
+    /*
+     * Single Page Application properties
+     */
+    public static final String SPA_ENABLED_CONFIG_KEY = "spa.enabled";
+    public static final String SPA_VIEW_NAME = "spa.viewName";
+
+    /*
+     * Targeting properties
+     */
     public static final String TARGETING_ENABLED_CONFIG_KEY = "targeting.enabled";
     public static final String AVAILABLE_TARGET_IDS_CONFIG_KEY = "targeting.availableTargetIds";
     public static final String FALLBACK_ID_CONFIG_KEY = "targeting.fallbackTargetId";
@@ -33,11 +46,12 @@ public class SiteProperties {
     public static final String EXCLUDE_PATTERNS_CONFIG_KEY = "targeting.excludePatterns";
     public static final String MERGE_FOLDERS_CONFIG_KEY = "targeting.mergeFolders";
     public static final String REDIRECT_TO_TARGETED_URL_CONFIG_KEY = "targeting.redirectToTargetedUrl";
-    public static final String INDEX_FILE_NAME_CONFIG_KEY = "indexFileName";
-    public static final String DISABLE_FULL_MODEL_TYPE_CONVERSION_CONFIG_KEY = "compatibility.disableFullModelTypeConversion";
-    public static final String NAVIGATION_ADDITIONAL_FIELDS_CONFIG_KEY = "navigation.additionalFields";
 
+    /*
+     * Defaults
+     */
     public static final String DEFAULT_INDEX_FILE_NAME = "index.xml";
+    public static final String DEFAULT_SPA_VIEW_NAME = "/";
 
     /**
      * Returns trues if targeting is enabled.
@@ -166,6 +180,32 @@ public class SiteProperties {
             return config.getStringArray(NAVIGATION_ADDITIONAL_FIELDS_CONFIG_KEY);
         } else {
             return new String[] {};
+        }
+    }
+
+    /**
+     * Returns true if SPA (Single Page App) mode is enabled.
+     */
+    public static boolean isSpaEnabled() {
+        Configuration config = ConfigUtils.getCurrentConfig();
+        if (config != null) {
+            return config.getBoolean(SPA_ENABLED_CONFIG_KEY, false);
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Returns the view name for the SPA (Single Page Application). Current view names can be a page URL (like /)
+     * or a template name (like /template/web/app.ftl). By default, if SPA is enabled and no view name config property
+     * is found, / is returned.
+     */
+    public static String getSpaViewName() {
+        Configuration config = ConfigUtils.getCurrentConfig();
+        if (config != null) {
+            return config.getString(SPA_VIEW_NAME, DEFAULT_SPA_VIEW_NAME);
+        } else {
+            return DEFAULT_SPA_VIEW_NAME;
         }
     }
 
