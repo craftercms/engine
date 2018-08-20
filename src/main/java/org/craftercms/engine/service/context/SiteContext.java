@@ -17,7 +17,6 @@
 package org.craftercms.engine.service.context;
 
 import java.net.URLClassLoader;
-import java.util.Arrays;
 
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.craftercms.core.exception.CrafterException;
@@ -32,6 +31,8 @@ import org.slf4j.MDC;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
+import org.tuckey.web.filters.urlrewrite.Conf;
+import org.tuckey.web.filters.urlrewrite.UrlRewriter;
 
 /**
  * Wrapper for a {@link Context} that adds properties specific to Crafter Engine.
@@ -52,9 +53,6 @@ public class SiteContext {
     protected String templatesPath;
     protected String restScriptsPath;
     protected String controllerScriptsPath;
-    protected String[] configPaths;
-    protected String[] applicationContextPaths;
-    protected String groovyClassesPath;
     protected FreeMarkerConfig freeMarkerConfig;
     protected UrlTransformationEngine urlTransformationEngine;
     protected PreviewOverlayCallback overlayCallback;
@@ -63,6 +61,7 @@ public class SiteContext {
     protected ApplicationContext globalApplicationContext;
     protected ConfigurableApplicationContext applicationContext;
     protected URLClassLoader classLoader;
+    protected UrlRewriter urlRewriter;
     protected Scheduler scheduler;
 
     /**
@@ -154,30 +153,6 @@ public class SiteContext {
         this.controllerScriptsPath = controllerScriptsPath;
     }
 
-    public String[] getConfigPaths() {
-        return configPaths;
-    }
-
-    public void setConfigPaths(String[] configPaths) {
-        this.configPaths = configPaths;
-    }
-
-    public String[] getApplicationContextPaths() {
-        return applicationContextPaths;
-    }
-
-    public void setApplicationContextPaths(String[] applicationContextPaths) {
-        this.applicationContextPaths = applicationContextPaths;
-    }
-
-    public String getGroovyClassesPath() {
-        return groovyClassesPath;
-    }
-
-    public void setGroovyClassesPath(String groovyClassesPath) {
-        this.groovyClassesPath = groovyClassesPath;
-    }
-
     public FreeMarkerConfig getFreeMarkerConfig() {
         return freeMarkerConfig;
     }
@@ -240,6 +215,14 @@ public class SiteContext {
 
     public void setClassLoader(URLClassLoader classLoader) {
         this.classLoader = classLoader;
+    }
+
+    public UrlRewriter getUrlRewriter() {
+        return urlRewriter;
+    }
+
+    public void setUrlRewriter(UrlRewriter urlRewriter) {
+        this.urlRewriter = urlRewriter;
     }
 
     public Scheduler getScheduler() {
@@ -313,9 +296,6 @@ public class SiteContext {
                ", templatesPath='" + templatesPath + '\'' +
                ", restScriptsPath='" + restScriptsPath + '\'' +
                ", controllerScriptsPath='" + controllerScriptsPath + '\'' +
-               ", configPaths=" + Arrays.toString(configPaths) +
-               ", applicationContextPaths=" + Arrays.toString(applicationContextPaths) +
-               ", groovyClassesPath='" + groovyClassesPath + '\'' +
                '}';
     }
 
