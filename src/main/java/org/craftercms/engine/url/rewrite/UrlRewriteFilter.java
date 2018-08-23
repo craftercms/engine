@@ -20,7 +20,7 @@ import java.io.IOException;
  * uses per-site configuration, which can be specified in {@code /config/engine/urlrewrite.xml} (for Tuckey's classic
  * XML style configuration) or {@code /config/engine/urlrewrite.conf} (for Apache's mod_rewrite style configuration).
  *
- * @author avasquezc
+ * @author avasquez
  *
  * @see <a href="http://tuckey.org/urlrewrite/">Tuckey URL Rewrite</a>
  */
@@ -43,17 +43,14 @@ public class UrlRewriteFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response,
                          FilterChain chain) throws IOException, ServletException {
+        HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+        HttpServletResponse httpServletResponse = (HttpServletResponse) response;
         UrlRewriter urlRewriter = getUrlRewriter();
-
-        HttpServletRequest hsRequest = (HttpServletRequest) request;
-        HttpServletResponse hsResponse = (HttpServletResponse) response;
-        UrlRewriteWrappedResponse urlRewriteWrappedResponse = new UrlRewriteWrappedResponse(hsResponse, hsRequest,
-                                                                                            urlRewriter);
-
         boolean requestRewritten = false;
+
         if (urlRewriter != null) {
-            // process the request
-            requestRewritten = urlRewriter.processRequest(hsRequest, urlRewriteWrappedResponse, chain);
+            httpServletResponse = new UrlRewriteWrappedResponse(httpServletResponse, httpServletRequest, urlRewriter);
+            requestRewritten = urlRewriter.processRequest(httpServletRequest, httpServletResponse, chain);
         } else {
             if (logger.isDebugEnabled()) {
                 logger.debug("URL rewriter engine not loaded, ignoring request");
@@ -62,7 +59,7 @@ public class UrlRewriteFilter implements Filter {
 
         // if no rewrite has taken place continue as normal
         if (!requestRewritten) {
-            chain.doFilter(hsRequest, urlRewriteWrappedResponse);
+            chain.doFilter(httpServletRequest, httpServletResponse);
         }
     }
 
