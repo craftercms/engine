@@ -300,7 +300,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             ScriptFactory scriptFactory = getScriptFactory(siteContext, classLoader);
             ConfigurableApplicationContext appContext = getApplicationContext(siteContext, classLoader, config,
                                                                               resolvedAppContextPaths, resourceLoader);
-            UrlRewriter urlRewriter = getUrlRewriter(siteContext, resolvedUrlRewriteConfPaths);
+            UrlRewriter urlRewriter = getUrlRewriter(siteContext, resolvedUrlRewriteConfPaths, resourceLoader);
 
             siteContext.setScriptFactory(scriptFactory);
             siteContext.setConfig(config);
@@ -412,10 +412,11 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         }
     }
 
-    protected UrlRewriter getUrlRewriter(SiteContext siteContext, String[] urlRewriteConfPaths) {
+    protected UrlRewriter getUrlRewriter(SiteContext siteContext, String[] urlRewriteConfPaths,
+                                         ResourceLoader resourceLoader) {
         String siteName = siteContext.getSiteName();
-        Context context = siteContext.getContext();
         String confPath = null;
+        Resource confResource = null;
         Conf conf = null;
         UrlRewriter urlRewriter = null;
 
@@ -425,21 +426,23 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
 
         try {
             for (int i = urlRewriteConfPaths.length - 1; i >= 0; i--) {
-                if (storeService.exists(context, urlRewriteConfPaths[i])) {
+                Resource resource = resourceLoader.getResource(urlRewriteConfPaths[i]);
+                if (resource.exists()) {
                     confPath = urlRewriteConfPaths[i];
+                    confResource = resource;
                     break;
                 }
             }
 
-            if (confPath != null) {
+            if (confResource != null) {
                 // By convention, if it ends in .xml, it's an XML-style url rewrite config, else it's a mod_rewrite-style
                 // url rewrite config
                 boolean modRewriteStyleConf = !confPath.endsWith(".xml");
 
-                try (InputStream is = storeService.getContent(context, confPath).getInputStream()) {
+                try (InputStream is = confResource.getInputStream()) {
                     conf = new Conf(servletContext, is, confPath, "", modRewriteStyleConf);
 
-                    logger.info("URL rewrite configuration loaded @ " + siteName + ":" + confPath);
+                    logger.info("URL rewrite configuration loaded @ " + confResource);
                 }
             }
 
