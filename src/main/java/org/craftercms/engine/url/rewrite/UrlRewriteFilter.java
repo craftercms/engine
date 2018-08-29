@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * Crafter implementation of Tuckey's {@code org.tuckey.web.filters.urlrewrite.UrlRewriteFilter}. It uses the same
+ * Crafter's implementation of Tuckey's {@code org.tuckey.web.filters.urlrewrite.UrlRewriteFilter}. It uses the same
  * {@code org.tuckey.web.filters.urlrewrite.UrlRewriter}, but skips most of the Servlet filter configuration and
  * uses per-site configuration, which can be specified in {@code /config/engine/urlrewrite.xml} (for Tuckey's classic
  * XML style configuration) or {@code /config/engine/urlrewrite.conf} (for Apache's mod_rewrite style configuration).
