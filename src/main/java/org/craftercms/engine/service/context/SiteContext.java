@@ -16,8 +16,6 @@
  */
 package org.craftercms.engine.service.context;
 
-import java.net.URLClassLoader;
-
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.craftercms.core.exception.CrafterException;
 import org.craftercms.core.service.ContentStoreService;
@@ -31,8 +29,9 @@ import org.slf4j.MDC;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
-import org.tuckey.web.filters.urlrewrite.Conf;
 import org.tuckey.web.filters.urlrewrite.UrlRewriter;
+
+import java.net.URLClassLoader;
 
 /**
  * Wrapper for a {@link Context} that adds properties specific to Crafter Engine.
