@@ -216,21 +216,24 @@ public class SiteContextManager implements ApplicationContextAware {
                     logger.info("<Creating site context: " + siteName + ">");
                     logger.info("==================================================");
 
-                    if (fallback) {
-                        siteContext = fallbackContextFactory.createContext(siteName);
-                        siteContext.setFallback(true);
-                    } else {
-                        siteContext = contextFactory.createContext(siteName);
+                    try {
+                        if (fallback) {
+                            siteContext = fallbackContextFactory.createContext(siteName);
+                            siteContext.setFallback(true);
+                        } else {
+                            siteContext = contextFactory.createContext(siteName);
+                        }
+
+                        publishEvent(new SiteContextCreatedEvent(siteContext, this), siteContext);
+
+                        contextRegistry.put(siteName, siteContext);
+
+                        logger.info("Site context created: " + siteContext);
+                    } finally {
+                        logger.info("==================================================");
+                        logger.info("</Creating site context: " + siteName + ">");
+                        logger.info("==================================================");
                     }
-
-                    publishEvent(new SiteContextCreatedEvent(siteContext, this), siteContext);
-
-                    contextRegistry.put(siteName, siteContext);
-
-                    logger.info("Site context created: " + siteContext);
-                    logger.info("==================================================");
-                    logger.info("</Creating site context: " + siteName + ">");
-                    logger.info("==================================================");
                 }
             } catch (RootFolderNotFoundException e) {
                 logger.error("Cannot resolve root folder for site '" + siteName + "'", e);
