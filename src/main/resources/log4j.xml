@@ -75,6 +75,10 @@
         <level value="warn" />
     </logger>
 
+    <logger name="org.tuckey">
+        <level value="info" />
+    </logger>
+
     <!-- Root Logger -->
     <root>
         <priority value="info" />

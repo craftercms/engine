@@ -17,15 +17,17 @@
  */
 package org.craftercms.engine.url.rewrite;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.craftercms.engine.http.impl.DefaultExceptionHandler;
 import org.craftercms.engine.service.SiteItemService;
 import org.craftercms.engine.service.context.SiteContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
 import org.tuckey.web.filters.urlrewrite.UrlRewriteWrappedResponse;
 import org.tuckey.web.filters.urlrewrite.UrlRewriter;
+import org.tuckey.web.filters.urlrewrite.utils.Log;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -43,18 +45,17 @@ import java.io.IOException;
  */
 public class UrlRewriteFilter implements Filter {
 
-    private static final Log logger = LogFactory.getLog(DefaultExceptionHandler.class);
-
-    protected SiteItemService siteItemService;
-
-    @Required
-    public void setSiteItemService(SiteItemService siteItemService) {
-        this.siteItemService = siteItemService;
-    }
+    private static final Logger logger = LoggerFactory.getLogger(DefaultExceptionHandler.class);
 
     @Override
     public void init(FilterConfig filterConfig) {
         // Do nothing
+    }
+
+    @PostConstruct
+    public void init() {
+        // Set Tuckey logging to use slf4j
+        Log.setLevel("slf4j");
     }
 
     @Override

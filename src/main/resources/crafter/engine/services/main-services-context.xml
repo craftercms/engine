@@ -168,9 +168,7 @@
         <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
     </bean>
 
-    <bean id="crafter.urlRewriteFilter" class="org.craftercms.engine.url.rewrite.UrlRewriteFilter">
-        <property name="siteItemService" ref="crafter.siteItemService"/>
-    </bean>
+    <bean id="crafter.urlRewriteFilter" class="org.craftercms.engine.url.rewrite.UrlRewriteFilter"/>
 
     <!-- ////////////////////////////////// -->
     <!--								 	-->
