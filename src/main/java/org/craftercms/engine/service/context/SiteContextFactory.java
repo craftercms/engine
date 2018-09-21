@@ -446,10 +446,14 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
                 }
             }
 
-            if (conf != null && conf.isOk() && conf.isEngineEnabled()) {
-                urlRewriter = new UrlRewriter(conf);
+            if (conf != null) {
+                if (conf.isOk() && conf.isEngineEnabled()) {
+                    urlRewriter = new UrlRewriter(conf);
 
-                logger.info("URL rewrite engine loaded for site " + siteName + " (conf ok)");
+                    logger.info("URL rewrite engine loaded for site " + siteName + " (conf ok)");
+                } else {
+                    logger.error("URL rewrite engine not loaded, there might have been conf errors");
+                }
             }
 
             return urlRewriter;
