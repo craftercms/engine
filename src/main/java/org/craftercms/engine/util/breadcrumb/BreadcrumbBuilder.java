@@ -93,7 +93,6 @@ public class BreadcrumbBuilder {
                     }
 
                     breadcrumb.add(new BreadcrumbItem(currentUrl, breadcrumbName));
-                    breadcrumb.addDependencyKey(item.getKey());
                 }
 
                 return breadcrumb;

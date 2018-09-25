@@ -8,7 +8,7 @@ import groovy.lang.Binding;
 import groovy.util.GroovyScriptEngine;
 import groovy.util.ResourceException;
 import org.apache.commons.collections.MapUtils;
-import org.craftercms.core.util.cache.impl.CachingAwareObjectBase;
+import org.craftercms.core.util.cache.impl.AbstractCachingAwareObject;
 import org.craftercms.engine.exception.ScriptException;
 import org.craftercms.engine.exception.ScriptNotFoundException;
 import org.craftercms.engine.scripting.Script;
@@ -18,7 +18,7 @@ import org.craftercms.engine.scripting.Script;
  *
  * @author Alfonso Vásquez
  */
-public class GroovyScript extends CachingAwareObjectBase implements Script {
+public class GroovyScript extends AbstractCachingAwareObject implements Script {
 
     protected GroovyScriptEngine scriptEngine;
     protected String scriptUrl;

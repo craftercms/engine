@@ -282,8 +282,6 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
 
                             loadScripts(siteContext.getScriptFactory(), page, view);
 
-                            view.addDependencyKey(page.getItem().getKey());
-
                             return applyLifecycleMethods(page.getStoreUrl(), view);
                         }
                     } else {
@@ -312,8 +310,6 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
                 for (String scriptUrl : scriptUrls) {
                     Script script = scriptFactory.getScript(scriptUrl);
                     scripts.add(script);
-
-                    view.addDependencyKey(script.getKey());
                 }
 
                 view.setScripts(scripts);
