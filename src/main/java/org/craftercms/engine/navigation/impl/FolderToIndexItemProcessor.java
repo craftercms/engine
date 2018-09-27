@@ -71,7 +71,6 @@ public class FolderToIndexItemProcessor implements ItemProcessor {
 
                 newFolderItem.setDescriptorUrl(indexItem.getDescriptorUrl());
                 newFolderItem.setDescriptorDom(indexItem.getDescriptorDom());
-                newFolderItem.addDependencyKey(indexItem.getKey());
 
                 return newFolderItem;
             }

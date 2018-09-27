@@ -59,7 +59,6 @@ public class FolderToIndexItemProcessorTest {
         assertEquals(WEBSITE_FOLDER_URL, processedItem.getUrl());
         assertEquals(INDEX_EN_URL, processedItem.getDescriptorUrl());
         assertEquals(XML, processedItem.getDescriptorDom().asXML());
-        assertEquals(Collections.singletonList(INDEX_EN_URL), processedItem.getDependencyKeys());
     }
 
     private UrlTransformationEngine createUrlTransformationEngine() {
