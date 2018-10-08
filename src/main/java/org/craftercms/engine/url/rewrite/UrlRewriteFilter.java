@@ -45,7 +45,7 @@ import java.io.IOException;
  */
 public class UrlRewriteFilter implements Filter {
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultExceptionHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(UrlRewriteFilter.class);
 
     @Override
     public void init(FilterConfig filterConfig) {

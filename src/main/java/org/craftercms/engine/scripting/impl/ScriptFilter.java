@@ -126,7 +126,6 @@ public class ScriptFilter implements Filter {
                                     mapping.excludes = excludes;
 
                                     mappings.add(mapping);
-                                    mappings.addDependencyKey(mapping.script.getKey());
                                 }
                             }
                         }
