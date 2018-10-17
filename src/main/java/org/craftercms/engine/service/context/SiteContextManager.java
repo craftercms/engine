@@ -27,6 +27,10 @@ import javax.annotation.PreDestroy;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.craftercms.commons.entitlements.exception.EntitlementException;
+import org.craftercms.commons.entitlements.model.EntitlementType;
+import org.craftercms.commons.entitlements.model.Module;
+import org.craftercms.commons.entitlements.validator.EntitlementValidator;
 import org.craftercms.core.exception.RootFolderNotFoundException;
 import org.craftercms.engine.event.SiteContextCreatedEvent;
 import org.craftercms.engine.event.SiteContextDestroyedEvent;
@@ -49,6 +53,7 @@ public class SiteContextManager implements ApplicationContextAware {
     protected SiteContextFactory contextFactory;
     protected SiteContextFactory fallbackContextFactory;
     protected ApplicationContext applicationContext;
+    protected EntitlementValidator entitlementValidator;
 
     public SiteContextManager() {
         lock = new ReentrantLock();
@@ -67,6 +72,11 @@ public class SiteContextManager implements ApplicationContextAware {
     @Required
     public void setFallbackContextFactory(SiteContextFactory fallbackContextFactory) {
         this.fallbackContextFactory = fallbackContextFactory;
+    }
+
+    @Required
+    public void setEntitlementValidator(final EntitlementValidator entitlementValidator) {
+        this.entitlementValidator = entitlementValidator;
     }
 
     @Override
@@ -187,6 +197,16 @@ public class SiteContextManager implements ApplicationContextAware {
     public SiteContext getContext(String siteName, boolean fallback) {
         SiteContext siteContext = contextRegistry.get(siteName);
         if (siteContext == null) {
+            if(!fallback) {
+                try {
+                    int totalSites = (int) contextRegistry.values().stream()
+                                            .filter(context -> !context.isFallback())
+                                            .count();
+                    entitlementValidator.validateEntitlement(Module.ENGINE, EntitlementType.SITE, totalSites, 1);
+                } catch (EntitlementException e) {
+                    return null;
+                }
+            }
             lock.lock();
             try {
                 // Double check locking, in case the context has been created already by another thread
@@ -196,21 +216,24 @@ public class SiteContextManager implements ApplicationContextAware {
                     logger.info("<Creating site context: " + siteName + ">");
                     logger.info("==================================================");
 
-                    if (fallback) {
-                        siteContext = fallbackContextFactory.createContext(siteName);
-                        siteContext.setFallback(true);
-                    } else {
-                        siteContext = contextFactory.createContext(siteName);
+                    try {
+                        if (fallback) {
+                            siteContext = fallbackContextFactory.createContext(siteName);
+                            siteContext.setFallback(true);
+                        } else {
+                            siteContext = contextFactory.createContext(siteName);
+                        }
+
+                        publishEvent(new SiteContextCreatedEvent(siteContext, this), siteContext);
+
+                        contextRegistry.put(siteName, siteContext);
+
+                        logger.info("Site context created: " + siteContext);
+                    } finally {
+                        logger.info("==================================================");
+                        logger.info("</Creating site context: " + siteName + ">");
+                        logger.info("==================================================");
                     }
-
-                    publishEvent(new SiteContextCreatedEvent(siteContext, this), siteContext);
-
-                    contextRegistry.put(siteName, siteContext);
-
-                    logger.info("Site context created: " + siteContext);
-                    logger.info("==================================================");
-                    logger.info("</Creating site context: " + siteName + ">");
-                    logger.info("==================================================");
                 }
             } catch (RootFolderNotFoundException e) {
                 logger.error("Cannot resolve root folder for site '" + siteName + "'", e);

@@ -1,7 +1,9 @@
 package org.craftercms.engine.test.utils;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +14,6 @@ import org.craftercms.core.service.Content;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.service.Item;
-import org.craftercms.core.service.impl.CachedContent;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.core.io.ClassPathResource;
@@ -94,11 +95,29 @@ public class ContentStoreServiceMockUtils {
     }
 
     public static Content getContentFromClassPath(String url) throws IOException {
-        ClassPathResource resource = new ClassPathResource(url);
+        final ClassPathResource resource = new ClassPathResource(url);
         if (resource.exists()) {
-            byte[] data = IOUtils.toByteArray(resource.getInputStream());
+            final byte[] data = IOUtils.toByteArray(resource.getInputStream());
+            final long lastModified = resource.lastModified();
 
-            return new CachedContent(data, resource.lastModified());
+            return new Content() {
+
+                @Override
+                public long getLastModified() {
+                    return lastModified;
+                }
+
+                @Override
+                public long getLength() {
+                    return data.length;
+                }
+
+                @Override
+                public InputStream getInputStream() throws IOException {
+                    return new ByteArrayInputStream(data);
+                }
+
+            };
         } else {
             return null;
         }

@@ -8,7 +8,7 @@
     <description>Crafter Content Delivery Engine</description>
     <url>https://github.com/craftercms/engine</url>
     <packaging>war</packaging>
-    <version>3.0.17-SNAPSHOT</version><!-- craftercms version flag -->
+    <version>3.1.0-SNAPSHOT</version><!-- craftercms version flag -->
     <organization>
         <name>CrafterCMS</name>
         <url>http://craftercms.org</url>
@@ -27,7 +27,6 @@
         <commons.configuration.version>2.1</commons.configuration.version>
         <commons.lang.version>3.5</commons.lang.version>
         <commons.collections.version>4.1</commons.collections.version>
-        <log4j.version>1.2.17</log4j.version>
         <cglib.version>3.1</cglib.version>
         <groovy.version>2.4.10</groovy.version>
         <gmongo.version>1.5</gmongo.version>
@@ -36,6 +35,8 @@
         <mockito.version>1.9.5</mockito.version>
         <rome.version>1.0</rome.version>
         <java.version>1.8</java.version>
+        <bouncycastle.version>1.60</bouncycastle.version>
+        <urlrewrite.version>4.0.4</urlrewrite.version>
     </properties>
 
     <licenses>
@@ -110,6 +111,11 @@
             <artifactId>crafter-commons-mongo</artifactId>
             <version>${crafter.commons.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.craftercms</groupId>
+            <artifactId>crafter-commons-entitlements</artifactId>
+            <version>${crafter.commons.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -155,11 +161,6 @@
 
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>${log4j.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -192,6 +193,19 @@
             <groupId>rome</groupId>
             <artifactId>rome</artifactId>
             <version>${rome.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.tuckey</groupId>
+            <artifactId>urlrewritefilter</artifactId>
+            <version>${urlrewrite.version}</version>
+        </dependency>
+
+        <!-- Providers -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpg-jdk15on</artifactId>
+            <version>${bouncycastle.version}</version>
         </dependency>
 
         <!-- Test dependencies -->

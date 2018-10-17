@@ -16,6 +16,7 @@
  */
 package org.craftercms.engine.service.context;
 
+import java.io.InputStream;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -65,6 +66,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
+import org.tuckey.web.filters.urlrewrite.Conf;
+import org.tuckey.web.filters.urlrewrite.UrlRewriter;
 
 /**
  * Factory for creating {@link SiteContext} with common properties. It also uses the {@link MacroResolver} to resolve
@@ -93,6 +96,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected String controllerScriptsPath;
     protected String[] configPaths;
     protected String[] applicationContextPaths;
+    protected String[] urlRewriteConfPaths;
     protected String groovyClassesPath;
     protected Map<String, Object> groovyGlobalVars;
     protected boolean mergingOn;
@@ -183,6 +187,11 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     @Required
     public void setApplicationContextPaths(String[] applicationContextPaths) {
         this.applicationContextPaths = applicationContextPaths;
+    }
+
+    @Required
+    public void setUrlRewriteConfPaths(String[] urlRewriteConfPaths) {
+        this.urlRewriteConfPaths = urlRewriteConfPaths;
     }
 
     @Required
@@ -280,21 +289,25 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
                 resolvedAppContextPaths[i] = macroResolver.resolveMacros(applicationContextPaths[i], macroValues);
             }
 
+            String[] resolvedUrlRewriteConfPaths = new String[urlRewriteConfPaths.length];
+            for (int i = 0; i < urlRewriteConfPaths.length; i++) {
+                resolvedUrlRewriteConfPaths[i] = macroResolver.resolveMacros(urlRewriteConfPaths[i], macroValues);
+            }
+
             ResourceLoader resourceLoader = new ContentStoreResourceLoader(siteContext);
             HierarchicalConfiguration<?> config = getConfig(siteContext, resolvedConfigPaths, resourceLoader);
             URLClassLoader classLoader = getClassLoader(siteContext);
             ScriptFactory scriptFactory = getScriptFactory(siteContext, classLoader);
             ConfigurableApplicationContext appContext = getApplicationContext(siteContext, classLoader, config,
                                                                               resolvedAppContextPaths, resourceLoader);
+            UrlRewriter urlRewriter = getUrlRewriter(siteContext, resolvedUrlRewriteConfPaths, resourceLoader);
 
-            siteContext.setConfigPaths(resolvedConfigPaths);
-            siteContext.setApplicationContextPaths(resolvedAppContextPaths);
-            siteContext.setGroovyClassesPath(groovyClassesPath);
             siteContext.setScriptFactory(scriptFactory);
             siteContext.setConfig(config);
             siteContext.setGlobalApplicationContext(globalApplicationContext);
             siteContext.setApplicationContext(appContext);
             siteContext.setClassLoader(classLoader);
+            siteContext.setUrlRewriter(urlRewriter);
 
             executeInitScript(siteContext, scriptFactory);
 
@@ -313,10 +326,12 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected HierarchicalConfiguration getConfig(SiteContext siteContext, String[] configPaths,
                                                   ResourceLoader resourceLoader) {
         String siteName = siteContext.getSiteName();
+
+        logger.info("--------------------------------------------------");
+        logger.info("<Loading configuration for site: " + siteName + ">");
+        logger.info("--------------------------------------------------");
+
         try {
-            logger.info("--------------------------------------------------");
-            logger.info("<Loading configuration for site: " + siteName + ">");
-            logger.info("--------------------------------------------------");
 
             ConfigurationBuilder<HierarchicalConfiguration> builder;
 
@@ -326,15 +341,13 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
                 builder = new MultiResourceConfigurationBuilder(configPaths, resourceLoader, textEncryptor);
             }
 
-            HierarchicalConfiguration config = builder.getConfiguration();
-
+            return builder.getConfiguration();
+        } catch (ConfigurationException e) {
+            throw new SiteContextCreationException("Unable to load configuration for site '" + siteName + "'", e);
+        } finally {
             logger.info("--------------------------------------------------");
             logger.info("</Loading configuration for site: " + siteName + ">");
             logger.info("--------------------------------------------------");
-
-            return config;
-        } catch (ConfigurationException e) {
-            throw new SiteContextCreationException("Unable to load configuration for site '" + siteContext.getSiteName() + "'", e);
         }
     }
 
@@ -352,6 +365,12 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
                                                                    HierarchicalConfiguration config,
                                                                    String[] applicationContextPaths,
                                                                    ResourceLoader resourceLoader) {
+        String siteName = siteContext.getSiteName();
+
+        logger.info("--------------------------------------------------");
+        logger.info("<Loading application context for site: " + siteName + ">");
+        logger.info("--------------------------------------------------");
+
         try {
             List<Resource> resources = new ArrayList<>();
 
@@ -363,12 +382,6 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             }
 
             if (CollectionUtils.isNotEmpty(resources)) {
-                String siteName = siteContext.getSiteName();
-
-                logger.info("--------------------------------------------------");
-                logger.info("<Loading application context for site: " + siteName + ">");
-                logger.info("--------------------------------------------------");
-
                 GenericApplicationContext appContext = new GenericApplicationContext(globalApplicationContext);
                 appContext.setClassLoader(classLoader);
 
@@ -386,17 +399,70 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
 
                 appContext.refresh();
 
-                logger.info("--------------------------------------------------");
-                logger.info("</Loading application context for site: " + siteName + ">");
-                logger.info("--------------------------------------------------");
-
                 return appContext;
             } else {
                 return null;
             }
         } catch (Exception e) {
-            throw new SiteContextCreationException("Unable to load application context for site '" +
-                                                   siteContext.getSiteName() + "'", e);
+            throw new SiteContextCreationException("Unable to load application context for site '" + siteName + "'", e);
+        } finally {
+            logger.info("--------------------------------------------------");
+            logger.info("</Loading application context for site: " + siteName + ">");
+            logger.info("--------------------------------------------------");
+        }
+    }
+
+    protected UrlRewriter getUrlRewriter(SiteContext siteContext, String[] urlRewriteConfPaths,
+                                         ResourceLoader resourceLoader) {
+        String siteName = siteContext.getSiteName();
+        String confPath = null;
+        Resource confResource = null;
+        Conf conf = null;
+        UrlRewriter urlRewriter = null;
+
+        logger.info("--------------------------------------------------");
+        logger.info("<Loading URL rewrite engine for site: " + siteName + ">");
+        logger.info("--------------------------------------------------");
+
+        try {
+            for (int i = urlRewriteConfPaths.length - 1; i >= 0; i--) {
+                Resource resource = resourceLoader.getResource(urlRewriteConfPaths[i]);
+                if (resource.exists()) {
+                    confPath = urlRewriteConfPaths[i];
+                    confResource = resource;
+                    break;
+                }
+            }
+
+            if (confResource != null) {
+                // By convention, if it ends in .xml, it's an XML-style url rewrite config, else it's a mod_rewrite-style
+                // url rewrite config
+                boolean modRewriteStyleConf = !confPath.endsWith(".xml");
+
+                try (InputStream is = confResource.getInputStream()) {
+                    conf = new Conf(servletContext, is, confPath, "", modRewriteStyleConf);
+
+                    logger.info("URL rewrite configuration loaded @ " + confResource);
+                }
+            }
+
+            if (conf != null) {
+                if (conf.isOk() && conf.isEngineEnabled()) {
+                    urlRewriter = new UrlRewriter(conf);
+
+                    logger.info("URL rewrite engine loaded for site " + siteName + " (conf ok)");
+                } else {
+                    logger.error("URL rewrite engine not loaded, there might have been conf errors");
+                }
+            }
+
+            return urlRewriter;
+        } catch (Exception e) {
+            throw new SiteContextCreationException("Unable to load URL rewrite conf for site '" + siteName + "'", e);
+        } finally {
+            logger.info("--------------------------------------------------");
+            logger.info("</Loading URL rewrite engine for site: " + siteName + ">");
+            logger.info("--------------------------------------------------");
         }
     }
 
@@ -406,6 +472,10 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
 
     protected Scheduler scheduleJobs(SiteContext siteContext) {
         String siteName = siteContext.getSiteName();
+
+        logger.info("--------------------------------------------------");
+        logger.info("<Scheduling job scripts for site: " + siteName + ">");
+        logger.info("--------------------------------------------------");
 
         try {
             List<JobContext> allJobContexts = new ArrayList<>();
@@ -420,10 +490,6 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             if (CollectionUtils.isNotEmpty(allJobContexts)) {
                 Scheduler scheduler = SchedulingUtils.createScheduler(siteName + "_scheduler");
 
-                logger.info("--------------------------------------------------");
-                logger.info("<Scheduling job scripts for site: " + siteName + ">");
-                logger.info("--------------------------------------------------");
-
                 for (JobContext jobContext : allJobContexts) {
                     scheduler.scheduleJob(jobContext.getDetail(), jobContext.getTrigger());
 
@@ -432,14 +498,14 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
 
                 scheduler.start();
 
-                logger.info("--------------------------------------------------");
-                logger.info("</Scheduling job scripts for site: " + siteName + ">");
-                logger.info("--------------------------------------------------");
-
                 return scheduler;
             }
         } catch (Exception e) {
             logger.error("Unable to schedule jobs for site '" + siteName + "'", e);
+        } finally {
+            logger.info("--------------------------------------------------");
+            logger.info("</Scheduling job scripts for site: " + siteName + ">");
+            logger.info("--------------------------------------------------");
         }
 
         return null;
