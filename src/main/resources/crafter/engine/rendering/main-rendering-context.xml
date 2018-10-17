@@ -67,6 +67,28 @@
         <property name="objectMapper" ref="crafter.coreObjectMapper"/>
     </bean>
 
+    <bean id="crafter.coreObjectMapper" class="org.craftercms.commons.jackson.CustomSerializationObjectMapper">
+        <property name="dateFormat">
+            <bean class="java.text.SimpleDateFormat">
+                <constructor-arg value="yyyy-MM-dd'T'HH:mm:ssXXX"/>
+            </bean>
+        </property>
+        <property name="serializers">
+            <list>
+                <bean class="org.craftercms.commons.jackson.ObjectIdSerializer"/>
+                <bean class="org.craftercms.core.util.json.jackson.Dom4jDocumentJsonSerializer"/>
+                <bean class="com.fasterxml.jackson.datatype.jsr310.ser.ZonedDateTimeSerializer" />
+            </list>
+        </property>
+        <property name="deserializers">
+            <map>
+                <entry key="org.bson.types.ObjectId">
+                    <bean class="org.craftercms.commons.jackson.ObjectIdDeserializer"/>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
     <bean id="crafter.xmlMsgConverter" class="org.springframework.http.converter.xml.MarshallingHttpMessageConverter">
         <constructor-arg ref="crafter.xmlMarshaller"/>
     </bean>
