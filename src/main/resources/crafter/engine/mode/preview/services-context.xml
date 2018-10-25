@@ -62,6 +62,7 @@
         <property name="groovyGlobalVars" ref="crafter.restScriptsVariables"/>
         <property name="jobResolvers" ref="crafter.scriptJobResolvers"/>
         <property name="textEncryptor" ref="crafter.textEncryptor"/>
+        <property name="storeType" value="${crafter.engine.store.type}"/>
     </bean>
 
     <!-- ////////////////////////////////// -->

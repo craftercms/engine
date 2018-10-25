@@ -37,7 +37,6 @@ import org.craftercms.commons.crypto.impl.NoOpTextEncryptor;
 import org.craftercms.commons.spring.ApacheCommonsConfiguration2PropertySource;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
-import org.craftercms.core.store.impl.filesystem.FileSystemContentStoreAdapter;
 import org.craftercms.core.url.UrlTransformationEngine;
 import org.craftercms.engine.exception.SiteContextCreationException;
 import org.craftercms.engine.macro.MacroResolver;
@@ -114,7 +113,6 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
 
     public SiteContextFactory() {
         siteNameMacroName = DEFAULT_SITE_NAME_MACRO_NAME;
-        storeType = FileSystemContentStoreAdapter.STORE_TYPE;
         storeServerUrl = null;
         username = null;
         password = null;
@@ -133,6 +131,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         this.siteNameMacroName = siteNameMacroName;
     }
 
+    @Required
     public void setStoreType(String storeType) {
         this.storeType = storeType;
     }
