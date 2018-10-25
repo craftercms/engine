@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean name="crafter.properties" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+        <property name="order" value="0"/>
+        <property name="locations">
+            <list>
+                <value>classpath:crafter/core/core.properties</value>
+                <value>classpath:crafter/security/security.properties</value>
+                <value>classpath:crafter/engine/server-config.properties</value>
+                <value>classpath:crafter/engine/mode/s3/server-config.properties</value>
+                <value>${crafter.engine.extension.base}/overlay-config.properties</value>
+                <value>${crafter.engine.extension.base}/server-config.properties</value>
+            </list>
+        </property>
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+    </bean>
+
+    <!-- AWS S3 Content Store Adapter -->
+    <bean id="crafter.contentStoreAdapter.s3" class="org.craftercms.engine.store.s3.S3ContentStoreAdapter">
+        <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
+        <property name="metadataFileExtension" value="${crafter.core.store.metadataFile.extension}"/>
+        <property name="descriptorFileExtension" value="${crafter.core.store.descriptorFile.extension}"/>
+    </bean>
+
+</beans>
