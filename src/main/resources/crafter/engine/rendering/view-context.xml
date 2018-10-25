@@ -59,7 +59,7 @@
 
     <bean id="crafter.freeMarkerViewResolver" class="org.craftercms.engine.view.freemarker.CrafterFreeMarkerViewResolver">
         <property name="order" value="10" />
-        <property name="cache" value="false" />
+        <property name="cache" value="#{ ! T(java.lang.Boolean).valueOf(${crafter.engine.preview:false}) }" />
         <property name="contentType" value="text/html;charset=UTF-8" />
         <property name="siteItemService" ref="crafter.siteItemService" />
         <property name="componentTemplateXPathQuery" value="${crafter.engine.component.view.name.xpathQuery}" />

@@ -59,24 +59,25 @@ public class TargetedContentStoreAdapterTest extends ConfigAwareTestBase {
     @Test
     public void testExists() throws Exception {
         Context context = new TargetedContentStoreAdapter.ContextWrapper(storeAdapter, mock(Context.class));
+        CachingOptions cachingOptions = CachingOptions.DEFAULT_CACHING_OPTIONS;
 
-        boolean exists = storeAdapter.exists(context, "/site/website/en");
-
-        assertTrue(exists);
-
-        exists = storeAdapter.exists(context, "/site/website/ja_jp_jp");
+        boolean exists = storeAdapter.exists(context, cachingOptions,"/site/website/en");
 
         assertTrue(exists);
 
-        exists = storeAdapter.exists(context, "/site/website/ja_jp_jp/index.xml");
+        exists = storeAdapter.exists(context, cachingOptions, "/site/website/ja_jp_jp");
 
         assertTrue(exists);
 
-        exists = storeAdapter.exists(context, "/site/website/index.xml");
+        exists = storeAdapter.exists(context, cachingOptions, "/site/website/ja_jp_jp/index.xml");
 
         assertTrue(exists);
 
-        exists = storeAdapter.exists(context, "/static-assets/css/main.css");
+        exists = storeAdapter.exists(context, cachingOptions, "/site/website/index.xml");
+
+        assertTrue(exists);
+
+        exists = storeAdapter.exists(context, cachingOptions, "/static-assets/css/main.css");
 
         assertTrue(exists);
     }
@@ -199,16 +200,16 @@ public class TargetedContentStoreAdapterTest extends ConfigAwareTestBase {
         frIdx.setName("index.xml");
         frIdx.setUrl("/site/website/ja/index.xml");
 
-        when(adapter.exists(any(Context.class),
+        when(adapter.exists(any(Context.class), any(CachingOptions.class),
                             eq("/site/website/index.xml"))).thenReturn(true);
 
-        when(adapter.exists(any(Context.class),
+        when(adapter.exists(any(Context.class), any(CachingOptions.class),
                             eq("/site/website/en"))).thenReturn(true);
 
-        when(adapter.exists(any(Context.class),
+        when(adapter.exists(any(Context.class), any(CachingOptions.class),
                             eq("/site/website/en/index.xml"))).thenReturn(true);
 
-        when(adapter.exists(any(Context.class),
+        when(adapter.exists(any(Context.class), any(CachingOptions.class),
                             eq("/static-assets/css/main.css"))).thenReturn(true);
 
         when(adapter.findContent(any(Context.class),
