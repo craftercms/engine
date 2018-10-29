@@ -10,7 +10,7 @@
                 <value>classpath:crafter/core/core.properties</value>
                 <value>classpath:crafter/security/security.properties</value>
                 <value>classpath:crafter/engine/server-config.properties</value>
-                <value>classpath:crafter/engine/mode/s3/server-config.properties</value>
+                <value>classpath:crafter/engine/store/s3/server-config.properties</value>
                 <value>${crafter.engine.extension.base}/overlay-config.properties</value>
                 <value>${crafter.engine.extension.base}/server-config.properties</value>
             </list>
@@ -18,11 +18,28 @@
         <property name="ignoreUnresolvablePlaceholders" value="true"/>
     </bean>
 
+    <!-- AWS S3 client builder -->
+    <bean id="crafter.s3ClientBuilder" class="org.craftercms.engine.store.s3.util.S3ClientBuilder">
+        <property name="region" value="${crafter.engine.s3.region:}"/>
+        <property name="accessKey" value="${crafter.engine.s3.accessKey:}"/>
+        <property name="secretKey" value="${crafter.engine.s3.secretKey:}"/>
+    </bean>
+
+    <!-- AWS S3 Site List Resolver -->
+    <bean id="crafter.siteListResolver" class="org.craftercms.engine.store.s3.S3SiteListResolver">
+        <property name="siteRootFolderPath" value="${crafter.engine.site.default.rootFolder.path}"/>
+        <property name="macroResolver" ref="crafter.macroResolver"/>
+        
+        <property name="clientBuilder" ref="crafter.s3ClientBuilder"/>
+    </bean>
+
     <!-- AWS S3 Content Store Adapter -->
     <bean id="crafter.contentStoreAdapter.s3" class="org.craftercms.engine.store.s3.S3ContentStoreAdapter">
         <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
         <property name="metadataFileExtension" value="${crafter.core.store.metadataFile.extension}"/>
         <property name="descriptorFileExtension" value="${crafter.core.store.descriptorFile.extension}"/>
+
+        <property name="clientBuilder" ref="crafter.s3ClientBuilder"/>
     </bean>
 
 </beans>

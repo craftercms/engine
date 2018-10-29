@@ -30,10 +30,11 @@ import org.craftercms.core.exception.StoreException;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.store.impl.AbstractFileBasedContentStoreAdapter;
 import org.craftercms.core.store.impl.File;
+import org.craftercms.engine.store.s3.util.S3ClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Required;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.AmazonS3URI;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.GetObjectRequest;
@@ -48,12 +49,15 @@ import com.amazonaws.services.s3.model.S3Object;
 public class S3ContentStoreAdapter extends AbstractFileBasedContentStoreAdapter {
 
     private static final Logger logger =
-        LoggerFactory.getLogger(org.craftercms.engine.store.s3.S3ContentStoreAdapter.class);
+        LoggerFactory.getLogger(S3ContentStoreAdapter.class);
 
     public static final String DELIMITER = "/";
 
-    protected AmazonS3 getClient() {
-        return AmazonS3ClientBuilder.defaultClient();
+    protected S3ClientBuilder clientBuilder;
+
+    @Required
+    public void setClientBuilder(final S3ClientBuilder clientBuilder) {
+        this.clientBuilder = clientBuilder;
     }
 
     protected boolean isResultEmpty(ListObjectsV2Result result) {
@@ -77,7 +81,7 @@ public class S3ContentStoreAdapter extends AbstractFileBasedContentStoreAdapter 
                                             .withBucketName(uri.getBucket())
                                             .withPrefix(uri.getKey())
                                             .withDelimiter(DELIMITER);
-        ListObjectsV2Result result = getClient().listObjectsV2(request);
+        ListObjectsV2Result result = clientBuilder.getClient().listObjectsV2(request);
 
         if(isResultEmpty(result)) {
             throw new RootFolderNotFoundException("Root folder " + rootFolderPath + " not found");
@@ -96,7 +100,7 @@ public class S3ContentStoreAdapter extends AbstractFileBasedContentStoreAdapter 
         String key = StringUtils.appendIfMissing(s3Context.getKey(), path);
 
         logger.debug("Getting item for key {}", key);
-        AmazonS3 client = getClient();
+        AmazonS3 client = clientBuilder.getClient();
         if(StringUtils.isEmpty(FilenameUtils.getExtension(key))) {
             // If it is a folder, check if there are objects with the prefix
             try {
@@ -151,7 +155,7 @@ public class S3ContentStoreAdapter extends AbstractFileBasedContentStoreAdapter 
         logger.debug("Getting children for key {}", s3Prefix.getPrefix());
 
         List<File> children = new LinkedList<>();
-        AmazonS3 client = getClient();
+        AmazonS3 client = clientBuilder.getClient();
 
         ListObjectsV2Request request = new ListObjectsV2Request()
                                             .withBucketName(s3Context.getBucket())
@@ -180,7 +184,7 @@ public class S3ContentStoreAdapter extends AbstractFileBasedContentStoreAdapter 
                                             .withBucketName(s3Context.getBucket())
                                             .withPrefix(s3Context.getKey())
                                             .withDelimiter(DELIMITER);
-        ListObjectsV2Result result = getClient().listObjectsV2(request);
+        ListObjectsV2Result result = clientBuilder.getClient().listObjectsV2(request);
 
         return !isResultEmpty(result);
     }
