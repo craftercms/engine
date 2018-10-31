@@ -20,7 +20,10 @@ package org.craftercms.engine.store.s3;
 import java.io.InputStream;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.craftercms.core.store.impl.File;
+
+import static org.craftercms.engine.store.s3.S3ContentStoreAdapter.DELIMITER;
 
 /**
  * Implementation of {@link File} for AWS S3 prefixes (used as folders).
@@ -43,12 +46,12 @@ public class S3Prefix implements File {
 
     @Override
     public String getName() {
-        return FilenameUtils.getName(prefix);
+        return FilenameUtils.getName(StringUtils.removeEnd(prefix, DELIMITER));
     }
 
     @Override
     public String getPath() {
-        return FilenameUtils.getPath(prefix);
+        return prefix;
     }
 
     @Override
