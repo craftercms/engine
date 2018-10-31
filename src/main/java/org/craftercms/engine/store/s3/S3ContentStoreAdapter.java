@@ -161,17 +161,22 @@ public class S3ContentStoreAdapter extends AbstractFileBasedContentStoreAdapter 
                                             .withBucketName(s3Context.getBucket())
                                             .withPrefix(s3Prefix.getPrefix())
                                             .withDelimiter(DELIMITER);
-        ListObjectsV2Result result = client.listObjectsV2(request);
-        if(isResultEmpty(result)) {
-            return null;
-        } else {
-            result.getCommonPrefixes().forEach(prefix ->
-                children.add(new S3Prefix(StringUtils.appendIfMissing(prefix, DELIMITER))));
-            result.getObjectSummaries().forEach(summary ->
-                children.add(new S3File(client.getObject(s3Context.getBucket(), summary.getKey()))));
+        ListObjectsV2Result result;
 
-            return children;
-        }
+        do {
+            result = client.listObjectsV2(request);
+            if (isResultEmpty(result)) {
+                return null;
+            } else {
+                result.getCommonPrefixes().forEach(prefix ->
+                    children.add(new S3Prefix(StringUtils.appendIfMissing(prefix, DELIMITER))));
+                result.getObjectSummaries().forEach(summary ->
+                    children.add(new S3File(client.getObject(s3Context.getBucket(), summary.getKey()))));
+            }
+            request.setContinuationToken(result.getNextContinuationToken());
+        } while (result.isTruncated());
+
+        return children;
     }
 
     /**
