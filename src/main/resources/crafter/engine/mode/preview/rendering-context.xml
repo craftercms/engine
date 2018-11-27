@@ -27,8 +27,10 @@
     <!--									-->
     <!-- ////////////////////////////////// -->
 
-    <bean id="crafter.httpProxyRequestHandler" class="org.craftercms.engine.controller.HttpProxyRequestHandler">
-        <property name="proxyRegistry" ref="crafter.httpProxyRegistry" />
+    <bean id="crafter.remoteAssetsRequestHandler" class="org.craftercms.engine.controller.RemoteAssetsRequestHandler"
+          init-method="init">
+        <property name="remoteFileResolver" ref="crafter.remoteFileResolver"/>
+        <property name="disableCaching" value="${crafter.engine.remoteAssets.disableCaching}"/>
     </bean>
 
     <bean id="crafter.componentRenderController" class="org.craftercms.engine.controller.ComponentRenderController">
@@ -41,7 +43,7 @@
         <entry key="/api/**" value-ref="crafter.restScriptsController"/>
         <entry key="/api/1/services/**" value-ref="crafter.restScriptsController"/> <!-- Deprecated mapping, might be removed in a later version -->
         <entry key="/static-assets/**" value-ref="crafter.staticAssetsRequestHandler"/>
-        <entry key="/proxy/{proxyName}/**" value-ref="crafter.httpProxyRequestHandler"/>
+        <entry key="/remote-assets/**" value-ref="crafter.remoteAssetsRequestHandler"/>
         <entry key="/*" value-ref="crafter.pageRenderController"/>
     </util:map>
 
