@@ -431,6 +431,14 @@
         </property>
     </bean>
 
+    <bean id="crafter.searchService3" class="org.craftercms.engine.search.SiteAwareSearchService">
+        <property name="actualSearchService">
+            <bean class="org.craftercms.search.service.impl.v3.RestClientSearchService">
+                <property name="serverUrl" value="${crafter.engine.search.server.url}"/>
+            </bean>
+        </property>
+    </bean>
+
     <!-- ////////////////////////////////// -->
     <!--								 	-->
     <!--		FreeMarker Config			-->
@@ -475,6 +483,7 @@
         <entry key="navTreeBuilder" value-ref="crafter.navTreeBuilder"/>
         <entry key="navBreadcrumbBuilder" value-ref="crafter.navBreadcrumbBuilder"/>
         <entry key="searchService" value-ref="crafter.searchService"/>
+        <entry key="searchService3" value-ref="crafter.searchService3"/>
         <entry key="breadcrumbBuilder" value-ref="crafter.breadcrumbBuilder"/>
         <entry key="globalProperties" value-ref="crafter.propertyResolver"/>
         <entry key="tenantsResolver" value-ref="crafter.tenantsResolver"/>
