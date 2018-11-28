@@ -21,7 +21,6 @@ import org.craftercms.commons.config.ConfigurationMapper;
 import org.craftercms.commons.config.profiles.ConfigurationProfile;
 import org.craftercms.commons.config.profiles.ConfigurationProfileLoader;
 import org.craftercms.core.service.Content;
-import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.engine.service.SiteItemService;
 import org.craftercms.engine.service.context.SiteContext;
 import org.springframework.beans.factory.annotation.Required;
