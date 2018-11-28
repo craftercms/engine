@@ -37,6 +37,9 @@
         <java.version>1.8</java.version>
         <bouncycastle.version>1.60</bouncycastle.version>
         <urlrewrite.version>4.0.4</urlrewrite.version>
+        <aws.version>1.11.435</aws.version>
+        <box.sdk.version>2.23.0</box.sdk.version>
+        <jackson.version>2.9.7</jackson.version>
     </properties>
 
     <licenses>
@@ -208,6 +211,26 @@
             <version>${bouncycastle.version}</version>
         </dependency>
 
+        <!-- AWS -->
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-s3</artifactId>
+        </dependency>
+
+        <!-- Box -->
+        <dependency>
+            <groupId>com.box</groupId>
+            <artifactId>box-java-sdk</artifactId>
+            <version>${box.sdk.version}</version>
+        </dependency>
+
+        <!-- Override the jackson dependency from AWS -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-cbor</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -228,6 +251,19 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- AWS SDK -->
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-bom</artifactId>
+                <version>${aws.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <finalName>ROOT</finalName>

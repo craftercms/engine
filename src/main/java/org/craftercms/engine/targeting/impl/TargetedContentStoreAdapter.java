@@ -92,14 +92,15 @@ public class TargetedContentStoreAdapter implements ContentStoreAdapter {
     }
 
     @Override
-    public boolean exists(Context context, String path) throws InvalidContextException, StoreException {
+    public boolean exists(Context context, CachingOptions cachingOptions, String path)
+        throws InvalidContextException, StoreException {
         context = ((ContextWrapper)context).getActualContext();
 
         if (SiteProperties.isTargetingEnabled() && !TargetingUtils.excludePath(path)) {
             List<String> candidatePaths = candidateTargetedUrlsResolver.getUrls(path);
             if (CollectionUtils.isNotEmpty(candidatePaths)) {
                 for (String candidatePath : candidatePaths) {
-                    if (actualAdapter.exists(context, candidatePath)) {
+                    if (actualAdapter.exists(context, cachingOptions, candidatePath)) {
                         if (logger.isDebugEnabled()) {
                             logger.debug("Targeted of " + path + " found at " + candidatePath);
                         }
@@ -110,10 +111,10 @@ public class TargetedContentStoreAdapter implements ContentStoreAdapter {
 
                 return false;
             } else {
-                return actualAdapter.exists(context, path);
+                return actualAdapter.exists(context, cachingOptions, path);
             }
         } else {
-            return actualAdapter.exists(context, path);
+            return actualAdapter.exists(context, cachingOptions, path);
         }
     }
 

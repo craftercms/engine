@@ -103,6 +103,12 @@ public class SiteItemServiceImpl implements SiteItemService {
 
     @Override
     public SiteItem getSiteItem(String url, ItemProcessor processor, Predicate<Item> predicate) {
+        SiteContext context = getSiteContext();
+
+        if(!storeService.exists(context.getContext(), url)) {
+            return null;
+        }
+
         if (CollectionUtils.isNotEmpty(defaultPredicates)) {
             List<Predicate<Item>> predicates = new ArrayList<>(defaultPredicates);
 
@@ -122,7 +128,7 @@ public class SiteItemServiceImpl implements SiteItemService {
             processor = processorPipeline;
         }
 
-        Item item = storeService.findItem(getSiteContext().getContext(), null, url, processor);
+        Item item = storeService.findItem(context.getContext(), null, url, processor);
         if (item != null && (predicate == null || predicate.evaluate(item))) {
             return createItemWrapper(item);
         } else {

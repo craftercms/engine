@@ -1,64 +1,74 @@
 
 <#macro toolSupport>
-   <script src="/studio/static-assets/libs/requirejs/require.js"
-           data-main="/studio/overlayhook?site=NOTUSED&page=NOTUSED&cs.js"></script>
+  <#if siteContext.overlayCallback??>
+    <!-- Alpha UI -->
+    <script src="/studio/static-assets/alpha/assets/js/studio-guest.build.js"></script>
+
+    <script src="/studio/static-assets/libs/requirejs/require.js"
+    data-main="/studio/overlayhook?site=NOTUSED&page=NOTUSED&cs.js"></script>
+    <script>document.domain = "${Request.serverName}"; </script>
+  </#if>
 </#macro>
 
 <#macro cstudioOverlaySupport>
-   <script src="/studio/static-assets/libs/requirejs/require.js"
-           data-main="/studio/overlayhook?site=NOTUSED&page=NOTUSED&cs.js"></script>
+  <@toolSupport />
 </#macro>
 
-<#macro iceAttr iceGroup >
-   <#if siteContext.overlayCallback??> data-studio-ice="${iceGroup}" </#if>
+<#macro componentAttr path="" ice=false iceGroup="">
+  <#if siteContext.overlayCallback??>data-studio-component-path="${path}" data-studio-component="${path}"
+    <#if ice==true>
+      <@iceAttr path=path iceGroup=iceGroup/>
+    </#if>
+  </#if>
 </#macro>
+
+<#macro componentContainerAttr target objectId="">
+  <#if siteContext.overlayCallback??> data-studio-components-target="${target}" data-studio-components-objectId="${objectId}"</#if>
+</#macro>
+
+<#macro iceAttr iceGroup="" path="" label="">
+  <#if label == "">
+    <#if iceGroup == "" >
+      <#assign label = path />
+    <#else>
+      <#assign label = iceGroup />
+    </#if>
+  </#if>
+  <#if siteContext.overlayCallback??> data-studio-ice="${iceGroup}" <#if path!="">data-studio-ice-path="${path}"</#if> data-studio-ice-label="${label}"</#if>
+</#macro>
+
 
 <#macro ice id="" component="" componentPath="">
-    <#if siteContext.overlayCallback??>
-        <#if id != "">
-			<#if componentPath != "">
-	            <div>NOT-DONE-COMPONENT-ICE</div>
-			<#else>
-	            <div data-studio-ice="${id}"><#nested></div>
-			</#if>			
-        <#elseif id == "" && componentPath == "">
-            <div>NOT-DONE-COMPONENT-ICE</div>
-            <#nested></div>
-        <#elseif id == "" && component == "">
-            <div>NOT-DONE-COMPONENT-ICE</div>
-            <#nested></div>
-        </#if>
-    <#else>
-        <#nested>
-    </#if>
+  <#if siteContext.overlayCallback??>
+    <div data-studio-ice="${id}" ></div>
+  </#if>
 </#macro>
 
 
 <#macro draggableComponent id="" component="" componentPath="">
-    <#if siteContext.overlayCallback??>
-        <#if id != "" && component == "" && componentPath == "">
-            <@ice id=id>
-	            <div id='${id}' class='cstudio-draggable-component'><#nested></div>
-	        </@ice>
-        <#elseif id == "" && componentPath == "">
-            <@ice component=component>
-            	<div id="cstudio-component-${component.key}" class='cstudio-draggable-component'><#nested></div>
-            </@ice>
-        <#elseif id == "" && component == "">
-            <@ice componentPath=componentPath>
-            	<div id="cstudio-component-${componentPath}" class='cstudio-draggable-component'><#nested></div>
-            </@ice>
-        </#if>
-    <#else>
-        <#nested>
+  <#if siteContext.overlayCallback??>
+    <#if id != "" && component == "" && componentPath == "">
+      <@ice id=id>
+        <div id='${id}' class='cstudio-draggable-component'><#nested></div>
+      </@ice>
+    <#elseif id == "" && componentPath == "">
+      <@ice component=component>
+        <div id="cstudio-component-${component.key}" class='cstudio-draggable-component'><#nested></div>
+      </@ice>
+    <#elseif id == "" && component == "">
+      <@ice componentPath=componentPath>
+        <div id="cstudio-component-${componentPath}" class='cstudio-draggable-component'><#nested></div>
+      </@ice>
     </#if>
+  <#else>
+    <#nested>
+  </#if>
 </#macro>
 
-
 <#macro componentZone id="">
-	<div class="cstudio-component-zone" id="zone-${id}">
-		<@ice id=id>
-			<#nested>
-		</@ice>
-	</div>
+  <div class="cstudio-component-zone" id="zone-${id}">
+    <@ice id=id>
+      <#nested>
+    </@ice>
+  </div>
 </#macro>

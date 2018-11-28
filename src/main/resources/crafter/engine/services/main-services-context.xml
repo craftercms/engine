@@ -363,6 +363,7 @@
         <property name="groovyGlobalVars" ref="crafter.restScriptsVariables"/>
         <property name="jobResolvers" ref="crafter.scriptJobResolvers"/>
         <property name="textEncryptor" ref="crafter.textEncryptor"/>
+        <property name="storeType" value="${crafter.engine.store.type}"/>
     </bean>
 
     <bean id="crafter.fallbackSiteContextFactory" class="org.craftercms.engine.service.context.SiteContextFactory">
@@ -384,6 +385,7 @@
         <property name="groovyGlobalVars" ref="crafter.restScriptsVariables"/>
         <property name="jobResolvers" ref="crafter.scriptJobResolvers"/>
         <property name="textEncryptor" ref="crafter.textEncryptor"/>
+        <property name="storeType" value="filesystem"/>
     </bean>
 
     <!-- ////////////////////////////////// -->
@@ -453,6 +455,7 @@
         <property name="freemarkerSettings">
             <props>
                 <prop key="output_encoding">UTF-8</prop>
+                <prop key="localized_lookup">false</prop>
                 <prop key="object_wrapper">org.craftercms.engine.freemarker.CrafterObjectWrapper</prop>
                 <prop key="datetime_format">${crafter.engine.model.datetime.pattern}</prop>
                 <prop key="time_zone">${crafter.engine.model.datetime.timeZone}</prop>
@@ -581,6 +584,60 @@
         <property name="siteItemService" ref="crafter.siteItemService"/>
         <property name="defaultItemConverter" ref="crafter.navItemConverter"/>
         <property name="processors" ref="crafter.navTreeProcessors"/>
+    </bean>
+
+
+    <!-- ////////////////////////////////// -->
+    <!--								 	-->
+    <!--		Configuration Profiles 	    -->
+    <!--									-->
+    <!-- ////////////////////////////////// -->
+    
+    <bean id="crafter.s3ProfileLoader" class="org.craftercms.engine.util.config.profiles.ConfigurationProfileLoaderImpl">
+        <property name="profilesUrl" value="${crafter.engine.site.default.config.aws.profiles.path}"/>
+        <property name="profileMapper">
+            <bean class="org.craftercms.commons.config.profiles.aws.S3ProfileMapper"/>
+        </property>
+        <property name="siteItemService" ref="crafter.siteItemService"/>
+    </bean>
+
+    <bean id="crafter.boxProfileLoader" class="org.craftercms.engine.util.config.profiles.ConfigurationProfileLoaderImpl">
+        <property name="profilesUrl" value="${crafter.engine.site.default.config.box.profiles.path}"/>
+        <property name="profileMapper">
+            <bean class="org.craftercms.commons.config.profiles.box.BoxProfileMapper"/>
+        </property>
+        <property name="siteItemService" ref="crafter.siteItemService"/>
+    </bean>
+
+    <!-- ////////////////////////////////// -->
+    <!--								 	-->
+    <!--		  Remote File Stores  	    -->
+    <!--									-->
+    <!-- ////////////////////////////////// -->
+
+    <bean id="crafter.profileAwareRemotePathParser"
+          class="org.craftercms.commons.file.stores.impl.PathPartsBasedProfileAwareRemotePathParser"/>
+
+    <bean id="crafter.s3FileStore" class="org.craftercms.commons.file.stores.impl.s3.S3FileStore">
+        <property name="profileLoader" ref="crafter.s3ProfileLoader"/>
+    </bean>
+
+    <bean id="crafter.boxFileStore" class="org.craftercms.commons.file.stores.impl.box.BoxFileStore">
+        <property name="profileLoader" ref="crafter.boxProfileLoader"/>
+    </bean>
+
+    <bean id="crafter.remoteFileResolver" class="org.craftercms.commons.file.stores.impl.RemoteFileResolverImpl">
+        <property name="pathParsers">
+            <map>
+                <entry key="^/([^/]+)/([^/]+)/(.+)$" value-ref="crafter.profileAwareRemotePathParser"/>
+            </map>
+        </property>
+        <property name="stores">
+            <map>
+                <entry key="s3" value-ref="crafter.s3FileStore"/>
+                <entry key="box" value-ref="crafter.boxFileStore"/>
+            </map>
+        </property>
     </bean>
 
     <!-- ////////////////////////////////// -->
