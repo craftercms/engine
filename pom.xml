@@ -217,6 +217,13 @@
             <version>${box.sdk.version}</version>
         </dependency>
 
+        <!-- Override the bouncy castle dependency from Box -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk15on</artifactId>
+            <version>${bouncycastle.version}</version>
+        </dependency>
+
         <!-- Override the jackson dependency from AWS -->
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
