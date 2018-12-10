@@ -28,8 +28,14 @@ import org.mockito.stubbing.Answer;
 
 import java.util.Arrays;
 
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for {@link NavTreeBuilderImpl}.
+ *
+ * @author avasquez
+ */
 public class NavTreeBuilderImplTest {
 
     private static final String ROOT_URL = "/site/website";
@@ -48,7 +54,19 @@ public class NavTreeBuilderImplTest {
 
     @Test
     public void testGetNavTree() {
-        navTreeBuilder.getNavTree(ROOT_URL, -1, URL3);
+        NavItem navItem = navTreeBuilder.getNavTree(ROOT_URL, -1, URL3);
+
+        assertNotNull(navItem);
+        assertEquals(ROOT_URL, navItem.getUrl());
+        assertTrue(navItem.isActive());
+        assertEquals(2, navItem.getSubItems().size());
+        assertEquals(URL1, navItem.getSubItems().get(0).getUrl());
+        assertFalse(navItem.getSubItems().get(0).isActive());
+        assertEquals(URL2, navItem.getSubItems().get(1).getUrl());
+        assertTrue(navItem.getSubItems().get(1).isActive());
+        assertEquals(1, navItem.getSubItems().get(1).getSubItems().size());
+        assertEquals(URL3, navItem.getSubItems().get(1).getSubItems().get(0).getUrl());
+        assertTrue(navItem.getSubItems().get(1).getSubItems().get(0).isActive());
     }
 
     private SiteItemService getSiteItemService() {
