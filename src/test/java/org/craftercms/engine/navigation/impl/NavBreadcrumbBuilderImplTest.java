@@ -16,8 +16,6 @@
  */
 package org.craftercms.engine.navigation.impl;
 
-import java.util.List;
-
 import org.craftercms.commons.converters.Converter;
 import org.craftercms.core.service.Item;
 import org.craftercms.engine.model.SiteItem;
@@ -27,15 +25,13 @@ import org.craftercms.engine.service.context.SiteContext;
 import org.dom4j.Document;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link NavBreadcrumbBuilderImpl}.
