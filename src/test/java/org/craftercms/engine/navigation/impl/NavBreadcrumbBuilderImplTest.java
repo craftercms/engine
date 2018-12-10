@@ -16,8 +16,6 @@
  */
 package org.craftercms.engine.navigation.impl;
 
-import java.util.List;
-
 import org.craftercms.commons.converters.Converter;
 import org.craftercms.core.service.Item;
 import org.craftercms.engine.model.SiteItem;
@@ -27,15 +25,13 @@ import org.craftercms.engine.service.context.SiteContext;
 import org.dom4j.Document;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link NavBreadcrumbBuilderImpl}.
@@ -119,22 +115,17 @@ public class NavBreadcrumbBuilderImplTest {
 
     protected Converter<SiteItem, NavItem> getItemConverter() {
         Converter<SiteItem, NavItem> converter = mock(Converter.class);
-        doAnswer(new Answer<NavItem>() {
+        doAnswer((Answer<NavItem>) invocation -> {
+            SiteItem siteItem = (SiteItem)invocation.getArguments()[0];
+            NavItem navItem = null;
 
-            @Override
-            public NavItem answer(InvocationOnMock invocation) throws Throwable {
-                SiteItem siteItem = (SiteItem)invocation.getArguments()[0];
-                NavItem navItem = null;
-
-                if (siteItem.getDom() != null) {
-                    navItem = new NavItem();
-                    navItem.setUrl(siteItem.getStoreUrl().replace("/site/website", ""));
-                    navItem.setLabel((String)siteItem.get("navLabel"));
-                }
-
-                return navItem;
+            if (siteItem.getDom() != null) {
+                navItem = new NavItem();
+                navItem.setUrl(siteItem.getStoreUrl().replace("/site/website", ""));
+                navItem.setLabel((String)siteItem.get("navLabel"));
             }
 
+            return navItem;
         }).when(converter).convert(any(SiteItem.class));
 
         return converter;
