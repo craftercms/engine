@@ -95,7 +95,7 @@ public class NavTreeBuilderImpl implements NavTreeBuilder {
         NavItem navItem = itemConverter.convert(siteItem);
         if (navItem != null) {
             navItem.setSubItems(getNavSubItems(siteItem, currentPageUrl, itemConverter));
-            navItem.setActive(currentPageUrl.startsWith(siteItem.getStoreUrl()));
+            navItem.setActive(isActive(currentPageUrl, siteItem.getStoreUrl()));
 
             return navItem;
         } else {
@@ -120,6 +120,23 @@ public class NavTreeBuilderImpl implements NavTreeBuilder {
         } else {
             return Collections.emptyList();
         }
+    }
+
+    protected boolean isActive(String currentPageUrl, String pageUrl) {
+        if (!currentPageUrl.startsWith("/")) {
+            currentPageUrl = "/" + currentPageUrl;
+        }
+        if (!currentPageUrl.endsWith("/")) {
+            currentPageUrl += "/";
+        }
+        if (!pageUrl.startsWith("/")) {
+            pageUrl = "/" + pageUrl;
+        }
+        if (!pageUrl.endsWith("/")) {
+            pageUrl += "/";
+        }
+
+        return pageUrl.startsWith(currentPageUrl);
     }
 
 }
