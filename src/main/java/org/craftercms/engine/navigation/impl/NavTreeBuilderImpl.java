@@ -16,10 +16,6 @@
  */
 package org.craftercms.engine.navigation.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.craftercms.commons.converters.Converter;
 import org.craftercms.core.processors.ItemProcessor;
@@ -30,9 +26,11 @@ import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.navigation.NavItem;
 import org.craftercms.engine.navigation.NavTreeBuilder;
 import org.craftercms.engine.service.SiteItemService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Default implementation of {@link NavTreeBuilderImpl}.
@@ -40,8 +38,6 @@ import org.springframework.beans.factory.annotation.Required;
  * @author avasquez
  */
 public class NavTreeBuilderImpl implements NavTreeBuilder {
-
-    private static final Logger logger = LoggerFactory.getLogger(NavTreeBuilderImpl.class);
 
     protected SiteItemService siteItemService;
     protected ItemFilter filter;
@@ -95,7 +91,7 @@ public class NavTreeBuilderImpl implements NavTreeBuilder {
         NavItem navItem = itemConverter.convert(siteItem);
         if (navItem != null) {
             navItem.setSubItems(getNavSubItems(siteItem, currentPageUrl, itemConverter));
-            navItem.setActive(currentPageUrl.startsWith(siteItem.getStoreUrl()));
+            navItem.setActive(isActive(currentPageUrl, siteItem.getStoreUrl()));
 
             return navItem;
         } else {
@@ -120,6 +116,23 @@ public class NavTreeBuilderImpl implements NavTreeBuilder {
         } else {
             return Collections.emptyList();
         }
+    }
+
+    protected boolean isActive(String currentPageUrl, String pageUrl) {
+        if (!currentPageUrl.startsWith("/")) {
+            currentPageUrl = "/" + currentPageUrl;
+        }
+        if (!currentPageUrl.endsWith("/")) {
+            currentPageUrl += "/";
+        }
+        if (!pageUrl.startsWith("/")) {
+            pageUrl = "/" + pageUrl;
+        }
+        if (!pageUrl.endsWith("/")) {
+            pageUrl += "/";
+        }
+
+        return currentPageUrl.startsWith(pageUrl);
     }
 
 }
