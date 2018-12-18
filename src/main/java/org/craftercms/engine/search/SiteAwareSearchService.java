@@ -28,8 +28,6 @@ import org.craftercms.search.rest.v3.requests.SearchRequest;
 import org.craftercms.search.rest.v3.requests.SearchResponse;
 import org.craftercms.search.service.Query;
 import org.craftercms.search.service.SearchService;
-import org.craftercms.search.v3.service.internal.QueryBuilder;
-import org.craftercms.search.v3.service.internal.SearchProvider;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
@@ -163,16 +161,6 @@ public class SiteAwareSearchService implements SearchService<Query> {
     @Override
     public SearchRequest createRequest() {
         return new SearchRequest().setIndexId(getActualIndexId(null));
-    }
-
-    @Override
-    public SearchProvider getProvider() {
-        return actualSearchService.getProvider();
-    }
-
-    @Override
-    public QueryBuilder createQueryBuilder() {
-        return actualSearchService.createQueryBuilder();
     }
 
     @Override
