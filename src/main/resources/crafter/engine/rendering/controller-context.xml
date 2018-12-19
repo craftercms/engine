@@ -66,6 +66,11 @@
         <property name="urlTransformationService" ref="crafter.urlTransformationService"/>
     </bean>
 
+    <bean id="crafter.siteElasticSearchController"
+          class="org.craftercms.engine.controller.rest.SiteElasticSearchController">
+        <property name="elasticSearchService" ref="crafter.elasticSearchService"/>
+    </bean>
+
     <!-- Overwrite CacheRestController from core -->
     <bean id="crafter.cacheRestController" class="org.craftercms.engine.controller.rest.FreeMarkerAwareCacheRestController">
         <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
