@@ -7,6 +7,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import groovy.util.GroovyScriptEngine;
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
@@ -137,8 +138,7 @@ public class RestScriptsControllerTest {
         SiteContext siteContext = mock(SiteContext.class);
 
         ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(siteContext);
-        ScriptFactory scriptFactory = new GroovyScriptFactory(resourceConnector,
-                                                              Collections.<String, Object>emptyMap());
+        ScriptFactory scriptFactory = new GroovyScriptFactory(resourceConnector, Collections.emptyMap());
 
         when(siteContext.getSiteName()).thenReturn("test");
         when(siteContext.getContext()).thenReturn(mock(Context.class));
