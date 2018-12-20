@@ -364,41 +364,6 @@
                     </webResources>
                 </configuration>
             </plugin>
-            <!--plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>aspectj-maven-plugin</artifactId>
-                <version>1.11</version>
-                <configuration>
-                    <complianceLevel>1.8</complianceLevel>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                    <sources>
-                        <source>
-                            <basedir>src/main/java</basedir>
-                            <includes>
-                                <include>org/craftercms/engine/util/aspects/compile/*.java</include>
-                            </includes>
-                        </source>
-                    </sources>
-                    <weaveDependencies>
-                        <weaveDependency>
-                            <groupId>org.codehaus.groovy</groupId>
-                            <artifactId>groovy</artifactId>
-                        </weaveDependency>
-                        <weaveDependency>
-                            <groupId>org.codehaus.groovy</groupId>
-                            <artifactId>groovy-all</artifactId>
-                        </weaveDependency>
-                    </weaveDependencies>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin-->
         </plugins>
     </build>
     <profiles>
