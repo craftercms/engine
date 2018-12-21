@@ -16,15 +16,6 @@
  */
 package org.craftercms.engine.service.context;
 
-import java.io.InputStream;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.servlet.ServletContext;
-
 import groovy.lang.GroovyClassLoader;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
@@ -49,6 +40,7 @@ import org.craftercms.engine.util.SchedulingUtils;
 import org.craftercms.engine.util.config.impl.MultiResourceConfigurationBuilder;
 import org.craftercms.engine.util.groovy.ContentStoreGroovyResourceLoader;
 import org.craftercms.engine.util.groovy.ContentStoreResourceConnector;
+import org.craftercms.engine.util.groovy.SandboxedGroovyClassLoader;
 import org.craftercms.engine.util.quartz.JobContext;
 import org.craftercms.engine.util.spring.ContentStoreResourceLoader;
 import org.quartz.Scheduler;
@@ -67,6 +59,11 @@ import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
 import org.tuckey.web.filters.urlrewrite.Conf;
 import org.tuckey.web.filters.urlrewrite.UrlRewriter;
+
+import javax.servlet.ServletContext;
+import java.io.InputStream;
+import java.net.URLClassLoader;
+import java.util.*;
 
 /**
  * Factory for creating {@link SiteContext} with common properties. It also uses the {@link MacroResolver} to resolve
@@ -98,6 +95,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected String[] urlRewriteConfPaths;
     protected String groovyClassesPath;
     protected Map<String, Object> groovyGlobalVars;
+    protected boolean groovySandboxEnabled;
     protected boolean mergingOn;
     protected boolean cacheOn;
     protected int maxAllowedItemsInCache;
@@ -201,6 +199,10 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     @Required
     public void setGroovyGlobalVars(Map<String, Object> groovyGlobalVars) {
         this.groovyGlobalVars = groovyGlobalVars;
+    }
+
+    public void setGroovySandboxEnabled(boolean groovySandboxEnabled) {
+        this.groovySandboxEnabled = groovySandboxEnabled;
     }
 
     public void setMergingOn(boolean mergingOn) {
@@ -351,10 +353,16 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     }
 
     protected URLClassLoader getClassLoader(SiteContext siteContext) {
+        GroovyClassLoader classLoader;
+
+        if (groovySandboxEnabled) {
+            classLoader = new SandboxedGroovyClassLoader(getClass().getClassLoader());
+        } else {
+            classLoader = new GroovyClassLoader(getClass().getClassLoader());
+        }
+
         ContentStoreGroovyResourceLoader resourceLoader = new ContentStoreGroovyResourceLoader(siteContext,
                                                                                                groovyClassesPath);
-
-        GroovyClassLoader classLoader = new GroovyClassLoader(getClass().getClassLoader());
         classLoader.setResourceLoader(resourceLoader);
 
         return classLoader;
@@ -466,7 +474,8 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     }
 
     protected ScriptFactory getScriptFactory(SiteContext siteContext, URLClassLoader classLoader) {
-        return new GroovyScriptFactory(new ContentStoreResourceConnector(siteContext), classLoader, groovyGlobalVars);
+        return new GroovyScriptFactory(new ContentStoreResourceConnector(siteContext), classLoader,
+                                       groovyGlobalVars, groovySandboxEnabled);
     }
 
     protected Scheduler scheduleJobs(SiteContext siteContext) {

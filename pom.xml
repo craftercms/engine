@@ -28,7 +28,8 @@
         <commons.lang.version>3.5</commons.lang.version>
         <commons.collections.version>4.1</commons.collections.version>
         <cglib.version>3.1</cglib.version>
-        <groovy.version>2.4.10</groovy.version>
+        <groovy.version>2.4.15</groovy.version>
+        <groovy.sandbox.version>1.19</groovy.sandbox.version>
         <gmongo.version>1.5</gmongo.version>
         <junit.version>4.12</junit.version>
         <mockito.version>1.9.5</mockito.version>
@@ -140,6 +141,8 @@
             <artifactId>cglib</artifactId>
             <version>${cglib.version}</version>
         </dependency>
+
+        <!-- Groovy -->
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
@@ -288,7 +291,6 @@
                     <revisionOnScmFailure>unknown</revisionOnScmFailure>
                 </configuration>
             </plugin>
-
             <plugin>
                 <inherited>true</inherited>
                 <groupId>org.apache.maven.plugins</groupId>
