@@ -7,6 +7,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import groovy.util.GroovyScriptEngine;
 import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
 import org.craftercms.commons.http.RequestContext;
@@ -130,7 +131,7 @@ public class ScriptFilterTest {
     private ScriptFactory createScriptFactory(SiteContext siteContext) {
         ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(siteContext);
 
-        return new GroovyScriptFactory(resourceConnector, Collections.<String, Object>emptyMap());
+        return new GroovyScriptFactory(resourceConnector, Collections.emptyMap());
     }
 
     private void setCurrentRequestContext(HttpServletRequest request, HttpServletResponse response) {
