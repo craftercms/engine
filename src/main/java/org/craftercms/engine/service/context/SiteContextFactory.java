@@ -40,7 +40,6 @@ import org.craftercms.engine.util.SchedulingUtils;
 import org.craftercms.engine.util.config.impl.MultiResourceConfigurationBuilder;
 import org.craftercms.engine.util.groovy.ContentStoreGroovyResourceLoader;
 import org.craftercms.engine.util.groovy.ContentStoreResourceConnector;
-import org.craftercms.engine.util.groovy.SandboxedGroovyClassLoader;
 import org.craftercms.engine.util.quartz.JobContext;
 import org.craftercms.engine.util.spring.ContentStoreResourceLoader;
 import org.quartz.Scheduler;
@@ -95,7 +94,6 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected String[] urlRewriteConfPaths;
     protected String groovyClassesPath;
     protected Map<String, Object> groovyGlobalVars;
-    protected boolean groovySandboxEnabled;
     protected boolean mergingOn;
     protected boolean cacheOn;
     protected int maxAllowedItemsInCache;
@@ -199,10 +197,6 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     @Required
     public void setGroovyGlobalVars(Map<String, Object> groovyGlobalVars) {
         this.groovyGlobalVars = groovyGlobalVars;
-    }
-
-    public void setGroovySandboxEnabled(boolean groovySandboxEnabled) {
-        this.groovySandboxEnabled = groovySandboxEnabled;
     }
 
     public void setMergingOn(boolean mergingOn) {
@@ -353,16 +347,10 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     }
 
     protected URLClassLoader getClassLoader(SiteContext siteContext) {
-        GroovyClassLoader classLoader;
-
-        if (groovySandboxEnabled) {
-            classLoader = new SandboxedGroovyClassLoader(getClass().getClassLoader());
-        } else {
-            classLoader = new GroovyClassLoader(getClass().getClassLoader());
-        }
-
+        GroovyClassLoader classLoader = new GroovyClassLoader(getClass().getClassLoader());
         ContentStoreGroovyResourceLoader resourceLoader = new ContentStoreGroovyResourceLoader(siteContext,
                                                                                                groovyClassesPath);
+
         classLoader.setResourceLoader(resourceLoader);
 
         return classLoader;
@@ -474,8 +462,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     }
 
     protected ScriptFactory getScriptFactory(SiteContext siteContext, URLClassLoader classLoader) {
-        return new GroovyScriptFactory(new ContentStoreResourceConnector(siteContext), classLoader,
-                                       groovyGlobalVars, groovySandboxEnabled);
+        return new GroovyScriptFactory(new ContentStoreResourceConnector(siteContext), classLoader, groovyGlobalVars);
     }
 
     protected Scheduler scheduleJobs(SiteContext siteContext) {
