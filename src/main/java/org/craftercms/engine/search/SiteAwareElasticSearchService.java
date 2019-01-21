@@ -17,7 +17,7 @@
 
 package org.craftercms.engine.search;
 
-import org.craftercms.commons.elasticsearch.impl.AbstractElasticSearchWrapper;
+import org.craftercms.search.elasticsearch.impl.AbstractElasticSearchWrapper;
 import org.craftercms.engine.service.context.SiteContext;
 import org.elasticsearch.action.search.SearchRequest;
 

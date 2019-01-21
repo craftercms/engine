@@ -138,8 +138,8 @@
         </dependency>
         <dependency>
             <groupId>org.craftercms</groupId>
-            <artifactId>crafter-commons-elasticsearch</artifactId>
-            <version>${crafter.commons.version}</version>
+            <artifactId>crafter-elasticsearch</artifactId>
+            <version>${crafter.search.version}</version>
         </dependency>
         <!-- This is needed because elasticsearch expects log4j2 to be present -->
         <dependency>
