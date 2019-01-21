@@ -113,12 +113,12 @@
         </dependency>
         <dependency>
             <groupId>org.craftercms</groupId>
-            <artifactId>crafter-search-client</artifactId>
+            <artifactId>crafter-search-solr-client</artifactId>
             <version>${crafter.search.version}</version>
         </dependency>
         <dependency>
             <groupId>org.craftercms</groupId>
-            <artifactId>crafter-search-api</artifactId>
+            <artifactId>crafter-search-solr-api</artifactId>
             <version>${crafter.search.version}</version>
         </dependency>
         <dependency>
@@ -138,7 +138,7 @@
         </dependency>
         <dependency>
             <groupId>org.craftercms</groupId>
-            <artifactId>crafter-elasticsearch</artifactId>
+            <artifactId>crafter-search-elasticsearch</artifactId>
             <version>${crafter.search.version}</version>
         </dependency>
         <!-- This is needed because elasticsearch expects log4j2 to be present -->
