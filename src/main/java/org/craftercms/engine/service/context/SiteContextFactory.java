@@ -16,6 +16,7 @@
  */
 package org.craftercms.engine.service.context;
 
+import graphql.GraphQL;
 import groovy.lang.GroovyClassLoader;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
@@ -30,6 +31,7 @@ import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.url.UrlTransformationEngine;
 import org.craftercms.engine.exception.SiteContextCreationException;
+import org.craftercms.engine.graphql.GraphQLFactory;
 import org.craftercms.engine.macro.MacroResolver;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.scripting.ScriptJobResolver;
@@ -112,6 +114,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected List<ScriptJobResolver> jobResolvers;
     protected Executor jobThreadPoolExecutor;
     protected TextEncryptor textEncryptor;
+    protected GraphQLFactory graphQLFactory;
 
     public SiteContextFactory() {
         siteNameMacroName = DEFAULT_SITE_NAME_MACRO_NAME;
@@ -260,6 +263,11 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         this.textEncryptor = textEncryptor;
     }
 
+    @Required
+    public void setGraphQLFactory(final GraphQLFactory graphQLFactory) {
+        this.graphQLFactory = graphQLFactory;
+    }
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.globalApplicationContext = applicationContext;
@@ -320,12 +328,32 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             Scheduler scheduler = scheduleJobs(siteContext);
             siteContext.setScheduler(scheduler);
 
+            GraphQL graphQL = getGraphQL(siteContext);
+            siteContext.setGraphQL(graphQL);
+
             return siteContext;
         } catch (Exception e) {
             // Destroy context if the site context creation failed
             storeService.destroyContext(context);
 
             throw e;
+        }
+    }
+
+    protected GraphQL getGraphQL(SiteContext siteContext) {
+        String siteName = siteContext.getSiteName();
+        logger.info("--------------------------------------------");
+        logger.info("<Loading GraphQL for site: " + siteName + ">");
+        logger.info("--------------------------------------------");
+
+        try {
+            return graphQLFactory.getInstance(siteContext);
+        } catch (Exception e) {
+            throw new SiteContextCreationException("Unable to load GraphQL for site " + siteName, e);
+        } finally {
+            logger.info("--------------------------------------------");
+            logger.info("</Loading GraphQL for site: " + siteName + ">");
+            logger.info("--------------------------------------------");
         }
     }
 

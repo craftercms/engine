@@ -375,6 +375,7 @@
         <property name="fallbackContextFactory" ref="crafter.fallbackSiteContextFactory"/>
         <property name="contextFactory" ref="crafter.siteContextFactory"/>
         <property name="entitlementValidator" ref="crafter.entitlementValidator"/>
+        <property name="graphQLFactory" ref="crafter.graphQLFactory"/>
     </bean>
 
     <bean id="crafter.siteContextsBootstrap" class="org.craftercms.engine.service.context.SiteContextsBootstrap">
@@ -403,6 +404,7 @@
         <property name="jobResolvers" ref="crafter.scriptJobResolvers"/>
         <property name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
         <property name="textEncryptor" ref="crafter.textEncryptor"/>
+        <property name="graphQLFactory" ref="crafter.graphQLFactory" />
         <property name="storeType" value="${crafter.engine.store.type}"/>
     </bean>
 
@@ -426,6 +428,7 @@
         <property name="jobResolvers" ref="crafter.scriptJobResolvers"/>
         <property name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
         <property name="textEncryptor" ref="crafter.textEncryptor"/>
+        <property name="graphQLFactory" ref="crafter.graphQLFactory" />
         <property name="storeType" value="filesystem"/>
     </bean>
 
@@ -696,6 +699,42 @@
 
     <bean id="crafter.entitlementsProvider" class="org.craftercms.engine.entitlement.EngineEntitlementUsageProvider">
         <property name="siteContextManager" ref="crafter.siteContextManager"/>
+    </bean>
+
+    <!-- ////////////////////////////////// -->
+    <!--								 	-->
+    <!--		      GraphQL    			-->
+    <!--									-->
+    <!-- ////////////////////////////////// -->
+
+    <bean id="crafter.dataFetcher" class="org.craftercms.engine.graphql.impl.SiteDataFetcher">
+        <property name="defaultLimit" value="${crafter.engine.graphql.query.limit}"/>
+        <property name="defaultSortField" value="${crafter.engine.graphql.query.sort.field}"/>
+        <property name="defaultSortOrder" value="${crafter.engine.graphql.query.sort.order}"/>
+        <property name="elasticsearch" ref="crafter.elasticSearchService"/>
+    </bean>
+
+    <bean id="crafter.graphQLFactory" class="org.craftercms.engine.graphql.impl.GraphQLFactoryImpl">
+        <property name="rootQueryTypeName" value="${crafter.engine.graphql.query.name}"/>
+        <property name="ignoredFields" value="${crafter.engine.graphql.ignoredFields}"/>
+        <property name="repoConfigFolder" value="${crafter.engine.graphql.repoConfigFolder}"/>
+        <property name="contentTypeDefinitionName" value="${crafter.engine.graphql.contentType.definition}"/>
+        <property name="contentTypeNameXpath" value="${crafter.engine.graphql.contentType.xpath.name}"/>
+        <property name="contentTypeTitleXpath" value="${crafter.engine.graphql.contentType.xpath.title}"/>
+        <property name="contentTypeFieldsXpath" value="${crafter.engine.graphql.contentType.xpath.fields}"/>
+        <property name="contentTypePropertyIdXpath" value="${crafter.engine.graphql.contentType.xpath.property.id}"/>
+        <property name="contentTypePropertyTypeXpath"
+                  value="${crafter.engine.graphql.contentType.xpath.property.type}"/>
+        <property name="contentTypePropertyTitleXpath"
+                  value="${crafter.engine.graphql.contentType.xpath.property.title}"/>
+        <property name="contentTypePropertyDataSourceNameXpath"
+                  value="${crafter.engine.graphql.contentType.xpath.property.datasource.name}"/>
+        <property name="contentTypePropertyItemManagerXpath"
+                  value="${crafter.engine.graphql.contentType.xpath.property.itemmanager.name}"/>
+        <property name="contentTypePropertyFieldsXpath"
+                  value="${crafter.engine.graphql.contentTYpe.xpath.property.fields}"/>
+
+        <property name="dataFetcher" ref="crafter.dataFetcher"/>
     </bean>
 
     <import resource="${crafter.engine.extension.base}/services-overlay-context.xml"/>
