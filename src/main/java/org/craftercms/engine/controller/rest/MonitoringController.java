@@ -17,8 +17,8 @@
 
 package org.craftercms.engine.controller.rest;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.craftercms.commons.monitoring.rest.MonitoringRestControllerBase;
 import org.craftercms.engine.util.logging.CircularQueueLogAppender;
@@ -38,7 +38,7 @@ public class MonitoringController extends MonitoringRestControllerBase {
     public final static String LOG_URL = "/log";
 
     @GetMapping(LOG_URL)
-    public List<HashMap<String,Object>> getLoggedEvents(@RequestParam String site, @RequestParam long since) {
+    public List<Map<String,Object>> getLoggedEvents(@RequestParam String site, @RequestParam long since) {
         return CircularQueueLogAppender.loggerQueue().getLoggedEvents(site, since);
     }
 

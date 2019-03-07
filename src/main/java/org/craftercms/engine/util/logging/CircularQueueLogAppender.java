@@ -99,12 +99,12 @@ public class CircularQueueLogAppender extends AbstractAppender {
     }
 
     @SuppressWarnings("unchecked")
-    public List<HashMap<String, Object>> getLoggedEvents(final String siteId, final long since) {
+    public List<Map<String, Object>> getLoggedEvents(final String siteId, final long since) {
 
-        final Iterator<HashMap<String, Object>> iter = buffer.iterator();
-        final List<HashMap<String, Object>> str = new ArrayList<>();
+        final Iterator<Map<String, Object>> iter = buffer.iterator();
+        final List<Map<String, Object>> str = new ArrayList<>();
         while (iter.hasNext()) {
-            HashMap<String, Object> map = iter.next();
+            Map<String, Object> map = iter.next();
             if (map.get("site").toString().equalsIgnoreCase(siteId)) {
                 if (new Date((long)map.get("timestampm")).after(new Date(since))) {
                     str.add(map);
