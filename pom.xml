@@ -45,7 +45,7 @@
         <commons.lang.version>3.5</commons.lang.version>
         <commons.collections.version>4.1</commons.collections.version>
         <cglib.version>3.1</cglib.version>
-        <groovy.version>2.4.15</groovy.version>
+        <groovy.version>2.4.15</groovy.version> <!-- When this version changes the policy file needs to be updated -->
         <groovy.sandbox.version>1.19</groovy.sandbox.version>
         <gmongo.version>1.5</gmongo.version>
         <junit.version>4.12</junit.version>
