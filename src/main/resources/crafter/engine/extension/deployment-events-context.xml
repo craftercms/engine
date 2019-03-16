@@ -1,0 +1,30 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <bean id="crafter.deploymentEventsWatcher" class="org.craftercms.engine.util.deployment.DeploymentEventsWatcher">
+        <property name="cacheService" ref="crafter.cacheService"/>
+        <property name="siteContextManager" ref="crafter.siteContextManager"/>
+    </bean>
+
+    <bean id="crafter.deploymentEventsWatcherJob"
+          class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="crafter.deploymentEventsWatcher"/>
+        <property name="targetMethod" value="checkForEvents"/>
+        <property name="concurrent" value="false"/>
+    </bean>
+
+    <bean id="crafter.deploymentEventsWatcherTrigger"
+          class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="crafter.deploymentEventsWatcherJob"/>
+        <property name="cronExpression" value="${crafter.engine.events.deployment.watcher.cron}"/>
+    </bean>
+
+    <util:list id="crafter.jobTriggers">
+        <ref bean="crafter.deploymentEventsWatcherTrigger"/>
+    </util:list>
+
+</beans>

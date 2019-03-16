@@ -17,6 +17,7 @@
 package org.craftercms.engine.service.context;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,6 +32,7 @@ import org.craftercms.commons.entitlements.exception.EntitlementException;
 import org.craftercms.commons.entitlements.model.EntitlementType;
 import org.craftercms.commons.entitlements.model.Module;
 import org.craftercms.commons.entitlements.validator.EntitlementValidator;
+import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.core.exception.RootFolderNotFoundException;
 import org.craftercms.engine.event.SiteContextCreatedEvent;
 import org.craftercms.engine.event.SiteContextDestroyedEvent;
@@ -58,10 +60,6 @@ public class SiteContextManager implements ApplicationContextAware {
     public SiteContextManager() {
         lock = new ReentrantLock();
         contextRegistry = new ConcurrentHashMap<>();
-    }
-
-    public Lock getLock() {
-        return lock;
     }
 
     @Required
@@ -194,6 +192,17 @@ public class SiteContextManager implements ApplicationContextAware {
         }
     }
 
+    public SiteContext rebuildContext(String siteName, boolean fallback) {
+        lock.lock();
+        try {
+            destroyContext(siteName);
+
+            return getContext(siteName, fallback);
+        } finally {
+            lock.unlock();
+        }
+    }
+
     public SiteContext getContext(String siteName, boolean fallback) {
         SiteContext siteContext = contextRegistry.get(siteName);
         if (siteContext == null) {
@@ -207,6 +216,7 @@ public class SiteContextManager implements ApplicationContextAware {
                     return null;
                 }
             }
+
             lock.lock();
             try {
                 // Double check locking, in case the context has been created already by another thread

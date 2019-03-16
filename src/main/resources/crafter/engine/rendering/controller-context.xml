@@ -60,7 +60,7 @@
     <bean id="crafter.monitoringRenderController" class="org.craftercms.engine.controller.rest.MonitoringController"/>
 
     <bean id="crafter.siteContextRestController" class="org.craftercms.engine.controller.rest.SiteContextRestController">
-        <property name="contextRegistry" ref="crafter.siteContextManager"/>
+        <property name="contextManager" ref="crafter.siteContextManager"/>
     </bean>
 
     <bean id="crafter.siteContentStoreRestController" class="org.craftercms.engine.controller.rest.SiteContentStoreRestController">

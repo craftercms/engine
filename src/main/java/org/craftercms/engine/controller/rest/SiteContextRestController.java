@@ -17,6 +17,7 @@
 
 package org.craftercms.engine.controller.rest;
 
+import java.time.Instant;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
@@ -26,8 +27,8 @@ import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.service.context.SiteContextManager;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
@@ -41,56 +42,54 @@ public class SiteContextRestController {
 
     public static final String URL_ROOT = "/site/context";
     public static final String URL_CONTEXT_ID = "/id";
+    public static final String URL_EVENTS = "/events";
     public static final String URL_DESTROY = "/destroy";
     public static final String URL_REBUILD = "/rebuild";
 
     public static final String MODEL_ATTR_ID =  "id";
 
-    private SiteContextManager contextRegistry;
+    private SiteContextManager contextManager;
 
     @Required
-    public void setContextRegistry(SiteContextManager contextRegistry) {
-        this.contextRegistry = contextRegistry;
+    public void setContextManager(SiteContextManager contextManager) {
+        this.contextManager = contextManager;
     }
 
-    @RequestMapping(value = URL_CONTEXT_ID, method = RequestMethod.GET)
+    @GetMapping(value = URL_CONTEXT_ID)
     @ResponseBody
     public Map<String, String> getContextId() {
         return Collections.singletonMap(MODEL_ATTR_ID, SiteContext.getCurrent().getContext().getId());
     }
 
-    @RequestMapping(value = URL_DESTROY, method = RequestMethod.GET)
+    @GetMapping(value = URL_EVENTS)
+    public Map<String, Instant> getEvents() {
+        return SiteContext.getCurrent().getEvents();
+    }
+
+    @GetMapping(value = URL_DESTROY)
     @ResponseBody
     public Map<String, String> destroy() {
         String siteName = SiteContext.getCurrent().getSiteName();
 
-        contextRegistry.destroyContext(siteName);
+        contextManager.destroyContext(siteName);
 
         return Collections.singletonMap(RestControllerBase.MESSAGE_MODEL_ATTRIBUTE_NAME,
                                         "Site context for '" + siteName + "' destroyed. Will be recreated on next " +
                                         "request");
     }
 
-    @RequestMapping(value = URL_REBUILD, method = RequestMethod.GET)
+    @GetMapping(value = URL_REBUILD)
     @ResponseBody
     public Map<String, String> rebuild() {
-        Lock lock = contextRegistry.getLock();
         SiteContext siteContext = SiteContext.getCurrent();
         String siteName = siteContext.getSiteName();
         boolean fallback = siteContext.isFallback();
 
-        lock.lock();
-        try {
-            contextRegistry.destroyContext(siteName);
+        siteContext = contextManager.rebuildContext(siteName, fallback);
+        SiteContext.setCurrent(siteContext);
 
-            siteContext = contextRegistry.getContext(siteName, fallback);
-            SiteContext.setCurrent(siteContext);
-
-            return Collections.singletonMap(RestControllerBase.MESSAGE_MODEL_ATTRIBUTE_NAME, "Site context for '" +
-                                                                                             siteName + "' rebuilt");
-        } finally {
-            lock.unlock();
-        }
+        return Collections.singletonMap(RestControllerBase.MESSAGE_MODEL_ATTRIBUTE_NAME, "Site context for '" +
+                                                                                         siteName + "' rebuilt");
     }
 
 }

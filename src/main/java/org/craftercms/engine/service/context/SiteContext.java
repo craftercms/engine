@@ -18,6 +18,7 @@ package org.craftercms.engine.service.context;
 
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.craftercms.core.exception.CrafterException;
+import org.craftercms.core.service.CacheService;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.url.UrlTransformationEngine;
@@ -32,6 +33,9 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
 import org.tuckey.web.filters.urlrewrite.UrlRewriter;
 
 import java.net.URLClassLoader;
+import java.time.Instant;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Wrapper for a {@link Context} that adds properties specific to Crafter Engine.
@@ -43,6 +47,9 @@ public class SiteContext {
     private static final String SITE_NAME_MDC_KEY = "siteName";
 
     private static ThreadLocal<SiteContext> threadLocal = new ThreadLocal<>();
+
+    public static final String CACHE_CLEARED_EVENT_KEY = "cacheCleared";
+    public static final String CONTEXT_BUILT_EVENT_KEY = "contextBuilt";
 
     protected ContentStoreService storeService;
     protected String siteName;
@@ -62,6 +69,7 @@ public class SiteContext {
     protected URLClassLoader classLoader;
     protected UrlRewriter urlRewriter;
     protected Scheduler scheduler;
+    protected Map<String, Instant> events;
 
     /**
      * Returns the context for the current thread.
@@ -86,6 +94,14 @@ public class SiteContext {
         MDC.remove(SITE_NAME_MDC_KEY);
 
         threadLocal.remove();
+    }
+
+    public SiteContext() {
+        Instant now = Instant.now();
+
+        events = new ConcurrentHashMap<>();
+        events.put(CACHE_CLEARED_EVENT_KEY, now);
+        events.put(CONTEXT_BUILT_EVENT_KEY, now);
     }
 
     public ContentStoreService getStoreService() {
@@ -232,11 +248,30 @@ public class SiteContext {
         this.scheduler = scheduler;
     }
 
+    public Map<String, Instant> getEvents() {
+        return events;
+    }
+
+    public void setEvents(Map<String, Instant> events) {
+        this.events = events;
+    }
+
     public boolean isValid() throws CrafterException {
         return storeService.validate(context);
     }
 
+    public void clearCache(CacheService cacheService) {
+        // Clear content cache
+        cacheService.clearScope(context);
+        // Clear Freemarker cache
+        freeMarkerConfig.getConfiguration().clearTemplateCache();
+
+        events.put(CACHE_CLEARED_EVENT_KEY, Instant.now());
+    }
+
     public void destroy() throws CrafterException {
+        storeService.destroyContext(context);
+
         if (applicationContext != null) {
             try {
                 applicationContext.close();
@@ -258,8 +293,6 @@ public class SiteContext {
                 throw new CrafterException("Unable to shutdown scheduler", e);
             }
         }
-
-        storeService.destroyContext(context);
     }
 
     @Override
