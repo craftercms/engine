@@ -27,7 +27,7 @@
                 <value>classpath:crafter/core/core.properties</value>
                 <value>classpath:crafter/security/security.properties</value>
                 <value>classpath:crafter/engine/server-config.properties</value>
-                <value>classpath:crafter/engine/extension/s33/server-config.properties</value>
+                <value>classpath:crafter/engine/extension/store/s3/server-config.properties</value>
                 <value>${crafter.engine.extension.base}/overlay-config.properties</value>
                 <value>${crafter.engine.extension.base}/server-config.properties</value>
             </list>
