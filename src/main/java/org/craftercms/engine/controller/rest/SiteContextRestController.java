@@ -19,6 +19,8 @@ package org.craftercms.engine.controller.rest;
 
 import java.time.Instant;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 
@@ -62,8 +64,15 @@ public class SiteContextRestController {
     }
 
     @GetMapping(value = URL_EVENTS)
-    public Map<String, Instant> getEvents() {
-        return SiteContext.getCurrent().getEvents();
+    public Map<String, String> getEvents() {
+        Map<String, Instant> events =  SiteContext.getCurrent().getEvents();
+        Map<String, String> eventsAsStr = new LinkedHashMap<>();
+
+        for (Map.Entry<String, Instant> entry : events.entrySet()) {
+            eventsAsStr.put(entry.getKey(), entry.getValue().toString());
+        }
+
+        return eventsAsStr;
     }
 
     @GetMapping(value = URL_DESTROY)
