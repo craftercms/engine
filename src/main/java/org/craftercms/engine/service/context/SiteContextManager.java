@@ -16,15 +16,6 @@
  */
 package org.craftercms.engine.service.context;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import javax.annotation.PreDestroy;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,7 +23,6 @@ import org.craftercms.commons.entitlements.exception.EntitlementException;
 import org.craftercms.commons.entitlements.model.EntitlementType;
 import org.craftercms.commons.entitlements.model.Module;
 import org.craftercms.commons.entitlements.validator.EntitlementValidator;
-import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.core.exception.RootFolderNotFoundException;
 import org.craftercms.engine.event.SiteContextCreatedEvent;
 import org.craftercms.engine.event.SiteContextDestroyedEvent;
@@ -40,6 +30,14 @@ import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationEvent;
+
+import javax.annotation.PreDestroy;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Registry and lifecycle manager of {@link SiteContext}s.
