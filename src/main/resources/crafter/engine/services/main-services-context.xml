@@ -331,7 +331,29 @@
         <ref bean="crafter.configurationScriptResolver"/>
     </util:list>
 
-    <bean id="crafter.schedulerFactory" class="org.quartz.impl.StdSchedulerFactory"/>
+    <bean id="crafter.jobThreadPoolExecutor" class="java.util.concurrent.ThreadPoolExecutor" destroy-method="shutdownNow">
+        <!-- Core pool size -->
+        <constructor-arg type="int" value="${crafter.engine.jobs.threadPool.coreSize}"/>
+        <!-- Max pool size -->
+        <constructor-arg type="int" value="#{T(Integer).MAX_VALUE}"/>
+        <!-- Keep Alive Idle -->
+        <constructor-arg type="long" value="${crafter.engine.jobs.threadPool.keepAliveIdle}"/>
+        <!-- Keep Alive Idle Time Units -->
+        <constructor-arg type="java.util.concurrent.TimeUnit" value="#{T(java.util.concurrent.TimeUnit).SECONDS}"/>
+        <!--- Blocking queue -->
+        <constructor-arg type="java.util.concurrent.BlockingQueue">
+            <bean class="java.util.concurrent.SynchronousQueue"/>
+        </constructor-arg>
+    </bean>
+
+    <util:list id="crafter.jobTriggers">
+    </util:list>
+
+    <bean id="crafter.jobScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean"
+          destroy-method="destroy">
+        <property name="taskExecutor" ref="crafter.jobThreadPoolExecutor"/>
+        <property name="triggers" ref="crafter.jobTriggers"/>
+    </bean>
 
     <!-- ////////////////////////////////// -->
     <!--								 	-->
@@ -379,6 +401,7 @@
         <property name="macroResolver" ref="crafter.macroResolver"/>
         <property name="groovyGlobalVars" ref="crafter.restScriptsVariables"/>
         <property name="jobResolvers" ref="crafter.scriptJobResolvers"/>
+        <property name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
         <property name="textEncryptor" ref="crafter.textEncryptor"/>
         <property name="storeType" value="${crafter.engine.store.type}"/>
     </bean>
@@ -401,6 +424,7 @@
         <property name="macroResolver" ref="crafter.macroResolver"/>
         <property name="groovyGlobalVars" ref="crafter.restScriptsVariables"/>
         <property name="jobResolvers" ref="crafter.scriptJobResolvers"/>
+        <property name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
         <property name="textEncryptor" ref="crafter.textEncryptor"/>
         <property name="storeType" value="filesystem"/>
     </bean>
@@ -669,6 +693,7 @@
     <!--		    Entitlements  			-->
     <!--									-->
     <!-- ////////////////////////////////// -->
+
     <bean id="crafter.entitlementsProvider" class="org.craftercms.engine.entitlement.EngineEntitlementUsageProvider">
         <property name="siteContextManager" ref="crafter.siteContextManager"/>
     </bean>

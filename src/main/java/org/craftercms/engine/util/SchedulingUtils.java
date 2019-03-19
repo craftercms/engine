@@ -17,6 +17,7 @@
 package org.craftercms.engine.util;
 
 import java.util.Properties;
+import java.util.concurrent.Executor;
 
 import javax.servlet.ServletContext;
 
@@ -31,6 +32,7 @@ import org.quartz.SchedulerFactory;
 import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.simpl.SimpleThreadPool;
+import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
 import static org.craftercms.engine.scripting.impl.ScriptJob.*;
 import static org.quartz.CronScheduleBuilder.cronSchedule;
@@ -43,9 +45,6 @@ import static org.quartz.TriggerBuilder.newTrigger;
  * @author avasquez
  */
 public class SchedulingUtils {
-
-    private static final String PROP_THREAD_COUNT = "org.quartz.threadPool.threadCount";
-    private static final int DEFAULT_THREAD_COUNT = 10;
 
     private SchedulingUtils() {
     }
@@ -84,15 +83,17 @@ public class SchedulingUtils {
         return new JobContext(detail, trigger, description);
     }
 
-    public static Scheduler createScheduler(String schedulerName) throws SchedulerException {
-        Properties props = new Properties();
-        props.setProperty(StdSchedulerFactory.PROP_SCHED_INSTANCE_NAME, schedulerName);
-        props.setProperty(StdSchedulerFactory.PROP_THREAD_POOL_CLASS, SimpleThreadPool.class.getName());
-        props.setProperty(PROP_THREAD_COUNT, Integer.toString(DEFAULT_THREAD_COUNT));
+    public static Scheduler createScheduler(String schedulerName, Executor threaPoolExecutor) throws SchedulerException {
+        try {
+            SchedulerFactoryBean schedulerFactoryBean = new SchedulerFactoryBean();
+            schedulerFactoryBean.setSchedulerName(schedulerName);
+            schedulerFactoryBean.setTaskExecutor(threaPoolExecutor);
+            schedulerFactoryBean.afterPropertiesSet();
 
-        SchedulerFactory schedulerFactory = new StdSchedulerFactory(props);
-
-        return schedulerFactory.getScheduler();
+            return schedulerFactoryBean.getObject();
+        } catch (Exception e) {
+            throw new SchedulerException("Unable to create scheduler", e);
+        }
     }
 
 }
