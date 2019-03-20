@@ -149,14 +149,14 @@ public class SiteDataFetcher implements DataFetcher<Object> {
 
         watch.start("processing items");
         result.put(FIELD_NAME_TOTAL, response.getHits().totalHits);
-        if(response.getHits().totalHits > 0) {
+        if (response.getHits().totalHits > 0) {
             for(SearchHit hit :  response.getHits().getHits()) {
                 items.add(fixItems(hit.getSourceAsMap()));
             }
         }
         watch.stop();
 
-        if(logger.isTraceEnabled()) {
+        if (logger.isTraceEnabled()) {
             logger.trace(watch.prettyPrint());
         }
 
@@ -175,14 +175,14 @@ public class SiteDataFetcher implements DataFetcher<Object> {
         String path = propertyName.replaceAll("/", ".");
 
         // Add the field to the list if it doesn't have any sub fields
-        if(CollectionUtils.isEmpty(currentField.getSelectionSet().getFields())) {
+        if (CollectionUtils.isEmpty(currentField.getSelectionSet().getFields())) {
             logger.debug("Adding selected field '{}' to query", path);
             selectedFields.add(path);
         }
 
         // Check the filters to build the ES query
         Object arg = currentField.getArguments().get(FILTER_NAME);
-        if(Objects.nonNull(arg)) {
+        if (Objects.nonNull(arg)) {
             logger.debug("Adding filters for field {}", path);
             Map<String, Object> filters = (Map<String,Object>) arg;
             filters.forEach((name, value) -> {
@@ -197,12 +197,17 @@ public class SiteDataFetcher implements DataFetcher<Object> {
                         query.filter(QueryBuilders.regexpQuery(path, value.toString()));
                         break;
                     case ARG_NAME_LT:
-                    case ARG_NAME_BEFORE:
                         query.filter(QueryBuilders.rangeQuery(path).lt(value));
                         break;
                     case ARG_NAME_GT:
-                    case ARG_NAME_AFTER:
                         query.filter(QueryBuilders.rangeQuery(path).gt(value));
+                        break;
+                    case ARG_NAME_LTE:
+                        query.filter(QueryBuilders.rangeQuery(path).lte(value));
+                        break;
+                    case ARG_NAME_GTE:
+                        query.filter(QueryBuilders.rangeQuery(path).gte(value));
+                        break;
                     default:
                         // never happens
                 }
@@ -220,11 +225,11 @@ public class SiteDataFetcher implements DataFetcher<Object> {
 
         map.forEach((key, value) -> {
             String graphQLKey = getGraphQLName(key);
-            if(FIELD_NAME_ITEM.equals(key)) {
-                if(!(value instanceof List)) {
+            if (FIELD_NAME_ITEM.equals(key)) {
+                if (!(value instanceof List)) {
                     temp.put(graphQLKey, Collections.singletonList(fixItems((Map<String, Object>) value)));
                 }
-            } else if(value instanceof Map) {
+            } else if (value instanceof Map) {
                 temp.put(graphQLKey, fixItems((Map<String, Object>) value));
             } else {
                 temp.put(graphQLKey, value);

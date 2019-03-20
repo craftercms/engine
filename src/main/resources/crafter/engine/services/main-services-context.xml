@@ -714,11 +714,36 @@
         <property name="elasticsearch" ref="crafter.elasticSearchService"/>
     </bean>
 
-    <bean id="crafter.graphQLFactory" class="org.craftercms.engine.graphql.impl.GraphQLFactoryImpl">
+    <bean id="crafter.checkboxFieldFactory" class="org.craftercms.engine.graphql.impl.field.CheckboxFieldFactory"/>
+
+    <bean id="crafter.checkboxGroupFieldFactory"
+          class="org.craftercms.engine.graphql.impl.field.CheckboxGroupFieldFactory">
+        <property name="contentTypePropertyDatasourceNameXpath"
+                  value="${crafter.engine.graphql.contentType.xpath.property.datasource.name}"/>
+    </bean>
+
+    <bean id="crafter.nodeSelectorFieldFactory"
+          class="org.craftercms.engine.graphql.impl.field.NodeSelectorFieldFactory">
+        <property name="contentTypePropertyItemManagerXpath"
+                  value="${crafter.engine.graphql.contentType.xpath.property.itemManager.name}"/>
+    </bean>
+
+    <bean id="crafter.rteFieldFactory" class="org.craftercms.engine.graphql.impl.field.RTEFieldFactory">
+        <property name="contentTypePropertyTitleXpath"
+                  value="${crafter.engine.graphql.contentType.xpath.property.title}"/>
+    </bean>
+
+    <bean id="crafter.repeatGroupFieldFactory"
+          class="org.craftercms.engine.graphql.impl.field.RepeatFieldFactory">
+        <property name="contentTypePropertyFieldsXpath"
+                  value="${crafter.engine.graphql.contentTYpe.xpath.property.fields}"/>
+        <property name="typeFactory" ref="crafter.typeFactory"/>
+    </bean>
+
+    <bean id="crafter.typeFactory" class="org.craftercms.engine.graphql.impl.type.GraphQLTypeFactoryImpl">
         <property name="rootQueryTypeName" value="${crafter.engine.graphql.query.name}"/>
         <property name="ignoredFields" value="${crafter.engine.graphql.ignoredFields}"/>
-        <property name="repoConfigFolder" value="${crafter.engine.graphql.repoConfigFolder}"/>
-        <property name="contentTypeDefinitionName" value="${crafter.engine.graphql.contentType.definition}"/>
+
         <property name="contentTypeNameXpath" value="${crafter.engine.graphql.contentType.xpath.name}"/>
         <property name="contentTypeTitleXpath" value="${crafter.engine.graphql.contentType.xpath.title}"/>
         <property name="contentTypeFieldsXpath" value="${crafter.engine.graphql.contentType.xpath.fields}"/>
@@ -727,14 +752,25 @@
                   value="${crafter.engine.graphql.contentType.xpath.property.type}"/>
         <property name="contentTypePropertyTitleXpath"
                   value="${crafter.engine.graphql.contentType.xpath.property.title}"/>
-        <property name="contentTypePropertyDataSourceNameXpath"
-                  value="${crafter.engine.graphql.contentType.xpath.property.datasource.name}"/>
-        <property name="contentTypePropertyItemManagerXpath"
-                  value="${crafter.engine.graphql.contentType.xpath.property.itemmanager.name}"/>
-        <property name="contentTypePropertyFieldsXpath"
-                  value="${crafter.engine.graphql.contentTYpe.xpath.property.fields}"/>
 
         <property name="dataFetcher" ref="crafter.dataFetcher"/>
+        <property name="fieldFactories">
+            <map>
+                <entry key="checkbox" value-ref="crafter.checkboxFieldFactory"/>
+                <entry key="checkbox-group" value-ref="crafter.checkboxGroupFieldFactory"/>
+                <entry key="node-selector" value-ref="crafter.nodeSelectorFieldFactory"/>
+                <entry key="repeat" value-ref="crafter.repeatGroupFieldFactory"/>
+                <entry key="rte" value-ref="crafter.rteFieldFactory"/>
+                <entry key="rte-tinymce5" value-ref="crafter.rteFieldFactory"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="crafter.graphQLFactory" class="org.craftercms.engine.graphql.impl.GraphQLFactoryImpl">
+        <property name="rootQueryTypeName" value="${crafter.engine.graphql.query.name}"/>
+        <property name="repoConfigFolder" value="${crafter.engine.graphql.repoConfigFolder}"/>
+        <property name="contentTypeDefinitionName" value="${crafter.engine.graphql.contentType.definition}"/>
+        <property name="typeFactory" ref="crafter.typeFactory"/>
     </bean>
 
     <import resource="${crafter.engine.extension.base}/services-overlay-context.xml"/>

@@ -60,14 +60,14 @@ public class SiteGraphQLController {
 
     @GetMapping
     @SuppressWarnings("unchecked")
-    public Map<String, Object> query(@RequestParam String query, @RequestParam String operatioName,
+    public Map<String, Object> query(@RequestParam String query, @RequestParam String operationName,
                                      @RequestParam String variablesStr) throws IOException {
 
         Map<String, Object> variables = StringUtils.isEmpty(variablesStr)?
             Collections.emptyMap() :
             objectMapper.readValue(variablesStr, Map.class);
 
-        return handleRequest(query, operatioName, variables);
+        return handleRequest(query, operationName, variables);
     }
 
     @PostMapping
@@ -89,7 +89,7 @@ public class SiteGraphQLController {
         ExecutionResult result = SiteContext.getCurrent().getGraphQL().execute(executionInput);
         watch.stop();
 
-        if(logger.isTraceEnabled()) {
+        if (logger.isTraceEnabled()) {
             logger.trace(watch.prettyPrint());
         }
 

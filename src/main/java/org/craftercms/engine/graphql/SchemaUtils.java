@@ -61,11 +61,11 @@ public abstract class SchemaUtils {
 
     public static final String ARG_NAME_LT = "lt";
 
-    public static final String ARG_NAME_GT = "GT";
+    public static final String ARG_NAME_GT = "gt";
 
-    public static final String ARG_NAME_BEFORE = "before";
+    public static final String ARG_NAME_LTE = "lte";
 
-    public static final String ARG_NAME_AFTER = "after";
+    public static final String ARG_NAME_GTE = "gte";
 
     public static final String FIELD_SEPARATOR = "_";
 
@@ -188,11 +188,19 @@ public abstract class SchemaUtils {
                 .type(GraphQLInt))
             .field(GraphQLInputObjectField.newInputObjectField()
                 .name(ARG_NAME_LT)
-                .description("Search for values lower than the given value")
+                .description("Search for values less than the given value")
                 .type(GraphQLInt))
             .field(GraphQLInputObjectField.newInputObjectField()
                 .name(ARG_NAME_GT)
                 .description("Search for values greater than the given value")
+                .type(GraphQLInt))
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name(ARG_NAME_GTE)
+                .description("Search for values greater than or equal to the given value")
+                .type(GraphQLInt))
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name(ARG_NAME_LTE)
+                .description("Search for values less than or equal to the given value")
                 .type(GraphQLInt))
             .build())
         .build();
@@ -209,11 +217,19 @@ public abstract class SchemaUtils {
                 .type(GraphQLFloat))
             .field(GraphQLInputObjectField.newInputObjectField()
                 .name(ARG_NAME_LT)
-                .description("Search for values lower than the given value")
+                .description("Search for values less than the given value")
                 .type(GraphQLFloat))
             .field(GraphQLInputObjectField.newInputObjectField()
                 .name(ARG_NAME_GT)
                 .description("Search for values greater than the given value")
+                .type(GraphQLFloat))
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name(ARG_NAME_GTE)
+                .description("Search for values greater than or equal to the given value")
+                .type(GraphQLFloat))
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name(ARG_NAME_LTE)
+                .description("Search for values less than or equal to the given value")
                 .type(GraphQLFloat))
             .build())
         .build();
@@ -230,11 +246,19 @@ public abstract class SchemaUtils {
                 .type(GraphQLLong))
             .field(GraphQLInputObjectField.newInputObjectField()
                 .name(ARG_NAME_LT)
-                .description("Search for values lower than the given value")
+                .description("Search for values less than the given value")
                 .type(GraphQLLong))
             .field(GraphQLInputObjectField.newInputObjectField()
                 .name(ARG_NAME_GT)
                 .description("Search for values greater than the given value")
+                .type(GraphQLLong))
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name(ARG_NAME_GTE)
+                .description("Search for values greater than or equal to the given value")
+                .type(GraphQLLong))
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name(ARG_NAME_LTE)
+                .description("Search for values less than or equal to the given value")
                 .type(GraphQLLong))
             .build())
         .build();
@@ -246,70 +270,78 @@ public abstract class SchemaUtils {
             .name("DateFilters")
             .description("Filters applicable for 'datetime' fields")
             .field(GraphQLInputObjectField.newInputObjectField()
-                .name(ARG_NAME_BEFORE)
-                .description("Search for values before the given value")
+                .name(ARG_NAME_LT)
+                .description("Search for values less than the given value")
                 .type(DateTime))
             .field(GraphQLInputObjectField.newInputObjectField()
-                .name(ARG_NAME_AFTER)
-                .description("Search for values after the given value")
+                .name(ARG_NAME_GT)
+                .description("Search for values greater than the given value")
+                .type(DateTime))
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name(ARG_NAME_GTE)
+                .description("Search for values greater than or equal to the given value")
+                .type(DateTime))
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name(ARG_NAME_LTE)
+                .description("Search for values less than or equal to the given value")
                 .type(DateTime))
             .build())
         .build();
 
-    public static final List<GraphQLFieldDefinition> DESCRIPTOR_FIELDS = Arrays.asList(
+    public static final List<GraphQLFieldDefinition> COMMON_ITEM_FIELDS = Arrays.asList(
         GraphQLFieldDefinition.newFieldDefinition()
             .name("localId")
-            .description("The unique path for the descriptor")
+            .description("The path of the item")
             .type(nonNull(GraphQLString))
             .argument(STRING_FILTER)
             .build(),
         GraphQLFieldDefinition.newFieldDefinition()
             .name("objectId")
-            .description("The unique objectId for the descriptor")
+            .description("The objectId of the item")
             .type(nonNull(GraphQLString))
             .argument(STRING_FILTER)
             .build(),
         GraphQLFieldDefinition.newFieldDefinition()
             .name("objectGroupId")
-            .description("The objectGroupId for the descriptor")
+            .description("The objectGroupId for the item")
             .type(nonNull(GraphQLString))
             .argument(STRING_FILTER)
             .build(),
         GraphQLFieldDefinition.newFieldDefinition()
             .name("createdDate_dt")
-            .description("The creation date for the descriptor")
+            .description("The created date of the item")
             .type(nonNull(DateTime))
             .argument(DATETIME_FILTER)
             .build(),
         GraphQLFieldDefinition.newFieldDefinition()
             .name("lastModifiedDate_dt")
-            .description("The last modified date for the descriptor")
+            .description("The last modified date of the item")
             .type(nonNull(DateTime))
             .argument(DATETIME_FILTER)
             .build()
     );
 
     public static final GraphQLObjectType INCLUDE_TYPE = GraphQLObjectType.newObject()
-        .name("DescriptorInclude")
-        .description("Holds a reference to another descriptor in the site")
+        .name("ItemInclude")
+        .description("Holds a reference to another item in the site")
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name(FIELD_NAME_VALUE)
-            .description("Indicates the descriptor name")
+            .description("The name of the item")
             .type(nonNull(GraphQLString))
             .argument(TEXT_FILTER))
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name(FIELD_NAME_KEY)
-            .description("Indicates the descriptor path")
+            .description("The path of the item")
             .type(nonNull(GraphQLString))
             .argument(TEXT_FILTER))
         .build();
 
     public static final GraphQLObjectType INCLUDE_WRAPPER_TYPE = GraphQLObjectType.newObject()
-        .name("DescriptorIncludeWrapper")
-        .description("Wrapper for a list of descriptor references")
+        .name("ItemIncludeWrapper")
+        .description("Wrapper for a list of item references")
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name(FIELD_NAME_ITEM)
-            .description("List of descriptor references")
+            .description("List of item references")
             .type(list(INCLUDE_TYPE)))
         .build();
 
@@ -335,6 +367,35 @@ public abstract class SchemaUtils {
             .replaceAll("^component_", "/component/")
             .replaceAll("^taxonomy", "/taxonomy")
             .replaceAll("__", "-");
+    }
+
+    /**
+     * Tries to set the type of a field based on its name suffix
+     */
+    public static void setTypeFromFieldName(String fieldName, GraphQLFieldDefinition.Builder newField) {
+        if (fieldName.endsWith("_s")) {
+            newField.type(GraphQLString);
+            newField.argument(STRING_FILTER);
+        } else if (fieldName.endsWith("_dt")) {
+            newField.type(DateTime);
+            newField.argument(DATETIME_FILTER);
+        } else if (fieldName.endsWith("_b")) {
+            newField.type(GraphQLBoolean);
+            newField.argument(BOOLEAN_FILTER);
+        } else if (fieldName.endsWith("_i")) {
+            newField.type(GraphQLInt);
+            newField.argument(INT_FILTER);
+        } else if (fieldName.endsWith("_f") || fieldName.endsWith("_d")) {
+            // GraphQL Float is actually a Java Double
+            newField.type(GraphQLFloat);
+            newField.argument(FLOAT_FILTER);
+        } else if (fieldName.endsWith("_l")) {
+            newField.type(GraphQLLong);
+            newField.argument(LONG_FILTER);
+        } else {
+            newField.type(GraphQLString);
+            newField.argument(TEXT_FILTER);
+        }
     }
 
 }
