@@ -20,7 +20,7 @@ package org.craftercms.engine.controller.rest;
 import java.util.Map;
 
 import org.craftercms.core.controller.rest.RestControllerBase;
-import org.craftercms.engine.search.SiteAwareElasticSearchService;
+import org.craftercms.engine.search.SiteAwareElasticsearchService;
 import org.elasticsearch.action.search.SearchResponse;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,10 +39,10 @@ public class SiteElasticSearchController {
     public static final String URL_ROOT = "/site/elasticsearch";
     public static final String URL_SEARCH = "/search";
 
-    protected SiteAwareElasticSearchService elasticSearchService;
+    protected SiteAwareElasticsearchService elasticSearchService;
 
     @Required
-    public void setElasticSearchService(final SiteAwareElasticSearchService elasticSearchService) {
+    public void setElasticSearchService(final SiteAwareElasticsearchService elasticSearchService) {
         this.elasticSearchService = elasticSearchService;
     }
 
