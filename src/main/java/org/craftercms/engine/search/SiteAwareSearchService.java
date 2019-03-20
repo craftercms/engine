@@ -38,22 +38,13 @@ import org.springframework.beans.factory.annotation.Required;
  */
 public class SiteAwareSearchService implements SearchService<Query> {
 
-    public static final String DEFAULT_INDEX_ID_SEPARATOR = "-";
 
-    protected String defaultIndexIdSuffix;
-    protected String indexIdSeparator;
+    protected String indexIdFormat;
     protected SearchService<Query> actualSearchService;
 
-    public SiteAwareSearchService() {
-        indexIdSeparator = DEFAULT_INDEX_ID_SEPARATOR;
-    }
-
-    public void setDefaultIndexIdSuffix(String defaultIndexIdSuffix) {
-        this.defaultIndexIdSuffix = defaultIndexIdSuffix;
-    }
-
-    public void setIndexIdSeparator(String indexIdSeparator) {
-        this.indexIdSeparator = indexIdSeparator;
+    @Required
+    public void setIndexIdFormat(final String indexIdFormat) {
+        this.indexIdFormat = indexIdFormat;
     }
 
     @Required
@@ -156,18 +147,12 @@ public class SiteAwareSearchService implements SearchService<Query> {
         actualSearchService.commit(getActualIndexId(indexId));
     }
 
-    protected String getActualIndexId(String indexIdSuffix) {
-        String actualIndexId;
-
-        if (StringUtils.isNotEmpty(indexIdSuffix)) {
-            actualIndexId = getCurrentSiteName() + indexIdSeparator + indexIdSuffix;
-        } else if (StringUtils.isNotEmpty(defaultIndexIdSuffix)) {
-            actualIndexId = getCurrentSiteName() + indexIdSeparator + defaultIndexIdSuffix;
+    protected String getActualIndexId(String indexId) {
+        if(StringUtils.isEmpty(indexId)) {
+            return String.format(indexIdFormat, getCurrentSiteName());
         } else {
-            actualIndexId = getCurrentSiteName();
+            return String.format(indexIdFormat, indexId);
         }
-
-        return actualIndexId;
     }
 
     protected String getCurrentSiteName() {

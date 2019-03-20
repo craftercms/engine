@@ -465,7 +465,7 @@
     <!-- ////////////////////////////////// -->
 
     <bean id="crafter.searchService" class="org.craftercms.engine.search.SiteAwareSearchService">
-        <property name="defaultIndexIdSuffix" value="${crafter.engine.search.index.suffix}"/>
+        <property name="indexIdFormat" value="${crafter.engine.search.index.format}"/>
         <property name="actualSearchService">
             <bean class="org.craftercms.search.service.impl.v2.SolrRestClientSearchService">
                 <property name="serverUrl" value="${crafter.engine.search.server.url}"/>
@@ -476,7 +476,7 @@
     <bean id="crafter.elasticSearchService" class="org.craftercms.engine.search.SiteAwareElasticsearchService">
         <property name="serverUrls" value="${crafter.engine.elasticsearch.urls}"/>
         <property name="filterQueries" value="${crafter.engine.elasticsearch.filters}"/>
-        <property name="indexIdFormat" value="${crafter.engine.elasticsearch.indexIdFormat}"/>
+        <property name="indexIdFormat" value="${crafter.engine.search.index.format}"/>
     </bean>
 
     <!-- ////////////////////////////////// -->
