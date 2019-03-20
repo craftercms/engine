@@ -30,6 +30,7 @@ import graphql.language.Field;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.SelectedField;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.craftercms.search.elasticsearch.ElasticSearchWrapper;
 import org.elasticsearch.action.search.SearchRequest;
@@ -173,8 +174,11 @@ public class SiteDataFetcher implements DataFetcher<Object> {
         // Build the ES-friendly path
         String path = propertyName.replaceAll("/", ".");
 
-        // Add the field to the list
-        selectedFields.add(path);
+        // Add the field to the list if it doesn't have any sub fields
+        if(CollectionUtils.isEmpty(currentField.getSelectionSet().getFields())) {
+            logger.debug("Adding selected field '{}' to query", path);
+            selectedFields.add(path);
+        }
 
         // Check the filters to build the ES query
         Object arg = currentField.getArguments().get(FILTER_NAME);
