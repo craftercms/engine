@@ -16,6 +16,7 @@
  */
 package org.craftercms.engine.service.context;
 
+import graphql.GraphQL;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.craftercms.core.exception.CrafterException;
 import org.craftercms.core.service.CacheService;
@@ -46,10 +47,11 @@ public class SiteContext {
 
     private static final String SITE_NAME_MDC_KEY = "siteName";
 
-    private static ThreadLocal<SiteContext> threadLocal = new ThreadLocal<>();
+    private static ThreadLocal<SiteContext> threadLocal = new InheritableThreadLocal<>();
 
     public static final String CACHE_CLEARED_EVENT_KEY = "cacheCleared";
     public static final String CONTEXT_BUILT_EVENT_KEY = "contextBuilt";
+    public static final String GRAPHQL_BUILT_EVENT_KEY = "graphQLBuilt";
 
     protected ContentStoreService storeService;
     protected String siteName;
@@ -70,6 +72,7 @@ public class SiteContext {
     protected UrlRewriter urlRewriter;
     protected Scheduler scheduler;
     protected Map<String, Instant> events;
+    protected GraphQL graphQL;
 
     /**
      * Returns the context for the current thread.
@@ -102,6 +105,7 @@ public class SiteContext {
         events = new ConcurrentHashMap<>();
         events.put(CACHE_CLEARED_EVENT_KEY, now);
         events.put(CONTEXT_BUILT_EVENT_KEY, now);
+        events.put(GRAPHQL_BUILT_EVENT_KEY, now);
     }
 
     public ContentStoreService getStoreService() {
@@ -254,6 +258,16 @@ public class SiteContext {
 
     public void setEvents(Map<String, Instant> events) {
         this.events = events;
+    }
+
+    public GraphQL getGraphQL() {
+        return graphQL;
+    }
+
+    public void setGraphQL(final GraphQL graphQL) {
+        this.graphQL = graphQL;
+
+        events.put(GRAPHQL_BUILT_EVENT_KEY, Instant.now());
     }
 
     public boolean isValid() throws CrafterException {

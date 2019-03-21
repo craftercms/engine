@@ -21,10 +21,9 @@ import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.service.context.SiteContextManager;
 import org.springframework.beans.factory.annotation.Required;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
 import java.util.Collections;
@@ -36,7 +35,7 @@ import java.util.Map;
  *
  * @author Alfonso Vásquez
  */
-@Controller
+@RestController
 @RequestMapping(RestControllerBase.REST_BASE_URI + SiteContextRestController.URL_ROOT)
 public class SiteContextRestController {
 
@@ -45,6 +44,7 @@ public class SiteContextRestController {
     public static final String URL_EVENTS = "/events";
     public static final String URL_DESTROY = "/destroy";
     public static final String URL_REBUILD = "/rebuild";
+    public static final String URL_GRAPHQL = "/graphql";
 
     public static final String MODEL_ATTR_ID =  "id";
 
@@ -56,7 +56,6 @@ public class SiteContextRestController {
     }
 
     @GetMapping(value = URL_CONTEXT_ID)
-    @ResponseBody
     public Map<String, String> getContextId() {
         return Collections.singletonMap(MODEL_ATTR_ID, SiteContext.getCurrent().getContext().getId());
     }
@@ -74,7 +73,6 @@ public class SiteContextRestController {
     }
 
     @GetMapping(value = URL_DESTROY)
-    @ResponseBody
     public Map<String, String> destroy() {
         String siteName = SiteContext.getCurrent().getSiteName();
 
@@ -86,7 +84,6 @@ public class SiteContextRestController {
     }
 
     @GetMapping(value = URL_REBUILD)
-    @ResponseBody
     public Map<String, String> rebuild() {
         SiteContext siteContext = SiteContext.getCurrent();
         String siteName = siteContext.getSiteName();
@@ -97,6 +94,15 @@ public class SiteContextRestController {
 
         return Collections.singletonMap(RestControllerBase.MESSAGE_MODEL_ATTRIBUTE_NAME, "Site context for '" +
                                                                                          siteName + "' rebuilt");
+    }
+
+    @GetMapping(URL_GRAPHQL + URL_REBUILD)
+    public Map<String, String> rebuildSchema() {
+        SiteContext siteContext = SiteContext.getCurrent();
+        contextManager.rebuildGraphQL(siteContext);
+
+        return Collections.singletonMap(RestControllerBase.MESSAGE_MODEL_ATTRIBUTE_NAME,
+            "GraphQL Schema for '" + siteContext.getSiteName() + "' rebuilt");
     }
 
 }

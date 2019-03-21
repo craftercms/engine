@@ -58,6 +58,8 @@
         <box.sdk.version>2.23.0</box.sdk.version>
         <jackson.version>2.9.8</jackson.version>
         <log4j.version>2.11.2</log4j.version>
+        <graphql.version>12.0</graphql.version>
+        <graphql.extended.scalars.version>1.0</graphql.extended.scalars.version>
     </properties>
 
     <licenses>
@@ -276,6 +278,18 @@
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-cbor</artifactId>
             <version>${jackson.version}</version>
+        </dependency>
+
+        <!-- GraphQL -->
+        <dependency>
+            <groupId>com.graphql-java</groupId>
+            <artifactId>graphql-java</artifactId>
+            <version>${graphql.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.graphql-java</groupId>
+            <artifactId>graphql-java-extended-scalars</artifactId>
+            <version>${graphql.extended.scalars.version}</version>
         </dependency>
 
         <!-- Test dependencies -->
