@@ -88,6 +88,8 @@
         <property name="elasticSearchService" ref="crafter.elasticSearchService"/>
     </bean>
 
+    <bean id="crafter.siteGraphQLController" class="org.craftercms.engine.controller.rest.SiteGraphQLController"/>
+
     <!-- Overwrite CacheRestController from core -->
     <bean id="crafter.cacheRestController" class="org.craftercms.engine.controller.rest.FreeMarkerAwareCacheRestController">
         <property name="cacheTemplate" ref="crafter.cacheTemplate"/>

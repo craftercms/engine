@@ -26,6 +26,7 @@ import org.craftercms.commons.entitlements.validator.EntitlementValidator;
 import org.craftercms.core.exception.RootFolderNotFoundException;
 import org.craftercms.engine.event.SiteContextCreatedEvent;
 import org.craftercms.engine.event.SiteContextDestroyedEvent;
+import org.craftercms.engine.graphql.GraphQLFactory;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -54,6 +55,7 @@ public class SiteContextManager implements ApplicationContextAware {
     protected SiteContextFactory fallbackContextFactory;
     protected ApplicationContext applicationContext;
     protected EntitlementValidator entitlementValidator;
+    protected GraphQLFactory graphQLFactory;
 
     public SiteContextManager() {
         lock = new ReentrantLock();
@@ -73,6 +75,11 @@ public class SiteContextManager implements ApplicationContextAware {
     @Required
     public void setEntitlementValidator(final EntitlementValidator entitlementValidator) {
         this.entitlementValidator = entitlementValidator;
+    }
+
+    @Required
+    public void setGraphQLFactory(final GraphQLFactory graphQLFactory) {
+        this.graphQLFactory = graphQLFactory;
     }
 
     @Override
@@ -199,6 +206,10 @@ public class SiteContextManager implements ApplicationContextAware {
         } finally {
             lock.unlock();
         }
+    }
+
+    public void rebuildGraphQL(SiteContext siteContext) {
+        siteContext.setGraphQL(graphQLFactory.getInstance(siteContext));
     }
 
     public SiteContext getContext(String siteName, boolean fallback) {

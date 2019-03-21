@@ -45,6 +45,7 @@ public class DeploymentEventsWatcher {
 
     private static final String CLEAR_CACHE_EVENT_KEY = "events.deployment.clearCache";
     private static final String REBUILD_CONTEXT_EVENT_KEY = "events.deployment.rebuildContext";
+    private static final String REBUILD_GRAPHQL_EVENT_KEY = "events.deployment.rebuildGraphQL";
 
     private String deploymentEventsFileUrl;
     private CacheService cacheService;
@@ -109,6 +110,17 @@ public class DeploymentEventsWatcher {
                 logger.info("Clear cache deployment event received. Clearing cache for site {}...", siteName);
 
                 siteContext.clearCache(cacheService);
+            }
+        }
+
+        if(!rebuildContextTriggered && deploymentEvents.containsKey(REBUILD_GRAPHQL_EVENT_KEY)) {
+            Instant rebuildGraphQLEvent = Instant.parse(deploymentEvents.getProperty(REBUILD_GRAPHQL_EVENT_KEY));
+            Instant lastRebuildGraphQLEvent = siteEvents.get(SiteContext.GRAPHQL_BUILT_EVENT_KEY);
+
+            if(lastRebuildGraphQLEvent.isBefore(rebuildGraphQLEvent)) {
+                logger.info("Rebuild GraphQL deployment event received. Rebuilding schema for site {}...", siteName);
+
+                siteContextManager.rebuildGraphQL(siteContext);
             }
         }
     }
