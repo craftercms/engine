@@ -20,20 +20,37 @@ package org.craftercms.engine.search;
 import org.craftercms.search.elasticsearch.impl.AbstractElasticSearchWrapper;
 import org.craftercms.engine.service.context.SiteContext;
 import org.elasticsearch.action.search.SearchRequest;
+import org.springframework.beans.factory.annotation.Required;
 
 /**
+ * Implementation of {@link org.craftercms.search.elasticsearch.ElasticSearchWrapper}
+ * that sets the index based on the current site context for all search requests.
  * @author joseross
+ * @since 3.1
  */
-    public class SiteAwareElasticSearchService extends AbstractElasticSearchWrapper {
+public class SiteAwareElasticsearchService extends AbstractElasticSearchWrapper {
 
-        @Override
-        protected void updateIndex(final SearchRequest request) {
-            SiteContext siteContext = SiteContext.getCurrent();
-            if (siteContext != null) {
-                request.indices(siteContext.getSiteName());
-            } else {
-                throw new IllegalStateException("Current site context not found");
-            }
-        }
+    /**
+     * Format used to build the index id
+     */
+    protected String indexIdFormat;
 
+    @Required
+    public void setIndexIdFormat(final String indexIdFormat) {
+        this.indexIdFormat = indexIdFormat;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void updateIndex(final SearchRequest request) {
+        SiteContext siteContext = SiteContext.getCurrent();
+        if (siteContext != null) {
+            request.indices(String.format(indexIdFormat, siteContext.getSiteName()));
+        } else {
+            throw new IllegalStateException("Current site context not found");
+        }
+    }
+
+}
