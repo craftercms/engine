@@ -16,14 +16,6 @@
  */
 package org.craftercms.engine.service.context;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import javax.annotation.PreDestroy;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,6 +30,14 @@ import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationEvent;
+
+import javax.annotation.PreDestroy;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Registry and lifecycle manager of {@link SiteContext}s.
@@ -58,10 +58,6 @@ public class SiteContextManager implements ApplicationContextAware {
     public SiteContextManager() {
         lock = new ReentrantLock();
         contextRegistry = new ConcurrentHashMap<>();
-    }
-
-    public Lock getLock() {
-        return lock;
     }
 
     @Required
@@ -194,6 +190,17 @@ public class SiteContextManager implements ApplicationContextAware {
         }
     }
 
+    public SiteContext rebuildContext(String siteName, boolean fallback) {
+        lock.lock();
+        try {
+            destroyContext(siteName);
+
+            return getContext(siteName, fallback);
+        } finally {
+            lock.unlock();
+        }
+    }
+
     public SiteContext getContext(String siteName, boolean fallback) {
         SiteContext siteContext = contextRegistry.get(siteName);
         if (siteContext == null) {
@@ -207,6 +214,7 @@ public class SiteContextManager implements ApplicationContextAware {
                     return null;
                 }
             }
+
             lock.lock();
             try {
                 // Double check locking, in case the context has been created already by another thread

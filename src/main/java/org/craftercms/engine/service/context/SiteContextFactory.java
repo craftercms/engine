@@ -62,7 +62,12 @@ import org.tuckey.web.filters.urlrewrite.UrlRewriter;
 import javax.servlet.ServletContext;
 import java.io.InputStream;
 import java.net.URLClassLoader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executor;
 
 /**
  * Factory for creating {@link SiteContext} with common properties. It also uses the {@link MacroResolver} to resolve
@@ -105,6 +110,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected MacroResolver macroResolver;
     protected ApplicationContext globalApplicationContext;
     protected List<ScriptJobResolver> jobResolvers;
+    protected Executor jobThreadPoolExecutor;
     protected TextEncryptor textEncryptor;
 
     public SiteContextFactory() {
@@ -242,6 +248,11 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     @Required
     public void setJobResolvers(List<ScriptJobResolver> jobResolvers) {
         this.jobResolvers = jobResolvers;
+    }
+
+    @Required
+    public void setJobThreadPoolExecutor(Executor jobThreadPoolExecutor) {
+        this.jobThreadPoolExecutor = jobThreadPoolExecutor;
     }
 
     @Required
@@ -483,7 +494,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             }
 
             if (CollectionUtils.isNotEmpty(allJobContexts)) {
-                Scheduler scheduler = SchedulingUtils.createScheduler(siteName + "_scheduler");
+                Scheduler scheduler = SchedulingUtils.createScheduler(siteName + "_scheduler", jobThreadPoolExecutor);
 
                 for (JobContext jobContext : allJobContexts) {
                     scheduler.scheduleJob(jobContext.getDetail(), jobContext.getTrigger());
