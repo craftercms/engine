@@ -58,8 +58,8 @@ public class CircularQueueLogAppender extends AbstractAppender {
 
     public static final String PLUGIN_NAME = "CircularQueueLogAppender";
 
-    private Buffer buffer; //This has to be sync !!!!
-    private static CircularQueueLogAppender instance;
+    private static Buffer buffer; //This has to be sync !!!!
+
     private SimpleDateFormat dateFormat;
 
     protected CircularQueueLogAppender(final String name, final Filter filter,
@@ -94,12 +94,8 @@ public class CircularQueueLogAppender extends AbstractAppender {
         buffer.clear();
     }
 
-    public static CircularQueueLogAppender loggerQueue() {
-        return instance;
-    }
-
     @SuppressWarnings("unchecked")
-    public List<Map<String, Object>> getLoggedEvents(final String siteId, final long since) {
+    public static List<Map<String, Object>> getLoggedEvents(final String siteId, final long since) {
 
         final Iterator<Map<String, Object>> iter = buffer.iterator();
         final List<Map<String, Object>> str = new ArrayList<>();
@@ -136,27 +132,27 @@ public class CircularQueueLogAppender extends AbstractAppender {
         @PluginAttribute(value = "maxQueueSize") int maxQueueSize,
         @PluginAttribute(value = "dateFormat") String dateFormat) {
 
-        if(instance == null) {
-            if(StringUtils.isEmpty(name)) {
-                LOGGER.error("No name provided for " + PLUGIN_NAME);
-                return null;
-            }
+        if (StringUtils.isEmpty(name)) {
+            LOGGER.error("No name provided for " + PLUGIN_NAME);
+            return null;
+        }
 
+        if (Objects.isNull(layout)) {
+            layout = PatternLayout.createDefaultLayout();
+        }
+
+        if (Objects.isNull(buffer)) {
+            LOGGER.debug("Initializing circular log queue buffer");
             if (maxQueueSize <= 0) {
                 throw new IllegalArgumentException("maxQueueSize must be a integer bigger that 0");
             }
-
-            if(Objects.isNull(layout)) {
-                layout = PatternLayout.createDefaultLayout();
-            }
-
-            instance = new CircularQueueLogAppender(name, filter, layout, ignoreExceptions, null);
-
-            instance.buffer = BufferUtils.synchronizedBuffer(new CircularFifoBuffer(maxQueueSize));
-            instance.dateFormat = new SimpleDateFormat(dateFormat);
+            buffer = BufferUtils.synchronizedBuffer(new CircularFifoBuffer(maxQueueSize));
         }
 
-        return instance;
+        CircularQueueLogAppender appender = new CircularQueueLogAppender(name, filter, layout, ignoreExceptions, null);
+        appender.dateFormat = new SimpleDateFormat(dateFormat);
+
+        return appender;
     }
 }
 
