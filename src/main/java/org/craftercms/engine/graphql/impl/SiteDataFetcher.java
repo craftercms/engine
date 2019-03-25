@@ -134,9 +134,11 @@ public class SiteDataFetcher implements DataFetcher<Object> {
         query.filter(QueryBuilders.termQuery("content-type", contentTypeName));
 
         // Check the selected fields to build the ES query
-        List<SelectedField> fields = env.getSelectionSet().getField(FIELD_NAME_ITEMS).getSelectionSet().getFields();
-        fields.forEach(
-            selectedField -> processSelectedField(selectedField, query, selectedFields));
+        SelectedField requestedFields = env.getSelectionSet().getField(FIELD_NAME_ITEMS);
+        if (Objects.nonNull(requestedFields)) {
+            List<SelectedField> fields = requestedFields.getSelectionSet().getFields();
+            fields.forEach(selectedField -> processSelectedField(selectedField, query, selectedFields));
+        }
 
         // Only fetch the selected fields for better performance
         source.fetchSource(selectedFields.toArray(new String[0]), new String[0]);
