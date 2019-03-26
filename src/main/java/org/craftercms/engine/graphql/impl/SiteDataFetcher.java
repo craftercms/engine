@@ -32,7 +32,7 @@ import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.SelectedField;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
-import org.craftercms.search.elasticsearch.ElasticSearchWrapper;
+import org.craftercms.search.elasticsearch.ElasticsearchWrapper;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -72,9 +72,9 @@ public class SiteDataFetcher implements DataFetcher<Object> {
     protected String defaultSortOrder;
 
     /**
-     * The instance of {@link ElasticSearchWrapper}
+     * The instance of {@link ElasticsearchWrapper}
      */
-    protected ElasticSearchWrapper elasticsearch;
+    protected ElasticsearchWrapper elasticsearch;
 
     @Required
     public void setDefaultLimit(final int defaultLimit) {
@@ -92,7 +92,7 @@ public class SiteDataFetcher implements DataFetcher<Object> {
     }
 
     @Required
-    public void setElasticsearch(final ElasticSearchWrapper elasticsearch) {
+    public void setElasticsearch(final ElasticsearchWrapper elasticsearch) {
         this.elasticsearch = elasticsearch;
     }
 

@@ -29,26 +29,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * REST controller to expose the ElasticSearch service
+ * REST controller to expose the Elasticsearch service
  * @author joseross
  */
 @RestController
-@RequestMapping(RestControllerBase.REST_BASE_URI + SiteElasticSearchController.URL_ROOT)
-public class SiteElasticSearchController {
+@RequestMapping(RestControllerBase.REST_BASE_URI + SiteElasticsearchController.URL_ROOT)
+public class SiteElasticsearchController {
 
     public static final String URL_ROOT = "/site/elasticsearch";
     public static final String URL_SEARCH = "/search";
 
-    protected SiteAwareElasticsearchService elasticSearchService;
+    protected SiteAwareElasticsearchService elasticsearchService;
 
     @Required
-    public void setElasticSearchService(final SiteAwareElasticsearchService elasticSearchService) {
-        this.elasticSearchService = elasticSearchService;
+    public void setElasticsearchService(final SiteAwareElasticsearchService elasticsearchService) {
+        this.elasticsearchService = elasticsearchService;
     }
 
     @PostMapping(URL_SEARCH)
     public SearchResponse search(@RequestBody Map<String, Object> request) {
-        return elasticSearchService.search(request);
+        return elasticsearchService.search(request);
     }
 
 }
