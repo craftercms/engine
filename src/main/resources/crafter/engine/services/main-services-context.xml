@@ -184,6 +184,12 @@
     <bean id="crafter.scriptFilter" class="org.craftercms.engine.scripting.impl.ScriptFilter">
         <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
     </bean>
+    
+    <bean id="crafter.poweredByFilter" class="org.craftercms.commons.web.AddResponseHeaderFilter">
+        <property name="enabled" value="${crafter.engine.header.poweredBy.enable}"/>
+        <property name="headerName" value="${crafter.engine.header.poweredBy.name}"/>
+        <property name="headerValue" value="${crafter.engine.header.poweredBy.value}"/>
+    </bean>
 
     <!-- ////////////////////////////////// -->
     <!--								 	-->
