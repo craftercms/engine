@@ -187,6 +187,12 @@
 
     <bean id="crafter.urlRewriteFilter" class="org.craftercms.engine.url.rewrite.UrlRewriteFilter"/>
 
+    <bean id="crafter.poweredByFilter" class="org.craftercms.commons.web.AddResponseHeaderFilter">
+        <property name="enabled" value="${crafter.engine.header.poweredBy.enable}"/>
+        <property name="headerName" value="${crafter.engine.header.poweredBy.name}"/>
+        <property name="headerValue" value="${crafter.engine.header.poweredBy.value}"/>
+    </bean>
+
     <!-- ////////////////////////////////// -->
     <!--								 	-->
     <!--			Services				-->
