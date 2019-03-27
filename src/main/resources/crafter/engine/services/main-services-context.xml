@@ -187,8 +187,12 @@
     
     <bean id="crafter.poweredByFilter" class="org.craftercms.commons.web.AddResponseHeaderFilter">
         <property name="enabled" value="${crafter.engine.header.poweredBy.enable}"/>
-        <property name="headerName" value="${crafter.engine.header.poweredBy.name}"/>
-        <property name="headerValue" value="${crafter.engine.header.poweredBy.value}"/>
+        <property name="headers">
+            <map>
+                <entry key="${crafter.engine.header.poweredBy.name}"
+                       value="${crafter.engine.header.poweredBy.value}"/>
+            </map>
+        </property>
     </bean>
 
     <!-- ////////////////////////////////// -->
