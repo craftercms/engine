@@ -37,9 +37,9 @@ public class MonitoringController extends MonitoringRestControllerBase {
     public final static String URL_ROOT = "/api/1";
     public final static String LOG_URL = "/log";
 
-    @GetMapping(LOG_URL)
+    @GetMapping(MonitoringRestControllerBase.ROOT_URL + LOG_URL)
     public List<Map<String,Object>> getLoggedEvents(@RequestParam String site, @RequestParam long since) {
-        return CircularQueueLogAppender.loggerQueue().getLoggedEvents(site, since);
+        return CircularQueueLogAppender.getLoggedEvents(site, since);
     }
 
 }

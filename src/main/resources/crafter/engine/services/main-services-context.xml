@@ -187,6 +187,16 @@
 
     <bean id="crafter.urlRewriteFilter" class="org.craftercms.engine.url.rewrite.UrlRewriteFilter"/>
 
+    <bean id="crafter.poweredByFilter" class="org.craftercms.commons.web.AddResponseHeaderFilter">
+        <property name="enabled" value="${crafter.engine.header.poweredBy.enable}"/>
+        <property name="headers">
+            <map>
+                <entry key="${crafter.engine.header.poweredBy.name}"
+                       value="${crafter.engine.header.poweredBy.value}"/>
+            </map>
+        </property>
+    </bean>
+
     <!-- ////////////////////////////////// -->
     <!--								 	-->
     <!--			Services				-->
@@ -476,7 +486,7 @@
         </property>
     </bean>
 
-    <bean id="crafter.elasticSearchService" class="org.craftercms.engine.search.SiteAwareElasticsearchService">
+    <bean id="crafter.elasticsearchService" class="org.craftercms.engine.search.SiteAwareElasticsearchService">
         <property name="serverUrls" value="${crafter.engine.elasticsearch.urls}"/>
         <property name="filterQueries" value="${crafter.engine.elasticsearch.filters}"/>
         <property name="indexIdFormat" value="${crafter.engine.search.index.format}"/>
@@ -527,7 +537,7 @@
         <entry key="navTreeBuilder" value-ref="crafter.navTreeBuilder"/>
         <entry key="navBreadcrumbBuilder" value-ref="crafter.navBreadcrumbBuilder"/>
         <entry key="searchService" value-ref="crafter.searchService"/>
-        <entry key="elasticSearch" value-ref="crafter.elasticSearchService"/>
+        <entry key="elasticsearch" value-ref="crafter.elasticsearchService"/>
         <entry key="breadcrumbBuilder" value-ref="crafter.breadcrumbBuilder"/>
         <entry key="globalProperties" value-ref="crafter.propertyResolver"/>
         <entry key="tenantsResolver" value-ref="crafter.tenantsResolver"/>
@@ -713,7 +723,7 @@
         <property name="defaultLimit" value="${crafter.engine.graphql.query.limit}"/>
         <property name="defaultSortField" value="${crafter.engine.graphql.query.sort.field}"/>
         <property name="defaultSortOrder" value="${crafter.engine.graphql.query.sort.order}"/>
-        <property name="elasticsearch" ref="crafter.elasticSearchService"/>
+        <property name="elasticsearch" ref="crafter.elasticsearchService"/>
     </bean>
 
     <bean id="crafter.checkboxFieldFactory" class="org.craftercms.engine.graphql.impl.field.CheckboxFieldFactory"/>

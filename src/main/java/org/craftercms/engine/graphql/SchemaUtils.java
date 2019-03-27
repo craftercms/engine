@@ -355,7 +355,8 @@ public abstract class SchemaUtils {
             .replaceAll("-", "__")
             .replaceAll("^/page/", "page_")
             .replaceAll("^/component/", "component_")
-            .replaceAll("^/taxonomy", "taxonomy");
+            .replaceAll("^/taxonomy", "taxonomy")
+            .replaceAll("/", "___");
     }
 
     /**
@@ -366,6 +367,7 @@ public abstract class SchemaUtils {
             .replaceAll("^page_", "/page/")
             .replaceAll("^component_", "/component/")
             .replaceAll("^taxonomy", "/taxonomy")
+            .replaceAll("___", "/")
             .replaceAll("__", "-");
     }
 

@@ -25,6 +25,8 @@ import org.craftercms.core.util.XmlUtils;
 import org.craftercms.engine.graphql.GraphQLFieldFactory;
 import org.dom4j.Document;
 import org.dom4j.Node;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
 
 import static graphql.Scalars.GraphQLString;
@@ -46,6 +48,8 @@ import static org.craftercms.engine.graphql.SchemaUtils.getGraphQLName;
  */
 public class NodeSelectorFieldFactory implements GraphQLFieldFactory {
 
+    private static final Logger logger = LoggerFactory.getLogger(NodeSelectorFieldFactory.class);
+
     protected String contentTypePropertyItemManagerXpath;
 
     @Required
@@ -61,11 +65,14 @@ public class NodeSelectorFieldFactory implements GraphQLFieldFactory {
         String datasourceType = XmlUtils.selectSingleNodeValue(definition,
             "form/datasources/datasource/id[text()='" + datasourceName + "']/../properties/property/name[text"
                 + "()='type']/../value");
-        if (StringUtils.isEmpty(datasourceType)) {
+        String referencedType = StringUtils.isNotEmpty(datasourceType)? getGraphQLName(datasourceType) : null;
+        if (StringUtils.isEmpty(referencedType)) {
             // If there is no content-type set in the datasource, just add a generic type for includes
+            logger.debug("Empty type for datasource '{}' in field '{}'", datasourceName, fieldName);
             newField.type(INCLUDE_WRAPPER_TYPE);
         } else {
             // If there is a content-type, then create a specific type for it
+            logger.debug("Adding reference to type '{}' for field '{}'", referencedType, fieldName);
             GraphQLObjectType flattenedType = GraphQLObjectType.newObject()
                 .name(typeName + FIELD_SEPARATOR + fieldName + "_flattened_item")
                 .description("Contains the data from another item in the site")
@@ -80,7 +87,7 @@ public class NodeSelectorFieldFactory implements GraphQLFieldFactory {
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name(FIELD_NAME_COMPONENT)
                     .description("The content of the item")
-                    .type(nonNull(GraphQLTypeReference.typeRef(getGraphQLName(datasourceType)))))
+                    .type(nonNull(GraphQLTypeReference.typeRef(referencedType))))
                 .build();
 
             GraphQLObjectType wrapperType = GraphQLObjectType.newObject()

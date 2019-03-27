@@ -32,7 +32,7 @@ import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.SelectedField;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
-import org.craftercms.search.elasticsearch.ElasticSearchWrapper;
+import org.craftercms.search.elasticsearch.ElasticsearchWrapper;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -72,9 +72,9 @@ public class SiteDataFetcher implements DataFetcher<Object> {
     protected String defaultSortOrder;
 
     /**
-     * The instance of {@link ElasticSearchWrapper}
+     * The instance of {@link ElasticsearchWrapper}
      */
-    protected ElasticSearchWrapper elasticsearch;
+    protected ElasticsearchWrapper elasticsearch;
 
     @Required
     public void setDefaultLimit(final int defaultLimit) {
@@ -92,7 +92,7 @@ public class SiteDataFetcher implements DataFetcher<Object> {
     }
 
     @Required
-    public void setElasticsearch(final ElasticSearchWrapper elasticsearch) {
+    public void setElasticsearch(final ElasticsearchWrapper elasticsearch) {
         this.elasticsearch = elasticsearch;
     }
 
@@ -134,9 +134,11 @@ public class SiteDataFetcher implements DataFetcher<Object> {
         query.filter(QueryBuilders.termQuery("content-type", contentTypeName));
 
         // Check the selected fields to build the ES query
-        List<SelectedField> fields = env.getSelectionSet().getField(FIELD_NAME_ITEMS).getSelectionSet().getFields();
-        fields.forEach(
-            selectedField -> processSelectedField(selectedField, query, selectedFields));
+        SelectedField requestedFields = env.getSelectionSet().getField(FIELD_NAME_ITEMS);
+        if (Objects.nonNull(requestedFields)) {
+            List<SelectedField> fields = requestedFields.getSelectionSet().getFields();
+            fields.forEach(selectedField -> processSelectedField(selectedField, query, selectedFields));
+        }
 
         // Only fetch the selected fields for better performance
         source.fetchSource(selectedFields.toArray(new String[0]), new String[0]);

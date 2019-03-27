@@ -17,18 +17,18 @@
 
 package org.craftercms.engine.search;
 
-import org.craftercms.search.elasticsearch.impl.AbstractElasticSearchWrapper;
+import org.craftercms.search.elasticsearch.impl.AbstractElasticsearchWrapper;
 import org.craftercms.engine.service.context.SiteContext;
 import org.elasticsearch.action.search.SearchRequest;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
- * Implementation of {@link org.craftercms.search.elasticsearch.ElasticSearchWrapper}
+ * Implementation of {@link org.craftercms.search.elasticsearch.ElasticsearchWrapper}
  * that sets the index based on the current site context for all search requests.
  * @author joseross
  * @since 3.1
  */
-public class SiteAwareElasticsearchService extends AbstractElasticSearchWrapper {
+public class SiteAwareElasticsearchService extends AbstractElasticsearchWrapper {
 
     /**
      * Format used to build the index id
