@@ -105,6 +105,11 @@
         <filter-name>crafter.scriptFilter</filter-name>
         <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
     </filter>
+
+    <filter>
+        <filter-name>crafter.poweredByFilter</filter-name>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+    </filter>
     
     <filter-mapping>
         <filter-name>log4jServletFilter</filter-name>
@@ -169,6 +174,14 @@
         <filter-name>crafter.scriptFilter</filter-name>
         <url-pattern>/*</url-pattern>
         <dispatcher>REQUEST</dispatcher>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>crafter.poweredByFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
     </filter-mapping>
 
 	<servlet>
