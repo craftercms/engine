@@ -50,10 +50,24 @@
         <property name="errorPageUrl" value="${crafter.security.accessDenied.error.url}"/>
     </bean>
 
+    <bean id="crafter.addSecurityCookiesProcessor"
+          class="org.craftercms.engine.security.PreAuthenticatedAddSecurityCookiesProcessor">
+        <property name="ticketCookieManager" ref="crafter.ticketCookieManager"/>
+        <property name="profileLastModifiedCookieManager" ref="crafter.profileLastModifiedCookieManager"/>
+    </bean>
+
     <bean id="crafter.urlAccessRestrictionCheckingProcessor"
           class="org.craftercms.engine.security.ConfigAwareUrlAccessRestrictionCheckingProcessor">
         <property name="urlRestrictions" ref="crafter.urlRestrictions"/>
         <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
+    </bean>
+
+    <bean id="crafter.mellonAutoLoginProcessor"
+          class="org.craftercms.engine.security.ConfigAwareMellonAutoLoginProcessor">
+        <property name="tenantService" ref="crafter.tenantServiceRestClient"/>
+        <property name="profileService" ref="crafter.profileServiceRestClient"/>
+        <property name="tenantsResolver" ref="crafter.tenantsResolver"/>
+        <property name="authenticationManager" ref="crafter.authenticationManager"/>
     </bean>
 
 </beans>
