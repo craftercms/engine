@@ -34,20 +34,20 @@ import org.craftercms.engine.util.ConfigUtils;
 import org.craftercms.profile.api.Profile;
 import org.craftercms.security.authentication.Authentication;
 import org.craftercms.security.processors.RequestSecurityProcessorChain;
-import org.craftercms.security.processors.impl.MellonAutoLoginProcessor;
+import org.craftercms.security.processors.impl.AuthenticationHeadersLoginProcessor;
 import org.craftercms.security.utils.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Extension of {@link MellonAutoLoginProcessor} that uses site config to support SAML authentication without
- * requiring Crafter Profile.
+ * Extension of {@link AuthenticationHeadersLoginProcessor} that uses site config to support SAML authentication
+ * without requiring Crafter Profile.
  * @author joseross
  * @since 3.1
  */
-public class ConfigAwareMellonAutoLoginProcessor extends MellonAutoLoginProcessor {
+public class ConfigAwareAuthenticationHeadersLoginProcessor extends AuthenticationHeadersLoginProcessor {
 
-    private static final Logger logger = LoggerFactory.getLogger(ConfigAwareMellonAutoLoginProcessor.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConfigAwareAuthenticationHeadersLoginProcessor.class);
 
     public static final String SAML_CONFIG_KEY = "security.saml";
 

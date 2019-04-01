@@ -62,8 +62,8 @@
         <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
     </bean>
 
-    <bean id="crafter.mellonAutoLoginProcessor"
-          class="org.craftercms.engine.security.ConfigAwareMellonAutoLoginProcessor">
+    <bean id="crafter.headersLoginProcessor"
+          class="org.craftercms.engine.security.ConfigAwareAuthenticationHeadersLoginProcessor">
         <property name="tenantService" ref="crafter.tenantServiceRestClient"/>
         <property name="profileService" ref="crafter.profileServiceRestClient"/>
         <property name="tenantsResolver" ref="crafter.tenantsResolver"/>
