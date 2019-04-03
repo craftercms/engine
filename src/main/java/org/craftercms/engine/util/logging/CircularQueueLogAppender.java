@@ -22,9 +22,10 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -60,31 +61,34 @@ public class CircularQueueLogAppender extends AbstractAppender {
 
     private static Buffer buffer; //This has to be sync !!!!
 
-    private SimpleDateFormat dateFormat;
+    private DateTimeFormatter dateFormat;
+
+    private boolean global;
 
     protected CircularQueueLogAppender(final String name, final Filter filter,
-                                    final Layout<? extends Serializable> layout, final boolean ignoreExceptions,
-                                    final Property[] properties) {
+                                       final Layout<? extends Serializable> layout, final boolean ignoreExceptions,
+                                       final Property[] properties) {
         super(name, filter, layout, ignoreExceptions, properties);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public void append(final LogEvent event) {
+        String siteName = StringUtils.EMPTY;
         final SiteContext ctx = SiteContext.getCurrent();
         if (ctx != null) {
-            final String siteName = ctx.getSiteName();
-            if (StringUtils.isNoneBlank(siteName)) {
-                Map<String, Object> mappy = new HashMap<>();
-                mappy.put("site", siteName);
-                mappy.put("level", event.getLevel().toString());
-                mappy.put("message", event.getMessage().getFormattedMessage());
-                mappy.put("thread", event.getThreadName());
-                mappy.put("exception", subAppend(event));
-                mappy.put("timestamp", dateFormat.format(new Date(event.getTimeMillis())));
-                mappy.put("timestampm", event.getInstant().getEpochMillisecond());
-                buffer.add(mappy);
-            }
+            siteName = ctx.getSiteName();
+        }
+        if (global || StringUtils.isNoneBlank(siteName)) {
+            Map<String, Object> mappy = new HashMap<>();
+            mappy.put("site", siteName);
+            mappy.put("level", event.getLevel().toString());
+            mappy.put("message", event.getMessage().getFormattedMessage());
+            mappy.put("thread", event.getThreadName());
+            mappy.put("exception", subAppend(event));
+            mappy.put("timestamp", dateFormat.format(Instant.ofEpochMilli(event.getTimeMillis())));
+            mappy.put("timestampm", event.getInstant().getEpochMillisecond());
+            buffer.add(mappy);
         }
     }
 
@@ -102,7 +106,7 @@ public class CircularQueueLogAppender extends AbstractAppender {
         while (iter.hasNext()) {
             Map<String, Object> map = iter.next();
             if (map.get("site").toString().equalsIgnoreCase(siteId)) {
-                if (new Date((long)map.get("timestampm")).after(new Date(since))) {
+                if (Instant.ofEpochMilli((long)map.get("timestampm")).isAfter(Instant.ofEpochMilli(since))) {
                     str.add(map);
                 }
             }
@@ -130,7 +134,8 @@ public class CircularQueueLogAppender extends AbstractAppender {
         @PluginElement(value = "Layout") Layout<? extends Serializable> layout,
         @PluginAttribute(value = "ignoreExceptions") boolean ignoreExceptions,
         @PluginAttribute(value = "maxQueueSize") int maxQueueSize,
-        @PluginAttribute(value = "dateFormat") String dateFormat) {
+        @PluginAttribute(value = "dateFormat") String dateFormat,
+        @PluginAttribute(value = "global") boolean global) {
 
         if (StringUtils.isEmpty(name)) {
             LOGGER.error("No name provided for " + PLUGIN_NAME);
@@ -150,7 +155,8 @@ public class CircularQueueLogAppender extends AbstractAppender {
         }
 
         CircularQueueLogAppender appender = new CircularQueueLogAppender(name, filter, layout, ignoreExceptions, null);
-        appender.dateFormat = new SimpleDateFormat(dateFormat);
+        appender.dateFormat = DateTimeFormatter.ofPattern(dateFormat).withZone(ZoneId.of("UTC"));
+        appender.global = global;
 
         return appender;
     }
