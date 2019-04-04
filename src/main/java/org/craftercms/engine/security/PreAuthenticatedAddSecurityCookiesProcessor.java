@@ -27,11 +27,11 @@ import org.craftercms.security.utils.SecurityUtils;
 
 /**
  * Extension of {@link org.craftercms.security.processors.impl.AddSecurityCookiesProcessor} that avoids adding
- * the cookies if the authentication is a {@link org.craftercms.engine.security.PersonaAuthentication}.
+ * the cookies if the authentication is a {@link PreAuthenticatedProfile}.
  *
  * @author avasquez
  */
-public class PreviewAddSecurityCookiesProcessor extends AddSecurityCookiesProcessor {
+public class PreAuthenticatedAddSecurityCookiesProcessor extends AddSecurityCookiesProcessor {
 
     @Override
     protected AddSecurityCookiesResponseWrapper wrapResponse(RequestContext context) {
@@ -47,7 +47,7 @@ public class PreviewAddSecurityCookiesProcessor extends AddSecurityCookiesProces
         @Override
         public void addCookies() {
             Authentication auth = SecurityUtils.getAuthentication(request);
-            if (auth instanceof PersonaAuthentication) {
+            if (auth instanceof PreAuthenticatedProfile) {
                 // Delete cookies if they still exist from a previous authentication
                 deleteTicketCookie();
                 deleteProfileLastModifiedCookie();

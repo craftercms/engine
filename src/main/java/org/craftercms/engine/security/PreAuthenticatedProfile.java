@@ -21,16 +21,15 @@ import org.craftercms.profile.api.Profile;
 import org.craftercms.security.authentication.Authentication;
 
 /**
- * Implementation of {@link org.craftercms.security.authentication.Authentication} used just for Crafter Studio's
- * Personas.
+ * Implementation of {@link org.craftercms.security.authentication.Authentication} used for standalone authentication.
  *
  * @author avasquez
  */
-public class PersonaAuthentication implements Authentication {
+public class PreAuthenticatedProfile implements Authentication {
 
     protected Profile profile;
 
-    public PersonaAuthentication(Profile profile) {
+    public PreAuthenticatedProfile(Profile profile) {
         this.profile = profile;
     }
 

@@ -72,7 +72,7 @@ public class PreviewCurrentAuthenticationResolvingProcessor extends CurrentAuthe
 
             profile.setAttributes(attributesNoUsernameNoRoles);
 
-            SecurityUtils.setAuthentication(request, new PersonaAuthentication(profile));
+            SecurityUtils.setAuthentication(request, new PreAuthenticatedProfile(profile));
 
             processorChain.processRequest(context);
         } else {
