@@ -80,30 +80,27 @@ public class ConfigAwareAuthenticationHeadersLoginProcessor extends Authenticati
     @Override
     public void processRequest(final RequestContext context, final RequestSecurityProcessorChain processorChain)
         throws Exception {
+        HttpServletRequest request = context.getRequest();
+        Authentication auth = SecurityUtils.getAuthentication(request);
+
+        logger.debug("Checking authentication headers");
+        String username = request.getHeader(usernameHeaderName);
+        String email = request.getHeader(emailHeaderName);
+
         HierarchicalConfiguration config = ConfigUtils.getCurrentConfig();
-        if (Objects.nonNull(config) && config.containsKey(SAML_TOKEN_CONFIG_KEY)) {
-            HttpServletRequest request = context.getRequest();
-            if (hasValidToken(request)) {
-                logger.debug("Using standalone SAML authentication");
-                Authentication auth = SecurityUtils.getAuthentication(request);
+        if (StringUtils.isNoneEmpty(username, email) && Objects.isNull(auth) && Objects.nonNull(config) &&
+            config.containsKey(SAML_TOKEN_CONFIG_KEY) && hasValidToken(request)) {
 
-                if (Objects.isNull(auth)) {
-                    logger.debug("Checking headers from Mellon");
-                    String username = request.getHeader(usernameHeaderName);
-                    String email = request.getHeader(emailHeaderName);
+            logger.debug("Using standalone SAML authentication");
 
-                    if (StringUtils.isNoneEmpty(username, email)) {
-                        logger.debug("Creating authentication object for '{}'", username);
-                        Profile profile = new Profile();
-                        profile.setUsername(username);
-                        profile.setEmail(email);
-                        addAttributes(profile, request, config);
-                        addRoles(profile, request, config);
+            logger.debug("Creating authentication object for '{}'", username);
+            Profile profile = new Profile();
+            profile.setUsername(username);
+            profile.setEmail(email);
+            addAttributes(profile, request, config);
+            addRoles(profile, request, config);
 
-                        SecurityUtils.setAuthentication(request, new PreAuthenticatedProfile(profile));
-                    }
-                }
-            }
+            SecurityUtils.setAuthentication(request, new PreAuthenticatedProfile(profile));
 
             processorChain.processRequest(context);
         } else {
