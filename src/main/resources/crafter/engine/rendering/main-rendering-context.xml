@@ -40,12 +40,24 @@
         <property name="locations">
             <list>
                 <value>classpath:crafter/core/core.properties</value>
+                <value>classpath:crafter/security/security.properties</value>
                 <value>classpath:crafter/engine/server-config.properties</value>
+            </list>
+        </property>
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+    </bean>
+
+    <!-- Runs after the mode post processors -->
+    <bean class="org.craftercms.commons.spring.ListMergingPostProcessor">
+        <property name="order" value="1000" />
+        <property name="beanName" value="crafter.properties" />
+        <property name="propertyName" value="locations" />
+        <property name="additionalElements">
+            <list>
                 <value>${crafter.engine.extension.base}/overlay-config.properties</value>
                 <value>${crafter.engine.extension.base}/server-config.properties</value>
             </list>
         </property>
-        <property name="ignoreUnresolvablePlaceholders" value="true" />
     </bean>
 
     <!--
