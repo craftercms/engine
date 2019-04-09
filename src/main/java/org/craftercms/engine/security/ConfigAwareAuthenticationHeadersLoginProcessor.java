@@ -83,7 +83,7 @@ public class ConfigAwareAuthenticationHeadersLoginProcessor extends Authenticati
         HttpServletRequest request = context.getRequest();
         Authentication auth = SecurityUtils.getAuthentication(request);
 
-        logger.debug("Checking headers from Mellon");
+        logger.debug("Checking authentication headers");
         String username = request.getHeader(usernameHeaderName);
         String email = request.getHeader(emailHeaderName);
 
