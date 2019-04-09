@@ -23,19 +23,15 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-    <bean name="crafter.properties" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
-        <property name="order" value="0"/>
-        <property name="locations">
+    <bean class="org.craftercms.commons.spring.ListMergingPostProcessor">
+        <property name="order" value="0" />
+        <property name="beanName" value="crafter.properties" />
+        <property name="propertyName" value="locations" />
+        <property name="additionalElements">
             <list>
-                <value>classpath:crafter/core/core.properties</value>
-                <value>classpath:crafter/security/security.properties</value>
-                <value>classpath:crafter/engine/server-config.properties</value>
                 <value>classpath:crafter/engine/mode/multi-tenant/simple/server-config.properties</value>
-                <value>${crafter.engine.extension.base}/overlay-config.properties</value>
-                <value>${crafter.engine.extension.base}/server-config.properties</value>
             </list>
         </property>
-        <property name="ignoreUnresolvablePlaceholders" value="true" />
     </bean>
 
     <bean id="crafter.siteCookieChangeInterceptor" class="org.craftercms.engine.servlet.interceptor.SiteCookieChangeInterceptor">

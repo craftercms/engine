@@ -20,7 +20,41 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <import resource="classpath:crafter/engine/extension/store/s3/store-context.xml"/>
-    <import resource="classpath:crafter/engine/extension/deployment-events-context.xml"/>
+    <import resource="classpath:crafter/engine/mode/serverless/deployment-events-context.xml" />
+
+    <bean class="org.craftercms.commons.spring.ListMergingPostProcessor">
+        <property name="order" value="0" />
+        <property name="beanName" value="crafter.properties" />
+        <property name="propertyName" value="locations" />
+        <property name="additionalElements">
+            <list>
+                <value>classpath:crafter/engine/mode/serverless/s3/server-config.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- AWS S3 client builder -->
+    <bean id="crafter.s3ClientBuilder" class="org.craftercms.engine.store.s3.util.S3ClientBuilder">
+        <property name="region" value="${crafter.engine.s3.region:}"/>
+        <property name="accessKey" value="${crafter.engine.s3.accessKey:}"/>
+        <property name="secretKey" value="${crafter.engine.s3.secretKey:}"/>
+    </bean>
+
+    <!-- AWS S3 Site List Resolver -->
+    <bean id="crafter.siteListResolver" class="org.craftercms.engine.store.s3.S3SiteListResolver">
+        <property name="siteRootFolderPath" value="${crafter.engine.site.default.rootFolder.path}"/>
+        <property name="macroResolver" ref="crafter.macroResolver"/>
+
+        <property name="clientBuilder" ref="crafter.s3ClientBuilder"/>
+    </bean>
+
+    <!-- AWS S3 Content Store Adapter -->
+    <bean id="crafter.contentStoreAdapter.s3" class="org.craftercms.engine.store.s3.S3ContentStoreAdapter">
+        <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
+        <property name="metadataFileExtension" value="${crafter.core.store.metadataFile.extension}"/>
+        <property name="descriptorFileExtension" value="${crafter.core.store.descriptorFile.extension}"/>
+
+        <property name="clientBuilder" ref="crafter.s3ClientBuilder"/>
+    </bean>
 
 </beans>
