@@ -60,8 +60,8 @@ public class SiteGraphQLController {
 
     @GetMapping
     @SuppressWarnings("unchecked")
-    public Map<String, Object> query(@RequestParam String query, @RequestParam String operationName,
-                                     @RequestParam String variablesStr) throws IOException {
+    public Map<String, Object> query(@RequestParam String query, @RequestParam(required = false) String operationName,
+                                     @RequestParam(required = false) String variablesStr) throws IOException {
 
         Map<String, Object> variables = StringUtils.isEmpty(variablesStr)?
             Collections.emptyMap() :
