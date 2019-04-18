@@ -233,8 +233,6 @@ public class ContentTypeBasedDataFetcher implements DataFetcher<Object> {
                             // never happens
                     }
                 });
-            } else {
-
             }
         }
     }
