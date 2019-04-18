@@ -17,15 +17,10 @@
 
 package org.craftercms.engine.graphql;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
-import graphql.schema.GraphQLArgument;
-import graphql.schema.GraphQLEnumType;
-import graphql.schema.GraphQLFieldDefinition;
-import graphql.schema.GraphQLInputObjectField;
-import graphql.schema.GraphQLInputObjectType;
-import graphql.schema.GraphQLObjectType;
+import graphql.schema.*;
+import org.apache.commons.collections4.ListUtils;
 
 import static graphql.Scalars.GraphQLBoolean;
 import static graphql.Scalars.GraphQLFloat;
@@ -38,6 +33,7 @@ import static graphql.schema.GraphQLNonNull.nonNull;
 
 /**
  * Utility objects & methods for building the GraphQL Schema
+ *
  * @author joseross
  * @since 3.1
  */
@@ -46,51 +42,35 @@ public abstract class SchemaUtils {
     // Constants
 
     public static final String ARG_NAME_SORT_BY = "sortBy";
-
     public static final String ARG_NAME_SORT_ORDER = "sortOrder";
-
     public static final String ARG_NAME_OFFSET = "offset";
-
     public static final String ARG_NAME_LIMIT = "limit";
-
     public static final String ARG_NAME_EQUALS = "equals";
-
     public static final String ARG_NAME_MATCHES = "matches";
-
     public static final String ARG_NAME_REGEX = "regex";
-
     public static final String ARG_NAME_LT = "lt";
-
     public static final String ARG_NAME_GT = "gt";
-
     public static final String ARG_NAME_LTE = "lte";
-
     public static final String ARG_NAME_GTE = "gte";
 
     public static final String FIELD_SEPARATOR = "_";
 
+    public static final String FIELD_NAME_CONTENT_ITEMS = "contentItems";
+    public static final String FIELD_NAME_PAGES = "pages";
+    public static final String FIELD_NAME_COMPONENTS = "components";
+    public static final String FIELD_NAME_CONTENT_TYPE = getGraphQLName("content-type");
     public static final String FIELD_NAME_ITEM = "item";
-
     public static final String FIELD_NAME_ITEMS = "items";
-
     public static final String FIELD_NAME_TOTAL = "total";
-
     public static final String FIELD_NAME_KEY = "key";
-
     public static final String FIELD_NAME_VALUE = "value";
-
     public static final String FIELD_NAME_SELECTED = "selected";
-
     public static final String FIELD_NAME_COMPONENT = "component";
 
     public static final String FIELD_SUFFIX_ITEM = FIELD_SEPARATOR + FIELD_NAME_ITEM;
-
     public static final String FIELD_SUFFIX_ITEMS = FIELD_SEPARATOR + FIELD_NAME_ITEMS;
-
     public static final String FIELD_SUFFIX_QUERY = FIELD_SEPARATOR + "query";
-
     public static final String FIELD_SUFFIX_RAW = FIELD_SEPARATOR + "raw";
-
     public static final String FIELD_SUFFIX_MULTIVALUE  = "mv";
 
     public static final String FILTER_NAME = "filter";
@@ -288,38 +268,77 @@ public abstract class SchemaUtils {
             .build())
         .build();
 
-    public static final List<GraphQLFieldDefinition> COMMON_ITEM_FIELDS = Arrays.asList(
+    public static final List<GraphQLFieldDefinition> CONTENT_ITEM_FIELDS = Arrays.asList(
         GraphQLFieldDefinition.newFieldDefinition()
-            .name("localId")
+            .name(FIELD_NAME_CONTENT_TYPE)
+            .description("The content type of the item")
+            .type(nonNull(GraphQLString))
+            .argument(STRING_FILTER)
+            .build(),
+        GraphQLFieldDefinition.newFieldDefinition()
+            .name(getGraphQLName("localId"))
             .description("The path of the item")
             .type(nonNull(GraphQLString))
             .argument(STRING_FILTER)
             .build(),
         GraphQLFieldDefinition.newFieldDefinition()
-            .name("objectId")
+            .name(getGraphQLName("objectId"))
             .description("The objectId of the item")
             .type(nonNull(GraphQLString))
             .argument(STRING_FILTER)
             .build(),
         GraphQLFieldDefinition.newFieldDefinition()
-            .name("objectGroupId")
+            .name(getGraphQLName("objectGroupId"))
             .description("The objectGroupId for the item")
             .type(nonNull(GraphQLString))
             .argument(STRING_FILTER)
             .build(),
         GraphQLFieldDefinition.newFieldDefinition()
-            .name("createdDate_dt")
+            .name(getGraphQLName("createdDate_dt"))
             .description("The created date of the item")
             .type(nonNull(DateTime))
             .argument(DATETIME_FILTER)
             .build(),
         GraphQLFieldDefinition.newFieldDefinition()
-            .name("lastModifiedDate_dt")
+            .name(getGraphQLName("lastModifiedDate_dt"))
             .description("The last modified date of the item")
             .type(nonNull(DateTime))
             .argument(DATETIME_FILTER)
             .build()
     );
+
+    public static final List<GraphQLFieldDefinition> PAGE_FIELDS = Arrays.asList(
+        GraphQLFieldDefinition.newFieldDefinition()
+            .name(getGraphQLName("placeInNav"))
+            .description("If the page should be placed in the navigation")
+            .type(GraphQLBoolean)
+            .argument(BOOLEAN_FILTER)
+            .build(),
+        GraphQLFieldDefinition.newFieldDefinition()
+            .name(getGraphQLName("orderDefault_f"))
+            .description("The order the page has in the navigation")
+            .type(GraphQLFloat)
+            .argument(FLOAT_FILTER)
+            .build(),
+        GraphQLFieldDefinition.newFieldDefinition()
+            .name(getGraphQLName("navLabel"))
+            .description("The label of the page in the navigation")
+            .type(GraphQLString)
+            .argument(STRING_FILTER)
+            .build()
+    );
+
+    public static final GraphQLInterfaceType CONTENT_ITEM_INTERFACE_TYPE = GraphQLInterfaceType.newInterface()
+        .name("ContentItem")
+        .description("Interface for all content items (pages, components and taxonomies)")
+        .fields(CONTENT_ITEM_FIELDS)
+        .build();
+
+    public static final GraphQLInterfaceType PAGE_INTERFACE_TYPE = GraphQLInterfaceType.newInterface()
+        .name("Page")
+        .description("Interface for pages")
+        .fields(ListUtils.union(CONTENT_ITEM_FIELDS, PAGE_FIELDS))
+        .build();
 
     public static final GraphQLObjectType INCLUDE_TYPE = GraphQLObjectType.newObject()
         .name("ItemInclude")
@@ -344,6 +363,18 @@ public abstract class SchemaUtils {
             .description("List of item references")
             .type(list(INCLUDE_TYPE)))
         .build();
+
+    public static final TypeResolver CONTENT_TYPE_BASED_TYPE_RESOLVER = env -> {
+        Object item = env.getObject();
+        if (item instanceof Map) {
+            Object contentType = ((Map) item).get(FIELD_NAME_CONTENT_TYPE);
+            if (contentType != null) {
+                return env.getSchema().getObjectType(getGraphQLName(contentType.toString()));
+            }
+        }
+
+        return null;
+    };
 
     // Utility methods
 
@@ -398,6 +429,24 @@ public abstract class SchemaUtils {
             newField.type(GraphQLString);
             newField.argument(TEXT_FILTER);
         }
+    }
+
+    /**
+     * Creates a query wrapper type (with total and list of items) for an actual type
+     */
+    public static GraphQLType createQueryWrapperType(String namePrefix, GraphQLType wrappedType, String description) {
+        return GraphQLObjectType.newObject()
+            .name(namePrefix + FIELD_SUFFIX_QUERY)
+            .description(description)
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name(FIELD_NAME_TOTAL)
+                .description("Total number of items found")
+                .type(nonNull(GraphQLInt)))
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name(FIELD_NAME_ITEMS)
+                .description("List of items")
+                .type(list(nonNull(wrappedType))))
+            .build();
     }
 
 }

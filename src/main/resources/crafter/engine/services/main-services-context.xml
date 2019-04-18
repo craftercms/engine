@@ -731,7 +731,7 @@
     <!--									-->
     <!-- ////////////////////////////////// -->
 
-    <bean id="crafter.dataFetcher" class="org.craftercms.engine.graphql.impl.SiteDataFetcher">
+    <bean id="crafter.dataFetcher" class="org.craftercms.engine.graphql.impl.ContentTypeBasedDataFetcher">
         <property name="defaultLimit" value="${crafter.engine.graphql.query.limit}"/>
         <property name="defaultSortField" value="${crafter.engine.graphql.query.sort.field}"/>
         <property name="defaultSortOrder" value="${crafter.engine.graphql.query.sort.order}"/>
@@ -795,6 +795,7 @@
         <property name="repoConfigFolder" value="${crafter.engine.graphql.repoConfigFolder}"/>
         <property name="contentTypeDefinitionName" value="${crafter.engine.graphql.contentType.definition}"/>
         <property name="typeFactory" ref="crafter.typeFactory"/>
+        <property name="dataFetcher" ref="crafter.dataFetcher"/>
     </bean>
 
     <import resource="${crafter.engine.extension.base}/services-overlay-context.xml"/>
