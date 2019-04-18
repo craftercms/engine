@@ -48,13 +48,19 @@ import org.springframework.util.StopWatch;
 import static org.craftercms.engine.graphql.SchemaUtils.*;
 
 /**
- * Implementation of {@link DataFetcher} that queries Elasticsearch to retrieve site content
+ * Implementation of {@link DataFetcher} that queries Elasticsearch to retrieve content based on a content type.
  * @author joseross
  * @since 3.1
  */
-public class SiteDataFetcher implements DataFetcher<Object> {
+public class ContentTypeBasedDataFetcher implements DataFetcher<Object> {
 
-    private static final Logger logger = LoggerFactory.getLogger(SiteDataFetcher.class);
+    private static final Logger logger = LoggerFactory.getLogger(ContentTypeBasedDataFetcher.class);
+
+    private static final String QUERY_FIELD_NAME_CONTENT_TYPE = getOriginalName(FIELD_NAME_CONTENT_TYPE);
+
+    // Lucene regexes always match the entire string, no need to specify ^ or $
+    public static final String CONTENT_TYPE_REGEX_PAGE = "/?page/.*";
+    public static final String CONTENT_TYPE_REGEX_COMPONENT = "/?component/.*";
 
     /**
      * The default value for the 'limit' argument
@@ -102,6 +108,7 @@ public class SiteDataFetcher implements DataFetcher<Object> {
     @Override
     public Object get(final DataFetchingEnvironment env) {
         Field field = env.getField();
+        String fieldName = field.getName();
 
         // Get arguments for pagination & sorting
         int offset = Optional.ofNullable(env.<Integer>getArgument(ARG_NAME_OFFSET)).orElse(0);
@@ -109,10 +116,9 @@ public class SiteDataFetcher implements DataFetcher<Object> {
         String sortBy = Optional.ofNullable(env.<String>getArgument(ARG_NAME_SORT_BY)).orElse(defaultSortField);
         String sortOrder = Optional.ofNullable(env.<String>getArgument(ARG_NAME_SORT_ORDER)).orElse(defaultSortOrder);
 
-        // Get the content-type name from the field name
-        String contentTypeName = getOriginalName(field.getName());
-
-        List<String> selectedFields = new LinkedList<>();
+        List<String> queryFieldIncludes = new LinkedList<>();
+        // Add content-type to includes, we might need it for a GraphQL TypeResolver
+        queryFieldIncludes.add(QUERY_FIELD_NAME_CONTENT_TYPE);
 
         List<Map<String, Object>> items = new LinkedList<>();
         Map<String, Object> result = new HashMap<>(2);
@@ -130,21 +136,32 @@ public class SiteDataFetcher implements DataFetcher<Object> {
         StopWatch watch = new StopWatch(field.getName() + " - " + field.getAlias());
 
         watch.start("build filters");
+
         // Filter by the content-type
-        query.filter(QueryBuilders.termQuery("content-type", contentTypeName));
+        if (fieldName.equals(FIELD_NAME_CONTENT_ITEMS)) {
+            query.filter(QueryBuilders.existsQuery(QUERY_FIELD_NAME_CONTENT_TYPE));
+        } else if (fieldName.equals(FIELD_NAME_PAGES)) {
+            query.filter(QueryBuilders.regexpQuery(QUERY_FIELD_NAME_CONTENT_TYPE, CONTENT_TYPE_REGEX_PAGE));
+        } else if (fieldName.equals(FIELD_NAME_COMPONENTS)) {
+            query.filter(QueryBuilders.regexpQuery(QUERY_FIELD_NAME_CONTENT_TYPE, CONTENT_TYPE_REGEX_COMPONENT));
+        } else {
+            // Get the content-type name from the field name
+            query.filter(QueryBuilders.termQuery(QUERY_FIELD_NAME_CONTENT_TYPE, getOriginalName(fieldName)));
+        }
 
         // Check the selected fields to build the ES query
         SelectedField requestedFields = env.getSelectionSet().getField(FIELD_NAME_ITEMS);
         if (Objects.nonNull(requestedFields)) {
             List<SelectedField> fields = requestedFields.getSelectionSet().getFields();
-            fields.forEach(selectedField -> processSelectedField(selectedField, query, selectedFields));
+            fields.forEach(selectedField -> processSelectedField(selectedField, query, queryFieldIncludes));
         }
 
         // Only fetch the selected fields for better performance
-        source.fetchSource(selectedFields.toArray(new String[0]), new String[0]);
+        source.fetchSource(queryFieldIncludes.toArray(new String[0]), new String[0]);
         watch.stop();
 
         logger.debug("Executing query: {}", source);
+
         watch.start("searching items");
         SearchResponse response = elasticsearch.search(new SearchRequest().source(source));
         watch.stop();
@@ -170,7 +187,7 @@ public class SiteDataFetcher implements DataFetcher<Object> {
      */
     @SuppressWarnings("unchecked")
     protected void processSelectedField(SelectedField currentField, BoolQueryBuilder query,
-                                        List<String> selectedFields) {
+                                        List<String> queryFieldIncludes)  {
         // Get the original field name
         String propertyName = getOriginalName(currentField.getQualifiedName());
         // Build the ES-friendly path
@@ -179,41 +196,46 @@ public class SiteDataFetcher implements DataFetcher<Object> {
         // Add the field to the list if it doesn't have any sub fields
         if (CollectionUtils.isEmpty(currentField.getSelectionSet().getFields())) {
             logger.debug("Adding selected field '{}' to query", path);
-            selectedFields.add(path);
+            queryFieldIncludes.add(path);
         }
 
         // Check the filters to build the ES query
         Object arg = currentField.getArguments().get(FILTER_NAME);
         if (Objects.nonNull(arg)) {
-            logger.debug("Adding filters for field {}", path);
-            Map<String, Object> filters = (Map<String,Object>) arg;
-            filters.forEach((name, value) -> {
-                switch (name) {
-                    case ARG_NAME_EQUALS:
-                        query.filter(QueryBuilders.termQuery(path, value));
-                        break;
-                    case ARG_NAME_MATCHES:
-                        query.filter(QueryBuilders.matchQuery(path, value));
-                        break;
-                    case ARG_NAME_REGEX:
-                        query.filter(QueryBuilders.regexpQuery(path, value.toString()));
-                        break;
-                    case ARG_NAME_LT:
-                        query.filter(QueryBuilders.rangeQuery(path).lt(value));
-                        break;
-                    case ARG_NAME_GT:
-                        query.filter(QueryBuilders.rangeQuery(path).gt(value));
-                        break;
-                    case ARG_NAME_LTE:
-                        query.filter(QueryBuilders.rangeQuery(path).lte(value));
-                        break;
-                    case ARG_NAME_GTE:
-                        query.filter(QueryBuilders.rangeQuery(path).gte(value));
-                        break;
-                    default:
-                        // never happens
-                }
-            });
+            if (arg instanceof Map) {
+                logger.debug("Adding filters for field {}", path);
+
+                Map<String, Object> filters = (Map<String, Object>) arg;
+                filters.forEach((name, value) -> {
+                    switch (name) {
+                        case ARG_NAME_EQUALS:
+                            query.filter(QueryBuilders.termQuery(path, value));
+                            break;
+                        case ARG_NAME_MATCHES:
+                            query.filter(QueryBuilders.matchQuery(path, value));
+                            break;
+                        case ARG_NAME_REGEX:
+                            query.filter(QueryBuilders.regexpQuery(path, value.toString()));
+                            break;
+                        case ARG_NAME_LT:
+                            query.filter(QueryBuilders.rangeQuery(path).lt(value));
+                            break;
+                        case ARG_NAME_GT:
+                            query.filter(QueryBuilders.rangeQuery(path).gt(value));
+                            break;
+                        case ARG_NAME_LTE:
+                            query.filter(QueryBuilders.rangeQuery(path).lte(value));
+                            break;
+                        case ARG_NAME_GTE:
+                            query.filter(QueryBuilders.rangeQuery(path).gte(value));
+                            break;
+                        default:
+                            // never happens
+                    }
+                });
+            } else {
+
+            }
         }
     }
 

@@ -22,9 +22,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import graphql.GraphQL;
-import graphql.schema.GraphQLCodeRegistry;
-import graphql.schema.GraphQLObjectType;
-import graphql.schema.GraphQLSchema;
+import graphql.schema.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Item;
@@ -36,6 +34,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.util.StopWatch;
+
+import static graphql.schema.AsyncDataFetcher.async;
+import static graphql.schema.FieldCoordinates.coordinates;
+import static graphql.schema.GraphQLNonNull.nonNull;
+import static org.craftercms.engine.graphql.SchemaUtils.*;
 
 /**
  * Default implementation of {@link GraphQLFactory} that creates a {@link GraphQLSchema} from the content-type
@@ -67,6 +70,11 @@ public class GraphQLFactoryImpl implements GraphQLFactory {
      */
     protected GraphQLTypeFactory typeFactory;
 
+    /**
+     * The {@link DataFetcher} to use for queries
+     */
+    protected DataFetcher<?> dataFetcher;
+
     @Required
     public void setRepoConfigFolder(final String repoConfigFolder) {
         this.repoConfigFolder = repoConfigFolder;
@@ -85,6 +93,11 @@ public class GraphQLFactoryImpl implements GraphQLFactory {
     @Required
     public void setTypeFactory(final GraphQLTypeFactory typeFactory) {
         this.typeFactory = typeFactory;
+    }
+
+    @Required
+    public void setDataFetcher(DataFetcher<?> dataFetcher) {
+        this.dataFetcher = async(dataFetcher);
     }
 
     /**
@@ -119,6 +132,42 @@ public class GraphQLFactoryImpl implements GraphQLFactory {
         GraphQLObjectType.Builder rootType = GraphQLObjectType.newObject()
             .name(rootQueryTypeName)
             .description("Provides access to all site content");
+
+        // Add the type resolver for the interfaces
+        codeRegistry.typeResolver(CONTENT_ITEM_INTERFACE_TYPE, CONTENT_TYPE_BASED_TYPE_RESOLVER);
+        codeRegistry.typeResolver(PAGE_INTERFACE_TYPE, CONTENT_TYPE_BASED_TYPE_RESOLVER);
+
+        // Add the all items field to the root type
+        rootType.field(GraphQLFieldDefinition.newFieldDefinition()
+             .name(FIELD_NAME_CONTENT_ITEMS)
+             .description("All content items")
+             .type(nonNull(createQueryWrapperType(FIELD_NAME_CONTENT_ITEMS, CONTENT_ITEM_INTERFACE_TYPE,
+                                                  "Query for all content items")))
+             .arguments(TYPE_ARGUMENTS)
+        );
+
+        // Add the all pages field to the root type
+        rootType.field(GraphQLFieldDefinition.newFieldDefinition()
+            .name(FIELD_NAME_PAGES)
+            .description("All pages")
+            .type(nonNull(createQueryWrapperType(FIELD_NAME_PAGES, PAGE_INTERFACE_TYPE,
+                                                 "Query for all pages")))
+            .arguments(TYPE_ARGUMENTS)
+        );
+
+        // Add the all components field to the root type
+        rootType.field(GraphQLFieldDefinition.newFieldDefinition()
+            .name(FIELD_NAME_COMPONENTS)
+            .description("All components")
+            .type(nonNull(createQueryWrapperType(FIELD_NAME_COMPONENTS, CONTENT_ITEM_INTERFACE_TYPE,
+                                                 "Query for all components")))
+            .arguments(TYPE_ARGUMENTS)
+        );
+
+        // Add the data fetcher for the new fields
+        codeRegistry.dataFetcher(coordinates(rootQueryTypeName, FIELD_NAME_CONTENT_ITEMS), dataFetcher);
+        codeRegistry.dataFetcher(coordinates(rootQueryTypeName, FIELD_NAME_PAGES), dataFetcher);
+        codeRegistry.dataFetcher(coordinates(rootQueryTypeName, FIELD_NAME_COMPONENTS), dataFetcher);
 
         ContentStoreService storeService = siteContext.getStoreService();
         Tree tree = storeService.findTree(siteContext.getContext(), repoConfigFolder);
