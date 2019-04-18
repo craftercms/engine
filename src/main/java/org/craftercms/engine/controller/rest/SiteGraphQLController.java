@@ -75,6 +75,7 @@ public class SiteGraphQLController {
         Map<String, Object> variables = Objects.isNull(request.getVariables())?
             Collections.emptyMap() :
             request.getVariables();
+
         return handleRequest(request.getQuery(), request.getOperationName(), variables);
     }
 
