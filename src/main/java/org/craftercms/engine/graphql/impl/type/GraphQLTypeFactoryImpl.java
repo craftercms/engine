@@ -24,7 +24,6 @@ import org.craftercms.core.service.Item;
 import org.craftercms.core.util.XmlUtils;
 import org.craftercms.engine.graphql.GraphQLFieldFactory;
 import org.craftercms.engine.graphql.GraphQLTypeFactory;
-import org.craftercms.engine.graphql.SchemaUtils;
 import org.dom4j.Document;
 import org.dom4j.Node;
 import org.slf4j.Logger;
