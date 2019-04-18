@@ -201,39 +201,37 @@ public class ContentTypeBasedDataFetcher implements DataFetcher<Object> {
 
         // Check the filters to build the ES query
         Object arg = currentField.getArguments().get(FILTER_NAME);
-        if (Objects.nonNull(arg)) {
-            if (arg instanceof Map) {
-                logger.debug("Adding filters for field {}", path);
+        if (Objects.nonNull(arg) && arg instanceof Map) {
+            logger.debug("Adding filters for field {}", path);
 
-                Map<String, Object> filters = (Map<String, Object>) arg;
-                filters.forEach((name, value) -> {
-                    switch (name) {
-                        case ARG_NAME_EQUALS:
-                            query.filter(QueryBuilders.termQuery(path, value));
-                            break;
-                        case ARG_NAME_MATCHES:
-                            query.filter(QueryBuilders.matchQuery(path, value));
-                            break;
-                        case ARG_NAME_REGEX:
-                            query.filter(QueryBuilders.regexpQuery(path, value.toString()));
-                            break;
-                        case ARG_NAME_LT:
-                            query.filter(QueryBuilders.rangeQuery(path).lt(value));
-                            break;
-                        case ARG_NAME_GT:
-                            query.filter(QueryBuilders.rangeQuery(path).gt(value));
-                            break;
-                        case ARG_NAME_LTE:
-                            query.filter(QueryBuilders.rangeQuery(path).lte(value));
-                            break;
-                        case ARG_NAME_GTE:
-                            query.filter(QueryBuilders.rangeQuery(path).gte(value));
-                            break;
-                        default:
-                            // never happens
-                    }
-                });
-            }
+            Map<String, Object> filters = (Map<String, Object>) arg;
+            filters.forEach((name, value) -> {
+                switch (name) {
+                    case ARG_NAME_EQUALS:
+                        query.filter(QueryBuilders.termQuery(path, value));
+                        break;
+                    case ARG_NAME_MATCHES:
+                        query.filter(QueryBuilders.matchQuery(path, value));
+                        break;
+                    case ARG_NAME_REGEX:
+                        query.filter(QueryBuilders.regexpQuery(path, value.toString()));
+                        break;
+                    case ARG_NAME_LT:
+                        query.filter(QueryBuilders.rangeQuery(path).lt(value));
+                        break;
+                    case ARG_NAME_GT:
+                        query.filter(QueryBuilders.rangeQuery(path).gt(value));
+                        break;
+                    case ARG_NAME_LTE:
+                        query.filter(QueryBuilders.rangeQuery(path).lte(value));
+                        break;
+                    case ARG_NAME_GTE:
+                        query.filter(QueryBuilders.rangeQuery(path).gte(value));
+                        break;
+                    default:
+                        // never happens
+                }
+            });
         }
     }
 

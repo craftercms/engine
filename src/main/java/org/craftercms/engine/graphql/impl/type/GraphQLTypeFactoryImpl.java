@@ -162,8 +162,8 @@ public class GraphQLTypeFactoryImpl implements GraphQLTypeFactory {
         }
 
         // Create a wrapper type for the queries of the content-type
-        GraphQLType queryType = SchemaUtils.createQueryWrapperType(typeName, newType.build(),
-                                                                   "Query for content-type " + contentTypeName);
+        GraphQLType queryType = createQueryWrapperType(typeName, newType.build(),
+                                                       "Query for content-type " + contentTypeName);
 
         // Add a field in the root type
         rootType.field(GraphQLFieldDefinition.newFieldDefinition()
