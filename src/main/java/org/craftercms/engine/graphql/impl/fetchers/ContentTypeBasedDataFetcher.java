@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.craftercms.engine.graphql.impl;
+package org.craftercms.engine.graphql.impl.fetchers;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -227,6 +227,14 @@ public class ContentTypeBasedDataFetcher implements DataFetcher<Object> {
                         break;
                     case ARG_NAME_GTE:
                         query.filter(QueryBuilders.rangeQuery(path).gte(value));
+                        break;
+                    case ARG_NAME_EXISTS:
+                        boolean exists = value instanceof Boolean ? (Boolean)value : Boolean.parseBoolean(value.toString());
+                        if (exists) {
+                            query.filter(QueryBuilders.existsQuery(path));
+                        } else {
+                            query.mustNot(QueryBuilders.existsQuery(path));
+                        }
                         break;
                     default:
                         // never happens
