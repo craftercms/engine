@@ -63,8 +63,8 @@ public class NodeSelectorFieldFactory implements GraphQLFieldFactory {
                             final GraphQLFieldDefinition.Builder newField) {
         String datasourceName = XmlUtils.selectSingleNodeValue(property, contentTypePropertyItemManagerXpath);
         String datasourceType = XmlUtils.selectSingleNodeValue(definition,
-            "form/datasources/datasource/id[text()='" + datasourceName + "']/../properties/property/name[text"
-                + "()='type']/../value");
+            "form/datasources/datasource/id[text()='" + datasourceName + "']/../properties/property/name[text" +
+            "()='type']/../value");
         String referencedType = StringUtils.isNotEmpty(datasourceType)? getGraphQLName(datasourceType) : null;
         if (StringUtils.isEmpty(referencedType)) {
             // If there is no content-type set in the datasource, just add a generic type for includes

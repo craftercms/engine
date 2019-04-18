@@ -731,7 +731,7 @@
     <!--									-->
     <!-- ////////////////////////////////// -->
 
-    <bean id="crafter.dataFetcher" class="org.craftercms.engine.graphql.impl.ContentTypeBasedDataFetcher">
+    <bean id="crafter.dataFetcher" class="org.craftercms.engine.graphql.impl.fetchers.ContentTypeBasedDataFetcher">
         <property name="defaultLimit" value="${crafter.engine.graphql.query.limit}"/>
         <property name="defaultSortField" value="${crafter.engine.graphql.query.sort.field}"/>
         <property name="defaultSortOrder" value="${crafter.engine.graphql.query.sort.order}"/>
