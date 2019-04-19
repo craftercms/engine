@@ -305,6 +305,12 @@ public abstract class SchemaUtils {
             .argument(STRING_FILTER)
             .build(),
         GraphQLFieldDefinition.newFieldDefinition()
+            .name(getGraphQLName("internal-name"))
+            .description("The name/label of the item in Authoring (can also be used as a navigation label in Delivery)")
+            .type(nonNull(GraphQLString))
+            .argument(STRING_FILTER)
+            .build(),
+        GraphQLFieldDefinition.newFieldDefinition()
             .name(getGraphQLName("localId"))
             .description("The path of the item")
             .type(nonNull(GraphQLString))
@@ -369,7 +375,7 @@ public abstract class SchemaUtils {
         .fields(ListUtils.union(CONTENT_ITEM_FIELDS, PAGE_FIELDS))
         .build();
 
-    public static final GraphQLObjectType INCLUDE_TYPE = GraphQLObjectType.newObject()
+    public static final GraphQLObjectType ITEM_INCLUDE_TYPE = GraphQLObjectType.newObject()
         .name("ItemInclude")
         .description("Holds a reference to another item in the site")
         .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -384,13 +390,13 @@ public abstract class SchemaUtils {
             .argument(TEXT_FILTER))
         .build();
 
-    public static final GraphQLObjectType INCLUDE_WRAPPER_TYPE = GraphQLObjectType.newObject()
+    public static final GraphQLObjectType ITEM_INCLUDE_WRAPPER_TYPE = GraphQLObjectType.newObject()
         .name("ItemIncludeWrapper")
         .description("Wrapper for a list of item references")
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name(FIELD_NAME_ITEM)
             .description("List of item references")
-            .type(list(INCLUDE_TYPE)))
+            .type(list(ITEM_INCLUDE_TYPE)))
         .build();
 
     public static final TypeResolver CONTENT_TYPE_BASED_TYPE_RESOLVER = env -> {
@@ -434,29 +440,29 @@ public abstract class SchemaUtils {
     /**
      * Tries to set the type of a field based on its name suffix
      */
-    public static void setTypeFromFieldName(String fieldName, GraphQLFieldDefinition.Builder newField) {
+    public static void setTypeFromFieldName(String fieldName, GraphQLFieldDefinition.Builder field) {
         if (fieldName.endsWith("_s")) {
-            newField.type(GraphQLString);
-            newField.argument(STRING_FILTER);
+            field.type(GraphQLString);
+            field.argument(STRING_FILTER);
         } else if (fieldName.endsWith("_dt")) {
-            newField.type(DateTime);
-            newField.argument(DATETIME_FILTER);
+            field.type(DateTime);
+            field.argument(DATETIME_FILTER);
         } else if (fieldName.endsWith("_b")) {
-            newField.type(GraphQLBoolean);
-            newField.argument(BOOLEAN_FILTER);
+            field.type(GraphQLBoolean);
+            field.argument(BOOLEAN_FILTER);
         } else if (fieldName.endsWith("_i")) {
-            newField.type(GraphQLInt);
-            newField.argument(INT_FILTER);
+            field.type(GraphQLInt);
+            field.argument(INT_FILTER);
         } else if (fieldName.endsWith("_f") || fieldName.endsWith("_d")) {
             // GraphQL Float is actually a Java Double
-            newField.type(GraphQLFloat);
-            newField.argument(FLOAT_FILTER);
+            field.type(GraphQLFloat);
+            field.argument(FLOAT_FILTER);
         } else if (fieldName.endsWith("_l")) {
-            newField.type(GraphQLLong);
-            newField.argument(LONG_FILTER);
+            field.type(GraphQLLong);
+            field.argument(LONG_FILTER);
         } else {
-            newField.type(GraphQLString);
-            newField.argument(TEXT_FILTER);
+            field.type(GraphQLString);
+            field.argument(TEXT_FILTER);
         }
     }
 

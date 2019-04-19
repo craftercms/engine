@@ -742,41 +742,43 @@
 
     <bean id="crafter.checkboxGroupFieldFactory"
           class="org.craftercms.engine.graphql.impl.field.CheckboxGroupFieldFactory">
-        <property name="contentTypePropertyDatasourceNameXpath"
-                  value="${crafter.engine.graphql.contentType.xpath.property.datasource.name}"/>
+        <property name="datasourceNameXPath"
+                  value="${crafter.engine.graphql.contentType.checkboxGroup.datasource.name.xpath}"/>
+        <property name="datasourceSettingsXPathFormat"
+                  value="${crafter.engine.graphql.contentType.checkboxGroup.datasource.settings.xpathFormat}"/>
     </bean>
 
     <bean id="crafter.nodeSelectorFieldFactory"
           class="org.craftercms.engine.graphql.impl.field.NodeSelectorFieldFactory">
-        <property name="contentTypePropertyItemManagerXpath"
-                  value="${crafter.engine.graphql.contentType.xpath.property.itemManager.name}"/>
+        <property name="disableFlatteningXPath"
+                  value="${crafter.engine.graphql.contentType.nodeSelector.disableFlattening.xpath}"/>
+        <property name="datasourceNameXPath"
+                  value="${crafter.engine.graphql.contentType.nodeSelector.datasource.name.xpath}"/>
+        <property name="datasourceItemTypeXPathFormat"
+                  value="${crafter.engine.graphql.contentType.nodeSelector.datasource.itemType.xpathFormat}"/>
     </bean>
 
     <bean id="crafter.rteFieldFactory" class="org.craftercms.engine.graphql.impl.field.RTEFieldFactory">
-        <property name="contentTypePropertyTitleXpath"
-                  value="${crafter.engine.graphql.contentType.xpath.property.title}"/>
+        <property name="titleXPath" value="${crafter.engine.graphql.contentType.field.title.xpath}"/>
     </bean>
 
     <bean id="crafter.repeatGroupFieldFactory"
-          class="org.craftercms.engine.graphql.impl.field.RepeatFieldFactory">
-        <property name="contentTypePropertyFieldsXpath"
-                  value="${crafter.engine.graphql.contentTYpe.xpath.property.fields}"/>
+          class="org.craftercms.engine.graphql.impl.field.RepeatGroupFieldFactory">
+        <property name="fieldsXPath" value="${crafter.engine.graphql.contentType.repeatingGroup.fields.xpath}"/>
         <property name="typeFactory" ref="crafter.typeFactory"/>
     </bean>
 
     <bean id="crafter.typeFactory" class="org.craftercms.engine.graphql.impl.type.GraphQLTypeFactoryImpl">
         <property name="rootQueryTypeName" value="${crafter.engine.graphql.query.name}"/>
         <property name="ignoredFields" value="${crafter.engine.graphql.ignoredFields}"/>
-
-        <property name="contentTypeNameXpath" value="${crafter.engine.graphql.contentType.xpath.name}"/>
-        <property name="contentTypeTitleXpath" value="${crafter.engine.graphql.contentType.xpath.title}"/>
-        <property name="contentTypeFieldsXpath" value="${crafter.engine.graphql.contentType.xpath.fields}"/>
-        <property name="contentTypePropertyIdXpath" value="${crafter.engine.graphql.contentType.xpath.property.id}"/>
-        <property name="contentTypePropertyTypeXpath"
-                  value="${crafter.engine.graphql.contentType.xpath.property.type}"/>
-        <property name="contentTypePropertyTitleXpath"
-                  value="${crafter.engine.graphql.contentType.xpath.property.title}"/>
-
+        <property name="contentTypeNameXPath" value="${crafter.engine.graphql.contentType.name.xpath}"/>
+        <property name="contentTypeTitleXPath" value="${crafter.engine.graphql.contentType.title.xpath}"/>
+        <property name="contentTypeFieldsXPath" value="${crafter.engine.graphql.contentType.fields.xpath}"/>
+        <property name="contentTypeFieldIdXPath" value="${crafter.engine.graphql.contentType.field.id.xpath}"/>
+        <property name="contentTypeFieldTypeXPath"
+                  value="${crafter.engine.graphql.contentType.field.type.xpath}"/>
+        <property name="contentTypeFieldTitleXPath"
+                  value="${crafter.engine.graphql.contentType.field.title.xpath}"/>
         <property name="dataFetcher" ref="crafter.dataFetcher"/>
         <property name="fieldFactories">
             <map>
