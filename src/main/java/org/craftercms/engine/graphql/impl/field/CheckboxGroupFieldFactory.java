@@ -57,13 +57,19 @@ public class CheckboxGroupFieldFactory implements GraphQLFieldFactory {
 
     private static final Logger logger = LoggerFactory.getLogger(CheckboxGroupFieldFactory.class);
 
-    protected String contentTypePropertyDatasourceNameXpath;
+    protected String datasourceNameXPath;
+    protected String datasourceSettingsXPathFormat;
 
     protected ObjectMapper objectMapper = new ObjectMapper();
 
     @Required
-    public void setContentTypePropertyDatasourceNameXpath(final String contentTypePropertyDatasourceNameXpath) {
-        this.contentTypePropertyDatasourceNameXpath = contentTypePropertyDatasourceNameXpath;
+    public void setDatasourceNameXPath(final String datasourceNameXPath) {
+        this.datasourceNameXPath = datasourceNameXPath;
+    }
+
+    @Required
+    public void setDatasourceSettingsXPathFormat(String datasourceSettingsXPathFormat) {
+        this.datasourceSettingsXPathFormat = datasourceSettingsXPathFormat;
     }
 
     /**
@@ -71,15 +77,16 @@ public class CheckboxGroupFieldFactory implements GraphQLFieldFactory {
      */
     @SuppressWarnings("unchecked")
     @Override
-    public void createField(final Document definition, final Node property, final String fieldId,
-                            final String typeName, final String fieldName, final GraphQLObjectType.Builder newType,
-                            final GraphQLFieldDefinition.Builder newField) {
-        String datasourceName = XmlUtils.selectSingleNodeValue(property, contentTypePropertyDatasourceNameXpath);
-        String datasourceSettings = XmlUtils.selectSingleNodeValue(definition,
-            "form/datasources/datasource/id[text()='" + datasourceName + "']/../properties/property/name[text"
-                + "()='dataType']/../value");
+    public void createField(final Document contentTypeDefinition, final Node contentTypeField,
+                            final String contentTypeFieldId, final String parentGraphQLTypeName,
+                            final GraphQLObjectType.Builder parentGraphQLType, final String graphQLFieldName,
+                            final GraphQLFieldDefinition.Builder graphQLField) {
+        String datasourceName = XmlUtils.selectSingleNodeValue(contentTypeField, datasourceNameXPath);
+        String datasourceSettings = XmlUtils.selectSingleNodeValue(
+                contentTypeDefinition, String.format(datasourceSettingsXPathFormat, datasourceName));
         String datasourceType = null;
         String datasourceSuffix = null;
+
         try {
             List<Map<String, Object>> typeSetting = objectMapper.readValue(datasourceSettings, List.class);
             Optional<Map<String, Object>> selectedType = typeSetting.stream()
@@ -90,8 +97,9 @@ public class CheckboxGroupFieldFactory implements GraphQLFieldFactory {
                 datasourceSuffix = StringUtils.substringAfter(datasourceType, FIELD_SEPARATOR);
             }
         } catch (IOException e) {
-            logger.warn("Error checking data source type for {}", fieldId);
+            logger.warn("Error checking data source type for '{}'", contentTypeFieldId);
         }
+
         String valueKey = FIELD_NAME_VALUE;
         if (StringUtils.isNotEmpty(datasourceSuffix)) {
             valueKey += FIELD_SEPARATOR + datasourceSuffix + FIELD_SUFFIX_MULTIVALUE;
@@ -109,8 +117,8 @@ public class CheckboxGroupFieldFactory implements GraphQLFieldFactory {
         }
 
         GraphQLObjectType itemType = GraphQLObjectType.newObject()
-            .name(typeName + FIELD_SEPARATOR + fieldName + FIELD_SUFFIX_ITEM)
-            .description("Item for field " + fieldId)
+            .name(parentGraphQLTypeName + FIELD_SEPARATOR + graphQLFieldName + FIELD_SUFFIX_ITEM)
+            .description("Item for field " + contentTypeFieldId)
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name(FIELD_NAME_KEY)
                 .description("The key of the item")
@@ -120,15 +128,15 @@ public class CheckboxGroupFieldFactory implements GraphQLFieldFactory {
             .build();
 
         GraphQLObjectType itemWrapper = GraphQLObjectType.newObject()
-            .name(typeName + FIELD_SEPARATOR + fieldName + FIELD_SUFFIX_ITEMS)
-            .description("Wrapper for field " + fieldId)
+            .name(parentGraphQLTypeName + FIELD_SEPARATOR + graphQLFieldName + FIELD_SUFFIX_ITEMS)
+            .description("Wrapper for field " + contentTypeFieldId)
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name(FIELD_NAME_ITEM)
-                .description("List of items for field " + fieldId)
+                .description("List of items for field " + contentTypeFieldId)
                 .type(list(itemType)))
             .build();
 
-        newField.type(itemWrapper);
+        graphQLField.type(itemWrapper);
     }
 
 }

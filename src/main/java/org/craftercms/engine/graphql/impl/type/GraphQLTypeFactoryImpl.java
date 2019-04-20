@@ -61,12 +61,12 @@ public class GraphQLTypeFactoryImpl implements GraphQLTypeFactory {
     /**
      * XPath selectors for the content-type definition file
      */
-    protected String contentTypeNameXpath;
-    protected String contentTypeTitleXpath;
-    protected String contentTypeFieldsXpath;
-    protected String contentTypePropertyIdXpath;
-    protected String contentTypePropertyTypeXpath;
-    protected String contentTypePropertyTitleXpath;
+    protected String contentTypeNameXPath;
+    protected String contentTypeTitleXPath;
+    protected String contentTypeFieldsXPath;
+    protected String contentTypeFieldIdXPath;
+    protected String contentTypeFieldTypeXPath;
+    protected String contentTypeFieldTitleXPath;
 
     /**
      * All known field factories to use during type build
@@ -88,33 +88,33 @@ public class GraphQLTypeFactoryImpl implements GraphQLTypeFactory {
     }
 
     @Required
-    public void setContentTypeNameXpath(final String contentTypeNameXpath) {
-        this.contentTypeNameXpath = contentTypeNameXpath;
+    public void setContentTypeNameXPath(final String contentTypeNameXPath) {
+        this.contentTypeNameXPath = contentTypeNameXPath;
     }
 
     @Required
-    public void setContentTypeTitleXpath(final String contentTypeTitleXpath) {
-        this.contentTypeTitleXpath = contentTypeTitleXpath;
+    public void setContentTypeTitleXPath(final String contentTypeTitleXPath) {
+        this.contentTypeTitleXPath = contentTypeTitleXPath;
     }
 
     @Required
-    public void setContentTypeFieldsXpath(final String contentTypeFieldsXpath) {
-        this.contentTypeFieldsXpath = contentTypeFieldsXpath;
+    public void setContentTypeFieldsXPath(final String contentTypeFieldsXPath) {
+        this.contentTypeFieldsXPath = contentTypeFieldsXPath;
     }
 
     @Required
-    public void setContentTypePropertyIdXpath(final String contentTypePropertyIdXpath) {
-        this.contentTypePropertyIdXpath = contentTypePropertyIdXpath;
+    public void setContentTypeFieldIdXPath(final String contentTypeFieldIdXPath) {
+        this.contentTypeFieldIdXPath = contentTypeFieldIdXPath;
     }
 
     @Required
-    public void setContentTypePropertyTypeXpath(final String contentTypePropertyTypeXpath) {
-        this.contentTypePropertyTypeXpath = contentTypePropertyTypeXpath;
+    public void setContentTypeFieldTypeXPath(final String contentTypeFieldTypeXPath) {
+        this.contentTypeFieldTypeXPath = contentTypeFieldTypeXPath;
     }
 
     @Required
-    public void setContentTypePropertyTitleXpath(final String contentTypePropertyTitleXpath) {
-        this.contentTypePropertyTitleXpath = contentTypePropertyTitleXpath;
+    public void setContentTypeFieldTitleXPath(final String contentTypeFieldTitleXPath) {
+        this.contentTypeFieldTitleXPath = contentTypeFieldTitleXPath;
     }
 
     @Required
@@ -130,82 +130,85 @@ public class GraphQLTypeFactoryImpl implements GraphQLTypeFactory {
     /**
      * {@inheritDoc}
      */
-    public void createType(Item formDefinition, GraphQLObjectType.Builder rootType,
+    public void createType(Item formDefinition, GraphQLObjectType.Builder rootGraphQLType,
                            GraphQLCodeRegistry.Builder codeRegistry) {
         logger.debug("Creating GraphQL Type from '{}'", formDefinition.getUrl());
 
-        Document definition = formDefinition.getDescriptorDom();
-        String contentTypeName = XmlUtils.selectSingleNodeValue(definition, contentTypeNameXpath);
-        String typeName = getGraphQLName(contentTypeName);
-        logger.debug("Creating GraphQL Type '{}' for '{}'", typeName, contentTypeName);
+        Document contentTypeDefinition = formDefinition.getDescriptorDom();
+        String contentTypeName = XmlUtils.selectSingleNodeValue(contentTypeDefinition, contentTypeNameXPath);
+        String graphQLTypeName = getGraphQLName(contentTypeName);
 
-        GraphQLObjectType.Builder newType = GraphQLObjectType.newObject()
+        logger.debug("Creating GraphQL Type '{}' for '{}'", graphQLTypeName, contentTypeName);
+
+        GraphQLObjectType.Builder graphQLType = GraphQLObjectType.newObject()
             .withInterface(CONTENT_ITEM_INTERFACE_TYPE)
-            .name(typeName)
-            .description(XmlUtils.selectSingleNodeValue(definition, contentTypeTitleXpath));
+            .name(graphQLTypeName)
+            .description(XmlUtils.selectSingleNodeValue(contentTypeDefinition, contentTypeTitleXPath));
 
         // Add commons fields
-        newType.fields(CONTENT_ITEM_FIELDS);
+        graphQLType.fields(CONTENT_ITEM_FIELDS);
 
         if (contentTypeName.matches(CONTENT_TYPE_REGEX_PAGE)) {
-            newType.withInterface(PAGE_INTERFACE_TYPE);
-            newType.fields(PAGE_FIELDS);
+            graphQLType.withInterface(PAGE_INTERFACE_TYPE);
+            graphQLType.fields(PAGE_FIELDS);
         }
 
-        List<Node> properties = XmlUtils.selectNodes(definition, contentTypeFieldsXpath, Collections.emptyMap());
+        List<Node> contentTypeFields = XmlUtils.selectNodes(contentTypeDefinition, contentTypeFieldsXPath,
+                                                            Collections.emptyMap());
         // Add the content-type specific fields
-        if (CollectionUtils.isNotEmpty(properties)) {
-            for(Node property : properties) {
-                createField(definition, typeName, property, newType);
+        if (CollectionUtils.isNotEmpty(contentTypeFields)) {
+            for(Node contentTypeField : contentTypeFields) {
+                createField(contentTypeDefinition, contentTypeField, graphQLTypeName, graphQLType);
             }
         }
 
         // Create a wrapper type for the queries of the content-type
-        GraphQLType queryType = createQueryWrapperType(typeName, newType.build(),
+        GraphQLType queryType = createQueryWrapperType(graphQLTypeName, graphQLType.build(),
                                                        "Query for content-type " + contentTypeName);
 
         // Add a field in the root type
-        rootType.field(GraphQLFieldDefinition.newFieldDefinition()
-            .name(typeName)
-            .description("Items of content-type " + contentTypeName)
-            .type(nonNull(queryType))
-            .arguments(TYPE_ARGUMENTS)
-        );
+        rootGraphQLType.field(GraphQLFieldDefinition.newFieldDefinition()
+                                                    .name(graphQLTypeName)
+                                                    .description("Items of content-type " + contentTypeName)
+                                                    .type(nonNull(queryType))
+                                                    .arguments(TYPE_ARGUMENTS)
+                             );
 
         // Add the data fetcher for the new field
-        codeRegistry.dataFetcher(coordinates(rootQueryTypeName, typeName), dataFetcher);
+        codeRegistry.dataFetcher(coordinates(rootQueryTypeName, graphQLTypeName), dataFetcher);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void createField(Document formDefinition, String typeName, Node property,
-                            GraphQLObjectType.Builder newType) {
-        String fieldId = XmlUtils.selectSingleNodeValue(property, contentTypePropertyIdXpath);
+    public void createField(Document contentTypeDefinition, Node contentTypeField, String parentGraphQLTypeName,
+                            GraphQLObjectType.Builder parentGraphQLType) {
+        String contentTypeFieldId = XmlUtils.selectSingleNodeValue(contentTypeField, contentTypeFieldIdXPath);
 
-        if (ArrayUtils.isNotEmpty(ignoredFields) && ArrayUtils.contains(ignoredFields, fieldId)) {
+        if (ArrayUtils.isNotEmpty(ignoredFields) && ArrayUtils.contains(ignoredFields, contentTypeFieldId)) {
             return;
         }
 
-        String type = XmlUtils.selectSingleNodeValue(property, contentTypePropertyTypeXpath);
-        String fieldName = getGraphQLName(fieldId);
+        String contentTypeFieldType = XmlUtils.selectSingleNodeValue(contentTypeField, contentTypeFieldTypeXPath);
+        String graphQLFieldName = getGraphQLName(contentTypeFieldId);
 
         // Don't add the field again if it already exists
-        if (!newType.hasField(fieldName)) {
-            logger.debug("Creating GraphQL field '{}' for '{}'", fieldName, fieldId);
+        if (!parentGraphQLType.hasField(graphQLFieldName)) {
+            logger.debug("Creating GraphQL field '{}' for '{}'", graphQLFieldName, contentTypeFieldId);
 
-            GraphQLFieldDefinition.Builder newField = GraphQLFieldDefinition.newFieldDefinition()
-                .name(getGraphQLName(fieldName))
-                .description(XmlUtils.selectSingleNodeValue(property, contentTypePropertyTitleXpath));
+            GraphQLFieldDefinition.Builder graphQLField = GraphQLFieldDefinition.newFieldDefinition()
+                .name(graphQLFieldName)
+                .description(XmlUtils.selectSingleNodeValue(contentTypeField, contentTypeFieldTitleXPath));
 
-            if (fieldFactories.containsKey(type)) {
-                fieldFactories.get(type).createField(formDefinition, property, fieldId, typeName, fieldName, newType,
-                                                     newField);
+            if (fieldFactories.containsKey(contentTypeFieldType)) {
+                fieldFactories.get(contentTypeFieldType).createField(contentTypeDefinition, contentTypeField,
+                                                                     contentTypeFieldId, parentGraphQLTypeName, parentGraphQLType,
+                                                                     graphQLFieldName, graphQLField);
             } else {
-                setTypeFromFieldName(fieldName, newField);
+                setTypeFromFieldName(parentGraphQLTypeName, graphQLField);
             }
 
-            newType.field(newField);
+            parentGraphQLType.field(graphQLField);
         }
     }
 

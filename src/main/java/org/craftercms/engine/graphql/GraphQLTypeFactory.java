@@ -32,19 +32,24 @@ public interface GraphQLTypeFactory {
 
     /**
      * Creates a GraphQL type for the given content-type and adds a field in the root type
-     * @param formDefinition the XML definition of the content-type
-     * @param rootType  the {@link GraphQLObjectType} for the root query
-     * @param codeRegistry  the {@link GraphQLCodeRegistry} to add {@link graphql.schema.DataFetcher} for new fields
+     *
+     * @param contentTypeDefinition the XML definition of the content-type
+     * @param rootGraphQLType       the {@link GraphQLObjectType} for the root query
+     * @param codeRegistry          the {@link GraphQLCodeRegistry} to add {@link graphql.schema.DataFetcher} for new
+     *                              fields
      */
-    void createType(Item formDefinition, GraphQLObjectType.Builder rootType, GraphQLCodeRegistry.Builder codeRegistry);
+    void createType(Item contentTypeDefinition, GraphQLObjectType.Builder rootGraphQLType,
+                    GraphQLCodeRegistry.Builder codeRegistry);
 
     /**
-     * Creates a GraphQL field for the given content-type property and adds it to the given type
-     * @param formDefinition the XML definition of the content-type
-     * @param typeName the GraphQL-friendly name for the type
-     * @param property the XML node for the property
-     * @param newType the {@link GraphQLObjectType} for the type
+     * Creates a GraphQL field for the given content-type field and adds it to the given GraphQL type
+     *
+     * @param contentTypeDefinition the XML definition of the content-type
+     * @param contentTypeField      the XML node for the content-type field
+     * @param parentGraphQLTypeName the field's parent GraphQL type name
+     * @param parentGraphQLType     the field's parent {@link GraphQLObjectType}
      */
-    void createField(Document formDefinition, String typeName, Node property, GraphQLObjectType.Builder newType);
+    void createField(Document contentTypeDefinition, Node contentTypeField, String parentGraphQLTypeName,
+                     GraphQLObjectType.Builder parentGraphQLType);
 
 }

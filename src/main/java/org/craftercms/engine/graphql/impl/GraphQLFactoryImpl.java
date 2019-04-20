@@ -187,11 +187,14 @@ public class GraphQLFactoryImpl implements GraphQLFactory {
     public GraphQL getInstance(SiteContext siteContext) {
         StopWatch watch = new StopWatch("GraphQL Schema");
         watch.start("Schema Build");
+
         GraphQLSchema schema = buildSchema(siteContext);
+
         watch.stop();
         if (logger.isTraceEnabled()) {
             logger.trace(watch.prettyPrint());
         }
+
         return GraphQL.newGraphQL(schema).build();
     }
 

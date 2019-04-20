@@ -37,11 +37,12 @@ public class CheckboxFieldFactory implements GraphQLFieldFactory {
      * {@inheritDoc}
      */
     @Override
-    public void createField(final Document definition, final Node property, final String fieldId,
-                            final String typeName, final String fieldName, final GraphQLObjectType.Builder newType,
-                            final GraphQLFieldDefinition.Builder newField) {
-        newField.type(GraphQLBoolean);
-        newField.argument(BOOLEAN_FILTER);
+    public void createField(final Document contentTypeDefinition, final Node contentTypeField,
+                            final String contentTypeFieldId, final String parentGraphQLTypeName,
+                            final GraphQLObjectType.Builder parentGraphQLType, final String graphQLFieldName,
+                            final GraphQLFieldDefinition.Builder graphQLField) {
+        graphQLField.type(GraphQLBoolean);
+        graphQLField.argument(BOOLEAN_FILTER);
     }
 
 }

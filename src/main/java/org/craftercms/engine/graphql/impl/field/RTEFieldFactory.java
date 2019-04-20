@@ -38,29 +38,30 @@ import static org.craftercms.engine.graphql.SchemaUtils.getGraphQLName;
  */
 public class RTEFieldFactory implements GraphQLFieldFactory {
 
-    protected String contentTypePropertyTitleXpath;
+    protected String titleXPath;
 
     @Required
-    public void setContentTypePropertyTitleXpath(final String contentTypePropertyTitleXpath) {
-        this.contentTypePropertyTitleXpath = contentTypePropertyTitleXpath;
+    public void setTitleXPath(final String titleXPath) {
+        this.titleXPath = titleXPath;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void createField(final Document definition, final Node property, final String fieldId,
-                            final String typeName, final String fieldName, final GraphQLObjectType.Builder newType,
-                            final GraphQLFieldDefinition.Builder newField) {
+    public void createField(final Document contentTypeDefinition, final Node contentTypeField,
+                            final String contentTypeFieldId, final String parentGraphQLTypeName,
+                            final GraphQLObjectType.Builder parentGraphQLType, final String graphQLFieldName,
+                            final GraphQLFieldDefinition.Builder graphQLField) {
         // Add the copy field as string without filters
-        newType.field(GraphQLFieldDefinition.newFieldDefinition()
-            .name(getGraphQLName(fieldName) + FIELD_SUFFIX_RAW)
-            .description(XmlUtils.selectSingleNodeValue(property, contentTypePropertyTitleXpath))
+        parentGraphQLType.field(GraphQLFieldDefinition.newFieldDefinition()
+            .name(getGraphQLName(graphQLFieldName) + FIELD_SUFFIX_RAW)
+            .description(XmlUtils.selectSingleNodeValue(contentTypeField, titleXPath))
             .type(GraphQLString));
 
         // Add the original as string with text filters
-        newField.type(GraphQLString);
-        newField.argument(TEXT_FILTER);
+        graphQLField.type(GraphQLString);
+        graphQLField.argument(TEXT_FILTER);
     }
 
 }
