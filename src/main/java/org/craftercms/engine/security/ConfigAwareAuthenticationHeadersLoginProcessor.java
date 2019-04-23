@@ -50,17 +50,12 @@ public class ConfigAwareAuthenticationHeadersLoginProcessor extends Authenticati
     private static final Logger logger = LoggerFactory.getLogger(ConfigAwareAuthenticationHeadersLoginProcessor.class);
 
     public static final String SAML_CONFIG_KEY = "security.saml";
-
     public static final String SAML_TOKEN_CONFIG_KEY = SAML_CONFIG_KEY + ".token";
-
     public static final String SAML_ATTRS_CONFIG_KEY = SAML_CONFIG_KEY + ".attributes";
-
     public static final String SAML_GROUPS_CONFIG_KEY = SAML_CONFIG_KEY + ".groups";
 
     public static final String NAME_CONFIG_KEY = "name";
-
     public static final String FIELD_CONFIG_KEY = "field";
-
     public static final String ROLE_CONFIG_KEY = "role";
 
     public static final String DEFAULT_GROUPS_HEADER_NAME = DEFAULT_MELLON_HEADER_PREFIX + "groups";
@@ -91,7 +86,7 @@ public class ConfigAwareAuthenticationHeadersLoginProcessor extends Authenticati
         if (StringUtils.isNoneEmpty(username, email) && Objects.isNull(auth) && Objects.nonNull(config) &&
             config.containsKey(SAML_TOKEN_CONFIG_KEY) && hasValidToken(request)) {
 
-            logger.debug("Using standalone SAML authentication");
+            logger.debug("Using site specific SAML authentication");
 
             logger.debug("Creating authentication object for '{}'", username);
             Profile profile = new Profile();
