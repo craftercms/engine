@@ -114,7 +114,9 @@ public class GraphQLFactoryImpl implements GraphQLFactory {
             if (formDefinition.isPresent()) {
                 typeFactory.createType(formDefinition.get(), rootType, codeRegistry);
             } else {
-                children.forEach(i -> findContentTypes((Tree) i, rootType, codeRegistry));
+                children.stream()
+                    .filter(i -> i instanceof Tree)
+                    .forEach(i -> findContentTypes((Tree) i, rootType, codeRegistry));
             }
         }
     }
