@@ -16,7 +16,16 @@
  */
 package org.craftercms.engine.service.context;
 
-import graphql.GraphQL;
+import java.io.InputStream;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executor;
+import javax.servlet.ServletContext;
+
 import groovy.lang.GroovyClassLoader;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
@@ -31,7 +40,6 @@ import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.url.UrlTransformationEngine;
 import org.craftercms.engine.exception.SiteContextCreationException;
-import org.craftercms.engine.graphql.GraphQLFactory;
 import org.craftercms.engine.macro.MacroResolver;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.scripting.ScriptJobResolver;
@@ -60,16 +68,6 @@ import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
 import org.tuckey.web.filters.urlrewrite.Conf;
 import org.tuckey.web.filters.urlrewrite.UrlRewriter;
-
-import javax.servlet.ServletContext;
-import java.io.InputStream;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Executor;
 
 /**
  * Factory for creating {@link SiteContext} with common properties. It also uses the {@link MacroResolver} to resolve
@@ -114,7 +112,6 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected List<ScriptJobResolver> jobResolvers;
     protected Executor jobThreadPoolExecutor;
     protected TextEncryptor textEncryptor;
-    protected GraphQLFactory graphQLFactory;
 
     public SiteContextFactory() {
         siteNameMacroName = DEFAULT_SITE_NAME_MACRO_NAME;
@@ -263,11 +260,6 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         this.textEncryptor = textEncryptor;
     }
 
-    @Required
-    public void setGraphQLFactory(final GraphQLFactory graphQLFactory) {
-        this.graphQLFactory = graphQLFactory;
-    }
-
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.globalApplicationContext = applicationContext;
@@ -328,9 +320,6 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             Scheduler scheduler = scheduleJobs(siteContext);
             siteContext.setScheduler(scheduler);
 
-            GraphQL graphQL = getGraphQL(siteContext);
-            siteContext.setGraphQL(graphQL);
-
             return siteContext;
         } catch (Exception e) {
             // Destroy context if the site context creation failed
@@ -340,22 +329,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         }
     }
 
-    protected GraphQL getGraphQL(SiteContext siteContext) {
-        String siteName = siteContext.getSiteName();
-        logger.info("--------------------------------------------");
-        logger.info("<Loading GraphQL for site: " + siteName + ">");
-        logger.info("--------------------------------------------");
 
-        try {
-            return graphQLFactory.getInstance(siteContext);
-        } catch (Exception e) {
-            throw new SiteContextCreationException("Unable to load GraphQL for site " + siteName, e);
-        } finally {
-            logger.info("--------------------------------------------");
-            logger.info("</Loading GraphQL for site: " + siteName + ">");
-            logger.info("--------------------------------------------");
-        }
-    }
 
     protected HierarchicalConfiguration getConfig(SiteContext siteContext, String[] configPaths,
                                                   ResourceLoader resourceLoader) {

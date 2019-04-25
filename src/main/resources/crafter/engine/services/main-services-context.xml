@@ -397,7 +397,7 @@
         <property name="fallbackContextFactory" ref="crafter.fallbackSiteContextFactory"/>
         <property name="contextFactory" ref="crafter.siteContextFactory"/>
         <property name="entitlementValidator" ref="crafter.entitlementValidator"/>
-        <property name="graphQLFactory" ref="crafter.graphQLFactory"/>
+        <property name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
     </bean>
 
     <bean id="crafter.siteContextsBootstrap" class="org.craftercms.engine.service.context.SiteContextsBootstrap">
@@ -426,7 +426,6 @@
         <property name="jobResolvers" ref="crafter.scriptJobResolvers"/>
         <property name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
         <property name="textEncryptor" ref="crafter.textEncryptor"/>
-        <property name="graphQLFactory" ref="crafter.graphQLFactory" />
         <property name="storeType" value="${crafter.engine.store.type}"/>
     </bean>
 
@@ -450,7 +449,6 @@
         <property name="jobResolvers" ref="crafter.scriptJobResolvers"/>
         <property name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
         <property name="textEncryptor" ref="crafter.textEncryptor"/>
-        <property name="graphQLFactory" ref="crafter.graphQLFactory" />
         <property name="storeType" value="filesystem"/>
     </bean>
 
@@ -779,7 +777,6 @@
                   value="${crafter.engine.graphql.contentType.field.type.xpath}"/>
         <property name="contentTypeFieldTitleXPath"
                   value="${crafter.engine.graphql.contentType.field.title.xpath}"/>
-        <property name="dataFetcher" ref="crafter.dataFetcher"/>
         <property name="fieldFactories">
             <map>
                 <entry key="checkbox" value-ref="crafter.checkboxFieldFactory"/>
@@ -798,6 +795,11 @@
         <property name="contentTypeDefinitionName" value="${crafter.engine.graphql.contentType.definition}"/>
         <property name="typeFactory" ref="crafter.typeFactory"/>
         <property name="dataFetcher" ref="crafter.dataFetcher"/>
+        <property name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
+    </bean>
+
+    <bean id="crafter.graphQLBuildTask" class="org.craftercms.engine.graphql.impl.GraphQLBuildTask" scope="prototype">
+        <property name="graphQLFactory" ref="crafter.graphQLFactory"/>
     </bean>
 
     <import resource="${crafter.engine.extension.base}/services-overlay-context.xml"/>

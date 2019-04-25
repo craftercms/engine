@@ -17,6 +17,7 @@
 
 package org.craftercms.engine.graphql;
 
+import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLCodeRegistry;
 import graphql.schema.GraphQLObjectType;
 import org.craftercms.core.service.Item;
@@ -37,9 +38,10 @@ public interface GraphQLTypeFactory {
      * @param rootGraphQLType       the {@link GraphQLObjectType} for the root query
      * @param codeRegistry          the {@link GraphQLCodeRegistry} to add {@link graphql.schema.DataFetcher} for new
      *                              fields
+     * @param dataFetcher           the {@link DataFetcher} to use for the new fields
      */
     void createType(Item contentTypeDefinition, GraphQLObjectType.Builder rootGraphQLType,
-                    GraphQLCodeRegistry.Builder codeRegistry);
+                    GraphQLCodeRegistry.Builder codeRegistry, DataFetcher<?> dataFetcher);
 
     /**
      * Creates a GraphQL field for the given content-type field and adds it to the given GraphQL type

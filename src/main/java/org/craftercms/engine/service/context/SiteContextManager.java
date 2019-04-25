@@ -26,7 +26,7 @@ import org.craftercms.commons.entitlements.validator.EntitlementValidator;
 import org.craftercms.core.exception.RootFolderNotFoundException;
 import org.craftercms.engine.event.SiteContextCreatedEvent;
 import org.craftercms.engine.event.SiteContextDestroyedEvent;
-import org.craftercms.engine.graphql.GraphQLFactory;
+import org.craftercms.engine.graphql.impl.GraphQLBuildTask;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -37,6 +37,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -55,7 +56,7 @@ public class SiteContextManager implements ApplicationContextAware {
     protected SiteContextFactory fallbackContextFactory;
     protected ApplicationContext applicationContext;
     protected EntitlementValidator entitlementValidator;
-    protected GraphQLFactory graphQLFactory;
+    protected Executor jobThreadPoolExecutor;
 
     public SiteContextManager() {
         lock = new ReentrantLock();
@@ -78,8 +79,8 @@ public class SiteContextManager implements ApplicationContextAware {
     }
 
     @Required
-    public void setGraphQLFactory(final GraphQLFactory graphQLFactory) {
-        this.graphQLFactory = graphQLFactory;
+    public void setJobThreadPoolExecutor(final Executor jobThreadPoolExecutor) {
+        this.jobThreadPoolExecutor = jobThreadPoolExecutor;
     }
 
     @Override
@@ -208,8 +209,20 @@ public class SiteContextManager implements ApplicationContextAware {
         }
     }
 
-    public void rebuildGraphQL(SiteContext siteContext) {
-        siteContext.setGraphQL(graphQLFactory.getInstance(siteContext));
+    /**
+     * Triggers the GraphQL schema build for the current site
+     */
+    public void startGraphQLBuild() {
+        startGraphQLBuild(SiteContext.getCurrent());
+    }
+
+    /**
+     * Triggers the GraphQL schema build for the given site
+     * @param siteContext the site context to use
+     */
+    protected void startGraphQLBuild(SiteContext siteContext) {
+        GraphQLBuildTask task = applicationContext.getBean(GraphQLBuildTask.class, siteContext);
+        jobThreadPoolExecutor.execute(task);
     }
 
     public SiteContext getContext(String siteName, boolean fallback) {
@@ -248,6 +261,8 @@ public class SiteContextManager implements ApplicationContextAware {
                         contextRegistry.put(siteName, siteContext);
 
                         logger.info("Site context created: " + siteContext);
+
+                        startGraphQLBuild(siteContext);
                     } finally {
                         logger.info("==================================================");
                         logger.info("</Creating site context: " + siteName + ">");

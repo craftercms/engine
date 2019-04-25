@@ -76,7 +76,6 @@
         <property name="jobResolvers" ref="crafter.scriptJobResolvers"/>
         <property name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
         <property name="textEncryptor" ref="crafter.textEncryptor"/>
-        <property name="graphQLFactory" ref="crafter.graphQLFactory" />
         <property name="storeType" value="${crafter.engine.store.type}"/>
     </bean>
 

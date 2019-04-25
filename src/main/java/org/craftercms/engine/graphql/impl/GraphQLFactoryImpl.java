@@ -20,6 +20,7 @@ package org.craftercms.engine.graphql.impl;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.Executor;
 
 import graphql.GraphQL;
 import graphql.schema.*;
@@ -30,6 +31,7 @@ import org.craftercms.core.service.Tree;
 import org.craftercms.engine.graphql.GraphQLFactory;
 import org.craftercms.engine.graphql.GraphQLTypeFactory;
 import org.craftercms.engine.service.context.SiteContext;
+import org.craftercms.engine.util.concurrent.SiteAwareThreadPoolExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
@@ -75,6 +77,11 @@ public class GraphQLFactoryImpl implements GraphQLFactory {
      */
     protected DataFetcher<?> dataFetcher;
 
+    /**
+     * The {@link Executor} to use for new threads
+     */
+    protected Executor jobThreadPoolExecutor;
+
     @Required
     public void setRepoConfigFolder(final String repoConfigFolder) {
         this.repoConfigFolder = repoConfigFolder;
@@ -97,14 +104,19 @@ public class GraphQLFactoryImpl implements GraphQLFactory {
 
     @Required
     public void setDataFetcher(DataFetcher<?> dataFetcher) {
-        this.dataFetcher = async(dataFetcher);
+        this.dataFetcher = dataFetcher;
+    }
+
+    @Required
+    public void setJobThreadPoolExecutor(final Executor jobThreadPoolExecutor) {
+        this.jobThreadPoolExecutor = jobThreadPoolExecutor;
     }
 
     /**
      * Recursively looks for content-type definitions
      */
     protected void findContentTypes(Tree item, GraphQLObjectType.Builder rootType,
-                                    GraphQLCodeRegistry.Builder codeRegistry) {
+                                    GraphQLCodeRegistry.Builder codeRegistry, DataFetcher<?> dataFetcher) {
         logger.debug("Looking for content-type definitions in '{}'", item.getUrl());
         List<Item> children = item.getChildren();
         if (CollectionUtils.isNotEmpty(children)) {
@@ -112,11 +124,11 @@ public class GraphQLFactoryImpl implements GraphQLFactory {
                 .filter(i -> contentTypeDefinitionName.equals(i.getName()))
                 .findFirst();
             if (formDefinition.isPresent()) {
-                typeFactory.createType(formDefinition.get(), rootType, codeRegistry);
+                typeFactory.createType(formDefinition.get(), rootType, codeRegistry, dataFetcher);
             } else {
                 children.stream()
                     .filter(i -> i instanceof Tree)
-                    .forEach(i -> findContentTypes((Tree) i, rootType, codeRegistry));
+                    .forEach(i -> findContentTypes((Tree) i, rootType, codeRegistry, dataFetcher));
             }
         }
     }
@@ -167,14 +179,16 @@ public class GraphQLFactoryImpl implements GraphQLFactory {
         );
 
         // Add the data fetcher for the new fields
-        codeRegistry.dataFetcher(coordinates(rootQueryTypeName, FIELD_NAME_CONTENT_ITEMS), dataFetcher);
-        codeRegistry.dataFetcher(coordinates(rootQueryTypeName, FIELD_NAME_PAGES), dataFetcher);
-        codeRegistry.dataFetcher(coordinates(rootQueryTypeName, FIELD_NAME_COMPONENTS), dataFetcher);
+        DataFetcher asyncFetcher = async(dataFetcher,
+            new SiteAwareThreadPoolExecutor(siteContext, jobThreadPoolExecutor));
+        codeRegistry.dataFetcher(coordinates(rootQueryTypeName, FIELD_NAME_CONTENT_ITEMS), asyncFetcher);
+        codeRegistry.dataFetcher(coordinates(rootQueryTypeName, FIELD_NAME_PAGES), asyncFetcher);
+        codeRegistry.dataFetcher(coordinates(rootQueryTypeName, FIELD_NAME_COMPONENTS), asyncFetcher);
 
         ContentStoreService storeService = siteContext.getStoreService();
         Tree tree = storeService.findTree(siteContext.getContext(), repoConfigFolder);
         if (Objects.nonNull(tree)) {
-            findContentTypes(tree, rootType, codeRegistry);
+            findContentTypes(tree, rootType, codeRegistry, asyncFetcher);
         }
 
         return GraphQLSchema.newSchema()

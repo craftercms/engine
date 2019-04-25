@@ -47,7 +47,7 @@ public class SiteContext {
 
     private static final String SITE_NAME_MDC_KEY = "siteName";
 
-    private static ThreadLocal<SiteContext> threadLocal = new InheritableThreadLocal<>();
+    private static ThreadLocal<SiteContext> threadLocal = new ThreadLocal<>();
 
     public static final String CACHE_CLEARED_EVENT_KEY = "cacheCleared";
     public static final String CONTEXT_BUILT_EVENT_KEY = "contextBuilt";
