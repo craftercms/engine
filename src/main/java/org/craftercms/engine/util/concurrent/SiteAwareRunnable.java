@@ -39,7 +39,7 @@ public class SiteAwareRunnable implements Runnable {
     public void run() {
         SiteContext.setCurrent(siteContext);
         wrappedRunnable.run();
-        SiteContext.setCurrent(null);
+        SiteContext.clear();
     }
 
 }

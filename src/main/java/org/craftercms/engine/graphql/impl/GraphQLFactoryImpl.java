@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ForkJoinPool;
 
 import graphql.GraphQL;
 import graphql.schema.*;
@@ -78,6 +77,11 @@ public class GraphQLFactoryImpl implements GraphQLFactory {
      */
     protected DataFetcher<?> dataFetcher;
 
+    /**
+     * The {@link Executor} to use for new threads
+     */
+    protected Executor jobThreadPoolExecutor;
+
     @Required
     public void setRepoConfigFolder(final String repoConfigFolder) {
         this.repoConfigFolder = repoConfigFolder;
@@ -101,6 +105,11 @@ public class GraphQLFactoryImpl implements GraphQLFactory {
     @Required
     public void setDataFetcher(DataFetcher<?> dataFetcher) {
         this.dataFetcher = dataFetcher;
+    }
+
+    @Required
+    public void setJobThreadPoolExecutor(final Executor jobThreadPoolExecutor) {
+        this.jobThreadPoolExecutor = jobThreadPoolExecutor;
     }
 
     /**
@@ -171,7 +180,7 @@ public class GraphQLFactoryImpl implements GraphQLFactory {
 
         // Add the data fetcher for the new fields
         DataFetcher asyncFetcher = async(dataFetcher,
-            new SiteAwareThreadPoolExecutor(siteContext, ForkJoinPool.commonPool()));
+            new SiteAwareThreadPoolExecutor(siteContext, jobThreadPoolExecutor));
         codeRegistry.dataFetcher(coordinates(rootQueryTypeName, FIELD_NAME_CONTENT_ITEMS), asyncFetcher);
         codeRegistry.dataFetcher(coordinates(rootQueryTypeName, FIELD_NAME_PAGES), asyncFetcher);
         codeRegistry.dataFetcher(coordinates(rootQueryTypeName, FIELD_NAME_COMPONENTS), asyncFetcher);

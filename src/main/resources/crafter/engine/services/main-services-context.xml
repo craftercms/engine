@@ -796,6 +796,7 @@
         <property name="contentTypeDefinitionName" value="${crafter.engine.graphql.contentType.definition}"/>
         <property name="typeFactory" ref="crafter.typeFactory"/>
         <property name="dataFetcher" ref="crafter.dataFetcher"/>
+        <property name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
     </bean>
 
     <bean id="crafter.graphQLBuildTask" class="org.craftercms.engine.graphql.impl.GraphQLBuildTask" scope="prototype">
