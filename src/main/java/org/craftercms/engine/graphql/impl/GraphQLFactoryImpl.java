@@ -116,7 +116,7 @@ public class GraphQLFactoryImpl implements GraphQLFactory {
      * Recursively looks for content-type definitions
      */
     protected void findContentTypes(Tree item, GraphQLObjectType.Builder rootType,
-                                    GraphQLCodeRegistry.Builder codeRegistry) {
+                                    GraphQLCodeRegistry.Builder codeRegistry, DataFetcher<?> dataFetcher) {
         logger.debug("Looking for content-type definitions in '{}'", item.getUrl());
         List<Item> children = item.getChildren();
         if (CollectionUtils.isNotEmpty(children)) {
@@ -124,11 +124,11 @@ public class GraphQLFactoryImpl implements GraphQLFactory {
                 .filter(i -> contentTypeDefinitionName.equals(i.getName()))
                 .findFirst();
             if (formDefinition.isPresent()) {
-                typeFactory.createType(formDefinition.get(), rootType, codeRegistry);
+                typeFactory.createType(formDefinition.get(), rootType, codeRegistry, dataFetcher);
             } else {
                 children.stream()
                     .filter(i -> i instanceof Tree)
-                    .forEach(i -> findContentTypes((Tree) i, rootType, codeRegistry));
+                    .forEach(i -> findContentTypes((Tree) i, rootType, codeRegistry, dataFetcher));
             }
         }
     }
@@ -188,7 +188,7 @@ public class GraphQLFactoryImpl implements GraphQLFactory {
         ContentStoreService storeService = siteContext.getStoreService();
         Tree tree = storeService.findTree(siteContext.getContext(), repoConfigFolder);
         if (Objects.nonNull(tree)) {
-            findContentTypes(tree, rootType, codeRegistry);
+            findContentTypes(tree, rootType, codeRegistry, asyncFetcher);
         }
 
         return GraphQLSchema.newSchema()

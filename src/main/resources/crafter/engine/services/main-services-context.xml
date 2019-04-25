@@ -777,7 +777,6 @@
                   value="${crafter.engine.graphql.contentType.field.type.xpath}"/>
         <property name="contentTypeFieldTitleXPath"
                   value="${crafter.engine.graphql.contentType.field.title.xpath}"/>
-        <property name="dataFetcher" ref="crafter.dataFetcher"/>
         <property name="fieldFactories">
             <map>
                 <entry key="checkbox" value-ref="crafter.checkboxFieldFactory"/>

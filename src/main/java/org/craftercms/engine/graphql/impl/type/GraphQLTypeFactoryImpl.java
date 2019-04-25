@@ -34,7 +34,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static graphql.schema.AsyncDataFetcher.async;
 import static graphql.schema.FieldCoordinates.coordinates;
 import static graphql.schema.GraphQLNonNull.nonNull;
 import static org.craftercms.engine.graphql.SchemaUtils.*;
@@ -72,11 +71,6 @@ public class GraphQLTypeFactoryImpl implements GraphQLTypeFactory {
      * All known field factories to use during type build
      */
     protected Map<String, GraphQLFieldFactory> fieldFactories;
-
-    /**
-     * The {@link DataFetcher} to use for queries
-     */
-    protected DataFetcher<?> dataFetcher;
 
     @Required
     public void setRootQueryTypeName(final String rootQueryTypeName) {
@@ -122,16 +116,11 @@ public class GraphQLTypeFactoryImpl implements GraphQLTypeFactory {
         this.fieldFactories = fieldFactories;
     }
 
-    @Required
-    public void setDataFetcher(DataFetcher<?> dataFetcher) {
-        this.dataFetcher = async(dataFetcher);
-    }
-
     /**
      * {@inheritDoc}
      */
     public void createType(Item formDefinition, GraphQLObjectType.Builder rootGraphQLType,
-                           GraphQLCodeRegistry.Builder codeRegistry) {
+                           GraphQLCodeRegistry.Builder codeRegistry, DataFetcher dataFetcher) {
         logger.debug("Creating GraphQL Type from '{}'", formDefinition.getUrl());
 
         Document contentTypeDefinition = formDefinition.getDescriptorDom();
