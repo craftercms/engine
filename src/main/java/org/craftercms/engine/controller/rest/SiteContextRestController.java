@@ -98,11 +98,10 @@ public class SiteContextRestController {
 
     @GetMapping(URL_GRAPHQL + URL_REBUILD)
     public Map<String, String> rebuildSchema() {
-        SiteContext siteContext = SiteContext.getCurrent();
-        contextManager.rebuildGraphQL(siteContext);
+        contextManager.startGraphQLBuild();
 
         return Collections.singletonMap(RestControllerBase.MESSAGE_MODEL_ATTRIBUTE_NAME,
-            "GraphQL Schema for '" + siteContext.getSiteName() + "' rebuilt");
+            "GraphQL Schema for '" + SiteContext.getCurrent().getSiteName() + "' rebuilt");
     }
 
 }

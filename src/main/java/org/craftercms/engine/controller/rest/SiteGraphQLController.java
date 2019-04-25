@@ -80,6 +80,14 @@ public class SiteGraphQLController {
     }
 
     protected Map<String, Object> handleRequest(String query, String operationName, Map<String, Object> variables) {
+        SiteContext context = SiteContext.getCurrent();
+        GraphQL graphQL = context.getGraphQL();
+        if (Objects.isNull(graphQL)) {
+            logger.warn("GraphQL schema has not been initialized for site {}", context.getSiteName());
+            return Collections.singletonMap("errors", Collections.singletonList("GraphQL schema has not been "
+                + "initialized for site " + context.getSiteName()));
+        }
+
         ExecutionInput.Builder executionInput = newExecutionInput()
             .query(query)
             .operationName(operationName)
@@ -87,7 +95,7 @@ public class SiteGraphQLController {
 
         StopWatch watch = new StopWatch("graphql - " + operationName);
         watch.start("query");
-        ExecutionResult result = SiteContext.getCurrent().getGraphQL().execute(executionInput);
+        ExecutionResult result = graphQL.execute(executionInput);
         watch.stop();
 
         if (logger.isTraceEnabled()) {
