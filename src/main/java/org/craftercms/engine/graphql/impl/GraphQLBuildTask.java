@@ -46,9 +46,13 @@ public class GraphQLBuildTask implements Runnable {
     protected GraphQLFactory graphQLFactory;
 
     /**
-     * The {@link SiteContext} to use (if not set {@code SiteContext.getCurrent()} will be used)
+     * The {@link SiteContext} to use
      */
     protected SiteContext siteContext;
+
+    public GraphQLBuildTask(final SiteContext siteContext) {
+        this.siteContext = siteContext;
+    }
 
     @Required
     public void setGraphQLFactory(final GraphQLFactory graphQLFactory) {
@@ -61,22 +65,21 @@ public class GraphQLBuildTask implements Runnable {
 
     @Override
     public void run() {
-        SiteContext context = Objects.nonNull(siteContext)? siteContext : SiteContext.getCurrent();
         if (lock.tryLock()) {
-            logger.info("Starting GraphQL Schema build for site {}", context.getSiteName());
+            logger.info("Starting GraphQL Schema build for site {}", siteContext.getSiteName());
             try {
-                GraphQL graphQL = graphQLFactory.getInstance(context);
+                GraphQL graphQL = graphQLFactory.getInstance(siteContext);
                 if (Objects.nonNull(graphQL)) {
-                    context.setGraphQL(graphQL);
-                    logger.info("GraphQL Schema build completed for site {}", context.getSiteName());
+                    siteContext.setGraphQL(graphQL);
+                    logger.info("GraphQL Schema build completed for site {}", siteContext.getSiteName());
                 }
             } catch (Exception e) {
-                logger.error("Error building the GraphQL Schema for site {}", context.getSiteName(), e);
+                logger.error("Error building the GraphQL Schema for site {}", siteContext.getSiteName(), e);
             } finally {
                 lock.unlock();
             }
         } else {
-            logger.info("GraphQL Schema is already being built for site {}", context.getSiteName());
+            logger.info("GraphQL Schema is already being built for site {}", siteContext.getSiteName());
         }
     }
 

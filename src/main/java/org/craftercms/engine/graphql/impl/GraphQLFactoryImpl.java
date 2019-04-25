@@ -20,6 +20,8 @@ package org.craftercms.engine.graphql.impl;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ForkJoinPool;
 
 import graphql.GraphQL;
 import graphql.schema.*;
@@ -30,6 +32,7 @@ import org.craftercms.core.service.Tree;
 import org.craftercms.engine.graphql.GraphQLFactory;
 import org.craftercms.engine.graphql.GraphQLTypeFactory;
 import org.craftercms.engine.service.context.SiteContext;
+import org.craftercms.engine.util.concurrent.SiteAwareThreadPoolExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
@@ -97,7 +100,7 @@ public class GraphQLFactoryImpl implements GraphQLFactory {
 
     @Required
     public void setDataFetcher(DataFetcher<?> dataFetcher) {
-        this.dataFetcher = async(dataFetcher);
+        this.dataFetcher = dataFetcher;
     }
 
     /**
@@ -167,9 +170,11 @@ public class GraphQLFactoryImpl implements GraphQLFactory {
         );
 
         // Add the data fetcher for the new fields
-        codeRegistry.dataFetcher(coordinates(rootQueryTypeName, FIELD_NAME_CONTENT_ITEMS), dataFetcher);
-        codeRegistry.dataFetcher(coordinates(rootQueryTypeName, FIELD_NAME_PAGES), dataFetcher);
-        codeRegistry.dataFetcher(coordinates(rootQueryTypeName, FIELD_NAME_COMPONENTS), dataFetcher);
+        DataFetcher asyncFetcher = async(dataFetcher,
+            new SiteAwareThreadPoolExecutor(siteContext, ForkJoinPool.commonPool()));
+        codeRegistry.dataFetcher(coordinates(rootQueryTypeName, FIELD_NAME_CONTENT_ITEMS), asyncFetcher);
+        codeRegistry.dataFetcher(coordinates(rootQueryTypeName, FIELD_NAME_PAGES), asyncFetcher);
+        codeRegistry.dataFetcher(coordinates(rootQueryTypeName, FIELD_NAME_COMPONENTS), asyncFetcher);
 
         ContentStoreService storeService = siteContext.getStoreService();
         Tree tree = storeService.findTree(siteContext.getContext(), repoConfigFolder);

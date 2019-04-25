@@ -214,7 +214,7 @@ public class SiteContextManager implements ApplicationContextAware {
      * Triggers the GraphQL schema build for the current site
      */
     public void startGraphQLBuild() {
-        startGraphQLBuild(null);
+        startGraphQLBuild(SiteContext.getCurrent());
     }
 
     /**
@@ -222,10 +222,7 @@ public class SiteContextManager implements ApplicationContextAware {
      * @param siteContext the site context to use
      */
     protected void startGraphQLBuild(SiteContext siteContext) {
-        GraphQLBuildTask task = applicationContext.getBean(GraphQLBuildTask.class);
-        if (Objects.nonNull(siteContext)) {
-            task.setSiteContext(siteContext);
-        }
+        GraphQLBuildTask task = applicationContext.getBean(GraphQLBuildTask.class, siteContext);
         jobThreadPoolExecutor.execute(task);
     }
 

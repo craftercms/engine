@@ -84,8 +84,12 @@ public class SiteGraphQLController {
         GraphQL graphQL = context.getGraphQL();
         if (Objects.isNull(graphQL)) {
             logger.warn("GraphQL schema has not been initialized for site {}", context.getSiteName());
-            return Collections.singletonMap("errors", Collections.singletonList("GraphQL schema has not been "
-                + "initialized for site " + context.getSiteName()));
+            return Collections.singletonMap("errors",
+                Collections.singletonList(
+                    Collections.singletonMap("message",
+                        "GraphQL schema has not been initialized for site " + context.getSiteName())
+                )
+            );
         }
 
         ExecutionInput.Builder executionInput = newExecutionInput()
