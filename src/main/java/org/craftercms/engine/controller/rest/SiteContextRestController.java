@@ -101,7 +101,7 @@ public class SiteContextRestController {
         contextManager.startGraphQLBuild();
 
         return Collections.singletonMap(RestControllerBase.MESSAGE_MODEL_ATTRIBUTE_NAME,
-            "GraphQL Schema for '" + SiteContext.getCurrent().getSiteName() + "' rebuilt");
+            "Rebuild of GraphQL schema for '" + SiteContext.getCurrent().getSiteName() + "' started");
     }
 
 }
