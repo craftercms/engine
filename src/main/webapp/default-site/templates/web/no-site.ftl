@@ -15,103 +15,70 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <!doctype html>
-<!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
-<!--[if lt IE 7]> <html class="no-js ie6" lang="en"> <![endif]-->
-<!--[if IE 7]>    <html class="no-js ie7" lang="en"> <![endif]-->
-<!--[if IE 8]>    <html class="no-js ie8" lang="en"> <![endif]-->
-<!-- Consider adding an manifest.appcache: h5bp.com/d/Offline -->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
+	<head>
+		<meta charset="utf-8">
+		<title>Crafter CMS: No Site Set</title>
 
-  <!-- Use the .htaccess and remove these lines to avoid edge case issues.
-       More info: h5bp.com/b/378 -->
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  
-  <title>Crafter CMS: NO SITE SET</title>
-  <meta name="description" content="">
-  <meta name="author" content="">
+		<!-- start CSS -->
+		<link href='${urlTransformationService.transform('toWebAppRelativeUrl', '/static-assets/css/default-style.css')}' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Pontano+Sans' rel='stylesheet' type='text/css'>
+		<!-- end CSS-->
 
-  <!-- Mobile viewport optimized: j.mp/bplateviewport -->
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+		<!-- All JavaScript at the bottom, except for Modernizr / Respond.
+		Modernizr enables HTML5 elements & feature detects; Respond is a polyfill for min/max-width CSS3 Media Queries
+		For optimal performance, use a custom Modernizr build: www.modernizr.com/download/ -->
+		<script src="js/libs/modernizr-2.0.6.min.js"></script>
 
-  <!-- Place favicon.ico and apple-touch-icon.png in the root directory: mathiasbynens.be/notes/touch-icons -->
+		<!-- Favicon Setting -->
+		<link rel="icon" type="image/x-icon" href='${urlTransformationService.transform('toWebAppRelativeUrl', '/static-assets/img/favicon.ico')}'/>
+	</head>
 
-  <!-- CSS: implied media=all -->
-  <!-- CSS concatenated and minified via ant build script-->
-  <link href='${urlTransformationService.transform('toWebAppRelativeUrl', '/static-assets/css/default-style.css')}' rel='stylesheet' type='text/css'>
-  <link href='http://fonts.googleapis.com/css?family=Pontano+Sans' rel='stylesheet' type='text/css'>
-  <!-- end CSS-->
+	<body>
+		<div id="container">
+			<div id="side-col">
+				<header>
+					<a class="logo" href="#"><img src="/static-assets/img/logo.svg" alt="Crafter CMS"/></a>
+					<nav>
+						<ul>
+							<li class="active"><span>Crafter CMS</span></li>
+							<li><a href="/studio"><span>Back to Crafter Studio</span></a></li>
+							<li><a href="http://docs.craftercms.org"><span>Documentation</span></a></li>
+							<li><a href="http://www.craftersoftware.com/resources"><span>Tutorials &amp; Screencasts</span></a></li>
+							<li><a href="http://www.craftersoftware.com/about/partners"><span>Professional Services</span></a></li>
+						</ul>
+					</nav>
+				</header>
+			</div>
 
-  <!-- More ideas for your <head> here: h5bp.com/d/head-Tips -->
+			<div id="main" role="main">
+				<section class="features bgOpaque">
+					<h1>Welcome to Crafter CMS</h1>
+					<h2>Error: No Site is Set.</h2>
+					<p>Crafter Engine has no sites configured for this domain.</p>
+					<h2>What is Crafter CMS?</h2>
+					<p>Crafter CMS is a modern content management platform for building digital experience applications using:</p>
+						<ul>
+							<li>SPA frameworks like React, Vue, and Angular</li>
+							<li>AR/VR applications using A-Frame</li>
+							<li>Native Mobile and Headless applications</li>
+							<li>HTML5 Websites using Bootstrap or other HTML frameworks</li>
+						</ul>
+					<p>Crafter is a dynamic CMS based on Git and supports DevOps processes for code and content. It is also a hybrid-headless, API-first (GraphQL, REST, in-process) CMS, and that allows developers to use their favorite UI frameworks and tools.</p>
+					<p>Crafter CMS differentiates itself from existing CMSs with its architecture: microservices-based, serverless, elastic and planet-wide scalability. To learn more, see the <a href="http://docs.craftercms.org">docs</a>.</p>
+				</section>
+			</div>
+		</div>
+		<footer>
+			<p>Copyright &copy; 2007 - ${.now?string('yyyy')}, Crafter Software Corporation. All rights reserved.<br />
+			Crafter CMS is open source software licensed under the GNU General Public License (GPL) version 3.0.</p>
+		</footer>
 
-  <!-- All JavaScript at the bottom, except for Modernizr / Respond.
-       Modernizr enables HTML5 elements & feature detects; Respond is a polyfill for min/max-width CSS3 Media Queries
-       For optimal performance, use a custom Modernizr build: www.modernizr.com/download/ -->
-  <script src="js/libs/modernizr-2.0.6.min.js"></script>
-</head>
+		<!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
+		<script src="/static-assets/js/libs/jquery-1.6.2.min.js"></script>
 
-<body>
-  <div id="container">
-    <div id="side-col">
-    <header>
-      <a class="logo" href="#"><img src="/static-assets/img/crafter-logo-transparent.png" alt="Crafter CMS by Crafter Software"   /></a>
-      <nav>
-        <ul>
-          <li class="active"><span>Crafter CMS</span></li>
-          <li><a href="/studio"><span>Crafter Studio</span></a></li>
-          <li><a href="http://www.craftersoftware.com/products"><span>Overview &amp; Features</span></a></li>
-          <li><a href="http://www.craftercms.org/downloads"><span>Download</span></a></li>
-          <li><a href="http://www.craftersoftware.com/resources"><span>Tutorials &amp; Screencasts</span></a></li>
-          <li><a href="http://docs.craftercms.org"><span>Documentation</span></a></li>
-          <li><a href="http://www.craftersoftware.com/about/partners"><span>Professional Services</span></a></li>
-        </ul>
-      </nav>
-    </header>
-    <aside>
-
-
-
-    </aside>
-  </div>    
-    <div id="main" role="main">
-    
-    <section class="intro bgOpaque">
-      <h1>Welcome to Crafter CMS</h1>
-      <p>Crafter CMS is an award-winning open source CMS built from the ground up as a modern platform for crafting high performance digital experiences through targeted delivery of personalized content.</p>
-    </section>
-
-    <section class="features bgOpaque">
-        <h1>No Site is Set!</h1>
-        <p>Crafter Engine has no sites configured for this domain.</p>
-    </section>
-      
-
-      <nav>
-      <ul>
-        <!--li class="active">Overivew &amp; Features</li>
-        <li><a href="#">Tutorials &amp; Screencasts</a></li>
-        <li><a href="#">FAQs</a></li>
-        <li><a href="#">Our Contributors</a></li-->
-      </ul>
-    </nav>
-    </div>
-    
-  </div> <!--! end of #container -->
-  <footer>
-    <p>Copyright &copy; 2007 - ${.now?string('yyyy')}, Crafter Software Corporation. All rights reserved.<br />
-    Crafter CMS is free and open source software licensed under the GNU General Public License (GPL) version 3.0  
-    </p>
-  </footer>
-
-  <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
-  <script src="/static-assets/js/libs/jquery-1.6.2.min.js"></script>
-
-
-  <!-- scripts concatenated and minified via ant build script-->
-  <script defer src="/static-assets/js/plugins.js"></script>
-  <script defer src="/static-assets/js/script.js"></script>
-  <!-- end scripts-->
-  
-</body>
+		<!-- scripts concatenated and minified via ant build script-->
+		<script defer src="/static-assets/js/plugins.js"></script>
+		<script defer src="/static-assets/js/script.js"></script>
+		<!-- end scripts-->
+	</body>
 </html>
