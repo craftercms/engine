@@ -40,6 +40,7 @@ import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.url.UrlTransformationEngine;
 import org.craftercms.engine.exception.SiteContextCreationException;
+import org.craftercms.engine.graphql.GraphQLFactory;
 import org.craftercms.engine.macro.MacroResolver;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.scripting.ScriptJobResolver;
@@ -112,6 +113,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected List<ScriptJobResolver> jobResolvers;
     protected Executor jobThreadPoolExecutor;
     protected TextEncryptor textEncryptor;
+    protected GraphQLFactory graphQLFactory;
 
     public SiteContextFactory() {
         siteNameMacroName = DEFAULT_SITE_NAME_MACRO_NAME;
@@ -260,6 +262,11 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         this.textEncryptor = textEncryptor;
     }
 
+    @Required
+    public void setGraphQLFactory(GraphQLFactory graphQLFactory) {
+        this.graphQLFactory = graphQLFactory;
+    }
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.globalApplicationContext = applicationContext;
@@ -284,6 +291,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             siteContext.setOverlayCallback(overlayCallback);
             siteContext.setRestScriptsPath(restScriptsPath);
             siteContext.setControllerScriptsPath(controllerScriptsPath);
+            siteContext.setGraphQLFactory(graphQLFactory);
 
             String[] resolvedConfigPaths = new String[configPaths.length];
             for (int i = 0; i < configPaths.length; i++) {

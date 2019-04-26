@@ -427,6 +427,7 @@
         <property name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
         <property name="textEncryptor" ref="crafter.textEncryptor"/>
         <property name="storeType" value="${crafter.engine.store.type}"/>
+        <property name="graphQLFactory" ref="crafter.graphQLFactory"/>
     </bean>
 
     <bean id="crafter.fallbackSiteContextFactory" class="org.craftercms.engine.service.context.SiteContextFactory">
@@ -450,6 +451,7 @@
         <property name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
         <property name="textEncryptor" ref="crafter.textEncryptor"/>
         <property name="storeType" value="filesystem"/>
+        <property name="graphQLFactory" ref="crafter.graphQLFactory"/>
     </bean>
 
     <!-- ////////////////////////////////// -->
@@ -796,10 +798,6 @@
         <property name="typeFactory" ref="crafter.typeFactory"/>
         <property name="dataFetcher" ref="crafter.dataFetcher"/>
         <property name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
-    </bean>
-
-    <bean id="crafter.graphQLBuildTask" class="org.craftercms.engine.graphql.impl.GraphQLBuildTask" scope="prototype">
-        <property name="graphQLFactory" ref="crafter.graphQLFactory"/>
     </bean>
 
     <import resource="${crafter.engine.extension.base}/services-overlay-context.xml"/>
