@@ -311,7 +311,7 @@ footer { font-size: 0.8em; line-height: 1.4; margin: 0 auto; padding: 10px 0 25p
 
 #main section { position: relative; }
 #main section.intro { left: 20%; width: 77%; top: 50px; }
-#main section.features { left: 32%; width: 50%; top: 70px; margin-bottom:60px; }
+#main section.features { left: 10%; width: 75%; top: 70px; margin-bottom:100px; }
 
 #main section h1 { font-size: 2em; }
 #main section h2 { font-size: 1.8em; }
