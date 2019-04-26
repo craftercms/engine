@@ -19,7 +19,7 @@ package org.craftercms.engine.exception;
 import org.craftercms.core.exception.CrafterException;
 
 /**
- * Throw when an error occurs while building a GraphQL schema.
+ * Thrown when an error occurs while building a GraphQL schema.
  *
  * @author avasquez
  * @since 3.1
