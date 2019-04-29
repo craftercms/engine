@@ -26,7 +26,6 @@ import org.craftercms.commons.entitlements.validator.EntitlementValidator;
 import org.craftercms.core.exception.RootFolderNotFoundException;
 import org.craftercms.engine.event.SiteContextCreatedEvent;
 import org.craftercms.engine.event.SiteContextDestroyedEvent;
-import org.craftercms.engine.graphql.impl.GraphQLBuildTask;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -221,8 +220,7 @@ public class SiteContextManager implements ApplicationContextAware {
      * @param siteContext the site context to use
      */
     protected void startGraphQLBuild(SiteContext siteContext) {
-        GraphQLBuildTask task = applicationContext.getBean(GraphQLBuildTask.class, siteContext);
-        jobThreadPoolExecutor.execute(task);
+        jobThreadPoolExecutor.execute(siteContext::buildGraphQLSchema);
     }
 
     public SiteContext getContext(String siteName, boolean fallback) {

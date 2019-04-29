@@ -23,10 +23,14 @@ import org.craftercms.core.service.CacheService;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.url.UrlTransformationEngine;
+import org.craftercms.engine.exception.GraphQLBuildException;
+import org.craftercms.engine.graphql.GraphQLFactory;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.PreviewOverlayCallback;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -36,7 +40,10 @@ import org.tuckey.web.filters.urlrewrite.UrlRewriter;
 import java.net.URLClassLoader;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Wrapper for a {@link Context} that adds properties specific to Crafter Engine.
@@ -44,6 +51,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Alfonso Vásquez
  */
 public class SiteContext {
+
+    private static final Logger logger = LoggerFactory.getLogger(SiteContext.class);
 
     private static final String SITE_NAME_MDC_KEY = "siteName";
 
@@ -72,6 +81,8 @@ public class SiteContext {
     protected UrlRewriter urlRewriter;
     protected Scheduler scheduler;
     protected Map<String, Instant> events;
+    protected Lock graphQLBuildLock;
+    protected GraphQLFactory graphQLFactory;
     protected GraphQL graphQL;
 
     /**
@@ -100,6 +111,8 @@ public class SiteContext {
     }
 
     public SiteContext() {
+        graphQLBuildLock = new ReentrantLock();
+
         Instant now = Instant.now();
 
         events = new ConcurrentHashMap<>();
@@ -252,22 +265,20 @@ public class SiteContext {
         this.scheduler = scheduler;
     }
 
+    public GraphQLFactory getGraphQLFactory() {
+        return graphQLFactory;
+    }
+
+    public void setGraphQLFactory(GraphQLFactory graphQLFactory) {
+        this.graphQLFactory = graphQLFactory;
+    }
+
     public Map<String, Instant> getEvents() {
         return events;
     }
 
-    public void setEvents(Map<String, Instant> events) {
-        this.events = events;
-    }
-
     public GraphQL getGraphQL() {
         return graphQL;
-    }
-
-    public void setGraphQL(final GraphQL graphQL) {
-        this.graphQL = graphQL;
-
-        events.put(GRAPHQL_BUILT_EVENT_KEY, Instant.now());
     }
 
     public boolean isValid() throws CrafterException {
@@ -281,6 +292,27 @@ public class SiteContext {
         freeMarkerConfig.getConfiguration().clearTemplateCache();
 
         events.put(CACHE_CLEARED_EVENT_KEY, Instant.now());
+    }
+
+    public void buildGraphQLSchema() throws GraphQLBuildException {
+        if (graphQLBuildLock.tryLock()) {
+            logger.info("Starting GraphQL schema build for site '{}'", siteName);
+            try {
+                GraphQL graphQL = graphQLFactory.getInstance(this);
+                if (Objects.nonNull(graphQL)) {
+                    this.graphQL = graphQL;
+
+                    events.put(GRAPHQL_BUILT_EVENT_KEY, Instant.now());
+                }
+            } catch (Exception e) {
+                throw new GraphQLBuildException("Error building the GraphQL schema for site '" + siteName + "'", e);
+            } finally {
+                graphQLBuildLock.unlock();
+            }
+            logger.info("GraphQL schema build completed for site '{}'", siteName);
+        } else {
+            logger.info("GraphQL schema is already being built for site '{}'", siteName);
+        }
     }
 
     public void destroy() throws CrafterException {
