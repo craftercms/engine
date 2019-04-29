@@ -97,15 +97,12 @@
 	<div class="no-site-message">
 		<p>
 			Crafter CMS has no site configured for this domain.
-			Please <a href="https://docs.craftercms.org/en/3.1/system-administrators/activities/delivery/configure-apache-vhost.html">configure the site you want to show</a>
-			or select a site on <a href="/studio">the authoring environment</a>.
+			Please configure the site you want to show or select a site on <a href="/studio">the authoring environment</a>.
 		</p>
 	</div>
 
 	<nav class="navigation">
 		<h2 class="navigation--title">Helpful links:</h2>
-		<a class="navigation--link" href="https://docs.craftercms.org/en/3.1/system-administrators/activities/delivery/setup-site-for-delivery.html">Setup delivery environment</a>
-		<a class="navigation--link" href="https://docs.craftercms.org/en/3.1/system-administrators/activities/production-environment-setup.html">Setup production environment</a>
 		<a class="navigation--link" href="/studio">Authoring environment</a>
 		<a class="navigation--link" href="http://docs.craftercms.org">Docs Homepage</a>
 		<a class="navigation--link" href="http://www.craftersoftware.com/resources">Tutorials &amp; Screencasts</a>
