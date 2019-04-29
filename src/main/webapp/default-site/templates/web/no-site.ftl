@@ -15,70 +15,108 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 <!doctype html>
-	<head>
-		<meta charset="utf-8">
-		<title>Crafter CMS: No Site Set</title>
+<head>
+	<meta charset="utf-8">
+	<title>Crafter CMS: No Site Set</title>
 
-		<!-- start CSS -->
-		<link href='${urlTransformationService.transform('toWebAppRelativeUrl', '/static-assets/css/default-style.css')}' rel='stylesheet' type='text/css'>
-		<link href='http://fonts.googleapis.com/css?family=Pontano+Sans' rel='stylesheet' type='text/css'>
-		<!-- end CSS-->
+	<!-- start CSS -->
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600" rel="stylesheet">
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap-reboot.min.css"
+				rel="stylesheet">
+	<style>
+		html, body {
+			height: 100%;
+		}
 
-		<!-- All JavaScript at the bottom, except for Modernizr / Respond.
-		Modernizr enables HTML5 elements & feature detects; Respond is a polyfill for min/max-width CSS3 Media Queries
-		For optimal performance, use a custom Modernizr build: www.modernizr.com/download/ -->
-		<script src="js/libs/modernizr-2.0.6.min.js"></script>
+		body {
+			font-family: 'Open Sans', sans-serif;
+			background-position: center center;
+			background-image: url('gears.jpg');
+			background-repeat: no-repeat;
+			background-size: cover;
+			align-items: center;
+			justify-content: center;
+			display: flex;
+		}
 
-		<!-- Favicon Setting -->
-		<link rel="icon" type="image/x-icon" href='${urlTransformationService.transform('toWebAppRelativeUrl', '/static-assets/img/favicon.ico')}'/>
-	</head>
+		#main {
+			margin: 20px;
+			padding: 20px;
+			max-width: 400px;
+			border-radius: 20px;
+			background-color: #fff;
+			background-color: rgba(255,255,255,.9);
+			position: relative;
+		}
 
-	<body>
-		<div id="container">
-			<div id="side-col">
-				<header>
-					<a class="logo" href="#"><img src="/static-assets/img/logo.svg" alt="Crafter CMS"/></a>
-					<nav>
-						<ul>
-							<li class="active"><span>Crafter CMS</span></li>
-							<li><a href="/studio"><span>Back to Crafter Studio</span></a></li>
-							<li><a href="http://docs.craftercms.org"><span>Documentation</span></a></li>
-							<li><a href="http://www.craftersoftware.com/resources"><span>Tutorials &amp; Screencasts</span></a></li>
-							<li><a href="http://www.craftersoftware.com/about/partners"><span>Professional Services</span></a></li>
-						</ul>
-					</nav>
-				</header>
-			</div>
+		.footer {
+			font-size: 65%;
+			color: #999;
+		}
 
-			<div id="main" role="main">
-				<section class="features bgOpaque">
-					<h1>Welcome to Crafter CMS</h1>
-					<h2>Error: No Site is Set.</h2>
-					<p>Crafter Engine has no sites configured for this domain.</p>
-					<h2>What is Crafter CMS?</h2>
-					<p>Crafter CMS is a modern content management platform for building digital experience applications using:</p>
-						<ul>
-							<li>SPA frameworks like React, Vue, and Angular</li>
-							<li>AR/VR applications using A-Frame</li>
-							<li>Native Mobile and Headless applications</li>
-							<li>HTML5 Websites using Bootstrap or other HTML frameworks</li>
-						</ul>
-					<p>Crafter is a dynamic CMS based on Git and supports DevOps processes for code and content. It is also a hybrid-headless, API-first (GraphQL, REST, in-process) CMS, and that allows developers to use their favorite UI frameworks and tools.</p>
-					<p>Crafter CMS differentiates itself from existing CMSs with its architecture: microservices-based, serverless, elastic and planet-wide scalability. To learn more, see the <a href="http://docs.craftercms.org">docs</a>.</p>
-				</section>
-			</div>
-		</div>
-		<footer>
-			<p>Copyright &copy; 2007 - ${.now?string('yyyy')}, Crafter Software Corporation. All rights reserved.<br />
-			Crafter CMS is open source software licensed under the GNU General Public License (GPL) version 3.0.</p>
-		</footer>
+		.logo {
+			width: 200px;
+			margin: 20px auto;
+			display: block;
+		}
 
-		<!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
-		<script src="/static-assets/js/libs/jquery-1.6.2.min.js"></script>
+		.navigation {
+			margin: 0 0 20px;
+		}
 
-		<!-- scripts concatenated and minified via ant build script-->
-		<script defer src="/static-assets/js/plugins.js"></script>
-		<script defer src="/static-assets/js/script.js"></script>
-		<!-- end scripts-->
-	</body>
+		.navigation--title {
+			font-size: 80%;
+		}
+
+		.navigation--link {
+			font-size: 80%;
+			display: block;
+		}
+
+		.footer,
+		.no-site-message {
+			text-align: center;
+		}
+	</style>
+	<!-- end CSS-->
+
+	<!-- Favicon Setting -->
+	<link rel="icon" type="image/x-icon"
+				href='${urlTransformationService.transform('toWebAppRelativeUrl', '/static-assets/img/favicon.ico')}'/>
+</head>
+
+<body>
+
+<main id="main">
+
+	<a href="https://craftercms.org">
+		<img src="${urlTransformationService.transform('toWebAppRelativeUrl', '/static-assets/img/logo.svg')}" alt="Crafter CMS"/>
+	</a>
+
+	<div class="no-site-message">
+		<p>
+			Crafter CMS has no site configured for this domain.
+			Please <a href="https://docs.craftercms.org/en/3.1/system-administrators/activities/delivery/configure-apache-vhost.html">configure the site you want to show</a>
+			or select a site on <a href="/studio">the authoring environment</a>.
+		</p>
+	</div>
+
+	<nav class="navigation">
+		<h2 class="navigation--title">Helpful links:</h2>
+    <a class="navigation--link" href="https://docs.craftercms.org/en/3.1/system-administrators/activities/delivery/setup-site-for-delivery.html">Setup delivery environment</a>
+    <a class="navigation--link" href="https://docs.craftercms.org/en/3.1/system-administrators/activities/production-environment-setup.html">Setup production environment</a>
+		<a class="navigation--link" href="/studio">Authoring environment</a>
+		<a class="navigation--link" href="http://docs.craftercms.org">Docs Homepage</a>
+		<a class="navigation--link" href="http://www.craftersoftware.com/resources">Tutorials &amp; Screencasts</a>
+		<a class="navigation--link" href="http://www.craftersoftware.com/about/partners">Professional Services</a>
+	</nav>
+
+	<footer class="footer">
+		Copyright &copy; 2007 - ${.now?string('yyyy')}, Crafter Software Corporation. All rights reserved.
+		Crafter CMS is open source software licensed under the GNU General Public License (GPL) version 3.0.
+	</footer>
+
+</main>
+
+</body>
 </html>
