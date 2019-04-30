@@ -36,10 +36,15 @@ public class CookieSiteResolver implements SiteResolver {
     private static final Log logger = LogFactory.getLog(CookieSiteResolver.class);
 
     protected String paramOrCookieName;
+    protected String defaultSiteName;
 
     @Required
     public void setParamOrCookieName(String paramOrCookieName) {
         this.paramOrCookieName = paramOrCookieName;
+    }
+
+    public void setDefaultSiteName(String defaultSiteName) {
+        this.defaultSiteName = defaultSiteName;
     }
 
     @Override
@@ -47,8 +52,10 @@ public class CookieSiteResolver implements SiteResolver {
         String siteName = request.getParameter(paramOrCookieName);
         if (StringUtils.isEmpty(siteName)) {
             siteName = HttpUtils.getCookieValue(paramOrCookieName, request);
+            if (StringUtils.isEmpty(siteName))
+                siteName = defaultSiteName;
             if (StringUtils.isEmpty(siteName) && logger.isDebugEnabled()) {
-                logger.debug("No '" + paramOrCookieName + "' request param or cookie found");
+                logger.debug("No '" + paramOrCookieName + "' request param or cookie found. No default sitename set.");
             }
         }
 

@@ -44,6 +44,7 @@
 
     <bean id="crafter.siteResolver" class="org.craftercms.engine.service.context.CookieSiteResolver">
         <property name="paramOrCookieName" value="${crafter.engine.request.param.siteName}"/>
+        <property name="defaultSiteName" value="${crafter.engine.site.default.name}"/>
     </bean>
 
     <bean id="crafter.siteContextsBootstrap" class="org.craftercms.engine.service.context.SiteContextsBootstrap">
