@@ -32,7 +32,7 @@
 		body {
 			font-family: 'Open Sans', sans-serif;
 			background-position: center center;
-			background-image: url('gears.jpg');
+			background-image: url('${urlTransformationService.transform('toWebAppRelativeUrl', '/static-assets/img/gears.jpg')}');
 			background-repeat: no-repeat;
 			background-size: cover;
 			align-items: center;
