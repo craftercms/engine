@@ -88,13 +88,15 @@ public class CheckboxGroupFieldFactory implements GraphQLFieldFactory {
         String datasourceSuffix = null;
 
         try {
-            List<Map<String, Object>> typeSetting = objectMapper.readValue(datasourceSettings, List.class);
-            Optional<Map<String, Object>> selectedType = typeSetting.stream()
-                .filter(s -> (Boolean) s.get(FIELD_NAME_SELECTED))
-                .findFirst();
-            if (selectedType.isPresent()) {
-                datasourceType = selectedType.get().get(FIELD_NAME_VALUE).toString();
-                datasourceSuffix = StringUtils.substringAfter(datasourceType, FIELD_SEPARATOR);
+            if(StringUtils.isNotEmpty(datasourceSettings)) {
+                List<Map<String, Object>> typeSetting = objectMapper.readValue(datasourceSettings, List.class);
+                Optional<Map<String, Object>> selectedType =
+                    typeSetting.stream()
+                               .filter(s -> (Boolean)s.get(FIELD_NAME_SELECTED)).findFirst();
+                if (selectedType.isPresent()) {
+                    datasourceType = selectedType.get().get(FIELD_NAME_VALUE).toString();
+                    datasourceSuffix = StringUtils.substringAfter(datasourceType, FIELD_SEPARATOR);
+                }
             }
         } catch (IOException e) {
             logger.warn("Error checking data source type for '{}'", contentTypeFieldId);
