@@ -69,8 +69,7 @@ public class S3ContentStoreAdapter extends AbstractFileBasedContentStoreAdapter 
      * {@inheritDoc}
      */
     @Override
-    public Context createContext(final String id, final String storeServerUrl, final String username,
-                                 final String password, final String rootFolderPath, final boolean mergingOn,
+    public Context createContext(final String id, final String rootFolderPath, final boolean mergingOn,
                                  final boolean cacheOn, final int maxAllowedItemsInCache,
                                  final boolean ignoreHiddenFiles)
         throws RootFolderNotFoundException, StoreException, AuthenticationException {
@@ -87,8 +86,8 @@ public class S3ContentStoreAdapter extends AbstractFileBasedContentStoreAdapter 
             throw new RootFolderNotFoundException("Root folder " + rootFolderPath + " not found");
         }
 
-        return new S3Context(id, this, storeServerUrl, rootFolderPath, mergingOn, cacheOn, maxAllowedItemsInCache,
-            ignoreHiddenFiles, uri);
+        return new S3Context(id, this, rootFolderPath, mergingOn, cacheOn, maxAllowedItemsInCache,
+                             ignoreHiddenFiles, uri);
     }
 
     /**
