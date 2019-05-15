@@ -26,12 +26,23 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import graphql.language.Argument;
+import graphql.language.BooleanValue;
 import graphql.language.Field;
+import graphql.language.FloatValue;
+import graphql.language.FragmentDefinition;
+import graphql.language.FragmentSpread;
+import graphql.language.InlineFragment;
+import graphql.language.IntValue;
+import graphql.language.ObjectField;
+import graphql.language.ObjectValue;
+import graphql.language.Selection;
+import graphql.language.StringValue;
+import graphql.language.Value;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import graphql.schema.SelectedField;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang.StringUtils;
 import org.craftercms.search.elasticsearch.ElasticsearchWrapper;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -107,7 +118,7 @@ public class ContentTypeBasedDataFetcher implements DataFetcher<Object> {
      */
     @Override
     public Object get(final DataFetchingEnvironment env) {
-        Field field = env.getField();
+        Field field = env.getMergedField().getSingleField();
         String fieldName = field.getName();
 
         // Get arguments for pagination & sorting
@@ -150,10 +161,15 @@ public class ContentTypeBasedDataFetcher implements DataFetcher<Object> {
         }
 
         // Check the selected fields to build the ES query
-        SelectedField requestedFields = env.getSelectionSet().getField(FIELD_NAME_ITEMS);
-        if (Objects.nonNull(requestedFields)) {
-            List<SelectedField> fields = requestedFields.getSelectionSet().getFields();
-            fields.forEach(selectedField -> processSelectedField(selectedField, query, queryFieldIncludes));
+        Optional<Field> itemsField = field.getSelectionSet().getSelections()
+                            .stream()
+                            .map(f -> (Field) f)
+                            .filter(f -> f.getName().equals(FIELD_NAME_ITEMS))
+                            .findFirst();
+        if (itemsField.isPresent()) {
+            List<Selection> selections = itemsField.get().getSelectionSet().getSelections();
+            selections.forEach(selection -> processSelection(StringUtils.EMPTY, selection, query, queryFieldIncludes,
+             env));
         }
 
         // Only fetch the selected fields for better performance
@@ -185,62 +201,102 @@ public class ContentTypeBasedDataFetcher implements DataFetcher<Object> {
     /**
      * Adds the required filters to the ES query for the given field
      */
-    @SuppressWarnings("unchecked")
-    protected void processSelectedField(SelectedField currentField, BoolQueryBuilder query,
-                                        List<String> queryFieldIncludes)  {
-        // Get the original field name
-        String propertyName = getOriginalName(currentField.getQualifiedName());
-        // Build the ES-friendly path
-        String path = propertyName.replaceAll("/", ".");
+    protected void processSelection(String path, Selection currentSelection, BoolQueryBuilder query,
+                                    List<String> queryFieldIncludes, DataFetchingEnvironment env)  {
+        if (currentSelection instanceof Field) {
+            // If the current selection is a field
 
-        // Add the field to the list if it doesn't have any sub fields
-        if (CollectionUtils.isEmpty(currentField.getSelectionSet().getFields())) {
-            logger.debug("Adding selected field '{}' to query", path);
-            queryFieldIncludes.add(path);
+            Field currentField = (Field) currentSelection;
+
+            // Get the original field name
+            String propertyName = getOriginalName(currentField.getName());
+            // Build the ES-friendly path
+            String fullPath = StringUtils.isEmpty(path)? propertyName : path + "." + propertyName;
+
+            // If the field has sub selection
+            if (Objects.nonNull(currentField.getSelectionSet())) {
+                // Process recursively and finish
+                currentField.getSelectionSet().getSelections()
+                    .forEach(selection -> processSelection(fullPath, selection, query, queryFieldIncludes, env));
+                return;
+            }
+
+            // Add the field to the list
+            logger.debug("Adding selected field '{}' to query", fullPath);
+            queryFieldIncludes.add(fullPath);
+
+            // Check the filters to build the ES query
+            Optional<Argument> arg =
+                currentField.getArguments().stream().filter(a -> a.getName().equals(FILTER_NAME)).findFirst();
+            if (arg.isPresent() && arg.get().getValue() instanceof ObjectValue) {
+                logger.debug("Adding filters for field {}", fullPath);
+
+                List<ObjectField> filters = ((ObjectValue) arg.get().getValue()).getObjectFields();
+                filters.forEach((filter) -> {
+                    switch (filter.getName()) {
+                        case ARG_NAME_EQUALS:
+                            query.filter(QueryBuilders.termQuery(fullPath, getRealValue(filter.getValue())));
+                            break;
+                        case ARG_NAME_MATCHES:
+                            query.filter(QueryBuilders.matchQuery(fullPath, getRealValue(filter.getValue())));
+                            break;
+                        case ARG_NAME_REGEX:
+                            query.filter(
+                                QueryBuilders.regexpQuery(fullPath, getRealValue(filter.getValue()).toString()));
+                            break;
+                        case ARG_NAME_LT:
+                            query.filter(QueryBuilders.rangeQuery(fullPath).lt(getRealValue(filter.getValue())));
+                            break;
+                        case ARG_NAME_GT:
+                            query.filter(QueryBuilders.rangeQuery(fullPath).gt(getRealValue(filter.getValue())));
+                            break;
+                        case ARG_NAME_LTE:
+                            query.filter(QueryBuilders.rangeQuery(fullPath).lte(getRealValue(filter.getValue())));
+                            break;
+                        case ARG_NAME_GTE:
+                            query.filter(QueryBuilders.rangeQuery(fullPath).gte(getRealValue(filter.getValue())));
+                            break;
+                        case ARG_NAME_EXISTS:
+                            boolean exists = (boolean) getRealValue(filter.getValue());
+                            if (exists) {
+                                query.filter(QueryBuilders.existsQuery(fullPath));
+                            } else {
+                                query.mustNot(QueryBuilders.existsQuery(fullPath));
+                            }
+                            break;
+                        default:
+                            // never happens
+                    }
+                });
+            }
+        } else if (currentSelection instanceof InlineFragment) {
+            // If the current selection is an inline fragment, process recursively
+            InlineFragment fragment = (InlineFragment) currentSelection;
+            fragment.getSelectionSet().getSelections()
+                .forEach(selection -> processSelection(path, selection, query, queryFieldIncludes, env));
+        } else if (currentSelection instanceof FragmentSpread) {
+            // If the current selection is a fragment spread, find the fragment and process recursively
+            FragmentSpread fragmentSpread = (FragmentSpread) currentSelection;
+            FragmentDefinition fragmentDefinition = env.getFragmentsByName().get(fragmentSpread.getName());
+            fragmentDefinition.getSelectionSet().getSelections()
+                .forEach(selection -> processSelection(path, selection, query, queryFieldIncludes, env));
         }
+    }
 
-        // Check the filters to build the ES query
-        Object arg = currentField.getArguments().get(FILTER_NAME);
-        if (Objects.nonNull(arg) && arg instanceof Map) {
-            logger.debug("Adding filters for field {}", path);
-
-            Map<String, Object> filters = (Map<String, Object>) arg;
-            filters.forEach((name, value) -> {
-                switch (name) {
-                    case ARG_NAME_EQUALS:
-                        query.filter(QueryBuilders.termQuery(path, value));
-                        break;
-                    case ARG_NAME_MATCHES:
-                        query.filter(QueryBuilders.matchQuery(path, value));
-                        break;
-                    case ARG_NAME_REGEX:
-                        query.filter(QueryBuilders.regexpQuery(path, value.toString()));
-                        break;
-                    case ARG_NAME_LT:
-                        query.filter(QueryBuilders.rangeQuery(path).lt(value));
-                        break;
-                    case ARG_NAME_GT:
-                        query.filter(QueryBuilders.rangeQuery(path).gt(value));
-                        break;
-                    case ARG_NAME_LTE:
-                        query.filter(QueryBuilders.rangeQuery(path).lte(value));
-                        break;
-                    case ARG_NAME_GTE:
-                        query.filter(QueryBuilders.rangeQuery(path).gte(value));
-                        break;
-                    case ARG_NAME_EXISTS:
-                        boolean exists = value instanceof Boolean ? (Boolean)value : Boolean.parseBoolean(value.toString());
-                        if (exists) {
-                            query.filter(QueryBuilders.existsQuery(path));
-                        } else {
-                            query.mustNot(QueryBuilders.existsQuery(path));
-                        }
-                        break;
-                    default:
-                        // never happens
-                }
-            });
+    /**
+     * Extracts a scalar value, this is needed because of GraphQL strict types
+     */
+    protected Object getRealValue(Value value) {
+        if (value instanceof BooleanValue) {
+            return ((BooleanValue)value).isValue();
+        } else if (value instanceof FloatValue) {
+            return ((FloatValue) value).getValue();
+        } else if (value instanceof IntValue) {
+            return ((IntValue) value).getValue();
+        } else if (value instanceof StringValue) {
+            return ((StringValue) value).getValue();
         }
+        return null;
     }
 
     /**
