@@ -36,6 +36,7 @@ import org.craftercms.search.elasticsearch.ElasticsearchWrapper;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -205,41 +206,72 @@ public class ContentTypeBasedDataFetcher implements DataFetcher<Object> {
             logger.debug("Adding filters for field {}", path);
 
             Map<String, Object> filters = (Map<String, Object>) arg;
-            filters.forEach((name, value) -> {
-                switch (name) {
-                    case ARG_NAME_EQUALS:
-                        query.filter(QueryBuilders.termQuery(path, value));
-                        break;
-                    case ARG_NAME_MATCHES:
-                        query.filter(QueryBuilders.matchQuery(path, value));
-                        break;
-                    case ARG_NAME_REGEX:
-                        query.filter(QueryBuilders.regexpQuery(path, value.toString()));
-                        break;
-                    case ARG_NAME_LT:
-                        query.filter(QueryBuilders.rangeQuery(path).lt(value));
-                        break;
-                    case ARG_NAME_GT:
-                        query.filter(QueryBuilders.rangeQuery(path).gt(value));
-                        break;
-                    case ARG_NAME_LTE:
-                        query.filter(QueryBuilders.rangeQuery(path).lte(value));
-                        break;
-                    case ARG_NAME_GTE:
-                        query.filter(QueryBuilders.rangeQuery(path).gte(value));
-                        break;
-                    case ARG_NAME_EXISTS:
-                        boolean exists = value instanceof Boolean ? (Boolean)value : Boolean.parseBoolean(value.toString());
-                        if (exists) {
-                            query.filter(QueryBuilders.existsQuery(path));
-                        } else {
-                            query.mustNot(QueryBuilders.existsQuery(path));
-                        }
-                        break;
-                    default:
-                        // never happens
+            filters.forEach((name, value) -> addFieldFilter(name, path, value, query));
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    protected void addFieldFilter(String name, String path, Object value, BoolQueryBuilder query) {
+        if (value instanceof List) {
+            List<Map<String, Object>> actualFilters = (List<Map<String, Object>>) value;
+            switch (name) {
+                case ARG_NAME_NOT:
+                    BoolQueryBuilder notQuery = QueryBuilders.boolQuery();
+                    actualFilters.forEach(notFilter -> notFilter.forEach((notName, notValue) ->
+                        addFieldFilter(notName, path, notValue, notQuery)));
+                    query.mustNot(notQuery);
+                    break;
+                case ARG_NAME_AND:
+                    BoolQueryBuilder andQuery = QueryBuilders.boolQuery();
+                    actualFilters.forEach(orFilter -> orFilter.forEach((orName, orValue) ->
+                        addFieldFilter(orName, path, orValue, andQuery)));
+                    query.filter(andQuery);
+                    break;
+                case ARG_NAME_OR:
+                    BoolQueryBuilder orQuery = QueryBuilders.boolQuery();
+                    actualFilters.forEach(orFilter -> {
+                        BoolQueryBuilder shouldQuery = QueryBuilders.boolQuery();
+                        orFilter.forEach((orName, orValue) -> addFieldFilter(orName, path, orValue, shouldQuery));
+                        orQuery.filter(shouldQuery);
+                    });
+                    BoolQueryBuilder realOrQuery = QueryBuilders.boolQuery();
+                    orQuery.filter().forEach(realOrQuery::should);
+                    query.must(realOrQuery);
+                    break;
+                default:
+                    // never happens
+            }
+        } else {
+            query.filter(getFilterQuery(name, path, value));
+        }
+    }
+
+    protected QueryBuilder getFilterQuery(String argName, String fieldPath, Object argValue) {
+        switch (argName) {
+            case ARG_NAME_EQUALS:
+                return QueryBuilders.termQuery(fieldPath, argValue);
+            case ARG_NAME_MATCHES:
+                return QueryBuilders.matchQuery(fieldPath, argValue);
+            case ARG_NAME_REGEX:
+                return QueryBuilders.regexpQuery(fieldPath, argValue.toString());
+            case ARG_NAME_LT:
+                return QueryBuilders.rangeQuery(fieldPath).lt(argValue);
+            case ARG_NAME_GT:
+                return QueryBuilders.rangeQuery(fieldPath).gt(argValue);
+            case ARG_NAME_LTE:
+                return QueryBuilders.rangeQuery(fieldPath).lte(argValue);
+            case ARG_NAME_GTE:
+                return QueryBuilders.rangeQuery(fieldPath).gte(argValue);
+            case ARG_NAME_EXISTS:
+                boolean exists = argValue instanceof Boolean ? (Boolean)argValue : Boolean.parseBoolean(argValue.toString());
+                if (exists) {
+                    return QueryBuilders.existsQuery(fieldPath);
+                } else {
+                    return QueryBuilders.existsQuery(fieldPath);
                 }
-            });
+            default:
+                // never happens
+                return null;
         }
     }
 
