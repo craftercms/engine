@@ -307,7 +307,7 @@ public abstract class SchemaUtils {
         GraphQLFieldDefinition.newFieldDefinition()
             .name(getGraphQLName("internal-name"))
             .description("The name/label of the item in Authoring (can also be used as a navigation label in Delivery)")
-            .type(nonNull(GraphQLString))
+            .type(GraphQLString)
             .argument(STRING_FILTER)
             .build(),
         GraphQLFieldDefinition.newFieldDefinition()
