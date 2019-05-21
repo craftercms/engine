@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import graphql.language.Argument;
 import graphql.language.BooleanValue;
@@ -310,7 +311,10 @@ public class ContentTypeBasedDataFetcher implements DataFetcher<Object> {
             String graphQLKey = getGraphQLName(key);
             if (FIELD_NAME_ITEM.equals(key)) {
                 if (!(value instanceof List)) {
-                    temp.put(graphQLKey, Collections.singletonList(fixItems((Map<String, Object>) value)));
+                    temp.put(graphQLKey, Collections.singletonList(fixItems((Map<String, Object>)value)));
+                } else {
+                    List<Map<String, Object>> list = (List<Map<String, Object>>) value;
+                    temp.put(graphQLKey, list.stream().map(this::fixItems).collect(Collectors.toList()));
                 }
             } else if (value instanceof Map) {
                 temp.put(graphQLKey, fixItems((Map<String, Object>) value));
