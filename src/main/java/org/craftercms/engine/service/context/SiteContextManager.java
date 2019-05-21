@@ -96,6 +96,11 @@ public class SiteContextManager implements ApplicationContextAware {
         return contextRegistry.values();
     }
 
+    /**
+     * Creates all contexts (if not already created) for the specified site names
+     *
+     * @param siteNames the site names of the contexts to create
+     */
     public void createContexts(Collection<String> siteNames) {
         logger.info("==================================================");
         logger.info("<CREATING SITE CONTEXTS>");
@@ -105,7 +110,7 @@ public class SiteContextManager implements ApplicationContextAware {
             for (String siteName : siteNames) {
                 try {
                     // If the site context doesn't exist (it's new), it will be created
-                    createContext(siteName, false);
+                    getContext(siteName, false);
                 } catch (Exception e) {
                     logger.error("Error creating site context for site '" + siteName + "'", e);
                 }
@@ -117,10 +122,9 @@ public class SiteContextManager implements ApplicationContextAware {
         logger.info("==================================================");
     }
 
-    public SiteContext createContext(String siteName, boolean fallback) {
-        return getContext(siteName, fallback);
-    }
-
+    /**
+     * Destroys all contexts
+     */
     public void destroyAllContexts() {
         logger.info("==================================================");
         logger.info("<DESTROYING SITE CONTEXTS>");
@@ -157,26 +161,88 @@ public class SiteContextManager implements ApplicationContextAware {
         logger.info("==================================================");
     }
 
-    protected void destroyContexts(Collection<String> siteNames) {
-        logger.info("==================================================");
-        logger.info("<DESTROYING SITE CONTEXTS>");
-        logger.info("==================================================");
-
-        if (CollectionUtils.isNotEmpty(siteNames)) {
-            for (String siteName : siteNames) {
-                try {
-                    destroyContext(siteName);
-                } catch (Exception e) {
-                    logger.error("Error destroying site context for site '" + siteName + "'", e);
-                }
+    /**
+     * Gets the {@link SiteContext} for the specified site name. If no context exists, a new one is created.
+     *
+     * @param siteName the context's site name
+     * @param fallback if the context is a fallback (which means it will be used if no context can be resolved during
+     *                 requests
+     *
+     * @return the context
+     */
+    public SiteContext getContext(String siteName, boolean fallback) {
+        SiteContext siteContext = contextRegistry.get(siteName);
+        if (siteContext == null) {
+            if (!fallback && !validateSiteCreationEntitlement()) {
+                return null;
             }
+
+            lock.lock();
+            try {
+                // Double check locking, in case the context has been created already by another thread
+                siteContext = contextRegistry.get(siteName);
+                if (siteContext == null) {
+                    logger.info("==================================================");
+                    logger.info("<Creating site context: " + siteName + ">");
+                    logger.info("==================================================");
+
+                    try {
+                        siteContext = createContext(siteName, fallback);
+                    } catch (RootFolderNotFoundException e) {
+                        logger.error("Cannot resolve root folder for site '" + siteName + "'", e);
+                    } finally {
+                        logger.info("==================================================");
+                        logger.info("</Creating site context: " + siteName + ">");
+                        logger.info("==================================================");
+                    }
+                }
+            } finally {
+                lock.unlock();
+            }
+        } else if (!siteContext.isValid()) {
+            logger.error("Site context " + siteContext + " is not valid anymore");
+
+            destroyContext(siteName);
+
+            siteContext = null;
         }
 
-        logger.info("==================================================");
-        logger.info("</DESTROYING SITE CONTEXTS>");
-        logger.info("==================================================");
+        return siteContext;
     }
 
+    public SiteContext rebuildContext(String siteName, boolean fallback) {
+        lock.lock();
+        try {
+            logger.info("==================================================");
+            logger.info("<Rebuilding site context: " + siteName + ">");
+            logger.info("==================================================");
+
+            try {
+                SiteContext oldSiteContext = contextRegistry.get(siteName);
+                SiteContext newSiteContext = createContext(siteName, fallback);
+
+                oldSiteContext.destroy();
+
+                return newSiteContext;
+            } catch (RootFolderNotFoundException e) {
+                logger.error("Cannot resolve root folder for site '" + siteName + "'", e);
+            } finally {
+                logger.info("==================================================");
+                logger.info("</Rebuilding site context: " + siteName + ">");
+                logger.info("==================================================");
+            }
+        } finally {
+            lock.unlock();
+        }
+
+        return null;
+    }
+
+    /**
+     * Destroys the context for the specified site name
+     *
+     * @param siteName the site name of the context to destroy
+     */
     public void destroyContext(String siteName) {
         lock.lock();
         try {
@@ -197,15 +263,24 @@ public class SiteContextManager implements ApplicationContextAware {
         }
     }
 
-    public SiteContext rebuildContext(String siteName, boolean fallback) {
-        lock.lock();
-        try {
-            destroyContext(siteName);
+    protected void destroyContexts(Collection<String> siteNames) {
+        logger.info("==================================================");
+        logger.info("<DESTROYING SITE CONTEXTS>");
+        logger.info("==================================================");
 
-            return getContext(siteName, fallback);
-        } finally {
-            lock.unlock();
+        if (CollectionUtils.isNotEmpty(siteNames)) {
+            for (String siteName : siteNames) {
+                try {
+                    destroyContext(siteName);
+                } catch (Exception e) {
+                    logger.error("Error destroying site context for site '" + siteName + "'", e);
+                }
+            }
         }
+
+        logger.info("==================================================");
+        logger.info("</DESTROYING SITE CONTEXTS>");
+        logger.info("==================================================");
     }
 
     /**
@@ -223,64 +298,23 @@ public class SiteContextManager implements ApplicationContextAware {
         jobThreadPoolExecutor.execute(siteContext::buildGraphQLSchema);
     }
 
-    public SiteContext getContext(String siteName, boolean fallback) {
-        SiteContext siteContext = contextRegistry.get(siteName);
-        if (siteContext == null) {
-            if(!fallback) {
-                try {
-                    int totalSites = (int) contextRegistry.values().stream()
-                                            .filter(context -> !context.isFallback())
-                                            .count();
-                    entitlementValidator.validateEntitlement(Module.ENGINE, EntitlementType.SITE, totalSites, 1);
-                } catch (EntitlementException e) {
-                    return null;
-                }
-            }
+    protected SiteContext createContext(String siteName, boolean fallback) {
+        SiteContext siteContext;
 
-            lock.lock();
-            try {
-                // Double check locking, in case the context has been created already by another thread
-                siteContext = contextRegistry.get(siteName);
-                if (siteContext == null) {
-                    logger.info("==================================================");
-                    logger.info("<Creating site context: " + siteName + ">");
-                    logger.info("==================================================");
-
-                    try {
-                        if (fallback) {
-                            siteContext = fallbackContextFactory.createContext(siteName);
-                            siteContext.setFallback(true);
-                        } else {
-                            siteContext = contextFactory.createContext(siteName);
-                        }
-
-                        publishEvent(new SiteContextCreatedEvent(siteContext, this), siteContext);
-
-                        contextRegistry.put(siteName, siteContext);
-
-                        logger.info("Site context created: " + siteContext);
-
-                        startGraphQLBuild(siteContext);
-                    } finally {
-                        logger.info("==================================================");
-                        logger.info("</Creating site context: " + siteName + ">");
-                        logger.info("==================================================");
-                    }
-                }
-            } catch (RootFolderNotFoundException e) {
-                logger.error("Cannot resolve root folder for site '" + siteName + "'", e);
-            } finally {
-                lock.unlock();
-            }
+        if (fallback) {
+            siteContext = fallbackContextFactory.createContext(siteName);
+            siteContext.setFallback(true);
         } else {
-            if (!siteContext.isValid()) {
-                logger.error("Site context " + siteContext + " is not valid anymore");
-
-                destroyContext(siteName);
-
-                siteContext = null;
-            }
+            siteContext = contextFactory.createContext(siteName);
         }
+
+        publishEvent(new SiteContextCreatedEvent(siteContext, this), siteContext);
+
+        contextRegistry.put(siteName, siteContext);
+
+        logger.info("Site context created: " + siteContext);
+
+        startGraphQLBuild(siteContext);
 
         return siteContext;
     }
@@ -299,6 +333,19 @@ public class SiteContextManager implements ApplicationContextAware {
             siteApplicationContext.publishEvent(event);
         } else {
             applicationContext.publishEvent(event);
+        }
+    }
+
+    protected boolean validateSiteCreationEntitlement() {
+        try {
+            int totalSites = (int) contextRegistry.values().stream()
+                                                  .filter(context -> !context.isFallback())
+                                                  .count();
+            entitlementValidator.validateEntitlement(Module.ENGINE, EntitlementType.SITE, totalSites, 1);
+
+            return true;
+        } catch (EntitlementException e) {
+            return false;
         }
     }
 

@@ -18,11 +18,7 @@ package org.craftercms.engine.service.context;
 
 import java.io.InputStream;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Executor;
 import javax.servlet.ServletContext;
 
@@ -86,9 +82,6 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected ServletContext servletContext;
     protected String siteNameMacroName;
     protected String storeType;
-    protected String storeServerUrl;
-    protected String username;
-    protected String password;
     protected String rootFolderPath;
     protected String staticAssetsPath;
     protected String templatesPath;
@@ -117,9 +110,6 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
 
     public SiteContextFactory() {
         siteNameMacroName = DEFAULT_SITE_NAME_MACRO_NAME;
-        storeServerUrl = null;
-        username = null;
-        password = null;
         mergingOn = Context.DEFAULT_MERGING_ON;
         cacheOn = Context.DEFAULT_CACHE_ON;
         maxAllowedItemsInCache = Context.DEFAULT_MAX_ALLOWED_ITEMS_IN_CACHE;
@@ -138,18 +128,6 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     @Required
     public void setStoreType(String storeType) {
         this.storeType = storeType;
-    }
-
-    public void setStoreServerUrl(String storeServerUrl) {
-        this.storeServerUrl = storeServerUrl;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     @Required
@@ -276,8 +254,8 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         Map<String, String> macroValues = Collections.singletonMap(siteNameMacroName, siteName);
         String resolvedRootFolderPath = macroResolver.resolveMacros(rootFolderPath, macroValues);
 
-        Context context = storeService.createContext(storeType, storeServerUrl, username, password, resolvedRootFolderPath,
-                                                     mergingOn, cacheOn, maxAllowedItemsInCache, ignoreHiddenFiles);
+        Context context = storeService.getContext(UUID.randomUUID().toString(), storeType, resolvedRootFolderPath,
+                                                  mergingOn, cacheOn, maxAllowedItemsInCache, ignoreHiddenFiles);
 
         try {
             SiteContext siteContext = new SiteContext();
@@ -504,7 +482,9 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             }
 
             if (CollectionUtils.isNotEmpty(allJobContexts)) {
-                Scheduler scheduler = SchedulingUtils.createScheduler(siteName + "_scheduler", jobThreadPoolExecutor);
+                Scheduler scheduler = SchedulingUtils.createScheduler(
+                        String.format("%s_%s_scheduler", siteName, siteContext.getContext().getId()),
+                        jobThreadPoolExecutor);
 
                 for (JobContext jobContext : allJobContexts) {
                     scheduler.scheduleJob(jobContext.getDetail(), jobContext.getTrigger());
