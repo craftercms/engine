@@ -205,7 +205,6 @@ public class ContentTypeBasedDataFetcher implements DataFetcher<Object> {
                                     List<String> queryFieldIncludes, DataFetchingEnvironment env)  {
         if (currentSelection instanceof Field) {
             // If the current selection is a field
-
             Field currentField = (Field) currentSelection;
 
             // Get the original field name
