@@ -191,10 +191,10 @@ public class GraphQLTypeFactoryImpl implements GraphQLTypeFactory {
 
             if (fieldFactories.containsKey(contentTypeFieldType)) {
                 fieldFactories.get(contentTypeFieldType).createField(contentTypeDefinition, contentTypeField,
-                                                                     contentTypeFieldId, parentGraphQLTypeName, parentGraphQLType,
-                                                                     graphQLFieldName, graphQLField);
+                                                                     contentTypeFieldId, parentGraphQLTypeName,
+                                                                     parentGraphQLType, graphQLFieldName, graphQLField);
             } else {
-                setTypeFromFieldName(parentGraphQLTypeName, graphQLField);
+                setTypeFromFieldName(contentTypeFieldId, graphQLField);
             }
 
             parentGraphQLType.field(graphQLField);
