@@ -25,13 +25,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import graphql.language.Argument;
+import graphql.language.BooleanValue;
 import graphql.language.Field;
+import graphql.language.FloatValue;
+import graphql.language.FragmentDefinition;
+import graphql.language.FragmentSpread;
+import graphql.language.InlineFragment;
+import graphql.language.IntValue;
+import graphql.language.ObjectField;
+import graphql.language.ObjectValue;
+import graphql.language.Selection;
+import graphql.language.StringValue;
+import graphql.language.Value;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import graphql.schema.SelectedField;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang.StringUtils;
 import org.craftercms.search.elasticsearch.ElasticsearchWrapper;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -108,7 +120,7 @@ public class ContentTypeBasedDataFetcher implements DataFetcher<Object> {
      */
     @Override
     public Object get(final DataFetchingEnvironment env) {
-        Field field = env.getField();
+        Field field = env.getMergedField().getSingleField();
         String fieldName = field.getName();
 
         // Get arguments for pagination & sorting
@@ -151,10 +163,15 @@ public class ContentTypeBasedDataFetcher implements DataFetcher<Object> {
         }
 
         // Check the selected fields to build the ES query
-        SelectedField requestedFields = env.getSelectionSet().getField(FIELD_NAME_ITEMS);
-        if (Objects.nonNull(requestedFields)) {
-            List<SelectedField> fields = requestedFields.getSelectionSet().getFields();
-            fields.forEach(selectedField -> processSelectedField(selectedField, query, queryFieldIncludes));
+        Optional<Field> itemsField = field.getSelectionSet().getSelections()
+                            .stream()
+                            .map(f -> (Field) f)
+                            .filter(f -> f.getName().equals(FIELD_NAME_ITEMS))
+                            .findFirst();
+        if (itemsField.isPresent()) {
+            List<Selection> selections = itemsField.get().getSelectionSet().getSelections();
+            selections.forEach(selection -> processSelection(StringUtils.EMPTY, selection, query, queryFieldIncludes,
+             env));
         }
 
         // Only fetch the selected fields for better performance
@@ -186,52 +203,74 @@ public class ContentTypeBasedDataFetcher implements DataFetcher<Object> {
     /**
      * Adds the required filters to the ES query for the given field
      */
-    @SuppressWarnings("unchecked")
-    protected void processSelectedField(SelectedField currentField, BoolQueryBuilder query,
-                                        List<String> queryFieldIncludes)  {
-        // Get the original field name
-        String propertyName = getOriginalName(currentField.getQualifiedName());
-        // Build the ES-friendly path
-        String path = propertyName.replaceAll("/", ".");
+    protected void processSelection(String path, Selection currentSelection, BoolQueryBuilder query,
+                                    List<String> queryFieldIncludes, DataFetchingEnvironment env)  {
+        if (currentSelection instanceof Field) {
+            // If the current selection is a field
+            Field currentField = (Field) currentSelection;
 
-        // Add the field to the list if it doesn't have any sub fields
-        if (CollectionUtils.isEmpty(currentField.getSelectionSet().getFields())) {
-            logger.debug("Adding selected field '{}' to query", path);
-            queryFieldIncludes.add(path);
-        }
+            // Get the original field name
+            String propertyName = getOriginalName(currentField.getName());
+            // Build the ES-friendly path
+            String fullPath = StringUtils.isEmpty(path)? propertyName : path + "." + propertyName;
 
-        // Check the filters to build the ES query
-        Object arg = currentField.getArguments().get(FILTER_NAME);
-        if (Objects.nonNull(arg) && arg instanceof Map) {
-            logger.debug("Adding filters for field {}", path);
+            // If the field has sub selection
+            if (Objects.nonNull(currentField.getSelectionSet())) {
+                // Process recursively and finish
+                currentField.getSelectionSet().getSelections()
+                    .forEach(selection -> processSelection(fullPath, selection, query, queryFieldIncludes, env));
+                return;
+            }
 
-            Map<String, Object> filters = (Map<String, Object>) arg;
-            filters.forEach((name, value) -> addFieldFilter(name, path, value, query));
+            // Add the field to the list
+            logger.debug("Adding selected field '{}' to query", fullPath);
+            queryFieldIncludes.add(fullPath);
+
+            // Check the filters to build the ES query
+            Optional<Argument> arg =
+                currentField.getArguments().stream().filter(a -> a.getName().equals(FILTER_NAME)).findFirst();
+            if (arg.isPresent() && arg.get().getValue() instanceof ObjectValue) {
+                logger.debug("Adding filters for field {}", fullPath);
+
+                List<ObjectField> filters = ((ObjectValue) arg.get().getValue()).getObjectFields();
+                filters.forEach((filter) -> addFieldFilter(path, filter, query));
+            }
+        } else if (currentSelection instanceof InlineFragment) {
+            // If the current selection is an inline fragment, process recursively
+            InlineFragment fragment = (InlineFragment) currentSelection;
+            fragment.getSelectionSet().getSelections()
+                .forEach(selection -> processSelection(path, selection, query, queryFieldIncludes, env));
+        } else if (currentSelection instanceof FragmentSpread) {
+            // If the current selection is a fragment spread, find the fragment and process recursively
+            FragmentSpread fragmentSpread = (FragmentSpread) currentSelection;
+            FragmentDefinition fragmentDefinition = env.getFragmentsByName().get(fragmentSpread.getName());
+            fragmentDefinition.getSelectionSet().getSelections()
+                .forEach(selection -> processSelection(path, selection, query, queryFieldIncludes, env));
         }
     }
 
     @SuppressWarnings("unchecked")
-    protected void addFieldFilter(String name, String path, Object value, BoolQueryBuilder query) {
-        if (value instanceof List) {
-            List<Map<String, Object>> actualFilters = (List<Map<String, Object>>) value;
-            switch (name) {
+    protected void addFieldFilter(String path, ObjectField filter, BoolQueryBuilder query) {
+        if (filter.getValue() instanceof List) {
+            List<Map<String, Object>> actualFilters = (List<Map<String, Object>>) filter.getValue();
+            switch (filter.getName()) {
                 case ARG_NAME_NOT:
                     BoolQueryBuilder notQuery = QueryBuilders.boolQuery();
-                    actualFilters.forEach(notFilter -> notFilter.forEach((notName, notValue) ->
-                        addFieldFilter(notName, path, notValue, notQuery)));
+//                    actualFilters.forEach(notFilter -> notFilter.forEach((notName, notValue) ->
+//                        addFieldFilter(notName, path, notValue, notQuery)));
                     query.mustNot(notQuery);
                     break;
                 case ARG_NAME_AND:
                     BoolQueryBuilder andQuery = QueryBuilders.boolQuery();
-                    actualFilters.forEach(orFilter -> orFilter.forEach((orName, orValue) ->
-                        addFieldFilter(orName, path, orValue, andQuery)));
+//                    actualFilters.forEach(orFilter -> orFilter.forEach((orName, orValue) ->
+//                        addFieldFilter(orName, path, orValue, andQuery)));
                     query.filter(andQuery);
                     break;
                 case ARG_NAME_OR:
                     BoolQueryBuilder orQuery = QueryBuilders.boolQuery();
                     actualFilters.forEach(orFilter -> {
                         BoolQueryBuilder shouldQuery = QueryBuilders.boolQuery();
-                        orFilter.forEach((orName, orValue) -> addFieldFilter(orName, path, orValue, shouldQuery));
+//                        orFilter.forEach((orName, orValue) -> addFieldFilter(orName, path, orValue, shouldQuery));
                         orQuery.filter(shouldQuery);
                     });
                     BoolQueryBuilder realOrQuery = QueryBuilders.boolQuery();
@@ -242,28 +281,28 @@ public class ContentTypeBasedDataFetcher implements DataFetcher<Object> {
                     // never happens
             }
         } else {
-            query.filter(getFilterQuery(name, path, value));
+            query.filter(getFilterQuery(path, filter));
         }
     }
 
-    protected QueryBuilder getFilterQuery(String argName, String fieldPath, Object argValue) {
-        switch (argName) {
+    protected QueryBuilder getFilterQuery(String fieldPath, ObjectField filter) {
+        switch (filter.getName()) {
             case ARG_NAME_EQUALS:
-                return QueryBuilders.termQuery(fieldPath, argValue);
+                return QueryBuilders.termQuery(fieldPath, getRealValue(filter.getValue()));
             case ARG_NAME_MATCHES:
-                return QueryBuilders.matchQuery(fieldPath, argValue);
+                return QueryBuilders.matchQuery(fieldPath, getRealValue(filter.getValue()));
             case ARG_NAME_REGEX:
-                return QueryBuilders.regexpQuery(fieldPath, argValue.toString());
+                return QueryBuilders.regexpQuery(fieldPath, getRealValue(filter.getValue()).toString());
             case ARG_NAME_LT:
-                return QueryBuilders.rangeQuery(fieldPath).lt(argValue);
+                return QueryBuilders.rangeQuery(fieldPath).lt(getRealValue(filter.getValue()));
             case ARG_NAME_GT:
-                return QueryBuilders.rangeQuery(fieldPath).gt(argValue);
+                return QueryBuilders.rangeQuery(fieldPath).gt(getRealValue(filter.getValue()));
             case ARG_NAME_LTE:
-                return QueryBuilders.rangeQuery(fieldPath).lte(argValue);
+                return QueryBuilders.rangeQuery(fieldPath).lte(getRealValue(filter.getValue()));
             case ARG_NAME_GTE:
-                return QueryBuilders.rangeQuery(fieldPath).gte(argValue);
+                return QueryBuilders.rangeQuery(fieldPath).gte(getRealValue(filter.getValue()));
             case ARG_NAME_EXISTS:
-                boolean exists = argValue instanceof Boolean ? (Boolean)argValue : Boolean.parseBoolean(argValue.toString());
+                boolean exists = (boolean) getRealValue(filter.getValue());
                 if (exists) {
                     return QueryBuilders.existsQuery(fieldPath);
                 } else {
@@ -273,6 +312,22 @@ public class ContentTypeBasedDataFetcher implements DataFetcher<Object> {
                 // never happens
                 return null;
         }
+    }
+
+    /**
+     * Extracts a scalar value, this is needed because of GraphQL strict types
+     */
+    protected Object getRealValue(Value value) {
+        if (value instanceof BooleanValue) {
+            return ((BooleanValue)value).isValue();
+        } else if (value instanceof FloatValue) {
+            return ((FloatValue) value).getValue();
+        } else if (value instanceof IntValue) {
+            return ((IntValue) value).getValue();
+        } else if (value instanceof StringValue) {
+            return ((StringValue) value).getValue();
+        }
+        return null;
     }
 
     /**
@@ -287,7 +342,10 @@ public class ContentTypeBasedDataFetcher implements DataFetcher<Object> {
             String graphQLKey = getGraphQLName(key);
             if (FIELD_NAME_ITEM.equals(key)) {
                 if (!(value instanceof List)) {
-                    temp.put(graphQLKey, Collections.singletonList(fixItems((Map<String, Object>) value)));
+                    temp.put(graphQLKey, Collections.singletonList(fixItems((Map<String, Object>)value)));
+                } else {
+                    List<Map<String, Object>> list = (List<Map<String, Object>>) value;
+                    temp.put(graphQLKey, list.stream().map(this::fixItems).collect(Collectors.toList()));
                 }
             } else if (value instanceof Map) {
                 temp.put(graphQLKey, fixItems((Map<String, Object>) value));
