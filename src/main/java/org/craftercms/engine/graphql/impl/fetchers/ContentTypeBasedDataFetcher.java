@@ -28,6 +28,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import graphql.language.Argument;
+import graphql.language.ArrayValue;
 import graphql.language.BooleanValue;
 import graphql.language.Field;
 import graphql.language.FloatValue;
@@ -233,7 +234,7 @@ public class ContentTypeBasedDataFetcher implements DataFetcher<Object> {
                 logger.debug("Adding filters for field {}", fullPath);
 
                 List<ObjectField> filters = ((ObjectValue) arg.get().getValue()).getObjectFields();
-                filters.forEach((filter) -> addFieldFilter(path, filter, query));
+                filters.forEach((filter) -> addFieldFilter(fullPath, filter, query));
             }
         } else if (currentSelection instanceof InlineFragment) {
             // If the current selection is an inline fragment, process recursively
@@ -251,31 +252,30 @@ public class ContentTypeBasedDataFetcher implements DataFetcher<Object> {
 
     @SuppressWarnings("unchecked")
     protected void addFieldFilter(String path, ObjectField filter, BoolQueryBuilder query) {
-        if (filter.getValue() instanceof List) {
-            List<Map<String, Object>> actualFilters = (List<Map<String, Object>>) filter.getValue();
+        if (filter.getValue() instanceof ArrayValue) {
+            ArrayValue actualFilters = (ArrayValue) filter.getValue();
             switch (filter.getName()) {
                 case ARG_NAME_NOT:
                     BoolQueryBuilder notQuery = QueryBuilders.boolQuery();
-//                    actualFilters.forEach(notFilter -> notFilter.forEach((notName, notValue) ->
-//                        addFieldFilter(notName, path, notValue, notQuery)));
-                    query.mustNot(notQuery);
+                    actualFilters.getValues()
+                        .forEach(notFilter -> ((ObjectValue) notFilter).getObjectFields()
+                            .forEach(notField -> addFieldFilter(path, notField, notQuery)));
+                    notQuery.filter().forEach(query::mustNot);
                     break;
                 case ARG_NAME_AND:
-                    BoolQueryBuilder andQuery = QueryBuilders.boolQuery();
-//                    actualFilters.forEach(orFilter -> orFilter.forEach((orName, orValue) ->
-//                        addFieldFilter(orName, path, orValue, andQuery)));
-                    query.filter(andQuery);
+                    actualFilters.getValues()
+                        .forEach(andFilter -> ((ObjectValue) andFilter).getObjectFields()
+                            .forEach(andField -> addFieldFilter(path, andField, query)));
                     break;
                 case ARG_NAME_OR:
+                    BoolQueryBuilder tempQuery = QueryBuilders.boolQuery();
                     BoolQueryBuilder orQuery = QueryBuilders.boolQuery();
-                    actualFilters.forEach(orFilter -> {
-                        BoolQueryBuilder shouldQuery = QueryBuilders.boolQuery();
-//                        orFilter.forEach((orName, orValue) -> addFieldFilter(orName, path, orValue, shouldQuery));
-                        orQuery.filter(shouldQuery);
+                    actualFilters.getValues().forEach(orFilter -> {
+                        ((ObjectValue) orFilter).getObjectFields()
+                            .forEach(orField -> addFieldFilter(path, orField, tempQuery));
                     });
-                    BoolQueryBuilder realOrQuery = QueryBuilders.boolQuery();
-                    orQuery.filter().forEach(realOrQuery::should);
-                    query.must(realOrQuery);
+                    tempQuery.filter().forEach(orQuery::should);
+                    query.filter(QueryBuilders.boolQuery().must(orQuery));
                     break;
                 default:
                     // never happens
