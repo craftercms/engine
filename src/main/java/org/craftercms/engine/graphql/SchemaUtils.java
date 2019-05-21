@@ -53,6 +53,17 @@ public abstract class SchemaUtils {
     public static final String ARG_NAME_LTE = "lte";
     public static final String ARG_NAME_GTE = "gte";
     public static final String ARG_NAME_EXISTS = "exists";
+    public static final String ARG_NAME_NOT = "not";
+    public static final String ARG_NAME_OR = "or";
+    public static final String ARG_NAME_AND = "and";
+
+    public static final String STRING_FILTER_NAME = "StringFilters";
+    public static final String TEXT_FILTER_NAME = "TextFilters";
+    public static final String BOOLEAN_FILTER_NAME = "BooleanFilters";
+    public static final String INT_FILTER_NAME = "IntFilters";
+    public static final String FLOAT_FILTER_NAME = "FloatFilters";
+    public static final String LONG_FILTER_NAME = "LongFilters";
+    public static final String DATETIME_FILTER_NAME = "DateFilters";
 
     public static final String FIELD_SEPARATOR = "_";
 
@@ -114,7 +125,7 @@ public abstract class SchemaUtils {
         .name(FILTER_NAME)
         .description(FILTER_DESCRIPTION)
         .type(GraphQLInputObjectType.newInputObject()
-            .name("StringFilters")
+            .name(STRING_FILTER_NAME)
             .description("Filters for 'string' fields")
             .field(GraphQLInputObjectField.newInputObjectField()
                 .name(ARG_NAME_EXISTS)
@@ -128,6 +139,18 @@ public abstract class SchemaUtils {
                 .name(ARG_NAME_REGEX)
                 .description("Search for a regex")
                 .type(GraphQLString))
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name(ARG_NAME_NOT)
+                .description("Combines the list of filters using the NOT operator")
+                .type(list(nonNull(GraphQLTypeReference.typeRef(STRING_FILTER_NAME)))))
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name(ARG_NAME_OR)
+                .description("Combines the list of filters using the OR operator")
+                .type(list(nonNull(GraphQLTypeReference.typeRef(STRING_FILTER_NAME)))))
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name(ARG_NAME_AND)
+                .description("Combines the list of filters using the AND operator")
+                .type(list(nonNull(GraphQLTypeReference.typeRef(STRING_FILTER_NAME)))))
             .build())
         .build();
 
@@ -135,7 +158,7 @@ public abstract class SchemaUtils {
         .name(FILTER_NAME)
         .description(FILTER_DESCRIPTION)
         .type(GraphQLInputObjectType.newInputObject()
-            .name("TextFilters")
+            .name(TEXT_FILTER_NAME)
             .description("Filters for 'text' fields")
             .field(GraphQLInputObjectField.newInputObjectField()
                 .name(ARG_NAME_EXISTS)
@@ -149,6 +172,18 @@ public abstract class SchemaUtils {
                 .name(ARG_NAME_REGEX)
                 .description("Search for a regex")
                 .type(GraphQLString))
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name(ARG_NAME_NOT)
+                .description("Combines the list of filters using the NOT operator")
+                .type(list(nonNull(GraphQLTypeReference.typeRef(TEXT_FILTER_NAME)))))
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name(ARG_NAME_OR)
+                .description("Combines the list of filters using the OR operator")
+                .type(list(nonNull(GraphQLTypeReference.typeRef(TEXT_FILTER_NAME)))))
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name(ARG_NAME_AND)
+                .description("Combines the list of filters using the AND operator")
+                .type(list(nonNull(GraphQLTypeReference.typeRef(TEXT_FILTER_NAME)))))
             .build())
         .build();
 
@@ -156,7 +191,7 @@ public abstract class SchemaUtils {
         .name(FILTER_NAME)
         .description(FILTER_DESCRIPTION)
         .type(GraphQLInputObjectType.newInputObject()
-            .name("BooleanFilters")
+            .name(BOOLEAN_FILTER_NAME)
             .description("Filters applicable for 'boolean' fields")
             .field(GraphQLInputObjectField.newInputObjectField()
                 .name(ARG_NAME_EXISTS)
@@ -166,6 +201,18 @@ public abstract class SchemaUtils {
                 .name(ARG_NAME_EQUALS)
                 .description("Search for the given value")
                 .type(GraphQLBoolean))
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name(ARG_NAME_NOT)
+                .description("Combines the list of filters using the NOT operator")
+                .type(list(nonNull(GraphQLTypeReference.typeRef(BOOLEAN_FILTER_NAME)))))
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name(ARG_NAME_OR)
+                .description("Combines the list of filters using the OR operator")
+                .type(list(nonNull(GraphQLTypeReference.typeRef(BOOLEAN_FILTER_NAME)))))
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name(ARG_NAME_AND)
+                .description("Combines the list of filters using the AND operator")
+                .type(list(nonNull(GraphQLTypeReference.typeRef(BOOLEAN_FILTER_NAME)))))
             .build())
         .build();
 
@@ -173,7 +220,7 @@ public abstract class SchemaUtils {
         .name(FILTER_NAME)
         .description(FILTER_DESCRIPTION)
         .type(GraphQLInputObjectType.newInputObject()
-            .name("IntFilters")
+            .name(INT_FILTER_NAME)
             .description("Filters applicable for 'int' fields")
             .field(GraphQLInputObjectField.newInputObjectField()
                 .name(ARG_NAME_EXISTS)
@@ -199,6 +246,18 @@ public abstract class SchemaUtils {
                 .name(ARG_NAME_LTE)
                 .description("Search for values less than or equal to the given value")
                 .type(GraphQLInt))
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name(ARG_NAME_NOT)
+                .description("Combines the list of filters using the NOT operator")
+                .type(list(nonNull(GraphQLTypeReference.typeRef(INT_FILTER_NAME)))))
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name(ARG_NAME_OR)
+                .description("Combines the list of filters using the OR operator")
+                .type(list(nonNull(GraphQLTypeReference.typeRef(INT_FILTER_NAME)))))
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name(ARG_NAME_AND)
+                .description("Combines the list of filters using the AND operator")
+                .type(list(nonNull(GraphQLTypeReference.typeRef(INT_FILTER_NAME)))))
             .build())
         .build();
 
@@ -206,7 +265,7 @@ public abstract class SchemaUtils {
         .name(FILTER_NAME)
         .description(FILTER_DESCRIPTION)
         .type(GraphQLInputObjectType.newInputObject()
-            .name("FloatFilters")
+            .name(FLOAT_FILTER_NAME)
             .description("Filters applicable for 'float' fields")
             .field(GraphQLInputObjectField.newInputObjectField()
                 .name(ARG_NAME_EXISTS)
@@ -232,6 +291,18 @@ public abstract class SchemaUtils {
                 .name(ARG_NAME_LTE)
                 .description("Search for values less than or equal to the given value")
                 .type(GraphQLFloat))
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name(ARG_NAME_NOT)
+                .description("Combines the list of filters using the NOT operator")
+                .type(list(nonNull(GraphQLTypeReference.typeRef(FLOAT_FILTER_NAME)))))
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name(ARG_NAME_OR)
+                .description("Combines the list of filters using the OR operator")
+                .type(list(nonNull(GraphQLTypeReference.typeRef(FLOAT_FILTER_NAME)))))
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name(ARG_NAME_AND)
+                .description("Combines the list of filters using the AND operator")
+                .type(list(nonNull(GraphQLTypeReference.typeRef(FLOAT_FILTER_NAME)))))
             .build())
         .build();
 
@@ -239,7 +310,7 @@ public abstract class SchemaUtils {
         .name(FILTER_NAME)
         .description(FILTER_DESCRIPTION)
         .type(GraphQLInputObjectType.newInputObject()
-            .name("LongFilters")
+            .name(LONG_FILTER_NAME)
             .description("Filters applicable for 'long' fields")
             .field(GraphQLInputObjectField.newInputObjectField()
                 .name(ARG_NAME_EXISTS)
@@ -265,6 +336,18 @@ public abstract class SchemaUtils {
                 .name(ARG_NAME_LTE)
                 .description("Search for values less than or equal to the given value")
                 .type(GraphQLLong))
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name(ARG_NAME_NOT)
+                .description("Combines the list of filters using the NOT operator")
+                .type(list(nonNull(GraphQLTypeReference.typeRef(LONG_FILTER_NAME)))))
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name(ARG_NAME_OR)
+                .description("Combines the list of filters using the OR operator")
+                .type(list(nonNull(GraphQLTypeReference.typeRef(LONG_FILTER_NAME)))))
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name(ARG_NAME_AND)
+                .description("Combines the list of filters using the AND operator")
+                .type(list(nonNull(GraphQLTypeReference.typeRef(LONG_FILTER_NAME)))))
             .build())
         .build();
 
@@ -272,7 +355,7 @@ public abstract class SchemaUtils {
         .name(FILTER_NAME)
         .description(FILTER_DESCRIPTION)
         .type(GraphQLInputObjectType.newInputObject()
-            .name("DateFilters")
+            .name(DATETIME_FILTER_NAME)
             .description("Filters applicable for 'datetime' fields")
             .field(GraphQLInputObjectField.newInputObjectField()
                 .name(ARG_NAME_EXISTS)
@@ -294,6 +377,18 @@ public abstract class SchemaUtils {
                 .name(ARG_NAME_LTE)
                 .description("Search for values less than or equal to the given value")
                 .type(DateTime))
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name(ARG_NAME_NOT)
+                .description("Combines the list of filters using the NOT operator")
+                .type(list(nonNull(GraphQLTypeReference.typeRef(DATETIME_FILTER_NAME)))))
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name(ARG_NAME_OR)
+                .description("Combines the list of filters using the OR operator")
+                .type(list(nonNull(GraphQLTypeReference.typeRef(DATETIME_FILTER_NAME)))))
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name(ARG_NAME_AND)
+                .description("Combines the list of filters using the AND operator")
+                .type(list(nonNull(GraphQLTypeReference.typeRef(DATETIME_FILTER_NAME)))))
             .build())
         .build();
 
