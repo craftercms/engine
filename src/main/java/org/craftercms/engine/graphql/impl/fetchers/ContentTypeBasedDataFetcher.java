@@ -28,6 +28,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import graphql.language.Argument;
+import graphql.language.ArrayValue;
 import graphql.language.BooleanValue;
 import graphql.language.Field;
 import graphql.language.FloatValue;
@@ -48,6 +49,7 @@ import org.craftercms.search.elasticsearch.ElasticsearchWrapper;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -232,42 +234,7 @@ public class ContentTypeBasedDataFetcher implements DataFetcher<Object> {
                 logger.debug("Adding filters for field {}", fullPath);
 
                 List<ObjectField> filters = ((ObjectValue) arg.get().getValue()).getObjectFields();
-                filters.forEach((filter) -> {
-                    switch (filter.getName()) {
-                        case ARG_NAME_EQUALS:
-                            query.filter(QueryBuilders.termQuery(fullPath, getRealValue(filter.getValue())));
-                            break;
-                        case ARG_NAME_MATCHES:
-                            query.filter(QueryBuilders.matchQuery(fullPath, getRealValue(filter.getValue())));
-                            break;
-                        case ARG_NAME_REGEX:
-                            query.filter(
-                                QueryBuilders.regexpQuery(fullPath, getRealValue(filter.getValue()).toString()));
-                            break;
-                        case ARG_NAME_LT:
-                            query.filter(QueryBuilders.rangeQuery(fullPath).lt(getRealValue(filter.getValue())));
-                            break;
-                        case ARG_NAME_GT:
-                            query.filter(QueryBuilders.rangeQuery(fullPath).gt(getRealValue(filter.getValue())));
-                            break;
-                        case ARG_NAME_LTE:
-                            query.filter(QueryBuilders.rangeQuery(fullPath).lte(getRealValue(filter.getValue())));
-                            break;
-                        case ARG_NAME_GTE:
-                            query.filter(QueryBuilders.rangeQuery(fullPath).gte(getRealValue(filter.getValue())));
-                            break;
-                        case ARG_NAME_EXISTS:
-                            boolean exists = (boolean) getRealValue(filter.getValue());
-                            if (exists) {
-                                query.filter(QueryBuilders.existsQuery(fullPath));
-                            } else {
-                                query.mustNot(QueryBuilders.existsQuery(fullPath));
-                            }
-                            break;
-                        default:
-                            // never happens
-                    }
-                });
+                filters.forEach((filter) -> addFieldFilter(fullPath, filter, query));
             }
         } else if (currentSelection instanceof InlineFragment) {
             // If the current selection is an inline fragment, process recursively
@@ -280,6 +247,70 @@ public class ContentTypeBasedDataFetcher implements DataFetcher<Object> {
             FragmentDefinition fragmentDefinition = env.getFragmentsByName().get(fragmentSpread.getName());
             fragmentDefinition.getSelectionSet().getSelections()
                 .forEach(selection -> processSelection(path, selection, query, queryFieldIncludes, env));
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    protected void addFieldFilter(String path, ObjectField filter, BoolQueryBuilder query) {
+        if (filter.getValue() instanceof ArrayValue) {
+            ArrayValue actualFilters = (ArrayValue) filter.getValue();
+            switch (filter.getName()) {
+                case ARG_NAME_NOT:
+                    BoolQueryBuilder notQuery = QueryBuilders.boolQuery();
+                    actualFilters.getValues()
+                        .forEach(notFilter -> ((ObjectValue) notFilter).getObjectFields()
+                            .forEach(notField -> addFieldFilter(path, notField, notQuery)));
+                    notQuery.filter().forEach(query::mustNot);
+                    break;
+                case ARG_NAME_AND:
+                    actualFilters.getValues()
+                        .forEach(andFilter -> ((ObjectValue) andFilter).getObjectFields()
+                            .forEach(andField -> addFieldFilter(path, andField, query)));
+                    break;
+                case ARG_NAME_OR:
+                    BoolQueryBuilder tempQuery = QueryBuilders.boolQuery();
+                    BoolQueryBuilder orQuery = QueryBuilders.boolQuery();
+                    actualFilters.getValues().forEach(orFilter -> {
+                        ((ObjectValue) orFilter).getObjectFields()
+                            .forEach(orField -> addFieldFilter(path, orField, tempQuery));
+                    });
+                    tempQuery.filter().forEach(orQuery::should);
+                    query.filter(QueryBuilders.boolQuery().must(orQuery));
+                    break;
+                default:
+                    // never happens
+            }
+        } else {
+            query.filter(getFilterQuery(path, filter));
+        }
+    }
+
+    protected QueryBuilder getFilterQuery(String fieldPath, ObjectField filter) {
+        switch (filter.getName()) {
+            case ARG_NAME_EQUALS:
+                return QueryBuilders.termQuery(fieldPath, getRealValue(filter.getValue()));
+            case ARG_NAME_MATCHES:
+                return QueryBuilders.matchQuery(fieldPath, getRealValue(filter.getValue()));
+            case ARG_NAME_REGEX:
+                return QueryBuilders.regexpQuery(fieldPath, getRealValue(filter.getValue()).toString());
+            case ARG_NAME_LT:
+                return QueryBuilders.rangeQuery(fieldPath).lt(getRealValue(filter.getValue()));
+            case ARG_NAME_GT:
+                return QueryBuilders.rangeQuery(fieldPath).gt(getRealValue(filter.getValue()));
+            case ARG_NAME_LTE:
+                return QueryBuilders.rangeQuery(fieldPath).lte(getRealValue(filter.getValue()));
+            case ARG_NAME_GTE:
+                return QueryBuilders.rangeQuery(fieldPath).gte(getRealValue(filter.getValue()));
+            case ARG_NAME_EXISTS:
+                boolean exists = (boolean) getRealValue(filter.getValue());
+                if (exists) {
+                    return QueryBuilders.existsQuery(fieldPath);
+                } else {
+                    return QueryBuilders.existsQuery(fieldPath);
+                }
+            default:
+                // never happens
+                return null;
         }
     }
 
