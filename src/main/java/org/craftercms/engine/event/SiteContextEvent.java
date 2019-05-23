@@ -17,23 +17,41 @@
 package org.craftercms.engine.event;
 
 import org.craftercms.engine.service.context.SiteContext;
+import org.springframework.context.ApplicationEvent;
 
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Event published when a new {@link SiteContext} is created.
+ * Application event that is related to a site context.
  *
  * @author avasquez
  */
-public class SiteContextCreatedEvent extends SiteContextEvent {
+public class SiteContextEvent extends ApplicationEvent {
 
     /**
-     * Create a new event.
+     * Returns the latest event of the specified class that has been fired during the handling of the request.
      *
-     * @param siteContext   the site's context
+     * @param eventClass the event class
+     * @param request the request
+     *
+     * @return the latest request event
      */
-    public SiteContextCreatedEvent(SiteContext siteContext) {
+    public static SiteContextEvent getLatestRequestEvent(Class<? extends SiteContextEvent> eventClass,
+                                                         HttpServletRequest request) {
+        return (SiteContextEvent) request.getAttribute(eventClass.getName());
+    }
+
+    /**
+     * Create a new ApplicationEvent.
+     *
+     * @param siteContext the site's context
+     */
+    public SiteContextEvent(SiteContext siteContext) {
         super(siteContext);
+    }
+
+    public SiteContext getSiteContext() {
+        return (SiteContext) getSource();
     }
 
 }

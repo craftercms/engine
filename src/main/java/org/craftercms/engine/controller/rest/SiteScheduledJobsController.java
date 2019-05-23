@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.craftercms.core.controller.rest.RestControllerBase;
+import org.craftercms.core.controller.rest.RestControllerBaseWithExceptionHandlers;
 import org.craftercms.engine.service.context.SiteContext;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
@@ -41,7 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping(RestControllerBase.REST_BASE_URI + SiteScheduledJobsController.URL_ROOT)
-public class SiteScheduledJobsController extends RestControllerBase {
+public class SiteScheduledJobsController extends RestControllerBaseWithExceptionHandlers {
 
     public static final String URL_ROOT = "/site/jobs";
     public static final String URL_LIST = "/list";

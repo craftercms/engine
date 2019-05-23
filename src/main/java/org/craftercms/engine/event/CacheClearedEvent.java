@@ -18,21 +18,19 @@ package org.craftercms.engine.event;
 
 import org.craftercms.engine.service.context.SiteContext;
 
-import javax.servlet.http.HttpServletRequest;
-
 /**
- * Event published when a new {@link SiteContext} is created.
+ * Event published when a site's cache is cleared.
  *
  * @author avasquez
  */
-public class SiteContextCreatedEvent extends SiteContextEvent {
+public class CacheClearedEvent extends SiteContextEvent {
 
     /**
      * Create a new event.
      *
      * @param siteContext   the site's context
      */
-    public SiteContextCreatedEvent(SiteContext siteContext) {
+    public CacheClearedEvent(SiteContext siteContext) {
         super(siteContext);
     }
 

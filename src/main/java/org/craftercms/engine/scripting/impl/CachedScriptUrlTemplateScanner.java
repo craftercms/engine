@@ -19,7 +19,6 @@ package org.craftercms.engine.scripting.impl;
 
 import java.util.List;
 
-import org.craftercms.commons.lang.Callback;
 import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.engine.event.SiteContextCreatedEvent;
 import org.craftercms.engine.scripting.ScriptUrlTemplateScanner;
@@ -60,14 +59,8 @@ public class CachedScriptUrlTemplateScanner implements ScriptUrlTemplateScanner,
 
     @Override
     public List<UriTemplate> scan(final SiteContext siteContext) {
-        return cacheTemplate.getObject(siteContext.getContext(), new Callback<List<UriTemplate>>() {
-
-            @Override
-            public List<UriTemplate> execute() {
-                return actualScanner.scan(siteContext);
-            }
-
-        }, URL_TEMPLATES_CACHE_KEY_ELEM);
+        return cacheTemplate.getObject(
+                siteContext.getContext(), () -> actualScanner.scan(siteContext), URL_TEMPLATES_CACHE_KEY_ELEM);
     }
 
 }

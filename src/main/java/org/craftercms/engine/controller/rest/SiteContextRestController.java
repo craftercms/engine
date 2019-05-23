@@ -18,13 +18,17 @@
 package org.craftercms.engine.controller.rest;
 
 import org.craftercms.core.controller.rest.RestControllerBase;
+import org.craftercms.engine.event.SiteContextCreatedEvent;
+import org.craftercms.engine.event.SiteContextEvent;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.service.context.SiteContextManager;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -37,11 +41,11 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(RestControllerBase.REST_BASE_URI + SiteContextRestController.URL_ROOT)
-public class SiteContextRestController {
+public class SiteContextRestController extends RestControllerBase {
 
     public static final String URL_ROOT = "/site/context";
     public static final String URL_CONTEXT_ID = "/id";
-    public static final String URL_EVENTS = "/events";
+    public static final String URL_LATEST_EVENTS = "/latest_events";
     public static final String URL_DESTROY = "/destroy";
     public static final String URL_REBUILD = "/rebuild";
     public static final String URL_GRAPHQL = "/graphql";
@@ -60,48 +64,64 @@ public class SiteContextRestController {
         return Collections.singletonMap(MODEL_ATTR_ID, SiteContext.getCurrent().getContext().getId());
     }
 
-    @GetMapping(value = URL_EVENTS)
-    public Map<String, String> getEvents() {
-        Map<String, Instant> events =  SiteContext.getCurrent().getEvents();
-        Map<String, String> eventsAsStr = new LinkedHashMap<>();
+    @GetMapping(value = URL_LATEST_EVENTS)
+    public Map<String, String> getLatestEvents() {
+        Map<Class<? extends SiteContextEvent>, SiteContextEvent> events =  SiteContext.getCurrent().getLatestEvents();
+        Map<String, String> respBody = new LinkedHashMap<>();
 
-        for (Map.Entry<String, Instant> entry : events.entrySet()) {
-            eventsAsStr.put(entry.getKey(), entry.getValue().toString());
+        for (Map.Entry<Class<? extends SiteContextEvent>, SiteContextEvent> entry : events.entrySet()) {
+            String eventClassName = entry.getKey().getName();
+            long eventTimestamp = entry.getValue().getTimestamp();
+
+            respBody.put(eventClassName, Instant.ofEpochMilli(eventTimestamp).toString());
         }
 
-        return eventsAsStr;
+        return respBody;
     }
 
     @GetMapping(value = URL_DESTROY)
-    public Map<String, String> destroy() {
+    public Map<String, Object> destroy() {
         String siteName = SiteContext.getCurrent().getSiteName();
 
         contextManager.destroyContext(siteName);
 
-        return Collections.singletonMap(RestControllerBase.MESSAGE_MODEL_ATTRIBUTE_NAME,
-                                        "Site context for '" + siteName + "' destroyed. Will be recreated on next " +
-                                        "request");
+        return createResponseMessage("Site context for '" + siteName + "' destroyed. Will be recreated on next " +
+                                     "request");
     }
 
     @GetMapping(value = URL_REBUILD)
-    public Map<String, String> rebuild() {
+    public Map<String, Object> rebuild(HttpServletRequest request) {
         SiteContext siteContext = SiteContext.getCurrent();
         String siteName = siteContext.getSiteName();
-        boolean fallback = siteContext.isFallback();
 
-        siteContext = contextManager.rebuildContext(siteName, fallback);
-        SiteContext.setCurrent(siteContext);
+        // Don't rebuild context if the context was just created in this request
+        if (SiteContextEvent.getLatestRequestEvent(SiteContextCreatedEvent.class, request) != null) {
+            return createResponseMessage("Site context for '" + siteName + "' created during the request. " +
+                                         "Context rebuild not necessary");
+        } else {
+            boolean fallback = siteContext.isFallback();
 
-        return Collections.singletonMap(RestControllerBase.MESSAGE_MODEL_ATTRIBUTE_NAME, "Site context for '" +
-                                                                                         siteName + "' rebuilt");
+            siteContext = contextManager.rebuildContext(siteName, fallback);
+            SiteContext.setCurrent(siteContext);
+
+            return createResponseMessage("Site context for '" + siteName + "' rebuilt");
+        }
     }
 
     @GetMapping(URL_GRAPHQL + URL_REBUILD)
-    public Map<String, String> rebuildSchema() {
-        contextManager.startGraphQLBuild();
+    public Map<String, Object> rebuildSchema(HttpServletRequest request) {
+        SiteContext siteContext = SiteContext.getCurrent();
+        String siteName = siteContext.getSiteName();
 
-        return Collections.singletonMap(RestControllerBase.MESSAGE_MODEL_ATTRIBUTE_NAME,
-            "Rebuild of GraphQL schema for '" + SiteContext.getCurrent().getSiteName() + "' started");
+        // Don't rebuild GraphQL schema if the context was just created in this request
+        if (SiteContextEvent.getLatestRequestEvent(SiteContextCreatedEvent.class, request) != null) {
+            return createResponseMessage("Site context for '" + siteName + "' created during the request. " +
+                                         "GraphQL schema rebuild not necessary");
+        } else {
+            contextManager.startGraphQLBuild();
+
+            return createResponseMessage("Rebuild of GraphQL schema for '" + siteName + "' started");
+        }
     }
 
 }
