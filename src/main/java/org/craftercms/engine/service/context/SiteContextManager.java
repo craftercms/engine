@@ -24,12 +24,7 @@ import org.craftercms.commons.entitlements.model.EntitlementType;
 import org.craftercms.commons.entitlements.model.Module;
 import org.craftercms.commons.entitlements.validator.EntitlementValidator;
 import org.craftercms.core.exception.RootFolderNotFoundException;
-import org.craftercms.engine.event.SiteContextCreatedEvent;
-import org.craftercms.engine.event.SiteContextDestroyedEvent;
 import org.springframework.beans.factory.annotation.Required;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.ApplicationEvent;
 
 import javax.annotation.PreDestroy;
 import java.util.Collection;
@@ -45,7 +40,7 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * @author Alfonso Vásquez
  */
-public class SiteContextManager implements ApplicationContextAware {
+public class SiteContextManager {
 
     private static final Log logger = LogFactory.getLog(SiteContextManager.class);
 
@@ -53,7 +48,6 @@ public class SiteContextManager implements ApplicationContextAware {
     protected Map<String, SiteContext> contextRegistry;
     protected SiteContextFactory contextFactory;
     protected SiteContextFactory fallbackContextFactory;
-    protected ApplicationContext applicationContext;
     protected EntitlementValidator entitlementValidator;
     protected Executor jobThreadPoolExecutor;
 
@@ -80,11 +74,6 @@ public class SiteContextManager implements ApplicationContextAware {
     @Required
     public void setJobThreadPoolExecutor(final Executor jobThreadPoolExecutor) {
         this.jobThreadPoolExecutor = jobThreadPoolExecutor;
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
     }
 
     @PreDestroy
@@ -308,7 +297,7 @@ public class SiteContextManager implements ApplicationContextAware {
             siteContext = contextFactory.createContext(siteName);
         }
 
-        publishEvent(new SiteContextCreatedEvent(siteContext, this), siteContext);
+        siteContext.init();
 
         contextRegistry.put(siteName, siteContext);
 
@@ -320,20 +309,9 @@ public class SiteContextManager implements ApplicationContextAware {
     }
 
     protected void destroyContext(SiteContext siteContext) {
-        publishEvent(new SiteContextDestroyedEvent(siteContext, this), siteContext);
-
         siteContext.destroy();
 
         logger.info("Site context destroyed: " + siteContext);
-    }
-
-    protected void publishEvent(ApplicationEvent event, SiteContext siteContext) {
-        ApplicationContext siteApplicationContext = siteContext.getApplicationContext();
-        if (siteApplicationContext != null) {
-            siteApplicationContext.publishEvent(event);
-        } else {
-            applicationContext.publishEvent(event);
-        }
     }
 
     protected boolean validateSiteCreationEntitlement() {

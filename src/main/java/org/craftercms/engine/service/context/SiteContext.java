@@ -18,11 +18,13 @@ package org.craftercms.engine.service.context;
 
 import graphql.GraphQL;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
+import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.exception.CrafterException;
 import org.craftercms.core.service.CacheService;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.url.UrlTransformationEngine;
+import org.craftercms.engine.event.*;
 import org.craftercms.engine.exception.GraphQLBuildException;
 import org.craftercms.engine.graphql.GraphQLFactory;
 import org.craftercms.engine.scripting.ScriptFactory;
@@ -38,7 +40,6 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
 import org.tuckey.web.filters.urlrewrite.UrlRewriter;
 
 import java.net.URLClassLoader;
-import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -58,10 +59,6 @@ public class SiteContext {
 
     private static ThreadLocal<SiteContext> threadLocal = new ThreadLocal<>();
 
-    public static final String CACHE_CLEARED_EVENT_KEY = "cacheCleared";
-    public static final String CONTEXT_BUILT_EVENT_KEY = "contextBuilt";
-    public static final String GRAPHQL_BUILT_EVENT_KEY = "graphQLBuilt";
-
     protected ContentStoreService storeService;
     protected String siteName;
     protected Context context;
@@ -80,7 +77,7 @@ public class SiteContext {
     protected URLClassLoader classLoader;
     protected UrlRewriter urlRewriter;
     protected Scheduler scheduler;
-    protected Map<String, Instant> events;
+    protected Map<Class<? extends SiteContextEvent>, SiteContextEvent> latestEvents;
     protected Lock graphQLBuildLock;
     protected GraphQLFactory graphQLFactory;
     protected GraphQL graphQL;
@@ -112,13 +109,7 @@ public class SiteContext {
 
     public SiteContext() {
         graphQLBuildLock = new ReentrantLock();
-
-        Instant now = Instant.now();
-
-        events = new ConcurrentHashMap<>();
-        events.put(CACHE_CLEARED_EVENT_KEY, now);
-        events.put(CONTEXT_BUILT_EVENT_KEY, now);
-        events.put(GRAPHQL_BUILT_EVENT_KEY, now);
+        latestEvents = new ConcurrentHashMap<>();
     }
 
     public ContentStoreService getStoreService() {
@@ -273,8 +264,12 @@ public class SiteContext {
         this.graphQLFactory = graphQLFactory;
     }
 
-    public Map<String, Instant> getEvents() {
-        return events;
+    public Map<Class<? extends SiteContextEvent>, SiteContextEvent> getLatestEvents() {
+        return latestEvents;
+    }
+
+    public SiteContextEvent getLatestEvent(Class<? extends SiteContextEvent> eventClass) {
+        return latestEvents.get(eventClass);
     }
 
     public GraphQL getGraphQL() {
@@ -285,13 +280,17 @@ public class SiteContext {
         return storeService.validate(context);
     }
 
+    public void init() {
+        publishEvent(new SiteContextCreatedEvent(this));
+    }
+
     public void clearCache(CacheService cacheService) {
         // Clear content cache
         cacheService.clearScope(context);
         // Clear Freemarker cache
         freeMarkerConfig.getConfiguration().clearTemplateCache();
 
-        events.put(CACHE_CLEARED_EVENT_KEY, Instant.now());
+        publishEvent(new CacheClearedEvent(this));
     }
 
     public void buildGraphQLSchema() throws GraphQLBuildException {
@@ -302,7 +301,7 @@ public class SiteContext {
                 if (Objects.nonNull(graphQL)) {
                     this.graphQL = graphQL;
 
-                    events.put(GRAPHQL_BUILT_EVENT_KEY, Instant.now());
+                    publishEvent(new GraphQLBuiltEvent(this));
                 }
             } catch (Exception e) {
                 throw new GraphQLBuildException("Error building the GraphQL schema for site '" + siteName + "'", e);
@@ -316,6 +315,8 @@ public class SiteContext {
     }
 
     public void destroy() throws CrafterException {
+        publishEvent(new SiteContextDestroyedEvent(this));
+
         storeService.destroyContext(context);
 
         if (applicationContext != null) {
@@ -375,6 +376,23 @@ public class SiteContext {
                ", restScriptsPath='" + restScriptsPath + '\'' +
                ", controllerScriptsPath='" + controllerScriptsPath + '\'' +
                '}';
+    }
+
+    protected void publishEvent(SiteContextEvent event) {
+        if (applicationContext != null) {
+            applicationContext.publishEvent(event);
+        } else {
+            globalApplicationContext.publishEvent(event);
+        }
+
+        // Store in the latest events
+        latestEvents.put(event.getClass(), event);
+
+        // Store a request attribute for the event so it's known later if the event was fired during the request
+        RequestContext requestContext = RequestContext.getCurrent();
+        if (requestContext != null) {
+            requestContext.getRequest().setAttribute(event.getClass().getName(), event);
+        }
     }
 
 }
