@@ -17,20 +17,22 @@
 
 package org.craftercms.engine.controller.rest;
 
-import java.util.Collections;
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.core.cache.CacheStatistics;
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.core.service.CacheService;
+import org.craftercms.engine.event.SiteContextCreatedEvent;
+import org.craftercms.engine.event.SiteContextEvent;
 import org.craftercms.engine.service.context.SiteContext;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 /**
  * REST controller for operations related to a site's cache.
@@ -39,7 +41,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 @Controller
 @RequestMapping(RestControllerBase.REST_BASE_URI + SiteCacheRestController.URL_ROOT)
-public class SiteCacheRestController {
+public class SiteCacheRestController extends RestControllerBase {
 
     private static final Log logger = LogFactory.getLog(SiteCacheRestController.class);
 
@@ -56,17 +58,24 @@ public class SiteCacheRestController {
 
     @RequestMapping(value = URL_CLEAR, method = RequestMethod.GET)
     @ResponseBody
-    public Map<String, String> clear() {
+    public Map<String, Object> clear(HttpServletRequest request) {
         SiteContext siteContext = SiteContext.getCurrent();
         String siteName = siteContext.getSiteName();
+        String msg;
 
-        siteContext.clearCache(cacheService);
+        // Don't clear cache if the context was just created in this request
+        if (SiteContextEvent.getLatestRequestEvent(SiteContextCreatedEvent.class, request) != null) {
+            return createResponseMessage("Site context for '" + siteName + "' created during the request. " +
+                                         "Cache clear not necessary");
+        } else {
+            siteContext.clearCache(cacheService);
 
-        String msg = "Content cache and Freemarker cache have been cleared for site '" + siteName + "'";
+            msg = "Content cache and Freemarker cache have been cleared for site '" + siteName + "'";
+        }
 
         logger.debug(msg);
 
-        return Collections.singletonMap(RestControllerBase.MESSAGE_MODEL_ATTRIBUTE_NAME, msg);
+        return createResponseMessage(msg);
     }
 
     @ResponseBody

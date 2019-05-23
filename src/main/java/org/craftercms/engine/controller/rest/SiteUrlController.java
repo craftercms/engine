@@ -18,6 +18,7 @@
 package org.craftercms.engine.controller.rest;
 
 import org.craftercms.core.controller.rest.RestControllerBase;
+import org.craftercms.core.controller.rest.RestControllerBaseWithExceptionHandlers;
 import org.craftercms.engine.service.UrlTransformationService;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping(RestControllerBase.REST_BASE_URI + SiteUrlController.URL_ROOT)
-public class SiteUrlController extends RestControllerBase {
+public class SiteUrlController extends RestControllerBaseWithExceptionHandlers {
 
     public static final String URL_ROOT = "/site/url";
     public static final String URL_TRANSFORM = "/transform";

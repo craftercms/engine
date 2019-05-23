@@ -26,6 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.core.controller.rest.ContentStoreRestController;
 import org.craftercms.core.controller.rest.RestControllerBase;
+import org.craftercms.core.controller.rest.RestControllerBaseWithExceptionHandlers;
 import org.craftercms.core.exception.PathNotFoundException;
 import org.craftercms.engine.service.context.SiteContext;
 import org.springframework.beans.factory.annotation.Required;
@@ -49,7 +50,7 @@ import static org.craftercms.core.controller.rest.ContentStoreRestController.* ;
  */
 @Controller
 @RequestMapping(RestControllerBase.REST_BASE_URI + SiteContentStoreRestController.URL_ROOT)
-public class SiteContentStoreRestController extends RestControllerBase {
+public class SiteContentStoreRestController extends RestControllerBaseWithExceptionHandlers {
 
     public static final String URL_ROOT = "/site/content_store";
 

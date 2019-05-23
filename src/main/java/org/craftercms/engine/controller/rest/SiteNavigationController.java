@@ -20,6 +20,7 @@ package org.craftercms.engine.controller.rest;
 import java.util.List;
 
 import org.craftercms.core.controller.rest.RestControllerBase;
+import org.craftercms.core.controller.rest.RestControllerBaseWithExceptionHandlers;
 import org.craftercms.engine.navigation.NavBreadcrumbBuilder;
 import org.craftercms.engine.navigation.NavItem;
 import org.craftercms.engine.navigation.NavTreeBuilder;
@@ -36,7 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping(RestControllerBase.REST_BASE_URI + SiteNavigationController.URL_ROOT)
-public class SiteNavigationController extends RestControllerBase {
+public class SiteNavigationController extends RestControllerBaseWithExceptionHandlers {
 
     public static final String URL_ROOT = "/site/navigation";
     public static final String URL_TREE = "/tree";
