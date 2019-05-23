@@ -39,7 +39,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
 import org.tuckey.web.filters.urlrewrite.UrlRewriter;
 
-import javax.servlet.http.HttpServletRequest;
 import java.net.URLClassLoader;
 import java.util.Map;
 import java.util.Objects;

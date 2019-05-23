@@ -18,8 +18,6 @@ package org.craftercms.engine.event;
 
 import org.craftercms.engine.service.context.SiteContext;
 
-import javax.servlet.http.HttpServletRequest;
-
 /**
  * Event published when a new {@link SiteContext} is created.
  *

@@ -24,10 +24,7 @@ import org.craftercms.commons.entitlements.model.EntitlementType;
 import org.craftercms.commons.entitlements.model.Module;
 import org.craftercms.commons.entitlements.validator.EntitlementValidator;
 import org.craftercms.core.exception.RootFolderNotFoundException;
-import org.craftercms.engine.event.SiteContextEvent;
 import org.springframework.beans.factory.annotation.Required;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 import javax.annotation.PreDestroy;
 import java.util.Collection;
