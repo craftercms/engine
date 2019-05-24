@@ -17,9 +17,6 @@
 
 package org.craftercms.engine.controller.rest;
 
-import java.util.Collection;
-import java.util.Map;
-
 import org.craftercms.core.controller.rest.CacheRestController;
 import org.craftercms.core.exception.CacheException;
 import org.craftercms.core.exception.InvalidContextException;
@@ -27,6 +24,9 @@ import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.service.context.SiteContextManager;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Extension of {@link org.craftercms.core.controller.rest.CacheRestController} that adds the functionality of
@@ -44,7 +44,7 @@ public class FreeMarkerAwareCacheRestController extends CacheRestController {
     }
 
     @Override
-    public Map<String, String> clearAllScopes() throws CacheException {
+    public Map<String, Object> clearAllScopes() throws CacheException {
         Collection<SiteContext> contexts = siteContextManager.listContexts();
 
         for (SiteContext siteContext : contexts) {
@@ -55,7 +55,7 @@ public class FreeMarkerAwareCacheRestController extends CacheRestController {
     }
 
     @Override
-    public Map<String, String> clearScope(@RequestParam(CacheRestController.REQUEST_PARAM_CONTEXT_ID) String contextId)
+    public Map<String, Object> clearScope(@RequestParam(CacheRestController.REQUEST_PARAM_CONTEXT_ID) String contextId)
         throws InvalidContextException, CacheException {
         Collection<SiteContext> contexts = siteContextManager.listContexts();
 
