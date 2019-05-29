@@ -17,19 +17,16 @@
 
 package org.craftercms.engine.servlet.filter;
 
-import java.io.IOException;
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-
 import org.craftercms.core.exception.CrafterException;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.service.context.SiteContextResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
+
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 
 /**
  * Filter that uses a {@link org.craftercms.engine.service.context.SiteContextResolver} to resolve the context for
@@ -38,6 +35,8 @@ import org.springframework.beans.factory.annotation.Required;
  * @author avasquez
  */
 public class SiteContextResolvingFilter implements Filter {
+
+    private static final Logger logger = LoggerFactory.getLogger(SiteContextResolvingFilter.class);
 
     protected SiteContextResolver contextResolver;
 
@@ -53,16 +52,26 @@ public class SiteContextResolvingFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response,
                          FilterChain chain) throws IOException, ServletException {
-        SiteContext siteContext = contextResolver.getContext((HttpServletRequest)request);
-        if (siteContext == null) {
-            throw new CrafterException("No site context was resolved for the current request");
-        }
-
-        SiteContext.setCurrent(siteContext);
+        SiteContext.setCurrent(getContext((HttpServletRequest) request));
         try {
             chain.doFilter(request, response);
         } finally {
             SiteContext.clear();
+        }
+    }
+
+    protected SiteContext getContext(HttpServletRequest request) throws ServletException {
+        try {
+            SiteContext siteContext = contextResolver.getContext(request);
+            if (siteContext != null) {
+                return siteContext;
+            } else {
+                throw new CrafterException("No site context was resolved for the current request");
+            }
+        } catch (Exception e) {
+            logger.error("Error while resolving site context for current request", e);
+
+            throw new ServletException("Error while resolving site context for current request", e);
         }
     }
 

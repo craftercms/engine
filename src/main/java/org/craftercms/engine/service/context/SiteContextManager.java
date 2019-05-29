@@ -23,7 +23,6 @@ import org.craftercms.commons.entitlements.exception.EntitlementException;
 import org.craftercms.commons.entitlements.model.EntitlementType;
 import org.craftercms.commons.entitlements.model.Module;
 import org.craftercms.commons.entitlements.validator.EntitlementValidator;
-import org.craftercms.core.exception.RootFolderNotFoundException;
 import org.springframework.beans.factory.annotation.Required;
 
 import javax.annotation.PreDestroy;
@@ -175,15 +174,11 @@ public class SiteContextManager {
                     logger.info("<Creating site context: " + siteName + ">");
                     logger.info("==================================================");
 
-                    try {
-                        siteContext = createContext(siteName, fallback);
-                    } catch (RootFolderNotFoundException e) {
-                        logger.error("Cannot resolve root folder for site '" + siteName + "'", e);
-                    } finally {
-                        logger.info("==================================================");
-                        logger.info("</Creating site context: " + siteName + ">");
-                        logger.info("==================================================");
-                    }
+                    siteContext = createContext(siteName, fallback);
+
+                    logger.info("==================================================");
+                    logger.info("</Creating site context: " + siteName + ">");
+                    logger.info("==================================================");
                 }
             } finally {
                 lock.unlock();
@@ -206,25 +201,19 @@ public class SiteContextManager {
             logger.info("<Rebuilding site context: " + siteName + ">");
             logger.info("==================================================");
 
-            try {
-                SiteContext oldSiteContext = contextRegistry.get(siteName);
-                SiteContext newSiteContext = createContext(siteName, fallback);
+            SiteContext oldSiteContext = contextRegistry.get(siteName);
+            SiteContext newSiteContext = createContext(siteName, fallback);
 
-                oldSiteContext.destroy();
+            oldSiteContext.destroy();
 
-                return newSiteContext;
-            } catch (RootFolderNotFoundException e) {
-                logger.error("Cannot resolve root folder for site '" + siteName + "'", e);
-            } finally {
-                logger.info("==================================================");
-                logger.info("</Rebuilding site context: " + siteName + ">");
-                logger.info("==================================================");
-            }
+            logger.info("==================================================");
+            logger.info("</Rebuilding site context: " + siteName + ">");
+            logger.info("==================================================");
+
+            return newSiteContext;
         } finally {
             lock.unlock();
         }
-
-        return null;
     }
 
     /**
