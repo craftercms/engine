@@ -768,6 +768,8 @@
         <property name="typeFactory" ref="crafter.typeFactory"/>
     </bean>
 
+    <bean id="crafter.timeFieldFactory" class="org.craftercms.engine.graphql.impl.field.TimeFieldFactory"/>
+
     <bean id="crafter.typeFactory" class="org.craftercms.engine.graphql.impl.type.GraphQLTypeFactoryImpl">
         <property name="rootQueryTypeName" value="${crafter.engine.graphql.query.name}"/>
         <property name="ignoredFields" value="${crafter.engine.graphql.ignoredFields}"/>
@@ -787,6 +789,7 @@
                 <entry key="repeat" value-ref="crafter.repeatGroupFieldFactory"/>
                 <entry key="rte" value-ref="crafter.rteFieldFactory"/>
                 <entry key="rte-tinymce5" value-ref="crafter.rteFieldFactory"/>
+                <entry key="time" value-ref="crafter.timeFieldFactory"/>
             </map>
         </property>
     </bean>
