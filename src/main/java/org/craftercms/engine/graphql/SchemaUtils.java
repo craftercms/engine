@@ -83,6 +83,7 @@ public abstract class SchemaUtils {
     public static final String FIELD_SUFFIX_ITEMS = FIELD_SEPARATOR + FIELD_NAME_ITEMS;
     public static final String FIELD_SUFFIX_QUERY = FIELD_SEPARATOR + "query";
     public static final String FIELD_SUFFIX_RAW = FIELD_SEPARATOR + "raw";
+    public static final String FIELD_SUFFIX_TZ = FIELD_SEPARATOR + "tz";
     public static final String FIELD_SUFFIX_MULTIVALUE  = "mv";
 
     public static final String FILTER_NAME = "filter";
@@ -539,7 +540,7 @@ public abstract class SchemaUtils {
         if (fieldName.endsWith("_s")) {
             field.type(GraphQLString);
             field.argument(STRING_FILTER);
-        } else if (fieldName.endsWith("_dt")) {
+        } else if (fieldName.endsWith("_dt") || fieldName.endsWith("_to")) {
             field.type(DateTime);
             field.argument(DATETIME_FILTER);
         } else if (fieldName.endsWith("_b")) {
