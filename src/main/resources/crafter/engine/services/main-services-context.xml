@@ -30,7 +30,6 @@
     <import resource="classpath:crafter/engine/services/scripting-context.xml"/>
     <import resource="classpath:crafter/engine/services/url-transformation-context.xml"/>
     <import resource="classpath:crafter/engine/services/targeting-context.xml"/>
-    <import resource="classpath:crafter/entitlements/entitlements-context.xml"/>
 
     <!-- ////////////////////////////////// -->
     <!--								 	-->
@@ -805,5 +804,6 @@
 
     <import resource="${crafter.engine.extension.base}/services-overlay-context.xml"/>
     <import resource="${crafter.engine.extension.base}/services-context.xml"/>
+    <import resource="classpath:crafter/entitlements/entitlements-context.xml"/>
 
 </beans>

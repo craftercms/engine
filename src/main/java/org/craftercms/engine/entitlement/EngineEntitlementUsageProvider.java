@@ -20,14 +20,11 @@ package org.craftercms.engine.entitlement;
 import java.util.Collections;
 import java.util.List;
 
-import org.craftercms.commons.entitlements.model.Entitlement;
 import org.craftercms.commons.entitlements.model.EntitlementType;
 import org.craftercms.commons.entitlements.model.Module;
 import org.craftercms.commons.entitlements.usage.EntitlementUsageProvider;
 import org.craftercms.engine.service.context.SiteContextManager;
 import org.springframework.beans.factory.annotation.Required;
-
-import static org.craftercms.commons.entitlements.model.Module.ENGINE;
 
 /**
  * Implementation of {@link EntitlementUsageProvider} for Crafter Engine module.
@@ -51,24 +48,23 @@ public class EngineEntitlementUsageProvider implements EntitlementUsageProvider 
      */
     @Override
     public Module getModule() {
-        return ENGINE;
+        return Module.ENGINE;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<Entitlement> getCurrentUsage() {
-        Entitlement sites = new Entitlement();
-        int totalSites = (int) siteContextManager.listContexts()
-                                            .stream()
-                                            .filter(context -> !context.isFallback())
-                                            .count();
+    public List<EntitlementType> getSupportedEntitlements() {
+        return Collections.singletonList(EntitlementType.SITE);
+    }
 
-        sites.setType(EntitlementType.SITE);
-        sites.setValue(totalSites);
-
-        return Collections.singletonList(sites);
+    @Override
+    public int doGetEntitlementUsage(final EntitlementType type) {
+        return (int) siteContextManager.listContexts()
+            .stream()
+            .filter(context -> !context.isFallback())
+            .count();
     }
 
 }

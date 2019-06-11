@@ -21,7 +21,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.entitlements.exception.EntitlementException;
 import org.craftercms.commons.entitlements.model.EntitlementType;
-import org.craftercms.commons.entitlements.model.Module;
 import org.craftercms.commons.entitlements.validator.EntitlementValidator;
 import org.springframework.beans.factory.annotation.Required;
 
@@ -305,11 +304,7 @@ public class SiteContextManager {
 
     protected boolean validateSiteCreationEntitlement() {
         try {
-            int totalSites = (int) contextRegistry.values().stream()
-                                                  .filter(context -> !context.isFallback())
-                                                  .count();
-            entitlementValidator.validateEntitlement(Module.ENGINE, EntitlementType.SITE, totalSites, 1);
-
+            entitlementValidator.validateEntitlement(EntitlementType.SITE, 1);
             return true;
         } catch (EntitlementException e) {
             return false;
