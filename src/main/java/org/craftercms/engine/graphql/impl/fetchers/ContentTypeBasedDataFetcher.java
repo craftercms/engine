@@ -41,6 +41,7 @@ import graphql.language.ObjectValue;
 import graphql.language.Selection;
 import graphql.language.StringValue;
 import graphql.language.Value;
+import graphql.language.VariableReference;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.apache.commons.collections.MapUtils;
@@ -234,7 +235,7 @@ public class ContentTypeBasedDataFetcher implements DataFetcher<Object> {
                 logger.debug("Adding filters for field {}", fullPath);
 
                 List<ObjectField> filters = ((ObjectValue) arg.get().getValue()).getObjectFields();
-                filters.forEach((filter) -> addFieldFilter(fullPath, filter, query));
+                filters.forEach((filter) -> addFieldFilter(fullPath, filter, query, env));
             }
         } else if (currentSelection instanceof InlineFragment) {
             // If the current selection is an inline fragment, process recursively
@@ -250,8 +251,8 @@ public class ContentTypeBasedDataFetcher implements DataFetcher<Object> {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    protected void addFieldFilter(String path, ObjectField filter, BoolQueryBuilder query) {
+    protected void addFieldFilter(String path, ObjectField filter, BoolQueryBuilder query,
+                                  DataFetchingEnvironment env) {
         if (filter.getValue() instanceof ArrayValue) {
             ArrayValue actualFilters = (ArrayValue) filter.getValue();
             switch (filter.getName()) {
@@ -259,20 +260,20 @@ public class ContentTypeBasedDataFetcher implements DataFetcher<Object> {
                     BoolQueryBuilder notQuery = QueryBuilders.boolQuery();
                     actualFilters.getValues()
                         .forEach(notFilter -> ((ObjectValue) notFilter).getObjectFields()
-                            .forEach(notField -> addFieldFilter(path, notField, notQuery)));
+                            .forEach(notField -> addFieldFilter(path, notField, notQuery, env)));
                     notQuery.filter().forEach(query::mustNot);
                     break;
                 case ARG_NAME_AND:
                     actualFilters.getValues()
                         .forEach(andFilter -> ((ObjectValue) andFilter).getObjectFields()
-                            .forEach(andField -> addFieldFilter(path, andField, query)));
+                            .forEach(andField -> addFieldFilter(path, andField, query, env)));
                     break;
                 case ARG_NAME_OR:
                     BoolQueryBuilder tempQuery = QueryBuilders.boolQuery();
                     BoolQueryBuilder orQuery = QueryBuilders.boolQuery();
                     actualFilters.getValues().forEach(orFilter -> {
                         ((ObjectValue) orFilter).getObjectFields()
-                            .forEach(orField -> addFieldFilter(path, orField, tempQuery));
+                            .forEach(orField -> addFieldFilter(path, orField, tempQuery, env));
                     });
                     tempQuery.filter().forEach(orQuery::should);
                     query.filter(QueryBuilders.boolQuery().must(orQuery));
@@ -280,29 +281,30 @@ public class ContentTypeBasedDataFetcher implements DataFetcher<Object> {
                 default:
                     // never happens
             }
-        } else {
-            query.filter(getFilterQuery(path, filter));
+        } else if (!(filter.getValue() instanceof VariableReference) ||
+                    env.getVariables().containsKey(((VariableReference)filter.getValue()).getName())) {
+            query.filter(getFilterQuery(path, filter, env));
         }
     }
 
-    protected QueryBuilder getFilterQuery(String fieldPath, ObjectField filter) {
+    protected QueryBuilder getFilterQuery(String fieldPath, ObjectField filter, DataFetchingEnvironment env) {
         switch (filter.getName()) {
             case ARG_NAME_EQUALS:
-                return QueryBuilders.termQuery(fieldPath, getRealValue(filter.getValue()));
+                return QueryBuilders.termQuery(fieldPath, getRealValue(filter.getValue(), env));
             case ARG_NAME_MATCHES:
-                return QueryBuilders.matchQuery(fieldPath, getRealValue(filter.getValue()));
+                return QueryBuilders.matchQuery(fieldPath, getRealValue(filter.getValue(), env));
             case ARG_NAME_REGEX:
-                return QueryBuilders.regexpQuery(fieldPath, getRealValue(filter.getValue()).toString());
+                return QueryBuilders.regexpQuery(fieldPath, getRealValue(filter.getValue(), env).toString());
             case ARG_NAME_LT:
-                return QueryBuilders.rangeQuery(fieldPath).lt(getRealValue(filter.getValue()));
+                return QueryBuilders.rangeQuery(fieldPath).lt(getRealValue(filter.getValue(), env));
             case ARG_NAME_GT:
-                return QueryBuilders.rangeQuery(fieldPath).gt(getRealValue(filter.getValue()));
+                return QueryBuilders.rangeQuery(fieldPath).gt(getRealValue(filter.getValue(), env));
             case ARG_NAME_LTE:
-                return QueryBuilders.rangeQuery(fieldPath).lte(getRealValue(filter.getValue()));
+                return QueryBuilders.rangeQuery(fieldPath).lte(getRealValue(filter.getValue(), env));
             case ARG_NAME_GTE:
-                return QueryBuilders.rangeQuery(fieldPath).gte(getRealValue(filter.getValue()));
+                return QueryBuilders.rangeQuery(fieldPath).gte(getRealValue(filter.getValue(), env));
             case ARG_NAME_EXISTS:
-                boolean exists = (boolean) getRealValue(filter.getValue());
+                boolean exists = (boolean) getRealValue(filter.getValue(), env);
                 if (exists) {
                     return QueryBuilders.existsQuery(fieldPath);
                 } else {
@@ -317,7 +319,7 @@ public class ContentTypeBasedDataFetcher implements DataFetcher<Object> {
     /**
      * Extracts a scalar value, this is needed because of GraphQL strict types
      */
-    protected Object getRealValue(Value value) {
+    protected Object getRealValue(Value value, DataFetchingEnvironment env) {
         if (value instanceof BooleanValue) {
             return ((BooleanValue)value).isValue();
         } else if (value instanceof FloatValue) {
@@ -326,6 +328,8 @@ public class ContentTypeBasedDataFetcher implements DataFetcher<Object> {
             return ((IntValue) value).getValue();
         } else if (value instanceof StringValue) {
             return ((StringValue) value).getValue();
+        } else if (value instanceof VariableReference) {
+            return env.getVariables().get(((VariableReference) value).getName());
         }
         return null;
     }
