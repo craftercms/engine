@@ -1,11 +1,7 @@
 
 <#macro toolSupport>
   <#if siteContext.overlayCallback??>
-    <!-- Alpha UI -->
-    <script src="/studio/static-assets/alpha/assets/js/studio-guest.build.js"></script>
-
-    <script src="/studio/static-assets/libs/requirejs/require.js"
-    data-main="/studio/overlayhook?site=NOTUSED&page=NOTUSED&cs.js"></script>
+    <script src="/studio/static-assets/libs/requirejs/require.js" data-main="/studio/overlayhook?site=NOTUSED&page=NOTUSED&cs.js"></script>
     <script>document.domain = "${Request.serverName}"; </script>
   </#if>
 </#macro>
