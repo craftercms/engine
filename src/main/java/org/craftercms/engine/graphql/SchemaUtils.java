@@ -409,7 +409,7 @@ public abstract class SchemaUtils {
         GraphQLFieldDefinition.newFieldDefinition()
             .name(getGraphQLName("localId"))
             .description("The path of the item")
-            .type(nonNull(GraphQLString))
+            .type(GraphQLString)
             .argument(STRING_FILTER)
             .build(),
         GraphQLFieldDefinition.newFieldDefinition()
@@ -493,6 +493,34 @@ public abstract class SchemaUtils {
             .name(FIELD_NAME_ITEM)
             .description("List of item references")
             .type(list(ITEM_INCLUDE_TYPE)))
+        .build();
+
+    public static final GraphQLObjectType CONTENT_INCLUDE_TYPE = GraphQLObjectType.newObject()
+        .name("ContentInclude")
+        .description("Holds the content of another item in the site")
+        .field(GraphQLFieldDefinition.newFieldDefinition()
+            .name(FIELD_NAME_VALUE)
+            .description("The name of the item")
+            .type(nonNull(GraphQLString))
+            .argument(TEXT_FILTER))
+        .field(GraphQLFieldDefinition.newFieldDefinition()
+            .name(FIELD_NAME_KEY)
+            .description("The path of the item")
+            .type(nonNull(GraphQLString))
+            .argument(TEXT_FILTER))
+        .field(GraphQLFieldDefinition.newFieldDefinition()
+            .name(FIELD_NAME_COMPONENT)
+            .description("The content of the item")
+            .type(nonNull(CONTENT_ITEM_INTERFACE_TYPE)))
+        .build();
+
+    public static final GraphQLObjectType CONTENT_INCLUDE_WRAPPER_TYPE = GraphQLObjectType.newObject()
+        .name("ContentIncludeWrapper")
+        .description("Wrapper for a list of flattened components")
+        .field(GraphQLFieldDefinition.newFieldDefinition()
+            .name(FIELD_NAME_ITEM)
+            .description("List of items")
+            .type(list(CONTENT_INCLUDE_TYPE)))
         .build();
 
     public static final TypeResolver CONTENT_TYPE_BASED_TYPE_RESOLVER = env -> {
