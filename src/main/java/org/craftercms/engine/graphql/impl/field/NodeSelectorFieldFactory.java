@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Required;
 import static graphql.Scalars.GraphQLString;
 import static graphql.schema.GraphQLList.list;
 import static graphql.schema.GraphQLNonNull.nonNull;
+import static org.craftercms.engine.graphql.SchemaUtils.CONTENT_INCLUDE_WRAPPER_TYPE;
 import static org.craftercms.engine.graphql.SchemaUtils.FIELD_NAME_COMPONENT;
 import static org.craftercms.engine.graphql.SchemaUtils.FIELD_NAME_ITEM;
 import static org.craftercms.engine.graphql.SchemaUtils.FIELD_NAME_KEY;
@@ -75,23 +76,33 @@ public class NodeSelectorFieldFactory implements GraphQLFieldFactory {
                             final String contentTypeFieldId, final String parentGraphQLTypeName,
                             final GraphQLObjectType.Builder parentGraphQLType, final String graphQLFieldName,
                             final GraphQLFieldDefinition.Builder graphQLField) {
-        String datasourceName = XmlUtils.selectSingleNodeValue(contentTypeField, datasourceNameXPath);
-        String itemType = XmlUtils.selectSingleNodeValue(
-                contentTypeDefinition, String.format(datasourceItemTypeXPathFormat, datasourceName));
-        String itemGraphQLType = StringUtils.isNotEmpty(itemType)? getGraphQLName(itemType) : null;
         boolean disableFlattening = BooleanUtils.toBoolean(
                 XmlUtils.selectSingleNodeValue(contentTypeField, disableFlatteningXPath));
+
+        if (disableFlattening) {
+            // Flattening is disabled, so use the generic item include type
+            logger.debug("Flattening is disabled for node selector '{}'. Won't generate additional schema " +
+                "types and fields for its items", graphQLFieldName);
+
+            graphQLField.type(ITEM_INCLUDE_WRAPPER_TYPE);
+            return;
+        }
+
+        String datasourceName = XmlUtils.selectSingleNodeValue(contentTypeField, datasourceNameXPath);
+        String itemType = XmlUtils.selectSingleNodeValue(
+            contentTypeDefinition, String.format(datasourceItemTypeXPathFormat, datasourceName));
+        String itemGraphQLType = StringUtils.isNotEmpty(itemType)? getGraphQLName(itemType) : null;
 
         if (StringUtils.isEmpty(itemGraphQLType)) {
             // If there is no item content-type set in the datasource, use the generic item include type
             logger.debug("No specific item type found for node selector '{}'. Won't generate additional schema " +
-                         "types and fields for its items", graphQLFieldName);
+                "types and fields for its items", graphQLFieldName);
 
-            graphQLField.type(ITEM_INCLUDE_WRAPPER_TYPE);
-        } else if (!disableFlattening) {
+            graphQLField.type(CONTENT_INCLUDE_WRAPPER_TYPE);
+        } else {
             // If there is an item content-type, then create a specific GraphQL type for it
             logger.debug("Item type found for node selector '{}': '{}'. Generating additional schema types and " +
-                         "fields for the items...", itemGraphQLType, graphQLFieldName);
+                "fields for the items...", itemGraphQLType, graphQLFieldName);
 
             GraphQLObjectType flattenedType = GraphQLObjectType.newObject()
                 .name(parentGraphQLTypeName + FIELD_SEPARATOR + graphQLFieldName + "_flattened_item")
@@ -120,12 +131,6 @@ public class NodeSelectorFieldFactory implements GraphQLFieldFactory {
                 .build();
 
             graphQLField.type(wrapperType);
-        } else {
-            // Flattening is disabled, so use the generic item include type
-            logger.debug("Flattening is disabled for node selector '{}'. Won't generate additional schema " +
-                         "types and fields for its items", graphQLFieldName);
-
-            graphQLField.type(ITEM_INCLUDE_WRAPPER_TYPE);
         }
     }
 }
