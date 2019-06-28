@@ -76,6 +76,7 @@ import org.tuckey.web.filters.urlrewrite.UrlRewriter;
 public class SiteContextFactory implements ApplicationContextAware, ServletContextAware {
 
     public static final String DEFAULT_SITE_NAME_MACRO_NAME = "siteName";
+    public static final String CONFIG_BEAN_NAME = "siteConfig";
 
     private static final Log logger = LogFactory.getLog(SiteContextFactory.class);
 
@@ -381,7 +382,8 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
 
                 if (config != null) {
                     MutablePropertySources propertySources = appContext.getEnvironment().getPropertySources();
-                    propertySources.addFirst(new ApacheCommonsConfiguration2PropertySource("siteConfig", config));
+                    propertySources.addFirst(new ApacheCommonsConfiguration2PropertySource(CONFIG_BEAN_NAME, config));
+                    appContext.getBeanFactory().registerSingleton(CONFIG_BEAN_NAME, config);
                 }
 
                 XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(appContext);
