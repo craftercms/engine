@@ -737,6 +737,10 @@
         <property name="elasticsearch" ref="crafter.elasticsearchService"/>
     </bean>
 
+    <bean id="crafter.urlTransformDataFetcher" class="org.craftercms.engine.graphql.impl.fetchers.UrlTransformDataFetcher">
+        <property name="urlTransformationService" ref="crafter.urlTransformationService"/>
+    </bean>
+
     <bean id="crafter.checkboxFieldFactory" class="org.craftercms.engine.graphql.impl.field.CheckboxFieldFactory"/>
 
     <bean id="crafter.checkboxGroupFieldFactory"
@@ -789,6 +793,11 @@
                 <entry key="rte" value-ref="crafter.rteFieldFactory"/>
                 <entry key="rte-tinymce5" value-ref="crafter.rteFieldFactory"/>
                 <entry key="time" value-ref="crafter.timeFieldFactory"/>
+            </map>
+        </property>
+        <property name="customFetchers">
+            <map>
+                <entry key="localId" value-ref="crafter.urlTransformDataFetcher"/>
             </map>
         </property>
     </bean>

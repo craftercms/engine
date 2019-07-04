@@ -19,6 +19,7 @@ package org.craftercms.engine.graphql.impl.type;
 
 import graphql.schema.*;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.craftercms.core.service.Item;
 import org.craftercms.core.util.XmlUtils;
@@ -71,6 +72,16 @@ public class GraphQLTypeFactoryImpl implements GraphQLTypeFactory {
      * All known field factories to use during type build
      */
     protected Map<String, GraphQLFieldFactory> fieldFactories;
+
+    /**
+     * Custom {@link DataFetcher}s to use for specific fields
+     */
+    protected Map<String, DataFetcher> customFetchers;
+
+    @Required
+    public void setCustomFetchers(final Map<String, DataFetcher> customFetchers) {
+        this.customFetchers = customFetchers;
+    }
 
     @Required
     public void setRootQueryTypeName(final String rootQueryTypeName) {
@@ -165,6 +176,16 @@ public class GraphQLTypeFactoryImpl implements GraphQLTypeFactory {
 
         // Add the data fetcher for the new field
         codeRegistry.dataFetcher(coordinates(rootQueryTypeName, graphQLTypeName), dataFetcher);
+
+        // Add the custom data fetchers for fields
+        if (MapUtils.isNotEmpty(customFetchers)) {
+            customFetchers.forEach((fieldName, customFetcher) -> {
+                String graphQLFieldName = getGraphQLName(fieldName);
+                if (graphQLType.hasField(graphQLFieldName)) {
+                    codeRegistry.dataFetcher(coordinates(graphQLTypeName, graphQLFieldName), customFetcher);
+                }
+            });
+        }
     }
 
     /**
