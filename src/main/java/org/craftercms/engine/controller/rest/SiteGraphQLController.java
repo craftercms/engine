@@ -25,6 +25,7 @@ import java.util.Objects;
 import graphql.ExecutionInput;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
+import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.engine.graphql.QueryRequest;
 import org.craftercms.engine.service.context.SiteContext;
@@ -80,14 +81,15 @@ public class SiteGraphQLController {
     }
 
     protected Map<String, Object> handleRequest(String query, String operationName, Map<String, Object> variables) {
-        SiteContext context = SiteContext.getCurrent();
-        GraphQL graphQL = context.getGraphQL();
+        SiteContext siteContext = SiteContext.getCurrent();
+        RequestContext requestContext = RequestContext.getCurrent();
+        GraphQL graphQL = siteContext.getGraphQL();
         if (Objects.isNull(graphQL)) {
-            logger.warn("GraphQL schema has not been initialized for site {}", context.getSiteName());
+            logger.warn("GraphQL schema has not been initialized for site {}", siteContext.getSiteName());
             return Collections.singletonMap("errors",
                 Collections.singletonList(
                     Collections.singletonMap("message",
-                        "GraphQL schema has not been initialized for site " + context.getSiteName())
+                        "GraphQL schema has not been initialized for site " + siteContext.getSiteName())
                 )
             );
         }
@@ -95,7 +97,8 @@ public class SiteGraphQLController {
         ExecutionInput.Builder executionInput = newExecutionInput()
             .query(query)
             .operationName(operationName)
-            .variables(variables);
+            .variables(variables)
+            .context(requestContext);
 
         StopWatch watch = new StopWatch("graphql - " + operationName);
         watch.start("query");

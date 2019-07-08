@@ -56,6 +56,7 @@ public abstract class SchemaUtils {
     public static final String ARG_NAME_NOT = "not";
     public static final String ARG_NAME_OR = "or";
     public static final String ARG_NAME_AND = "and";
+    public static final String ARG_NAME_TRANSFORM = "transform";
 
     public static final String STRING_FILTER_NAME = "StringFilters";
     public static final String TEXT_FILTER_NAME = "TextFilters";
@@ -121,6 +122,12 @@ public abstract class SchemaUtils {
             .type(GraphQLInt)
             .build()
     );
+
+    public static final GraphQLArgument TRANSFORM_ARG = GraphQLArgument.newArgument()
+        .name(ARG_NAME_TRANSFORM)
+        .description("The name of the transformer to apply")
+        .type(GraphQLString)
+        .build();
 
     public static final GraphQLArgument STRING_FILTER = GraphQLArgument.newArgument()
         .name(FILTER_NAME)
@@ -410,7 +417,7 @@ public abstract class SchemaUtils {
             .name(getGraphQLName("localId"))
             .description("The path of the item")
             .type(GraphQLString)
-            .argument(STRING_FILTER)
+            .arguments(Arrays.asList(TRANSFORM_ARG, STRING_FILTER))
             .build(),
         GraphQLFieldDefinition.newFieldDefinition()
             .name(getGraphQLName("objectId"))
