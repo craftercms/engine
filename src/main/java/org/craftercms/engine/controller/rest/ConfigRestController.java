@@ -20,6 +20,7 @@ package org.craftercms.engine.controller.rest;
 import java.util.Map;
 
 import org.craftercms.core.controller.rest.RestControllerBase;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,13 +41,19 @@ public class ConfigRestController {
     public static final String URL_ROOT = "/config";
     public static final String URL_MODE_PREVIEW = "/preview";
 
+    protected boolean modePreview;
+
+    @Required
+    public void setModePreview(final boolean modePreview) {
+        this.modePreview = modePreview;
+    }
+
     /**
      * Indicates if the system is currently configured for preview
      */
     @GetMapping(URL_MODE_PREVIEW)
     public Map<String, Boolean> getModePreview() {
-        return singletonMap("preview",
-            Boolean.parseBoolean(System.getProperty("crafter.modePreview", Boolean.FALSE.toString())));
+        return singletonMap("preview", modePreview);
     }
 
 }

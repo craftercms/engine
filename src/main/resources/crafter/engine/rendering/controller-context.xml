@@ -90,7 +90,9 @@
 
     <bean id="crafter.siteGraphQLController" class="org.craftercms.engine.controller.rest.SiteGraphQLController"/>
 
-    <bean id="crafter.siteConfigController" class="org.craftercms.engine.controller.rest.ConfigRestController"/>
+    <bean id="crafter.siteConfigController" class="org.craftercms.engine.controller.rest.ConfigRestController">
+        <property name="modePreview" value="${crafter.engine.preview}"/>
+    </bean>
 
     <!-- Overwrite CacheRestController from core -->
     <bean id="crafter.cacheRestController" class="org.craftercms.engine.controller.rest.FreeMarkerAwareCacheRestController">
