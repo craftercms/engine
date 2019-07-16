@@ -76,14 +76,17 @@ public class PageRenderController extends AbstractController {
 
         if (siteContext != null) {
             if (siteContext.isFallback()) {
-                logger.warn("Rendering fallback page [" + fallbackPageUrl + "]");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Rendering fallback page [" + fallbackPageUrl + "]");
+                }
 
                 pageUrl = fallbackPageUrl;
             } else {
                 pageUrl = (String)request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
                 if (StringUtils.isEmpty(pageUrl)) {
                     throw new IllegalStateException(
-                        "Required request attribute '" + HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE + "' is not set");
+                        "Required request attribute '" + HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE +
+                        "' is not set");
                 }
 
                 Script controllerScript = getControllerScript(siteContext, request, pageUrl);

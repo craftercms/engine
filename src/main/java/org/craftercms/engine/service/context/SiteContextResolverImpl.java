@@ -71,18 +71,14 @@ public class SiteContextResolverImpl implements SiteContextResolver {
             fallback = true;
             siteName = fallbackSiteName;
 
-            logger.warn("Unable to resolve a site name for the request. Using fallback site");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Unable to resolve a site name for the request. Using fallback site");
+            }
         }
 
         SiteContext siteContext = getContext(siteName, fallback);
-        if (siteContext == null && !fallback) {
-            logger.warn("Unable to retrieve context for site name '" + siteName + "'. Using fallback site");
-
-            siteContext = getContext(fallbackSiteName, true);
-        }
-
         if (siteContext == null) {
-            throw new IllegalStateException("Unable to resolve to a context for site name '" + siteName + "'");
+            throw new IllegalStateException("Unable to resolve context for site name '" + siteName + "'");
         }
 
         request.setAttribute(SITE_NAME_ATTRIBUTE, siteName);

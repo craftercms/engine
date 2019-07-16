@@ -42,9 +42,7 @@
 
     <!-- AWS S3 Site List Resolver -->
     <bean id="crafter.siteListResolver" class="org.craftercms.engine.store.s3.S3SiteListResolver">
-        <property name="siteRootFolderPath" value="${crafter.engine.site.default.rootFolder.path}"/>
-        <property name="macroResolver" ref="crafter.macroResolver"/>
-
+        <property name="s3Uri" value="${crafter.engine.site.default.rootFolder.path}"/>
         <property name="clientBuilder" ref="crafter.s3ClientBuilder"/>
     </bean>
 
