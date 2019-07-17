@@ -123,7 +123,7 @@ public class DeploymentEventsWatcher {
             if(lastRebuildGraphQLEvent < rebuildGraphQLEvent) {
                 logger.info("Rebuild GraphQL deployment event received. Rebuilding schema for site {}...", siteName);
 
-                siteContextManager.startGraphQLBuild();
+                siteContextManager.startGraphQLBuild(siteContext);
             }
         }
     }

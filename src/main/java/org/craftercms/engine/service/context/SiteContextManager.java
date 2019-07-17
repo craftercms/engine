@@ -271,7 +271,7 @@ public class SiteContextManager {
      * Triggers the GraphQL schema build for the given site
      * @param siteContext the site context to use
      */
-    protected void startGraphQLBuild(SiteContext siteContext) {
+    public void startGraphQLBuild(SiteContext siteContext) {
         jobThreadPoolExecutor.execute(siteContext::buildGraphQLSchema);
     }
 
