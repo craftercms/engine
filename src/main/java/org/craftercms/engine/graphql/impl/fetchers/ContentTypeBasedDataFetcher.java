@@ -76,6 +76,7 @@ public class ContentTypeBasedDataFetcher implements DataFetcher<Object> {
     // Lucene regexes always match the entire string, no need to specify ^ or $
     public static final String CONTENT_TYPE_REGEX_PAGE = "/?page/.*";
     public static final String CONTENT_TYPE_REGEX_COMPONENT = "/?component/.*";
+    public static final String COMPONENT_INCLUDE_REGEX = ".*\\.item\\.component";
 
     /**
      * The default value for the 'limit' argument
@@ -218,6 +219,15 @@ public class ContentTypeBasedDataFetcher implements DataFetcher<Object> {
 
             // If the field has sub selection
             if (Objects.nonNull(currentField.getSelectionSet())) {
+                // If the field is a flattened component
+                if (fullPath.matches(COMPONENT_INCLUDE_REGEX)) {
+                    // Include the 'content-type' field to make sure the type can be resolved during runtime
+                    String contentTypeFieldPath = fullPath + "." + QUERY_FIELD_NAME_CONTENT_TYPE;
+                    if (!queryFieldIncludes.contains(contentTypeFieldPath)) {
+                        queryFieldIncludes.add(contentTypeFieldPath);
+                    }
+                }
+
                 // Process recursively and finish
                 currentField.getSelectionSet().getSelections()
                     .forEach(selection -> processSelection(fullPath, selection, query, queryFieldIncludes, env));
