@@ -18,10 +18,7 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:util="http://www.springframework.org/schema/util"
-       xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <bean class="org.craftercms.commons.spring.ListMergingPostProcessor">
         <property name="order" value="0" />
@@ -40,24 +37,10 @@
     <!--									-->
     <!-- ////////////////////////////////// -->
 
-    <bean id="crafter.remoteAssetsRequestHandler" class="org.craftercms.engine.controller.RemoteAssetsRequestHandler"
-          init-method="init">
-        <property name="remoteFileResolver" ref="crafter.remoteFileResolver"/>
-        <property name="disableCaching" value="${crafter.engine.remoteAssets.disableCaching}"/>
-    </bean>
-
     <bean id="crafter.componentRenderController" class="org.craftercms.engine.controller.ComponentRenderController">
         <property name="renderComponentViewName" value="/templates/web/render-component.ftl"/>
     </bean>
 
     <bean id="crafter.profileRestController" class="org.craftercms.engine.controller.rest.preview.ProfileRestController"/>
-
-    <util:map id="crafter.urlMappings">
-        <entry key="/api/**" value-ref="crafter.restScriptsController"/>
-        <entry key="/api/1/services/**" value-ref="crafter.restScriptsController"/> <!-- Deprecated mapping, might be removed in a later version -->
-        <entry key="/static-assets/**" value-ref="crafter.staticAssetsRequestHandler"/>
-        <entry key="/remote-assets/**" value-ref="crafter.remoteAssetsRequestHandler"/>
-        <entry key="/*" value-ref="crafter.pageRenderController"/>
-    </util:map>
 
 </beans>

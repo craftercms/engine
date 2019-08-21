@@ -48,6 +48,12 @@
         <property name="disableCaching" value="${crafter.engine.staticAssets.disableCaching}"/>
     </bean>
 
+    <bean id="crafter.remoteAssetsRequestHandler" class="org.craftercms.engine.controller.RemoteAssetsRequestHandler"
+          init-method="init">
+        <property name="remoteFileResolver" ref="crafter.remoteFileResolver"/>
+        <property name="disableCaching" value="${crafter.engine.remoteAssets.disableCaching}"/>
+    </bean>
+
     <bean id="crafter.pageRenderController" class="org.craftercms.engine.controller.PageRenderController">
         <property name="fallbackPageUrl" value="/no-site.html"/>
         <property name="storeService" ref="crafter.contentStoreService"/>
@@ -105,6 +111,7 @@
         <entry key="/api/**" value-ref="crafter.restScriptsController"/>
         <entry key="/api/1/services/**" value-ref="crafter.restScriptsController"/> <!-- Deprecated mapping, might be removed in a later version -->
         <entry key="/static-assets/**" value-ref="crafter.staticAssetsRequestHandler"/>
+        <entry key="/remote-assets/**" value-ref="crafter.remoteAssetsRequestHandler"/>
         <entry key="/*" value-ref="crafter.pageRenderController"/>
     </util:map>
 
