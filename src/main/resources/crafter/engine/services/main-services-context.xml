@@ -773,6 +773,10 @@
 
     <bean id="crafter.timeFieldFactory" class="org.craftercms.engine.graphql.impl.field.TimeFieldFactory"/>
 
+    <bean id="crafter.inputFieldFactory" class="org.craftercms.engine.graphql.impl.field.InputFieldFactory">
+        <constructor-arg value="${crafter.engine.graphql.contentType.field.tokenize.xpath}"/>
+    </bean>
+
     <bean id="crafter.typeFactory" class="org.craftercms.engine.graphql.impl.type.GraphQLTypeFactoryImpl">
         <property name="rootQueryTypeName" value="${crafter.engine.graphql.query.name}"/>
         <property name="ignoredFields" value="${crafter.engine.graphql.ignoredFields}"/>
@@ -793,6 +797,7 @@
                 <entry key="rte" value-ref="crafter.rteFieldFactory"/>
                 <entry key="rte-tinymce5" value-ref="crafter.rteFieldFactory"/>
                 <entry key="time" value-ref="crafter.timeFieldFactory"/>
+                <entry key="input" value-ref="crafter.inputFieldFactory"/>
             </map>
         </property>
         <property name="customFetchers">
