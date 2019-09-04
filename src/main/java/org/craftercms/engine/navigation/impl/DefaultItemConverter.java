@@ -87,9 +87,9 @@ public class DefaultItemConverter implements Converter<SiteItem, NavItem> {
     }
 
     protected String getNavigationLabel(SiteItem siteItem) {
-        String navLabel = siteItem.getItem().queryDescriptorValue(navLabelXPath);
+        String navLabel = siteItem.queryValue(navLabelXPath);
         if (StringUtils.isEmpty(navLabel)) {
-            navLabel = siteItem.getItem().queryDescriptorValue(internalNameXPath);
+            navLabel = siteItem.queryValue(internalNameXPath);
             if (StringUtils.isEmpty(navLabel)) {
                 navLabel = FilenameUtils.removeExtension(siteItem.getStoreName());
                 navLabel = StringUtils.replace(navLabel, "-", " ");

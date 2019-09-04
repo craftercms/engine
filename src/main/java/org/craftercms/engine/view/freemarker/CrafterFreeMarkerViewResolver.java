@@ -32,6 +32,7 @@ public class CrafterFreeMarkerViewResolver extends FreeMarkerViewResolver {
     protected SiteItemService siteItemService;
     protected String componentTemplateXPathQuery;
     protected String componentIncludeElementName;
+    protected String componentEmbeddedElementName;
     protected SiteItemScriptResolver componentScriptResolver;
 
     @Required
@@ -47,6 +48,11 @@ public class CrafterFreeMarkerViewResolver extends FreeMarkerViewResolver {
     @Required
     public void setComponentIncludeElementName(String componentIncludeElementName) {
         this.componentIncludeElementName = componentIncludeElementName;
+    }
+
+    @Required
+    public void setComponentEmbeddedElementName(final String componentEmbeddedElementName) {
+        this.componentEmbeddedElementName = componentEmbeddedElementName;
     }
 
     @Required
@@ -67,6 +73,7 @@ public class CrafterFreeMarkerViewResolver extends FreeMarkerViewResolver {
         view.setComponentTemplateNamePrefix(getPrefix());
         view.setComponentTemplateNameSuffix(getSuffix());
         view.setComponentIncludeElementName(componentIncludeElementName);
+        view.setComponentEmbeddedElementName(componentEmbeddedElementName);
         view.setComponentScriptResolver(componentScriptResolver);
 
         return view;

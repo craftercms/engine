@@ -21,12 +21,12 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.craftercms.commons.lang.Callback;
 import org.craftercms.commons.lang.UrlUtils;
-import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
-import org.craftercms.core.service.Item;
 import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.core.util.cache.impl.CachingAwareList;
+import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.properties.SiteProperties;
+import org.craftercms.engine.service.SiteItemService;
 import org.craftercms.engine.service.context.SiteContext;
 import org.springframework.beans.factory.annotation.Required;
 
@@ -44,7 +44,7 @@ public class BreadcrumbBuilder {
     public static final String HOME_BREADCRUMB_NAME = "Home";
 
     protected CacheTemplate cacheTemplate;
-    protected ContentStoreService storeService;
+    protected SiteItemService siteItemService;
     protected String homePath;
     protected String breadcrumbNameXPathQuery;
 
@@ -54,8 +54,8 @@ public class BreadcrumbBuilder {
     }
 
     @Required
-    public void setStoreService(ContentStoreService storeService) {
-        this.storeService = storeService;
+    public void setSiteItemService(final SiteItemService siteItemService) {
+        this.siteItemService = siteItemService;
     }
 
     @Required
@@ -86,9 +86,10 @@ public class BreadcrumbBuilder {
                         currentUrl += "/" + breadcrumbUrlComponent;
                     }
 
-                    Item item = storeService.getItem(context, UrlUtils.concat(currentUrl, indexFileName));
-                    if (item != null && item.getDescriptorDom() != null) {
-                        String breadcrumbName = item.queryDescriptorValue(breadcrumbNameXPathQuery);
+                    SiteItem siteItem = siteItemService.getSiteItem(UrlUtils.concat(currentUrl, indexFileName));
+
+                    if (siteItem != null && siteItem.getDom() != null) {
+                        String breadcrumbName = siteItem.queryValue(breadcrumbNameXPathQuery);
                         if (StringUtils.isEmpty(breadcrumbName)) {
                             if (StringUtils.isNotEmpty(breadcrumbUrlComponent)) {
                                 breadcrumbName = StringUtils.capitalize(breadcrumbUrlComponent.replace("-", " ").replace(".xml", ""));

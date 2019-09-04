@@ -26,7 +26,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.http.RequestContext;
-import org.craftercms.commons.lang.Callback;
 import org.craftercms.core.service.CachingOptions;
 import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.engine.mobile.UserAgentTemplateDetector;
@@ -246,9 +245,9 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
             return cacheTemplate.getObject(siteContext.getContext(), cachingOptions, () -> {
                 SiteItem page = getPage(url);
                 if (page != null) {
-                    String redirectUrl = page.getItem().queryDescriptorValue(redirectUrlXPathQuery);
-                    String contentType = page.getItem().queryDescriptorValue(contentTypeXPathQuery);
-                    String forceHttps = page.getItem().queryDescriptorValue(forceHttpsXPathQuery);
+                    String redirectUrl = page.queryValue(redirectUrlXPathQuery);
+                    String contentType = page.queryValue(contentTypeXPathQuery);
+                    String forceHttps = page.queryValue(forceHttpsXPathQuery);
 
                     if (StringUtils.isNotEmpty(contentType) &&
                         StringUtils.equalsIgnoreCase(redirectContentType, contentType) &&

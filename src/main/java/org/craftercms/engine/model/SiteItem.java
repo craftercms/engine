@@ -14,161 +14,52 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.craftercms.engine.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.craftercms.commons.converters.Converter;
 import org.craftercms.core.service.Item;
-import org.craftercms.core.service.Tree;
-import org.craftercms.core.util.XmlUtils;
 import org.dom4j.Document;
-import org.dom4j.Element;
 
 /**
- * Basic adapter to a {@link Item}, enhanced with methods that can be easily invoked in template engines like Freemarker.
- * The generic get method allows things like ${model.header.title} in Freemarker.
+ * Defines the basic behavior for a site item
  *
- * @author Alfonso Vásquez
+ * @author joseross
+ * @since 3.1.2
  */
-public class SiteItem {
+public interface SiteItem {
 
-    protected Item item;
-    protected List<SiteItem> childItems;
-    protected Converter<Element, Object> modelFieldConverter;
-    protected Comparator<SiteItem> sortComparator;
+    Item getItem();
 
-    public SiteItem(Item item, Converter<Element, Object> modelFieldConverter, Comparator<SiteItem> sortComparator) {
-        this.item = item;
-        this.modelFieldConverter = modelFieldConverter;
-        this.sortComparator = sortComparator;
-    }
+    String getStoreName();
 
-    public Item getItem() {
-        return item;
-    }
+    String getStoreUrl();
 
-    public String getStoreName() {
-        return item.getName();
-    }
+    boolean isFolder();
 
-    public String getStoreUrl() {
-        return item.getUrl();
-    }
+    Document getDom();
 
-    public boolean isFolder() {
-        return item.isFolder();
-    }
+    Map<String, Object> getProperties();
 
-    public Document getDom() {
-        return item.getDescriptorDom();
-    }
+    Object get(String xpathExpression);
 
-    public Map<String, Object> getProperties() {
-        return item.getProperties();
-    }
+    String queryValue(String xpathExpression);
 
-    public Object get(String xpathExpression) {
-        if (getDom() != null) {
-            Object result = XmlUtils.selectObject(getDom().getRootElement(), xpathExpression);
-            if (result instanceof Element) {
-                return modelFieldConverter.convert((Element) result);
-            } else {
-                return result;
-            }
-        } else {
-            return null;
-        }
-    }
+    List<String> queryValues(String xpathExpression);
 
-    public String queryValue(String xpathExpression) {
-        if (getDom() != null) {
-            return XmlUtils.selectSingleNodeValue(getDom().getRootElement(), xpathExpression);
-        } else {
-            return null;
-        }
-    }
+    String queryValue(String xpathExpression, Map<String, String> namespaceUris);
 
-    public List<String> queryValues(String xpathExpression) {
-        if (getDom() != null) {
-            return XmlUtils.selectNodeValues(getDom().getRootElement(), xpathExpression);
-        } else {
-            return null;
-        }
-    }
+    List<String> queryValues(String xpathExpression, Map<String, String> namespaceUris);
 
-    public String queryValue(String xpathExpression, Map<String, String> namespaceUris) {
-        if (getDom() != null) {
-            return XmlUtils.selectSingleNodeValue(getDom().getRootElement(), xpathExpression, namespaceUris);
-        } else {
-            return null;
-        }
-    }
+    List<SiteItem> getChildItems();
 
-    public List<String> queryValues(String xpathExpression, Map<String, String> namespaceUris) {
-        if (getDom() != null) {
-            return XmlUtils.selectNodeValues(getDom().getRootElement(), xpathExpression, namespaceUris);
-        } else {
-            return null;
-        }
-    }
+    SiteItem getChildItem(String storeName);
 
-    public List<SiteItem> getChildItems() {
-        if (childItems == null) {
-            if (item instanceof Tree) {
-                List<Item> treeChildren = ((Tree) item).getChildren();
-                if (CollectionUtils.isNotEmpty(treeChildren)) {
-                    childItems = new ArrayList<>(treeChildren.size());
-                    for (Item treeChild : treeChildren) {
-                        childItems.add(createItemWrapper(treeChild));
-                    }
+    List<SiteItem> sortItems(List<SiteItem> items, Comparator<SiteItem> comparator);
 
-                    if (sortComparator != null) {
-                        childItems = sortItems(childItems, sortComparator);
-                    }
-                } else {
-                    childItems = Collections.emptyList();
-                }
-            } else {
-                childItems = Collections.emptyList();
-            }
-        }
-
-        return childItems;
-    }
-
-    public SiteItem getChildItem(String storeName) {
-        for (SiteItem childItem : getChildItems()) {
-            if (childItem.getStoreName().equals(storeName)) {
-                return childItem;
-            }
-        }
-
-        return null;
-    }
-
-    @Override
-    public String toString() {
-        return "SiteItem[" +
-                "storeName='" + getStoreName() + '\'' +
-                ", storeUrl='" + getStoreUrl() + '\'' +
-                ", folder=" + isFolder() +
-                ']';
-    }
-
-    protected List<SiteItem> sortItems(List<SiteItem> items, Comparator<SiteItem> comparator) {
-        Collections.sort(items, comparator);
-
-        return items;
-    }
-
-    protected SiteItem createItemWrapper(Item item) {
-        return new SiteItem(item, modelFieldConverter, sortComparator);
-    }
+    SiteItem createItemWrapper(Item item);
 
 }
