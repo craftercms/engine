@@ -85,6 +85,7 @@ public abstract class SchemaUtils {
     public static final String FIELD_SUFFIX_QUERY = FIELD_SEPARATOR + "query";
     public static final String FIELD_SUFFIX_RAW = FIELD_SEPARATOR + "raw";
     public static final String FIELD_SUFFIX_TZ = FIELD_SEPARATOR + "tz";
+    public static final String FIELD_SUFFIX_TOKENIZED = FIELD_SEPARATOR + "t";
     public static final String FIELD_SUFFIX_MULTIVALUE  = "mv";
 
     public static final String FILTER_NAME = "filter";
