@@ -79,7 +79,7 @@ public class SiteItemScriptResolverImpl implements SiteItemScriptResolver {
         SiteContext siteContext = SiteContext.getCurrent();
 
         if (siteContext != null) {
-            String contentType = item.getItem().queryDescriptorValue(contentTypeXPathQuery);
+            String contentType = item.queryValue(contentTypeXPathQuery);
 
             if (StringUtils.isNotEmpty(contentType)) {
                 String scriptUrl = getScriptUrlForContentType(contentType);
@@ -105,7 +105,7 @@ public class SiteItemScriptResolverImpl implements SiteItemScriptResolver {
             }
 
             if (CollectionUtils.isNotEmpty(scriptUrls)) {
-                List<String> additionalUrls = item.getItem().queryDescriptorValues(scriptsXPathQuery);
+                List<String> additionalUrls = item.queryValues(scriptsXPathQuery);
 
                 if (scriptUrls == null) {
                     scriptUrls = new ArrayList<>();
@@ -115,7 +115,7 @@ public class SiteItemScriptResolverImpl implements SiteItemScriptResolver {
                     scriptUrls.addAll(additionalUrls);
                 }
             } else {
-                scriptUrls = item.getItem().queryDescriptorValues(scriptsXPathQuery);
+                scriptUrls = item.queryValues(scriptsXPathQuery);
             }
         }
 

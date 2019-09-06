@@ -16,8 +16,6 @@
  */
 package org.craftercms.engine.view;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -210,7 +208,7 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
     }
 
     protected String getPageViewName() throws RenderingException {
-        String pageViewName = page.getItem().queryDescriptorValue(pageViewNameXPathQuery);
+        String pageViewName = page.queryValue(pageViewNameXPathQuery);
         if (StringUtils.isNotEmpty(pageViewName)) {
             return pageViewName;
         } else {
@@ -219,7 +217,7 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
     }
 
     protected String getMimeType() {
-        return page.getItem().queryDescriptorValue(mimeTypeXPathQuery);
+        return page.queryValue(mimeTypeXPathQuery);
     }
 
     protected void renderActualView(String pageViewName, Map<String, Object> model, HttpServletRequest request,

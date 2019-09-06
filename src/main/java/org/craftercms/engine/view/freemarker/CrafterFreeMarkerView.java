@@ -92,6 +92,7 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     protected String componentTemplateNamePrefix;
     protected String componentTemplateNameSuffix;
     protected String componentIncludeElementName;
+    protected String componentEmbeddedElementName;
     protected SiteItemScriptResolver componentScriptResolver;
 
     protected ServletContextHashModel servletContextHashModel;
@@ -128,6 +129,11 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     @Required
     public void setComponentIncludeElementName(String componentIncludeElementName) {
         this.componentIncludeElementName = componentIncludeElementName;
+    }
+
+    @Required
+    public void setComponentEmbeddedElementName(final String componentEmbeddedElementName) {
+        this.componentEmbeddedElementName = componentEmbeddedElementName;
     }
 
     @Required
@@ -216,6 +222,7 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
         renderComponentDirective.setTemplateNamePrefix(componentTemplateNamePrefix);
         renderComponentDirective.setTemplateNameSuffix(componentTemplateNameSuffix);
         renderComponentDirective.setIncludeElementName(componentIncludeElementName);
+        renderComponentDirective.setComponentElementName(componentEmbeddedElementName);
         renderComponentDirective.setScriptResolver(componentScriptResolver);
         renderComponentDirective.setServletContext(getServletContext());
 

@@ -79,7 +79,7 @@ public class CrafterPageAccessManager {
     }
 
     protected List<String> getAuthorizedRolesForPage(SiteItem page) {
-        return page.getItem().queryDescriptorValues(authorizedRolesXPathQuery);
+        return page.queryValues(authorizedRolesXPathQuery);
     }
 
     protected boolean containsRole(String role, List<String> roles) {

@@ -76,6 +76,7 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
     protected String templateNamePrefix;
     protected String templateNameSuffix;
     protected String includeElementName;
+    protected String componentElementName;
     protected SiteItemScriptResolver scriptResolver;
 
     @Required
@@ -111,6 +112,11 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
     @Required
     public void setIncludeElementName(String includeElementName) {
         this.includeElementName = includeElementName;
+    }
+
+    @Required
+    public void setComponentElementName(final String componentElementName) {
+        this.componentElementName = componentElementName;
     }
 
     @Required
@@ -150,14 +156,19 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
     protected SiteItem getComponentFromNode(TemplateModel componentParam, Environment env) throws TemplateException {
         Element includeElementParent = unwrap(COMPONENT_PARAM_NAME, componentParam, Element.class, env);
         Element includeElement = includeElementParent.element(includeElementName);
+        Element componentElement = includeElementParent.element(componentElementName);
 
         if (includeElement != null) {
+            logger.debug("Using the include element to load the site item");
             String componentPath = includeElement.getTextTrim();
 
             return getComponent(componentPath, env);
+        } else if (componentElement != null) {
+            logger.debug("Using an embedded site item");
+            return siteItemService.getSiteItem(componentElement);
         } else {
-            throw new IllegalStateException("No '" + includeElementName + "' element found under component " +
-                                            includeElementParent.getUniquePath());
+            throw new IllegalStateException("No '" + includeElementName + "' or '" + componentElementName + "' element "
+                + "found under component "+ includeElementParent.getUniquePath());
         }
     }
 
@@ -275,7 +286,7 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
     }
 
     protected String getComponentTemplateName(SiteItem component, Environment env) throws TemplateException {
-        String componentTemplateName = component.getItem().queryDescriptorValue(templateXPathQuery);
+        String componentTemplateName = component.queryValue(templateXPathQuery);
         if (StringUtils.isNotEmpty(componentTemplateName)) {
             return templateNamePrefix + componentTemplateName + templateNameSuffix;
         } else {

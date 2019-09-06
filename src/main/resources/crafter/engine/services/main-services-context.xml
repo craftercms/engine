@@ -593,7 +593,7 @@
 
     <!-- Deprecated -->
     <bean id="crafter.breadcrumbBuilder" class="org.craftercms.engine.util.breadcrumb.BreadcrumbBuilder">
-        <property name="storeService" ref="crafter.contentStoreService"/>
+        <property name="siteItemService" ref="crafter.siteItemService"/>
         <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
         <property name="homePath" value="${crafter.engine.site.default.descriptors.pages.path}"/>
         <property name="breadcrumbNameXPathQuery" value="${crafter.engine.page.navLabel.xpathQuery}"/>

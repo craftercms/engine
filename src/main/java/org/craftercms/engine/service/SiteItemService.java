@@ -24,6 +24,7 @@ import org.craftercms.core.service.Content;
 import org.craftercms.core.service.Item;
 import org.craftercms.core.service.ItemFilter;
 import org.craftercms.engine.model.SiteItem;
+import org.dom4j.Element;
 
 /**
  * Service for accessing {@link org.craftercms.engine.model.SiteItem}s of the current site.
@@ -38,6 +39,15 @@ public interface SiteItemService {
      * @param url   the URL of the item
      */
     Content getRawContent(String url);
+
+    /**
+     * Returns the site item for the given XML element
+     *
+     * @since 3.1.2
+     * @param element the XML element
+     * @return the site item
+     */
+    SiteItem getSiteItem(Element element);
 
     /**
      * Returns the site item for the given URL
