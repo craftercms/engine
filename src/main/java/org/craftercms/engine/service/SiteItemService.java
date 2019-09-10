@@ -47,7 +47,7 @@ public interface SiteItemService {
      * @param element the XML element
      * @return the site item
      */
-    SiteItem getSiteItem(Element element);
+    SiteItem getSiteItem(SiteItem parent, Element element);
 
     /**
      * Returns the site item for the given URL

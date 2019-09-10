@@ -94,8 +94,8 @@ public class SiteItemServiceImpl implements SiteItemService {
     }
 
     @Override
-    public SiteItem getSiteItem(final Element element) {
-        return new EmbeddedSiteItem(element, modelFieldConverter);
+    public SiteItem getSiteItem(final SiteItem parent, final Element element) {
+        return new EmbeddedSiteItem(parent, element, modelFieldConverter);
     }
 
     @Override

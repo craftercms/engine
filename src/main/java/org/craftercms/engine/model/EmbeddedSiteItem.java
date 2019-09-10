@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.craftercms.commons.converters.Converter;
 import org.craftercms.core.service.Item;
+import org.craftercms.core.util.XmlUtils;
 import org.dom4j.Document;
 import org.dom4j.Element;
 
@@ -34,14 +35,29 @@ import org.dom4j.Element;
  */
 public class EmbeddedSiteItem extends AbstractXmlSiteItem {
 
+    public static final String XPATH_OBJECT_ID = "objectId";
+
     /**
-     * The root XML element of the embedded component
+     * The parent of the embedded component
+     */
+    protected SiteItem parentItem;
+
+    /**
+     * The unique id of the embedded component
+     */
+    protected String componentId;
+
+    /**
+     * The XML root element of the embedded component
      */
     protected Element rootElement;
 
-    public EmbeddedSiteItem(final Element rootElement, final Converter<Element, Object> modelFieldConverter) {
+    public EmbeddedSiteItem(final SiteItem parentItem, final Element rootElement,
+                            final Converter<Element, Object> modelFieldConverter) {
         super(modelFieldConverter);
+        this.parentItem = parentItem;
         this.rootElement = rootElement;
+        this.componentId = XmlUtils.selectSingleNodeValue(rootElement, XPATH_OBJECT_ID);
     }
 
     @Override
@@ -56,12 +72,12 @@ public class EmbeddedSiteItem extends AbstractXmlSiteItem {
 
     @Override
     public String getStoreName() {
-        return null;
+        return parentItem.getStoreName();
     }
 
     @Override
     public String getStoreUrl() {
-        return null;
+        return parentItem.getStoreUrl();
     }
 
     @Override
@@ -101,7 +117,7 @@ public class EmbeddedSiteItem extends AbstractXmlSiteItem {
 
     @Override
     public String toString() {
-        return "EmbeddedSiteItem{" + "rootElement=" + rootElement + '}';
+        return "EmbeddedSiteItem{" + "parentItem=" + parentItem + ", objectId='" + componentId + '\'' + '}';
     }
 
 }
