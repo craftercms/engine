@@ -683,6 +683,15 @@
         <property name="siteItemService" ref="crafter.siteItemService"/>
     </bean>
 
+    <bean id="crafter.webDavProfileLoader"
+          class="org.craftercms.engine.util.config.profiles.ConfigurationProfileLoaderImpl">
+        <property name="profilesUrl" value="${crafter.engine.site.default.config.webdav.profiles.path}"/>
+        <property name="profileMapper">
+            <bean class="org.craftercms.commons.config.profiles.webdav.WebDavProfileMappper"/>
+        </property>
+        <property name="siteItemService" ref="crafter.siteItemService"/>
+    </bean>
+
     <!-- ////////////////////////////////// -->
     <!--								 	-->
     <!--		  Remote File Stores  	    -->
@@ -700,6 +709,10 @@
         <property name="profileLoader" ref="crafter.boxProfileLoader"/>
     </bean>
 
+    <bean id="crafter.webDavFileStore" class="org.craftercms.commons.file.stores.impl.webdav.WebDavFileStore">
+        <property name="profileLoader" ref="crafter.webDavProfileLoader"/>
+    </bean>
+
     <bean id="crafter.remoteFileResolver" class="org.craftercms.commons.file.stores.impl.RemoteFileResolverImpl">
         <property name="pathParsers">
             <map>
@@ -710,6 +723,7 @@
             <map>
                 <entry key="s3" value-ref="crafter.s3FileStore"/>
                 <entry key="box" value-ref="crafter.boxFileStore"/>
+                <entry key="webdav" value-ref="crafter.webDavFileStore"/>
             </map>
         </property>
     </bean>
