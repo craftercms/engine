@@ -17,10 +17,14 @@
 
 package org.craftercms.engine.graphql.impl;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Executor;
+
+import javax.servlet.ServletContext;
 
 import graphql.GraphQL;
 import graphql.schema.*;
@@ -28,14 +32,19 @@ import org.apache.commons.collections.CollectionUtils;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Item;
 import org.craftercms.core.service.Tree;
+import org.craftercms.engine.exception.ScriptNotFoundException;
 import org.craftercms.engine.graphql.GraphQLFactory;
 import org.craftercms.engine.graphql.GraphQLTypeFactory;
+import org.craftercms.engine.graphql.SchemaCustomizer;
+import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.service.context.SiteContext;
+import org.craftercms.engine.util.GroovyScriptUtils;
 import org.craftercms.engine.util.concurrent.SiteAwareThreadPoolExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.util.StopWatch;
+import org.springframework.web.context.ServletContextAware;
 
 import static graphql.schema.AsyncDataFetcher.async;
 import static graphql.schema.FieldCoordinates.coordinates;
@@ -48,9 +57,16 @@ import static org.craftercms.engine.graphql.SchemaUtils.*;
  * @author joseross
  * @since 3.1
  */
-public class GraphQLFactoryImpl implements GraphQLFactory {
+public class GraphQLFactoryImpl implements GraphQLFactory, ServletContextAware {
 
     private static final Logger logger = LoggerFactory.getLogger(GraphQLFactory.class);
+
+    public static final String VARIABLE_SCHEMA = "schema";
+
+    /**
+     * The path of the init script for custom fields & fetchers
+     */
+    protected String schemaScriptPath;
 
     /**
      * The path to look for content-type definitions
@@ -82,6 +98,16 @@ public class GraphQLFactoryImpl implements GraphQLFactory {
      */
     protected Executor jobThreadPoolExecutor;
 
+    /**
+     * The servlet context
+     */
+    protected ServletContext servletContext;
+
+    @Required
+    public void setSchemaScriptPath(final String schemaScriptPath) {
+        this.schemaScriptPath = schemaScriptPath;
+    }
+
     @Required
     public void setRepoConfigFolder(final String repoConfigFolder) {
         this.repoConfigFolder = repoConfigFolder;
@@ -110,6 +136,11 @@ public class GraphQLFactoryImpl implements GraphQLFactory {
     @Required
     public void setJobThreadPoolExecutor(final Executor jobThreadPoolExecutor) {
         this.jobThreadPoolExecutor = jobThreadPoolExecutor;
+    }
+
+    @Override
+    public void setServletContext(final ServletContext servletContext) {
+        this.servletContext = servletContext;
     }
 
     /**
@@ -191,10 +222,30 @@ public class GraphQLFactoryImpl implements GraphQLFactory {
             findContentTypes(tree, rootType, codeRegistry, asyncFetcher);
         }
 
+        runInitScript(siteContext, rootType, codeRegistry);
+
         return GraphQLSchema.newSchema()
             .codeRegistry(codeRegistry.build())
             .query(rootType)
             .build();
+    }
+
+    protected void runInitScript(SiteContext siteContext, GraphQLObjectType.Builder rootType,
+                                 GraphQLCodeRegistry.Builder codeRegistry) {
+        Script script = siteContext.getScriptFactory().getScript(schemaScriptPath);
+
+        Map<String, Object> variables = new HashMap<>();
+        GroovyScriptUtils.addJobScriptVariables(variables, servletContext);
+        SchemaCustomizer schemaCustomizer = new SchemaCustomizer();
+        variables.put(VARIABLE_SCHEMA, schemaCustomizer);
+
+        try {
+            script.execute(variables);
+            logger.info("Updating GraphQL schema with custom fields, fetchers & resolvers");
+            schemaCustomizer.apply(rootQueryTypeName, rootType, codeRegistry);
+        } catch (ScriptNotFoundException e) {
+            logger.info("No custom GraphQL schema found for site '{}'", siteContext.getSiteName());
+        }
     }
 
     /**

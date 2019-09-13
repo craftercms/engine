@@ -808,6 +808,7 @@
     </bean>
 
     <bean id="crafter.graphQLFactory" class="org.craftercms.engine.graphql.impl.GraphQLFactoryImpl">
+        <property name="schemaScriptPath" value="${crafter.engine.graphql.script}"/>
         <property name="rootQueryTypeName" value="${crafter.engine.graphql.query.name}"/>
         <property name="repoConfigFolder" value="${crafter.engine.graphql.repoConfigFolder}"/>
         <property name="contentTypeDefinitionName" value="${crafter.engine.graphql.contentType.definition}"/>
