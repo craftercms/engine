@@ -13,7 +13,7 @@
 <#macro componentAttr path="" ice=false iceGroup="">
   <#if siteContext.overlayCallback??>data-studio-component-path="${path}" data-studio-component="${path}"
     <#if ice==true>
-      <@iceAttr path=path iceGroup=iceGroup/>
+      <@iceAttrLegacy path=path iceGroup=iceGroup/>
     </#if>
   </#if>
 </#macro>
@@ -22,17 +22,49 @@
   <#if siteContext.overlayCallback??> data-studio-components-target="${target}" data-studio-components-objectId="${objectId}"</#if>
 </#macro>
 
-<#macro iceAttr iceGroup="" path="" label="">
-  <#if label == "">
-    <#if iceGroup == "" >
-      <#assign label = path />
-    <#else>
-      <#assign label = iceGroup />
-    </#if>
+<#-- Main macro for ICE attributes -->
+<#macro iceAttr iceGroup="" path="" label="" component={} >
+  <#if !modePreview>
+    <#return>
   </#if>
-  <#if siteContext.overlayCallback??> data-studio-ice="${iceGroup}" <#if path!="">data-studio-ice-path="${path}"</#if> data-studio-ice-label="${label}"</#if>
+  <#if component?has_content >
+    <@iceAttrComponent iceGroup=iceGroup label=label component=component />
+  <#else>
+    <@iceAttrLegacy iceGroup=iceGroup label=label path=path />
+  </#if>
 </#macro>
 
+<#-- Macro to handle ICE attributes for a SiteItem -->
+<#macro iceAttrComponent iceGroup="" label="" component={} >
+  <#-- Figure out the label to use -->
+  <#if label?has_content >
+    <#assign actualLabel = label />
+  <#elseif iceGroup?has_content >
+    <#assign actualLabel = iceGroup />
+  <#else>
+    <#assign actualLabel = component["internal-name"] />
+  </#if>
+  data-studio-ice="${iceGroup}" data-studio-ice-label="${actualLabel}" data-studio-ice-path="${component.storeUrl}"
+  <#-- If the given component has a parent -->
+  <#if !component.getDom()?has_content >
+    data-studio-embedded-item-id="${component.objectId}"
+  </#if>
+</#macro>
+
+<#-- Macro to handle ICE attributes for a path -->
+<#macro iceAttrLegacy iceGroup="" label="" path="" >
+  <#if label?has_content >
+    <#assign actualLabel = label />
+  <#elseif iceGroup?has_content >
+    <#assign actualLabel = iceGroup />
+  <#else>
+    <#assign actualLabel = path />
+  </#if>
+  data-studio-ice="${iceGroup}" data-studio-ice-label="${actualLabel}"
+  <#if path?has_content >
+    data-studio-ice-path="${path}"
+  </#if>
+</#macro>
 
 <#macro ice id="" component="" componentPath="">
   <#if siteContext.overlayCallback??>

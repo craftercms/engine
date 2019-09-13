@@ -65,6 +65,7 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
     public static final String KEY_MODEL = "model";
     public static final String KEY_CONTENT_MODEL = "contentModel";
 
+    public static final String COMPONENT_PARENT_PARAM_NAME = "parent";
     public static final String COMPONENT_PARAM_NAME = "component";
     public static final String COMPONENT_PATH_PARAM_NAME = "componentPath";
     public static final String ADDITIONAL_MODEL_PARAM_NAME = "additionalModel";
@@ -126,6 +127,7 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
 
     @SuppressWarnings("unchecked")
     public void execute(Environment env, Map params, TemplateModel[] loopVars, TemplateDirectiveBody body) throws TemplateException {
+        TemplateModel componentParentParam = (TemplateModel) params.get(COMPONENT_PARENT_PARAM_NAME);
         TemplateModel componentParam = (TemplateModel) params.get(COMPONENT_PARAM_NAME);
         TemplateModel componentPathParam = (TemplateModel) params.get(COMPONENT_PATH_PARAM_NAME);
         TemplateModel additionalModelParam = (TemplateModel) params.get(ADDITIONAL_MODEL_PARAM_NAME);
@@ -136,7 +138,7 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
             throw new TemplateException("No '" + COMPONENT_PARAM_NAME + "' or '" + COMPONENT_PATH_PARAM_NAME +
                                         "' param specified", env);
         } else if (componentParam != null) {
-            component = getComponentFromNode(componentParam, env);
+            component = getComponentFromNode(componentParentParam, componentParam, env);
         } else {
             component = getComponentFromPath(componentPathParam, env);
         }
@@ -153,7 +155,9 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
         processComponentTemplate(template, model, output, env);
     }
 
-    protected SiteItem getComponentFromNode(TemplateModel componentParam, Environment env) throws TemplateException {
+    protected SiteItem getComponentFromNode(TemplateModel parentParam, TemplateModel componentParam, Environment env)
+        throws TemplateException {
+        SiteItem parentItem = unwrap(COMPONENT_PARENT_PARAM_NAME, parentParam, SiteItem.class, env);
         Element includeElementParent = unwrap(COMPONENT_PARAM_NAME, componentParam, Element.class, env);
         Element includeElement = includeElementParent.element(includeElementName);
         Element componentElement = includeElementParent.element(componentElementName);
@@ -165,7 +169,11 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
             return getComponent(componentPath, env);
         } else if (componentElement != null) {
             logger.debug("Using an embedded site item");
-            return siteItemService.getSiteItem(componentElement);
+            if (parentItem == null) {
+                throw new IllegalStateException("No parent found for component " +
+                    includeElementParent.getUniquePath());
+            }
+            return siteItemService.getSiteItem(parentItem, componentElement);
         } else {
             throw new IllegalStateException("No '" + includeElementName + "' or '" + componentElementName + "' element "
                 + "found under component "+ includeElementParent.getUniquePath());
