@@ -185,7 +185,9 @@
 
     <bean id="crafter.siteContextResolvingFilter"
           class="org.craftercms.engine.servlet.filter.SiteContextResolvingFilter">
+        <property name="errorTemplate" value="${crafter.engine.error.siteResolving}"/>
         <property name="contextResolver" ref="crafter.siteContextResolver"/>
+        <property name="freeMarkerConfigFactory" ref="crafter.freeMarkerConfigFactory"/>
     </bean>
 
     <bean id="crafter.siteAwareCORSFilter"
