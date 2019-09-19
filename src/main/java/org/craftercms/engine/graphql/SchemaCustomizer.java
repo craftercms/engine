@@ -17,13 +17,19 @@
 
 package org.craftercms.engine.graphql;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLCodeRegistry;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
+import graphql.schema.GraphQLType;
+import graphql.schema.StaticDataFetcher;
 import graphql.schema.TypeResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +45,8 @@ import static graphql.schema.FieldCoordinates.coordinates;
 public class SchemaCustomizer {
 
     private static final Logger logger = LoggerFactory.getLogger(SchemaCustomizer.class);
+
+    public static final DataFetcher<?> EMPTY_DATA_FETCHER = new StaticDataFetcher(Collections.emptyMap());
 
     /**
      * List of custom fields to add
@@ -56,12 +64,25 @@ public class SchemaCustomizer {
     protected List<ResolverBuilder> resolvers = new LinkedList<>();
 
     /**
+     * List of additional types to add
+     */
+    protected List<GraphQLType> additionalTypes = new LinkedList<>();
+
+    /**
      * Adds a custom field
      * @param field the field definition
      * @param fetcher the fetcher for the field
      */
     public void field(GraphQLFieldDefinition.Builder field, DataFetcher<?> fetcher) {
         fields.add(new FieldBuilder(field, fetcher));
+    }
+
+    /**
+     * Adds a custom field without a fetcher (for wrapper fields)
+     * @param field the field definition
+     */
+    public void field(GraphQLFieldDefinition.Builder field) {
+        field(field, EMPTY_DATA_FETCHER);
     }
 
     /**
@@ -81,6 +102,14 @@ public class SchemaCustomizer {
      */
     public void resolver(String typeName, TypeResolver resolver) {
         resolvers.add(new ResolverBuilder(typeName, resolver));
+    }
+
+    /**
+     * Adds one or more additional types (needed during runtime but not referenced by any field)
+     * @param types the types to add
+     */
+    public void additionalTypes(GraphQLType... types) {
+        additionalTypes.addAll(Arrays.asList(types));
     }
 
     /**
@@ -105,6 +134,13 @@ public class SchemaCustomizer {
             logger.debug("Adding custom resolver for {}", builder.typeName);
             codeRegistry.typeResolver(builder.typeName, builder.resolver);
         });
+    }
+
+    /**
+     * Returns the set of additional types to add
+     */
+    public Set<GraphQLType> getAdditionalTypes() {
+        return new HashSet<>(additionalTypes);
     }
 
     /**
