@@ -380,6 +380,46 @@
 
     <!-- ////////////////////////////////// -->
     <!--								 	-->
+    <!--		    Cache Warming  	        -->
+    <!--									-->
+    <!-- ////////////////////////////////// -->
+
+    <bean id="crafter.treeBasedContextCacheWarmer" class="org.craftercms.engine.util.cache.TreeBasedContextCacheWarmer">
+        <property name="storeService" ref="crafter.contentStoreService"/>
+        <property name="rootPath" value="/"/>
+        <property name="depth" value="${crafter.engine.site.cache.warmUp.tree.depth}"/>
+        <property name="filters">
+            <list>
+                <bean class="org.craftercms.core.service.impl.ExcludeByUrlItemFilter">
+                    <constructor-arg value="/config(/.+)?,/static-assets(/.+)?"/>
+                </bean>
+            </list>
+        </property>
+        <property name="processors">
+            <list>
+                <bean class="org.craftercms.core.processors.impl.IncludesAndExcludesAwareProcessor">
+                    <property name="includeUrls" value="/templates/.+,/scripts/.+"/>
+                    <property name="actualProcessor">
+                        <bean class="org.craftercms.core.processors.impl.ContentRetrievingProcessor">
+                            <property name="storeService" ref="crafter.contentStoreService"/>
+                        </bean>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <util:list id="crafter.contextCacheWarmers">
+        <ref bean="crafter.treeBasedContextCacheWarmer"/>
+    </util:list>
+
+    <bean id="crafter.siteCacheWarmer" class="org.craftercms.engine.util.cache.SiteCacheWarmerImpl">
+        <property name="cacheService" ref="crafter.cacheService"/>
+        <property name="contextCacheWarmers" ref="crafter.contextCacheWarmers"/>
+    </bean>
+
+    <!-- ////////////////////////////////// -->
+    <!--								 	-->
     <!--			Contexts				-->
     <!--									-->
     <!-- ////////////////////////////////// -->
@@ -398,7 +438,6 @@
         <property name="fallbackContextFactory" ref="crafter.fallbackSiteContextFactory"/>
         <property name="contextFactory" ref="crafter.siteContextFactory"/>
         <property name="entitlementValidator" ref="crafter.entitlementValidator"/>
-        <property name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
     </bean>
 
     <bean id="crafter.siteContextsBootstrap" class="org.craftercms.engine.service.context.SiteContextsBootstrap">
@@ -422,6 +461,7 @@
         <property name="groovyClassesPath" value="${crafter.engine.site.default.classes.groovy.path}"/>
         <property name="urlTransformationEngine" ref="crafter.urlTransformationEngine"/>
         <property name="storeService" ref="crafter.contentStoreService"/>
+        <property name="cacheService" ref="crafter.cacheService"/>
         <property name="macroResolver" ref="crafter.macroResolver"/>
         <property name="groovyGlobalVars" ref="crafter.restScriptsVariables"/>
         <property name="jobResolvers" ref="crafter.scriptJobResolvers"/>
@@ -429,6 +469,8 @@
         <property name="textEncryptor" ref="crafter.textEncryptor"/>
         <property name="storeType" value="${crafter.engine.store.type}"/>
         <property name="graphQLFactory" ref="crafter.graphQLFactory"/>
+        <property name="cacheWarmUpEnabled" value="${crafter.engine.site.cache.warmUp.enabled}"/>
+        <property name="cacheWarmer" ref="crafter.siteCacheWarmer"/>
     </bean>
 
     <bean id="crafter.fallbackSiteContextFactory" class="org.craftercms.engine.service.context.SiteContextFactory">
@@ -446,6 +488,7 @@
         <property name="groovyClassesPath" value="/classes/groovy"/>
         <property name="urlTransformationEngine" ref="crafter.urlTransformationEngine"/>
         <property name="storeService" ref="crafter.contentStoreService"/>
+        <property name="cacheService" ref="crafter.cacheService"/>
         <property name="macroResolver" ref="crafter.macroResolver"/>
         <property name="groovyGlobalVars" ref="crafter.restScriptsVariables"/>
         <property name="jobResolvers" ref="crafter.scriptJobResolvers"/>
@@ -453,6 +496,8 @@
         <property name="textEncryptor" ref="crafter.textEncryptor"/>
         <property name="storeType" value="filesystem"/>
         <property name="graphQLFactory" ref="crafter.graphQLFactory"/>
+        <property name="cacheWarmUpEnabled" value="false"/>
+        <property name="cacheWarmer" ref="crafter.siteCacheWarmer"/>
     </bean>
 
     <!-- ////////////////////////////////// -->

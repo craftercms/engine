@@ -21,11 +21,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.core.cache.CacheStatistics;
 import org.craftercms.core.controller.rest.RestControllerBase;
-import org.craftercms.core.service.CacheService;
 import org.craftercms.engine.event.SiteContextCreatedEvent;
 import org.craftercms.engine.event.SiteContextEvent;
 import org.craftercms.engine.service.context.SiteContext;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -49,13 +47,6 @@ public class SiteCacheRestController extends RestControllerBase {
     public static final String URL_CLEAR = "/clear";
     public static final String URL_STATS = "/statistics";
 
-    protected CacheService cacheService;
-
-    @Required
-    public void setCacheService(CacheService cacheService) {
-        this.cacheService = cacheService;
-    }
-
     @RequestMapping(value = URL_CLEAR, method = RequestMethod.GET)
     @ResponseBody
     public Map<String, Object> clear(HttpServletRequest request) {
@@ -68,7 +59,7 @@ public class SiteCacheRestController extends RestControllerBase {
             return createResponseMessage("Site context for '" + siteName + "' created during the request. " +
                                          "Cache clear not necessary");
         } else {
-            siteContext.clearCache(cacheService);
+            siteContext.clearCache();
 
             msg = "Content cache and Freemarker cache have been cleared for site '" + siteName + "'";
         }
@@ -82,7 +73,8 @@ public class SiteCacheRestController extends RestControllerBase {
     @RequestMapping(value = URL_STATS, method = RequestMethod.GET)
     public CacheStatistics getStatistics() {
         SiteContext siteContext = SiteContext.getCurrent();
-        return cacheService.getStatistics(siteContext.getContext());
+
+        return siteContext.getCacheService().getStatistics(siteContext.getContext());
     }
 
 }

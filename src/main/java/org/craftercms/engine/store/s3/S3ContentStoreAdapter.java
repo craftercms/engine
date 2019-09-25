@@ -17,9 +17,9 @@
 
 package org.craftercms.engine.store.s3;
 
-import java.util.LinkedList;
-import java.util.List;
-
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3URI;
+import com.amazonaws.services.s3.model.*;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
@@ -34,13 +34,9 @@ import org.craftercms.engine.store.s3.util.S3ClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3URI;
-import com.amazonaws.services.s3.model.AmazonS3Exception;
-import com.amazonaws.services.s3.model.GetObjectRequest;
-import com.amazonaws.services.s3.model.ListObjectsV2Request;
-import com.amazonaws.services.s3.model.ListObjectsV2Result;
-import com.amazonaws.services.s3.model.S3Object;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Implementation of {@link org.craftercms.core.store.ContentStoreAdapter} to read files from AWS S3.
@@ -95,6 +91,10 @@ public class S3ContentStoreAdapter extends AbstractFileBasedContentStoreAdapter 
      */
     @Override
     protected File findFile(final Context context, final String path) throws InvalidContextException, StoreException {
+        if (context.ignoreHiddenFiles() && isHidden(path)) {
+            return null;
+        }
+
         S3Context s3Context = (S3Context) context;
         String key = StringUtils.appendIfMissing(s3Context.getKey(), path);
 
@@ -167,10 +167,13 @@ public class S3ContentStoreAdapter extends AbstractFileBasedContentStoreAdapter 
             if (isResultEmpty(result)) {
                 return null;
             } else {
-                result.getCommonPrefixes().forEach(prefix ->
-                    children.add(new S3Prefix(StringUtils.appendIfMissing(prefix, DELIMITER))));
-                result.getObjectSummaries().forEach(summary ->
-                    children.add(new S3File(client.getObject(s3Context.getBucket(), summary.getKey()))));
+                result.getCommonPrefixes().stream()
+                      .filter(p -> !context.ignoreHiddenFiles() || !isHidden(p))
+                      .forEach(p -> children.add(new S3Prefix(StringUtils.appendIfMissing(p, DELIMITER))));
+
+                result.getObjectSummaries().stream()
+                      .filter(s-> !context.ignoreHiddenFiles() || !isHidden(s.getKey()))
+                      .forEach(s -> children.add(new S3File(client.getObject(s3Context.getBucket(), s.getKey()))));
             }
             request.setContinuationToken(result.getNextContinuationToken());
         } while (result.isTruncated());
@@ -199,6 +202,10 @@ public class S3ContentStoreAdapter extends AbstractFileBasedContentStoreAdapter 
     @Override
     public void destroyContext(final Context context) throws StoreException, AuthenticationException {
         // Nothing to do ...
+    }
+
+    private boolean isHidden(final String path) {
+        return FilenameUtils.getName(path).startsWith(".");
     }
 
 }

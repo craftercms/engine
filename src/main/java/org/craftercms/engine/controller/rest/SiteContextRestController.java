@@ -117,7 +117,7 @@ public class SiteContextRestController extends RestControllerBase {
             return createResponseMessage("Site context for '" + siteName + "' created during the request. " +
                                          "GraphQL schema rebuild not necessary");
         } else {
-            contextManager.startGraphQLBuild();
+            siteContext.buildGraphQLSchema();
 
             return createResponseMessage("Rebuild of GraphQL schema for '" + siteName + "' started");
         }

@@ -29,7 +29,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executor;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -47,7 +46,6 @@ public class SiteContextManager {
     protected SiteContextFactory contextFactory;
     protected SiteContextFactory fallbackContextFactory;
     protected EntitlementValidator entitlementValidator;
-    protected Executor jobThreadPoolExecutor;
 
     public SiteContextManager() {
         lock = new ReentrantLock();
@@ -67,11 +65,6 @@ public class SiteContextManager {
     @Required
     public void setEntitlementValidator(final EntitlementValidator entitlementValidator) {
         this.entitlementValidator = entitlementValidator;
-    }
-
-    @Required
-    public void setJobThreadPoolExecutor(final Executor jobThreadPoolExecutor) {
-        this.jobThreadPoolExecutor = jobThreadPoolExecutor;
     }
 
     @PreDestroy
@@ -260,21 +253,6 @@ public class SiteContextManager {
         logger.info("==================================================");
     }
 
-    /**
-     * Triggers the GraphQL schema build for the current site
-     */
-    public void startGraphQLBuild() {
-        startGraphQLBuild(SiteContext.getCurrent());
-    }
-
-    /**
-     * Triggers the GraphQL schema build for the given site
-     * @param siteContext the site context to use
-     */
-    public void startGraphQLBuild(SiteContext siteContext) {
-        jobThreadPoolExecutor.execute(siteContext::buildGraphQLSchema);
-    }
-
     protected SiteContext createContext(String siteName, boolean fallback) {
         SiteContext siteContext;
 
@@ -291,7 +269,7 @@ public class SiteContextManager {
 
         logger.info("Site context created: " + siteContext);
 
-        startGraphQLBuild(siteContext);
+        siteContext.buildGraphQLSchema();
 
         return siteContext;
     }

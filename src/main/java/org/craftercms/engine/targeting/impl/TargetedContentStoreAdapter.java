@@ -16,9 +16,6 @@
  */
 package org.craftercms.engine.targeting.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.Predicate;
@@ -34,10 +31,13 @@ import org.craftercms.core.service.Context;
 import org.craftercms.core.service.Item;
 import org.craftercms.core.store.ContentStoreAdapter;
 import org.craftercms.core.util.cache.impl.CachingAwareList;
+import org.craftercms.engine.properties.SiteProperties;
 import org.craftercms.engine.targeting.CandidateTargetedUrlsResolver;
 import org.craftercms.engine.util.TargetingUtils;
-import org.craftercms.engine.properties.SiteProperties;
 import org.springframework.beans.factory.annotation.Required;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * {@link ContentStoreAdapter} implementation that uses a {@link CandidateTargetedUrlsResolver} to generate candidate
@@ -271,6 +271,21 @@ public class TargetedContentStoreAdapter implements ContentStoreAdapter {
         }
 
         @Override
+        public long getCacheVersion() {
+            return actualContext.getCacheVersion();
+        }
+
+        @Override
+        public void setCacheVersion(long cacheVersion) {
+            actualContext.setCacheVersion(cacheVersion);
+        }
+
+        @Override
+        public String getCacheScope() {
+            return actualContext.getCacheScope();
+        }
+
+        @Override
         public ContentStoreAdapter getStoreAdapter() {
             return storeAdapter;
         }
@@ -293,6 +308,11 @@ public class TargetedContentStoreAdapter implements ContentStoreAdapter {
         @Override
         public boolean ignoreHiddenFiles() {
             return actualContext.ignoreHiddenFiles();
+        }
+
+        @Override
+        public Context clone() {
+            return new ContextWrapper(storeAdapter, actualContext.clone());
         }
 
         @Override

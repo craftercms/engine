@@ -73,9 +73,7 @@
         <property name="wrappedController" ref="crafter.contentStoreRestController"/>
     </bean>
 
-    <bean id="crafter.siteCacheRestController" class="org.craftercms.engine.controller.rest.SiteCacheRestController">
-        <property name="cacheService" ref="crafter.cacheService"/>
-    </bean>
+    <bean id="crafter.siteCacheRestController" class="org.craftercms.engine.controller.rest.SiteCacheRestController"/>
 
     <bean id="crafter.siteNavigationRestController" class="org.craftercms.engine.controller.rest.SiteNavigationController">
         <property name="navTreeBuilder" ref="crafter.navTreeBuilder"/>
