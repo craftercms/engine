@@ -390,8 +390,8 @@
         <property name="depth" value="${crafter.engine.site.cache.warmUp.tree.depth}"/>
         <property name="filters">
             <list>
-                <bean class="org.craftercms.core.service.impl.ExcludeByUrlItemFilter">
-                    <constructor-arg value="/config(/.+)?,/static-assets(/.+)?"/>
+                <bean class="org.craftercms.core.service.impl.IncludeByUrlItemFilter">
+                    <constructor-arg value="/site(/.+)?,/scripts(/.+)?,/templates(/.+)?"/>
                 </bean>
             </list>
         </property>
