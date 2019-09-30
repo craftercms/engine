@@ -14,33 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.craftercms.engine.http;
+package org.craftercms.engine.event;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.craftercms.core.util.spring.AbstractBeanIdBasedRegistry;
+import org.craftercms.engine.service.context.SiteContext;
 
 /**
- * {@link AbstractBeanIdBasedRegistry} for {@link HttpProxy}s.
+ * Event published when a new {@link SiteContext} is created.
  *
- * @author Alfonso Vásquez
+ * @author avasquez
  */
-public class HttpProxyRegistry extends AbstractBeanIdBasedRegistry<HttpProxy> {
+public class SiteContextInitializedEvent extends SiteContextEvent {
 
-    @Override
-    protected Class<HttpProxy> getRegistryType() {
-        return HttpProxy.class;
-    }
-
-    @Override
-    protected String getBeanNameIdPrefix() {
-        return "crafter.proxy.";
-    }
-
-    @Override
-    protected Map<String, HttpProxy> createRegistry() {
-        return new HashMap<>();
+    /**
+     * Create a new event.
+     *
+     * @param siteContext   the site's context
+     */
+    public SiteContextInitializedEvent(SiteContext siteContext) {
+        super(siteContext);
     }
 
 }

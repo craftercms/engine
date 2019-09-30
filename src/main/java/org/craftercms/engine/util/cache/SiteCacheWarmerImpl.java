@@ -52,19 +52,27 @@ public class SiteCacheWarmerImpl implements SiteCacheWarmer {
     @Override
     public void warmUpCache(SiteContext siteContext, boolean switchCache) {
         if (switchCache) {
-            Context oldContext = siteContext.getContext();
+            Context currentContext = siteContext.getContext();
+            long oldCacheVersion = currentContext.getCacheVersion();
+            long newCacheVersion = System.nanoTime();
 
-            Context newContext = oldContext.clone();
-            newContext.setCacheVersion(System.nanoTime());
+            // Create a tmp context that will be used to warm up a new version of the cache
+            Context tmpContext = currentContext.clone();
+            tmpContext.setCacheVersion(newCacheVersion);
 
-            cacheService.addScope(newContext);
+            cacheService.addScope(tmpContext);
 
             try {
                 logger.info("Warm up for new cache of site '{}' started", siteContext.getSiteName());
 
-                doCacheWarmUp(newContext);
+                doCacheWarmUp(tmpContext);
                 if (siteContext.isValid()) {
-                    siteContext.setContext(newContext);
+                    // Switch cache versions
+                    currentContext.setCacheVersion(newCacheVersion);
+                    tmpContext.setCacheVersion(oldCacheVersion);
+
+                    // Delete old cache version
+                    cacheService.removeScope(tmpContext);
                 } else {
                     throw new CrafterException("The site context has become invalid");
                 }
@@ -72,12 +80,10 @@ public class SiteCacheWarmerImpl implements SiteCacheWarmer {
                 logger.info("Warm up for new cache of site '{}' finished (switched with old cache)",
                             siteContext.getSiteName());
             } catch (Exception e) {
-                cacheService.removeScope(newContext);
+                cacheService.removeScope(tmpContext);
 
                 logger.error("Cache warm up failed", e);
             }
-
-            cacheService.removeScope(oldContext);
         } else {
             logger.info("Warm up for cache of site '{}' started", siteContext.getSiteName());
 

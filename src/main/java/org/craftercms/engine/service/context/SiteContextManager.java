@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -46,6 +47,8 @@ public class SiteContextManager {
     protected SiteContextFactory contextFactory;
     protected SiteContextFactory fallbackContextFactory;
     protected EntitlementValidator entitlementValidator;
+    protected boolean waitForContextInit;
+    protected Executor jobThreadPoolExecutor;
 
     public SiteContextManager() {
         lock = new ReentrantLock();
@@ -65,6 +68,16 @@ public class SiteContextManager {
     @Required
     public void setEntitlementValidator(final EntitlementValidator entitlementValidator) {
         this.entitlementValidator = entitlementValidator;
+    }
+
+    @Required
+    public void setWaitForContextInit(boolean waitForContextInit) {
+        this.waitForContextInit = waitForContextInit;
+    }
+
+    @Required
+    public void setJobThreadPoolExecutor(Executor jobThreadPoolExecutor) {
+        this.jobThreadPoolExecutor = jobThreadPoolExecutor;
     }
 
     @PreDestroy
@@ -186,26 +199,14 @@ public class SiteContextManager {
         return siteContext;
     }
 
-    public SiteContext rebuildContext(String siteName, boolean fallback) {
-        lock.lock();
-        try {
-            logger.info("==================================================");
-            logger.info("<Rebuilding site context: " + siteName + ">");
-            logger.info("==================================================");
-
-            SiteContext oldSiteContext = contextRegistry.get(siteName);
-            SiteContext newSiteContext = createContext(siteName, fallback);
-
-            oldSiteContext.destroy();
-
-            logger.info("==================================================");
-            logger.info("</Rebuilding site context: " + siteName + ">");
-            logger.info("==================================================");
-
-            return newSiteContext;
-        } finally {
-            lock.unlock();
-        }
+    /**
+     * Starts a context rebuild in the background
+     *
+     * @param siteName the site name of the context
+     * @param fallback if the new context should be a fallback context
+     */
+    public void startContextRebuild(String siteName, boolean fallback) {
+        jobThreadPoolExecutor.execute(() -> rebuildContext(siteName, fallback));
     }
 
     /**
@@ -263,15 +264,34 @@ public class SiteContextManager {
             siteContext = contextFactory.createContext(siteName);
         }
 
-        siteContext.init();
+        siteContext.init(waitForContextInit);
 
         contextRegistry.put(siteName, siteContext);
 
         logger.info("Site context created: " + siteContext);
 
-        siteContext.buildGraphQLSchema();
-
         return siteContext;
+    }
+
+    protected void rebuildContext(String siteName, boolean fallback) {
+        lock.lock();
+        try {
+            logger.info("==================================================");
+            logger.info("<Rebuilding site context: " + siteName + ">");
+            logger.info("==================================================");
+
+            SiteContext oldSiteContext = contextRegistry.get(siteName);
+
+            createContext(siteName, fallback);
+
+            oldSiteContext.destroy();
+
+            logger.info("==================================================");
+            logger.info("</Rebuilding site context: " + siteName + ">");
+            logger.info("==================================================");
+        } finally {
+            lock.unlock();
+        }
     }
 
     protected void destroyContext(SiteContext siteContext) {

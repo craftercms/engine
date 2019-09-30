@@ -16,7 +16,10 @@
  */
 package org.craftercms.engine.util.deployment;
 
-import org.craftercms.core.service.*;
+import org.craftercms.core.service.CachingOptions;
+import org.craftercms.core.service.Content;
+import org.craftercms.core.service.ContentStoreService;
+import org.craftercms.core.service.Context;
 import org.craftercms.engine.event.CacheClearedEvent;
 import org.craftercms.engine.event.GraphQLBuiltEvent;
 import org.craftercms.engine.event.SiteContextCreatedEvent;
@@ -71,17 +74,21 @@ public class DeploymentEventsWatcher {
         logger.debug("Deployment events watcher running...");
 
         for (SiteContext siteContext : siteContextManager.listContexts()) {
-            try {
-                checkForSiteEvents(siteContext);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            checkForSiteEvents(siteContext);
         }
     }
 
-    public void checkForSiteEvents(SiteContext siteContext) throws IOException {
-        Properties deploymentEvents = loadDeploymentEvents(siteContext);
+    public void checkForSiteEvents(SiteContext siteContext) {
         String siteName = siteContext.getSiteName();
+        Properties deploymentEvents;
+
+        try {
+            deploymentEvents = loadDeploymentEvents(siteContext);
+        } catch (IOException e) {
+            logger.error("Unable to load deployment events for site '{}'", siteName, e);
+            return;
+        }
+
         boolean rebuildContextTriggered = false;
 
         logger.debug("Checking deployment events for site {}...", siteName);
@@ -93,7 +100,7 @@ public class DeploymentEventsWatcher {
             if (lastContextBuildEvent != null && lastContextBuildEvent < rebuildContextEvent) {
                 logger.info("Rebuild context deployment event received. Rebuilding context for site {}...", siteName);
 
-                siteContextManager.rebuildContext(siteContext.getSiteName(), siteContext.isFallback());
+                siteContextManager.startContextRebuild(siteContext.getSiteName(), siteContext.isFallback());
 
                 rebuildContextTriggered = true;
             }
@@ -106,7 +113,7 @@ public class DeploymentEventsWatcher {
             if (lastCacheClearEvent != null && lastCacheClearEvent < clearCacheEvent) {
                 logger.info("Clear cache deployment event received. Clearing cache for site {}...", siteName);
 
-                siteContext.clearCache();
+                siteContext.startCacheClear();
             }
         }
 
@@ -117,7 +124,7 @@ public class DeploymentEventsWatcher {
             if(lastRebuildGraphQLEvent != null && lastRebuildGraphQLEvent < rebuildGraphQLEvent) {
                 logger.info("Rebuild GraphQL deployment event received. Rebuilding schema for site {}...", siteName);
 
-                siteContext.buildGraphQLSchema();
+                siteContext.startGraphQLSchemaBuild();
             }
         }
     }

@@ -59,9 +59,9 @@ public class SiteCacheRestController extends RestControllerBase {
             return createResponseMessage("Site context for '" + siteName + "' created during the request. " +
                                          "Cache clear not necessary");
         } else {
-            siteContext.clearCache();
+            siteContext.startCacheClear();
 
-            msg = "Content cache and Freemarker cache have been cleared for site '" + siteName + "'";
+            msg = "Cache clear for site '" + siteName + "' started";
         }
 
         logger.debug(msg);

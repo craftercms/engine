@@ -98,12 +98,9 @@ public class SiteContextRestController extends RestControllerBase {
             return createResponseMessage("Site context for '" + siteName + "' created during the request. " +
                                          "Context rebuild not necessary");
         } else {
-            boolean fallback = siteContext.isFallback();
+            contextManager.startContextRebuild(siteName, siteContext.isFallback());
 
-            siteContext = contextManager.rebuildContext(siteName, fallback);
-            SiteContext.setCurrent(siteContext);
-
-            return createResponseMessage("Site context for '" + siteName + "' rebuilt");
+            return createResponseMessage("Started rebuild for Site context for '" + siteName + "'");
         }
     }
 
@@ -117,9 +114,9 @@ public class SiteContextRestController extends RestControllerBase {
             return createResponseMessage("Site context for '" + siteName + "' created during the request. " +
                                          "GraphQL schema rebuild not necessary");
         } else {
-            siteContext.buildGraphQLSchema();
+            siteContext.startGraphQLSchemaBuild();
 
-            return createResponseMessage("Rebuild of GraphQL schema for '" + siteName + "' started");
+            return createResponseMessage("Rebuild of GraphQL schema for started for '" + siteName + "'");
         }
     }
 
