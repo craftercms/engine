@@ -17,10 +17,20 @@
 
 package org.craftercms.engine.search;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.craftercms.profile.api.Profile;
 import org.craftercms.search.elasticsearch.impl.AbstractElasticsearchWrapper;
 import org.craftercms.engine.service.context.SiteContext;
+import org.craftercms.security.utils.SecurityUtils;
 import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
+
+import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.elasticsearch.index.query.QueryBuilders.existsQuery;
+import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 
 /**
  * Implementation of {@link org.craftercms.search.elasticsearch.ElasticsearchWrapper}
@@ -30,14 +40,24 @@ import org.springframework.beans.factory.annotation.Required;
  */
 public class SiteAwareElasticsearchService extends AbstractElasticsearchWrapper {
 
+    private static final Logger logger = LoggerFactory.getLogger(SiteAwareElasticsearchService.class);
+
+    private static final String DEFAULT_ROLE_FIELD_NAME = "authorizedRoles.item.role";
+
     /**
      * Format used to build the index id
      */
     protected String indexIdFormat;
 
+    protected String roleFieldName = DEFAULT_ROLE_FIELD_NAME;
+
     @Required
     public void setIndexIdFormat(final String indexIdFormat) {
         this.indexIdFormat = indexIdFormat;
+    }
+
+    public void setRoleFieldName(final String roleFieldName) {
+        this.roleFieldName = roleFieldName;
     }
 
     /**
@@ -50,6 +70,25 @@ public class SiteAwareElasticsearchService extends AbstractElasticsearchWrapper 
             request.indices(String.format(indexIdFormat, siteContext.getSiteName()));
         } else {
             throw new IllegalStateException("Current site context not found");
+        }
+    }
+
+    @Override
+    protected void updateFilters(final SearchRequest request) {
+        super.updateFilters(request);
+
+        BoolQueryBuilder mainQuery = (BoolQueryBuilder) request.source().query();
+
+        Profile profile = SecurityUtils.getCurrentProfile();
+        if (profile != null && CollectionUtils.isNotEmpty(profile.getRoles())) {
+            logger.debug("Filtering search results for roles: {}", profile.getRoles());
+            mainQuery.filter(boolQuery().must(boolQuery()
+                .should(boolQuery().mustNot(existsQuery(roleFieldName)))
+                .should(matchQuery(roleFieldName, String.join(" ", profile.getRoles())))
+            ));
+        } else {
+            logger.debug("Filtering search to show only public items");
+            mainQuery.filter(boolQuery().mustNot(existsQuery(roleFieldName)));
         }
     }
 
