@@ -28,6 +28,7 @@ import javax.annotation.PreDestroy;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.locks.Lock;
@@ -42,7 +43,7 @@ public class SiteContextManager {
 
     private static final Log logger = LogFactory.getLog(SiteContextManager.class);
 
-    protected Lock lock;
+    protected SiteLockFactory siteLockFactory;
     protected Map<String, SiteContext> contextRegistry;
     protected SiteContextFactory contextFactory;
     protected SiteContextFactory fallbackContextFactory;
@@ -51,7 +52,7 @@ public class SiteContextManager {
     protected Executor jobThreadPoolExecutor;
 
     public SiteContextManager() {
-        lock = new ReentrantLock();
+        siteLockFactory = new SiteLockFactory();
         contextRegistry = new ConcurrentHashMap<>();
     }
 
@@ -123,30 +124,30 @@ public class SiteContextManager {
         logger.info("<DESTROYING SITE CONTEXTS>");
         logger.info("==================================================");
 
-        lock.lock();
-        try {
-            for (Iterator<SiteContext> iter = contextRegistry.values().iterator(); iter.hasNext();) {
-                SiteContext siteContext = iter.next();
-                String siteName = siteContext.getSiteName();
 
-                logger.info("==================================================");
-                logger.info("<Destroying site context: " + siteName + ">");
-                logger.info("==================================================");
+        for (Iterator<SiteContext> iter = contextRegistry.values().iterator(); iter.hasNext();) {
+            SiteContext siteContext = iter.next();
+            String siteName = siteContext.getSiteName();
 
-                try {
-                    destroyContext(siteContext);
-                } catch (Exception e) {
-                    logger.error("Error destroying site context for site '" + siteName + "'", e);
-                }
+            logger.info("==================================================");
+            logger.info("<Destroying site context: " + siteName + ">");
+            logger.info("==================================================");
 
-                logger.info("==================================================");
-                logger.info("</Destroying site context: " + siteName + ">");
-                logger.info("==================================================");
-
-                iter.remove();
+            Lock lock = siteLockFactory.getLock(siteName);
+            lock.lock();
+            try {
+                destroyContext(siteContext);
+            } catch (Exception e) {
+                logger.error("Error destroying site context for site '" + siteName + "'", e);
+            } finally {
+                lock.unlock();
             }
-        } finally {
-            lock.unlock();
+
+            logger.info("==================================================");
+            logger.info("</Destroying site context: " + siteName + ">");
+            logger.info("==================================================");
+
+            iter.remove();
         }
 
         logger.info("==================================================");
@@ -170,6 +171,7 @@ public class SiteContextManager {
                 return null;
             }
 
+            Lock lock = siteLockFactory.getLock(siteName);
             lock.lock();
             try {
                 // Double check locking, in case the context has been created already by another thread
@@ -215,6 +217,7 @@ public class SiteContextManager {
      * @param siteName the site name of the context to destroy
      */
     public void destroyContext(String siteName) {
+        Lock lock = siteLockFactory.getLock(siteName);
         lock.lock();
         try {
             SiteContext siteContext = contextRegistry.remove(siteName);
@@ -274,6 +277,7 @@ public class SiteContextManager {
     }
 
     protected void rebuildContext(String siteName, boolean fallback) {
+        Lock lock = siteLockFactory.getLock(siteName);
         lock.lock();
         try {
             logger.info("==================================================");
@@ -307,6 +311,26 @@ public class SiteContextManager {
         } catch (EntitlementException e) {
             return false;
         }
+    }
+
+    protected static class SiteLockFactory {
+
+        protected Map<String, Lock> locks;
+
+        public SiteLockFactory() {
+            locks = new WeakHashMap<>();
+        }
+
+        public synchronized Lock getLock(String siteName) {
+            Lock lock = locks.get(siteName);
+            if (lock == null) {
+                lock = new ReentrantLock();
+                locks.put(siteName, lock);
+            }
+
+            return lock;
+        }
+
     }
 
 }

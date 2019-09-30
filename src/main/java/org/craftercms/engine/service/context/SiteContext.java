@@ -327,6 +327,8 @@ public class SiteContext {
 
     public void init(boolean waitTillFinished) throws SiteContextInitializationException {
         if (state == State.CREATED) {
+            publishEvent(new SiteContextCreatedEvent(this));
+
             Runnable initTask = () -> {
                 SiteContext.setCurrent(this);
                 try {
@@ -456,6 +458,23 @@ public class SiteContext {
         }
     }
 
+    protected void publishEvent(SiteContextEvent event) {
+        if (applicationContext != null) {
+            applicationContext.publishEvent(event);
+        } else {
+            globalApplicationContext.publishEvent(event);
+        }
+
+        // Store in the latest events
+        latestEvents.put(event.getClass(), event);
+
+        // Store a request attribute for the event so it's known later if the event was fired during the request
+        RequestContext requestContext = RequestContext.getCurrent();
+        if (requestContext != null) {
+            requestContext.getRequest().setAttribute(event.getClass().getName(), event);
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -490,23 +509,6 @@ public class SiteContext {
                ", restScriptsPath='" + restScriptsPath + '\'' +
                ", controllerScriptsPath='" + controllerScriptsPath + '\'' +
                '}';
-    }
-
-    protected void publishEvent(SiteContextEvent event) {
-        if (applicationContext != null) {
-            applicationContext.publishEvent(event);
-        } else {
-            globalApplicationContext.publishEvent(event);
-        }
-
-        // Store in the latest events
-        latestEvents.put(event.getClass(), event);
-
-        // Store a request attribute for the event so it's known later if the event was fired during the request
-        RequestContext requestContext = RequestContext.getCurrent();
-        if (requestContext != null) {
-            requestContext.getRequest().setAttribute(event.getClass().getName(), event);
-        }
     }
 
 }
