@@ -37,7 +37,7 @@ import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.scripting.ScriptJobResolver;
 import org.craftercms.engine.scripting.impl.GroovyScriptFactory;
 import org.craftercms.engine.util.SchedulingUtils;
-import org.craftercms.engine.util.cache.SiteCacheWarmer;
+import org.craftercms.engine.cache.SiteCacheWarmer;
 import org.craftercms.engine.util.config.impl.MultiResourceConfigurationBuilder;
 import org.craftercms.engine.util.groovy.ContentStoreGroovyResourceLoader;
 import org.craftercms.engine.util.groovy.ContentStoreResourceConnector;

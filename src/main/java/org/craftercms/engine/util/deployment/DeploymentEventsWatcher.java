@@ -92,12 +92,13 @@ public class DeploymentEventsWatcher {
         boolean rebuildContextTriggered = false;
 
         logger.debug("Checking deployment events for site {}...", siteName);
+
+        long lastContextBuildEvent = getSiteEvent(siteContext, SiteContextCreatedEvent.class);
         
         if (deploymentEvents.containsKey(REBUILD_CONTEXT_EVENT_KEY)) {
             long rebuildContextEvent = getEventProperty(deploymentEvents, REBUILD_CONTEXT_EVENT_KEY);
-            Long lastContextBuildEvent = getSiteEvent(siteContext, SiteContextCreatedEvent.class);
             
-            if (lastContextBuildEvent != null && lastContextBuildEvent < rebuildContextEvent) {
+            if (lastContextBuildEvent < rebuildContextEvent) {
                 logger.info("Rebuild context deployment event received. Rebuilding context for site {}...", siteName);
 
                 siteContextManager.startContextRebuild(siteContext.getSiteName(), siteContext.isFallback());
@@ -108,9 +109,9 @@ public class DeploymentEventsWatcher {
 
         if (!rebuildContextTriggered && deploymentEvents.containsKey(CLEAR_CACHE_EVENT_KEY)) {
             long clearCacheEvent = getEventProperty(deploymentEvents, CLEAR_CACHE_EVENT_KEY);
-            Long lastCacheClearEvent = getSiteEvent(siteContext, CacheClearedEvent.class);
+            long lastCacheClearEvent = getSiteEvent(siteContext, CacheClearedEvent.class);
 
-            if (lastCacheClearEvent != null && lastCacheClearEvent < clearCacheEvent) {
+            if (lastContextBuildEvent < clearCacheEvent && lastCacheClearEvent < clearCacheEvent) {
                 logger.info("Clear cache deployment event received. Clearing cache for site {}...", siteName);
 
                 siteContext.startCacheClear();
@@ -119,9 +120,9 @@ public class DeploymentEventsWatcher {
 
         if(!rebuildContextTriggered && deploymentEvents.containsKey(REBUILD_GRAPHQL_EVENT_KEY)) {
             long rebuildGraphQLEvent = getEventProperty(deploymentEvents, REBUILD_GRAPHQL_EVENT_KEY);
-            Long lastRebuildGraphQLEvent = getSiteEvent(siteContext, GraphQLBuiltEvent.class);
+            long lastRebuildGraphQLEvent = getSiteEvent(siteContext, GraphQLBuiltEvent.class);
 
-            if(lastRebuildGraphQLEvent != null && lastRebuildGraphQLEvent < rebuildGraphQLEvent) {
+            if (lastContextBuildEvent < rebuildGraphQLEvent && lastRebuildGraphQLEvent < rebuildGraphQLEvent) {
                 logger.info("Rebuild GraphQL deployment event received. Rebuilding schema for site {}...", siteName);
 
                 siteContext.startGraphQLSchemaBuild();
@@ -143,12 +144,12 @@ public class DeploymentEventsWatcher {
         return events;
     }
 
-    private Long getSiteEvent(SiteContext siteContext, Class<? extends SiteContextEvent> eventClass) {
+    private long getSiteEvent(SiteContext siteContext, Class<? extends SiteContextEvent> eventClass) {
         ApplicationEvent event = siteContext.getLatestEvent(eventClass);
         if (event != null) {
             return event.getTimestamp();
         } else {
-            return null;
+            return -1;
         }
     }
 

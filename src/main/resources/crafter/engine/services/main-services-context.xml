@@ -385,17 +385,30 @@
     <!-- ////////////////////////////////// -->
 
     <bean id="crafter.cacheWarmingContentStoreAdapterDecorator"
-          class="org.craftercms.engine.util.cache.CacheWarmingContentStoreAdapterDecorator" scope="prototype">
+          class="org.craftercms.engine.cache.CacheWarmingContentStoreAdapterDecorator" scope="prototype">
+        <property name="warmUpEnabled" value="${crafter.engine.site.cache.warmUp.enabled}"/>
+    </bean>
+
+    <bean id="crafter.contentStoreAdapterPreloadedFoldersBasedCacheWarmer"
+          class="org.craftercms.engine.cache.ContentStoreAdapterPreloadedFoldersBasedCacheWarmer">
         <property name="warmUpEnabled" value="${crafter.engine.site.cache.warmUp.enabled}"/>
         <property name="contentPreloadFolders" value="${crafter.engine.site.cache.warmUp.content.folders}"/>
         <property name="descriptorPreloadFolders" value="${crafter.engine.site.cache.warmUp.descriptor.folders}"/>
     </bean>
 
+    <bean id="crafter.contentStoreServiceTreeBasedContextCacheWarmer"
+          class="org.craftercms.engine.cache.ContentStoreServiceTreeBasedContextCacheWarmer">
+        <property name="warmUpEnabled" value="${crafter.engine.site.cache.warmUp.enabled}"/>
+        <property name="preloadFolders" value="${crafter.engine.site.cache.warmUp.descriptor.folders}"/>
+        <property name="contentStoreService" ref="crafter.contentStoreService"/>
+    </bean>
+
     <util:list id="crafter.contextCacheWarmers">
-        <ref bean="crafter.cacheWarmingContentStoreAdapterDecorator"/>
+        <ref bean="crafter.contentStoreAdapterPreloadedFoldersBasedCacheWarmer"/>
+        <ref bean="crafter.contentStoreServiceTreeBasedContextCacheWarmer"/>
     </util:list>
 
-    <bean id="crafter.siteCacheWarmer" class="org.craftercms.engine.util.cache.SiteCacheWarmerImpl">
+    <bean id="crafter.siteCacheWarmer" class="org.craftercms.engine.cache.SiteCacheWarmerImpl">
         <property name="cacheService" ref="crafter.cacheService"/>
         <property name="contextCacheWarmers" ref="crafter.contextCacheWarmers"/>
     </bean>

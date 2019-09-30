@@ -30,7 +30,7 @@ import org.craftercms.engine.exception.SiteContextInitializationException;
 import org.craftercms.engine.graphql.GraphQLFactory;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.util.GroovyScriptUtils;
-import org.craftercms.engine.util.cache.SiteCacheWarmer;
+import org.craftercms.engine.cache.SiteCacheWarmer;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;

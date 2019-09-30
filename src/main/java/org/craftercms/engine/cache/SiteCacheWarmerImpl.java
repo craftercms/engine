@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.craftercms.engine.util.cache;
+package org.craftercms.engine.cache;
 
 import org.craftercms.core.exception.CrafterException;
 import org.craftercms.core.service.CacheService;

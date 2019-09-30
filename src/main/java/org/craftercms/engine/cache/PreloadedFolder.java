@@ -1,4 +1,4 @@
-package org.craftercms.engine.util.cache;
+package org.craftercms.engine.cache;
 
 import org.apache.commons.lang3.StringUtils;
 import org.craftercms.core.service.ContentStoreService;
