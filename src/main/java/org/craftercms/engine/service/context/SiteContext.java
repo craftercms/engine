@@ -415,15 +415,13 @@ public class SiteContext {
             cacheWarmer.warmUpCache(this, true);
             // Clear Freemarker cache
             freeMarkerConfig.getConfiguration().clearTemplateCache();
-
-            publishEvent(new CacheWarmedUpAndSwitchedEvent(this));
         } else {
             cacheService.clearScope(context);
             // Clear Freemarker cache
             freeMarkerConfig.getConfiguration().clearTemplateCache();
-
-            publishEvent(new CacheClearedEvent(this));
         }
+
+        publishEvent(new CacheClearedEvent(this));
     }
 
     protected void buildGraphQLSchema() {
