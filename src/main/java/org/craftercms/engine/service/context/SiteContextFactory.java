@@ -36,7 +36,6 @@ import org.craftercms.engine.macro.MacroResolver;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.scripting.ScriptJobResolver;
 import org.craftercms.engine.scripting.impl.GroovyScriptFactory;
-import org.craftercms.engine.service.PreviewOverlayCallback;
 import org.craftercms.engine.util.SchedulingUtils;
 import org.craftercms.engine.util.cache.SiteCacheWarmer;
 import org.craftercms.engine.util.config.impl.MultiResourceConfigurationBuilder;
@@ -101,7 +100,6 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected boolean ignoreHiddenFiles;
     protected ObjectFactory<FreeMarkerConfig> freeMarkerConfigFactory;
     protected UrlTransformationEngine urlTransformationEngine;
-    protected PreviewOverlayCallback overlayCallback;
     protected ContentStoreService storeService;
     protected CacheService cacheService;
     protected MacroResolver macroResolver;
@@ -216,10 +214,6 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         this.urlTransformationEngine = urlTransformationEngine;
     }
 
-    public void setOverlayCallback(PreviewOverlayCallback overlayCallback) {
-        this.overlayCallback = overlayCallback;
-    }
-
     @Required
     public void setStoreService(ContentStoreService storeService) {
         this.storeService = storeService;
@@ -288,7 +282,6 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             siteContext.setInitScriptPath(initScriptPath);
             siteContext.setFreeMarkerConfig(freeMarkerConfigFactory.getObject());
             siteContext.setUrlTransformationEngine(urlTransformationEngine);
-            siteContext.setOverlayCallback(overlayCallback);
             siteContext.setRestScriptsPath(restScriptsPath);
             siteContext.setControllerScriptsPath(controllerScriptsPath);
             siteContext.setGraphQLFactory(graphQLFactory);

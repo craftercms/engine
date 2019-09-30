@@ -29,7 +29,6 @@ import org.craftercms.engine.exception.GraphQLBuildException;
 import org.craftercms.engine.exception.SiteContextInitializationException;
 import org.craftercms.engine.graphql.GraphQLFactory;
 import org.craftercms.engine.scripting.ScriptFactory;
-import org.craftercms.engine.service.PreviewOverlayCallback;
 import org.craftercms.engine.util.GroovyScriptUtils;
 import org.craftercms.engine.util.cache.SiteCacheWarmer;
 import org.quartz.Scheduler;
@@ -80,7 +79,6 @@ public class SiteContext {
     protected String initScriptPath;
     protected FreeMarkerConfig freeMarkerConfig;
     protected UrlTransformationEngine urlTransformationEngine;
-    protected PreviewOverlayCallback overlayCallback;
     protected ScriptFactory scriptFactory;
     protected HierarchicalConfiguration config;
     protected ServletContext servletContext;
@@ -225,14 +223,6 @@ public class SiteContext {
 
     public void setUrlTransformationEngine(UrlTransformationEngine urlTransformationEngine) {
         this.urlTransformationEngine = urlTransformationEngine;
-    }
-
-    public PreviewOverlayCallback getOverlayCallback() {
-        return overlayCallback;
-    }
-
-    public void setOverlayCallback(PreviewOverlayCallback overlayCallback) {
-        this.overlayCallback = overlayCallback;
     }
 
     public ScriptFactory getScriptFactory() {

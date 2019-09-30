@@ -51,6 +51,8 @@ public class SiteCacheWarmerImpl implements SiteCacheWarmer {
 
     @Override
     public void warmUpCache(SiteContext siteContext, boolean switchCache) {
+        String siteName = siteContext.getSiteName();
+
         if (switchCache) {
             Context currentContext = siteContext.getContext();
             long oldCacheVersion = currentContext.getCacheVersion();
@@ -63,7 +65,7 @@ public class SiteCacheWarmerImpl implements SiteCacheWarmer {
             cacheService.addScope(tmpContext);
 
             try {
-                logger.info("Warm up for new cache of site '{}' started", siteContext.getSiteName());
+                logger.info("Warm up for new cache of site '{}' started", siteName);
 
                 doCacheWarmUp(tmpContext);
                 if (siteContext.isValid()) {
@@ -74,22 +76,21 @@ public class SiteCacheWarmerImpl implements SiteCacheWarmer {
                     // Delete old cache version
                     cacheService.removeScope(tmpContext);
                 } else {
-                    throw new CrafterException("The site context has become invalid");
+                    throw new CrafterException("The site context has become invalid (possibly destroyed)");
                 }
 
-                logger.info("Warm up for new cache of site '{}' finished (switched with old cache)",
-                            siteContext.getSiteName());
+                logger.info("Warm up for new cache of site '{}' finished (switched with old cache)", siteName);
             } catch (Exception e) {
                 cacheService.removeScope(tmpContext);
 
                 logger.error("Cache warm up failed", e);
             }
         } else {
-            logger.info("Warm up for cache of site '{}' started", siteContext.getSiteName());
+            logger.info("Warm up for cache of site '{}' started", siteName);
 
             doCacheWarmUp(siteContext.getContext());
 
-            logger.info("Warm up for cache of site '{}' finished", siteContext.getSiteName());
+            logger.info("Warm up for cache of site '{}' finished", siteName);
         }
     }
 
