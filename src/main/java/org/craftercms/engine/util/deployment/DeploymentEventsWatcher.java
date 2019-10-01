@@ -20,10 +20,7 @@ import org.craftercms.core.service.CachingOptions;
 import org.craftercms.core.service.Content;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
-import org.craftercms.engine.event.CacheClearedEvent;
-import org.craftercms.engine.event.GraphQLBuiltEvent;
-import org.craftercms.engine.event.SiteContextCreatedEvent;
-import org.craftercms.engine.event.SiteContextEvent;
+import org.craftercms.engine.event.*;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.service.context.SiteContextManager;
 import org.slf4j.Logger;
@@ -109,7 +106,7 @@ public class DeploymentEventsWatcher {
 
         if (!rebuildContextTriggered && deploymentEvents.containsKey(CLEAR_CACHE_EVENT_KEY)) {
             long clearCacheEvent = getEventProperty(deploymentEvents, CLEAR_CACHE_EVENT_KEY);
-            long lastCacheClearEvent = getSiteEvent(siteContext, CacheClearedEvent.class);
+            long lastCacheClearEvent = getSiteEvent(siteContext, CacheClearStartedEvent.class);
 
             if (lastContextBuildEvent < clearCacheEvent && lastCacheClearEvent < clearCacheEvent) {
                 logger.info("Clear cache deployment event received. Clearing cache for site {}...", siteName);
@@ -120,7 +117,7 @@ public class DeploymentEventsWatcher {
 
         if(!rebuildContextTriggered && deploymentEvents.containsKey(REBUILD_GRAPHQL_EVENT_KEY)) {
             long rebuildGraphQLEvent = getEventProperty(deploymentEvents, REBUILD_GRAPHQL_EVENT_KEY);
-            long lastRebuildGraphQLEvent = getSiteEvent(siteContext, GraphQLBuiltEvent.class);
+            long lastRebuildGraphQLEvent = getSiteEvent(siteContext, GraphQLBuildStartedEvent.class);
 
             if (lastContextBuildEvent < rebuildGraphQLEvent && lastRebuildGraphQLEvent < rebuildGraphQLEvent) {
                 logger.info("Rebuild GraphQL deployment event received. Rebuilding schema for site {}...", siteName);

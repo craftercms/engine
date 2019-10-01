@@ -41,7 +41,7 @@ public class ContentStoreServiceTreeBasedContextCacheWarmer implements ContextCa
             int depth = entry.getValue();
             StopWatch stopWatch = new StopWatch();
 
-            logger.info("Started preload of tree [{}] with depth {}", treeRoot, depth);
+            logger.info("Starting preload of tree [{}] with depth {}", treeRoot, depth);
 
             stopWatch.start();
 
@@ -53,7 +53,7 @@ public class ContentStoreServiceTreeBasedContextCacheWarmer implements ContextCa
 
             stopWatch.stop();
 
-            logger.info("Finished preload of tree [{}] with depth {} ({} secs)", treeRoot, depth,
+            logger.info("Preload of tree [{}] with depth {} completed in {} secs", treeRoot, depth,
                         stopWatch.getTime(TimeUnit.SECONDS));
         }
     }

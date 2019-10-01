@@ -19,7 +19,7 @@ package org.craftercms.engine.event;
 import org.craftercms.engine.service.context.SiteContext;
 
 /**
- * Event published when a {@link SiteContext} is destroyed.
+ * Event published when a {@link SiteContext} has been destroyed.
  *
  * @author avasquez
  */

@@ -18,6 +18,7 @@ package org.craftercms.engine.service.context;
 
 import graphql.GraphQL;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
+import org.apache.commons.lang3.time.StopWatch;
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.exception.CrafterException;
 import org.craftercms.core.service.CacheService;
@@ -424,6 +425,8 @@ public class SiteContext {
     }
 
     protected void cacheClear() {
+        publishEvent(new CacheClearStartedEvent(this));
+
         // If there's a cache warmer, do a content cache switch instead of aclear
         if (cacheWarmer != null) {
             cacheWarmer.warmUpCache(this, true);
@@ -435,24 +438,32 @@ public class SiteContext {
             freeMarkerConfig.getConfiguration().clearTemplateCache();
         }
 
-        publishEvent(new CacheClearedEvent(this));
+        publishEvent(new CacheClearCompletedEvent(this));
     }
 
     protected void buildGraphQLSchema() {
         logger.info("Starting GraphQL schema build for site '{}'", siteName);
+
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+
+        publishEvent(new GraphQLBuildStartedEvent(this));
 
         try {
             GraphQL graphQL = graphQLFactory.getInstance(this);
             if (Objects.nonNull(graphQL)) {
                 this.graphQL = graphQL;
 
-                publishEvent(new GraphQLBuiltEvent(this));
+                publishEvent(new GraphQLBuildCompletedEvent(this));
             }
         } catch (Exception e) {
             logger.error("Error building the GraphQL schema for site '" + siteName + "'", e);
         }
 
-        logger.info("GraphQL schema build completed for site '{}'", siteName);
+        stopWatch.stop();
+
+        logger.info("GraphQL schema build completed for site '{}' in {} secs", siteName,
+                    stopWatch.getTime(TimeUnit.SECONDS));
     }
 
     protected void executeInitScript() {

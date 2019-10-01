@@ -16,6 +16,7 @@
  */
 package org.craftercms.engine.cache;
 
+import org.apache.commons.lang3.time.StopWatch;
 import org.craftercms.core.exception.CrafterException;
 import org.craftercms.core.service.CacheService;
 import org.craftercms.core.service.Context;
@@ -25,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Default implementation for {@link SiteCacheWarmerImpl}.
@@ -52,6 +54,7 @@ public class SiteCacheWarmerImpl implements SiteCacheWarmer {
     @Override
     public void warmUpCache(SiteContext siteContext, boolean switchCache) {
         String siteName = siteContext.getSiteName();
+        StopWatch stopWatch = new StopWatch();
 
         if (switchCache) {
             Context currentContext = siteContext.getContext();
@@ -65,7 +68,9 @@ public class SiteCacheWarmerImpl implements SiteCacheWarmer {
             cacheService.addScope(tmpContext);
 
             try {
-                logger.info("Warm up for new cache of site '{}' started", siteName);
+                logger.info("Starting warm up for new cache of site '{}'", siteName);
+
+                stopWatch.start();
 
                 doCacheWarmUp(tmpContext);
                 if (siteContext.isValid()) {
@@ -79,18 +84,26 @@ public class SiteCacheWarmerImpl implements SiteCacheWarmer {
                     throw new CrafterException("The site context has become invalid (possibly destroyed)");
                 }
 
-                logger.info("Warm up for new cache of site '{}' finished (switched with old cache)", siteName);
+                stopWatch.stop();
+
+                logger.info("Warm up for new cache of site '{}' completed (switched with old cache) in {} secs",
+                            siteName, stopWatch.getTime(TimeUnit.SECONDS));
             } catch (Exception e) {
                 cacheService.removeScope(tmpContext);
 
                 logger.error("Cache warm up failed", e);
             }
         } else {
-            logger.info("Warm up for cache of site '{}' started", siteName);
+            logger.info("Starting warm up for cache of site '{}'", siteName);
+
+            stopWatch.start();
 
             doCacheWarmUp(siteContext.getContext());
 
-            logger.info("Warm up for cache of site '{}' finished", siteName);
+            stopWatch.stop();
+
+            logger.info("Warm up for cache of site '{}' completed in {} secs", siteName,
+                        stopWatch.getTime(TimeUnit.SECONDS));
         }
     }
 

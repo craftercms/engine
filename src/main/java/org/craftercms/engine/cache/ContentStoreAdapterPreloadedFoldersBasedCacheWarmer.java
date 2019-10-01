@@ -75,7 +75,7 @@ public class ContentStoreAdapterPreloadedFoldersBasedCacheWarmer implements Cont
         Context actualContext = contextWrapper.getActualContext();
         StopWatch stopWatch = new StopWatch();
 
-        logger.info("Started preload of folder [{}] with depth {}", path, depth);
+        logger.info("Starting preload of folder [{}] with depth {}", path, depth);
 
         stopWatch.start();
 
@@ -95,7 +95,7 @@ public class ContentStoreAdapterPreloadedFoldersBasedCacheWarmer implements Cont
 
         stopWatch.stop();
 
-        logger.info("Finished preload of folder [{}] with depth {} ({} secs)", path, depth,
+        logger.info("Preload of folder [{}] with depth {} completed in {} secs", path, depth,
                     stopWatch.getTime(TimeUnit.SECONDS));
     }
 
