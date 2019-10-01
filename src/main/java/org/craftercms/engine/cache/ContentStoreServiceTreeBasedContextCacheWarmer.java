@@ -1,5 +1,6 @@
 package org.craftercms.engine.cache;
 
+import org.apache.commons.lang3.time.StopWatch;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.engine.util.CacheUtils;
@@ -8,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class ContentStoreServiceTreeBasedContextCacheWarmer implements ContextCacheWarmer {
 
@@ -37,12 +39,22 @@ public class ContentStoreServiceTreeBasedContextCacheWarmer implements ContextCa
         for (Map.Entry<String, Integer> entry : preloadFolders.entrySet()) {
             String treeRoot = entry.getKey();
             int depth = entry.getValue();
+            StopWatch stopWatch = new StopWatch();
 
-            logger.info("[{}] -> Started preload of tree {} with depth {}", context, treeRoot, depth);
+            logger.info("Started preload of tree [{}] with depth {}", treeRoot, depth);
 
-            contentStoreService.getTree(context, treeRoot, depth);
+            stopWatch.start();
 
-            logger.info("[{}] -> Finished preload of tree {} with depth {}", context, treeRoot, depth);
+            try {
+                contentStoreService.getTree(context, treeRoot, depth);
+            } catch (Exception e) {
+                logger.error("Error while preloading tree at [{}]", treeRoot, e);
+            }
+
+            stopWatch.stop();
+
+            logger.info("Finished preload of tree [{}] with depth {} ({} secs)", treeRoot, depth,
+                        stopWatch.getTime(TimeUnit.SECONDS));
         }
     }
 

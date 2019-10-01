@@ -370,11 +370,25 @@ public class SiteContext {
     }
 
     public void startCacheClear() {
-        maintenanceTaskExecutor.execute(this::cacheClear);
+        maintenanceTaskExecutor.execute(() -> {
+            SiteContext.setCurrent(this);
+            try {
+                cacheClear();
+            } finally {
+                SiteContext.clear();
+            }
+        });
     }
 
     public void startGraphQLSchemaBuild() throws GraphQLBuildException {
-        maintenanceTaskExecutor.execute(this::buildGraphQLSchema);
+        maintenanceTaskExecutor.execute(() -> {
+            SiteContext.setCurrent(this);
+            try {
+                buildGraphQLSchema();
+            } finally {
+                SiteContext.clear();
+            }
+        });
     }
 
     public void destroy() throws CrafterException {

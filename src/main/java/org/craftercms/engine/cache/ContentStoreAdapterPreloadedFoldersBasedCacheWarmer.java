@@ -1,6 +1,7 @@
 package org.craftercms.engine.cache;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.time.StopWatch;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.service.Item;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class ContentStoreAdapterPreloadedFoldersBasedCacheWarmer implements ContextCacheWarmer {
 
@@ -71,8 +73,11 @@ public class ContentStoreAdapterPreloadedFoldersBasedCacheWarmer implements Cont
         path = ContentStoreUtils.normalizePath(path);
 
         Context actualContext = contextWrapper.getActualContext();
+        StopWatch stopWatch = new StopWatch();
 
-        logger.info("[{}] -> Started preload of folder {} with depth {}", actualContext, path, depth);
+        logger.info("Started preload of folder [{}] with depth {}", path, depth);
+
+        stopWatch.start();
 
         Item rootFolder = actualContext.getStoreAdapter().findItem(actualContext, null, path, true);
         if (rootFolder == null || !rootFolder.isFolder()) {
@@ -85,10 +90,13 @@ public class ContentStoreAdapterPreloadedFoldersBasedCacheWarmer implements Cont
             preloadFolderChildren(actualContext, path, depth, contentOnly, preloadedDescendants);
             preloadedFolders.add(new PreloadedFolder(path, depth, preloadedDescendants));
         } catch (Exception e) {
-            logger.error("Error while preloading folder {}", path, e);
+            logger.error("Error while preloading folder [{}]", path, e);
         }
 
-        logger.info("[{}] -> Finished preload of folder {} with depth {}", actualContext, path, depth);
+        stopWatch.stop();
+
+        logger.info("Finished preload of folder [{}] with depth {} ({} secs)", path, depth,
+                    stopWatch.getTime(TimeUnit.SECONDS));
     }
 
     protected void preloadFolderChildren(Context context, String path, int depth, boolean contentOnly,
@@ -104,7 +112,7 @@ public class ContentStoreAdapterPreloadedFoldersBasedCacheWarmer implements Cont
                     String childPath = item.getUrl();
 
                     if (item.isFolder()) {
-                        logger.debug("[{}] -> Preloading folder [{}]", context, childPath);
+                        logger.debug("Preloading folder [{}]", childPath);
                         if (!contentOnly) {
                             context.getStoreAdapter().findItem(context, null, childPath, true);
                         }
@@ -113,12 +121,12 @@ public class ContentStoreAdapterPreloadedFoldersBasedCacheWarmer implements Cont
 
                         preloadFolderChildren(context, childPath, depth, contentOnly, preloadedPaths);
                     } else if (contentOnly) {
-                        logger.debug("[{}] -> Preloading content [{}]", context, childPath);
+                        logger.debug("Preloading content [{}]", childPath);
                         context.getStoreAdapter().findContent(context, null, childPath);
 
                         preloadedPaths.add(childPath);
                     } else {
-                        logger.debug("[{}] -> Preloading item [{}]", context, childPath);
+                        logger.debug("Preloading item [{}]", childPath);
                         context.getStoreAdapter().findItem(context, null, childPath, true);
 
                         preloadedPaths.add(childPath);
