@@ -91,7 +91,6 @@ public class SiteContext {
     protected GraphQLFactory graphQLFactory;
     protected SiteCacheWarmer cacheWarmer;
 
-    protected Map<Class<? extends SiteContextEvent>, SiteContextEvent> latestEvents;
     protected ExecutorService maintenanceTaskExecutor;
     protected GraphQL graphQL;
     protected State state;
@@ -122,7 +121,6 @@ public class SiteContext {
     }
 
     public SiteContext() {
-        latestEvents = new ConcurrentHashMap<>();
         // With this executor maintenance tasks are executed sequentially in the order they're received. This is
         // important when a cache warm is submitted and a GraphQL re-build needs to wait till the cache warm is
         // finished
@@ -306,14 +304,6 @@ public class SiteContext {
         this.cacheWarmer = cacheWarmer;
     }
 
-    public Map<Class<? extends SiteContextEvent>, SiteContextEvent> getLatestEvents() {
-        return latestEvents;
-    }
-
-    public SiteContextEvent getLatestEvent(Class<? extends SiteContextEvent> eventClass) {
-        return latestEvents.get(eventClass);
-    }
-
     public GraphQL getGraphQL() {
         return graphQL;
     }
@@ -481,15 +471,12 @@ public class SiteContext {
         }
     }
 
-    protected void publishEvent(SiteContextEvent event) {
+    protected void publishEvent(SiteEvent event) {
         if (applicationContext != null) {
             applicationContext.publishEvent(event);
         } else {
             globalApplicationContext.publishEvent(event);
         }
-
-        // Store in the latest events
-        latestEvents.put(event.getClass(), event);
 
         // Store a request attribute for the event so it's known later if the event was fired during the request
         RequestContext requestContext = RequestContext.getCurrent();

@@ -19,7 +19,7 @@ package org.craftercms.engine.controller.rest;
 
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.engine.event.SiteContextCreatedEvent;
-import org.craftercms.engine.event.SiteContextEvent;
+import org.craftercms.engine.event.SiteEvent;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.service.context.SiteContextManager;
 import org.springframework.beans.factory.annotation.Required;
@@ -28,9 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.Instant;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -63,21 +61,6 @@ public class SiteContextRestController extends RestControllerBase {
         return Collections.singletonMap(MODEL_ATTR_ID, SiteContext.getCurrent().getContext().getId());
     }
 
-    @GetMapping(value = URL_LATEST_EVENTS)
-    public Map<String, String> getLatestEvents() {
-        Map<Class<? extends SiteContextEvent>, SiteContextEvent> events =  SiteContext.getCurrent().getLatestEvents();
-        Map<String, String> respBody = new LinkedHashMap<>();
-
-        for (Map.Entry<Class<? extends SiteContextEvent>, SiteContextEvent> entry : events.entrySet()) {
-            String eventClassName = entry.getKey().getName();
-            long eventTimestamp = entry.getValue().getTimestamp();
-
-            respBody.put(eventClassName, Instant.ofEpochMilli(eventTimestamp).toString());
-        }
-
-        return respBody;
-    }
-
     @GetMapping(value = URL_DESTROY)
     public Map<String, Object> destroy() {
         String siteName = SiteContext.getCurrent().getSiteName();
@@ -94,7 +77,7 @@ public class SiteContextRestController extends RestControllerBase {
         String siteName = siteContext.getSiteName();
 
         // Don't rebuild context if the context was just created in this request
-        if (SiteContextEvent.getLatestRequestEvent(SiteContextCreatedEvent.class, request) != null) {
+        if (SiteEvent.getLatestRequestEvent(SiteContextCreatedEvent.class, request) != null) {
             return createResponseMessage("Site context for '" + siteName + "' created during the request. " +
                                          "Context rebuild not necessary");
         } else {
@@ -110,7 +93,7 @@ public class SiteContextRestController extends RestControllerBase {
         String siteName = siteContext.getSiteName();
 
         // Don't rebuild GraphQL schema if the context was just created in this request
-        if (SiteContextEvent.getLatestRequestEvent(SiteContextCreatedEvent.class, request) != null) {
+        if (SiteEvent.getLatestRequestEvent(SiteContextCreatedEvent.class, request) != null) {
             return createResponseMessage("Site context for '" + siteName + "' created during the request. " +
                                          "GraphQL schema rebuild not necessary");
         } else {

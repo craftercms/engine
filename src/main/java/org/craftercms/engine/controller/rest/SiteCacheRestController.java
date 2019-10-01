@@ -22,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.craftercms.core.cache.CacheStatistics;
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.engine.event.SiteContextCreatedEvent;
-import org.craftercms.engine.event.SiteContextEvent;
+import org.craftercms.engine.event.SiteEvent;
 import org.craftercms.engine.service.context.SiteContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,7 +55,7 @@ public class SiteCacheRestController extends RestControllerBase {
         String msg;
 
         // Don't clear cache if the context was just created in this request
-        if (SiteContextEvent.getLatestRequestEvent(SiteContextCreatedEvent.class, request) != null) {
+        if (SiteEvent.getLatestRequestEvent(SiteContextCreatedEvent.class, request) != null) {
             return createResponseMessage("Site context for '" + siteName + "' created during the request. " +
                                          "Cache clear not necessary");
         } else {

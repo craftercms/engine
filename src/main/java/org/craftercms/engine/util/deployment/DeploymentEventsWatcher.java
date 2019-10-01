@@ -20,19 +20,24 @@ import org.craftercms.core.service.CachingOptions;
 import org.craftercms.core.service.Content;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
-import org.craftercms.engine.event.*;
+import org.craftercms.engine.event.CacheClearStartedEvent;
+import org.craftercms.engine.event.GraphQLBuildStartedEvent;
+import org.craftercms.engine.event.SiteContextCreatedEvent;
+import org.craftercms.engine.event.SiteEvent;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.service.context.SiteContextManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
-import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Utility class that runs on a cron job (configurable) and checks every site to see if they have a deployment
@@ -41,11 +46,13 @@ import java.util.Properties;
  *
  * @author avasquez
  */
-public class DeploymentEventsWatcher {
+public class DeploymentEventsWatcher implements ApplicationListener<SiteEvent> {
 
     private static final Logger logger = LoggerFactory.getLogger(DeploymentEventsWatcher.class);
 
     public static final String DEFAULT_DEPLOYMENT_EVENTS_FILE_URL = "deployment-events.properties";
+
+    private static final String LATEST_EVENT_KEY_FORMAT = "siteName=%s, eventType=%s";
 
     private static final String CLEAR_CACHE_EVENT_KEY = "events.deployment.clearCache";
     private static final String REBUILD_CONTEXT_EVENT_KEY = "events.deployment.rebuildContext";
@@ -54,8 +61,11 @@ public class DeploymentEventsWatcher {
     private String deploymentEventsFileUrl;
     private SiteContextManager siteContextManager;
 
+    private Map<String, SiteEvent> latestEvents;
+
     public DeploymentEventsWatcher() {
         this.deploymentEventsFileUrl = DEFAULT_DEPLOYMENT_EVENTS_FILE_URL;
+        this.latestEvents = new ConcurrentHashMap<>();
     }
 
     public void setDeploymentEventsFileUrl(String deploymentEventsFileUrl) {
@@ -90,7 +100,7 @@ public class DeploymentEventsWatcher {
 
         logger.debug("Checking deployment events for site {}...", siteName);
 
-        long lastContextBuildEvent = getSiteEvent(siteContext, SiteContextCreatedEvent.class);
+        long lastContextBuildEvent = getLatestEventTimestamp(siteName, SiteContextCreatedEvent.class);
         
         if (deploymentEvents.containsKey(REBUILD_CONTEXT_EVENT_KEY)) {
             long rebuildContextEvent = getEventProperty(deploymentEvents, REBUILD_CONTEXT_EVENT_KEY);
@@ -106,7 +116,7 @@ public class DeploymentEventsWatcher {
 
         if (!rebuildContextTriggered && deploymentEvents.containsKey(CLEAR_CACHE_EVENT_KEY)) {
             long clearCacheEvent = getEventProperty(deploymentEvents, CLEAR_CACHE_EVENT_KEY);
-            long lastCacheClearEvent = getSiteEvent(siteContext, CacheClearStartedEvent.class);
+            long lastCacheClearEvent = getLatestEventTimestamp(siteName, CacheClearStartedEvent.class);
 
             if (lastContextBuildEvent < clearCacheEvent && lastCacheClearEvent < clearCacheEvent) {
                 logger.info("Clear cache deployment event received. Clearing cache for site {}...", siteName);
@@ -117,13 +127,34 @@ public class DeploymentEventsWatcher {
 
         if(!rebuildContextTriggered && deploymentEvents.containsKey(REBUILD_GRAPHQL_EVENT_KEY)) {
             long rebuildGraphQLEvent = getEventProperty(deploymentEvents, REBUILD_GRAPHQL_EVENT_KEY);
-            long lastRebuildGraphQLEvent = getSiteEvent(siteContext, GraphQLBuildStartedEvent.class);
+            long lastRebuildGraphQLEvent = getLatestEventTimestamp(siteName, GraphQLBuildStartedEvent.class);
 
             if (lastContextBuildEvent < rebuildGraphQLEvent && lastRebuildGraphQLEvent < rebuildGraphQLEvent) {
                 logger.info("Rebuild GraphQL deployment event received. Rebuilding schema for site {}...", siteName);
 
                 siteContext.startGraphQLSchemaBuild();
             }
+        }
+    }
+
+    @Override
+    public void onApplicationEvent(SiteEvent event) {
+        String siteName = event.getSiteContext().getSiteName();
+        Class<? extends SiteEvent> eventClass = event.getClass();
+
+        if (eventClass.equals(SiteContextCreatedEvent.class) ||
+            eventClass.equals(CacheClearStartedEvent.class) ||
+            eventClass.equals(GraphQLBuildStartedEvent.class)) {
+            latestEvents.put(String.format(LATEST_EVENT_KEY_FORMAT, siteName, eventClass), event);
+        }
+    }
+
+    private long getLatestEventTimestamp(String siteName, Class<? extends SiteEvent> eventClass) {
+        SiteEvent event = latestEvents.get(String.format(LATEST_EVENT_KEY_FORMAT, siteName, eventClass));
+        if (event != null) {
+            return event.getTimestamp();
+        } else {
+            return -1;
         }
     }
 
@@ -139,15 +170,6 @@ public class DeploymentEventsWatcher {
         }
 
         return events;
-    }
-
-    private long getSiteEvent(SiteContext siteContext, Class<? extends SiteContextEvent> eventClass) {
-        ApplicationEvent event = siteContext.getLatestEvent(eventClass);
-        if (event != null) {
-            return event.getTimestamp();
-        } else {
-            return -1;
-        }
     }
 
     private long getEventProperty(Properties deploymentEvents, String name) {

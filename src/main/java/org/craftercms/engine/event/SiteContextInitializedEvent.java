@@ -23,7 +23,7 @@ import org.craftercms.engine.service.context.SiteContext;
  *
  * @author avasquez
  */
-public class SiteContextInitializedEvent extends SiteContextEvent {
+public class SiteContextInitializedEvent extends SiteEvent {
 
     /**
      * Create a new event.

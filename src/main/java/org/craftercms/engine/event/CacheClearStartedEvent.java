@@ -23,7 +23,7 @@ import org.craftercms.engine.service.context.SiteContext;
  *
  * @author avasquez
  */
-public class CacheClearStartedEvent extends SiteContextEvent {
+public class CacheClearStartedEvent extends SiteEvent {
 
     /**
      * Create a new event.

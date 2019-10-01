@@ -23,7 +23,7 @@ import org.craftercms.engine.service.context.SiteContext;
  *
  * @author avasquez
  */
-public class GraphQLBuildCompletedEvent extends SiteContextEvent {
+public class GraphQLBuildCompletedEvent extends SiteEvent {
 
     /**
      * Create a new event.
