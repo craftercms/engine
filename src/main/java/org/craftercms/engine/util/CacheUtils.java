@@ -32,7 +32,7 @@ public class CacheUtils {
      * Parses a list of preloaded folder paths and their depths, in the following format: {PATH}:{DEPTH}
      *
      * @param preloadFolders the list of folder paths to preload
-     * @return a map with {@code key = preload} path and {@code value = depth}
+     * @return a map with {@code key = preload path} and {@code value = depth}
      */
     public static Map<String, Integer> parsePreloadFoldersList(String[] preloadFolders) {
         Map<String, Integer> preloadFoldersMappings = new HashMap<>();
