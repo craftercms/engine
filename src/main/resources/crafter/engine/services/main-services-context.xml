@@ -385,7 +385,7 @@
     <!-- ////////////////////////////////// -->
 
     <bean id="crafter.cacheWarmingContentStoreAdapterDecorator"
-          class="org.craftercms.engine.cache.CacheWarmingContentStoreAdapterDecorator" scope="prototype">
+          class="org.craftercms.engine.cache.CacheWarmingAwareContentStoreAdapterDecorator" scope="prototype">
         <property name="warmUpEnabled" value="${crafter.engine.site.cache.warmUp.enabled}"/>
     </bean>
 

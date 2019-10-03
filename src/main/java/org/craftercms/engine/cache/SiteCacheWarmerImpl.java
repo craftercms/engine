@@ -41,16 +41,25 @@ public class SiteCacheWarmerImpl implements SiteCacheWarmer {
     protected CacheService cacheService;
     protected List<ContextCacheWarmer> contextCacheWarmers;
 
+    /**
+     * Sets the {@link CacheService}
+     */
     @Required
     public void setCacheService(CacheService cacheService) {
         this.cacheService = cacheService;
     }
 
+    /**
+     * Sets the list of {@link ContextCacheWarmer} used to perfotm the warm up
+     */
     @Required
     public void setContextCacheWarmers(List<ContextCacheWarmer> contextCacheWarmers) {
         this.contextCacheWarmers = contextCacheWarmers;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void warmUpCache(SiteContext siteContext, boolean switchCache) {
         String siteName = siteContext.getSiteName();
