@@ -14,33 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.craftercms.engine.http;
+package org.craftercms.engine.cache;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.craftercms.core.util.spring.AbstractBeanIdBasedRegistry;
+import org.craftercms.engine.service.context.SiteContext;
 
 /**
- * {@link AbstractBeanIdBasedRegistry} for {@link HttpProxy}s.
+ * Helper class that's used to warm up the cache of a site context.
  *
- * @author Alfonso Vásquez
+ * @author avasquez
+ * @since 3.1.4
  */
-public class HttpProxyRegistry extends AbstractBeanIdBasedRegistry<HttpProxy> {
+public interface SiteCacheWarmer {
 
-    @Override
-    protected Class<HttpProxy> getRegistryType() {
-        return HttpProxy.class;
-    }
-
-    @Override
-    protected String getBeanNameIdPrefix() {
-        return "crafter.proxy.";
-    }
-
-    @Override
-    protected Map<String, HttpProxy> createRegistry() {
-        return new HashMap<>();
-    }
+    /**
+     * Warms up the cache for the specified site context. If {@code switchCache} is true, then a new cache is created,
+     * warmed up and then switched with the current cache of the site.
+     *
+     * @param siteContext the site context
+     * @param switchCache if a new cache should be warmed and then switched with the current cache
+     */
+    void warmUpCache(SiteContext siteContext, boolean switchCache);
 
 }

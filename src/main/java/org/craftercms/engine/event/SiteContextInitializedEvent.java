@@ -14,22 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.craftercms.engine.http;
+package org.craftercms.engine.event;
 
-import org.craftercms.engine.exception.HttpProxyException;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import org.craftercms.engine.service.context.SiteContext;
 
 /**
- * Represents a proxy to a HTTP service: a request is issued to the service according to the given servlet request and the response
- * from the service is written back to the given servlet response.
+ * Event published when a new {@link SiteContext} has been initialized.
  *
- * @author Alfonso Vásquez
+ * @author avasquez
  */
-public interface HttpProxy {
+public class SiteContextInitializedEvent extends SiteEvent {
 
-    void proxyGet(String url, HttpServletRequest request, HttpServletResponse response) throws HttpProxyException;
-    void proxyPost(String url, HttpServletRequest request, HttpServletResponse response) throws HttpProxyException;
+    /**
+     * Create a new event.
+     *
+     * @param siteContext   the site's context
+     */
+    public SiteContextInitializedEvent(SiteContext siteContext) {
+        super(siteContext);
+    }
 
 }

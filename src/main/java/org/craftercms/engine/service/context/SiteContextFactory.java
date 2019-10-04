@@ -16,12 +16,6 @@
  */
 package org.craftercms.engine.service.context;
 
-import java.io.InputStream;
-import java.net.URLClassLoader;
-import java.util.*;
-import java.util.concurrent.Executor;
-import javax.servlet.ServletContext;
-
 import groovy.lang.GroovyClassLoader;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
@@ -32,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.crypto.TextEncryptor;
 import org.craftercms.commons.crypto.impl.NoOpTextEncryptor;
 import org.craftercms.commons.spring.ApacheCommonsConfiguration2PropertySource;
+import org.craftercms.core.service.CacheService;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.url.UrlTransformationEngine;
@@ -41,9 +36,8 @@ import org.craftercms.engine.macro.MacroResolver;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.scripting.ScriptJobResolver;
 import org.craftercms.engine.scripting.impl.GroovyScriptFactory;
-import org.craftercms.engine.service.PreviewOverlayCallback;
-import org.craftercms.engine.util.GroovyScriptUtils;
 import org.craftercms.engine.util.SchedulingUtils;
+import org.craftercms.engine.cache.SiteCacheWarmer;
 import org.craftercms.engine.util.config.impl.MultiResourceConfigurationBuilder;
 import org.craftercms.engine.util.groovy.ContentStoreGroovyResourceLoader;
 import org.craftercms.engine.util.groovy.ContentStoreResourceConnector;
@@ -65,6 +59,12 @@ import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
 import org.tuckey.web.filters.urlrewrite.Conf;
 import org.tuckey.web.filters.urlrewrite.UrlRewriter;
+
+import javax.servlet.ServletContext;
+import java.io.InputStream;
+import java.net.URLClassLoader;
+import java.util.*;
+import java.util.concurrent.Executor;
 
 /**
  * Factory for creating {@link SiteContext} with common properties. It also uses the {@link MacroResolver} to resolve
@@ -100,14 +100,16 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected boolean ignoreHiddenFiles;
     protected ObjectFactory<FreeMarkerConfig> freeMarkerConfigFactory;
     protected UrlTransformationEngine urlTransformationEngine;
-    protected PreviewOverlayCallback overlayCallback;
     protected ContentStoreService storeService;
+    protected CacheService cacheService;
     protected MacroResolver macroResolver;
     protected ApplicationContext globalApplicationContext;
     protected List<ScriptJobResolver> jobResolvers;
     protected Executor jobThreadPoolExecutor;
     protected TextEncryptor textEncryptor;
     protected GraphQLFactory graphQLFactory;
+    protected boolean cacheWarmUpEnabled;
+    protected SiteCacheWarmer cacheWarmer;
 
     public SiteContextFactory() {
         siteNameMacroName = DEFAULT_SITE_NAME_MACRO_NAME;
@@ -212,13 +214,14 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         this.urlTransformationEngine = urlTransformationEngine;
     }
 
-    public void setOverlayCallback(PreviewOverlayCallback overlayCallback) {
-        this.overlayCallback = overlayCallback;
-    }
-
     @Required
     public void setStoreService(ContentStoreService storeService) {
         this.storeService = storeService;
+    }
+
+    @Required
+    public void setCacheService(CacheService cacheService) {
+        this.cacheService = cacheService;
     }
 
     @Required
@@ -246,6 +249,16 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         this.graphQLFactory = graphQLFactory;
     }
 
+    @Required
+    public void setCacheWarmUpEnabled(boolean cacheWarmUpEnabled) {
+        this.cacheWarmUpEnabled = cacheWarmUpEnabled;
+    }
+
+    @Required
+    public void setCacheWarmer(SiteCacheWarmer cacheWarmer) {
+        this.cacheWarmer = cacheWarmer;
+    }
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.globalApplicationContext = applicationContext;
@@ -261,16 +274,22 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         try {
             SiteContext siteContext = new SiteContext();
             siteContext.setStoreService(storeService);
+            siteContext.setCacheService(cacheService);
             siteContext.setSiteName(siteName);
             siteContext.setContext(context);
             siteContext.setStaticAssetsPath(staticAssetsPath);
             siteContext.setTemplatesPath(templatesPath);
+            siteContext.setInitScriptPath(initScriptPath);
             siteContext.setFreeMarkerConfig(freeMarkerConfigFactory.getObject());
             siteContext.setUrlTransformationEngine(urlTransformationEngine);
-            siteContext.setOverlayCallback(overlayCallback);
             siteContext.setRestScriptsPath(restScriptsPath);
             siteContext.setControllerScriptsPath(controllerScriptsPath);
             siteContext.setGraphQLFactory(graphQLFactory);
+            siteContext.setServletContext(servletContext);
+
+            if (cacheWarmUpEnabled) {
+                siteContext.setCacheWarmer(cacheWarmer);
+            }
 
             String[] resolvedConfigPaths = new String[configPaths.length];
             for (int i = 0; i < configPaths.length; i++) {
@@ -302,13 +321,13 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             siteContext.setClassLoader(classLoader);
             siteContext.setUrlRewriter(urlRewriter);
 
-            executeInitScript(siteContext, scriptFactory);
-
             Scheduler scheduler = scheduleJobs(siteContext);
             siteContext.setScheduler(scheduler);
 
             return siteContext;
         } catch (Exception e) {
+            logger.error("Error creating context for site '" + siteName + "'", e);
+
             // Destroy context if the site context creation failed
             storeService.destroyContext(context);
 
@@ -507,32 +526,6 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         }
 
         return null;
-    }
-
-    protected void executeInitScript(SiteContext siteContext, ScriptFactory scriptFactory) {
-        if (storeService.exists(siteContext.getContext(), initScriptPath)) {
-            String siteName = siteContext.getSiteName();
-
-            SiteContext.setCurrent(siteContext);
-            try {
-                Map<String, Object> variables = new HashMap<>();
-                GroovyScriptUtils.addJobScriptVariables(variables, servletContext);
-
-                logger.info("--------------------------------------------------");
-                logger.info("<Executing init script for site: " + siteName + ">");
-                logger.info("--------------------------------------------------");
-
-                scriptFactory.getScript(initScriptPath).execute(variables);
-
-                logger.info("--------------------------------------------------");
-                logger.info("</Executing init script for site: " + siteName + ">");
-                logger.info("--------------------------------------------------");
-            } catch (Exception e) {
-                logger.error("Error executing init script for site '" + siteName + "'", e);
-            } finally {
-                SiteContext.clear();
-            }
-        }
     }
 
 }

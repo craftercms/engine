@@ -69,8 +69,8 @@
         <property name="groovyClassesPath" value="${crafter.engine.site.default.classes.groovy.path}"/>
         <property name="cacheOn" value="false"/>
         <property name="urlTransformationEngine" ref="crafter.urlTransformationEngine"/>
-        <property name="overlayCallback" ref="crafter.authoringOverlayCallback"/>
         <property name="storeService" ref="crafter.contentStoreService"/>
+        <property name="cacheService" ref="crafter.cacheService"/>
         <property name="macroResolver" ref="crafter.macroResolver"/>
         <property name="groovyGlobalVars" ref="crafter.restScriptsVariables"/>
         <property name="jobResolvers" ref="crafter.scriptJobResolvers"/>
@@ -78,6 +78,8 @@
         <property name="textEncryptor" ref="crafter.textEncryptor"/>
         <property name="storeType" value="${crafter.engine.store.type}"/>
         <property name="graphQLFactory" ref="crafter.graphQLFactory"/>
+        <property name="cacheWarmUpEnabled" value="false"/>
+        <property name="cacheWarmer" ref="crafter.siteCacheWarmer"/>
     </bean>
 
     <!-- ////////////////////////////////// -->
@@ -85,16 +87,6 @@
     <!--		 Preview Support			-->
     <!--									-->
     <!-- ////////////////////////////////// -->
-
-    <bean id="crafter.httpProxyRegistry" class="org.craftercms.engine.http.HttpProxyRegistry"/>
-
-    <bean id="crafter.authoringOverlayCallback" class="org.craftercms.engine.service.PreviewOverlayCallback">
-        <property name="scriptFormat" value="${crafter.engine.proxy.authoring.callback.preview.script.format}"/>
-        <property name="previewServerJsScriptSources"
-                  value="${crafter.engine.proxy.authoring.callback.preview.scripts}"/>
-        <property name="macroResolver" ref="crafter.macroResolver"/>
-        <property name="userAgentTemplateDetector" ref="crafter.userAgentTemplateDetector"/>
-    </bean>
 
     <util:list id="crafter.defaultItemPredicates"/>
 

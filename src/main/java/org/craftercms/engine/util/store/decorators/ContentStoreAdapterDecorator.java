@@ -14,24 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.craftercms.engine.event;
+package org.craftercms.engine.util.store.decorators;
 
-import org.craftercms.engine.service.context.SiteContext;
+import org.craftercms.core.store.ContentStoreAdapter;
 
 /**
- * Event published when a {@link SiteContext} has been destroyed.
+ * Represents a decorator to a {@link ContentStoreAdapter}.
  *
  * @author avasquez
+ * @since 3.1.4
  */
-public class SiteContextDestroyedEvent extends SiteEvent {
+public interface ContentStoreAdapterDecorator extends ContentStoreAdapter {
 
     /**
-     * Create a new event.
+     * Sets the store adapter to be decorated
      *
-     * @param siteContext   the site's context
+     * @param actualStoreAdapter the actual store adapter
      */
-    public SiteContextDestroyedEvent(SiteContext siteContext) {
-        super(siteContext);
-    }
+    void setActualStoreAdapter(ContentStoreAdapter actualStoreAdapter);
 
 }

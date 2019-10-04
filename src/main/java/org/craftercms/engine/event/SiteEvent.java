@@ -22,11 +22,11 @@ import org.springframework.context.ApplicationEvent;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Application event that is related to a site context.
+ * Application event that is related to a site.
  *
  * @author avasquez
  */
-public class SiteContextEvent extends ApplicationEvent {
+public class SiteEvent extends ApplicationEvent {
 
     /**
      * Returns the latest event of the specified class that has been fired during the handling of the request.
@@ -36,9 +36,9 @@ public class SiteContextEvent extends ApplicationEvent {
      *
      * @return the latest request event
      */
-    public static SiteContextEvent getLatestRequestEvent(Class<? extends SiteContextEvent> eventClass,
-                                                         HttpServletRequest request) {
-        return (SiteContextEvent) request.getAttribute(eventClass.getName());
+    public static SiteEvent getLatestRequestEvent(Class<? extends SiteEvent> eventClass,
+                                                  HttpServletRequest request) {
+        return (SiteEvent) request.getAttribute(eventClass.getName());
     }
 
     /**
@@ -46,7 +46,7 @@ public class SiteContextEvent extends ApplicationEvent {
      *
      * @param siteContext the site's context
      */
-    public SiteContextEvent(SiteContext siteContext) {
+    public SiteEvent(SiteContext siteContext) {
         super(siteContext);
     }
 
