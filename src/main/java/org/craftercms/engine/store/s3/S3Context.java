@@ -54,17 +54,4 @@ public class S3Context extends ContextImpl {
         return rootFolderUri.getKey();
     }
 
-    @Override
-    public String toString() {
-        return "S3Context{" +
-               "id='" + id + '\'' +
-               ", storeAdapter=" + storeAdapter +
-               ", rootFolderPath='" + rootFolderPath + '\'' +
-               ", mergingOn=" + mergingOn +
-               ", cacheOn=" + cacheOn +
-               ", maxAllowedItemsInCache=" + maxAllowedItemsInCache +
-               ", ignoreHiddenFiles=" + ignoreHiddenFiles +
-               '}';
-    }
-
 }

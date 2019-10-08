@@ -18,6 +18,7 @@ package org.craftercms.engine.service.context;
 
 import graphql.GraphQL;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
+import org.apache.commons.lang3.time.StopWatch;
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.exception.CrafterException;
 import org.craftercms.core.service.CacheService;
@@ -26,9 +27,11 @@ import org.craftercms.core.service.Context;
 import org.craftercms.core.url.UrlTransformationEngine;
 import org.craftercms.engine.event.*;
 import org.craftercms.engine.exception.GraphQLBuildException;
+import org.craftercms.engine.exception.SiteContextInitializationException;
 import org.craftercms.engine.graphql.GraphQLFactory;
 import org.craftercms.engine.scripting.ScriptFactory;
-import org.craftercms.engine.service.PreviewOverlayCallback;
+import org.craftercms.engine.util.GroovyScriptUtils;
+import org.craftercms.engine.cache.SiteCacheWarmer;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
@@ -39,12 +42,12 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
 import org.tuckey.web.filters.urlrewrite.UrlRewriter;
 
+import javax.servlet.ServletContext;
 import java.net.URLClassLoader;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.*;
 
 /**
  * Wrapper for a {@link Context} that adds properties specific to Crafter Engine.
@@ -59,7 +62,14 @@ public class SiteContext {
 
     private static ThreadLocal<SiteContext> threadLocal = new ThreadLocal<>();
 
+    public enum State {
+        CREATED,
+        INITIALIZED,
+        DESTROYED
+    }
+
     protected ContentStoreService storeService;
+    protected CacheService cacheService;
     protected String siteName;
     protected Context context;
     protected boolean fallback;
@@ -67,20 +77,23 @@ public class SiteContext {
     protected String templatesPath;
     protected String restScriptsPath;
     protected String controllerScriptsPath;
+    protected String initScriptPath;
     protected FreeMarkerConfig freeMarkerConfig;
     protected UrlTransformationEngine urlTransformationEngine;
-    protected PreviewOverlayCallback overlayCallback;
     protected ScriptFactory scriptFactory;
     protected HierarchicalConfiguration config;
+    protected ServletContext servletContext;
     protected ApplicationContext globalApplicationContext;
     protected ConfigurableApplicationContext applicationContext;
     protected URLClassLoader classLoader;
     protected UrlRewriter urlRewriter;
     protected Scheduler scheduler;
-    protected Map<Class<? extends SiteContextEvent>, SiteContextEvent> latestEvents;
-    protected Lock graphQLBuildLock;
     protected GraphQLFactory graphQLFactory;
+    protected SiteCacheWarmer cacheWarmer;
+
+    protected ExecutorService maintenanceTaskExecutor;
     protected GraphQL graphQL;
+    protected State state;
 
     /**
      * Returns the context for the current thread.
@@ -108,8 +121,11 @@ public class SiteContext {
     }
 
     public SiteContext() {
-        graphQLBuildLock = new ReentrantLock();
-        latestEvents = new ConcurrentHashMap<>();
+        // With this executor maintenance tasks are executed sequentially in the order they're received. This is
+        // important when a cache warm is submitted and a GraphQL re-build needs to wait till the cache warm is
+        // finished
+        maintenanceTaskExecutor = Executors.newSingleThreadExecutor();
+        state = State.CREATED;
     }
 
     public ContentStoreService getStoreService() {
@@ -118,6 +134,14 @@ public class SiteContext {
 
     public void setStoreService(ContentStoreService storeService) {
         this.storeService = storeService;
+    }
+
+    public CacheService getCacheService() {
+        return cacheService;
+    }
+
+    public void setCacheService(CacheService cacheService) {
+        this.cacheService = cacheService;
     }
 
     public String getSiteName() {
@@ -176,6 +200,14 @@ public class SiteContext {
         this.controllerScriptsPath = controllerScriptsPath;
     }
 
+    public String getInitScriptPath() {
+        return initScriptPath;
+    }
+
+    public void setInitScriptPath(String initScriptPath) {
+        this.initScriptPath = initScriptPath;
+    }
+
     public FreeMarkerConfig getFreeMarkerConfig() {
         return freeMarkerConfig;
     }
@@ -192,14 +224,6 @@ public class SiteContext {
         this.urlTransformationEngine = urlTransformationEngine;
     }
 
-    public PreviewOverlayCallback getOverlayCallback() {
-        return overlayCallback;
-    }
-
-    public void setOverlayCallback(PreviewOverlayCallback overlayCallback) {
-        this.overlayCallback = overlayCallback;
-    }
-
     public ScriptFactory getScriptFactory() {
         return scriptFactory;
     }
@@ -214,6 +238,14 @@ public class SiteContext {
 
     public void setConfig(HierarchicalConfiguration config) {
         this.config = config;
+    }
+
+    public ServletContext getServletContext() {
+        return servletContext;
+    }
+
+    public void setServletContext(ServletContext servletContext) {
+        this.servletContext = servletContext;
     }
 
     public ApplicationContext getGlobalApplicationContext() {
@@ -264,12 +296,12 @@ public class SiteContext {
         this.graphQLFactory = graphQLFactory;
     }
 
-    public Map<Class<? extends SiteContextEvent>, SiteContextEvent> getLatestEvents() {
-        return latestEvents;
+    public SiteCacheWarmer getCacheWarmer() {
+        return cacheWarmer;
     }
 
-    public SiteContextEvent getLatestEvent(Class<? extends SiteContextEvent> eventClass) {
-        return latestEvents.get(eventClass);
+    public void setCacheWarmer(SiteCacheWarmer cacheWarmer) {
+        this.cacheWarmer = cacheWarmer;
     }
 
     public GraphQL getGraphQL() {
@@ -277,45 +309,85 @@ public class SiteContext {
     }
 
     public boolean isValid() throws CrafterException {
-        return storeService.validate(context);
+        return state == State.INITIALIZED && storeService.validate(context);
     }
 
-    public void init() {
-        publishEvent(new SiteContextCreatedEvent(this));
+    public State getState() {
+        return state;
     }
 
-    public void clearCache(CacheService cacheService) {
-        // Clear content cache
-        cacheService.clearScope(context);
-        // Clear Freemarker cache
-        freeMarkerConfig.getConfiguration().clearTemplateCache();
+    public void init(boolean waitTillFinished) throws SiteContextInitializationException {
+        if (state == State.CREATED) {
+            publishEvent(new SiteContextCreatedEvent(this));
 
-        publishEvent(new CacheClearedEvent(this));
-    }
+            Runnable initTask = () -> {
+                SiteContext.setCurrent(this);
+                try {
+                    logger.info("--------------------------------------------------");
+                    logger.info("<Initializing context site: " + siteName + ">");
+                    logger.info("--------------------------------------------------");
 
-    public void buildGraphQLSchema() throws GraphQLBuildException {
-        if (graphQLBuildLock.tryLock()) {
-            logger.info("Starting GraphQL schema build for site '{}'", siteName);
-            try {
-                GraphQL graphQL = graphQLFactory.getInstance(this);
-                if (Objects.nonNull(graphQL)) {
-                    this.graphQL = graphQL;
+                    if (cacheWarmer != null) {
+                        cacheWarmer.warmUpCache(this, false);
+                    }
 
-                    publishEvent(new GraphQLBuiltEvent(this));
+                    buildGraphQLSchema();
+                    executeInitScript();
+
+                    state = State.INITIALIZED;
+
+                    logger.info("--------------------------------------------------");
+                    logger.info("</Initializing context site: " + siteName + ">");
+                    logger.info("--------------------------------------------------");
+
+                    publishEvent(new SiteContextInitializedEvent(this));
+                } finally {
+                    SiteContext.clear();
                 }
-            } catch (Exception e) {
-                throw new GraphQLBuildException("Error building the GraphQL schema for site '" + siteName + "'", e);
-            } finally {
-                graphQLBuildLock.unlock();
+            };
+
+            if (waitTillFinished) {
+                // Done through the executor so that maintenance tasks submitted while init are queued
+                Future<?> future = maintenanceTaskExecutor.submit(initTask);
+                try {
+                    future.get();
+                } catch (InterruptedException | ExecutionException e) {
+                    throw new SiteContextInitializationException("Error while waiting for context init", e);
+                }
+            } else {
+                maintenanceTaskExecutor.execute(initTask);
             }
-            logger.info("GraphQL schema build completed for site '{}'", siteName);
-        } else {
-            logger.info("GraphQL schema is already being built for site '{}'", siteName);
         }
     }
 
+    public void startCacheClear() {
+        maintenanceTaskExecutor.execute(() -> {
+            SiteContext.setCurrent(this);
+            try {
+                cacheClear();
+            } finally {
+                SiteContext.clear();
+            }
+        });
+    }
+
+    public void startGraphQLSchemaBuild() throws GraphQLBuildException {
+        maintenanceTaskExecutor.execute(() -> {
+            SiteContext.setCurrent(this);
+            try {
+                buildGraphQLSchema();
+            } finally {
+                SiteContext.clear();
+            }
+        });
+    }
+
     public void destroy() throws CrafterException {
+        state = State.DESTROYED;
+
         publishEvent(new SiteContextDestroyedEvent(this));
+
+        maintenanceTaskExecutor.shutdownNow();
 
         storeService.destroyContext(context);
 
@@ -339,6 +411,77 @@ public class SiteContext {
             } catch (SchedulerException e) {
                 throw new CrafterException("Unable to shutdown scheduler", e);
             }
+        }
+    }
+
+    protected void cacheClear() {
+        publishEvent(new CacheClearStartedEvent(this));
+
+        // If there's a cache warmer, do a content cache switch instead of aclear
+        if (cacheWarmer != null) {
+            cacheWarmer.warmUpCache(this, true);
+            // Clear Freemarker cache
+            freeMarkerConfig.getConfiguration().clearTemplateCache();
+        } else {
+            cacheService.clearScope(context);
+            // Clear Freemarker cache
+            freeMarkerConfig.getConfiguration().clearTemplateCache();
+        }
+
+        publishEvent(new CacheClearCompletedEvent(this));
+    }
+
+    protected void buildGraphQLSchema() {
+        logger.info("Starting GraphQL schema build for site '{}'", siteName);
+
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+
+        publishEvent(new GraphQLBuildStartedEvent(this));
+
+        try {
+            GraphQL graphQL = graphQLFactory.getInstance(this);
+            if (Objects.nonNull(graphQL)) {
+                this.graphQL = graphQL;
+
+                publishEvent(new GraphQLBuildCompletedEvent(this));
+            }
+        } catch (Exception e) {
+            logger.error("Error building the GraphQL schema for site '" + siteName + "'", e);
+        }
+
+        stopWatch.stop();
+
+        logger.info("GraphQL schema build completed for site '{}' in {} secs", siteName,
+                    stopWatch.getTime(TimeUnit.SECONDS));
+    }
+
+    protected void executeInitScript() {
+        if (storeService.exists(context, initScriptPath)) {
+            try {
+                Map<String, Object> variables = new HashMap<>();
+                GroovyScriptUtils.addJobScriptVariables(variables, servletContext);
+
+                logger.info("Executing init script for site '{}'", siteName);
+
+                scriptFactory.getScript(initScriptPath).execute(variables);
+            } catch (Exception e) {
+                logger.error("Error executing init script for site '" + siteName + "'", e);
+            }
+        }
+    }
+
+    protected void publishEvent(SiteEvent event) {
+        if (applicationContext != null) {
+            applicationContext.publishEvent(event);
+        } else {
+            globalApplicationContext.publishEvent(event);
+        }
+
+        // Store a request attribute for the event so it's known later if the event was fired during the request
+        RequestContext requestContext = RequestContext.getCurrent();
+        if (requestContext != null) {
+            requestContext.getRequest().setAttribute(event.getClass().getName(), event);
         }
     }
 
@@ -376,23 +519,6 @@ public class SiteContext {
                ", restScriptsPath='" + restScriptsPath + '\'' +
                ", controllerScriptsPath='" + controllerScriptsPath + '\'' +
                '}';
-    }
-
-    protected void publishEvent(SiteContextEvent event) {
-        if (applicationContext != null) {
-            applicationContext.publishEvent(event);
-        } else {
-            globalApplicationContext.publishEvent(event);
-        }
-
-        // Store in the latest events
-        latestEvents.put(event.getClass(), event);
-
-        // Store a request attribute for the event so it's known later if the event was fired during the request
-        RequestContext requestContext = RequestContext.getCurrent();
-        if (requestContext != null) {
-            requestContext.getRequest().setAttribute(event.getClass().getName(), event);
-        }
     }
 
 }

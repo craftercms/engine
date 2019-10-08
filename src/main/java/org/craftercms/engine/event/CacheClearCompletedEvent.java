@@ -19,18 +19,18 @@ package org.craftercms.engine.event;
 import org.craftercms.engine.service.context.SiteContext;
 
 /**
- * Event published when a {@link SiteContext} has been destroyed.
+ * Event published when a site's cache clear has completed.
  *
  * @author avasquez
  */
-public class SiteContextDestroyedEvent extends SiteEvent {
+public class CacheClearCompletedEvent extends SiteEvent {
 
     /**
      * Create a new event.
      *
      * @param siteContext   the site's context
      */
-    public SiteContextDestroyedEvent(SiteContext siteContext) {
+    public CacheClearCompletedEvent(SiteContext siteContext) {
         super(siteContext);
     }
 
