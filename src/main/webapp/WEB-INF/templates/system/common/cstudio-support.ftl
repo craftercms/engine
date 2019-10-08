@@ -1,6 +1,6 @@
 
 <#macro toolSupport>
-  <#if siteContext.overlayCallback??>
+  <#if modePreview>
     <script src="/studio/static-assets/libs/requirejs/require.js" data-main="/studio/overlayhook?site=NOTUSED&page=NOTUSED&cs.js"></script>
     <script>document.domain = "${Request.serverName}"; </script>
   </#if>
@@ -11,7 +11,7 @@
 </#macro>
 
 <#macro componentAttr path="" ice=false iceGroup="">
-  <#if siteContext.overlayCallback??>data-studio-component-path="${path}" data-studio-component="${path}"
+  <#if modePreview>data-studio-component-path="${path}" data-studio-component="${path}"
     <#if ice==true>
       <@iceAttrLegacy path=path iceGroup=iceGroup/>
     </#if>
@@ -19,7 +19,7 @@
 </#macro>
 
 <#macro componentContainerAttr target objectId="">
-  <#if siteContext.overlayCallback??> data-studio-components-target="${target}" data-studio-components-objectId="${objectId}"</#if>
+  <#if modePreview> data-studio-components-target="${target}" data-studio-components-objectId="${objectId}"</#if>
 </#macro>
 
 <#-- Main macro for ICE attributes -->
@@ -67,14 +67,14 @@
 </#macro>
 
 <#macro ice id="" component="" componentPath="">
-  <#if siteContext.overlayCallback??>
+  <#if modePreview>
     <div data-studio-ice="${id}" ></div>
   </#if>
 </#macro>
 
 
 <#macro draggableComponent id="" component="" componentPath="">
-  <#if siteContext.overlayCallback??>
+  <#if modePreview>
     <#if id != "" && component == "" && componentPath == "">
       <@ice id=id>
         <div id='${id}' class='cstudio-draggable-component'><#nested></div>
