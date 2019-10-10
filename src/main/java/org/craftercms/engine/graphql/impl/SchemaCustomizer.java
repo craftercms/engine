@@ -15,13 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.craftercms.engine.graphql;
+package org.craftercms.engine.graphql.impl;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import graphql.schema.DataFetcher;
@@ -31,6 +32,7 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLType;
 import graphql.schema.StaticDataFetcher;
 import graphql.schema.TypeResolver;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +53,7 @@ public class SchemaCustomizer {
     /**
      * List of custom fields to add
      */
-    protected List<FieldBuilder> fields = new LinkedList<>();
+    protected List<FieldBuilder> customFields = new LinkedList<>();
 
     /**
      * List of custom fetchers to add
@@ -69,20 +71,39 @@ public class SchemaCustomizer {
     protected List<GraphQLType> additionalTypes = new LinkedList<>();
 
     /**
-     * Adds a custom field
+     * Adds a custom field to the root type
      * @param field the field definition
      * @param fetcher the fetcher for the field
      */
     public void field(GraphQLFieldDefinition.Builder field, DataFetcher<?> fetcher) {
-        fields.add(new FieldBuilder(field, fetcher));
+        customFields.add(new FieldBuilder(null, field, fetcher));
     }
 
     /**
-     * Adds a custom field without a fetcher (for wrapper fields)
+     * Adds a custom field to the root type without a fetcher (for wrapper fields)
      * @param field the field definition
      */
     public void field(GraphQLFieldDefinition.Builder field) {
         field(field, EMPTY_DATA_FETCHER);
+    }
+
+    /**
+     * Adds a custom field to a specific type
+     * @param typeName the name of the type
+     * @param field the field definition
+     * @param fetcher the fetcher for the field
+     */
+    public void field(String typeName, GraphQLFieldDefinition.Builder field, DataFetcher<?> fetcher) {
+        customFields.add(new FieldBuilder(typeName, field, fetcher));
+    }
+
+    /**
+     * Adds a custom field to a specific type without a fetcher (for wrapper fields)
+     * @param typeName the name of the type
+     * @param field the field definition
+     */
+    public void field(String typeName, GraphQLFieldDefinition.Builder field) {
+        field(typeName, field, EMPTY_DATA_FETCHER);
     }
 
     /**
@@ -118,14 +139,35 @@ public class SchemaCustomizer {
      * @param rootTypeBuilder the root type
      * @param codeRegistry the code registry
      */
-    public void apply(String rootTypeName, GraphQLObjectType.Builder rootTypeBuilder,
-                      GraphQLCodeRegistry.Builder codeRegistry) {
-        fields.forEach(builder -> {
+    protected void apply(String rootTypeName, GraphQLObjectType.Builder rootTypeBuilder,
+                      GraphQLCodeRegistry.Builder codeRegistry, Map<String, GraphQLObjectType.Builder> types) {
+        customFields.forEach(builder -> {
             String fieldName = builder.field.build().getName();
-            logger.debug("Adding custom field & fetcher {}", fieldName);
-            rootTypeBuilder.field(builder.field);
-            codeRegistry.dataFetcher(coordinates(rootTypeName, fieldName), builder.fetcher);
+            if (StringUtils.isEmpty(builder.typeName)) {
+                // Add a top level field
+                logger.debug("Adding custom field & fetcher {}", fieldName);
+                if (rootTypeBuilder.hasField(fieldName)) {
+                    throw new IllegalArgumentException(
+                        String.format("GraphQL schema already contains a field '%s'", fieldName));
+                }
+                rootTypeBuilder.field(builder.field);
+                codeRegistry.dataFetcher(coordinates(rootTypeName, fieldName), builder.fetcher);
+            } else {
+                // Add a field to a specific type
+                if (!types.containsKey(builder.typeName)) {
+                    throw new IllegalArgumentException(
+                        String.format("GraphQL schema does not contain a type '%s'", builder.typeName));
+                } else if (types.get(builder.typeName).hasField(fieldName)) {
+                    throw new IllegalArgumentException(
+                        String.format("GraphQL schema already contains a field '%s.%s'", builder.typeName, fieldName));
+                }
+                logger.debug("Adding custom field & fetcher {}.{}", builder.typeName, fieldName);
+                types.get(builder.typeName).field(builder.field);
+                codeRegistry.dataFetcher(coordinates(builder.typeName, fieldName), builder.fetcher);
+            }
+
         });
+
         fetchers.forEach(builder -> {
             logger.debug("Adding custom fetcher for {}/{}", builder.typeName, builder.fieldName);
             codeRegistry.dataFetcher(coordinates(builder.typeName, builder.fieldName), builder.dataFetcher);
@@ -148,13 +190,17 @@ public class SchemaCustomizer {
      */
     private static class FieldBuilder {
 
+        public final String typeName;
         public final GraphQLFieldDefinition.Builder field;
         public final DataFetcher<?> fetcher;
 
-        public FieldBuilder(final GraphQLFieldDefinition.Builder field, final DataFetcher<?> fetcher) {
+        public FieldBuilder(final String typeName, final GraphQLFieldDefinition.Builder field,
+                            final DataFetcher<?> fetcher) {
+            this.typeName = typeName;
             this.field = field;
             this.fetcher = fetcher;
         }
+
     }
 
     /**

@@ -130,8 +130,10 @@ public class GraphQLTypeFactoryImpl implements GraphQLTypeFactory {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void createType(Item formDefinition, GraphQLObjectType.Builder rootGraphQLType,
-                           GraphQLCodeRegistry.Builder codeRegistry, DataFetcher dataFetcher) {
+                           GraphQLCodeRegistry.Builder codeRegistry, DataFetcher<?> dataFetcher,
+                           Map<String, GraphQLObjectType.Builder> siteTypes) {
         logger.debug("Creating GraphQL Type from '{}'", formDefinition.getUrl());
 
         Document contentTypeDefinition = formDefinition.getDescriptorDom();
@@ -153,6 +155,9 @@ public class GraphQLTypeFactoryImpl implements GraphQLTypeFactory {
             graphQLType.fields(PAGE_FIELDS);
         }
 
+        // Add the type builder so it's available later to the customizer
+        siteTypes.put(graphQLTypeName, graphQLType);
+
         List<Node> contentTypeFields = XmlUtils.selectNodes(contentTypeDefinition, contentTypeFieldsXPath,
                                                             Collections.emptyMap());
         // Add the content-type specific fields
@@ -163,8 +168,7 @@ public class GraphQLTypeFactoryImpl implements GraphQLTypeFactory {
         }
 
         // Create a wrapper type for the queries of the content-type
-        GraphQLType queryType = createQueryWrapperType(graphQLTypeName, graphQLType.build(),
-                                                       "Query for content-type " + contentTypeName);
+        GraphQLType queryType = createQueryWrapperType(graphQLTypeName, "Query for content-type " + contentTypeName);
 
         // Add a field in the root type
         rootGraphQLType.field(GraphQLFieldDefinition.newFieldDefinition()
@@ -191,6 +195,7 @@ public class GraphQLTypeFactoryImpl implements GraphQLTypeFactory {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void createField(Document contentTypeDefinition, Node contentTypeField, String parentGraphQLTypeName,
                             GraphQLObjectType.Builder parentGraphQLType) {
         String contentTypeFieldId = XmlUtils.selectSingleNodeValue(contentTypeField, contentTypeFieldIdXPath);
