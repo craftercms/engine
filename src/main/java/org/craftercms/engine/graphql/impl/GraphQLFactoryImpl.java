@@ -18,10 +18,12 @@
 package org.craftercms.engine.graphql.impl;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.Executor;
 
 import javax.servlet.ServletContext;
@@ -35,7 +37,6 @@ import org.craftercms.core.service.Tree;
 import org.craftercms.engine.exception.ScriptNotFoundException;
 import org.craftercms.engine.graphql.GraphQLFactory;
 import org.craftercms.engine.graphql.GraphQLTypeFactory;
-import org.craftercms.engine.graphql.SchemaCustomizer;
 import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.GroovyScriptUtils;
@@ -147,7 +148,8 @@ public class GraphQLFactoryImpl implements GraphQLFactory, ServletContextAware {
      * Recursively looks for content-type definitions
      */
     protected void findContentTypes(Tree item, GraphQLObjectType.Builder rootType,
-                                    GraphQLCodeRegistry.Builder codeRegistry, DataFetcher<?> dataFetcher) {
+                                    GraphQLCodeRegistry.Builder codeRegistry, DataFetcher<?> dataFetcher,
+                                    Map<String, GraphQLObjectType.Builder> siteTypes) {
         logger.debug("Looking for content-type definitions in '{}'", item.getUrl());
         List<Item> children = item.getChildren();
         if (CollectionUtils.isNotEmpty(children)) {
@@ -155,11 +157,11 @@ public class GraphQLFactoryImpl implements GraphQLFactory, ServletContextAware {
                 .filter(i -> contentTypeDefinitionName.equals(i.getName()))
                 .findFirst();
             if (formDefinition.isPresent()) {
-                typeFactory.createType(formDefinition.get(), rootType, codeRegistry, dataFetcher);
+                typeFactory.createType(formDefinition.get(), rootType, codeRegistry, dataFetcher, siteTypes);
             } else {
                 children.stream()
                     .filter(i -> i instanceof Tree)
-                    .forEach(i -> findContentTypes((Tree) i, rootType, codeRegistry, dataFetcher));
+                    .forEach(i -> findContentTypes((Tree) i, rootType, codeRegistry, dataFetcher, siteTypes));
             }
         }
     }
@@ -216,24 +218,31 @@ public class GraphQLFactoryImpl implements GraphQLFactory, ServletContextAware {
         codeRegistry.dataFetcher(coordinates(rootQueryTypeName, FIELD_NAME_PAGES), asyncFetcher);
         codeRegistry.dataFetcher(coordinates(rootQueryTypeName, FIELD_NAME_COMPONENTS), asyncFetcher);
 
+        Map<String, GraphQLObjectType.Builder> siteTypes = new HashMap<>();
         ContentStoreService storeService = siteContext.getStoreService();
         Tree tree = storeService.findTree(siteContext.getContext(), repoConfigFolder);
         if (Objects.nonNull(tree)) {
-            findContentTypes(tree, rootType, codeRegistry, asyncFetcher);
+            findContentTypes(tree, rootType, codeRegistry, asyncFetcher, siteTypes);
         }
 
         SchemaCustomizer customizer = new SchemaCustomizer();
-        runInitScript(siteContext, rootType, codeRegistry, customizer);
+        runInitScript(siteContext, rootType, codeRegistry, customizer, siteTypes);
+
+        // Build the content-type related types, needs to be done after the init script to support custom fields
+        Set<GraphQLType> additionalTypes = new HashSet<>();
+        siteTypes.forEach((name, type) -> additionalTypes.add(type.build()));
 
         return GraphQLSchema.newSchema()
             .additionalTypes(customizer.getAdditionalTypes())
+            .additionalTypes(additionalTypes)
             .codeRegistry(codeRegistry.build())
             .query(rootType)
             .build();
     }
 
     protected void runInitScript(SiteContext siteContext, GraphQLObjectType.Builder rootType,
-                                 GraphQLCodeRegistry.Builder codeRegistry, SchemaCustomizer customizer) {
+                                 GraphQLCodeRegistry.Builder codeRegistry, SchemaCustomizer customizer,
+                                 Map<String, GraphQLObjectType.Builder> siteTypes) {
         Script script = siteContext.getScriptFactory().getScript(schemaScriptPath);
 
         Map<String, Object> variables = new HashMap<>();
@@ -243,7 +252,7 @@ public class GraphQLFactoryImpl implements GraphQLFactory, ServletContextAware {
         try {
             script.execute(variables);
             logger.info("Updating GraphQL schema with custom fields, fetchers & resolvers");
-            customizer.apply(rootQueryTypeName, rootType, codeRegistry);
+            customizer.apply(rootQueryTypeName, rootType, codeRegistry, siteTypes);
         } catch (ScriptNotFoundException e) {
             logger.info("No custom GraphQL schema found for site '{}'", siteContext.getSiteName());
         }

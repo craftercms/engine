@@ -599,9 +599,28 @@ public abstract class SchemaUtils {
     }
 
     /**
+     * Creates a query wrapper type (with total and list of items) using a reference to a type
+     */
+    public static GraphQLType createQueryWrapperType(String namePrefix, String description) {
+        return GraphQLObjectType.newObject()
+            .name(namePrefix + FIELD_SUFFIX_QUERY)
+            .description(description)
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name(FIELD_NAME_TOTAL)
+                .description("Total number of items found")
+                .type(nonNull(GraphQLInt)))
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name(FIELD_NAME_ITEMS)
+                .description("List of items")
+                .type(list(nonNull(GraphQLTypeReference.typeRef(namePrefix)))))
+            .build();
+    }
+
+    /**
      * Creates a query wrapper type (with total and list of items) for an actual type
      */
-    public static GraphQLType createQueryWrapperType(String namePrefix, GraphQLType wrappedType, String description) {
+    public static GraphQLType createQueryWrapperType(String namePrefix, GraphQLType wrappedType,
+                                                     String description) {
         return GraphQLObjectType.newObject()
             .name(namePrefix + FIELD_SUFFIX_QUERY)
             .description(description)
