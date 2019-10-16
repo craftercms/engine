@@ -90,11 +90,21 @@ public class CacheWarmingAwareContentStoreAdapterDecorator implements ContentSto
     public boolean exists(Context context, CachingOptions cachingOptions, String path)
             throws InvalidContextException, StoreException {
         if (warmUpEnabled) {
+            path = ContentStoreUtils.normalizePath(path);
+
             PreloadedFoldersAwareContext contextWrapper = (PreloadedFoldersAwareContext) context;
             Context actualContext = contextWrapper.getActualContext();
 
-            return executeIfNotPreloadedOrIfExistsInPreloadedPaths(contextWrapper, path, false, () ->
-                    actualStoreAdapter.exists(actualContext, cachingOptions, path));
+            PreloadedFolder preloadedAncestor = findPreloadedAncestor(contextWrapper.getPreloadedFolders(), path);
+            if (preloadedAncestor != null) {
+                Boolean exists = preloadedAncestor.exists(path);
+                // If path is null, it means the path wasn't preloaded
+                if (exists != null) {
+                    return exists;
+                }
+            }
+
+            return actualStoreAdapter.exists(actualContext, cachingOptions, path);
         } else {
             return actualStoreAdapter.exists(context, cachingOptions, path);
         }
