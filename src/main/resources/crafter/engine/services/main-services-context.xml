@@ -468,6 +468,7 @@
 
     <bean id="crafter.siteContextsBootstrap" class="org.craftercms.engine.service.context.SiteContextsBootstrap">
         <property name="createContextsOnStartup" value="${crafter.engine.site.context.createOnStartup}"/>
+        <property name="cacheWarmUpEnabled" value="${crafter.engine.site.cache.warmUp.enabled}"/>
         <property name="siteContextManager" ref="crafter.siteContextManager"/>
         <property name="siteListResolver" ref="crafter.siteResolver"/>
     </bean>

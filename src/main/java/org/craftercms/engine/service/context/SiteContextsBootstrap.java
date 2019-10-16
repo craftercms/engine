@@ -29,6 +29,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 public class SiteContextsBootstrap implements ApplicationListener<ContextRefreshedEvent> {
 
     protected boolean createContextsOnStartup;
+    protected boolean cacheWarmUpEnabled;
     protected SiteListResolver siteListResolver;
     protected SiteContextManager siteContextManager;
 
@@ -37,6 +38,11 @@ public class SiteContextsBootstrap implements ApplicationListener<ContextRefresh
     @Required
     public void setCreateContextsOnStartup(boolean createContextsOnStartup) {
         this.createContextsOnStartup = createContextsOnStartup;
+    }
+
+    @Required
+    public void setCacheWarmUpEnabled(final boolean cacheWarmUpEnabled) {
+        this.cacheWarmUpEnabled = cacheWarmUpEnabled;
     }
 
     @Required
@@ -55,6 +61,12 @@ public class SiteContextsBootstrap implements ApplicationListener<ContextRefresh
             triggered = true;
 
             siteContextManager.createContexts(siteListResolver.getSiteList());
+        }
+    }
+
+    public void updateSiteContexts() {
+        if (cacheWarmUpEnabled) {
+            siteContextManager.updateContexts(siteListResolver.getSiteList());
         }
     }
 

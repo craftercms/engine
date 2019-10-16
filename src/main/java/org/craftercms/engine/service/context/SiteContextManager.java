@@ -116,6 +116,17 @@ public class SiteContextManager {
         logger.info("==================================================");
     }
 
+    public void updateContexts(Collection<String> siteNames) {
+        // destroy the contexts for sites in the registry that are not needed anymore
+        contextRegistry.keySet()
+            .stream()
+            .filter(siteName -> !siteNames.contains(siteName))
+            .forEach(this::destroyContext);
+
+        // create the contexts for new sites
+        createContexts(siteNames);
+    }
+
     /**
      * Destroys all contexts
      */
