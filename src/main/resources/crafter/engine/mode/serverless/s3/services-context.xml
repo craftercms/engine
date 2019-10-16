@@ -82,23 +82,4 @@
         </property>
     </bean>
 
-    <bean id="crafter.updateSiteContextsJob"
-          class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-        <property name="targetObject" ref="crafter.siteContextsBootstrap"/>
-        <property name="targetMethod" value="updateSiteContexts"/>
-        <property name="concurrent" value="false"/>
-    </bean>
-
-    <bean id="crafter.updateSiteContextsTrigger"
-          class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
-        <property name="jobDetail" ref="crafter.updateSiteContextsJob"/>
-        <property name="startDelay" value="${crafter.engine.site.context.update.task.delay}"/>
-        <property name="repeatInterval" value="${crafter.engine.site.context.update.task.interval}"/>
-    </bean>
-
-    <util:list id="crafter.jobTriggers">
-        <ref bean="crafter.deploymentEventsWatcherTrigger"/>
-        <ref bean="crafter.updateSiteContextsTrigger"/>
-    </util:list>
-
 </beans>
