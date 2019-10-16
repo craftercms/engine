@@ -47,6 +47,7 @@ public class SiteContextManager {
     protected Map<String, SiteContext> contextRegistry;
     protected SiteContextFactory contextFactory;
     protected SiteContextFactory fallbackContextFactory;
+    protected SiteListResolver siteListResolver;
     protected EntitlementValidator entitlementValidator;
     protected boolean waitForContextInit;
     protected Executor jobThreadPoolExecutor;
@@ -64,6 +65,11 @@ public class SiteContextManager {
     @Required
     public void setFallbackContextFactory(SiteContextFactory fallbackContextFactory) {
         this.fallbackContextFactory = fallbackContextFactory;
+    }
+
+    @Required
+    public void setSiteListResolver(final SiteListResolver siteListResolver) {
+        this.siteListResolver = siteListResolver;
     }
 
     @Required
@@ -114,6 +120,19 @@ public class SiteContextManager {
         logger.info("==================================================");
         logger.info("</CREATING SITE CONTEXTS>");
         logger.info("==================================================");
+    }
+
+    public void syncContexts() {
+        logger.debug("Syncing the site contexts ...");
+        Collection<String> siteNames = siteListResolver.getSiteList();
+        // destroy the contexts for sites in the registry that are not needed anymore
+        contextRegistry.keySet()
+            .stream()
+            .filter(siteName -> !siteNames.contains(siteName))
+            .forEach(this::destroyContext);
+
+        // create the contexts for new sites
+        createContexts(siteNames);
     }
 
     /**
