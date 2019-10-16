@@ -122,8 +122,8 @@ public class SiteContextManager {
         logger.info("==================================================");
     }
 
-    public void updateContexts() {
-        logger.debug("Updating the site contexts ...");
+    public void syncContexts() {
+        logger.debug("Syncing the site contexts ...");
         Collection<String> siteNames = siteListResolver.getSiteList();
         // destroy the contexts for sites in the registry that are not needed anymore
         contextRegistry.keySet()

@@ -80,7 +80,7 @@ public class DeploymentEventsWatcher implements ApplicationListener<SiteEvent> {
     public void checkForEvents() {
         logger.debug("Deployment events watcher running...");
 
-        siteContextManager.updateContexts();
+        siteContextManager.syncContexts();
 
         for (SiteContext siteContext : siteContextManager.listContexts()) {
             checkForSiteEvents(siteContext);
