@@ -89,26 +89,20 @@ public class CacheWarmingAwareContentStoreAdapterDecorator implements ContentSto
     @Override
     public boolean exists(Context context, CachingOptions cachingOptions, String path)
             throws InvalidContextException, StoreException {
-        if (warmUpEnabled) {
-            PreloadedFoldersAwareContext contextWrapper = (PreloadedFoldersAwareContext) context;
-            Context actualContext = contextWrapper.getActualContext();
-
-            return executeIfNotPreloadedOrIfExistsInPreloadedPaths(contextWrapper, path, false, () ->
-                    actualStoreAdapter.exists(actualContext, cachingOptions, path));
-        } else {
-            return actualStoreAdapter.exists(context, cachingOptions, path);
-        }
+        return findItem(context, cachingOptions, path, false) != null;
     }
 
     @Override
     public Content findContent(Context context, CachingOptions cachingOptions, String path)
             throws InvalidContextException, StoreException {
         if (warmUpEnabled) {
+            String normalizedPath = ContentStoreUtils.normalizePath(path);
+
             PreloadedFoldersAwareContext contextWrapper = (PreloadedFoldersAwareContext) context;
             Context actualContext = contextWrapper.getActualContext();
 
-            return executeIfNotPreloadedOrIfExistsInPreloadedPaths(contextWrapper, path, null, () ->
-                    actualStoreAdapter.findContent(actualContext, cachingOptions, path));
+            return executeIfNotPreloadedOrIfExistsInPreloadedPaths(contextWrapper, normalizedPath, () ->
+                    actualStoreAdapter.findContent(actualContext, cachingOptions, normalizedPath));
         } else {
             return actualStoreAdapter.findContent(context, cachingOptions, path);
         }
@@ -118,11 +112,13 @@ public class CacheWarmingAwareContentStoreAdapterDecorator implements ContentSto
     public Item findItem(Context context, CachingOptions cachingOptions, String path, boolean withDescriptor)
             throws InvalidContextException, XmlFileParseException, StoreException {
         if (warmUpEnabled) {
+            String normalizedPath = ContentStoreUtils.normalizePath(path);
+
             PreloadedFoldersAwareContext contextWrapper = (PreloadedFoldersAwareContext) context;
             Context actualContext = contextWrapper.getActualContext();
 
-            return executeIfNotPreloadedOrIfExistsInPreloadedPaths(contextWrapper, path, null, () ->
-                    actualStoreAdapter.findItem(actualContext, cachingOptions, path, withDescriptor));
+            return executeIfNotPreloadedOrIfExistsInPreloadedPaths(contextWrapper, normalizedPath, () ->
+                    actualStoreAdapter.findItem(actualContext, cachingOptions, normalizedPath, withDescriptor));
         } else {
             return actualStoreAdapter.findItem(context, cachingOptions, path, withDescriptor);
         }
@@ -132,21 +128,20 @@ public class CacheWarmingAwareContentStoreAdapterDecorator implements ContentSto
     public List<Item> findItems(Context context, CachingOptions cachingOptions, String path)
             throws InvalidContextException, XmlFileParseException, StoreException {
         if (warmUpEnabled) {
+            String normalizedPath = ContentStoreUtils.normalizePath(path);
+
             PreloadedFoldersAwareContext contextWrapper = (PreloadedFoldersAwareContext) context;
             Context actualContext = contextWrapper.getActualContext();
 
-            return executeIfNotPreloadedOrIfExistsInPreloadedPaths(contextWrapper, path, null, () ->
-                    actualStoreAdapter.findItems(actualContext, cachingOptions, path));
+            return executeIfNotPreloadedOrIfExistsInPreloadedPaths(contextWrapper, normalizedPath, () ->
+                    actualStoreAdapter.findItems(actualContext, cachingOptions, normalizedPath));
         } else {
             return actualStoreAdapter.findItems(context, cachingOptions, path);
         }
     }
 
     protected <T> T executeIfNotPreloadedOrIfExistsInPreloadedPaths(PreloadedFoldersAwareContext contextWrapper,
-                                                                    String path, T valueIfPreloadedAndNotExists,
-                                                                    Supplier<T> actualCall) {
-        path = ContentStoreUtils.normalizePath(path);
-
+                                                                    String path, Supplier<T> actualCall) {
         PreloadedFolder preloadedAncestor = findPreloadedAncestor(contextWrapper.getPreloadedFolders(), path);
         if (preloadedAncestor != null) {
             Boolean exists = preloadedAncestor.exists(path);
@@ -154,7 +149,7 @@ public class CacheWarmingAwareContentStoreAdapterDecorator implements ContentSto
             if (exists != null && !exists) {
                 logger.debug("Path {} not found in preloaded descendants of {}", path, preloadedAncestor);
 
-                return valueIfPreloadedAndNotExists;
+                return null;
             }
         }
 
