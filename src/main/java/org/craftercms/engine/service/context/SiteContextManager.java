@@ -124,12 +124,15 @@ public class SiteContextManager {
 
     public void syncContexts() {
         logger.debug("Syncing the site contexts ...");
+
         Collection<String> siteNames = siteListResolver.getSiteList();
-        // destroy the contexts for sites in the registry that are not needed anymore
-        contextRegistry.keySet()
-            .stream()
-            .filter(siteName -> !siteNames.contains(siteName))
-            .forEach(this::destroyContext);
+
+        // destroy the contexts for sites in the registry that are not present anymore (except fallback sites)
+        contextRegistry.forEach((siteName, siteContext) -> {
+            if (!siteContext.isFallback() && !siteNames.contains(siteName)) {
+                destroyContext(siteName);
+            }
+        });
 
         // create the contexts for new sites
         createContexts(siteNames);
