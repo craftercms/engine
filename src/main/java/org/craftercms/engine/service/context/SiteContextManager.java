@@ -130,12 +130,22 @@ public class SiteContextManager {
         // destroy the contexts for sites in the registry that are not present anymore (except fallback sites)
         contextRegistry.forEach((siteName, siteContext) -> {
             if (!siteContext.isFallback() && !siteNames.contains(siteName)) {
-                destroyContext(siteName);
+                try {
+                    destroyContext(siteName);
+                } catch (Exception e) {
+                    logger.error("Error destroying site context for site '" + siteName + "'", e);
+                }
             }
         });
 
         // create the contexts for new sites
-        createContexts(siteNames);
+        siteNames.forEach(siteName -> {
+            try {
+                getContext(siteName, false);
+            } catch (Exception e) {
+                logger.error("Error creating site context for site '" + siteName + "'", e);
+            }
+        });
     }
 
     /**
