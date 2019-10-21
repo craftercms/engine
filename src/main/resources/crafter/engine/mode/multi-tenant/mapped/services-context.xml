@@ -42,6 +42,10 @@
         <property name="siteContextManager" ref="crafter.siteContextManager"/>
     </bean>
 
+    <bean id="crafter.headerSiteResolver" class="org.craftercms.engine.service.context.HeaderSiteResolver">
+        <property name="headerName" value="${crafter.engine.request.header.siteName}"/>
+    </bean>
+
     <bean id="crafter.cookieSiteResolver" class="org.craftercms.engine.service.context.CookieSiteResolver">
         <property name="paramOrCookieName" value="${crafter.engine.request.param.siteName}"/>
     </bean>
@@ -50,6 +54,7 @@
         <property name="chain">
             <list>
                 <ref bean="crafter.mappingsSiteResolver"/>
+                <ref bean="crafter.headerSiteResolver"/>
                 <ref bean="crafter.cookieSiteResolver"/>
             </list>
         </property>

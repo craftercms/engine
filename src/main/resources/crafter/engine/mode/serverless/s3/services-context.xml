@@ -33,24 +33,6 @@
         </property>
     </bean>
 
-    <!-- Site Resolver -->
-    <bean id="crafter.headerSiteResolver" class="org.craftercms.engine.service.context.HeaderSiteResolver">
-        <property name="headerName" value="${crafter.engine.request.header.siteName}"/>
-    </bean>
-
-    <bean id="crafter.cookieSiteResolver" class="org.craftercms.engine.service.context.CookieSiteResolver">
-        <property name="paramOrCookieName" value="${crafter.engine.request.param.siteName}"/>
-    </bean>
-
-    <bean id="crafter.siteResolver" class="org.craftercms.engine.service.context.SiteResolverChain">
-        <property name="chain">
-            <list>
-                <ref bean="crafter.headerSiteResolver"/>
-                <ref bean="crafter.cookieSiteResolver"/>
-            </list>
-        </property>
-    </bean>
-
     <!-- AWS S3 client builder -->
     <bean id="crafter.s3ClientBuilder" class="org.craftercms.engine.store.s3.util.S3ClientBuilder">
         <property name="region" value="${crafter.engine.s3.region:}"/>
