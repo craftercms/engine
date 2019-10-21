@@ -35,9 +35,10 @@
 
     <!-- AWS S3 client builder -->
     <bean id="crafter.s3ClientBuilder" class="org.craftercms.engine.store.s3.util.S3ClientBuilder">
-        <property name="region" value="${crafter.engine.s3.region:}"/>
-        <property name="accessKey" value="${crafter.engine.s3.accessKey:}"/>
-        <property name="secretKey" value="${crafter.engine.s3.secretKey:}"/>
+        <constructor-arg value="${crafter.engine.s3.endpoint:}"/>
+        <constructor-arg value="${crafter.engine.s3.region:}"/>
+        <constructor-arg value="${crafter.engine.s3.accessKey:}"/>
+        <constructor-arg value="${crafter.engine.s3.secretKey:}"/>
     </bean>
 
     <!-- AWS S3 Site List Resolver -->

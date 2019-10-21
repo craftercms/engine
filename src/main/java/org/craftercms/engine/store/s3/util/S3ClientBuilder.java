@@ -18,10 +18,11 @@
 package org.craftercms.engine.store.s3.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.craftercms.commons.config.profiles.aws.S3Profile;
+import org.craftercms.commons.file.stores.S3Utils;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 
 /**
  * Utility class to build the AWS S3 client instances.
@@ -29,31 +30,16 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
  */
 public class S3ClientBuilder {
 
-    /**
-     * AWS S3 Region
-     */
-    protected String region;
+    protected S3Profile profile;
 
-    /**
-     * AWS Access Key
-     */
-    protected String accessKey;
-
-    /**
-     * AWS Secret Key
-     */
-    protected String secretKey;
-
-    public void setRegion(final String region) {
-        this.region = region;
-    }
-
-    public void setAccessKey(final String accessKey) {
-        this.accessKey = accessKey;
-    }
-
-    public void setSecretKey(final String secretKey) {
-        this.secretKey = secretKey;
+    public S3ClientBuilder(String endpoint, String region, String accessKey, String secretKey) {
+        profile = new S3Profile();
+        profile.setEndpoint(endpoint);
+        profile.setRegion(region);
+        if (StringUtils.isNotEmpty(accessKey) && StringUtils.isNotEmpty(secretKey)) {
+            profile.setCredentialsProvider(
+                new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKey, secretKey)));
+        }
     }
 
     /**
@@ -61,14 +47,7 @@ public class S3ClientBuilder {
      * @return AWS S3 client
      */
     public AmazonS3 getClient() {
-        AmazonS3ClientBuilder builder = AmazonS3ClientBuilder.standard();
-        if(StringUtils.isNotEmpty(region)) {
-            builder.withRegion(region);
-        }
-        if(StringUtils.isNotEmpty(accessKey) && StringUtils.isNotEmpty(secretKey)) {
-            builder.withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKey, secretKey)));
-        }
-        return builder.build();
+        return S3Utils.createClient(profile);
     }
 
 }
