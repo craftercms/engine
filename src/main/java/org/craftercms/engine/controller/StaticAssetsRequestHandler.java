@@ -50,7 +50,11 @@ public class StaticAssetsRequestHandler extends ResourceHttpRequestHandler {
     private boolean disableCaching;
 
     protected void init() {
-        if(disableCaching) {
+        if (disableCaching) {
+            // fully disable cache in the browser
+            setCacheControl(CacheControl.noStore());
+        } else {
+            // make the browser check for changes before using a cached version
             setCacheControl(CacheControl.noCache());
         }
         setRequireSession(false);
@@ -104,12 +108,13 @@ public class StaticAssetsRequestHandler extends ResourceHttpRequestHandler {
             }
 
             @Override
-            public long lastModified() throws IOException {
-                return content.getLastModified();
+            public long lastModified() {
+                // don't provide timestamp to rely on etag comparison instead
+                return -1;
             }
 
             @Override
-            public long contentLength() throws IOException {
+            public long contentLength() {
                 return content.getLength();
             }
 
