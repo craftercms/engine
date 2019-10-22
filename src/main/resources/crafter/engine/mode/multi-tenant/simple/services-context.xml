@@ -37,13 +37,26 @@
     <!--									-->
     <!-- ////////////////////////////////// -->
 
+    <bean id="crafter.headerSiteResolver" class="org.craftercms.engine.service.context.HeaderSiteResolver">
+        <property name="headerName" value="${crafter.engine.request.header.siteName}"/>
+    </bean>
+
+    <bean id="crafter.cookieSiteResolver" class="org.craftercms.engine.service.context.CookieSiteResolver">
+        <property name="paramOrCookieName" value="${crafter.engine.request.param.siteName}"/>
+    </bean>
+
+    <bean id="crafter.siteResolver" class="org.craftercms.engine.service.context.SiteResolverChain">
+        <property name="chain">
+            <list>
+                <ref bean="crafter.headerSiteResolver"/>
+                <ref bean="crafter.cookieSiteResolver"/>
+            </list>
+        </property>
+    </bean>
+
     <bean id="crafter.siteListResolver" class="org.craftercms.engine.service.context.FolderScanningSiteListResolver">
         <property name="siteRootFolderPath" value="${crafter.engine.site.default.rootFolder.path}"/>
         <property name="macroResolver" ref="crafter.macroResolver"/>
-    </bean>
-
-    <bean id="crafter.siteResolver" class="org.craftercms.engine.service.context.CookieSiteResolver">
-        <property name="paramOrCookieName" value="${crafter.engine.request.param.siteName}"/>
     </bean>
 
     <bean id="crafter.siteContextsBootstrap" class="org.craftercms.engine.service.context.SiteContextsBootstrap">
