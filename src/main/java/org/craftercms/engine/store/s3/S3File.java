@@ -19,12 +19,13 @@ package org.craftercms.engine.store.s3;
 
 import org.apache.commons.io.FilenameUtils;
 import org.craftercms.core.store.impl.File;
+import org.craftercms.core.util.cache.impl.AbstractCachingAwareObject;
 
 /**
  * Implementations of {@link File} for AWS S3 items.
  * @author joseross
  */
-public class S3File implements File {
+public class S3File extends AbstractCachingAwareObject implements File {
 
     /**
      * The S3 key.

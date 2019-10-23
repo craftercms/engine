@@ -27,23 +27,24 @@ import org.craftercms.core.exception.AuthenticationException;
 import org.craftercms.core.exception.InvalidContextException;
 import org.craftercms.core.exception.RootFolderNotFoundException;
 import org.craftercms.core.exception.StoreException;
+import org.craftercms.core.service.CachingOptions;
 import org.craftercms.core.service.Content;
 import org.craftercms.core.service.Context;
-import org.craftercms.core.store.impl.AbstractFileBasedContentStoreAdapter;
 import org.craftercms.core.store.impl.File;
+import org.craftercms.core.util.cache.impl.CachingAwareList;
+import org.craftercms.engine.store.AbstractCachedFileBasedContentStoreAdapter;
 import org.craftercms.engine.store.s3.util.S3ClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**
  * Implementation of {@link org.craftercms.core.store.ContentStoreAdapter} to read files from AWS S3.
  * @author joseross
  */
-public class S3ContentStoreAdapter extends AbstractFileBasedContentStoreAdapter {
+public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(S3ContentStoreAdapter.class);
 
@@ -87,10 +88,13 @@ public class S3ContentStoreAdapter extends AbstractFileBasedContentStoreAdapter 
     }
 
     @Override
-    protected Content getContent(Context context, File file) throws InvalidContextException, StoreException {
+    protected Content getContent(Context context, CachingOptions cachingOptions,
+                                 File file) throws InvalidContextException, StoreException {
         S3Context s3Context = (S3Context) context;
         String key = ((S3File) file).getKey();
         AmazonS3 client = clientBuilder.getClient();
+
+        logger.debug("Getting content for key {}", key);
 
         try {
             GetObjectRequest request = new GetObjectRequest(s3Context.getBucket(), key);
@@ -110,7 +114,7 @@ public class S3ContentStoreAdapter extends AbstractFileBasedContentStoreAdapter 
      * {@inheritDoc}
      */
     @Override
-    protected File findFile(final Context context, final String path) throws InvalidContextException, StoreException {
+    protected File doFindFile(Context context, String path) throws InvalidContextException, StoreException {
         if (context.ignoreHiddenFiles() && isHidden(path)) {
             return null;
         }
@@ -158,7 +162,7 @@ public class S3ContentStoreAdapter extends AbstractFileBasedContentStoreAdapter 
      * {@inheritDoc}
      */
     @Override
-    protected List<File> getChildren(final Context context, final File dir)
+    protected List<File> doGetChildren(Context context, File dir)
         throws InvalidContextException, StoreException {
 
         if (!(dir instanceof S3Prefix)) {
@@ -170,7 +174,7 @@ public class S3ContentStoreAdapter extends AbstractFileBasedContentStoreAdapter 
 
         logger.debug("Getting children for key {}", s3Prefix.getPrefix());
 
-        List<File> children = new LinkedList<>();
+        List<File> children = new CachingAwareList<>();
         AmazonS3 client = clientBuilder.getClient();
 
         ListObjectsV2Request request = new ListObjectsV2Request()
