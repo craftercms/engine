@@ -51,6 +51,7 @@ public class SiteContextManager {
     protected EntitlementValidator entitlementValidator;
     protected boolean waitForContextInit;
     protected Executor jobThreadPoolExecutor;
+    protected String defaultSiteName;
 
     public SiteContextManager() {
         siteLockFactory = new SiteLockFactory();
@@ -85,6 +86,11 @@ public class SiteContextManager {
     @Required
     public void setJobThreadPoolExecutor(Executor jobThreadPoolExecutor) {
         this.jobThreadPoolExecutor = jobThreadPoolExecutor;
+    }
+
+    @Required
+    public void setDefaultSiteName(final String defaultSiteName) {
+        this.defaultSiteName = defaultSiteName;
     }
 
     @PreDestroy
@@ -199,7 +205,7 @@ public class SiteContextManager {
     public SiteContext getContext(String siteName, boolean fallback) {
         SiteContext siteContext = contextRegistry.get(siteName);
         if (siteContext == null) {
-            if (!fallback && !validateSiteCreationEntitlement()) {
+            if (!fallback && !siteName.equals(defaultSiteName) && !validateSiteCreationEntitlement()) {
                 return null;
             }
 
