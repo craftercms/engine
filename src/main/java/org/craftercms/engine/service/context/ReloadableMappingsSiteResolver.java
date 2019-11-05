@@ -17,21 +17,16 @@
 
 package org.craftercms.engine.service.context;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import javax.annotation.PostConstruct;
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.core.exception.CrafterException;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.io.Resource;
+
+import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * {@link org.craftercms.engine.service.context.SiteResolver} that resolves the current site name from a mapping
@@ -66,15 +61,9 @@ public class ReloadableMappingsSiteResolver implements SiteListResolver, SiteRes
     }
 
     public synchronized void reloadMappings() throws CrafterException {
-        Collection<String> oldSiteList = getSiteList();
-
         loadMappings();
 
-        Collection<String> newSiteList = getSiteList();
-        Collection<String> sitesToDestroy = CollectionUtils.subtract(oldSiteList, newSiteList);
-
-        siteContextManager.destroyContexts(sitesToDestroy);
-        siteContextManager.createContexts(newSiteList);
+        siteContextManager.syncContexts();
     }
 
     @Override

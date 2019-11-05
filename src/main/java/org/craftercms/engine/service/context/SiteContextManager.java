@@ -29,8 +29,10 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.concurrent.CompletionService;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -103,22 +105,49 @@ public class SiteContextManager {
     }
 
     /**
-     * Creates all contexts (if not already created) for the specified site names
+     * Creates all contexts (if not already created) from the site list resolver
      *
-     * @param siteNames the site names of the contexts to create
+     * @param concurrent if the context creation should be done concurrently
      */
-    public void createContexts(Collection<String> siteNames) {
+    public void createContexts(boolean concurrent) {
+        Collection<String> siteNames = siteListResolver.getSiteList();
+
         logger.info("==================================================");
         logger.info("<CREATING SITE CONTEXTS>");
         logger.info("==================================================");
 
         if (CollectionUtils.isNotEmpty(siteNames)) {
-            for (String siteName : siteNames) {
-                try {
-                    // If the site context doesn't exist (it's new), it will be created
-                    getContext(siteName, false);
-                } catch (Exception e) {
-                    logger.error("Error creating site context for site '" + siteName + "'", e);
+            if (concurrent) {
+                CompletionService<SiteContext> cs = new ExecutorCompletionService<>(jobThreadPoolExecutor);
+                for (String siteName : siteNames) {
+                    cs.submit(() -> {
+                        try {
+                            // If the site context doesn't exist (it's new), it will be created
+                            return getContext(siteName, false);
+                        } catch (Exception e) {
+                            logger.error("Error creating site context for site '" + siteName + "'", e);
+                        }
+
+                        return null;
+                    });
+                }
+
+                for (int i = 0; i < siteNames.size(); i++) {
+                    try {
+                        cs.take();
+                    } catch (InterruptedException e) {
+                        logger.error("Stopping creation of site contexts, thread interrupted");
+                        return;
+                    }
+                }
+            } else {
+                for (String siteName : siteNames) {
+                    try {
+                        // If the site context doesn't exist (it's new), it will be created
+                        getContext(siteName, false);
+                    } catch (Exception e) {
+                        logger.error("Error creating site context for site '" + siteName + "'", e);
+                    }
                 }
             }
         }

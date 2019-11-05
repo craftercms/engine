@@ -20,15 +20,13 @@ import org.craftercms.core.service.CachingOptions;
 import org.craftercms.core.service.Content;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
-import org.craftercms.engine.event.CacheClearStartedEvent;
-import org.craftercms.engine.event.GraphQLBuildStartedEvent;
-import org.craftercms.engine.event.SiteContextCreatedEvent;
-import org.craftercms.engine.event.SiteEvent;
+import org.craftercms.engine.event.*;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.service.context.SiteContextManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 
 import java.io.IOException;
@@ -46,7 +44,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author avasquez
  */
-public class DeploymentEventsWatcher implements ApplicationListener<SiteEvent> {
+public class DeploymentEventsWatcher implements ApplicationListener<ApplicationEvent> {
 
     private static final Logger logger = LoggerFactory.getLogger(DeploymentEventsWatcher.class);
 
@@ -61,10 +59,12 @@ public class DeploymentEventsWatcher implements ApplicationListener<SiteEvent> {
     private String deploymentEventsFileUrl;
     private SiteContextManager siteContextManager;
 
+    private volatile boolean startupCompleted;
     private Map<String, SiteEvent> latestEvents;
 
     public DeploymentEventsWatcher() {
         this.deploymentEventsFileUrl = DEFAULT_DEPLOYMENT_EVENTS_FILE_URL;
+        this.startupCompleted = false;
         this.latestEvents = new ConcurrentHashMap<>();
     }
 
@@ -78,12 +78,14 @@ public class DeploymentEventsWatcher implements ApplicationListener<SiteEvent> {
     }
 
     public void checkForEvents() {
-        logger.debug("Deployment events watcher running...");
+        if (startupCompleted) {
+            logger.debug("Deployment events watcher running...");
 
-        siteContextManager.syncContexts();
+            siteContextManager.syncContexts();
 
-        for (SiteContext siteContext : siteContextManager.listContexts()) {
-            checkForSiteEvents(siteContext);
+            for (SiteContext siteContext : siteContextManager.listContexts()) {
+                checkForSiteEvents(siteContext);
+            }
         }
     }
 
@@ -140,14 +142,19 @@ public class DeploymentEventsWatcher implements ApplicationListener<SiteEvent> {
     }
 
     @Override
-    public void onApplicationEvent(SiteEvent event) {
-        String siteName = event.getSiteContext().getSiteName();
-        Class<? extends SiteEvent> eventClass = event.getClass();
+    public void onApplicationEvent(ApplicationEvent event) {
+        if (event instanceof SiteContextInitializedEvent) {
+            startupCompleted = true;
+        } else if (event instanceof SiteEvent) {
+            SiteEvent siteEvent = (SiteEvent) event;
+            String siteName = siteEvent.getSiteContext().getSiteName();
+            Class<? extends SiteEvent> eventClass = siteEvent.getClass();
 
-        if (eventClass.equals(SiteContextCreatedEvent.class) ||
-            eventClass.equals(CacheClearStartedEvent.class) ||
-            eventClass.equals(GraphQLBuildStartedEvent.class)) {
-            latestEvents.put(String.format(LATEST_EVENT_KEY_FORMAT, siteName, eventClass), event);
+            if (eventClass.equals(SiteContextCreatedEvent.class) ||
+                eventClass.equals(CacheClearStartedEvent.class) ||
+                eventClass.equals(GraphQLBuildStartedEvent.class)) {
+                latestEvents.put(String.format(LATEST_EVENT_KEY_FORMAT, siteName, eventClass), siteEvent);
+            }
         }
     }
 
