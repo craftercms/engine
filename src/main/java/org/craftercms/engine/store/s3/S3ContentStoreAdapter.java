@@ -36,6 +36,8 @@ import org.craftercms.engine.store.AbstractCachedFileBasedContentStoreAdapter;
 import org.craftercms.engine.store.s3.util.S3ClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 
 import java.util.List;
@@ -44,17 +46,27 @@ import java.util.List;
  * Implementation of {@link org.craftercms.core.store.ContentStoreAdapter} to read files from AWS S3.
  * @author joseross
  */
-public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAdapter {
+public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAdapter implements InitializingBean, DisposableBean {
 
     private static final Logger logger = LoggerFactory.getLogger(S3ContentStoreAdapter.class);
 
     public static final String DELIMITER = "/";
 
     protected S3ClientBuilder clientBuilder;
+    protected AmazonS3 client;
 
     @Required
     public void setClientBuilder(final S3ClientBuilder clientBuilder) {
         this.clientBuilder = clientBuilder;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        client = clientBuilder.getClient();
+    }
+
+    public void destroy() {
+        client.shutdown();
     }
 
     protected boolean isResultEmpty(ListObjectsV2Result result) {
@@ -77,7 +89,7 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
                                             .withBucketName(uri.getBucket())
                                             .withPrefix(uri.getKey())
                                             .withDelimiter(DELIMITER);
-        ListObjectsV2Result result = clientBuilder.getClient().listObjectsV2(request);
+        ListObjectsV2Result result = client.listObjectsV2(request);
 
         if(isResultEmpty(result)) {
             throw new RootFolderNotFoundException("Root folder " + rootFolderPath + " not found");
@@ -92,7 +104,6 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
                                  File file) throws InvalidContextException, StoreException {
         S3Context s3Context = (S3Context) context;
         String key = ((S3File) file).getKey();
-        AmazonS3 client = clientBuilder.getClient();
 
         logger.debug("Getting content for key {}", key);
 
@@ -121,7 +132,6 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
 
         S3Context s3Context = (S3Context) context;
         String key = StringUtils.appendIfMissing(s3Context.getKey(), path);
-        AmazonS3 client = clientBuilder.getClient();
 
         logger.debug("Getting file for key {}", key);
 
@@ -175,8 +185,6 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
         logger.debug("Getting children for key {}", s3Prefix.getPrefix());
 
         List<File> children = new CachingAwareList<>();
-        AmazonS3 client = clientBuilder.getClient();
-
         ListObjectsV2Request request = new ListObjectsV2Request()
                                             .withBucketName(s3Context.getBucket())
                                             .withPrefix(s3Prefix.getPrefix())
@@ -213,7 +221,7 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
                                             .withBucketName(s3Context.getBucket())
                                             .withPrefix(s3Context.getKey())
                                             .withDelimiter(DELIMITER);
-        ListObjectsV2Result result = clientBuilder.getClient().listObjectsV2(request);
+        ListObjectsV2Result result = client.listObjectsV2(request);
 
         return !isResultEmpty(result);
     }
