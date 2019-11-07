@@ -461,7 +461,7 @@
     <bean id="crafter.siteContextManager" class="org.craftercms.engine.service.context.SiteContextManager">
         <property name="fallbackContextFactory" ref="crafter.fallbackSiteContextFactory"/>
         <property name="contextFactory" ref="crafter.siteContextFactory"/>
-        <property name="siteListResolver" ref="crafter.siteListResolver"/>
+        <property name="siteListResolver" ref="crafter.siteResolver"/>
         <property name="entitlementValidator" ref="crafter.entitlementValidator"/>
         <property name="waitForContextInit" value="${crafter.engine.site.context.waitForInit}"/>
         <property name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
@@ -470,8 +470,8 @@
 
     <bean id="crafter.siteContextsBootstrap" class="org.craftercms.engine.service.context.SiteContextsBootstrap">
         <property name="createContextsOnStartup" value="${crafter.engine.site.context.createOnStartup}"/>
+        <property name="createConcurrently" value="${crafter.engine.site.cache.warmUp.enabled}"/>
         <property name="siteContextManager" ref="crafter.siteContextManager"/>
-        <property name="siteListResolver" ref="crafter.siteResolver"/>
     </bean>
 
     <bean id="crafter.siteContextFactory" class="org.craftercms.engine.service.context.SiteContextFactory">

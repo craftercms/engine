@@ -40,19 +40,23 @@
     <!--									-->
     <!-- ////////////////////////////////// -->
 
+    <bean id="crafter.siteResolver" class="org.craftercms.engine.service.context.CookieSiteResolver">
+        <property name="paramOrCookieName" value="${crafter.engine.request.param.siteName}"/>
+    </bean>
+
     <bean id="crafter.siteListResolver" class="org.craftercms.engine.service.context.FolderScanningSiteListResolver">
         <property name="siteRootFolderPath" value="${crafter.engine.site.default.rootFolder.path}"/>
         <property name="macroResolver" ref="crafter.macroResolver"/>
     </bean>
 
-    <bean id="crafter.siteResolver" class="org.craftercms.engine.service.context.CookieSiteResolver">
-        <property name="paramOrCookieName" value="${crafter.engine.request.param.siteName}"/>
-    </bean>
-
-    <bean id="crafter.siteContextsBootstrap" class="org.craftercms.engine.service.context.SiteContextsBootstrap">
-        <property name="createContextsOnStartup" value="${crafter.engine.site.context.createOnStartup}"/>
-        <property name="siteContextManager" ref="crafter.siteContextManager"/>
+    <bean id="crafter.siteContextManager" class="org.craftercms.engine.service.context.SiteContextManager">
+        <property name="fallbackContextFactory" ref="crafter.fallbackSiteContextFactory"/>
+        <property name="contextFactory" ref="crafter.siteContextFactory"/>
         <property name="siteListResolver" ref="crafter.siteListResolver"/>
+        <property name="entitlementValidator" ref="crafter.entitlementValidator"/>
+        <property name="waitForContextInit" value="${crafter.engine.site.context.waitForInit}"/>
+        <property name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
+        <property name="defaultSiteName" value="${crafter.engine.site.default.name}"/>
     </bean>
 
     <bean id="crafter.siteContextFactory" class="org.craftercms.engine.service.context.SiteContextFactory">

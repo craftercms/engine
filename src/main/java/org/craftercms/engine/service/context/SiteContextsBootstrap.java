@@ -29,19 +29,22 @@ import org.springframework.context.event.ContextRefreshedEvent;
 public class SiteContextsBootstrap implements ApplicationListener<ContextRefreshedEvent> {
 
     protected boolean createContextsOnStartup;
-    protected SiteListResolver siteListResolver;
+    protected boolean createConcurrently;
     protected SiteContextManager siteContextManager;
 
     protected boolean triggered;
+
+    public SiteContextsBootstrap() {
+        createConcurrently = false;
+    }
 
     @Required
     public void setCreateContextsOnStartup(boolean createContextsOnStartup) {
         this.createContextsOnStartup = createContextsOnStartup;
     }
 
-    @Required
-    public void setSiteListResolver(SiteListResolver siteListResolver) {
-        this.siteListResolver = siteListResolver;
+    public void setCreateConcurrently(boolean createConcurrently) {
+        this.createConcurrently = createConcurrently;
     }
 
     @Required
@@ -54,7 +57,7 @@ public class SiteContextsBootstrap implements ApplicationListener<ContextRefresh
         if (!triggered && createContextsOnStartup) {
             triggered = true;
 
-            siteContextManager.createContexts(siteListResolver.getSiteList());
+            siteContextManager.createContexts(createConcurrently);
         }
     }
 
