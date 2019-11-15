@@ -100,10 +100,46 @@
     <!--									-->
     <!-- ////////////////////////////////// -->
 
-    <bean id="crafter.currentAuthenticationResolvingProcessor"
-          class="org.craftercms.engine.security.PreviewCurrentAuthenticationResolvingProcessor">
-        <property name="authenticationManager" ref="crafter.authenticationManager"/>
+    <bean id="crafter.targetingAuthenticationProvider"
+          class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
+        <property name="preAuthenticatedUserDetailsService" ref="crafter.preAuthenticatedUserDetailsService"/>
     </bean>
+
+    <bean id="crafter.targetingAuthenticationFilter"
+          class="org.craftercms.engine.util.spring.security.targeting.TargetingPreAuthenticatedFilter">
+        <property name="invalidateSessionOnPrincipalChange" value="false"/>
+        <property name="authenticationManager" ref="crafter.authenticationManager"/>
+        <property name="authenticationDetailsSource" ref="crafter.defaultDetailsSource"/>
+    </bean>
+
+    <util:list id="crafter.securityFilters">
+        <ref bean="crafter.securityContextFilter"/>
+        <ref bean="crafter.logoutFilter"/>
+        <ref bean="crafter.standaloneHeadersAuthenticationFilter"/>
+        <ref bean="crafter.profileHeadersAuthenticationFilter"/>
+        <ref bean="crafter.formLoginFilter"/>
+
+        <!-- Include targeting authentication filter -->
+        <ref bean="crafter.targetingAuthenticationFilter"/>
+
+        <ref bean="crafter.rememberMeFilter"/>
+        <ref bean="crafter.requestCacheFilter"/>
+        <ref bean="crafter.servletApiFilter"/>
+        <ref bean="crafter.sessionManagementFilter"/>
+        <ref bean="crafter.exceptionTranslationFilter"/>
+        <ref bean="crafter.filterSecurityInterceptor"/>
+    </util:list>
+
+    <util:list id="crafter.authenticationProviders">
+        <!-- Include targeting authentication provider -->
+        <ref bean="crafter.targetingAuthenticationProvider"/>
+
+        <ref bean="crafter.profilePreAuthenticationProvider"/>
+        <ref bean="crafter.standaloneHeadersAuthenticationProvider"/>
+        <ref bean="crafter.profileAuthenticationProvider"/>
+        <ref bean="crafter.rememberMeAuthenticationProvider"/>
+
+    </util:list>
 
     <bean id="crafter.tenantsResolver" class="org.craftercms.engine.util.tenant.SiteNameTenantResolver"/>
 

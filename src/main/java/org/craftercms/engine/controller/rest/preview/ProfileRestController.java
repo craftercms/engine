@@ -16,19 +16,20 @@
  */
 package org.craftercms.engine.controller.rest.preview;
 
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang3.StringUtils;
+import org.bson.types.ObjectId;
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 /**
  * REST controller for integration with Crafter Profile.
@@ -65,8 +66,14 @@ public class ProfileRestController {
 
         while (paramNamesEnum.hasMoreElements()) {
             String paramName = paramNamesEnum.nextElement();
-            profile.put(paramName, request.getParameter(paramName).trim());
+            String paramValue = request.getParameter(paramName);
+            if (isNotEmpty(paramValue)) {
+                profile.put(paramName, paramValue.trim());
+            }
         }
+
+        // change the id so the authentication object is updated
+        profile.put("id", new ObjectId().toHexString());
 
         session.setAttribute(PROFILE_SESSION_ATTRIBUTE, profile);
 

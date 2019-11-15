@@ -15,20 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.craftercms.engine.security;
+package org.craftercms.engine.util.spring.security;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.engine.test.utils.ConfigAwareTestBase;
-import org.craftercms.security.exception.AccessDeniedException;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.access.AccessDeniedException;
 
-import static org.craftercms.engine.security.ConfigAwareAccessDeniedHandler.ACCESS_DENIED_ERROR_PAGE_URL_KEY;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Unit tests for {@link org.craftercms.engine.security.ConfigAwareAccessDeniedHandler}.
+ * Unit tests for {@link ConfigAwareAccessDeniedHandler}.
  *
  * @author avasquez
  */
@@ -41,15 +43,16 @@ public class ConfigAwareAccessDeniedHandlerTest extends ConfigAwareTestBase {
     public void setUp() throws Exception {
         super.setUp();
 
-        handler = new ConfigAwareAccessDeniedHandler();
-        handler.setErrorPageUrl("/access-denied");
+        handler = new ConfigAwareAccessDeniedHandler("/access-denied");
     }
 
     @Test
     public void testProcessRequest() throws Exception {
-        handler.handle(RequestContext.getCurrent(), new AccessDeniedException(""));
+        HttpServletRequest request = RequestContext.getCurrent().getRequest();
+        HttpServletResponse response = RequestContext.getCurrent().getResponse();
+        handler.handle(request, response, new AccessDeniedException(""));
 
-        assertEquals(config.getString(ACCESS_DENIED_ERROR_PAGE_URL_KEY),
+        assertEquals(config.getString(ConfigAwareAccessDeniedHandler.ACCESS_DENIED_ERROR_PAGE_URL_KEY),
                      ((MockHttpServletResponse)RequestContext.getCurrent().getResponse()).getForwardedUrl());
     }
     
