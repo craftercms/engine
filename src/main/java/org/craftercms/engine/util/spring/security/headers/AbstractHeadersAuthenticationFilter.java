@@ -89,12 +89,22 @@ public abstract class AbstractHeadersAuthenticationFilter extends ConfigAwarePre
         this.defaultTokenValue = defaultTokenValue;
     }
 
+    protected abstract Object doGetPreAuthenticatedPrincipal(final HttpServletRequest request);
+
     @Override
     protected boolean principalChanged(final HttpServletRequest request, final Authentication currentAuthentication) {
         if (hasValidToken(request)) {
             return super.principalChanged(request, currentAuthentication);
         }
         return false;
+    }
+
+    @Override
+    protected Object getPreAuthenticatedPrincipal(final HttpServletRequest request) {
+        if (hasValidToken(request)) {
+            return doGetPreAuthenticatedPrincipal(request);
+        }
+        return null;
     }
 
     protected String getTokenExpectedValue() {

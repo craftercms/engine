@@ -62,7 +62,7 @@ public class StandaloneHeadersAuthenticationFilter extends AbstractHeadersAuthen
     }
 
     @Override
-    protected Object getPreAuthenticatedPrincipal(final HttpServletRequest request) {
+    protected Object doGetPreAuthenticatedPrincipal(final HttpServletRequest request) {
         String username = request.getHeader(usernameHeaderName);
 
         if (isNotEmpty(username)) {

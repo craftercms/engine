@@ -66,7 +66,7 @@ public class ProfileHeadersAuthenticationFilter extends AbstractHeadersAuthentic
     }
 
     @Override
-    protected Object getPreAuthenticatedPrincipal(final HttpServletRequest request) {
+    protected Object doGetPreAuthenticatedPrincipal(final HttpServletRequest request) {
         String username = request.getHeader(usernameHeaderName);
         String email = request.getHeader(emailHeaderName);
 
