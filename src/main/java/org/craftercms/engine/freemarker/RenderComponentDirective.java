@@ -170,8 +170,9 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
         } else if (componentElement != null) {
             logger.debug("Using an embedded site item");
             if (parentItem == null) {
-                throw new IllegalStateException("No parent found for component " +
-                    includeElementParent.getUniquePath());
+                logger.debug("Using default parent component");
+                parentItem =
+                    unwrap(KEY_CONTENT_MODEL, env.getVariable(CrafterPageView.KEY_CONTENT_MODEL), SiteItem.class, env);
             }
             return siteItemService.getSiteItem(parentItem, componentElement);
         } else {
