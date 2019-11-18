@@ -9,16 +9,52 @@
   <@toolSupport />
 </#macro>
 
-<#macro componentAttr path="" ice=false iceGroup="">
-  <#if modePreview>data-studio-component-path="${path}" data-studio-component="${path}"
-    <#if ice==true>
-      <@iceAttrLegacy path=path iceGroup=iceGroup/>
-    </#if>
+<#-- Main macro for component attributes -->
+<#macro componentAttr path="" ice=false iceGroup="" component={}>
+  <#if !modePreview>
+    <#return>
+  </#if>
+  <#if component?has_content>
+    <@componentAttrComponent ice=ice iceGroup=iceGroup component=component />
+  <#else>
+    <@componentAttrLegacy ice=ice iceGroup=iceGroup path=path />
   </#if>
 </#macro>
 
-<#macro componentContainerAttr target objectId="">
-  <#if modePreview> data-studio-components-target="${target}" data-studio-components-objectId="${objectId}"</#if>
+<#-- Macro to handle component attributes for a SiteItem -->
+<#macro componentAttrComponent ice=false iceGroup="" component={}>
+  data-studio-component="${component.storeUrl}"
+  data-studio-component-path="${component.storeUrl}"
+  <#if ice>
+    <@iceAttrComponent component=component iceGroup=iceGroup/>
+  </#if>
+  <#if !component.getDom()?has_content >
+    data-studio-embedded-item-id="${component.objectId}"
+  </#if>
+</#macro>
+
+<#-- Macro to handle component attributes for a path -->
+<#macro componentAttrLegacy path="" ice=false iceGroup="">
+  data-studio-component="${path}"
+  data-studio-component-path="${path}"
+  <#if ice>
+    <@iceAttrLegacy path=path iceGroup=iceGroup/>
+  </#if>
+</#macro>
+
+<#macro componentContainerAttr target objectId="" component={}>
+  <#if !modePreview>
+    <#return>
+  </#if>
+  data-studio-components-target="${target}"
+  <#if component?has_content>
+    <#-- Use the component object -->
+    data-studio-components-objectId="${component.objectId}"
+    data-studio-zone-content-type="${component['content-type']}"
+  <#else>
+    <#-- Use objectId for backwards compatibility -->
+    data-studio-components-objectId="${objectId}"
+  </#if>
 </#macro>
 
 <#-- Main macro for ICE attributes -->
