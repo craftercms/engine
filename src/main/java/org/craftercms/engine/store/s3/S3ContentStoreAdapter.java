@@ -144,7 +144,7 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
                                                     .withDelimiter(DELIMITER);
                 ListObjectsV2Result result = client.listObjectsV2(request);
                 if (!isResultEmpty(result)) {
-                    return new S3Prefix(StringUtils.appendIfMissing(key, DELIMITER));
+                    return new S3Prefix(key);
                 }
             } catch (AmazonS3Exception e) {
                 if(e.getStatusCode() == HttpStatus.SC_NOT_FOUND) {
@@ -198,7 +198,7 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
             } else {
                 result.getCommonPrefixes().stream()
                       .filter(p -> !context.ignoreHiddenFiles() || !isHidden(p))
-                      .forEach(p -> children.add(new S3Prefix(StringUtils.appendIfMissing(p, DELIMITER))));
+                      .forEach(p -> children.add(new S3Prefix(p)));
 
                 result.getObjectSummaries().stream()
                       .filter(s-> !context.ignoreHiddenFiles() || !isHidden(s.getKey()))
