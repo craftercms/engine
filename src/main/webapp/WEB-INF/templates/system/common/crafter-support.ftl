@@ -1,7 +1,11 @@
-<#macro renderComponents componentList>
+<#macro renderComponents componentList parent={}>
   <#if componentList?? && componentList.item??>
     <#list componentList.item as module>
-      <@renderComponent component=module />
+      <#if parent?has_content>
+        <@renderComponent component=module parent=parent />
+      <#else>
+        <@renderComponent component=module />
+      </#if>
     </#list>
   </#if>
 </#macro>
