@@ -9,39 +9,27 @@
   <@toolSupport />
 </#macro>
 
-<#-- Main macro for component attributes -->
+<#-- Macro for component attributes -->
 <#macro componentAttr path="" ice=false iceGroup="" component={}>
   <#if !modePreview>
     <#return>
   </#if>
-  <#if component?has_content>
-    <@componentAttrComponent ice=ice iceGroup=iceGroup component=component />
+  <#if !component?has_content>
+    <#assign item = siteItemService.getSiteItem(path)/>
   <#else>
-    <@componentAttrLegacy ice=ice iceGroup=iceGroup path=path />
+    <#assign item = component/>
   </#if>
-</#macro>
-
-<#-- Macro to handle component attributes for a SiteItem -->
-<#macro componentAttrComponent ice=false iceGroup="" component={}>
-  data-studio-component="${component.storeUrl}"
-  data-studio-component-path="${component.storeUrl}"
+  data-studio-component="${item.storeUrl}"
+  data-studio-component-path="${item.storeUrl}"
   <#if ice>
-    <@iceAttrComponent component=component iceGroup=iceGroup/>
+    <@iceAttr component=item iceGroup=iceGroup/>
   </#if>
-  <#if !component.getDom()?has_content >
-    data-studio-embedded-item-id="${component.objectId}"
-  </#if>
-</#macro>
-
-<#-- Macro to handle component attributes for a path -->
-<#macro componentAttrLegacy path="" ice=false iceGroup="">
-  data-studio-component="${path}"
-  data-studio-component-path="${path}"
-  <#if ice>
-    <@iceAttrLegacy path=path iceGroup=iceGroup/>
+  <#if !ice && !item.getDom()?has_content >
+    data-studio-embedded-item-id="${item.objectId}"
   </#if>
 </#macro>
 
+<#-- Macro for drop zone attributes -->
 <#macro componentContainerAttr target objectId="" component={}>
   <#if !modePreview>
     <#return>
@@ -54,50 +42,36 @@
   <#else>
     <#-- Use objectId for backwards compatibility -->
     data-studio-components-objectId="${objectId}"
+    data-studio-zone-content-type="${contentModel['content-type']}"
   </#if>
 </#macro>
 
-<#-- Main macro for ICE attributes -->
+<#-- Macro for ICE attributes -->
 <#macro iceAttr iceGroup="" path="" label="" component={} >
   <#if !modePreview>
     <#return>
   </#if>
-  <#if component?has_content >
-    <@iceAttrComponent iceGroup=iceGroup label=label component=component />
+  <#if !(component?has_content)>
+    <#if path?has_content>
+        <#assign item = siteItemService.getSiteItem(path)/>
+    <#else>
+        <#assign item = contentModel/>
+    </#if>
   <#else>
-    <@iceAttrLegacy iceGroup=iceGroup label=label path=path />
+    <#assign item = component/>
   </#if>
-</#macro>
-
-<#-- Macro to handle ICE attributes for a SiteItem -->
-<#macro iceAttrComponent iceGroup="" label="" component={} >
   <#-- Figure out the label to use -->
   <#if label?has_content >
     <#assign actualLabel = label />
   <#elseif iceGroup?has_content >
     <#assign actualLabel = iceGroup />
   <#else>
-    <#assign actualLabel = component["internal-name"] />
+    <#assign actualLabel = item["internal-name"]!"" />
   </#if>
-  data-studio-ice="${iceGroup}" data-studio-ice-label="${actualLabel}" data-studio-ice-path="${component.storeUrl}"
+  data-studio-ice="${iceGroup}" data-studio-ice-label="${actualLabel}" data-studio-ice-path="${item.storeUrl}"
   <#-- If the given component has a parent -->
-  <#if !component.getDom()?has_content >
-    data-studio-embedded-item-id="${component.objectId}"
-  </#if>
-</#macro>
-
-<#-- Macro to handle ICE attributes for a path -->
-<#macro iceAttrLegacy iceGroup="" label="" path="" >
-  <#if label?has_content >
-    <#assign actualLabel = label />
-  <#elseif iceGroup?has_content >
-    <#assign actualLabel = iceGroup />
-  <#else>
-    <#assign actualLabel = path />
-  </#if>
-  data-studio-ice="${iceGroup}" data-studio-ice-label="${actualLabel}"
-  <#if path?has_content >
-    data-studio-ice-path="${path}"
+  <#if !item.getDom()?has_content >
+    data-studio-embedded-item-id="${item.objectId}"
   </#if>
 </#macro>
 
