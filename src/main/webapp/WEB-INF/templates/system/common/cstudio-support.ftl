@@ -24,7 +24,7 @@
   <#if ice>
     <@iceAttr component=item iceGroup=iceGroup/>
   </#if>
-  <#if !ice && !item.getDom()?has_content >
+  <#if !ice && !item.dom?has_content >
     data-studio-embedded-item-id="${item.objectId}"
   </#if>
 </#macro>
@@ -70,7 +70,7 @@
   </#if>
   data-studio-ice="${iceGroup}" data-studio-ice-label="${actualLabel}" data-studio-ice-path="${item.storeUrl}"
   <#-- If the given component has a parent -->
-  <#if !item.getDom()?has_content >
+  <#if !item.dom?has_content >
     data-studio-embedded-item-id="${item.objectId}"
   </#if>
 </#macro>
