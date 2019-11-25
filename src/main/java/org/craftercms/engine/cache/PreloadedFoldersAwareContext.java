@@ -16,6 +16,7 @@
  */
 package org.craftercms.engine.cache;
 
+import org.craftercms.core.service.CacheService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.store.ContentStoreAdapter;
 import org.craftercms.engine.util.store.decorators.DecoratedStoreAdapterContext;
@@ -32,30 +33,33 @@ import java.util.List;
  */
 class PreloadedFoldersAwareContext extends DecoratedStoreAdapterContext {
 
-    protected List<PreloadedFolder> preloadedFolders;
+    public static final String PRELOADED_FOLDERS_CACHE_KEY = "cache.warmUp.preloadedFolders";
 
-    public PreloadedFoldersAwareContext(Context actualContext, ContentStoreAdapter decoratedStoreAdapter) {
-        super(actualContext, decoratedStoreAdapter);
-        this.preloadedFolders = Collections.emptyList();
-    }
+    protected CacheService cacheService;
 
     public PreloadedFoldersAwareContext(Context actualContext, ContentStoreAdapter decoratedStoreAdapter,
-                                        List<PreloadedFolder> preloadedFolders) {
+                                        CacheService cacheService) {
         super(actualContext, decoratedStoreAdapter);
-        this.preloadedFolders = preloadedFolders;
+        this.cacheService = cacheService;
     }
 
+    @SuppressWarnings("unchecked")
     public List<PreloadedFolder> getPreloadedFolders() {
-        return preloadedFolders;
+        List<PreloadedFolder> folders = (List<PreloadedFolder>) cacheService.get(this, PRELOADED_FOLDERS_CACHE_KEY);
+        if (folders != null) {
+            return folders;
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     public void setPreloadedFolders(List<PreloadedFolder> preloadedFolders) {
-        this.preloadedFolders = preloadedFolders;
+        cacheService.put(this, PRELOADED_FOLDERS_CACHE_KEY, preloadedFolders);
     }
 
     @Override
     public Context clone() {
-        return new PreloadedFoldersAwareContext(actualContext.clone(), decoratedStoreAdapter, preloadedFolders);
+        return new PreloadedFoldersAwareContext(actualContext.clone(), decoratedStoreAdapter, cacheService);
     }
 
 }
