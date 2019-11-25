@@ -17,10 +17,7 @@
 package org.craftercms.engine.cache;
 
 import org.craftercms.core.exception.*;
-import org.craftercms.core.service.CachingOptions;
-import org.craftercms.core.service.Content;
-import org.craftercms.core.service.Context;
-import org.craftercms.core.service.Item;
+import org.craftercms.core.service.*;
 import org.craftercms.core.store.ContentStoreAdapter;
 import org.craftercms.core.util.ContentStoreUtils;
 import org.craftercms.engine.util.store.decorators.ContentStoreAdapterDecorator;
@@ -44,6 +41,7 @@ public class CacheWarmingAwareContentStoreAdapterDecorator implements ContentSto
 
     protected boolean warmUpEnabled;
     protected ContentStoreAdapter actualStoreAdapter;
+    protected CacheService cacheService;
 
     @Required
     public void setWarmUpEnabled(boolean warmUpEnabled) {
@@ -55,6 +53,11 @@ public class CacheWarmingAwareContentStoreAdapterDecorator implements ContentSto
         this.actualStoreAdapter = actualStoreAdapter;
     }
 
+    @Required
+    public void setCacheService(CacheService cacheService) {
+        this.cacheService = cacheService;
+    }
+
     @Override
     public Context createContext(String id, String rootFolderPath, boolean mergingOn, boolean cacheOn,
                                  int maxAllowedItemsInCache, boolean ignoreHiddenFiles)
@@ -62,7 +65,7 @@ public class CacheWarmingAwareContentStoreAdapterDecorator implements ContentSto
         Context context = actualStoreAdapter.createContext(id, rootFolderPath, mergingOn, cacheOn,
                                                            maxAllowedItemsInCache, ignoreHiddenFiles);
         if (warmUpEnabled) {
-            return new PreloadedFoldersAwareContext(context, actualStoreAdapter);
+            return new PreloadedFoldersAwareContext(context, actualStoreAdapter, cacheService);
         } else {
             return context;
         }
