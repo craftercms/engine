@@ -63,7 +63,9 @@
         <property name="errorViewNamePrefix" value="${crafter.engine.error.viewName.prefix}"/>
     </bean>
 
-    <bean id="crafter.monitoringRenderController" class="org.craftercms.engine.controller.rest.MonitoringController"/>
+    <bean id="crafter.monitoringRenderController" class="org.craftercms.engine.controller.rest.MonitoringController">
+        <property name="configuredToken" value="${crafter.engine.monitoring.authorizationToken}" />
+    </bean>
 
     <bean id="crafter.siteContextRestController" class="org.craftercms.engine.controller.rest.SiteContextRestController">
         <property name="contextManager" ref="crafter.siteContextManager"/>
