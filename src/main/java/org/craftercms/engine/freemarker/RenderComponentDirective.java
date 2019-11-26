@@ -65,6 +65,7 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
     public static final String KEY_MODEL = "model";
     public static final String KEY_CONTENT_MODEL = "contentModel";
 
+    public static final String COMPONENT_PARENT_PARAM_NAME = "parent";
     public static final String COMPONENT_PARAM_NAME = "component";
     public static final String COMPONENT_PATH_PARAM_NAME = "componentPath";
     public static final String ADDITIONAL_MODEL_PARAM_NAME = "additionalModel";
@@ -76,6 +77,7 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
     protected String templateNamePrefix;
     protected String templateNameSuffix;
     protected String includeElementName;
+    protected String componentElementName;
     protected SiteItemScriptResolver scriptResolver;
 
     @Required
@@ -114,12 +116,18 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
     }
 
     @Required
+    public void setComponentElementName(final String componentElementName) {
+        this.componentElementName = componentElementName;
+    }
+
+    @Required
     public void setScriptResolver(SiteItemScriptResolver scriptResolver) {
         this.scriptResolver = scriptResolver;
     }
 
     @SuppressWarnings("unchecked")
     public void execute(Environment env, Map params, TemplateModel[] loopVars, TemplateDirectiveBody body) throws TemplateException {
+        TemplateModel componentParentParam = (TemplateModel) params.get(COMPONENT_PARENT_PARAM_NAME);
         TemplateModel componentParam = (TemplateModel) params.get(COMPONENT_PARAM_NAME);
         TemplateModel componentPathParam = (TemplateModel) params.get(COMPONENT_PATH_PARAM_NAME);
         TemplateModel additionalModelParam = (TemplateModel) params.get(ADDITIONAL_MODEL_PARAM_NAME);
@@ -130,7 +138,7 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
             throw new TemplateException("No '" + COMPONENT_PARAM_NAME + "' or '" + COMPONENT_PATH_PARAM_NAME +
                                         "' param specified", env);
         } else if (componentParam != null) {
-            component = getComponentFromNode(componentParam, env);
+            component = getComponentFromNode(componentParentParam, componentParam, env);
         } else {
             component = getComponentFromPath(componentPathParam, env);
         }
@@ -147,17 +155,29 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
         processComponentTemplate(template, model, output, env);
     }
 
-    protected SiteItem getComponentFromNode(TemplateModel componentParam, Environment env) throws TemplateException {
+    protected SiteItem getComponentFromNode(TemplateModel parentParam, TemplateModel componentParam, Environment env)
+        throws TemplateException {
+        SiteItem parentItem = unwrap(COMPONENT_PARENT_PARAM_NAME, parentParam, SiteItem.class, env);
         Element includeElementParent = unwrap(COMPONENT_PARAM_NAME, componentParam, Element.class, env);
         Element includeElement = includeElementParent.element(includeElementName);
+        Element componentElement = includeElementParent.element(componentElementName);
 
         if (includeElement != null) {
+            logger.debug("Using the include element to load the site item");
             String componentPath = includeElement.getTextTrim();
 
             return getComponent(componentPath, env);
+        } else if (componentElement != null) {
+            logger.debug("Using an embedded site item");
+            if (parentItem == null) {
+                logger.debug("Using default parent component");
+                parentItem =
+                    unwrap(KEY_CONTENT_MODEL, env.getVariable(CrafterPageView.KEY_CONTENT_MODEL), SiteItem.class, env);
+            }
+            return siteItemService.getSiteItem(parentItem, componentElement);
         } else {
-            throw new IllegalStateException("No '" + includeElementName + "' element found under component " +
-                                            includeElementParent.getUniquePath());
+            throw new IllegalStateException("No '" + includeElementName + "' or '" + componentElementName + "' element "
+                + "found under component "+ includeElementParent.getUniquePath());
         }
     }
 
@@ -275,7 +295,7 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
     }
 
     protected String getComponentTemplateName(SiteItem component, Environment env) throws TemplateException {
-        String componentTemplateName = component.getItem().queryDescriptorValue(templateXPathQuery);
+        String componentTemplateName = component.queryValue(templateXPathQuery);
         if (StringUtils.isNotEmpty(componentTemplateName)) {
             return templateNamePrefix + componentTemplateName + templateNameSuffix;
         } else {

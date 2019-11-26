@@ -17,15 +17,15 @@
 
 package org.craftercms.engine.scripting.impl;
 
-import java.util.List;
-
 import org.craftercms.core.util.cache.CacheTemplate;
-import org.craftercms.engine.event.SiteContextCreatedEvent;
+import org.craftercms.engine.event.SiteContextInitializedEvent;
 import org.craftercms.engine.scripting.ScriptUrlTemplateScanner;
 import org.craftercms.engine.service.context.SiteContext;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationListener;
 import org.springframework.web.util.UriTemplate;
+
+import java.util.List;
 
 /**
  * {@link ScriptUrlTemplateScanner} decorator that caches the result of an actual scan, and also pre-caches
@@ -34,10 +34,11 @@ import org.springframework.web.util.UriTemplate;
  * @author avasquez
  */
 public class CachedScriptUrlTemplateScanner implements ScriptUrlTemplateScanner,
-    ApplicationListener<SiteContextCreatedEvent> {
+                                                       ApplicationListener<SiteContextInitializedEvent> {
 
     public static final String URL_TEMPLATES_CACHE_KEY_ELEM = "restScriptUrlTemplates";
 
+    protected boolean warmUpEnabled;
     protected CacheTemplate cacheTemplate;
     protected ScriptUrlTemplateScanner actualScanner;
 
@@ -52,8 +53,8 @@ public class CachedScriptUrlTemplateScanner implements ScriptUrlTemplateScanner,
     }
 
     @Override
-    public void onApplicationEvent(SiteContextCreatedEvent event) {
-        // Pre-cache the url templates when a site context is created.
+    public void onApplicationEvent(SiteContextInitializedEvent event) {
+        // Pre-cache the url templates after a site context is initialized.
         scan(event.getSiteContext());
     }
 

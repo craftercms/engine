@@ -37,6 +37,8 @@ import org.craftercms.core.service.Item;
 import org.craftercms.core.service.ItemFilter;
 import org.craftercms.core.service.Tree;
 import org.craftercms.core.service.impl.CompositeItemFilter;
+import org.craftercms.engine.model.DefaultSiteItem;
+import org.craftercms.engine.model.EmbeddedSiteItem;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.service.SiteItemService;
 import org.craftercms.engine.service.context.SiteContext;
@@ -89,6 +91,11 @@ public class SiteItemServiceImpl implements SiteItemService {
     @Override
     public Content getRawContent(String url) {
         return storeService.findContent(getSiteContext().getContext(), url);
+    }
+
+    @Override
+    public SiteItem getSiteItem(final SiteItem parent, final Element element) {
+        return new EmbeddedSiteItem(parent, element, modelFieldConverter);
     }
 
     @Override
@@ -240,7 +247,7 @@ public class SiteItemServiceImpl implements SiteItemService {
     }
 
     protected SiteItem createItemWrapper(Item item) {
-        return new SiteItem(item, modelFieldConverter, sortComparator);
+        return new DefaultSiteItem(item, modelFieldConverter, sortComparator);
     }
 
 }

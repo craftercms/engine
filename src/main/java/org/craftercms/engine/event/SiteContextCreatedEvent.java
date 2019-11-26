@@ -19,11 +19,11 @@ package org.craftercms.engine.event;
 import org.craftercms.engine.service.context.SiteContext;
 
 /**
- * Event published when a new {@link SiteContext} is created.
+ * Event published when a new {@link SiteContext} has been created.
  *
  * @author avasquez
  */
-public class SiteContextCreatedEvent extends SiteContextEvent {
+public class SiteContextCreatedEvent extends SiteEvent {
 
     /**
      * Create a new event.

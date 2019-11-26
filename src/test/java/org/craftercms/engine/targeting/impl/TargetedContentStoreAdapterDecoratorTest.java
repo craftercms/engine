@@ -17,49 +17,44 @@
 
 package org.craftercms.engine.targeting.impl;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.commons.lang3.LocaleUtils;
 import org.craftercms.core.service.CachingOptions;
 import org.craftercms.core.service.Content;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.service.Item;
 import org.craftercms.core.store.ContentStoreAdapter;
+import org.craftercms.engine.properties.SiteProperties;
 import org.craftercms.engine.targeting.CandidateTargetedUrlsResolver;
 import org.craftercms.engine.test.utils.ConfigAwareTestBase;
-import org.craftercms.engine.properties.SiteProperties;
+import org.craftercms.engine.util.store.decorators.DecoratedStoreAdapterContext;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.i18n.LocaleContextHolder;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyBoolean;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for {@link TargetedContentStoreAdapter}.
+ * Unit tests for {@link TargetedContentStoreAdapterDecorator}.
  *
  * @author avasquez
  */
-public class TargetedContentStoreAdapterTest extends ConfigAwareTestBase {
+public class TargetedContentStoreAdapterDecoratorTest extends ConfigAwareTestBase {
 
-    private TargetedContentStoreAdapter storeAdapter;
+    private TargetedContentStoreAdapterDecorator storeAdapter;
 
     @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
 
-        storeAdapter = new TargetedContentStoreAdapter();
-        storeAdapter.setActualAdapter(createActualAdapter());
+        storeAdapter = new TargetedContentStoreAdapterDecorator();
+        storeAdapter.setActualStoreAdapter(createActualStoreAdapter());
         storeAdapter.setCandidateTargetedUrlsResolver(createCandidateTargetedUrlsResolver());
 
         LocaleContextHolder.setLocale(LocaleUtils.toLocale("en"));
@@ -75,7 +70,7 @@ public class TargetedContentStoreAdapterTest extends ConfigAwareTestBase {
 
     @Test
     public void testExists() throws Exception {
-        Context context = new TargetedContentStoreAdapter.ContextWrapper(storeAdapter, mock(Context.class));
+        Context context = new DecoratedStoreAdapterContext(mock(Context.class), storeAdapter);
         CachingOptions cachingOptions = CachingOptions.DEFAULT_CACHING_OPTIONS;
 
         boolean exists = storeAdapter.exists(context, cachingOptions,"/site/website/en");
@@ -101,7 +96,7 @@ public class TargetedContentStoreAdapterTest extends ConfigAwareTestBase {
 
     @Test
     public void testFindContent() throws Exception {
-        Context context = new TargetedContentStoreAdapter.ContextWrapper(storeAdapter, mock(Context.class));
+        Context context = new DecoratedStoreAdapterContext(mock(Context.class), storeAdapter);
         CachingOptions cachingOptions = CachingOptions.DEFAULT_CACHING_OPTIONS;
 
         Content content = storeAdapter.findContent(context, cachingOptions, "/site/website/en/index.xml");
@@ -123,7 +118,7 @@ public class TargetedContentStoreAdapterTest extends ConfigAwareTestBase {
 
     @Test
     public void testFindItem() throws Exception {
-        Context context = new TargetedContentStoreAdapter.ContextWrapper(storeAdapter, mock(Context.class));
+        Context context = new DecoratedStoreAdapterContext(mock(Context.class), storeAdapter);
         CachingOptions cachingOptions = CachingOptions.DEFAULT_CACHING_OPTIONS;
 
         Item item = storeAdapter.findItem(context, cachingOptions, "/site/website/en", true);
@@ -159,10 +154,10 @@ public class TargetedContentStoreAdapterTest extends ConfigAwareTestBase {
 
     @Test
     public void testFindItems() throws Exception {
-        Context context = new TargetedContentStoreAdapter.ContextWrapper(storeAdapter, mock(Context.class));
+        Context context = new DecoratedStoreAdapterContext(mock(Context.class), storeAdapter);
         CachingOptions cachingOptions = CachingOptions.DEFAULT_CACHING_OPTIONS;
 
-        List<Item> items = storeAdapter.findItems(context, cachingOptions, "/site/website/en", true);
+        List<Item> items = storeAdapter.findItems(context, cachingOptions, "/site/website/en");
 
         assertNotNull(items);
         assertEquals(2, items.size());
@@ -171,7 +166,7 @@ public class TargetedContentStoreAdapterTest extends ConfigAwareTestBase {
         assertEquals("about-us", items.get(1).getName());
         assertEquals("/site/website/en/about-us", items.get(1).getUrl());
 
-        items = storeAdapter.findItems(context, cachingOptions, "/site/website/ja_jp_jp", true);
+        items = storeAdapter.findItems(context, cachingOptions, "/site/website/ja_jp_jp");
 
         assertNotNull(items);
         assertEquals(2, items.size());
@@ -182,7 +177,7 @@ public class TargetedContentStoreAdapterTest extends ConfigAwareTestBase {
 
         config.setProperty(SiteProperties.MERGE_FOLDERS_CONFIG_KEY, false);
 
-        items = storeAdapter.findItems(context, cachingOptions, "/site/website/ja_jp_jp", true);
+        items = storeAdapter.findItems(context, cachingOptions, "/site/website/ja_jp_jp");
 
         assertNotNull(items);
         assertEquals(1, items.size());
@@ -190,7 +185,7 @@ public class TargetedContentStoreAdapterTest extends ConfigAwareTestBase {
         assertEquals("/site/website/ja/index.xml", items.get(0).getUrl());
     }
 
-    private ContentStoreAdapter createActualAdapter() {
+    private ContentStoreAdapter createActualStoreAdapter() {
         ContentStoreAdapter adapter = mock(ContentStoreAdapter.class);
 
         Item idx = new Item();
@@ -261,13 +256,11 @@ public class TargetedContentStoreAdapterTest extends ConfigAwareTestBase {
 
         when(adapter.findItems(any(Context.class),
                                any(CachingOptions.class),
-                               eq("/site/website/en"),
-                               anyBoolean())).thenReturn(Arrays.asList(enIdx, enAboutUs));
+                               eq("/site/website/en"))).thenReturn(Arrays.asList(enIdx, enAboutUs));
 
         when(adapter.findItems(any(Context.class),
                                any(CachingOptions.class),
-                               eq("/site/website/ja"),
-                               anyBoolean())).thenReturn(Collections.singletonList(frIdx));
+                               eq("/site/website/ja"))).thenReturn(Collections.singletonList(frIdx));
 
         return adapter;
     }

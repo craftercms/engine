@@ -33,9 +33,12 @@ import static org.apache.logging.log4j.core.Core.CATEGORY_NAME;
 
 /**
  * Log4j filter that decides to log an entry based on whether an MDC key exists or not. If the key specified by
- * {@code key} exists, and {@code acceptIfKeyExists} is true, then {@link Result#ACCEPT} is returned. If
- * {@code acceptIfKeyExists} is false, {@link Result#DENY} is returned. If the key doesn't exist, and
- * {@code denyIfKeyDoesNotExist} is true, then {@link Result#DENY} is returned, otherwise {@link Result#NEUTRAL} is
+ * {@code key} exists, and {@code acceptIfKeyExists} is true, then
+ * {@link org.apache.logging.log4j.core.Filter.Result#ACCEPT} is returned. If
+ * {@code acceptIfKeyExists} is false, {@link org.apache.logging.log4j.core.Filter.Result#DENY} is returned. If the
+ * key doesn't exist, and {@code denyIfKeyDoesNotExist} is true, then
+ * {@link org.apache.logging.log4j.core.Filter.Result#DENY} is returned, otherwise
+ * {@link org.apache.logging.log4j.core.Filter.Result#NEUTRAL} is
  * returned.
  *
  * @author avasquez

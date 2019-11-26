@@ -25,7 +25,7 @@
     <description>Crafter Content Delivery Engine</description>
     <url>https://github.com/craftercms/engine</url>
     <packaging>war</packaging>
-    <version>3.1.3</version><!-- craftercms version flag -->
+    <version>3.1.4</version><!-- craftercms version flag -->
     <organization>
         <name>CrafterCMS</name>
         <url>http://craftercms.org</url>
@@ -42,7 +42,7 @@
         <spring.version>4.3.18.RELEASE</spring.version>
         <httpcomponents.version>4.5.2</httpcomponents.version>
         <commons.configuration.version>2.1</commons.configuration.version>
-        <commons.lang.version>3.5</commons.lang.version>
+        <commons.lang3.version>3.5</commons.lang3.version>
         <commons.collections.version>4.1</commons.collections.version>
         <cglib.version>3.1</cglib.version>
         <groovy.version>2.4.15</groovy.version> <!-- When this version changes the policy file needs to be updated -->
@@ -56,10 +56,12 @@
         <urlrewrite.version>4.0.4</urlrewrite.version>
         <aws.version>1.11.435</aws.version>
         <box.sdk.version>2.28.1</box.sdk.version>
-        <jackson.dataformat.version>2.9.9</jackson.dataformat.version>
+        <jackson.dataformat.version>2.9.10</jackson.dataformat.version>
         <log4j.version>2.11.2</log4j.version>
         <graphql.version>12.0</graphql.version>
         <graphql.extended.scalars.version>1.0</graphql.extended.scalars.version>
+        <sardine.version>5.9</sardine.version>
+        <xerces.version>2.12.0</xerces.version>
     </properties>
 
     <licenses>
@@ -188,7 +190,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>${commons.lang.version}</version>
+            <version>${commons.lang3.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -222,6 +224,12 @@
             <groupId>org.tuckey</groupId>
             <artifactId>urlrewritefilter</artifactId>
             <version>${urlrewrite.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+            <version>${xerces.version}</version>
         </dependency>
 
         <!-- Logging -->
@@ -264,6 +272,13 @@
             <groupId>com.box</groupId>
             <artifactId>box-java-sdk</artifactId>
             <version>${box.sdk.version}</version>
+        </dependency>
+
+        <!-- WebDAV -->
+        <dependency>
+            <groupId>com.github.lookfirst</groupId>
+            <artifactId>sardine</artifactId>
+            <version>${sardine.version}</version>
         </dependency>
 
         <!-- Override the bouncy castle dependency from Box -->

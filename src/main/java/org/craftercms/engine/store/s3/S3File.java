@@ -17,67 +17,37 @@
 
 package org.craftercms.engine.store.s3;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.bouncycastle.util.StoreException;
 import org.craftercms.core.store.impl.File;
-import com.amazonaws.services.s3.model.S3Object;
+import org.craftercms.core.util.cache.impl.AbstractCachingAwareObject;
 
 /**
  * Implementations of {@link File} for AWS S3 items.
  * @author joseross
  */
-public class S3File implements File {
+public class S3File extends AbstractCachingAwareObject implements File {
 
     /**
-     * The name of the file.
+     * The S3 key.
      */
-    protected String name;
+    protected String key;
 
-    /**
-     * The path of the file.
-     */
-    protected String path;
+    public S3File(final String key) {
+        this.key = key;
+    }
 
-    /**
-     * When the file was last modified.
-     */
-    protected long lastModified;
-
-    /**
-     * The length of the file.
-     */
-    protected long length;
-
-    /**
-     * The content of the file.
-     */
-    protected byte[] content;
-
-    public S3File(final S3Object s3Object) {
-        name = FilenameUtils.getName(s3Object.getKey());
-        path = FilenameUtils.getPath(s3Object.getKey());
-        lastModified = s3Object.getObjectMetadata().getLastModified().getTime();
-        length = s3Object.getObjectMetadata().getContentLength();
-        content = new byte[(int)length];
-        try(InputStream is = s3Object.getObjectContent()) {
-            IOUtils.readFully(is, content);
-        } catch (Exception e) {
-            throw new StoreException("Error reading S3 item " + s3Object, e);
-        }
+    public String getKey() {
+        return key;
     }
 
     @Override
     public String getName() {
-        return name;
+        return FilenameUtils.getName(key);
     }
 
     @Override
     public String getPath() {
-        return path;
+        return FilenameUtils.getPath(key);
     }
 
     @Override
@@ -91,24 +61,10 @@ public class S3File implements File {
     }
 
     @Override
-    public long getLastModified() {
-        return lastModified;
-    }
-
-    @Override
-    public long getLength() {
-        return length;
-    }
-
-    @Override
-    public InputStream getInputStream() {
-        return new ByteArrayInputStream(content);
-    }
-
-    @Override
     public String toString() {
-        return "S3File{" + "name='" + name + '\'' + ", path='" + path + '\'' + ", lastModified=" + lastModified + ", "
-            + "length=" + length + '}';
+        return "S3File{" +
+               "key='" + key + '\'' +
+               '}';
     }
 
 }

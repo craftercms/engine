@@ -14,24 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.craftercms.engine.event;
+package org.craftercms.engine.cache;
 
-import org.craftercms.engine.service.context.SiteContext;
+import org.craftercms.core.service.Context;
 
 /**
- * Event published when a site's GraphQL schema is built.
+ * Helper class that's used to warm up the cache of a context. Normally several of these will be used by the
+ * {@link SiteCacheWarmer} to do a full warm up.
  *
  * @author avasquez
+ * @since 3.1.4
  */
-public class GraphQLBuiltEvent extends SiteContextEvent {
+public interface ContextCacheWarmer {
 
     /**
-     * Create a new event.
+     * Warm ups the cache associate to the context
      *
-     * @param siteContext   the site's context
+     * @param context the context
      */
-    public GraphQLBuiltEvent(SiteContext siteContext) {
-        super(siteContext);
-    }
+    void warmUpCache(Context context);
 
 }

@@ -35,9 +35,10 @@
 
     <!-- AWS S3 client builder -->
     <bean id="crafter.s3ClientBuilder" class="org.craftercms.engine.store.s3.util.S3ClientBuilder">
-        <property name="region" value="${crafter.engine.s3.region:}"/>
-        <property name="accessKey" value="${crafter.engine.s3.accessKey:}"/>
-        <property name="secretKey" value="${crafter.engine.s3.secretKey:}"/>
+        <constructor-arg value="${crafter.engine.s3.endpoint:}"/>
+        <constructor-arg value="${crafter.engine.s3.region:}"/>
+        <constructor-arg value="${crafter.engine.s3.accessKey:}"/>
+        <constructor-arg value="${crafter.engine.s3.secretKey:}"/>
     </bean>
 
     <!-- AWS S3 Site List Resolver -->
@@ -46,13 +47,48 @@
         <property name="clientBuilder" ref="crafter.s3ClientBuilder"/>
     </bean>
 
+    <bean id="crafter.siteContextManager" class="org.craftercms.engine.service.context.SiteContextManager">
+        <property name="fallbackContextFactory" ref="crafter.fallbackSiteContextFactory"/>
+        <property name="contextFactory" ref="crafter.siteContextFactory"/>
+        <property name="siteListResolver" ref="crafter.siteListResolver"/>
+        <property name="entitlementValidator" ref="crafter.entitlementValidator"/>
+        <property name="waitForContextInit" value="${crafter.engine.site.context.waitForInit}"/>
+        <property name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
+        <property name="defaultSiteName" value="${crafter.engine.site.default.name}"/>
+    </bean>
+
     <!-- AWS S3 Content Store Adapter -->
-    <bean id="crafter.contentStoreAdapter.s3" class="org.craftercms.engine.store.s3.S3ContentStoreAdapter">
+
+    <bean id="crafter.s3ContentStoreAdapter" class="org.craftercms.engine.store.s3.S3ContentStoreAdapter">
         <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
         <property name="metadataFileExtension" value="${crafter.core.store.metadataFile.extension}"/>
         <property name="descriptorFileExtension" value="${crafter.core.store.descriptorFile.extension}"/>
-
+        <property name="pathValidator">
+            <bean class="org.craftercms.commons.validation.validators.impl.SecurePathValidator">
+                <constructor-arg value="path"/>
+            </bean>
+        </property>
         <property name="clientBuilder" ref="crafter.s3ClientBuilder"/>
+    </bean>
+
+    <bean id="crafter.contentStoreAdapter.s3"
+          class="org.craftercms.engine.util.store.decorators.ContentStoreAdapterDecoratorChainFactoryBean">
+        <property name="storeAdapter" ref="crafter.s3ContentStoreAdapter"/>
+        <property name="decorators">
+            <list>
+                <ref bean="crafter.cacheWarmingContentStoreAdapterDecorator"/>
+                <ref bean="crafter.targetedContentStoreAdapterDecorator"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="crafter.contentStoreAdapterRegistry" class="org.craftercms.core.store.impl.ContentStoreAdapterRegistryImpl" >
+        <property name="adapters">
+            <map>
+                <entry key="filesystem" value-ref="crafter.contentStoreAdapter.filesystem"/>
+                <entry key="s3" value-ref="crafter.contentStoreAdapter.s3"/>
+            </map>
+        </property>
     </bean>
 
 </beans>

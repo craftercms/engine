@@ -25,7 +25,6 @@ import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.exception.CrafterException;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
-import org.craftercms.core.service.Item;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.scripting.SiteItemScriptResolver;
 import org.craftercms.engine.service.context.SiteContext;
@@ -66,13 +65,11 @@ public class SiteItemScriptResolverImplTest {
 
     @Test
     public void testGetScriptUrlsExisting() throws Exception {
-        Item item = mock(Item.class);
-        when(item.queryDescriptorValue("*/content-type")).thenReturn("/page/mypage1");
-        when(item.queryDescriptorValues("*/scripts/item/key")).thenReturn(Arrays.asList(
-            "/scripts/pages/script1.groovy"));
 
         SiteItem siteItem = mock(SiteItem.class);
-        when(siteItem.getItem()).thenReturn(item);
+        when(siteItem.queryValue("content-type")).thenReturn("/page/mypage1");
+        when(siteItem.queryValues("scripts/item/key")).thenReturn(Arrays.asList(
+            "/scripts/pages/script1.groovy"));
 
         List<String> scriptUrls = scriptResolver.getScriptUrls(siteItem);
         assertNotNull(scriptUrls);
@@ -83,13 +80,10 @@ public class SiteItemScriptResolverImplTest {
 
     @Test
     public void testGetScriptUrlNotFound() throws Exception {
-        Item item = mock(Item.class);
-        when(item.queryDescriptorValue("*/content-type")).thenReturn("/page/mypage2");
-        when(item.queryDescriptorValues("*/scripts/item/key")).thenReturn(Arrays.asList(
-            "/scripts/pages/script1.groovy"));
-
         SiteItem siteItem = mock(SiteItem.class);
-        when(siteItem.getItem()).thenReturn(item);
+        when(siteItem.queryValue("content-type")).thenReturn("/page/mypage2");
+        when(siteItem.queryValues("scripts/item/key")).thenReturn(Arrays.asList(
+            "/scripts/pages/script1.groovy"));
 
         List<String> scriptUrls = scriptResolver.getScriptUrls(siteItem);
         assertNotNull(scriptUrls);
@@ -99,13 +93,10 @@ public class SiteItemScriptResolverImplTest {
 
     @Test
     public void testGetScriptUrlError() throws Exception {
-        Item item = mock(Item.class);
-        when(item.queryDescriptorValue("*/content-type")).thenReturn("/page/mypage3");
-        when(item.queryDescriptorValues("*/scripts/item/key")).thenReturn(Arrays.asList(
-                "/scripts/pages/script1.groovy"));
-
         SiteItem siteItem = mock(SiteItem.class);
-        when(siteItem.getItem()).thenReturn(item);
+        when(siteItem.queryValue("content-type")).thenReturn("/page/mypage3");
+        when(siteItem.queryValues("scripts/item/key")).thenReturn(Arrays.asList(
+            "/scripts/pages/script1.groovy"));
 
         List<String> scriptUrls = scriptResolver.getScriptUrls(siteItem);
         assertNotNull(scriptUrls);
@@ -125,9 +116,9 @@ public class SiteItemScriptResolverImplTest {
     private SiteItemScriptResolver createScriptResolver(ContentStoreService storeService) {
         SiteItemScriptResolverImpl scriptResolver = new SiteItemScriptResolverImpl();
         scriptResolver.setContentTypePattern("^/page/(.+)$");
-        scriptResolver.setContentTypeXPathQuery("*/content-type");
+        scriptResolver.setContentTypeXPathQuery("content-type");
         scriptResolver.setScriptUrlFormat("/scripts/pages/%s.groovy");
-        scriptResolver.setScriptsXPathQuery("*/scripts/item/key");
+        scriptResolver.setScriptsXPathQuery("scripts/item/key");
         scriptResolver.setStoreService(storeService);
 
         return scriptResolver;

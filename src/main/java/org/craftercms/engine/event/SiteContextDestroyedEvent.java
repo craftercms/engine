@@ -19,11 +19,11 @@ package org.craftercms.engine.event;
 import org.craftercms.engine.service.context.SiteContext;
 
 /**
- * Event published when a {@link SiteContext} is destroyed.
+ * Event published when a {@link SiteContext} has been destroyed.
  *
  * @author avasquez
  */
-public class SiteContextDestroyedEvent extends SiteContextEvent {
+public class SiteContextDestroyedEvent extends SiteEvent {
 
     /**
      * Create a new event.

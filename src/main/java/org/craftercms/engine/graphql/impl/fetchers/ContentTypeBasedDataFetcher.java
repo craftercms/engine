@@ -45,7 +45,7 @@ import graphql.language.VariableReference;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.craftercms.search.elasticsearch.ElasticsearchWrapper;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -67,7 +67,7 @@ import static org.craftercms.engine.graphql.SchemaUtils.*;
  * @author joseross
  * @since 3.1
  */
-public class ContentTypeBasedDataFetcher implements DataFetcher<Object> {
+public class ContentTypeBasedDataFetcher extends RequestAwareDataFetcher<Object> {
 
     private static final Logger logger = LoggerFactory.getLogger(ContentTypeBasedDataFetcher.class);
 
@@ -122,7 +122,7 @@ public class ContentTypeBasedDataFetcher implements DataFetcher<Object> {
      * {@inheritDoc}
      */
     @Override
-    public Object get(final DataFetchingEnvironment env) {
+    public Object doGet(final DataFetchingEnvironment env) {
         Field field = env.getMergedField().getSingleField();
         String fieldName = field.getName();
 
