@@ -41,22 +41,12 @@ public class ProfileUser extends CustomUser {
     protected Profile profile;
 
     public ProfileUser(final Authentication auth) {
-        this(auth.getProfile(), null);
-        this.authentication = auth;
-    }
-
-    public ProfileUser(final Authentication auth, final UsernamePasswordAuthenticationToken token) {
-        this(auth.getProfile(), token);
+        this(auth.getProfile());
         this.authentication = auth;
     }
 
     public ProfileUser(final Profile profile) {
-        this(profile, null);
-    }
-
-    public ProfileUser(final Profile profile, final UsernamePasswordAuthenticationToken token) {
-        super(profile.getUsername(), token != null? token.getCredentials().toString() : "N/A",
-            profile.isEnabled(), true, true, true,
+        super(profile.getUsername(), "N/A", profile.isEnabled(), true, true, true,
             profile.getRoles().stream().map(SimpleGrantedAuthority::new).collect(toSet()));
         this.profile = profile;
     }

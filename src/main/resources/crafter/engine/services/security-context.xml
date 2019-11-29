@@ -58,9 +58,7 @@
     <!-- Access Denied Handlers -->
 
     <bean id="crafter.accessDeniedHandler"
-          class="org.craftercms.engine.util.spring.security.ConfigAwareAccessDeniedHandler">
-        <constructor-arg value="${crafter.security.accessDenied.error.url}"/>
-    </bean>
+          class="org.craftercms.engine.util.spring.security.ConfigAwareAccessDeniedHandler"/>
 
     <!-- Entry Points -->
     <bean id="crafter.authenticationEntryPoint"
@@ -262,5 +260,7 @@
     <bean id="crafter.securityFilter" class="org.springframework.security.web.FilterChainProxy">
         <constructor-arg ref="crafter.securityFilterChain"/>
     </bean>
+
+    <import resource="classpath*:crafter/engine/security/*-context.xml"/>
 
 </beans>

@@ -43,7 +43,7 @@ public class ConfigAwareAccessDeniedHandlerTest extends ConfigAwareTestBase {
     public void setUp() throws Exception {
         super.setUp();
 
-        handler = new ConfigAwareAccessDeniedHandler("/access-denied");
+        handler = new ConfigAwareAccessDeniedHandler();
     }
 
     @Test

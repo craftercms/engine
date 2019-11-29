@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.configuration2.HierarchicalConfiguration;
+import org.apache.commons.lang3.StringUtils;
 import org.craftercms.engine.util.ConfigUtils;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.WebAttributes;
@@ -39,18 +40,12 @@ public class ConfigAwareAccessDeniedHandler implements AccessDeniedHandler {
 
     public static final String ACCESS_DENIED_ERROR_PAGE_URL_KEY = "security.accessDenied.errorPageUrl";
 
-    protected String errorPage;
-
-    public ConfigAwareAccessDeniedHandler(final String errorPage) {
-        this.errorPage = errorPage;
-    }
-
     public String getErrorPage() {
         HierarchicalConfiguration siteConfig = ConfigUtils.getCurrentConfig();
         if (siteConfig != null && siteConfig.containsKey(ACCESS_DENIED_ERROR_PAGE_URL_KEY)) {
             return siteConfig.getString(ACCESS_DENIED_ERROR_PAGE_URL_KEY);
         }
-        return errorPage;
+        return null;
     }
 
     // Copied from Spring's AccessDeniedHandlerImpl
@@ -61,7 +56,7 @@ public class ConfigAwareAccessDeniedHandler implements AccessDeniedHandler {
         ServletException {
         if (!response.isCommitted()) {
             String errorPage = getErrorPage();
-            if (errorPage != null) {
+            if (StringUtils.isNotEmpty(errorPage)) {
                 // Put exception into request scope (perhaps of use to a view)
                 request.setAttribute(WebAttributes.ACCESS_DENIED_403,
                     accessDeniedException);

@@ -61,7 +61,7 @@ public class ProfileAuthenticationProvider extends AbstractUserDetailsAuthentica
             Authentication profileAuth =
                 authenticationManager.authenticateUser(tenants, username, authentication.getCredentials().toString());
 
-            return createPrincipal(authentication, profileAuth);
+            return createPrincipal(profileAuth);
         } catch (Exception e) {
             throw new AuthenticationServiceException("Error authenticating user " + username, e);
         }
@@ -75,8 +75,8 @@ public class ProfileAuthenticationProvider extends AbstractUserDetailsAuthentica
         return tenants;
     }
 
-    protected ProfileUser createPrincipal(UsernamePasswordAuthenticationToken token, Authentication auth) {
-        return new ProfileUser(auth, token);
+    protected ProfileUser createPrincipal(Authentication auth) {
+        return new ProfileUser(auth);
     }
 
 }
