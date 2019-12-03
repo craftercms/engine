@@ -490,7 +490,7 @@
         <property name="groovyClassesPath" value="${crafter.engine.site.default.classes.groovy.path}"/>
         <property name="urlTransformationEngine" ref="crafter.urlTransformationEngine"/>
         <property name="storeService" ref="crafter.contentStoreService"/>
-        <property name="cacheService" ref="crafter.cacheService"/>
+        <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
         <property name="macroResolver" ref="crafter.macroResolver"/>
         <property name="groovyGlobalVars" ref="crafter.restScriptsVariables"/>
         <property name="jobResolvers" ref="crafter.scriptJobResolvers"/>
@@ -517,7 +517,7 @@
         <property name="groovyClassesPath" value="/classes/groovy"/>
         <property name="urlTransformationEngine" ref="crafter.urlTransformationEngine"/>
         <property name="storeService" ref="crafter.contentStoreService"/>
-        <property name="cacheService" ref="crafter.cacheService"/>
+        <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
         <property name="macroResolver" ref="crafter.macroResolver"/>
         <property name="groovyGlobalVars" ref="crafter.restScriptsVariables"/>
         <property name="jobResolvers" ref="crafter.scriptJobResolvers"/>
@@ -616,6 +616,7 @@
                 <ref bean="crafter.crafterFreeMarkerTemplateLoader"/>
             </array>
         </property>
+        <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
     </bean>
 
     <util:map id="crafter.freemarkerVariables">

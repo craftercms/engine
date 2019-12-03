@@ -17,18 +17,6 @@
 
 package org.craftercms.engine.scripting.impl;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.lang3.ArrayUtils;
@@ -46,6 +34,12 @@ import org.craftercms.engine.util.ConfigUtils;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
+
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Servlet filter that passes the request through a series of scripts that act as filters too.
@@ -114,43 +108,38 @@ public class ScriptFilter implements Filter {
     protected List<FilterMapping> getFilterMappings() {
         final SiteContext siteContext = SiteContext.getCurrent();
         if (siteContext != null) {
-            Callback<List<FilterMapping>> callback = new Callback<List<FilterMapping>>() {
+            Callback<List<FilterMapping>> callback = () -> {
+                HierarchicalConfiguration config = ConfigUtils.getCurrentConfig();
+                CachingAwareList<FilterMapping> mappings = new CachingAwareList<>();
 
-                @Override
-                public List<FilterMapping> execute() {
-                    HierarchicalConfiguration config = ConfigUtils.getCurrentConfig();
-                    CachingAwareList<FilterMapping> mappings = new CachingAwareList<>();
+                if (config != null) {
+                    List<HierarchicalConfiguration> filtersConfig = config.configurationsAt(FILTER_KEY);
+                    if (CollectionUtils.isNotEmpty(filtersConfig)) {
+                        for (HierarchicalConfiguration filterConfig : filtersConfig) {
+                            String scriptUrl = filterConfig.getString(SCRIPT_KEY);
+                            String[] includes = filterConfig.getStringArray(INCLUDE_MAPPINGS_KEY);
+                            String[] excludes = filterConfig.getStringArray(EXCLUDE_MAPPINGS_KEY);
 
-                    if (config != null) {
-                        List<HierarchicalConfiguration> filtersConfig = config.configurationsAt(FILTER_KEY);
-                        if (CollectionUtils.isNotEmpty(filtersConfig)) {
-                            for (HierarchicalConfiguration filterConfig : filtersConfig) {
-                                String scriptUrl = filterConfig.getString(SCRIPT_KEY);
-                                String[] includes = filterConfig.getStringArray(INCLUDE_MAPPINGS_KEY);
-                                String[] excludes = filterConfig.getStringArray(EXCLUDE_MAPPINGS_KEY);
+                            if (StringUtils.isNotEmpty(scriptUrl) && ArrayUtils.isNotEmpty(includes)) {
+                                ContentStoreService storeService = siteContext.getStoreService();
+                                ScriptFactory scriptFactory = siteContext.getScriptFactory();
 
-                                if (StringUtils.isNotEmpty(scriptUrl) && ArrayUtils.isNotEmpty(includes)) {
-                                    ContentStoreService storeService = siteContext.getStoreService();
-                                    ScriptFactory scriptFactory = siteContext.getScriptFactory();
-
-                                    if (!storeService.exists(siteContext.getContext(), scriptUrl)) {
-                                        throw new ConfigurationException("No filter script found at " + scriptUrl);
-                                    }
-
-                                    FilterMapping mapping = new FilterMapping();
-                                    mapping.script = scriptFactory.getScript(scriptUrl);
-                                    mapping.includes = includes;
-                                    mapping.excludes = excludes;
-
-                                    mappings.add(mapping);
+                                if (!storeService.exists(siteContext.getContext(), scriptUrl)) {
+                                    throw new ConfigurationException("No filter script found at " + scriptUrl);
                                 }
+
+                                FilterMapping mapping = new FilterMapping();
+                                mapping.script = scriptFactory.getScript(scriptUrl);
+                                mapping.includes = includes;
+                                mapping.excludes = excludes;
+
+                                mappings.add(mapping);
                             }
                         }
                     }
-
-                    return mappings;
                 }
 
+                return mappings;
             };
 
             return cacheTemplate.getObject(siteContext.getContext(), callback, FILTER_MAPPINGS_CACHE_KEY);

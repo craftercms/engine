@@ -17,19 +17,16 @@
 
 package org.craftercms.engine.scripting.impl;
 
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Map;
-
 import groovy.lang.Binding;
-import groovy.util.GroovyScriptEngine;
-import groovy.util.ResourceException;
 import org.apache.commons.collections.MapUtils;
+import org.codehaus.groovy.runtime.InvokerHelper;
 import org.craftercms.core.util.cache.impl.AbstractCachingAwareObject;
 import org.craftercms.engine.exception.ScriptException;
-import org.craftercms.engine.exception.ScriptNotFoundException;
 import org.craftercms.engine.scripting.Script;
 import org.slf4j.MDC;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Runs a script through the {@link groovy.util.GroovyScriptEngine}.
@@ -40,12 +37,12 @@ public class GroovyScript extends AbstractCachingAwareObject implements Script {
 
     private static final String SCRIPT_URL_MDC_KEY = "scriptUrl";
 
-    protected GroovyScriptEngine scriptEngine;
+    protected Class<?> groovyScriptClass;
     protected String scriptUrl;
     protected Map<String, Object> globalVariables;
 
-    public GroovyScript(GroovyScriptEngine scriptEngine, String scriptUrl, Map<String, Object> globalVariables) {
-        this.scriptEngine = scriptEngine;
+    public GroovyScript(Class<?> groovyScriptClass, String scriptUrl, Map<String, Object> globalVariables) {
+        this.groovyScriptClass = groovyScriptClass;
         this.scriptUrl = scriptUrl;
         this.globalVariables = globalVariables;
     }
@@ -67,16 +64,10 @@ public class GroovyScript extends AbstractCachingAwareObject implements Script {
         }
 
         MDC.put(SCRIPT_URL_MDC_KEY, scriptUrl);
-
         try  {
-            return scriptEngine.run(scriptUrl, new Binding(allVariables));
+            return InvokerHelper.createScript(groovyScriptClass, new Binding(allVariables)).run();
         } catch (Exception e) {
-            Throwable cause = e.getCause();
-            if (e instanceof ResourceException && cause instanceof FileNotFoundException) {
-                throw new ScriptNotFoundException(cause.getMessage(), cause);
-            } else {
-                throw new ScriptException(e.getMessage(), e);
-            }
+            throw new ScriptException(e.getMessage(), e);
         } finally {
             MDC.remove(SCRIPT_URL_MDC_KEY);
         }

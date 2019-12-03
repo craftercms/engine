@@ -19,12 +19,15 @@ package org.craftercms.engine.scripting.impl;
 
 import groovy.util.GroovyScriptEngine;
 import groovy.util.ResourceConnector;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import groovy.util.ResourceException;
+import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.engine.exception.ScriptException;
+import org.craftercms.engine.exception.ScriptNotFoundException;
 import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.scripting.ScriptFactory;
+import org.craftercms.engine.service.context.SiteContext;
 
+import java.io.FileNotFoundException;
 import java.util.Map;
 
 /**
@@ -35,20 +38,27 @@ import java.util.Map;
  */
 public class GroovyScriptFactory implements ScriptFactory {
 
-    private static final Log logger = LogFactory.getLog(GroovyScriptFactory.class);
-
     public static final String GROOVY_FILE_EXTENSION = "groovy";
 
+    public static final String CACHE_CONST_KEY_ELEM_SCRIPT = "groovyScript";
+
+    protected SiteContext siteContext;
+    protected CacheTemplate cacheTemplate;
     protected GroovyScriptEngine scriptEngine;
     protected Map<String, Object> globalVariables;
 
-    public GroovyScriptFactory(ResourceConnector resourceConnector, Map<String, Object> globalVariables) {
+    public GroovyScriptFactory(SiteContext siteContext, CacheTemplate cacheTemplate, ResourceConnector resourceConnector,
+                               Map<String, Object> globalVariables) {
+        this.siteContext = siteContext;
+        this.cacheTemplate = cacheTemplate;
         this.scriptEngine = new GroovyScriptEngine(resourceConnector);
         this.globalVariables = globalVariables;
     }
 
-    public GroovyScriptFactory(ResourceConnector resourceConnector, ClassLoader parentClassLoader,
-                               Map<String, Object> globalVariables) {
+    public GroovyScriptFactory(SiteContext siteContext, CacheTemplate cacheTemplate, ResourceConnector resourceConnector,
+                               ClassLoader parentClassLoader, Map<String, Object> globalVariables) {
+        this.siteContext = siteContext;
+        this.cacheTemplate = cacheTemplate;
         this.scriptEngine = new GroovyScriptEngine(resourceConnector, parentClassLoader);
         this.globalVariables = globalVariables;
     }
@@ -60,7 +70,18 @@ public class GroovyScriptFactory implements ScriptFactory {
 
     @Override
     public Script getScript(String url) throws ScriptException {
-        return new GroovyScript(scriptEngine, url, globalVariables);
+        return cacheTemplate.getObject(siteContext.getContext(), () -> {
+            try {
+                return new GroovyScript(scriptEngine.loadScriptByName(url), url, globalVariables);
+            } catch (Exception e) {
+                Throwable cause = e.getCause();
+                if (e instanceof ResourceException && cause instanceof FileNotFoundException) {
+                    throw new ScriptNotFoundException(cause.getMessage(), cause);
+                } else {
+                    throw new ScriptException(e.getMessage(), e);
+                }
+            }
+        }, url, CACHE_CONST_KEY_ELEM_SCRIPT);
     }
 
 }
