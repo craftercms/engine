@@ -17,14 +17,6 @@
 
 package org.craftercms.engine.scripting.impl;
 
-import java.util.Collections;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import groovy.util.GroovyScriptEngine;
 import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
 import org.craftercms.commons.http.RequestContext;
@@ -46,7 +38,15 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockServletContext;
 
-import static org.junit.Assert.*;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Collections;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.*;
 
 /**
@@ -73,7 +73,7 @@ public class ScriptFilterTest {
         CacheTemplateMockUtils.setUpWithNoCaching(cacheTemplate);
         ContentStoreServiceMockUtils.setUpGetContentFromClassPath(storeService);
 
-        siteContext = createSiteContext(storeService);
+        siteContext = createSiteContext(storeService, cacheTemplate);
         servletContext = new MockServletContext();
 
         filter = new ScriptFilter();
@@ -129,9 +129,9 @@ public class ScriptFilterTest {
         clearCurrentRequestContext();
     }
 
-    private SiteContext createSiteContext(ContentStoreService storeService) throws Exception {
+    private SiteContext createSiteContext(ContentStoreService storeService, CacheTemplate cacheTemplate) throws Exception {
         SiteContext siteContext = mock(SiteContext.class);
-        ScriptFactory scriptFactory = createScriptFactory(siteContext);
+        ScriptFactory scriptFactory = createScriptFactory(siteContext, cacheTemplate);
 
         XMLConfiguration config = ConfigUtils.readXmlConfiguration(new ClassPathResource("config/site-config.xml"), ',');
         config.setListDelimiterHandler(new DefaultListDelimiterHandler(','));
@@ -145,10 +145,10 @@ public class ScriptFilterTest {
         return siteContext;
     }
 
-    private ScriptFactory createScriptFactory(SiteContext siteContext) {
+    private ScriptFactory createScriptFactory(SiteContext siteContext, CacheTemplate cacheTemplate) {
         ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(siteContext);
 
-        return new GroovyScriptFactory(resourceConnector, Collections.emptyMap());
+        return new GroovyScriptFactory(siteContext, cacheTemplate, resourceConnector, Collections.emptyMap());
     }
 
     private void setCurrentRequestContext(HttpServletRequest request, HttpServletResponse response) {

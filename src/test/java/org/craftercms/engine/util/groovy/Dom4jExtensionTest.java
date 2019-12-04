@@ -17,23 +17,25 @@
 
 package org.craftercms.engine.util.groovy;
 
-import java.io.StringReader;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
-import groovy.util.GroovyScriptEngine;
 import org.craftercms.core.service.ContentStoreService;
+import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.scripting.impl.GroovyScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
+import org.craftercms.engine.test.utils.CacheTemplateMockUtils;
 import org.craftercms.engine.test.utils.ContentStoreServiceMockUtils;
 import org.dom4j.io.SAXReader;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
+import java.io.StringReader;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by alfonsovasquez on 1/8/16.
@@ -52,10 +54,11 @@ public class Dom4jExtensionTest {
 
     @Before
     public void setUp() throws Exception {
+        CacheTemplate cacheTemplate = createCacheTemplate();
         SiteContext siteContext = createSiteContext(createContentStoreService());
         Map<String, Object> globalVars = Collections.emptyMap();
 
-        scriptFactory = createScriptFactory(siteContext, globalVars);
+        scriptFactory = createScriptFactory(siteContext, cacheTemplate, globalVars);
     }
 
     @Test
@@ -79,6 +82,13 @@ public class Dom4jExtensionTest {
         return storeService;
     }
 
+    private CacheTemplate createCacheTemplate() {
+        CacheTemplate cacheTemplate = mock(CacheTemplate.class);
+        CacheTemplateMockUtils.setUpWithNoCaching(cacheTemplate);
+
+        return cacheTemplate;
+    }
+
     private SiteContext createSiteContext(ContentStoreService storeService) {
         SiteContext siteContext = mock(SiteContext.class);
         when(siteContext.getSiteName()).thenReturn("default");
@@ -87,10 +97,11 @@ public class Dom4jExtensionTest {
         return siteContext;
     }
 
-    private ScriptFactory createScriptFactory(SiteContext siteContext, Map<String, Object> globalVars) {
+    private ScriptFactory createScriptFactory(SiteContext siteContext, CacheTemplate cacheTemplate,
+                                              Map<String, Object> globalVars) {
         ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(siteContext);
 
-        return new GroovyScriptFactory(resourceConnector, globalVars);
+        return new GroovyScriptFactory(siteContext, cacheTemplate, resourceConnector, globalVars);
     }
 
 }
