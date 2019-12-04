@@ -100,18 +100,6 @@
     <!--									-->
     <!-- ////////////////////////////////// -->
 
-    <bean id="crafter.targetingAuthenticationProvider"
-          class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
-        <property name="preAuthenticatedUserDetailsService" ref="crafter.preAuthenticatedUserDetailsService"/>
-    </bean>
-
-    <bean id="crafter.targetingAuthenticationFilter"
-          class="org.craftercms.engine.util.spring.security.targeting.TargetingPreAuthenticatedFilter">
-        <property name="invalidateSessionOnPrincipalChange" value="false"/>
-        <property name="authenticationManager" ref="crafter.authenticationManager"/>
-        <property name="authenticationDetailsSource" ref="crafter.defaultDetailsSource"/>
-    </bean>
-
     <import resource="classpath:crafter/engine/mode/preview/security-context.xml"/>
 
     <bean id="crafter.tenantsResolver" class="org.craftercms.engine.util.tenant.SiteNameTenantResolver"/>

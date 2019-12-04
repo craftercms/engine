@@ -23,6 +23,8 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
+    <!-- Add beans & overrides needed to support Targeting -->
+
     <bean id="crafter.targetingAuthenticationProvider"
           class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
         <property name="preAuthenticatedUserDetailsService" ref="crafter.preAuthenticatedUserDetailsService"/>

@@ -261,6 +261,7 @@
         <constructor-arg ref="crafter.securityFilterChain"/>
     </bean>
 
+    <!-- Include additional security contexts -->
     <import resource="classpath*:crafter/engine/security/*-context.xml"/>
 
 </beans>
