@@ -17,14 +17,18 @@
 
 package org.craftercms.engine.scripting.impl;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+
 import groovy.lang.GroovyClassLoader;
+import groovy.util.GroovyScriptEngine;
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
-import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.test.utils.CacheTemplateMockUtils;
 import org.craftercms.engine.test.utils.ContentStoreServiceMockUtils;
 import org.craftercms.engine.util.groovy.ContentStoreGroovyResourceLoader;
 import org.craftercms.engine.util.groovy.ContentStoreResourceConnector;
@@ -35,11 +39,6 @@ import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.web.MockHttpServletRequest;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -102,13 +101,6 @@ public class GroovyScriptFactoryTest {
         return storeService;
     }
 
-    private CacheTemplate createCacheTemplate() {
-        CacheTemplate cacheTemplate = mock(CacheTemplate.class);
-        CacheTemplateMockUtils.setUpWithNoCaching(cacheTemplate);
-
-        return cacheTemplate;
-    }
-
     private GroovyClassLoader createGroovyClassLoader() {
         ContentStoreGroovyResourceLoader resourceLoader = new ContentStoreGroovyResourceLoader(SiteContext.getCurrent(),
                                                                                                "/classes");
@@ -136,10 +128,8 @@ public class GroovyScriptFactoryTest {
 
     private ScriptFactory createScriptFactory(GroovyClassLoader parentClassLoader, Map<String, Object> globalVars) {
         ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(SiteContext.getCurrent());
-        CacheTemplate cacheTemplate = createCacheTemplate();
 
-        return new GroovyScriptFactory(SiteContext.getCurrent(), cacheTemplate, resourceConnector, parentClassLoader,
-                                       globalVars);
+        return new GroovyScriptFactory(resourceConnector, parentClassLoader, globalVars);
     }
 
     private void setCurrentSiteContext(SiteContext siteContext) {

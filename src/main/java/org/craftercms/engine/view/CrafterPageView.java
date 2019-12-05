@@ -16,6 +16,13 @@
  */
 package org.craftercms.engine.view;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -35,13 +42,6 @@ import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.view.AbstractView;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
 /**
  * @author Alfonso Vásquez
  */
@@ -60,6 +60,7 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
 
     protected transient String scope;
     protected transient Object key;
+    protected transient List<Object> dependencyKeys;
     protected transient Long cachingTime;
 
     protected SiteItem page;
