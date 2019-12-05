@@ -74,7 +74,7 @@
         <property name="cacheOn" value="false"/>
         <property name="urlTransformationEngine" ref="crafter.urlTransformationEngine"/>
         <property name="storeService" ref="crafter.contentStoreService"/>
-        <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
+        <property name="cacheService" ref="crafter.cacheService"/>
         <property name="macroResolver" ref="crafter.macroResolver"/>
         <property name="groovyGlobalVars" ref="crafter.restScriptsVariables"/>
         <property name="jobResolvers" ref="crafter.scriptJobResolvers"/>
@@ -135,10 +135,9 @@
                 <ref bean="crafter.crafterFreeMarkerTemplateLoader"/>
             </array>
         </property>
-        <property name="freemarkerCacheStorage">
+        <property name="cacheStorage">
             <bean class="freemarker.cache.NullCacheStorage"/>
         </property>
-        <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
     </bean>
 
 </beans>

@@ -16,20 +16,17 @@
  */
 package org.craftercms.engine.freemarker;
 
+import java.io.IOException;
+import java.util.List;
+
 import freemarker.cache.CacheStorage;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.TemplateLoader;
-import freemarker.template.*;
-import org.craftercms.core.exception.CrafterException;
-import org.craftercms.core.util.cache.CacheTemplate;
+import freemarker.template.Configuration;
+import freemarker.template.TemplateException;
+import freemarker.template.TemplateExceptionHandler;
 import org.craftercms.engine.macro.MacroResolver;
-import org.craftercms.engine.service.context.SiteContext;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * Extends {@link org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer} to:
@@ -42,12 +39,9 @@ import java.util.Locale;
  */
 public class CrafterFreeMarkerConfigurer extends FreeMarkerConfigurer {
 
-    public static final String CACHE_CONST_KEY_ELEM_TEMPLATE = "freemarkerTemplate";
-
     private MacroResolver macroResolver;
     private TemplateExceptionHandler templateExceptionHandler;
-    private CacheStorage freemarkerCacheStorage;
-    private CacheTemplate cacheTemplate;
+    private CacheStorage cacheStorage;
 
     public void setMacroResolver(MacroResolver macroResolver) {
         this.macroResolver = macroResolver;
@@ -57,18 +51,8 @@ public class CrafterFreeMarkerConfigurer extends FreeMarkerConfigurer {
         this.templateExceptionHandler = templateExceptionHandler;
     }
 
-    public void setFreemarkerCacheStorage(final CacheStorage freemarkerCacheStorage) {
-        this.freemarkerCacheStorage = freemarkerCacheStorage;
-    }
-
-    @Required
-    public void setCacheTemplate(CacheTemplate cacheTemplate) {
-        this.cacheTemplate = cacheTemplate;
-    }
-
-    @Override
-    protected Configuration newConfiguration() throws IOException, TemplateException {
-        return new CrafterCacheAwareConfiguration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
+    public void setCacheStorage(final CacheStorage cacheStorage) {
+        this.cacheStorage = cacheStorage;
     }
 
     @Override
@@ -76,8 +60,8 @@ public class CrafterFreeMarkerConfigurer extends FreeMarkerConfigurer {
         if (templateExceptionHandler != null) {
             config.setTemplateExceptionHandler(templateExceptionHandler);
         }
-        if (freemarkerCacheStorage != null) {
-            config.setCacheStorage(freemarkerCacheStorage);
+        if (cacheStorage != null) {
+            config.setCacheStorage(cacheStorage);
         }
     }
 
@@ -94,39 +78,6 @@ public class CrafterFreeMarkerConfigurer extends FreeMarkerConfigurer {
     protected void postProcessTemplateLoaders(List<TemplateLoader> templateLoaders) {
         // Overwrote to get rid of the log.info
         templateLoaders.add(new ClassTemplateLoader(FreeMarkerConfigurer.class, ""));
-    }
-
-    /**
-     * Freemarker {@code Configuration} class extension that caches the template in the Crafter Cache, allowing for
-     * templates to be loaded and parsed once, even when concurrent threads are trying to retrieve the same template.
-     */
-    public class CrafterCacheAwareConfiguration extends Configuration {
-
-        public CrafterCacheAwareConfiguration(Version incompatibleImprovements) {
-            super(incompatibleImprovements);
-        }
-
-        @Override
-        public Template getTemplate(String name, Locale locale, Object customLookupCondition, String encoding,
-                                    boolean parseAsFTL, boolean ignoreMissing) throws IOException {
-            SiteContext siteContext = SiteContext.getCurrent();
-            if (siteContext != null) {
-                try {
-                    return cacheTemplate.getObject(siteContext.getContext(), () -> {
-                        try {
-                            return super.getTemplate(name, locale, customLookupCondition, encoding, parseAsFTL,
-                                                     ignoreMissing);
-                        } catch (Exception e) {
-                            throw new CrafterException(e);
-                        }
-                    }, name, locale, customLookupCondition, encoding, parseAsFTL, CACHE_CONST_KEY_ELEM_TEMPLATE);
-                } catch (CrafterException e) {
-                    throw (IOException) e.getCause();
-                }
-            } else {
-                return super.getTemplate(name, locale, customLookupCondition, encoding, parseAsFTL, ignoreMissing);
-            }
-        }
     }
 
 }

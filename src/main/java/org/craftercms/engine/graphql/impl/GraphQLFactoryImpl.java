@@ -17,6 +17,17 @@
 
 package org.craftercms.engine.graphql.impl;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.Executor;
+
+import javax.servlet.ServletContext;
+
 import graphql.GraphQL;
 import graphql.schema.*;
 import org.apache.commons.collections.CollectionUtils;
@@ -26,6 +37,7 @@ import org.craftercms.core.service.Tree;
 import org.craftercms.engine.exception.ScriptNotFoundException;
 import org.craftercms.engine.graphql.GraphQLFactory;
 import org.craftercms.engine.graphql.GraphQLTypeFactory;
+import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.GroovyScriptUtils;
 import org.craftercms.engine.util.concurrent.SiteAwareThreadPoolExecutor;
@@ -34,10 +46,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.util.StopWatch;
 import org.springframework.web.context.ServletContextAware;
-
-import javax.servlet.ServletContext;
-import java.util.*;
-import java.util.concurrent.Executor;
 
 import static graphql.schema.AsyncDataFetcher.async;
 import static graphql.schema.FieldCoordinates.coordinates;
@@ -235,12 +243,14 @@ public class GraphQLFactoryImpl implements GraphQLFactory, ServletContextAware {
     protected void runInitScript(SiteContext siteContext, GraphQLObjectType.Builder rootType,
                                  GraphQLCodeRegistry.Builder codeRegistry, SchemaCustomizer customizer,
                                  Map<String, GraphQLObjectType.Builder> siteTypes) {
+        Script script = siteContext.getScriptFactory().getScript(schemaScriptPath);
+
         Map<String, Object> variables = new HashMap<>();
         GroovyScriptUtils.addJobScriptVariables(variables, servletContext);
         variables.put(VARIABLE_SCHEMA, customizer);
 
         try {
-            siteContext.getScriptFactory().getScript(schemaScriptPath).execute(variables);
+            script.execute(variables);
             logger.info("Updating GraphQL schema with custom fields, fetchers & resolvers");
             customizer.apply(rootQueryTypeName, rootType, codeRegistry, siteTypes);
         } catch (ScriptNotFoundException e) {

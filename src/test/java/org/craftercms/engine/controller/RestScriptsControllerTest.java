@@ -17,15 +17,21 @@
 
 package org.craftercms.engine.controller;
 
+import java.util.Collections;
+import java.util.Map;
+import javax.servlet.ServletContext;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import groovy.util.GroovyScriptEngine;
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
-import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.engine.controller.rest.RestScriptsController;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.scripting.impl.GroovyScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.test.utils.CacheTemplateMockUtils;
 import org.craftercms.engine.test.utils.ContentStoreServiceMockUtils;
 import org.craftercms.engine.util.groovy.ContentStoreResourceConnector;
 import org.junit.Before;
@@ -35,14 +41,9 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Collections;
-import java.util.Map;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -54,13 +55,11 @@ import static org.mockito.Mockito.when;
 public class RestScriptsControllerTest {
 
     private ContentStoreService storeService;
-    private CacheTemplate cacheTemplate;
     private RestScriptsController controller;
 
     @Before
     public void setUp() throws Exception {
         storeService = createContentStoreService();
-        cacheTemplate = createCacheTemplate();
 
         controller = new RestScriptsController();
         controller.setServletContext(createServletContext());
@@ -72,7 +71,7 @@ public class RestScriptsControllerTest {
         MockHttpServletResponse response = createResponse();
 
         setCurrentRequest(request);
-        setCurrentSiteContext(storeService, cacheTemplate);
+        setCurrentSiteContext(storeService);
 
         ModelAndView modelAndView = controller.handleRequest(request, response);
 
@@ -108,7 +107,7 @@ public class RestScriptsControllerTest {
         MockHttpServletResponse response = createResponse();
 
         setCurrentRequest(request);
-        setCurrentSiteContext(storeService, cacheTemplate);
+        setCurrentSiteContext(storeService);
 
         ModelAndView modelAndView = controller.handleRequest(request, response);
 
@@ -127,7 +126,7 @@ public class RestScriptsControllerTest {
         MockHttpServletResponse response = createResponse();
 
         setCurrentRequest(request);
-        setCurrentSiteContext(storeService, cacheTemplate);
+        setCurrentSiteContext(storeService);
 
         ModelAndView modelAndView = controller.handleRequest(request, response);
 
@@ -152,19 +151,11 @@ public class RestScriptsControllerTest {
         return storeService;
     }
 
-    private CacheTemplate createCacheTemplate() {
-        CacheTemplate cacheTemplate = mock(CacheTemplate.class);
-        CacheTemplateMockUtils.setUpWithNoCaching(cacheTemplate);
-
-        return cacheTemplate;
-    }
-
-    private SiteContext createSiteContext(ContentStoreService storeService, CacheTemplate cacheTemplate) {
+    private SiteContext createSiteContext(ContentStoreService storeService) {
         SiteContext siteContext = mock(SiteContext.class);
 
         ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(siteContext);
-        ScriptFactory scriptFactory = new GroovyScriptFactory(siteContext, cacheTemplate, resourceConnector,
-                                                              Collections.emptyMap());
+        ScriptFactory scriptFactory = new GroovyScriptFactory(resourceConnector, Collections.emptyMap());
 
         when(siteContext.getSiteName()).thenReturn("test");
         when(siteContext.getContext()).thenReturn(mock(Context.class));
@@ -175,8 +166,8 @@ public class RestScriptsControllerTest {
         return siteContext;
     }
 
-    private void setCurrentSiteContext(ContentStoreService storeService, CacheTemplate cacheTemplate)  {
-        SiteContext.setCurrent(createSiteContext(storeService, cacheTemplate));
+    private void setCurrentSiteContext(ContentStoreService storeService)  {
+        SiteContext.setCurrent(createSiteContext(storeService));
     }
 
     private void removeCurrentSiteContext() {
