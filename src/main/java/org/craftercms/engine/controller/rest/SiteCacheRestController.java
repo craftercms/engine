@@ -20,12 +20,12 @@ package org.craftercms.engine.controller.rest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.craftercms.commons.exceptions.InvalidManagementTokenException;
 import org.craftercms.core.cache.CacheStatistics;
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.engine.event.SiteContextCreatedEvent;
 import org.craftercms.engine.event.SiteEvent;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.util.logging.CircularQueueLogAppender;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -56,7 +56,7 @@ public class SiteCacheRestController extends RestControllerBase {
 
     @RequestMapping(value = URL_CLEAR, method = RequestMethod.GET)
     @ResponseBody
-    public Map<String, Object> clear(HttpServletRequest request) {
+    public Map<String, Object> clear(HttpServletRequest request) throws InvalidManagementTokenException {
         String token = request.getParameter(PARAM_TOKEN);
         if (StringUtils.isNotEmpty(token) && StringUtils.equals(token, getConfiguredToken())) {
             SiteContext siteContext = SiteContext.getCurrent();
@@ -77,19 +77,19 @@ public class SiteCacheRestController extends RestControllerBase {
 
             return createResponseMessage(msg);
         } else {
-            throw new InvalidMonitoringTokenException("Monitoring authorization failed, invalid token.");
+            throw new InvalidManagementTokenException("Monitoring authorization failed, invalid token.");
         }
     }
 
     @ResponseBody
     @RequestMapping(value = URL_STATS, method = RequestMethod.GET)
-    public CacheStatistics getStatistics(@RequestParam String token) {
+    public CacheStatistics getStatistics(@RequestParam String token) throws InvalidManagementTokenException {
         if (StringUtils.isNotEmpty(token) && StringUtils.equals(token, getConfiguredToken())) {
             SiteContext siteContext = SiteContext.getCurrent();
 
             return siteContext.getCacheService().getStatistics(siteContext.getContext());
         } else {
-            throw new InvalidMonitoringTokenException("Monitoring authorization failed, invalid token.");
+            throw new InvalidManagementTokenException("Monitoring authorization failed, invalid token.");
         }
     }
 

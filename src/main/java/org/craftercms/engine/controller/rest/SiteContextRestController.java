@@ -18,12 +18,12 @@
 package org.craftercms.engine.controller.rest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.craftercms.commons.exceptions.InvalidManagementTokenException;
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.engine.event.SiteContextCreatedEvent;
 import org.craftercms.engine.event.SiteEvent;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.service.context.SiteContextManager;
-import org.craftercms.engine.util.logging.CircularQueueLogAppender;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -62,16 +62,16 @@ public class SiteContextRestController extends RestControllerBase {
     }
 
     @GetMapping(value = URL_CONTEXT_ID)
-    public Map<String, String> getContextId(@RequestParam String token) {
+    public Map<String, String> getContextId(@RequestParam String token) throws InvalidManagementTokenException {
         if (StringUtils.isNotEmpty(token) && StringUtils.equals(token, getConfiguredToken())) {
             return Collections.singletonMap(MODEL_ATTR_ID, SiteContext.getCurrent().getContext().getId());
         } else {
-            throw new InvalidMonitoringTokenException("Monitoring authorization failed, invalid token.");
+            throw new InvalidManagementTokenException("Monitoring authorization failed, invalid token.");
         }
     }
 
     @GetMapping(value = URL_DESTROY)
-    public Map<String, Object> destroy(@RequestParam String token) {
+    public Map<String, Object> destroy(@RequestParam String token) throws InvalidManagementTokenException {
         if (StringUtils.isNotEmpty(token) && StringUtils.equals(token, getConfiguredToken())) {
             String siteName = SiteContext.getCurrent().getSiteName();
 
@@ -80,12 +80,12 @@ public class SiteContextRestController extends RestControllerBase {
             return createResponseMessage("Site context for '" + siteName + "' destroyed. Will be recreated on next " +
                     "request");
         } else {
-            throw new InvalidMonitoringTokenException("Monitoring authorization failed, invalid token.");
+            throw new InvalidManagementTokenException("Monitoring authorization failed, invalid token.");
         }
     }
 
     @GetMapping(value = URL_REBUILD)
-    public Map<String, Object> rebuild(HttpServletRequest request) {
+    public Map<String, Object> rebuild(HttpServletRequest request) throws InvalidManagementTokenException {
         String token = request.getParameter(PARAM_TOKEN);
         if (StringUtils.isNotEmpty(token) && StringUtils.equals(token, getConfiguredToken())) {
             SiteContext siteContext = SiteContext.getCurrent();
@@ -101,12 +101,12 @@ public class SiteContextRestController extends RestControllerBase {
                 return createResponseMessage("Started rebuild for Site context for '" + siteName + "'");
             }
         } else {
-            throw new InvalidMonitoringTokenException("Monitoring authorization failed, invalid token.");
+            throw new InvalidManagementTokenException("Monitoring authorization failed, invalid token.");
         }
     }
 
     @GetMapping(URL_GRAPHQL + URL_REBUILD)
-    public Map<String, Object> rebuildSchema(HttpServletRequest request) {
+    public Map<String, Object> rebuildSchema(HttpServletRequest request) throws InvalidManagementTokenException {
         String token = request.getParameter(PARAM_TOKEN);
         if (StringUtils.isNotEmpty(token) && StringUtils.equals(token, getConfiguredToken())) {
             SiteContext siteContext = SiteContext.getCurrent();
@@ -122,7 +122,7 @@ public class SiteContextRestController extends RestControllerBase {
                 return createResponseMessage("Rebuild of GraphQL schema for started for '" + siteName + "'");
             }
         } else {
-            throw new InvalidMonitoringTokenException("Monitoring authorization failed, invalid token.");
+            throw new InvalidManagementTokenException("Monitoring authorization failed, invalid token.");
         }
     }
 
