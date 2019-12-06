@@ -26,7 +26,9 @@
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
     <import resource="classpath:crafter/core/core-context.xml"/>
-    <import resource="classpath:crafter/engine/services/security-context.xml"/>
+    <import resource="classpath:crafter/engine/services/profile-context.xml"/>
+    <!-- Spring Security context, optional to avoid conflicts in Studio -->
+    <import resource="classpath*:crafter/engine/services/security-context.xml"/>
     <import resource="classpath:crafter/engine/services/scripting-context.xml"/>
     <import resource="classpath:crafter/engine/services/url-transformation-context.xml"/>
     <import resource="classpath:crafter/engine/services/targeting-context.xml"/>
@@ -267,6 +269,19 @@
         <property name="sortComparator">
             <bean class="org.craftercms.engine.model.sorting.OrderDefaultComparator"/>
         </property>
+    </bean>
+
+    <!-- ////////////////////////////////// -->
+    <!--                                    -->
+    <!--              Security              -->
+    <!--                                    -->
+    <!-- ////////////////////////////////// -->
+
+    <bean id="crafter.textEncryptor" class="org.craftercms.commons.crypto.impl.NoOpTextEncryptor"/>
+
+    <bean id="crafter.pageAccessManager" class="org.craftercms.engine.security.CrafterPageAccessManager">
+        <property name="authorizedRolesXPathQuery"
+                  value="${crafter.security.authorization.page.authorizedRoles.xpathQuery}"/>
     </bean>
 
     <!-- ////////////////////////////////// -->
@@ -627,9 +642,11 @@
         <entry key="elasticsearch" value-ref="crafter.elasticsearchService"/>
         <entry key="breadcrumbBuilder" value-ref="crafter.breadcrumbBuilder"/>
         <entry key="globalProperties" value-ref="crafter.propertyResolver"/>
-        <entry key="tenantsResolver" value-ref="crafter.tenantsResolver"/>
         <entry key="modePreview" value="#{T(java.lang.Boolean).valueOf(${crafter.engine.preview})}"/>
         <entry key="crafterEnv" value="${crafter.engine.environment}"/>
+
+        <!-- For backwards compatibility only, should not be used anymore -->
+        <entry key="tenantsResolver" value-ref="crafter.tenantsResolver"/>
     </util:map>
 
     <bean id="crafter.freeMarkerConfigFactory"
@@ -642,7 +659,6 @@
     <!--		  Social Services			-->
     <!--									-->
     <!-- ////////////////////////////////// -->
-
     <bean id="crafter.connectionFactoryLocator"
           class="org.craftercms.engine.util.spring.social.ConfigAwareConnectionFactoryLocator">
         <property name="defaultLocator" ref="crafter.defaultConnectionFactoryLocator"/>
@@ -654,9 +670,10 @@
         <!-- Override to specify default connection factories -->
     </bean>
 
-    <bean id="crafter.providerLoginSupport" class="org.craftercms.security.social.impl.ProviderLoginSupportImpl">
+    <bean id="crafter.providerLoginSupport"
+          class="org.craftercms.engine.util.spring.security.profile.SecurityContextAwareProviderLoginSupport">
         <property name="connectionFactoryLocator" ref="crafter.connectionFactoryLocator"/>
-        <property name="authenticationManager" ref="crafter.authenticationManager"/>
+        <property name="authenticationManager" ref="crafter.profileAuthenticationManager"/>
         <property name="profileService" ref="crafter.profileServiceRestClient"/>
         <property name="textEncryptor" ref="crafter.textEncryptor"/>
     </bean>

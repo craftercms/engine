@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.craftercms.engine.security;
+package org.craftercms.engine.util.spring.security.targeting;
 
 import org.craftercms.profile.api.Profile;
 import org.craftercms.security.authentication.Authentication;
@@ -25,11 +25,11 @@ import org.craftercms.security.authentication.Authentication;
  *
  * @author avasquez
  */
-public class PreAuthenticatedProfile implements Authentication {
+public class TargetingAuthentication implements Authentication {
 
     protected Profile profile;
 
-    public PreAuthenticatedProfile(Profile profile) {
+    public TargetingAuthentication(Profile profile) {
         this.profile = profile;
     }
 

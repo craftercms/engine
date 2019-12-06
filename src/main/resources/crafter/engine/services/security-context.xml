@@ -18,56 +18,250 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd">
 
-    <import resource="classpath:crafter/security/security-context.xml"/>
+    <!-- Spring Security Integration -->
 
-    <bean id="crafter.pageAccessManager" class="org.craftercms.engine.security.CrafterPageAccessManager">
-        <property name="authorizedRolesXPathQuery"
-                  value="${crafter.security.authorization.page.authorizedRoles.xpathQuery}"/>
-    </bean>
+    <!-- Login Handlers -->
 
-    <bean id="crafter.loginSuccessHandler" class="org.craftercms.engine.security.ConfigAwareLoginSuccessHandler">
+    <bean id="crafter.loginSuccessHandler"
+          class="org.craftercms.engine.util.spring.security.ConfigAwareAuthenticationSuccessHandler">
         <property name="defaultTargetUrl" value="${crafter.security.login.success.url}"/>
         <property name="alwaysUseDefaultTargetUrl" value="${crafter.security.login.success.alwaysUseDefaultUrl}"/>
+        <property name="requestCache" ref="crafter.requestCache"/>
     </bean>
 
-    <bean id="crafter.loginFailureHandler" class="org.craftercms.engine.security.ConfigAwareLoginFailureHandler">
-        <property name="targetUrl" value="${crafter.security.login.failure.url}"/>
+    <bean id="crafter.loginFailureHandler"
+          class="org.craftercms.engine.util.spring.security.ConfigAwareAuthenticationFailureHandler">
+        <property name="defaultFailureUrl" value="${crafter.security.login.failure.url}"/>
     </bean>
 
-    <bean id="crafter.logoutSuccessHandler" class="org.craftercms.engine.security.ConfigAwareLogoutSuccessHandler">
-        <property name="targetUrl" value="${crafter.security.logout.success.url}"/>
+    <!-- Logout Handlers -->
+
+    <bean id="crafter.logoutSuccessHandler"
+          class="org.craftercms.engine.util.spring.security.ConfigAwareLogoutSuccessHandler">
+        <property name="defaultTargetUrl" value="${crafter.security.logout.success.url}"/>
     </bean>
 
-    <bean id="crafter.authenticationRequiredHandler"
-          class="org.craftercms.engine.security.ConfigAwareAuthenticationRequiredHandler">
-        <property name="loginFormUrl" value="${crafter.security.login.form.url}"/>
+    <bean name="crafter.logoutHandler"
+          class="org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler"/>
+
+    <util:list id="crafter.logoutHandlers">
+        <ref bean="crafter.profileLogoutHandler"/>
+        <ref bean="crafter.profileRememberMeServices"/>
+        <ref bean="crafter.logoutHandler"/>
+    </util:list>
+
+    <!-- Access Denied Handlers -->
+
+    <bean id="crafter.accessDeniedHandler"
+          class="org.craftercms.engine.util.spring.security.ConfigAwareAccessDeniedHandler"/>
+
+    <!-- Entry Points -->
+    <bean id="crafter.authenticationEntryPoint"
+          class="org.craftercms.engine.util.spring.security.ConfigAwareLoginUrlAuthenticationEntryPoint">
+        <constructor-arg value="${crafter.security.login.form.url}"/>
     </bean>
 
-    <bean id="crafter.accessDeniedHandler" class="org.craftercms.engine.security.ConfigAwareAccessDeniedHandler">
-        <property name="errorPageUrl" value="${crafter.security.accessDenied.error.url}"/>
+    <!-- User Details -->
+    <bean id="crafter.preAuthenticatedUserDetailsService"
+          class="org.craftercms.engine.util.spring.security.DefaultPreAuthenticatedUserDetailsService"/>
+
+    <bean id="crafter.defaultDetailsSource"
+          class="org.craftercms.engine.util.spring.security.DefaultAuthenticationDetailsSource"/>
+
+    <!-- Authentication -->
+
+    <util:list id="crafter.authenticationProviders">
+        <ref bean="crafter.profilePreAuthenticationProvider"/>
+        <ref bean="crafter.standaloneHeadersAuthenticationProvider"/>
+        <ref bean="crafter.profileAuthenticationProvider"/>
+        <ref bean="crafter.rememberMeAuthenticationProvider"/>
+    </util:list>
+
+    <bean id="crafter.authenticationManager" class="org.springframework.security.authentication.ProviderManager">
+        <constructor-arg ref="crafter.authenticationProviders"/>
     </bean>
 
-    <bean id="crafter.addSecurityCookiesProcessor"
-          class="org.craftercms.engine.security.PreAuthenticatedAddSecurityCookiesProcessor">
-        <property name="ticketCookieManager" ref="crafter.ticketCookieManager"/>
-        <property name="profileLastModifiedCookieManager" ref="crafter.profileLastModifiedCookieManager"/>
+    <bean id="crafter.rememberMeAuthenticationProvider"
+          class="org.springframework.security.authentication.RememberMeAuthenticationProvider">
+        <constructor-arg value="${crafter.security.rememberme.key}"/>
     </bean>
 
-    <bean id="crafter.urlAccessRestrictionCheckingProcessor"
-          class="org.craftercms.engine.security.ConfigAwareUrlAccessRestrictionCheckingProcessor">
-        <property name="urlRestrictions" ref="crafter.urlRestrictions"/>
-        <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
+    <bean id="crafter.standaloneHeadersAuthenticationProvider"
+          class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
+        <property name="preAuthenticatedUserDetailsService" ref="crafter.preAuthenticatedUserDetailsService"/>
     </bean>
 
-    <bean id="crafter.headersLoginProcessor"
-          class="org.craftercms.engine.security.ConfigAwareAuthenticationHeadersLoginProcessor">
-        <property name="tenantService" ref="crafter.tenantServiceRestClient"/>
-        <property name="profileService" ref="crafter.profileServiceRestClient"/>
-        <property name="tenantsResolver" ref="crafter.tenantsResolver"/>
+    <!-- Authorization -->
+
+    <util:list id="crafter.accessDecisionVoters">
+        <bean class="org.springframework.security.web.access.expression.WebExpressionVoter"/>
+        <bean class="org.springframework.security.access.vote.RoleVoter"/>
+        <bean class="org.springframework.security.access.vote.AuthenticatedVoter"/>
+    </util:list>
+    
+    <bean id="crafter.accessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
+        <constructor-arg ref="crafter.accessDecisionVoters"/>
+    </bean>
+
+    <bean id="crafter.securityMetadataSource"
+          class="org.craftercms.engine.util.spring.security.ConfigAwareSecurityMetadataSource">
+        <constructor-arg ref="crafter.cacheTemplate"/>
+    </bean>
+
+    <!-- Session Management -->
+
+    <bean id="crafter.securityContextRepository"
+          class="org.springframework.security.web.context.HttpSessionSecurityContextRepository">
+        <property name="disableUrlRewriting" value="true"/>
+    </bean>
+
+    <bean id="crafter.sessionAuthenticationStrategy"
+          class="org.springframework.security.web.authentication.session.SessionFixationProtectionStrategy"/>
+
+    <bean id="crafter.requestCache" class="org.springframework.security.web.savedrequest.HttpSessionRequestCache"/>
+
+    <!-- Remember Me -->
+
+    <bean id="crafter.profileRememberMeServices"
+          class="org.craftercms.engine.util.spring.security.profile.ProfileRememberMeServices">
+        <constructor-arg value="${crafter.security.rememberme.key}"/>
+        <constructor-arg ref="crafter.profileUserDetailsService"/>
+        <constructor-arg ref="crafter.authenticationServiceRestClient"/>
+    </bean>
+
+    <!-- Profile Integration   -->
+
+    <bean id="crafter.profileLogoutHandler"
+          class="org.craftercms.engine.util.spring.security.profile.ProfileLogoutHandler">
+        <constructor-arg ref="crafter.profileAuthenticationManager"/>
+    </bean>
+
+    <bean id="crafter.profileAuthenticationProvider"
+          class="org.craftercms.engine.util.spring.security.profile.ProfileAuthenticationProvider">
+        <constructor-arg ref="crafter.tenantsResolver"/>
+        <constructor-arg ref="crafter.profileAuthenticationManager"/>
+    </bean>
+
+    <bean id="crafter.profileUserDetailsService"
+          class="org.craftercms.engine.util.spring.security.profile.ProfileUserDetailsService">
+        <constructor-arg ref="crafter.tenantsResolver"/>
+        <constructor-arg ref="crafter.profileServiceRestClient"/>
+    </bean>
+
+    <bean id="crafter.profilePreAuthenticationProvider"
+          class="org.craftercms.engine.util.spring.security.profile.PreAuthenticatedProfileProvider">
+        <constructor-arg ref="crafter.profileAuthenticationManager"/>
+    </bean>
+
+    <bean id="crafter.profileHeadersAuthenticationFilter"
+          class="org.craftercms.engine.util.spring.security.profile.ProfileHeadersAuthenticationFilter">
+        <constructor-arg ref="crafter.profileServiceRestClient"/>
+        <constructor-arg ref="crafter.tenantServiceRestClient"/>
+        <constructor-arg ref="crafter.tenantsResolver"/>
         <property name="authenticationManager" ref="crafter.authenticationManager"/>
+        <property name="defaultTokenValue" value="${crafter.security.header.token}"/>
     </bean>
+
+    <!-- Security Filters -->
+
+    <bean id="crafter.securityContextFilter"
+          class="org.springframework.security.web.context.SecurityContextPersistenceFilter">
+        <constructor-arg ref="crafter.securityContextRepository" />
+    </bean>
+
+    <bean id="crafter.logoutFilter" class="org.springframework.security.web.authentication.logout.LogoutFilter">
+        <constructor-arg ref="crafter.logoutSuccessHandler"/>
+        <constructor-arg ref="crafter.logoutHandlers"/>
+        <property name="filterProcessesUrl" value="${crafter.security.logout.url}"/>
+    </bean>
+
+    <bean id="crafter.standaloneHeadersAuthenticationFilter"
+          class="org.craftercms.engine.util.spring.security.headers.StandaloneHeadersAuthenticationFilter">
+        <constructor-arg ref="crafter.cacheTemplate"/>
+        <property name="authenticationManager" ref="crafter.authenticationManager"/>
+        <property name="authenticationDetailsSource" ref="crafter.defaultDetailsSource"/>
+    </bean>
+
+    <bean id="crafter.formLoginFilter"
+          class="org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter">
+        <property name="filterProcessesUrl" value="${crafter.security.login.url}"/>
+        <property name="authenticationManager" ref="crafter.authenticationManager"/>
+        <property name="authenticationSuccessHandler" ref="crafter.loginSuccessHandler"/>
+        <property name="authenticationFailureHandler" ref="crafter.loginFailureHandler"/>
+        <property name="sessionAuthenticationStrategy" ref="crafter.sessionAuthenticationStrategy"/>
+        <property name="rememberMeServices" ref="crafter.profileRememberMeServices"/>
+    </bean>
+
+    <bean id="crafter.rememberMeFilter"
+          class="org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter">
+        <constructor-arg ref="crafter.authenticationManager" />
+        <constructor-arg ref="crafter.profileRememberMeServices"/>
+    </bean>
+
+    <bean id="crafter.requestCacheFilter"
+          class="org.springframework.security.web.savedrequest.RequestCacheAwareFilter">
+        <constructor-arg ref="crafter.requestCache"/>
+    </bean>
+
+    <bean id="crafter.servletApiFilter"
+          class="org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter">
+        <property name="authenticationEntryPoint" ref="crafter.authenticationEntryPoint"/>
+        <property name="authenticationManager" ref="crafter.authenticationManager"/>
+        <property name="logoutHandlers" ref="crafter.logoutHandlers"/>
+    </bean>
+
+    <bean id="crafter.sessionManagementFilter"
+          class="org.springframework.security.web.session.SessionManagementFilter">
+        <constructor-arg ref="crafter.securityContextRepository" />
+    </bean>
+
+    <bean id="crafter.exceptionTranslationFilter"
+          class="org.springframework.security.web.access.ExceptionTranslationFilter">
+        <constructor-arg ref="crafter.authenticationEntryPoint"/>
+        <constructor-arg ref="crafter.requestCache"/>
+        <property name="accessDeniedHandler" ref="crafter.accessDeniedHandler"/>
+    </bean>
+
+    <bean id="crafter.filterSecurityInterceptor"
+          class="org.springframework.security.web.access.intercept.FilterSecurityInterceptor">
+        <property name="securityMetadataSource" ref="crafter.securityMetadataSource"/>
+        <property name="authenticationManager" ref="crafter.authenticationManager"/>
+        <property name="accessDecisionManager" ref="crafter.accessDecisionManager"/>
+    </bean>
+
+    <util:list id="crafter.securityFilters">
+        <ref bean="crafter.securityContextFilter"/>
+        <ref bean="crafter.logoutFilter"/>
+        <ref bean="crafter.standaloneHeadersAuthenticationFilter"/>
+        <ref bean="crafter.profileHeadersAuthenticationFilter"/>
+        <ref bean="crafter.formLoginFilter"/>
+        <ref bean="crafter.rememberMeFilter"/>
+        <ref bean="crafter.requestCacheFilter"/>
+        <ref bean="crafter.servletApiFilter"/>
+        <ref bean="crafter.sessionManagementFilter"/>
+        <ref bean="crafter.exceptionTranslationFilter"/>
+        <ref bean="crafter.filterSecurityInterceptor"/>
+    </util:list>
+
+    <!-- Security Filter Chains -->
+
+    <bean id="crafter.securityFilterChain"
+          class="org.craftercms.engine.util.spring.security.DefaultSecurityFilterChain">
+        <constructor-arg value="${crafter.security.enabled}"/>
+        <constructor-arg value="${crafter.security.urlsToExclude}"/>
+        <constructor-arg ref="crafter.securityFilters"/>
+    </bean>
+
+    <bean id="crafter.securityFilter" class="org.springframework.security.web.FilterChainProxy">
+        <constructor-arg ref="crafter.securityFilterChain"/>
+    </bean>
+
+    <!-- Include additional security contexts -->
+    <import resource="classpath*:crafter/engine/security/*-context.xml"/>
 
 </beans>

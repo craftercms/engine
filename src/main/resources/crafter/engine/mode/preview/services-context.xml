@@ -100,10 +100,7 @@
     <!--									-->
     <!-- ////////////////////////////////// -->
 
-    <bean id="crafter.currentAuthenticationResolvingProcessor"
-          class="org.craftercms.engine.security.PreviewCurrentAuthenticationResolvingProcessor">
-        <property name="authenticationManager" ref="crafter.authenticationManager"/>
-    </bean>
+    <import resource="classpath:crafter/engine/mode/preview/security-context.xml"/>
 
     <bean id="crafter.tenantsResolver" class="org.craftercms.engine.util.tenant.SiteNameTenantResolver"/>
 

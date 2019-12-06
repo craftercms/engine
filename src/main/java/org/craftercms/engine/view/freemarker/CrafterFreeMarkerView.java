@@ -40,12 +40,13 @@ import org.craftercms.engine.service.SiteItemService;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.freemarker.HttpRequestHashModel;
 import org.craftercms.engine.util.spring.ApplicationContextAccessor;
-import org.craftercms.security.authentication.Authentication;
-import org.craftercms.security.utils.SecurityUtils;
+import org.craftercms.engine.util.spring.security.profile.ProfileUser;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerView;
 
@@ -72,6 +73,7 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     public static final String KEY_APP_CONTEXT = "applicationContext";
     public static final String KEY_COOKIES_CAP = "Cookies";
     public static final String KEY_COOKIES = "cookies";
+    public static final String KEY_AUTH_TOKEN = "authToken";
     public static final String KEY_AUTH_CAP = "Authentication";
     public static final String KEY_AUTH = "authentication";
     public static final String KEY_PROFILE_CAP = "Profile";
@@ -179,12 +181,19 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
         templateModel.put(KEY_COOKIES_CAP, cookies);
         templateModel.put(KEY_COOKIES, cookies);
 
-        Authentication auth = SecurityUtils.getAuthentication(request);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null) {
-            templateModel.put(KEY_AUTH_CAP, auth);
-            templateModel.put(KEY_AUTH, auth);
-            templateModel.put(KEY_PROFILE_CAP, auth.getProfile());
-            templateModel.put(KEY_PROFILE, auth.getProfile());
+            templateModel.put(KEY_AUTH_TOKEN, auth);
+
+            // for backwards compatibility with Profile ...
+
+            if (auth.getPrincipal() instanceof ProfileUser) {
+                ProfileUser details = (ProfileUser) auth.getPrincipal();
+                templateModel.put(KEY_AUTH_CAP, details.getAuthentication());
+                templateModel.put(KEY_AUTH, details.getAuthentication());
+                templateModel.put(KEY_PROFILE_CAP, details.getProfile());
+                templateModel.put(KEY_PROFILE, details.getProfile());
+            }
         }
 
         SiteContext siteContext = SiteContext.getCurrent();
