@@ -43,7 +43,7 @@ public class MonitoringController extends MonitoringRestControllerBase {
 
     @GetMapping(MonitoringRestControllerBase.ROOT_URL + LOG_URL)
     public List<Map<String,Object>> getLoggedEvents(@RequestParam String site, @RequestParam long since,
-                                                    @RequestParam String token) {
+                                                    @RequestParam String token) throws InvalidManagementTokenException {
         if (StringUtils.isNotEmpty(token) && StringUtils.equals(token, getConfiguredToken())) {
             return CircularQueueLogAppender.getLoggedEvents(site, since);
         } else {
