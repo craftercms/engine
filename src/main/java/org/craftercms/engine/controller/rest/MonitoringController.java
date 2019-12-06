@@ -20,6 +20,7 @@ package org.craftercms.engine.controller.rest;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.craftercms.commons.monitoring.rest.MonitoringRestControllerBase;
 import org.craftercms.engine.util.logging.CircularQueueLogAppender;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,8 +41,13 @@ public class MonitoringController extends MonitoringRestControllerBase {
     private String configuredToken;
 
     @GetMapping(MonitoringRestControllerBase.ROOT_URL + LOG_URL)
-    public List<Map<String,Object>> getLoggedEvents(@RequestParam String site, @RequestParam long since) {
-        return CircularQueueLogAppender.getLoggedEvents(site, since);
+    public List<Map<String,Object>> getLoggedEvents(@RequestParam String site, @RequestParam long since,
+                                                    @RequestParam String token) {
+        if (StringUtils.isNotEmpty(token) && StringUtils.equals(token, getConfiguredToken())) {
+            return CircularQueueLogAppender.getLoggedEvents(site, since);
+        } else {
+            throw new InvalidMonitoringTokenException("Monitoring authorization failed, invalid token.");
+        }
     }
 
     @Override
