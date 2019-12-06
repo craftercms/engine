@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.craftercms.commons.exceptions.InvalidManagementTokenException;
 import org.craftercms.commons.monitoring.rest.MonitoringRestControllerBase;
 import org.craftercms.engine.util.logging.CircularQueueLogAppender;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,7 +47,7 @@ public class MonitoringController extends MonitoringRestControllerBase {
         if (StringUtils.isNotEmpty(token) && StringUtils.equals(token, getConfiguredToken())) {
             return CircularQueueLogAppender.getLoggedEvents(site, since);
         } else {
-            throw new InvalidMonitoringTokenException("Monitoring authorization failed, invalid token.");
+            throw new InvalidManagementTokenException("Management authorization failed, invalid token.");
         }
     }
 
