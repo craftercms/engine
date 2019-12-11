@@ -22,8 +22,11 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.configuration2.HierarchicalConfiguration;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.bson.types.ObjectId;
 import org.craftercms.core.controller.rest.RestControllerBase;
+import org.craftercms.engine.util.ConfigUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -45,6 +48,8 @@ public class ProfileRestController {
 
     public static final String PROFILE_SESSION_ATTRIBUTE = "_cr_profile_state";
 
+    public static final String CLEANSE_ATTRS_CONFIG_KEY = "preview.targeting.cleanseAttributes";
+
     @RequestMapping(value = "/get", method = RequestMethod.GET)
     @ResponseBody
     @SuppressWarnings("unchecked")
@@ -61,6 +66,8 @@ public class ProfileRestController {
     @RequestMapping(value = "/set", method = RequestMethod.GET)
     @ResponseBody
     public Map<String, String> setProfile(HttpServletRequest request, HttpSession session) {
+        boolean cleanseAttributes = shouldCleanseAttributes();
+
         Map<String, String> profile = new HashMap<String, String>();
         Enumeration<String> paramNamesEnum = request.getParameterNames();
 
@@ -68,7 +75,8 @@ public class ProfileRestController {
             String paramName = paramNamesEnum.nextElement();
             String paramValue = request.getParameter(paramName);
             if (isNotEmpty(paramValue)) {
-                profile.put(paramName, paramValue.trim());
+                String value = paramValue.trim();
+                profile.put(paramName, cleanseAttributes? StringEscapeUtils.escapeHtml4(value) : value);
             }
         }
 
@@ -78,6 +86,12 @@ public class ProfileRestController {
         session.setAttribute(PROFILE_SESSION_ATTRIBUTE, profile);
 
         return profile;
+    }
+
+    @SuppressWarnings("rawtypes")
+    protected boolean shouldCleanseAttributes() {
+        HierarchicalConfiguration siteConfig = ConfigUtils.getCurrentConfig();
+        return siteConfig != null && siteConfig.getBoolean(CLEANSE_ATTRS_CONFIG_KEY, true);
     }
 
 }
