@@ -16,30 +16,15 @@
  */
 package org.craftercms.engine.util;
 
-import java.io.IOException;
-import java.util.Map;
-
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
-import org.apache.commons.configuration2.XMLConfiguration;
-import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
-import org.apache.commons.configuration2.builder.fluent.Parameters;
-import org.apache.commons.configuration2.builder.fluent.XMLBuilderParameters;
-import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
-import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.apache.commons.configuration2.interpol.Lookup;
 import org.craftercms.engine.service.context.SiteContext;
-import org.springframework.core.io.Resource;
 
 /**
  * Configuration related utility methods.
  *
  * @author avasquez
  */
-public class ConfigUtils {
-
-    private ConfigUtils() {
-    }
+public abstract class ConfigUtils {
 
     /**
      * Returns the configuration from the current site context.
@@ -51,33 +36,6 @@ public class ConfigUtils {
         } else {
             return null;
         }
-    }
-
-    public static XMLConfiguration readXmlConfiguration(Resource resource, char listDelimiter) throws ConfigurationException {
-        return readXmlConfiguration(resource, listDelimiter, null);
-    }
-
-    public static XMLConfiguration readXmlConfiguration(Resource resource, char listDelimiter,
-                                                        Map<String, Lookup> prefixLookups) throws ConfigurationException {
-        Parameters params = new Parameters();
-        FileBasedConfigurationBuilder<XMLConfiguration> builder = new FileBasedConfigurationBuilder<>(XMLConfiguration.class);
-
-        try {
-            XMLBuilderParameters xmlParams = params
-                .xml()
-                .setURL(resource.getURL())
-                .setListDelimiterHandler(new DefaultListDelimiterHandler(listDelimiter));
-
-            if (MapUtils.isNotEmpty(prefixLookups)) {
-                xmlParams = xmlParams.setPrefixLookups(prefixLookups);
-            }
-
-            builder.configure(xmlParams);
-        } catch (IOException e) {
-            throw new ConfigurationException("Unable to get URL of resource " + resource, e);
-        }
-
-        return builder.getConfiguration();
     }
 
 }
