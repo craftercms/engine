@@ -118,12 +118,14 @@ public abstract class AbstractHeadersAuthenticationFilter extends ConfigAwarePre
     protected boolean hasValidToken(HttpServletRequest request) {
         logger.debug("Checking security token from request headers");
         String tokenHeaderValue = request.getHeader(tokenHeaderName);
-        if (StringUtils.equals(tokenHeaderValue, getTokenExpectedValue())) {
-            return true;
-        } else {
+        if (StringUtils.isEmpty(tokenHeaderValue)) {
+            logger.debug("No security token found for request from '{}'", request.getRemoteAddr());
+            return false;
+        } else if (!StringUtils.equals(tokenHeaderValue, getTokenExpectedValue())) {
             logger.warn("Security token mismatch during authentication from '{}'", request.getRemoteAddr());
             return false;
         }
+        return true;
     }
 
 }
