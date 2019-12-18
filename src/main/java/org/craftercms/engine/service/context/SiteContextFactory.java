@@ -23,6 +23,7 @@ import org.apache.commons.configuration2.builder.ConfigurationBuilder;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.craftercms.commons.config.MultiResourceConfigurationBuilder;
 import org.craftercms.commons.crypto.TextEncryptor;
 import org.craftercms.commons.crypto.impl.NoOpTextEncryptor;
 import org.craftercms.commons.spring.ApacheCommonsConfiguration2PropertySource;
@@ -38,7 +39,6 @@ import org.craftercms.engine.scripting.ScriptJobResolver;
 import org.craftercms.engine.scripting.impl.GroovyScriptFactory;
 import org.craftercms.engine.util.SchedulingUtils;
 import org.craftercms.engine.cache.SiteCacheWarmer;
-import org.craftercms.engine.util.config.impl.MultiResourceConfigurationBuilder;
 import org.craftercms.engine.util.groovy.ContentStoreGroovyResourceLoader;
 import org.craftercms.engine.util.groovy.ContentStoreResourceConnector;
 import org.craftercms.engine.util.quartz.JobContext;
@@ -347,7 +347,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
 
         try {
 
-            ConfigurationBuilder<HierarchicalConfiguration> builder;
+            ConfigurationBuilder<HierarchicalConfiguration<?>> builder;
 
             if (textEncryptor instanceof NoOpTextEncryptor) {
                 builder = new MultiResourceConfigurationBuilder(configPaths, resourceLoader);

@@ -277,7 +277,14 @@
     <!--                                    -->
     <!-- ////////////////////////////////// -->
 
-    <bean id="crafter.textEncryptor" class="org.craftercms.commons.crypto.impl.NoOpTextEncryptor"/>
+    <bean id="crafter.textEncryptor" class="org.craftercms.commons.crypto.impl.PbkAesTextEncryptor">
+        <constructor-arg value="${crafter.security.encryption.key}"/>
+        <constructor-arg value="${crafter.security.encryption.salt}"/>
+    </bean>
+
+    <bean id="crafter.configurationReader" class="org.craftercms.commons.config.EncryptionAwareConfigurationReader">
+        <constructor-arg ref="crafter.textEncryptor"/>
+    </bean>
 
     <bean id="crafter.pageAccessManager" class="org.craftercms.engine.security.CrafterPageAccessManager">
         <property name="authorizedRolesXPathQuery"
@@ -763,7 +770,9 @@
     <bean id="crafter.s3ProfileLoader" class="org.craftercms.engine.util.config.profiles.ConfigurationProfileLoaderImpl">
         <property name="profilesUrl" value="${crafter.engine.site.default.config.aws.profiles.path}"/>
         <property name="profileMapper">
-            <bean class="org.craftercms.commons.config.profiles.aws.S3ProfileMapper"/>
+            <bean class="org.craftercms.commons.config.profiles.aws.S3ProfileMapper">
+                <constructor-arg ref="crafter.configurationReader"/>
+            </bean>
         </property>
         <property name="siteItemService" ref="crafter.siteItemService"/>
     </bean>
@@ -771,7 +780,9 @@
     <bean id="crafter.boxProfileLoader" class="org.craftercms.engine.util.config.profiles.ConfigurationProfileLoaderImpl">
         <property name="profilesUrl" value="${crafter.engine.site.default.config.box.profiles.path}"/>
         <property name="profileMapper">
-            <bean class="org.craftercms.commons.config.profiles.box.BoxProfileMapper"/>
+            <bean class="org.craftercms.commons.config.profiles.box.BoxProfileMapper">
+                <constructor-arg ref="crafter.configurationReader"/>
+            </bean>
         </property>
         <property name="siteItemService" ref="crafter.siteItemService"/>
     </bean>
@@ -780,7 +791,9 @@
           class="org.craftercms.engine.util.config.profiles.ConfigurationProfileLoaderImpl">
         <property name="profilesUrl" value="${crafter.engine.site.default.config.webdav.profiles.path}"/>
         <property name="profileMapper">
-            <bean class="org.craftercms.commons.config.profiles.webdav.WebDavProfileMappper"/>
+            <bean class="org.craftercms.commons.config.profiles.webdav.WebDavProfileMapper">
+                <constructor-arg ref="crafter.configurationReader"/>
+            </bean>
         </property>
         <property name="siteItemService" ref="crafter.siteItemService"/>
     </bean>
