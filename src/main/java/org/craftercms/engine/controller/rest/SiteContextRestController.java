@@ -66,7 +66,7 @@ public class SiteContextRestController extends RestControllerBase {
         if (StringUtils.isNotEmpty(token) && StringUtils.equals(token, getConfiguredToken())) {
             return Collections.singletonMap(MODEL_ATTR_ID, SiteContext.getCurrent().getContext().getId());
         } else {
-            throw new InvalidManagementTokenException("Monitoring authorization failed, invalid token.");
+            throw new InvalidManagementTokenException("Management authorization failed, invalid token.");
         }
     }
 
@@ -80,7 +80,7 @@ public class SiteContextRestController extends RestControllerBase {
             return createResponseMessage("Site context for '" + siteName + "' destroyed. Will be recreated on next " +
                     "request");
         } else {
-            throw new InvalidManagementTokenException("Monitoring authorization failed, invalid token.");
+            throw new InvalidManagementTokenException("Management authorization failed, invalid token.");
         }
     }
 
@@ -101,7 +101,7 @@ public class SiteContextRestController extends RestControllerBase {
                 return createResponseMessage("Started rebuild for Site context for '" + siteName + "'");
             }
         } else {
-            throw new InvalidManagementTokenException("Monitoring authorization failed, invalid token.");
+            throw new InvalidManagementTokenException("Management authorization failed, invalid token.");
         }
     }
 
@@ -122,7 +122,7 @@ public class SiteContextRestController extends RestControllerBase {
                 return createResponseMessage("Rebuild of GraphQL schema for started for '" + siteName + "'");
             }
         } else {
-            throw new InvalidManagementTokenException("Monitoring authorization failed, invalid token.");
+            throw new InvalidManagementTokenException("Management authorization failed, invalid token.");
         }
     }
 

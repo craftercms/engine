@@ -77,7 +77,7 @@ public class SiteCacheRestController extends RestControllerBase {
 
             return createResponseMessage(msg);
         } else {
-            throw new InvalidManagementTokenException("Monitoring authorization failed, invalid token.");
+            throw new InvalidManagementTokenException("Management authorization failed, invalid token.");
         }
     }
 
@@ -89,7 +89,7 @@ public class SiteCacheRestController extends RestControllerBase {
 
             return siteContext.getCacheService().getStatistics(siteContext.getContext());
         } else {
-            throw new InvalidManagementTokenException("Monitoring authorization failed, invalid token.");
+            throw new InvalidManagementTokenException("Management authorization failed, invalid token.");
         }
     }
 
