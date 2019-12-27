@@ -597,6 +597,8 @@
 
     <bean id="crafter.elasticsearchService" class="org.craftercms.engine.search.SiteAwareElasticsearchService">
         <property name="serverUrls" value="${crafter.engine.elasticsearch.urls}"/>
+        <property name="username" value="${crafter.engine.elasticsearch.username}"/>
+        <property name="password" value="${crafter.engine.elasticsearch.password}"/>
         <property name="filterQueries" value="${crafter.engine.elasticsearch.filters}"/>
         <property name="indexIdFormat" value="${crafter.engine.search.index.format}"/>
     </bean>
