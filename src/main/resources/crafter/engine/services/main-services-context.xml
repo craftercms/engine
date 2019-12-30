@@ -777,11 +777,11 @@
     <bean id="crafter.profileAwareRemotePathParser"
           class="org.craftercms.commons.file.stores.impl.PathPartsBasedProfileAwareRemotePathParser"/>
 
-    <bean id="crafter.s3ClientCachingFactory" class="org.craftercms.commons.file.stores.S3ClientCachingFactory"/>
+    <bean id="crafter.s3ClientFactory" class="org.craftercms.commons.aws.S3ClientCachingFactory"/>
 
     <bean id="crafter.s3FileStore" class="org.craftercms.commons.file.stores.impl.s3.S3FileStore">
         <property name="profileLoader" ref="crafter.s3ProfileLoader"/>
-        <property name="s3ClientCachingFactory" ref="crafter.s3ClientCachingFactory"/>
+        <property name="clientFactory" ref="crafter.s3ClientFactory"/>
     </bean>
 
     <bean id="crafter.boxFileStore" class="org.craftercms.commons.file.stores.impl.box.BoxFileStore">
