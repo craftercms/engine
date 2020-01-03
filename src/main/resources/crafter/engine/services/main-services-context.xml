@@ -400,7 +400,7 @@
     <bean id="crafter.contentStoreServiceTreeBasedContextCacheWarmer"
           class="org.craftercms.engine.cache.ContentStoreServiceTreeBasedContextCacheWarmer">
         <property name="warmUpEnabled" value="${crafter.engine.site.cache.warmUp.enabled}"/>
-        <property name="preloadFolders" value="${crafter.engine.site.cache.warmUp.descriptor.folders}"/>
+        <property name="descriptorPreloadFolders" value="${crafter.engine.site.cache.warmUp.descriptor.folders}"/>
         <property name="contentStoreService" ref="crafter.contentStoreService"/>
     </bean>
 
