@@ -17,11 +17,13 @@
 package org.craftercms.engine.cache;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.service.Item;
 import org.craftercms.core.util.ContentStoreUtils;
+import org.craftercms.engine.properties.SiteProperties;
 import org.craftercms.engine.util.CacheUtils;
 import org.craftercms.engine.util.store.decorators.DecoratedStoreAdapterContext;
 import org.slf4j.Logger;
@@ -84,11 +86,11 @@ public class ContentStoreAdapterPreloadedFoldersBasedCacheWarmer implements Cont
             throw new IllegalStateException("PreloadedFoldersAwareContext expected but not found");
         }
 
-        for (Map.Entry<String, Integer> entry : contentPreloadFolders.entrySet()) {
+        for (Map.Entry<String, Integer> entry : getContentPreloadFolders().entrySet()) {
             preloadFolder(contextWrapper, entry.getKey(), entry.getValue(), true, preloadedFolders);
         }
 
-        for (Map.Entry<String, Integer> entry : descriptorPreloadFolders.entrySet()) {
+        for (Map.Entry<String, Integer> entry : getDescriptorPreloadFolders().entrySet()) {
             preloadFolder(contextWrapper, entry.getKey(), entry.getValue(), false, preloadedFolders);
         }
 
@@ -170,6 +172,24 @@ public class ContentStoreAdapterPreloadedFoldersBasedCacheWarmer implements Cont
                     }
                 }
             }
+        }
+    }
+
+    protected Map<String, Integer> getDescriptorPreloadFolders() {
+        Map<String, Integer> preloadFolders = SiteProperties.getDescriptorPreloadFolders();
+        if (MapUtils.isNotEmpty(preloadFolders)) {
+            return preloadFolders;
+        } else {
+            return descriptorPreloadFolders;
+        }
+    }
+
+    protected Map<String, Integer> getContentPreloadFolders() {
+        Map<String, Integer> preloadFolders = SiteProperties.getContentPreloadFolders();
+        if (MapUtils.isNotEmpty(preloadFolders)) {
+            return preloadFolders;
+        } else {
+            return contentPreloadFolders;
         }
     }
 
