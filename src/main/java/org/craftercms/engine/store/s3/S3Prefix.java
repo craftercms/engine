@@ -35,7 +35,12 @@ public class S3Prefix extends AbstractCachingAwareObject implements File {
      */
     protected String prefix;
 
-    public S3Prefix(final String prefix) {
+    public S3Prefix(String prefix) {
+        if (!prefix.equals(DELIMITER)) {
+            prefix = StringUtils.stripStart(prefix, DELIMITER);
+            prefix = StringUtils.appendIfMissing(prefix, DELIMITER);
+        }
+
         this.prefix = prefix;
     }
 
