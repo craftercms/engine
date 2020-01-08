@@ -74,7 +74,7 @@ public class SiteCacheRestController extends RestControllerBase {
     public CacheStatistics getStatistics() {
         SiteContext siteContext = SiteContext.getCurrent();
 
-        return siteContext.getCacheService().getStatistics(siteContext.getContext());
+        return siteContext.getCacheTemplate().getCacheService().getStatistics(siteContext.getContext());
     }
 
 }

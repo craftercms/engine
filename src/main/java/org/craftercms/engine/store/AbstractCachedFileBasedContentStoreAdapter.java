@@ -56,7 +56,7 @@ public abstract class AbstractCachedFileBasedContentStoreAdapter extends Abstrac
                                      ".findFile(%s, %s)", context, path);
             }
 
-        }, context, path, CONST_KEY_ELEM_FILE);
+        }, path, CONST_KEY_ELEM_FILE);
     }
 
     @Override
@@ -86,7 +86,7 @@ public abstract class AbstractCachedFileBasedContentStoreAdapter extends Abstrac
                                      ".getChildren(%s, %s)", context, dir);
             }
 
-        }, context, dir, CONST_KEY_ELEM_CHILDREN);
+        }, dir, CONST_KEY_ELEM_CHILDREN);
     }
 
     protected abstract File doFindFile(Context context, String path) throws InvalidContextException, StoreException;

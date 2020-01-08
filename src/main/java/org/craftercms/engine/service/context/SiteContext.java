@@ -20,11 +20,13 @@ import graphql.GraphQL;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.lang3.time.StopWatch;
 import org.craftercms.commons.http.RequestContext;
+import org.craftercms.commons.lang.Callback;
 import org.craftercms.core.exception.CrafterException;
 import org.craftercms.core.service.CacheService;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.url.UrlTransformationEngine;
+import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.engine.event.*;
 import org.craftercms.engine.exception.GraphQLBuildException;
 import org.craftercms.engine.exception.SiteContextInitializationException;
@@ -69,7 +71,7 @@ public class SiteContext {
     }
 
     protected ContentStoreService storeService;
-    protected CacheService cacheService;
+    protected CacheTemplate cacheTemplate;
     protected String siteName;
     protected Context context;
     protected boolean fallback;
@@ -100,6 +102,24 @@ public class SiteContext {
      */
     public static SiteContext getCurrent() {
         return threadLocal.get();
+    }
+
+    /**
+     * Returns the item from the cache of the current site context. If there's no current site context, the loader
+     * is called directly to get the item.
+     *
+     * @param loader        the loader used to retrieve the item if it's not in cache
+     * @param keyElements   the elements that conform the key
+     *
+     * @return the cached item
+     */
+    public static <T> T getFromCurrentCache(Callback<T> loader, Object... keyElements) {
+        SiteContext siteContext = getCurrent();
+        if (siteContext != null) {
+            return siteContext.getFromCache(loader, keyElements);
+        } else {
+            return loader.execute();
+        }
     }
 
     /**
@@ -136,12 +156,12 @@ public class SiteContext {
         this.storeService = storeService;
     }
 
-    public CacheService getCacheService() {
-        return cacheService;
+    public CacheTemplate getCacheTemplate() {
+        return cacheTemplate;
     }
 
-    public void setCacheService(CacheService cacheService) {
-        this.cacheService = cacheService;
+    public void setCacheTemplate(CacheTemplate cacheTemplate) {
+        this.cacheTemplate = cacheTemplate;
     }
 
     public String getSiteName() {
@@ -414,6 +434,10 @@ public class SiteContext {
         }
     }
 
+    public <T> T getFromCache(Callback<T> loader, Object... keyElements) {
+        return cacheTemplate.getObject(context, loader, keyElements);
+    }
+
     protected void cacheClear() {
         publishEvent(new CacheClearStartedEvent(this));
 
@@ -423,7 +447,7 @@ public class SiteContext {
             // Clear Freemarker cache
             freeMarkerConfig.getConfiguration().clearTemplateCache();
         } else {
-            cacheService.clearScope(context);
+            cacheTemplate.getCacheService().clearScope(context);
             // Clear Freemarker cache
             freeMarkerConfig.getConfiguration().clearTemplateCache();
         }
