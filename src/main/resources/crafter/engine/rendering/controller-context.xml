@@ -108,6 +108,7 @@
         <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
         <property name="storeService" ref="crafter.contentStoreService"/>
         <property name="siteContextManager" ref="crafter.siteContextManager"/>
+        <property name="authorizationToken" value="${crafter.engine.management.authorizationToken}"/>
     </bean>
 
     <util:map id="crafter.urlMappings">
