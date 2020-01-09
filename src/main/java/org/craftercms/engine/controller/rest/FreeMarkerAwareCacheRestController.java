@@ -17,6 +17,7 @@
 
 package org.craftercms.engine.controller.rest;
 
+import org.craftercms.commons.exceptions.InvalidManagementTokenException;
 import org.craftercms.core.controller.rest.CacheRestController;
 import org.craftercms.core.exception.CacheException;
 import org.craftercms.core.exception.InvalidContextException;
@@ -44,19 +45,23 @@ public class FreeMarkerAwareCacheRestController extends CacheRestController {
     }
 
     @Override
-    public Map<String, Object> clearAllScopes() throws CacheException {
+    public Map<String, Object> clearAllScopes(@RequestParam String token)
+        throws CacheException, InvalidManagementTokenException {
+        validateToken(token);
         Collection<SiteContext> contexts = siteContextManager.listContexts();
 
         for (SiteContext siteContext : contexts) {
             siteContext.getFreeMarkerConfig().getConfiguration().clearTemplateCache();
         }
 
-        return super.clearAllScopes();
+        return super.clearAllScopes(token);
     }
 
     @Override
-    public Map<String, Object> clearScope(@RequestParam(CacheRestController.REQUEST_PARAM_CONTEXT_ID) String contextId)
-        throws InvalidContextException, CacheException {
+    public Map<String, Object> clearScope(@RequestParam(CacheRestController.REQUEST_PARAM_CONTEXT_ID) String contextId,
+                                          @RequestParam String token)
+        throws InvalidContextException, CacheException, InvalidManagementTokenException {
+        validateToken(token);
         Collection<SiteContext> contexts = siteContextManager.listContexts();
 
         for (SiteContext siteContext : contexts) {
@@ -66,7 +71,7 @@ public class FreeMarkerAwareCacheRestController extends CacheRestController {
             }
         }
 
-        return super.clearScope(contextId);
+        return super.clearScope(contextId, token);
     }
 
 }
