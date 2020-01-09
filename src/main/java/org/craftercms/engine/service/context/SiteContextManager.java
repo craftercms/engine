@@ -19,6 +19,8 @@ package org.craftercms.engine.service.context;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.craftercms.commons.concurrent.locks.KeyBasedLockFactory;
+import org.craftercms.commons.concurrent.locks.WeakKeyBasedReentrantLockFactory;
 import org.craftercms.commons.entitlements.exception.EntitlementException;
 import org.craftercms.commons.entitlements.model.EntitlementType;
 import org.craftercms.commons.entitlements.validator.EntitlementValidator;
@@ -45,7 +47,7 @@ public class SiteContextManager {
 
     private static final Log logger = LogFactory.getLog(SiteContextManager.class);
 
-    protected SiteLockFactory siteLockFactory;
+    protected KeyBasedLockFactory<ReentrantLock> siteLockFactory;
     protected Map<String, SiteContext> contextRegistry;
     protected SiteContextFactory contextFactory;
     protected SiteContextFactory fallbackContextFactory;
@@ -56,7 +58,7 @@ public class SiteContextManager {
     protected String defaultSiteName;
 
     public SiteContextManager() {
-        siteLockFactory = new SiteLockFactory();
+        siteLockFactory = new WeakKeyBasedReentrantLockFactory();
         contextRegistry = new ConcurrentHashMap<>();
     }
 
@@ -378,26 +380,6 @@ public class SiteContextManager {
         } catch (EntitlementException e) {
             return false;
         }
-    }
-
-    protected static class SiteLockFactory {
-
-        protected Map<String, Lock> locks;
-
-        public SiteLockFactory() {
-            locks = new WeakHashMap<>();
-        }
-
-        public synchronized Lock getLock(String siteName) {
-            Lock lock = locks.get(siteName);
-            if (lock == null) {
-                lock = new ReentrantLock();
-                locks.put(siteName, lock);
-            }
-
-            return lock;
-        }
-
     }
 
 }

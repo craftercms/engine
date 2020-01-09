@@ -30,6 +30,7 @@ import org.craftercms.core.service.CacheService;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.url.UrlTransformationEngine;
+import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.engine.exception.SiteContextCreationException;
 import org.craftercms.engine.graphql.GraphQLFactory;
 import org.craftercms.engine.macro.MacroResolver;
@@ -101,7 +102,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected ObjectFactory<FreeMarkerConfig> freeMarkerConfigFactory;
     protected UrlTransformationEngine urlTransformationEngine;
     protected ContentStoreService storeService;
-    protected CacheService cacheService;
+    protected CacheTemplate cacheTemplate;
     protected MacroResolver macroResolver;
     protected ApplicationContext globalApplicationContext;
     protected List<ScriptJobResolver> jobResolvers;
@@ -220,8 +221,8 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     }
 
     @Required
-    public void setCacheService(CacheService cacheService) {
-        this.cacheService = cacheService;
+    public void setCacheTemplate(CacheTemplate cacheTemplate) {
+        this.cacheTemplate = cacheTemplate;
     }
 
     @Required
@@ -274,7 +275,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         try {
             SiteContext siteContext = new SiteContext();
             siteContext.setStoreService(storeService);
-            siteContext.setCacheService(cacheService);
+            siteContext.setCacheTemplate(cacheTemplate);
             siteContext.setSiteName(siteName);
             siteContext.setContext(context);
             siteContext.setStaticAssetsPath(staticAssetsPath);
@@ -482,7 +483,8 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     }
 
     protected ScriptFactory getScriptFactory(SiteContext siteContext, URLClassLoader classLoader) {
-        return new GroovyScriptFactory(new ContentStoreResourceConnector(siteContext), classLoader, groovyGlobalVars);
+        return new GroovyScriptFactory(siteContext, new ContentStoreResourceConnector(siteContext), classLoader,
+                                       groovyGlobalVars);
     }
 
     protected Scheduler scheduleJobs(SiteContext siteContext) {
