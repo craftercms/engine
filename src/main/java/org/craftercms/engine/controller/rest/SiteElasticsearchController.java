@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping(RestControllerBase.REST_BASE_URI + SiteElasticsearchController.URL_ROOT)
-public class SiteElasticsearchController {
+public class SiteElasticsearchController extends RestControllerBase {
 
     public static final String URL_ROOT = "/site/elasticsearch";
     public static final String URL_SEARCH = "/search";
