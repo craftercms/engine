@@ -23,12 +23,13 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import groovy.lang.GroovyClassLoader;
-import groovy.util.GroovyScriptEngine;
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
+import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
+import org.craftercms.engine.test.utils.CacheTemplateMockUtils;
 import org.craftercms.engine.test.utils.ContentStoreServiceMockUtils;
 import org.craftercms.engine.util.groovy.ContentStoreGroovyResourceLoader;
 import org.craftercms.engine.util.groovy.ContentStoreResourceConnector;
@@ -86,10 +87,13 @@ public class GroovyScriptFactoryTest {
     }
 
     private SiteContext createSiteContext(ContentStoreService storeService) {
+        CacheTemplate cacheTemplate = CacheTemplateMockUtils.createCacheTemplate();
+
         SiteContext siteContext = mock(SiteContext.class);
         when(siteContext.getSiteName()).thenReturn("default");
         when(siteContext.getContext()).thenReturn(mock(Context.class));
         when(siteContext.getStoreService()).thenReturn(storeService);
+        when(siteContext.getCacheTemplate()).thenReturn(cacheTemplate);
 
         return siteContext;
     }
@@ -129,7 +133,7 @@ public class GroovyScriptFactoryTest {
     private ScriptFactory createScriptFactory(GroovyClassLoader parentClassLoader, Map<String, Object> globalVars) {
         ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(SiteContext.getCurrent());
 
-        return new GroovyScriptFactory(resourceConnector, parentClassLoader, globalVars);
+        return new GroovyScriptFactory(SiteContext.getCurrent(), resourceConnector, parentClassLoader, globalVars);
     }
 
     private void setCurrentSiteContext(SiteContext siteContext) {
