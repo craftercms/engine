@@ -27,11 +27,10 @@ import org.craftercms.engine.event.SiteContextCreatedEvent;
 import org.craftercms.engine.event.SiteEvent;
 import org.craftercms.engine.service.context.SiteContext;
 import org.springframework.beans.factory.annotation.Required;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
@@ -41,7 +40,7 @@ import java.util.Map;
  *
  * @author Alfonso Vásquez
  */
-@Controller
+@RestController
 @RequestMapping(RestControllerBase.REST_BASE_URI + SiteCacheRestController.URL_ROOT)
 public class SiteCacheRestController extends RestControllerBase {
 
@@ -50,15 +49,12 @@ public class SiteCacheRestController extends RestControllerBase {
     public static final String URL_ROOT = "/site/cache";
     public static final String URL_CLEAR = "/clear";
     public static final String URL_STATS = "/statistics";
-    public static final String PARAM_TOKEN = "token";
 
     private String configuredToken;
 
     @RequestMapping(value = URL_CLEAR, method = RequestMethod.GET)
-    @ResponseBody
-    public Map<String, Object> clear(HttpServletRequest request) throws InvalidManagementTokenException {
-        String token = request.getParameter(PARAM_TOKEN);
-        if (StringUtils.isNotEmpty(token) && StringUtils.equals(token, getConfiguredToken())) {
+    public Map<String, Object> clear(HttpServletRequest request, @RequestParam String token) throws InvalidManagementTokenException {
+        if (StringUtils.equals(token, getConfiguredToken())) {
             SiteContext siteContext = SiteContext.getCurrent();
             String siteName = siteContext.getSiteName();
             String msg;
@@ -81,7 +77,6 @@ public class SiteCacheRestController extends RestControllerBase {
         }
     }
 
-    @ResponseBody
     @RequestMapping(value = URL_STATS, method = RequestMethod.GET)
     public CacheStatistics getStatistics(@RequestParam String token) throws InvalidManagementTokenException {
         if (StringUtils.isNotEmpty(token) && StringUtils.equals(token, getConfiguredToken())) {

@@ -49,7 +49,6 @@ public class SiteContextRestController extends RestControllerBase {
     public static final String URL_DESTROY = "/destroy";
     public static final String URL_REBUILD = "/rebuild";
     public static final String URL_GRAPHQL = "/graphql";
-    public static final String PARAM_TOKEN = "token";
 
     public static final String MODEL_ATTR_ID =  "id";
 
@@ -85,9 +84,8 @@ public class SiteContextRestController extends RestControllerBase {
     }
 
     @GetMapping(value = URL_REBUILD)
-    public Map<String, Object> rebuild(HttpServletRequest request) throws InvalidManagementTokenException {
-        String token = request.getParameter(PARAM_TOKEN);
-        if (StringUtils.isNotEmpty(token) && StringUtils.equals(token, getConfiguredToken())) {
+    public Map<String, Object> rebuild(HttpServletRequest request, @RequestParam String token) throws InvalidManagementTokenException {
+        if (StringUtils.equals(token, getConfiguredToken())) {
             SiteContext siteContext = SiteContext.getCurrent();
             String siteName = siteContext.getSiteName();
 
@@ -106,9 +104,8 @@ public class SiteContextRestController extends RestControllerBase {
     }
 
     @GetMapping(URL_GRAPHQL + URL_REBUILD)
-    public Map<String, Object> rebuildSchema(HttpServletRequest request) throws InvalidManagementTokenException {
-        String token = request.getParameter(PARAM_TOKEN);
-        if (StringUtils.isNotEmpty(token) && StringUtils.equals(token, getConfiguredToken())) {
+    public Map<String, Object> rebuildSchema(HttpServletRequest request, @RequestParam String token) throws InvalidManagementTokenException {
+        if (StringUtils.equals(token, getConfiguredToken())) {
             SiteContext siteContext = SiteContext.getCurrent();
             String siteName = siteContext.getSiteName();
 

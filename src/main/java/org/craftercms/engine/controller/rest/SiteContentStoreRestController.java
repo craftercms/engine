@@ -24,10 +24,10 @@ import org.craftercms.core.controller.rest.ContentStoreRestController;
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.engine.service.context.SiteContext;
 import org.springframework.beans.factory.annotation.Required;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 
 import static org.craftercms.core.controller.rest.ContentStoreRestController.REQUEST_PARAM_TREE_DEPTH;
@@ -43,7 +43,7 @@ import static org.craftercms.core.controller.rest.ContentStoreRestController.URL
  *
  * @author avasquez
  */
-@Controller
+@RestController
 @RequestMapping(RestControllerBase.REST_BASE_URI + SiteContentStoreRestController.URL_ROOT)
 public class SiteContentStoreRestController extends RestControllerBase {
 
