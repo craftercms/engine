@@ -27,10 +27,9 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.bson.types.ObjectId;
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.engine.util.ConfigUtils;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
@@ -40,7 +39,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
  * @author Russ Danner
  * @author Alfonso Vásquez
  */
-@Controller
+@RestController
 @RequestMapping(RestControllerBase.REST_BASE_URI + ProfileRestController.URL_ROOT)
 public class ProfileRestController {
 
@@ -51,7 +50,6 @@ public class ProfileRestController {
     public static final String CLEANSE_ATTRS_CONFIG_KEY = "preview.targeting.cleanseAttributes";
 
     @RequestMapping(value = "/get", method = RequestMethod.GET)
-    @ResponseBody
     @SuppressWarnings("unchecked")
     public Map<String, String> getProfile(HttpSession session) {
         Map<String, String> profile = (Map<String, String>) session.getAttribute(PROFILE_SESSION_ATTRIBUTE);
@@ -64,7 +62,6 @@ public class ProfileRestController {
     }
 
     @RequestMapping(value = "/set", method = RequestMethod.GET)
-    @ResponseBody
     public Map<String, String> setProfile(HttpServletRequest request, HttpSession session) {
         boolean cleanseAttributes = shouldCleanseAttributes();
 
