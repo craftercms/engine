@@ -116,7 +116,7 @@ public class SiteContextRestController extends RestControllerBase {
             } else {
                 siteContext.startGraphQLSchemaBuild();
 
-                return createResponseMessage("Rebuild of GraphQL schema for started for '" + siteName + "'");
+                return createResponseMessage("Rebuild of GraphQL schema started for '" + siteName + "'");
             }
         } else {
             throw new InvalidManagementTokenException("Management authorization failed, invalid token.");
