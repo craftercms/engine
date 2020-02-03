@@ -91,7 +91,7 @@ public class SiteContext {
     protected GraphQLFactory graphQLFactory;
     protected SiteCacheWarmer cacheWarmer;
 
-    protected CountDownLatch initializationLatch = new CountDownLatch(1);
+    protected CountDownLatch initializationLatch;
     protected ExecutorService maintenanceTaskExecutor;
     protected GraphQL graphQL;
     protected State state;
@@ -127,6 +127,7 @@ public class SiteContext {
         // finished
         maintenanceTaskExecutor = Executors.newSingleThreadExecutor();
         state = State.CREATED;
+        initializationLatch = new CountDownLatch(1);
     }
 
     public ContentStoreService getStoreService() {
@@ -314,7 +315,7 @@ public class SiteContext {
         try {
             if (state == State.CREATED) {
                 logger.debug("Waiting for initialization of {}", this);
-                initializationLatch.await();
+                initializationLatch.await(5, TimeUnit.MINUTES);
             }
             return state == State.INITIALIZED && storeService.validate(context);
         } catch (InterruptedException e) {
@@ -351,8 +352,8 @@ public class SiteContext {
                     logger.info("--------------------------------------------------");
 
                     publishEvent(new SiteContextInitializedEvent(this));
-                    initializationLatch.countDown();
                 } finally {
+                    initializationLatch.countDown();
                     SiteContext.clear();
                 }
             };
