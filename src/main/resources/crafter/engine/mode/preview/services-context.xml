@@ -84,6 +84,7 @@
         <property name="graphQLFactory" ref="crafter.graphQLFactory"/>
         <property name="cacheWarmUpEnabled" value="false"/>
         <property name="cacheWarmer" ref="crafter.siteCacheWarmer"/>
+        <property name="initTimeout" value="${crafter.engine.site.context.initTimeout}"/>
     </bean>
 
     <!-- ////////////////////////////////// -->
