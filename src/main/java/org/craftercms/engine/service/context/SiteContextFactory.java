@@ -76,6 +76,7 @@ import java.util.concurrent.Executor;
 public class SiteContextFactory implements ApplicationContextAware, ServletContextAware {
 
     public static final String DEFAULT_SITE_NAME_MACRO_NAME = "siteName";
+    public static final long DEFAULT_INIT_TIMEOUT = 300000L;
     public static final String CONFIG_BEAN_NAME = "siteConfig";
 
     private static final Log logger = LogFactory.getLog(SiteContextFactory.class);
@@ -110,6 +111,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected GraphQLFactory graphQLFactory;
     protected boolean cacheWarmUpEnabled;
     protected SiteCacheWarmer cacheWarmer;
+    protected long initTimeout;
 
     public SiteContextFactory() {
         siteNameMacroName = DEFAULT_SITE_NAME_MACRO_NAME;
@@ -117,6 +119,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         cacheOn = Context.DEFAULT_CACHE_ON;
         maxAllowedItemsInCache = Context.DEFAULT_MAX_ALLOWED_ITEMS_IN_CACHE;
         ignoreHiddenFiles = Context.DEFAULT_IGNORE_HIDDEN_FILES;
+        initTimeout = DEFAULT_INIT_TIMEOUT;
     }
 
     @Override
@@ -259,6 +262,10 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         this.cacheWarmer = cacheWarmer;
     }
 
+    public void setInitTimeout(final long initTimeout) {
+        this.initTimeout = initTimeout;
+    }
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.globalApplicationContext = applicationContext;
@@ -273,6 +280,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
 
         try {
             SiteContext siteContext = new SiteContext();
+            siteContext.setInitTimeout(initTimeout);
             siteContext.setStoreService(storeService);
             siteContext.setCacheService(cacheService);
             siteContext.setSiteName(siteName);

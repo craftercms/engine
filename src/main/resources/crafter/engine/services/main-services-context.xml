@@ -522,6 +522,7 @@
         <property name="graphQLFactory" ref="crafter.graphQLFactory"/>
         <property name="cacheWarmUpEnabled" value="${crafter.engine.site.cache.warmUp.enabled}"/>
         <property name="cacheWarmer" ref="crafter.siteCacheWarmer"/>
+        <property name="initTimeout" value="${crafter.engine.site.context.initTimeout}"/>
     </bean>
 
     <bean id="crafter.fallbackSiteContextFactory" class="org.craftercms.engine.service.context.SiteContextFactory">
@@ -549,6 +550,7 @@
         <property name="graphQLFactory" ref="crafter.graphQLFactory"/>
         <property name="cacheWarmUpEnabled" value="false"/>
         <property name="cacheWarmer" ref="crafter.siteCacheWarmer"/>
+        <property name="initTimeout" value="${crafter.engine.site.context.initTimeout}"/>
     </bean>
 
     <!-- ////////////////////////////////// -->

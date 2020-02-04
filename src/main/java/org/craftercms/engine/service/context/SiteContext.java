@@ -91,6 +91,8 @@ public class SiteContext {
     protected GraphQLFactory graphQLFactory;
     protected SiteCacheWarmer cacheWarmer;
 
+    protected long initTimeout;
+    protected CountDownLatch initializationLatch;
     protected ExecutorService maintenanceTaskExecutor;
     protected GraphQL graphQL;
     protected State state;
@@ -126,6 +128,7 @@ public class SiteContext {
         // finished
         maintenanceTaskExecutor = Executors.newSingleThreadExecutor();
         state = State.CREATED;
+        initializationLatch = new CountDownLatch(1);
     }
 
     public ContentStoreService getStoreService() {
@@ -304,12 +307,25 @@ public class SiteContext {
         this.cacheWarmer = cacheWarmer;
     }
 
+    public void setInitTimeout(final long initTimeout) {
+        this.initTimeout = initTimeout;
+    }
+
     public GraphQL getGraphQL() {
         return graphQL;
     }
 
     public boolean isValid() throws CrafterException {
-        return state == State.INITIALIZED && storeService.validate(context);
+
+        try {
+            if (state == State.CREATED) {
+                logger.debug("Waiting for initialization of {}", this);
+                initializationLatch.await(initTimeout, TimeUnit.MILLISECONDS);
+            }
+            return state == State.INITIALIZED && storeService.validate(context);
+        } catch (InterruptedException e) {
+            throw new CrafterException("Error while waiting for initialization of " + this);
+        }
     }
 
     public State getState() {
@@ -342,6 +358,7 @@ public class SiteContext {
 
                     publishEvent(new SiteContextInitializedEvent(this));
                 } finally {
+                    initializationLatch.countDown();
                     SiteContext.clear();
                 }
             };
