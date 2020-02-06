@@ -34,8 +34,15 @@
         </property>
     </bean>
 
-    <bean id="crafter.siteCookieChangeInterceptor" class="org.craftercms.engine.servlet.interceptor.SiteCookieChangeInterceptor">
-        <property name="cookieName" value="${crafter.engine.request.param.siteName}"/>
+    <bean id="crafter.siteCookieChangeInterceptor"
+          class="org.craftercms.engine.servlet.interceptor.SiteCookieChangeInterceptor">
+        <constructor-arg value="${crafter.engine.request.cookie.enable}"/>
+        <constructor-arg value="${crafter.engine.request.param.siteName}"/>
+        <constructor-arg value="${crafter.engine.request.cookie.domain}"/>
+        <constructor-arg value="${crafter.engine.request.cookie.path}"/>
+        <constructor-arg value="${crafter.engine.request.cookie.maxAge}"/>
+        <constructor-arg value="${crafter.engine.request.cookie.httpOnly}"/>
+        <constructor-arg value="${crafter.engine.request.cookie.secure}"/>
     </bean>
 
     <util:list id="crafter.interceptors">

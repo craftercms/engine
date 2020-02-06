@@ -25,13 +25,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.http.HttpUtils;
 import org.craftercms.engine.service.context.SiteContext;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+
 /**
- * Handler interceptor that will set the site cookie whenever the cookie is missing or the current site is different that the cookie value.
- * Use in conjunction with {@link org.craftercms.engine.service.context.CookieSiteResolver} when you want to set up simple multi tenancy.
+ * Handler interceptor that will set the site cookie whenever the cookie is missing or the current site is different
+ * that the cookie value. Use in conjunction with {@link org.craftercms.engine.service.context.CookieSiteResolver}
+ * when you want to set up simple multi tenancy.
  *
  * @author avasquez
  */
@@ -39,16 +41,38 @@ public class SiteCookieChangeInterceptor extends HandlerInterceptorAdapter {
 
     private static final Log logger = LogFactory.getLog(SiteCookieChangeInterceptor.class);
 
+    protected boolean enabled;
+
     protected String cookieName;
 
-    @Required
-    public void setCookieName(String cookieName) {
+    protected String cookieDomain;
+
+    protected String cookiePath;
+
+    protected int cookieMaxAge;
+
+    protected boolean httpOnly;
+
+    protected boolean secure;
+
+    public SiteCookieChangeInterceptor(final boolean enabled, final String cookieName, final String cookieDomain,
+                                       final String cookiePath, final int cookieMaxAge, final boolean httpOnly,
+                                       final boolean secure) {
+        this.enabled = enabled;
         this.cookieName = cookieName;
+        this.cookieDomain = cookieDomain;
+        this.cookiePath = cookiePath;
+        this.cookieMaxAge = cookieMaxAge;
+        this.httpOnly = httpOnly;
+        this.secure = secure;
     }
 
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
-                           ModelAndView modelAndView) throws Exception {
+                           ModelAndView modelAndView) {
+        if (!enabled) {
+            return;
+        }
         SiteContext siteContext = SiteContext.getCurrent();
         if (siteContext != null) {
             String siteName = siteContext.getSiteName();
@@ -60,9 +84,15 @@ public class SiteCookieChangeInterceptor extends HandlerInterceptorAdapter {
                 }
 
                 Cookie cookie = new Cookie(cookieName, siteName);
-                cookie.setDomain(request.getServerName());
-                cookie.setPath("/");
-                cookie.setMaxAge(-1);
+                if (isEmpty(cookieDomain)) {
+                    cookie.setDomain(request.getServerName());
+                } else {
+                    cookie.setDomain(cookieDomain);
+                }
+                cookie.setPath(cookiePath);
+                cookie.setMaxAge(cookieMaxAge);
+                cookie.setHttpOnly(httpOnly);
+                cookie.setSecure(secure);
 
                 response.addCookie(cookie);
             }
