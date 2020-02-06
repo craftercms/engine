@@ -45,7 +45,6 @@ public class SiteContextRestController extends RestControllerBase {
 
     public static final String URL_ROOT = "/site/context";
     public static final String URL_CONTEXT_ID = "/id";
-    public static final String URL_LATEST_EVENTS = "/latest_events";
     public static final String URL_DESTROY = "/destroy";
     public static final String URL_REBUILD = "/rebuild";
     public static final String URL_GRAPHQL = "/graphql";
