@@ -40,6 +40,7 @@ import org.slf4j.MDC;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 import org.tuckey.web.filters.urlrewrite.UrlRewriter;
 
 import javax.servlet.ServletContext;
@@ -79,6 +80,7 @@ public class SiteContext {
     protected String controllerScriptsPath;
     protected String initScriptPath;
     protected FreeMarkerConfig freeMarkerConfig;
+    protected FreeMarkerViewResolver freeMarkerViewResolver;
     protected UrlTransformationEngine urlTransformationEngine;
     protected ScriptFactory scriptFactory;
     protected HierarchicalConfiguration config;
@@ -217,6 +219,14 @@ public class SiteContext {
 
     public void setFreeMarkerConfig(FreeMarkerConfig freeMarkerConfig) {
         this.freeMarkerConfig = freeMarkerConfig;
+    }
+
+    public FreeMarkerViewResolver getFreeMarkerViewResolver() {
+        return freeMarkerViewResolver;
+    }
+
+    public void setFreeMarkerViewResolver(FreeMarkerViewResolver freeMarkerViewResolver) {
+        this.freeMarkerViewResolver = freeMarkerViewResolver;
     }
 
     public UrlTransformationEngine getUrlTransformationEngine() {
@@ -439,10 +449,14 @@ public class SiteContext {
             cacheWarmer.warmUpCache(this, true);
             // Clear Freemarker cache
             freeMarkerConfig.getConfiguration().clearTemplateCache();
+            // Clear view resolver cache
+            freeMarkerViewResolver.clearCache();
         } else {
             cacheService.clearScope(context);
             // Clear Freemarker cache
             freeMarkerConfig.getConfiguration().clearTemplateCache();
+            // Clear view resolver cache
+            freeMarkerViewResolver.clearCache();
         }
 
         publishEvent(new CacheClearCompletedEvent(this));

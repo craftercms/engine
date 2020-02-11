@@ -64,6 +64,7 @@
         <property name="staticAssetsPath" value="${crafter.engine.site.default.staticAssets.path}"/>
         <property name="templatesPath" value="${crafter.engine.site.default.templates.path}"/>
         <property name="freeMarkerConfigFactory" ref="crafter.freeMarkerConfigFactory"/>
+        <property name="freeMarkerViewResolverFactory" ref="crafter.freeMarkerViewResolverFactory"/>
         <property name="initScriptPath" value="${crafter.engine.site.default.init.script.path}"/>
         <property name="restScriptsPath" value="${crafter.engine.site.default.rest.scripts.path}"/>
         <property name="controllerScriptsPath" value="${crafter.engine.site.default.controller.scripts.path}"/>

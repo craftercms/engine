@@ -57,6 +57,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 import org.tuckey.web.filters.urlrewrite.Conf;
 import org.tuckey.web.filters.urlrewrite.UrlRewriter;
 
@@ -100,6 +101,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected int maxAllowedItemsInCache;
     protected boolean ignoreHiddenFiles;
     protected ObjectFactory<FreeMarkerConfig> freeMarkerConfigFactory;
+    protected ObjectFactory<FreeMarkerViewResolver> freeMarkerViewResolverFactory;
     protected UrlTransformationEngine urlTransformationEngine;
     protected ContentStoreService storeService;
     protected CacheService cacheService;
@@ -213,6 +215,11 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     }
 
     @Required
+    public void setFreeMarkerViewResolverFactory(ObjectFactory<FreeMarkerViewResolver> freeMarkerViewResolverFactory) {
+        this.freeMarkerViewResolverFactory = freeMarkerViewResolverFactory;
+    }
+
+    @Required
     public void setUrlTransformationEngine(UrlTransformationEngine urlTransformationEngine) {
         this.urlTransformationEngine = urlTransformationEngine;
     }
@@ -289,6 +296,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             siteContext.setTemplatesPath(templatesPath);
             siteContext.setInitScriptPath(initScriptPath);
             siteContext.setFreeMarkerConfig(freeMarkerConfigFactory.getObject());
+            siteContext.setFreeMarkerViewResolver(freeMarkerViewResolverFactory.getObject());
             siteContext.setUrlTransformationEngine(urlTransformationEngine);
             siteContext.setRestScriptsPath(restScriptsPath);
             siteContext.setControllerScriptsPath(controllerScriptsPath);

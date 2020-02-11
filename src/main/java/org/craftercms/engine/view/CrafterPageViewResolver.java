@@ -16,10 +16,6 @@
  */
 package org.craftercms.engine.view;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -30,6 +26,7 @@ import org.craftercms.core.service.CachingOptions;
 import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.engine.mobile.UserAgentTemplateDetector;
 import org.craftercms.engine.model.SiteItem;
+import org.craftercms.engine.properties.SiteProperties;
 import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.scripting.SiteItemScriptResolver;
@@ -37,7 +34,6 @@ import org.craftercms.engine.security.CrafterPageAccessManager;
 import org.craftercms.engine.service.SiteItemService;
 import org.craftercms.engine.service.UrlTransformationService;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.properties.SiteProperties;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.Ordered;
 import org.springframework.web.context.support.WebApplicationObjectSupport;
@@ -45,6 +41,10 @@ import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.view.RedirectView;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * {@link org.springframework.web.servlet.ViewResolver} that resolves to {@link CrafterPageView}s. This resolver
@@ -77,7 +77,6 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     protected String mimeTypeXPathQuery;
     protected String forceHttpsXPathQuery;
     protected SiteItemScriptResolver scriptResolver;
-    protected ViewResolver delegatedViewResolver;
     protected UserAgentTemplateDetector userAgentTemplateDetector;
     protected CrafterPageAccessManager accessManager;
 
@@ -174,11 +173,6 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     }
 
     @Required
-    public void setDelegatedViewResolver(ViewResolver delegatedViewResolver) {
-        this.delegatedViewResolver = delegatedViewResolver;
-    }
-
-    @Required
     public void setUserAgentTemplateDetector(UserAgentTemplateDetector userAgentTemplateDetector) {
         this.userAgentTemplateDetector = userAgentTemplateDetector;
     }
@@ -268,10 +262,9 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
                         view.setServletContext(getServletContext());
                         view.setPage(page);
                         view.setLocale(locale);
-                        view.setSiteItemService(siteItemService);
                         view.setPageViewNameXPathQuery(pageViewNameXPathQuery);
                         view.setMimeTypeXPathQuery(mimeTypeXPathQuery);
-                        view.setDelegatedViewResolver(delegatedViewResolver);
+                        view.setDelegatedViewResolver(siteContext.getFreeMarkerViewResolver());
                         view.setUserAgentTemplateDetector(userAgentTemplateDetector);
 
                         loadScripts(siteContext.getScriptFactory(), page, view);

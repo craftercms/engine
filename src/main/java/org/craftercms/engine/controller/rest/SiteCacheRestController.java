@@ -62,7 +62,7 @@ public class SiteCacheRestController extends RestControllerBase {
             // Don't clear cache if the context was just created in this request
             if (SiteEvent.getLatestRequestEvent(SiteContextCreatedEvent.class, request) != null) {
                 return createResponseMessage("Site context for '" + siteName + "' created during the request. " +
-                        "Cache clear not necessary");
+                                             "Cache clear not necessary");
             } else {
                 siteContext.startCacheClear();
 
