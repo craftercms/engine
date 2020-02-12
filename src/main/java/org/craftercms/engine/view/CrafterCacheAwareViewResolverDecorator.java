@@ -16,6 +16,7 @@
 package org.craftercms.engine.view;
 
 import org.craftercms.engine.service.context.SiteContext;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.Ordered;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
@@ -23,14 +24,22 @@ import org.springframework.web.servlet.ViewResolver;
 import java.util.Locale;
 
 /**
- * View resolver that delagates to the view resolver of the current {@link SiteContext}
+ * {@code ViewResolver} decorator that caches views on Crafter's own cache per site.
+ *
+ * <p>
+ *     <strong>NOTE:</strong> if you're decorating a  {@code AbstractCachingViewResolver} please make sure you turn
+ *     off the caching of that view resolver.
+ * </p>
  *
  * @author avasquez
  * @since 3.1.5
  */
-public class SiteContextDelegatingFreeMarkerViewResolver implements Ordered, ViewResolver {
+public class CrafterCacheAwareViewResolverDecorator implements ViewResolver, Ordered {
+
+    private static final String VIEW_CONST_KEY_ELEM = "view";
 
     protected int order;
+    protected ViewResolver actualViewResolver;
 
     @Override
     public int getOrder() {
@@ -41,13 +50,28 @@ public class SiteContextDelegatingFreeMarkerViewResolver implements Ordered, Vie
         this.order = order;
     }
 
+    @Required
+    public void setActualViewResolver(ViewResolver actualViewResolver) {
+        this.actualViewResolver = actualViewResolver;
+    }
+
     @Override
     public View resolveViewName(String viewName, Locale locale) throws Exception {
         SiteContext siteContext = SiteContext.getCurrent();
         if (siteContext != null) {
-            return siteContext.getFreeMarkerViewResolver().resolveViewName(viewName, locale);
+            try {
+                return siteContext.getCacheTemplate().getObject(siteContext.getContext(), () -> {
+                    try {
+                        return actualViewResolver.resolveViewName(viewName, locale);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }, viewName, locale, VIEW_CONST_KEY_ELEM);
+            } catch (RuntimeException e) {
+                throw (Exception) e.getCause();
+            }
         } else {
-            return null;
+            return actualViewResolver.resolveViewName(viewName, locale);
         }
     }
 

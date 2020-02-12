@@ -27,10 +27,11 @@ import org.craftercms.commons.config.MultiResourceConfigurationBuilder;
 import org.craftercms.commons.crypto.TextEncryptor;
 import org.craftercms.commons.crypto.impl.NoOpTextEncryptor;
 import org.craftercms.commons.spring.ApacheCommonsConfiguration2PropertySource;
-import org.craftercms.core.service.CacheService;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.url.UrlTransformationEngine;
+import org.craftercms.core.util.cache.CacheTemplate;
+import org.craftercms.engine.cache.SiteCacheWarmer;
 import org.craftercms.engine.exception.SiteContextCreationException;
 import org.craftercms.engine.graphql.GraphQLFactory;
 import org.craftercms.engine.macro.MacroResolver;
@@ -38,7 +39,6 @@ import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.scripting.ScriptJobResolver;
 import org.craftercms.engine.scripting.impl.GroovyScriptFactory;
 import org.craftercms.engine.util.SchedulingUtils;
-import org.craftercms.engine.cache.SiteCacheWarmer;
 import org.craftercms.engine.util.groovy.ContentStoreGroovyResourceLoader;
 import org.craftercms.engine.util.groovy.ContentStoreResourceConnector;
 import org.craftercms.engine.util.quartz.JobContext;
@@ -57,7 +57,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
-import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 import org.tuckey.web.filters.urlrewrite.Conf;
 import org.tuckey.web.filters.urlrewrite.UrlRewriter;
 
@@ -101,10 +100,9 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected int maxAllowedItemsInCache;
     protected boolean ignoreHiddenFiles;
     protected ObjectFactory<FreeMarkerConfig> freeMarkerConfigFactory;
-    protected ObjectFactory<FreeMarkerViewResolver> freeMarkerViewResolverFactory;
     protected UrlTransformationEngine urlTransformationEngine;
     protected ContentStoreService storeService;
-    protected CacheService cacheService;
+    protected CacheTemplate cacheTemplate;
     protected MacroResolver macroResolver;
     protected ApplicationContext globalApplicationContext;
     protected List<ScriptJobResolver> jobResolvers;
@@ -215,11 +213,6 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     }
 
     @Required
-    public void setFreeMarkerViewResolverFactory(ObjectFactory<FreeMarkerViewResolver> freeMarkerViewResolverFactory) {
-        this.freeMarkerViewResolverFactory = freeMarkerViewResolverFactory;
-    }
-
-    @Required
     public void setUrlTransformationEngine(UrlTransformationEngine urlTransformationEngine) {
         this.urlTransformationEngine = urlTransformationEngine;
     }
@@ -230,8 +223,8 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     }
 
     @Required
-    public void setCacheService(CacheService cacheService) {
-        this.cacheService = cacheService;
+    public void setCacheTemplate(CacheTemplate cacheTemplate) {
+        this.cacheTemplate = cacheTemplate;
     }
 
     @Required
@@ -289,14 +282,13 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             SiteContext siteContext = new SiteContext();
             siteContext.setInitTimeout(initTimeout);
             siteContext.setStoreService(storeService);
-            siteContext.setCacheService(cacheService);
+            siteContext.setCacheTemplate(cacheTemplate);
             siteContext.setSiteName(siteName);
             siteContext.setContext(context);
             siteContext.setStaticAssetsPath(staticAssetsPath);
             siteContext.setTemplatesPath(templatesPath);
             siteContext.setInitScriptPath(initScriptPath);
             siteContext.setFreeMarkerConfig(freeMarkerConfigFactory.getObject());
-            siteContext.setFreeMarkerViewResolver(freeMarkerViewResolverFactory.getObject());
             siteContext.setUrlTransformationEngine(urlTransformationEngine);
             siteContext.setRestScriptsPath(restScriptsPath);
             siteContext.setControllerScriptsPath(controllerScriptsPath);

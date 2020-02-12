@@ -64,7 +64,6 @@
         <property name="staticAssetsPath" value="${crafter.engine.site.default.staticAssets.path}"/>
         <property name="templatesPath" value="${crafter.engine.site.default.templates.path}"/>
         <property name="freeMarkerConfigFactory" ref="crafter.freeMarkerConfigFactory"/>
-        <property name="freeMarkerViewResolverFactory" ref="crafter.freeMarkerViewResolverFactory"/>
         <property name="initScriptPath" value="${crafter.engine.site.default.init.script.path}"/>
         <property name="restScriptsPath" value="${crafter.engine.site.default.rest.scripts.path}"/>
         <property name="controllerScriptsPath" value="${crafter.engine.site.default.controller.scripts.path}"/>
@@ -75,7 +74,7 @@
         <property name="cacheOn" value="false"/>
         <property name="urlTransformationEngine" ref="crafter.urlTransformationEngine"/>
         <property name="storeService" ref="crafter.contentStoreService"/>
-        <property name="cacheService" ref="crafter.cacheService"/>
+        <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
         <property name="macroResolver" ref="crafter.macroResolver"/>
         <property name="groovyGlobalVars" ref="crafter.restScriptsVariables"/>
         <property name="jobResolvers" ref="crafter.scriptJobResolvers"/>

@@ -59,6 +59,7 @@
 					<property name="disabledXPathQuery" value="${crafter.engine.page.disabled.xpathQuery}" />
                     <property name="mimeTypeXPathQuery" value="${crafter.engine.page.mimeType.xpathQuery}" />
                     <property name="forceHttpsXPathQuery" value="${crafter.engine.page.forceHttps.xpathQuery}" />
+                    <property name="delegatedViewResolver" ref="crafter.freeMarkerViewResolver" />
                     <property name="userAgentTemplateDetector" ref="crafter.userAgentTemplateDetector" />
                     <property name="accessManager" ref="crafter.pageAccessManager"/>
                     <property name="scriptResolver" ref="crafter.pageScriptResolver"/>
@@ -73,8 +74,19 @@
         </property>
     </bean>
 
-    <bean id="crafter.globalFreeMarkerViewResolver" class="org.craftercms.engine.view.SiteContextDelegatingFreeMarkerViewResolver">
-        <property name="order" value="10" />
+    <bean id="crafter.freeMarkerViewResolver" class="org.craftercms.engine.view.CrafterCacheAwareViewResolverDecorator">
+        <property name="actualViewResolver">
+            <bean class="org.craftercms.engine.view.freemarker.CrafterFreeMarkerViewResolver">
+                <property name="cache" value="false" />
+                <property name="contentType" value="text/html;charset=UTF-8" />
+                <property name="siteItemService" ref="crafter.siteItemService" />
+                <property name="componentTemplateXPathQuery" value="${crafter.engine.component.view.name.xpathQuery}" />
+                <property name="componentIncludeElementName" value="${crafter.engine.component.include.element.name}" />
+                <property name="componentEmbeddedElementName" value="${crafter.engine.component.embedded.element.name}" />
+                <property name="requestContextAttribute" value="requestContext" />
+                <property name="componentScriptResolver" ref="crafter.componentScriptResolver"/>
+            </bean>
+        </property>
     </bean>
 
 </beans>

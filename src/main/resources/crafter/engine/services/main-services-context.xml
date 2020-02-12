@@ -503,7 +503,6 @@
         <property name="staticAssetsPath" value="${crafter.engine.site.default.staticAssets.path}"/>
         <property name="templatesPath" value="${crafter.engine.site.default.templates.path}"/>
         <property name="freeMarkerConfigFactory" ref="crafter.freeMarkerConfigFactory"/>
-        <property name="freeMarkerViewResolverFactory" ref="crafter.freeMarkerViewResolverFactory"/>
         <property name="initScriptPath" value="${crafter.engine.site.default.init.script.path}"/>
         <property name="restScriptsPath" value="${crafter.engine.site.default.rest.scripts.path}"/>
         <property name="controllerScriptsPath" value="${crafter.engine.site.default.controller.scripts.path}"/>
@@ -513,7 +512,7 @@
         <property name="groovyClassesPath" value="${crafter.engine.site.default.classes.groovy.path}"/>
         <property name="urlTransformationEngine" ref="crafter.urlTransformationEngine"/>
         <property name="storeService" ref="crafter.contentStoreService"/>
-        <property name="cacheService" ref="crafter.cacheService"/>
+        <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
         <property name="macroResolver" ref="crafter.macroResolver"/>
         <property name="groovyGlobalVars" ref="crafter.restScriptsVariables"/>
         <property name="jobResolvers" ref="crafter.scriptJobResolvers"/>
@@ -532,7 +531,6 @@
         <property name="staticAssetsPath" value="/static-assets"/>
         <property name="templatesPath" value="/"/>
         <property name="freeMarkerConfigFactory" ref="crafter.freeMarkerConfigFactory"/>
-        <property name="freeMarkerViewResolverFactory" ref="crafter.freeMarkerViewResolverFactory"/>
         <property name="initScriptPath" value="/scripts/init.groovy"/>
         <property name="restScriptsPath" value="/scripts/rest"/>
         <property name="controllerScriptsPath" value="/scripts/controllers"/>
@@ -542,7 +540,7 @@
         <property name="groovyClassesPath" value="/classes/groovy"/>
         <property name="urlTransformationEngine" ref="crafter.urlTransformationEngine"/>
         <property name="storeService" ref="crafter.contentStoreService"/>
-        <property name="cacheService" ref="crafter.cacheService"/>
+        <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
         <property name="macroResolver" ref="crafter.macroResolver"/>
         <property name="groovyGlobalVars" ref="crafter.restScriptsVariables"/>
         <property name="jobResolvers" ref="crafter.scriptJobResolvers"/>
@@ -646,18 +644,6 @@
         </property>
     </bean>
 
-    <!-- Declared with scope="prototype" so that a new one is created for every SiteContext -->
-    <bean id="crafter.freeMarkerViewResolver" class="org.craftercms.engine.view.freemarker.CrafterFreeMarkerViewResolver" scope="prototype">
-        <property name="cache" value="#{ ! T(java.lang.Boolean).valueOf(${crafter.engine.preview:false}) }" />
-        <property name="contentType" value="text/html;charset=UTF-8" />
-        <property name="siteItemService" ref="crafter.siteItemService" />
-        <property name="componentTemplateXPathQuery" value="${crafter.engine.component.view.name.xpathQuery}" />
-        <property name="componentIncludeElementName" value="${crafter.engine.component.include.element.name}" />
-        <property name="componentEmbeddedElementName" value="${crafter.engine.component.embedded.element.name}" />
-        <property name="requestContextAttribute" value="requestContext" />
-        <property name="componentScriptResolver" ref="crafter.componentScriptResolver"/>
-    </bean>
-
     <util:map id="crafter.freemarkerVariables">
         <entry key="siteItemService" value-ref="crafter.siteItemService"/>
         <entry key="urlTransformationService" value-ref="crafter.urlTransformationService"/>
@@ -677,11 +663,6 @@
     <bean id="crafter.freeMarkerConfigFactory"
           class="org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean">
         <property name="targetBeanName" value="crafter.freeMarkerConfig"/>
-    </bean>
-
-    <bean id="crafter.freeMarkerViewResolverFactory"
-          class="org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean">
-        <property name="targetBeanName" value="crafter.freeMarkerViewResolver"/>
     </bean>
 
     <!-- ////////////////////////////////// -->

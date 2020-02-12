@@ -82,7 +82,7 @@ public class SiteCacheRestController extends RestControllerBase {
         if (StringUtils.isNotEmpty(token) && StringUtils.equals(token, getConfiguredToken())) {
             SiteContext siteContext = SiteContext.getCurrent();
 
-            return siteContext.getCacheService().getStatistics(siteContext.getContext());
+            return siteContext.getCacheTemplate().getCacheService().getStatistics(siteContext.getContext());
         } else {
             throw new InvalidManagementTokenException("Management authorization failed, invalid token.");
         }

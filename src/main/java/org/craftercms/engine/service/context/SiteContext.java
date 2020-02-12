@@ -21,17 +21,17 @@ import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.lang3.time.StopWatch;
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.exception.CrafterException;
-import org.craftercms.core.service.CacheService;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.url.UrlTransformationEngine;
+import org.craftercms.core.util.cache.CacheTemplate;
+import org.craftercms.engine.cache.SiteCacheWarmer;
 import org.craftercms.engine.event.*;
 import org.craftercms.engine.exception.GraphQLBuildException;
 import org.craftercms.engine.exception.SiteContextInitializationException;
 import org.craftercms.engine.graphql.GraphQLFactory;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.util.GroovyScriptUtils;
-import org.craftercms.engine.cache.SiteCacheWarmer;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
@@ -40,7 +40,6 @@ import org.slf4j.MDC;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
-import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 import org.tuckey.web.filters.urlrewrite.UrlRewriter;
 
 import javax.servlet.ServletContext;
@@ -70,7 +69,7 @@ public class SiteContext {
     }
 
     protected ContentStoreService storeService;
-    protected CacheService cacheService;
+    protected CacheTemplate cacheTemplate;
     protected String siteName;
     protected Context context;
     protected boolean fallback;
@@ -80,7 +79,6 @@ public class SiteContext {
     protected String controllerScriptsPath;
     protected String initScriptPath;
     protected FreeMarkerConfig freeMarkerConfig;
-    protected FreeMarkerViewResolver freeMarkerViewResolver;
     protected UrlTransformationEngine urlTransformationEngine;
     protected ScriptFactory scriptFactory;
     protected HierarchicalConfiguration config;
@@ -141,12 +139,12 @@ public class SiteContext {
         this.storeService = storeService;
     }
 
-    public CacheService getCacheService() {
-        return cacheService;
+    public CacheTemplate getCacheTemplate() {
+        return cacheTemplate;
     }
 
-    public void setCacheService(CacheService cacheService) {
-        this.cacheService = cacheService;
+    public void setCacheTemplate(CacheTemplate cacheTemplate) {
+        this.cacheTemplate = cacheTemplate;
     }
 
     public String getSiteName() {
@@ -219,14 +217,6 @@ public class SiteContext {
 
     public void setFreeMarkerConfig(FreeMarkerConfig freeMarkerConfig) {
         this.freeMarkerConfig = freeMarkerConfig;
-    }
-
-    public FreeMarkerViewResolver getFreeMarkerViewResolver() {
-        return freeMarkerViewResolver;
-    }
-
-    public void setFreeMarkerViewResolver(FreeMarkerViewResolver freeMarkerViewResolver) {
-        this.freeMarkerViewResolver = freeMarkerViewResolver;
     }
 
     public UrlTransformationEngine getUrlTransformationEngine() {
@@ -449,14 +439,10 @@ public class SiteContext {
             cacheWarmer.warmUpCache(this, true);
             // Clear Freemarker cache
             freeMarkerConfig.getConfiguration().clearTemplateCache();
-            // Clear view resolver cache
-            freeMarkerViewResolver.clearCache();
         } else {
-            cacheService.clearScope(context);
+            cacheTemplate.getCacheService().clearScope(context);
             // Clear Freemarker cache
             freeMarkerConfig.getConfiguration().clearTemplateCache();
-            // Clear view resolver cache
-            freeMarkerViewResolver.clearCache();
         }
 
         publishEvent(new CacheClearCompletedEvent(this));

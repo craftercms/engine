@@ -76,6 +76,7 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     protected String disabledXPathQuery;
     protected String mimeTypeXPathQuery;
     protected String forceHttpsXPathQuery;
+    protected ViewResolver delegatedViewResolver;
     protected SiteItemScriptResolver scriptResolver;
     protected UserAgentTemplateDetector userAgentTemplateDetector;
     protected CrafterPageAccessManager accessManager;
@@ -173,6 +174,11 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     }
 
     @Required
+    public void setDelegatedViewResolver(ViewResolver delegatedViewResolver) {
+        this.delegatedViewResolver = delegatedViewResolver;
+    }
+
+    @Required
     public void setUserAgentTemplateDetector(UserAgentTemplateDetector userAgentTemplateDetector) {
         this.userAgentTemplateDetector = userAgentTemplateDetector;
     }
@@ -264,7 +270,7 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
                         view.setLocale(locale);
                         view.setPageViewNameXPathQuery(pageViewNameXPathQuery);
                         view.setMimeTypeXPathQuery(mimeTypeXPathQuery);
-                        view.setDelegatedViewResolver(siteContext.getFreeMarkerViewResolver());
+                        view.setDelegatedViewResolver(delegatedViewResolver);
                         view.setUserAgentTemplateDetector(userAgentTemplateDetector);
 
                         loadScripts(siteContext.getScriptFactory(), page, view);
