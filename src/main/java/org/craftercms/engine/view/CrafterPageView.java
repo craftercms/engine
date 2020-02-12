@@ -16,13 +16,6 @@
  */
 package org.craftercms.engine.view;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -33,7 +26,6 @@ import org.craftercms.engine.exception.HttpStatusCodeAwareException;
 import org.craftercms.engine.exception.RenderingException;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.scripting.Script;
-import org.craftercms.engine.service.SiteItemService;
 import org.craftercms.engine.util.GroovyScriptUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
@@ -41,6 +33,13 @@ import org.springframework.http.MediaType;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.view.AbstractView;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * @author Alfonso Vásquez
@@ -60,12 +59,10 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
 
     protected transient String scope;
     protected transient Object key;
-    protected transient List<Object> dependencyKeys;
     protected transient Long cachingTime;
 
     protected SiteItem page;
     protected Locale locale;
-    protected SiteItemService siteItemService;
     protected String pageViewNameXPathQuery;
     protected String mimeTypeXPathQuery;
     protected List<Script> scripts;
@@ -83,11 +80,6 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
     @Required
     public void setLocale(Locale locale) {
         this.locale = locale;
-    }
-
-    @Required
-    public void setSiteItemService(SiteItemService siteItemService) {
-        this.siteItemService = siteItemService;
     }
 
     @Required
