@@ -17,14 +17,14 @@
 
 package org.craftercms.engine.view;
 
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.craftercms.engine.exception.RenderingException;
 import org.craftercms.engine.mobile.UserAgentTemplateDetector;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.servlet.View;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 public class UserAgentAwareCrafterPageView extends CrafterPageView {
 

@@ -16,15 +16,6 @@
  */
 package org.craftercms.engine.view.freemarker;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import javax.servlet.ServletContext;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.ext.servlet.HttpRequestParametersHashModel;
 import freemarker.ext.servlet.HttpSessionHashModel;
@@ -49,6 +40,15 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerView;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * Extends {@link FreeMarkerView} to add {@link RenderComponentDirective}s to support page component rendering in
@@ -255,7 +255,7 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     }
 
     protected Map<String, String> createCookieMap(HttpServletRequest request) {
-    	 Map<String, String> cookieMap = new HashMap<String, String>();
+    	 Map<String, String> cookieMap = new HashMap<>();
     	 Cookie[] cookies = request.getCookies();
 
         if (ArrayUtils.isNotEmpty(cookies)) {
