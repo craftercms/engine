@@ -26,17 +26,16 @@ import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.engine.service.context.ReloadableMappingsSiteResolver;
 import org.craftercms.engine.service.context.SiteResolver;
 import org.springframework.beans.factory.annotation.Required;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * REST controller for operations related to site mappings.
  *
  * @author avasquez
  */
-@Controller
+@RestController
 @RequestMapping(RestControllerBase.REST_BASE_URI + SiteMappingsRestController.URL_ROOT)
 public class SiteMappingsRestController {
 
@@ -51,7 +50,6 @@ public class SiteMappingsRestController {
     }
 
     @RequestMapping(value = URL_RELOAD, method = RequestMethod.GET)
-    @ResponseBody
     public Map<String, String> reloadMappings(HttpServletResponse response) {
         if (siteResolver instanceof ReloadableMappingsSiteResolver) {
             ((ReloadableMappingsSiteResolver)siteResolver).reloadMappings();

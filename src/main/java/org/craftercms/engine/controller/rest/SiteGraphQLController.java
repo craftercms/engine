@@ -51,7 +51,7 @@ import static graphql.ExecutionInput.newExecutionInput;
  */
 @RestController
 @RequestMapping(RestControllerBase.REST_BASE_URI + SiteGraphQLController.BASE_URL)
-public class SiteGraphQLController {
+public class SiteGraphQLController extends RestControllerBase {
 
     private static final Logger logger = LoggerFactory.getLogger(SiteGraphQLController.class);
 

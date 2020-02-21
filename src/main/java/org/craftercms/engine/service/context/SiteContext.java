@@ -21,17 +21,17 @@ import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.lang3.time.StopWatch;
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.exception.CrafterException;
-import org.craftercms.core.service.CacheService;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.url.UrlTransformationEngine;
+import org.craftercms.core.util.cache.CacheTemplate;
+import org.craftercms.engine.cache.SiteCacheWarmer;
 import org.craftercms.engine.event.*;
 import org.craftercms.engine.exception.GraphQLBuildException;
 import org.craftercms.engine.exception.SiteContextInitializationException;
 import org.craftercms.engine.graphql.GraphQLFactory;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.util.GroovyScriptUtils;
-import org.craftercms.engine.cache.SiteCacheWarmer;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
@@ -69,7 +69,7 @@ public class SiteContext {
     }
 
     protected ContentStoreService storeService;
-    protected CacheService cacheService;
+    protected CacheTemplate cacheTemplate;
     protected String siteName;
     protected Context context;
     protected boolean fallback;
@@ -91,6 +91,8 @@ public class SiteContext {
     protected GraphQLFactory graphQLFactory;
     protected SiteCacheWarmer cacheWarmer;
 
+    protected long initTimeout;
+    protected CountDownLatch initializationLatch;
     protected ExecutorService maintenanceTaskExecutor;
     protected GraphQL graphQL;
     protected State state;
@@ -126,6 +128,7 @@ public class SiteContext {
         // finished
         maintenanceTaskExecutor = Executors.newSingleThreadExecutor();
         state = State.CREATED;
+        initializationLatch = new CountDownLatch(1);
     }
 
     public ContentStoreService getStoreService() {
@@ -136,12 +139,12 @@ public class SiteContext {
         this.storeService = storeService;
     }
 
-    public CacheService getCacheService() {
-        return cacheService;
+    public CacheTemplate getCacheTemplate() {
+        return cacheTemplate;
     }
 
-    public void setCacheService(CacheService cacheService) {
-        this.cacheService = cacheService;
+    public void setCacheTemplate(CacheTemplate cacheTemplate) {
+        this.cacheTemplate = cacheTemplate;
     }
 
     public String getSiteName() {
@@ -304,12 +307,25 @@ public class SiteContext {
         this.cacheWarmer = cacheWarmer;
     }
 
+    public void setInitTimeout(final long initTimeout) {
+        this.initTimeout = initTimeout;
+    }
+
     public GraphQL getGraphQL() {
         return graphQL;
     }
 
     public boolean isValid() throws CrafterException {
-        return state == State.INITIALIZED && storeService.validate(context);
+
+        try {
+            if (state == State.CREATED) {
+                logger.debug("Waiting for initialization of {}", this);
+                initializationLatch.await(initTimeout, TimeUnit.MILLISECONDS);
+            }
+            return state == State.INITIALIZED && storeService.validate(context);
+        } catch (InterruptedException e) {
+            throw new CrafterException("Error while waiting for initialization of " + this);
+        }
     }
 
     public State getState() {
@@ -342,6 +358,7 @@ public class SiteContext {
 
                     publishEvent(new SiteContextInitializedEvent(this));
                 } finally {
+                    initializationLatch.countDown();
                     SiteContext.clear();
                 }
             };
@@ -423,7 +440,7 @@ public class SiteContext {
             // Clear Freemarker cache
             freeMarkerConfig.getConfiguration().clearTemplateCache();
         } else {
-            cacheService.clearScope(context);
+            cacheTemplate.getCacheService().clearScope(context);
             // Clear Freemarker cache
             freeMarkerConfig.getConfiguration().clearTemplateCache();
         }

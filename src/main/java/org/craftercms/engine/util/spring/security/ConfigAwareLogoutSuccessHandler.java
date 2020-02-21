@@ -15,30 +15,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.craftercms.engine.security;
+package org.craftercms.engine.util.spring.security;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.craftercms.engine.util.ConfigUtils;
-import org.craftercms.security.authentication.impl.LogoutSuccessHandlerImpl;
+import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
 
 /**
- * Extension of {@link org.craftercms.security.authentication.impl.LogoutSuccessHandlerImpl} that uses site config
- * to override the default properties.
+ * Extension of {@link SimpleUrlLogoutSuccessHandler} that uses site config to override properties
  *
- * @author avasquez
+ * @author joseross
+ * @since 3.1.5
  */
-public class ConfigAwareLogoutSuccessHandler extends LogoutSuccessHandlerImpl {
+public class ConfigAwareLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler {
 
     public static final String LOGOUT_SUCCESS_URL_KEY = "security.logout.successUrl";
 
     @Override
-    protected String getTargetUrl() {
-        HierarchicalConfiguration config = ConfigUtils.getCurrentConfig();
-        if (config != null) {
-            return config.getString(LOGOUT_SUCCESS_URL_KEY, targetUrl);
-        } else {
-            return targetUrl;
+    protected String determineTargetUrl(final HttpServletRequest request, final HttpServletResponse response) {
+        HierarchicalConfiguration siteConfig = ConfigUtils.getCurrentConfig();
+        if (siteConfig != null && siteConfig.containsKey(LOGOUT_SUCCESS_URL_KEY)) {
+            return siteConfig.getString(LOGOUT_SUCCESS_URL_KEY);
         }
+        return super.determineTargetUrl(request, response);
     }
 
 }

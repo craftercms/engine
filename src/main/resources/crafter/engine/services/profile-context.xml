@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (C) 2007-2019 Crafter Software Corporation. All Rights Reserved.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- Beans in this context are provided for backwards compatibility, new sites should not use them directly -->
+
+    <import resource="classpath:crafter/profile/client-context.xml"/>
+
+    <bean id="crafter.defaultTenantResolver" class="org.craftercms.security.utils.tenant.DefaultTenantsResolver">
+        <property name="defaultTenantNames" value="${crafter.security.tenant.default.names}"/>
+    </bean>
+
+    <bean id="crafter.paramTenantResolver" class="org.craftercms.security.utils.tenant.ParamTenantsResolver"/>
+
+    <bean id="crafter.tenantsResolver" class="org.craftercms.security.utils.tenant.TenantsResolverChain">
+        <property name="resolvers">
+            <list>
+                <ref bean="crafter.paramTenantResolver"/>
+                <ref bean="crafter.defaultTenantResolver"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="crafter.authenticationCacheConfig" class="net.sf.ehcache.config.CacheConfiguration">
+        <property name="name" value="authenticationCache"/>
+        <property name="maxEntriesLocalHeap" value="${crafter.security.authentication.cache.maxElementsInMemory}"/>
+        <property name="timeToIdleSeconds" value="${crafter.security.authentication.cache.timeToIdle}"/>
+    </bean>
+
+    <bean id="crafter.ehCacheAuthenticationCache" class="org.craftercms.commons.cache.EhCacheFactoryBean">
+        <property name="configuration" ref="crafter.authenticationCacheConfig"/>
+    </bean>
+
+    <bean id="crafter.authenticationCache"
+          class="org.craftercms.security.authentication.impl.EhCacheAuthenticationCache">
+        <property name="cache" ref="crafter.ehCacheAuthenticationCache"/>
+    </bean>
+
+    <bean id="crafter.profileAuthenticationManager"
+          class="org.craftercms.security.authentication.impl.AuthenticationManagerImpl">
+        <property name="authenticationService" ref="crafter.authenticationServiceRestClient"/>
+        <property name="authenticationCache" ref="crafter.authenticationCache"/>
+        <property name="profileService" ref="crafter.profileServiceRestClient"/>
+    </bean>
+
+    <bean id="crafter.profileAuthenticationProvider"
+          class="org.craftercms.engine.util.spring.security.profile.ProfileAuthenticationProvider">
+        <constructor-arg ref="crafter.tenantsResolver"/>
+        <constructor-arg ref="crafter.profileAuthenticationManager"/>
+    </bean>
+
+</beans>

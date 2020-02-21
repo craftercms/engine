@@ -18,9 +18,9 @@
 package org.craftercms.engine.test.utils;
 
 import org.apache.commons.configuration2.XMLConfiguration;
+import org.craftercms.commons.config.ConfigUtils;
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.util.ConfigUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.mockito.Mock;
@@ -51,7 +51,7 @@ public class ConfigAwareTestBase {
         setCurrentRequestContext();
         setCurrentSiteContext();
 
-        config = ConfigUtils.readXmlConfiguration(new ClassPathResource("config/site-config.xml"), ',');
+        config = ConfigUtils.readXmlConfiguration(new ClassPathResource("config/site-config.xml"), ',', null);
 
         when(siteContext.getConfig()).thenReturn(config);
     }
@@ -67,6 +67,7 @@ public class ConfigAwareTestBase {
 
     private void setCurrentRequestContext() {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/");
+        request.setPathInfo("/");
         MockHttpServletResponse response = new MockHttpServletResponse();
         RequestContext context = new RequestContext(request, response, null);
 

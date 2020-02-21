@@ -38,8 +38,11 @@ public class SiteAwareRunnable implements Runnable {
     @Override
     public void run() {
         SiteContext.setCurrent(siteContext);
-        wrappedRunnable.run();
-        SiteContext.clear();
+        try {
+            wrappedRunnable.run();
+        } finally {
+            SiteContext.clear();
+        }
     }
 
 }
