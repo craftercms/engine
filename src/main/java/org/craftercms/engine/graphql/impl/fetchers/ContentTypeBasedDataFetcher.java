@@ -51,7 +51,6 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
@@ -61,12 +60,14 @@ import org.springframework.beans.factory.annotation.Required;
 import org.springframework.util.StopWatch;
 
 import static org.craftercms.engine.graphql.SchemaUtils.*;
+import static org.elasticsearch.index.query.QueryBuilders.*;
 
 /**
  * Implementation of {@link DataFetcher} that queries Elasticsearch to retrieve content based on a content type.
  * @author joseross
  * @since 3.1
  */
+@SuppressWarnings("unchecked, rawtypes")
 public class ContentTypeBasedDataFetcher extends RequestAwareDataFetcher<Object> {
 
     private static final Logger logger = LoggerFactory.getLogger(ContentTypeBasedDataFetcher.class);
@@ -142,7 +143,7 @@ public class ContentTypeBasedDataFetcher extends RequestAwareDataFetcher<Object>
 
         // Setup the ES query
         SearchSourceBuilder source = new SearchSourceBuilder();
-        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        BoolQueryBuilder query = boolQuery();
         source
             .query(query)
             .from(offset)
@@ -154,15 +155,20 @@ public class ContentTypeBasedDataFetcher extends RequestAwareDataFetcher<Object>
         watch.start("build filters");
 
         // Filter by the content-type
-        if (fieldName.equals(FIELD_NAME_CONTENT_ITEMS)) {
-            query.filter(QueryBuilders.existsQuery(QUERY_FIELD_NAME_CONTENT_TYPE));
-        } else if (fieldName.equals(FIELD_NAME_PAGES)) {
-            query.filter(QueryBuilders.regexpQuery(QUERY_FIELD_NAME_CONTENT_TYPE, CONTENT_TYPE_REGEX_PAGE));
-        } else if (fieldName.equals(FIELD_NAME_COMPONENTS)) {
-            query.filter(QueryBuilders.regexpQuery(QUERY_FIELD_NAME_CONTENT_TYPE, CONTENT_TYPE_REGEX_COMPONENT));
-        } else {
-            // Get the content-type name from the field name
-            query.filter(QueryBuilders.termQuery(QUERY_FIELD_NAME_CONTENT_TYPE, getOriginalName(fieldName)));
+        switch (fieldName) {
+            case FIELD_NAME_CONTENT_ITEMS:
+                query.filter(existsQuery(QUERY_FIELD_NAME_CONTENT_TYPE));
+                break;
+            case FIELD_NAME_PAGES:
+                query.filter(regexpQuery(QUERY_FIELD_NAME_CONTENT_TYPE, CONTENT_TYPE_REGEX_PAGE));
+                break;
+            case FIELD_NAME_COMPONENTS:
+                query.filter(regexpQuery(QUERY_FIELD_NAME_CONTENT_TYPE, CONTENT_TYPE_REGEX_COMPONENT));
+                break;
+            default:
+                // Get the content-type name from the field name
+                query.filter(termQuery(QUERY_FIELD_NAME_CONTENT_TYPE, getOriginalName(fieldName)));
+                break;
         }
 
         // Check the selected fields to build the ES query
@@ -241,11 +247,18 @@ public class ContentTypeBasedDataFetcher extends RequestAwareDataFetcher<Object>
             // Check the filters to build the ES query
             Optional<Argument> arg =
                 currentField.getArguments().stream().filter(a -> a.getName().equals(FILTER_NAME)).findFirst();
-            if (arg.isPresent() && arg.get().getValue() instanceof ObjectValue) {
+            if (arg.isPresent()) {
                 logger.debug("Adding filters for field {}", fullPath);
-
-                List<ObjectField> filters = ((ObjectValue) arg.get().getValue()).getObjectFields();
-                filters.forEach((filter) -> addFieldFilter(fullPath, filter, query, env));
+                Value<?> argValue = arg.get().getValue();
+                if (argValue instanceof ObjectValue) {
+                    List<ObjectField> filters = ((ObjectValue) argValue).getObjectFields();
+                    filters.forEach((filter) -> addFieldFilterFromObjectField(fullPath, filter, query, env));
+                } else if (argValue instanceof VariableReference &&
+                        env.getVariables().containsKey(((VariableReference) argValue).getName())) {
+                    Map<String, Object> map =
+                            (Map<String, Object>) env.getVariables().get(((VariableReference) argValue).getName());
+                    map.entrySet().forEach(filter -> addFieldFilterFromMapEntry(fullPath, filter, query, env));
+                }
             }
         } else if (currentSelection instanceof InlineFragment) {
             // If the current selection is an inline fragment, process recursively
@@ -261,64 +274,124 @@ public class ContentTypeBasedDataFetcher extends RequestAwareDataFetcher<Object>
         }
     }
 
-    protected void addFieldFilter(String path, ObjectField filter, BoolQueryBuilder query,
-                                  DataFetchingEnvironment env) {
+    protected void addFieldFilterFromObjectField(String path, ObjectField filter, BoolQueryBuilder query,
+                                                 DataFetchingEnvironment env) {
         if (filter.getValue() instanceof ArrayValue) {
             ArrayValue actualFilters = (ArrayValue) filter.getValue();
             switch (filter.getName()) {
                 case ARG_NAME_NOT:
-                    BoolQueryBuilder notQuery = QueryBuilders.boolQuery();
+                    BoolQueryBuilder notQuery = boolQuery();
                     actualFilters.getValues()
                         .forEach(notFilter -> ((ObjectValue) notFilter).getObjectFields()
-                            .forEach(notField -> addFieldFilter(path, notField, notQuery, env)));
+                            .forEach(notField -> addFieldFilterFromObjectField(path, notField, notQuery, env)));
                     notQuery.filter().forEach(query::mustNot);
                     break;
                 case ARG_NAME_AND:
                     actualFilters.getValues()
                         .forEach(andFilter -> ((ObjectValue) andFilter).getObjectFields()
-                            .forEach(andField -> addFieldFilter(path, andField, query, env)));
+                            .forEach(andField -> addFieldFilterFromObjectField(path, andField, query, env)));
                     break;
                 case ARG_NAME_OR:
-                    BoolQueryBuilder tempQuery = QueryBuilders.boolQuery();
-                    BoolQueryBuilder orQuery = QueryBuilders.boolQuery();
-                    actualFilters.getValues().forEach(orFilter -> {
+                    BoolQueryBuilder tempQuery = boolQuery();
+                    BoolQueryBuilder orQuery = boolQuery();
+                    actualFilters.getValues().forEach(orFilter ->
                         ((ObjectValue) orFilter).getObjectFields()
-                            .forEach(orField -> addFieldFilter(path, orField, tempQuery, env));
-                    });
+                            .forEach(orField -> addFieldFilterFromObjectField(path, orField, tempQuery, env)));
                     tempQuery.filter().forEach(orQuery::should);
-                    query.filter(QueryBuilders.boolQuery().must(orQuery));
+                    query.filter(boolQuery().must(orQuery));
                     break;
                 default:
                     // never happens
             }
         } else if (!(filter.getValue() instanceof VariableReference) ||
                     env.getVariables().containsKey(((VariableReference)filter.getValue()).getName())) {
-            query.filter(getFilterQuery(path, filter, env));
+            query.filter(getFilterQueryFromObjectField(path, filter, env));
         }
     }
 
-    protected QueryBuilder getFilterQuery(String fieldPath, ObjectField filter, DataFetchingEnvironment env) {
+    protected void addFieldFilterFromMapEntry(String path, Map.Entry<String, Object> filter, BoolQueryBuilder query,
+                                              DataFetchingEnvironment env) {
+        if (filter.getValue() instanceof List) {
+            List<Map<String, Object>> actualFilters = (List<Map<String, Object>>) filter.getValue();
+            switch (filter.getKey()) {
+                case ARG_NAME_NOT:
+                    BoolQueryBuilder notQuery = boolQuery();
+                    actualFilters.forEach(notFilter -> notFilter.entrySet()
+                            .forEach(notField -> addFieldFilterFromMapEntry(path, notField, notQuery, env)));
+                    notQuery.filter().forEach(query::mustNot);
+                    break;
+                case ARG_NAME_AND:
+                    actualFilters.forEach(andFilter -> andFilter.entrySet()
+                            .forEach(andField -> addFieldFilterFromMapEntry(path, andField, query, env)));
+                    break;
+                case ARG_NAME_OR:
+                    BoolQueryBuilder tempQuery = boolQuery();
+                    BoolQueryBuilder orQuery = boolQuery();
+                    actualFilters.forEach(orFilter -> orFilter.entrySet()
+                            .forEach(orField -> addFieldFilterFromMapEntry(path, orField, tempQuery, env)));
+                    tempQuery.filter().forEach(orQuery::should);
+                    query.filter(boolQuery().must(orQuery));
+                    break;
+                default:
+                    // never happens
+            }
+        } else {
+            query.filter(getFilterQueryFromMapEntry(path, filter));
+        }
+    }
+
+    protected QueryBuilder getFilterQueryFromObjectField(String fieldPath, ObjectField filter,
+                                                         DataFetchingEnvironment env) {
         switch (filter.getName()) {
             case ARG_NAME_EQUALS:
-                return QueryBuilders.termQuery(fieldPath, getRealValue(filter.getValue(), env));
+                return termQuery(fieldPath, getRealValue(filter.getValue(), env));
             case ARG_NAME_MATCHES:
-                return QueryBuilders.matchQuery(fieldPath, getRealValue(filter.getValue(), env));
+                return matchQuery(fieldPath, getRealValue(filter.getValue(), env));
             case ARG_NAME_REGEX:
-                return QueryBuilders.regexpQuery(fieldPath, getRealValue(filter.getValue(), env).toString());
+                return regexpQuery(fieldPath, getRealValue(filter.getValue(), env).toString());
             case ARG_NAME_LT:
-                return QueryBuilders.rangeQuery(fieldPath).lt(getRealValue(filter.getValue(), env));
+                return rangeQuery(fieldPath).lt(getRealValue(filter.getValue(), env));
             case ARG_NAME_GT:
-                return QueryBuilders.rangeQuery(fieldPath).gt(getRealValue(filter.getValue(), env));
+                return rangeQuery(fieldPath).gt(getRealValue(filter.getValue(), env));
             case ARG_NAME_LTE:
-                return QueryBuilders.rangeQuery(fieldPath).lte(getRealValue(filter.getValue(), env));
+                return rangeQuery(fieldPath).lte(getRealValue(filter.getValue(), env));
             case ARG_NAME_GTE:
-                return QueryBuilders.rangeQuery(fieldPath).gte(getRealValue(filter.getValue(), env));
+                return rangeQuery(fieldPath).gte(getRealValue(filter.getValue(), env));
             case ARG_NAME_EXISTS:
                 boolean exists = (boolean) getRealValue(filter.getValue(), env);
                 if (exists) {
-                    return QueryBuilders.existsQuery(fieldPath);
+                    return existsQuery(fieldPath);
                 } else {
-                    return QueryBuilders.existsQuery(fieldPath);
+                    return boolQuery().mustNot(existsQuery(fieldPath));
+                }
+            default:
+                // never happens
+                return null;
+        }
+    }
+
+    protected QueryBuilder getFilterQueryFromMapEntry(String fieldPath, Map.Entry<String, Object> filter) {
+        switch (filter.getKey()) {
+            case ARG_NAME_EQUALS:
+                return termQuery(fieldPath, filter.getValue());
+            case ARG_NAME_MATCHES:
+                return matchQuery(fieldPath, filter.getValue());
+            case ARG_NAME_REGEX:
+                return regexpQuery(fieldPath, filter.getValue().toString());
+            case ARG_NAME_LT:
+                return rangeQuery(fieldPath).lt(filter.getValue());
+            case ARG_NAME_GT:
+                return rangeQuery(fieldPath).gt(filter.getValue());
+            case ARG_NAME_LTE:
+                return rangeQuery(fieldPath).lte(filter.getValue());
+            case ARG_NAME_GTE:
+                return rangeQuery(fieldPath).gte(filter.getValue());
+            case ARG_NAME_EXISTS:
+                boolean exists = (boolean) filter.getValue();
+                if (exists) {
+                    return existsQuery(fieldPath);
+                } else {
+                    return boolQuery().mustNot(existsQuery(fieldPath));
                 }
             default:
                 // never happens
@@ -348,7 +421,6 @@ public class ContentTypeBasedDataFetcher extends RequestAwareDataFetcher<Object>
      * Checks for fields containing the 'item' keyword and makes sure they are always a list even if there is only
      * one value. This is needed because the GraphQL schema always needs to return the same type for a field.
      */
-    @SuppressWarnings("unchecked")
     protected Map<String, Object> fixItems(Map<String, Object> map) {
         Map<String, Object> temp = new LinkedHashMap<>();
 
