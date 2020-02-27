@@ -38,7 +38,6 @@ public class CachedScriptUrlTemplateScanner implements ScriptUrlTemplateScanner,
 
     public static final String URL_TEMPLATES_CACHE_KEY_ELEM = "restScriptUrlTemplates";
 
-    protected boolean warmUpEnabled;
     protected CacheTemplate cacheTemplate;
     protected ScriptUrlTemplateScanner actualScanner;
 

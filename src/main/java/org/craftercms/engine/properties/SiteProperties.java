@@ -17,7 +17,12 @@
 package org.craftercms.engine.properties;
 
 import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.lang3.ArrayUtils;
+import org.craftercms.engine.util.CacheUtils;
 import org.craftercms.engine.util.ConfigUtils;
+
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * Properties specific of the current site.
@@ -46,6 +51,12 @@ public class SiteProperties {
     public static final String EXCLUDE_PATTERNS_CONFIG_KEY = "targeting.excludePatterns";
     public static final String MERGE_FOLDERS_CONFIG_KEY = "targeting.mergeFolders";
     public static final String REDIRECT_TO_TARGETED_URL_CONFIG_KEY = "targeting.redirectToTargetedUrl";
+
+    /**
+     * Cache warm-up properties
+     */
+    public static final String CACHE_WARMUP_DESCRIPTOR_FOLDERS_CONFIG_KEY = "cache.warmUp.descriptorFolders";
+    public static final String CACHE_WARMUP_CONTENT_FOLDERS_CONFIG_KEY = "cache.warmUp.contentFolders";
 
     /*
      * Defaults
@@ -207,6 +218,38 @@ public class SiteProperties {
         } else {
             return DEFAULT_SPA_VIEW_NAME;
         }
+    }
+
+    /**
+     * Gets the list of descriptor folders to preload in the cache. Each folder can have it's depth specified
+     * after a colon, like {@code PATH:DEPTH}
+     */
+    public static final Map<String, Integer> getDescriptorPreloadFolders() {
+        Configuration config = ConfigUtils.getCurrentConfig();
+        if (config != null) {
+            String[] folders = config.getStringArray(CACHE_WARMUP_DESCRIPTOR_FOLDERS_CONFIG_KEY);
+            if (ArrayUtils.isNotEmpty(folders)) {
+                return CacheUtils.parsePreloadFoldersList(folders);
+            }
+        }
+
+        return Collections.emptyMap();
+    }
+
+    /**
+     * Gets the list of content folders to preload in the cache. Each folder can have it's depth specified
+     * after a colon, like {@code PATH:DEPTH}
+     */
+    public static final Map<String, Integer> getContentPreloadFolders() {
+        Configuration config = ConfigUtils.getCurrentConfig();
+        if (config != null) {
+            String[] folders = config.getStringArray(CACHE_WARMUP_CONTENT_FOLDERS_CONFIG_KEY);
+            if (ArrayUtils.isNotEmpty(folders)) {
+                return CacheUtils.parsePreloadFoldersList(folders);
+            }
+        }
+
+        return Collections.emptyMap();
     }
 
 }

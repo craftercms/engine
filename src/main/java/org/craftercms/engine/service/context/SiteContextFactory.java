@@ -490,7 +490,8 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     }
 
     protected ScriptFactory getScriptFactory(SiteContext siteContext, URLClassLoader classLoader) {
-        return new GroovyScriptFactory(new ContentStoreResourceConnector(siteContext), classLoader, groovyGlobalVars);
+        return new GroovyScriptFactory(siteContext, new ContentStoreResourceConnector(siteContext), classLoader,
+                                       groovyGlobalVars);
     }
 
     protected Scheduler scheduleJobs(SiteContext siteContext) {

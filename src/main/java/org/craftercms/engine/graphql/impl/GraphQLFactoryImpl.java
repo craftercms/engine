@@ -243,19 +243,19 @@ public class GraphQLFactoryImpl implements GraphQLFactory, ServletContextAware {
     protected void runInitScript(SiteContext siteContext, GraphQLObjectType.Builder rootType,
                                  GraphQLCodeRegistry.Builder codeRegistry, SchemaCustomizer customizer,
                                  Map<String, GraphQLObjectType.Builder> siteTypes) {
-        Script script = siteContext.getScriptFactory().getScript(schemaScriptPath);
-
         Map<String, Object> variables = new HashMap<>();
         GroovyScriptUtils.addJobScriptVariables(variables, servletContext);
         variables.put(VARIABLE_SCHEMA, customizer);
 
         try {
-            script.execute(variables);
-            logger.info("Updating GraphQL schema with custom fields, fetchers & resolvers");
-            customizer.apply(rootQueryTypeName, rootType, codeRegistry, siteTypes);
+            siteContext.getScriptFactory().getScript(schemaScriptPath).execute(variables);
         } catch (ScriptNotFoundException e) {
             logger.info("No custom GraphQL schema found for site '{}'", siteContext.getSiteName());
         }
+
+        logger.info("Updating GraphQL schema with custom fields, fetchers & resolvers");
+        
+        customizer.apply(rootQueryTypeName, rootType, codeRegistry, siteTypes);
     }
 
     /**

@@ -26,6 +26,7 @@ import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import org.craftercms.engine.macro.MacroResolver;
+import org.craftercms.engine.util.freemarker.CrafterCacheAwareConfiguration;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 /**
@@ -78,6 +79,11 @@ public class CrafterFreeMarkerConfigurer extends FreeMarkerConfigurer {
     protected void postProcessTemplateLoaders(List<TemplateLoader> templateLoaders) {
         // Overwrote to get rid of the log.info
         templateLoaders.add(new ClassTemplateLoader(FreeMarkerConfigurer.class, ""));
+    }
+
+    @Override
+    protected Configuration newConfiguration() {
+        return new CrafterCacheAwareConfiguration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
     }
 
 }

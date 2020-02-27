@@ -24,9 +24,11 @@ import java.util.Map;
 
 import groovy.util.GroovyScriptEngine;
 import org.craftercms.core.service.ContentStoreService;
+import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.scripting.impl.GroovyScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
+import org.craftercms.engine.test.utils.CacheTemplateMockUtils;
 import org.craftercms.engine.test.utils.ContentStoreServiceMockUtils;
 import org.dom4j.io.SAXReader;
 import org.junit.Before;
@@ -80,9 +82,12 @@ public class Dom4jExtensionTest {
     }
 
     private SiteContext createSiteContext(ContentStoreService storeService) {
+        CacheTemplate cacheTemplate = CacheTemplateMockUtils.createCacheTemplate();
+
         SiteContext siteContext = mock(SiteContext.class);
         when(siteContext.getSiteName()).thenReturn("default");
         when(siteContext.getStoreService()).thenReturn(storeService);
+        when(siteContext.getCacheTemplate()).thenReturn(cacheTemplate);
 
         return siteContext;
     }
@@ -90,7 +95,7 @@ public class Dom4jExtensionTest {
     private ScriptFactory createScriptFactory(SiteContext siteContext, Map<String, Object> globalVars) {
         ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(siteContext);
 
-        return new GroovyScriptFactory(resourceConnector, globalVars);
+        return new GroovyScriptFactory(siteContext, resourceConnector, globalVars);
     }
 
 }

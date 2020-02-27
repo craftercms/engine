@@ -141,6 +141,7 @@ public class ScriptFilterTest {
         when(siteContext.getStoreService()).thenReturn(storeService);
         when(siteContext.getConfig()).thenReturn(config);
         when(siteContext.getScriptFactory()).thenReturn(scriptFactory);
+        when(siteContext.getCacheTemplate()).thenReturn(cacheTemplate);
 
         return siteContext;
     }
@@ -148,7 +149,7 @@ public class ScriptFilterTest {
     private ScriptFactory createScriptFactory(SiteContext siteContext) {
         ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(siteContext);
 
-        return new GroovyScriptFactory(resourceConnector, Collections.emptyMap());
+        return new GroovyScriptFactory(siteContext, resourceConnector, Collections.emptyMap());
     }
 
     private void setCurrentRequestContext(HttpServletRequest request, HttpServletResponse response) {

@@ -71,40 +71,35 @@ public class BreadcrumbBuilder {
     public List<BreadcrumbItem> buildBreadcrumb(final String url) {
         final Context context = SiteContext.getCurrent().getContext();
 
-        return cacheTemplate.getObject(context, new Callback<List<BreadcrumbItem>>() {
+        return cacheTemplate.getObject(context, (Callback<List<BreadcrumbItem>>) () -> {
+            String indexFileName = SiteProperties.getIndexFileName();
+            CachingAwareList<BreadcrumbItem> breadcrumb = new CachingAwareList<BreadcrumbItem>();
+            String breadcrumbUrl = StringUtils.substringBeforeLast(StringUtils.substringAfter(url, homePath), indexFileName);
+            String[] breadcrumbUrlComponents = breadcrumbUrl.split("/");
+            String currentUrl = homePath;
 
-            @Override
-            public List<BreadcrumbItem> execute() {
-                String indexFileName = SiteProperties.getIndexFileName();
-                CachingAwareList<BreadcrumbItem> breadcrumb = new CachingAwareList<BreadcrumbItem>();
-                String breadcrumbUrl = StringUtils.substringBeforeLast(StringUtils.substringAfter(url, homePath), indexFileName);
-                String[] breadcrumbUrlComponents = breadcrumbUrl.split("/");
-                String currentUrl = homePath;
-
-                for (String breadcrumbUrlComponent : breadcrumbUrlComponents) {
-                    if (StringUtils.isNotEmpty(breadcrumbUrlComponent)) {
-                        currentUrl += "/" + breadcrumbUrlComponent;
-                    }
-
-                    SiteItem siteItem = siteItemService.getSiteItem(UrlUtils.concat(currentUrl, indexFileName));
-
-                    if (siteItem != null && siteItem.getDom() != null) {
-                        String breadcrumbName = siteItem.queryValue(breadcrumbNameXPathQuery);
-                        if (StringUtils.isEmpty(breadcrumbName)) {
-                            if (StringUtils.isNotEmpty(breadcrumbUrlComponent)) {
-                                breadcrumbName = StringUtils.capitalize(breadcrumbUrlComponent.replace("-", " ").replace(".xml", ""));
-                            } else {
-                                breadcrumbName = HOME_BREADCRUMB_NAME;
-                            }
-                        }
-
-                        breadcrumb.add(new BreadcrumbItem(currentUrl, breadcrumbName));
-                    }
+            for (String breadcrumbUrlComponent : breadcrumbUrlComponents) {
+                if (StringUtils.isNotEmpty(breadcrumbUrlComponent)) {
+                    currentUrl += "/" + breadcrumbUrlComponent;
                 }
 
-                return breadcrumb;
+                SiteItem siteItem = siteItemService.getSiteItem(UrlUtils.concat(currentUrl, indexFileName));
+
+                if (siteItem != null && siteItem.getDom() != null) {
+                    String breadcrumbName = siteItem.queryValue(breadcrumbNameXPathQuery);
+                    if (StringUtils.isEmpty(breadcrumbName)) {
+                        if (StringUtils.isNotEmpty(breadcrumbUrlComponent)) {
+                            breadcrumbName = StringUtils.capitalize(breadcrumbUrlComponent.replace("-", " ").replace(".xml", ""));
+                        } else {
+                            breadcrumbName = HOME_BREADCRUMB_NAME;
+                        }
+                    }
+
+                    breadcrumb.add(new BreadcrumbItem(currentUrl, breadcrumbName));
+                }
             }
 
+            return breadcrumb;
         }, url, BREADCRUMB_CONST_KEY_ELEM);
     }
 
