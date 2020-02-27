@@ -28,12 +28,12 @@ import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.scripting.impl.GroovyScript;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.spring.ApplicationContextAccessor;
-import org.craftercms.profile.api.Profile;
-import org.craftercms.security.authentication.Authentication;
-import org.craftercms.security.utils.SecurityUtils;
+import org.craftercms.engine.util.spring.security.profile.ProfileUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Utility methods for Groovy scripts.
@@ -62,6 +62,7 @@ public class GroovyScriptUtils {
     public static final String VARIABLE_CONTENT_MODEL = "contentModel";
     public static final String VARIABLE_AUTH = "authentication";
     public static final String VARIABLE_PROFILE = "profile";
+    public static final String VARIABLE_AUTH_TOKEN = "authToken";
     public static final String VARIABLE_SITE_CONTEXT = "siteContext";
     public static final String VARIABLE_SITE_CONFIG = "siteConfig";
     public static final String VARIABLE_FILTER_CHAIN = "filterChain";
@@ -155,15 +156,19 @@ public class GroovyScriptUtils {
     }
 
     private static void addSecurityVariables(Map<String, Object> variables) {
-        Authentication auth = SecurityUtils.getCurrentAuthentication();
-        Profile profile = null;
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        variables.put(VARIABLE_AUTH_TOKEN, auth);
 
-        if (auth != null) {
-            profile = auth.getProfile();
+        // for backwards compatibility with Profile ...
+
+        variables.put(VARIABLE_AUTH, null);
+        variables.put(VARIABLE_PROFILE, null);
+
+        if (auth != null && auth.getPrincipal() instanceof ProfileUser) {
+            ProfileUser details = (ProfileUser) auth.getPrincipal();
+            variables.put(VARIABLE_AUTH, details.getAuthentication());
+            variables.put(VARIABLE_PROFILE, details.getProfile());
         }
-
-        variables.put(VARIABLE_AUTH, auth);
-        variables.put(VARIABLE_PROFILE, profile);
     }
 
     private static void addSiteContextVariable(Map<String, Object> variables) {

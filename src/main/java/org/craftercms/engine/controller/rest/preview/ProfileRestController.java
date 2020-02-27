@@ -16,19 +16,22 @@
  */
 package org.craftercms.engine.controller.rest.preview;
 
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.configuration2.HierarchicalConfiguration;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.bson.types.ObjectId;
 import org.craftercms.core.controller.rest.RestControllerBase;
-import org.springframework.stereotype.Controller;
+import org.craftercms.engine.util.ConfigUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 /**
  * REST controller for integration with Crafter Profile.
@@ -36,7 +39,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @author Russ Danner
  * @author Alfonso Vásquez
  */
-@Controller
+@RestController
 @RequestMapping(RestControllerBase.REST_BASE_URI + ProfileRestController.URL_ROOT)
 public class ProfileRestController {
 
@@ -44,8 +47,9 @@ public class ProfileRestController {
 
     public static final String PROFILE_SESSION_ATTRIBUTE = "_cr_profile_state";
 
+    public static final String CLEANSE_ATTRS_CONFIG_KEY = "preview.targeting.cleanseAttributes";
+
     @RequestMapping(value = "/get", method = RequestMethod.GET)
-    @ResponseBody
     @SuppressWarnings("unchecked")
     public Map<String, String> getProfile(HttpSession session) {
         Map<String, String> profile = (Map<String, String>) session.getAttribute(PROFILE_SESSION_ATTRIBUTE);
@@ -58,19 +62,33 @@ public class ProfileRestController {
     }
 
     @RequestMapping(value = "/set", method = RequestMethod.GET)
-    @ResponseBody
     public Map<String, String> setProfile(HttpServletRequest request, HttpSession session) {
+        boolean cleanseAttributes = shouldCleanseAttributes();
+
         Map<String, String> profile = new HashMap<String, String>();
         Enumeration<String> paramNamesEnum = request.getParameterNames();
 
         while (paramNamesEnum.hasMoreElements()) {
             String paramName = paramNamesEnum.nextElement();
-            profile.put(paramName, request.getParameter(paramName).trim());
+            String paramValue = request.getParameter(paramName);
+            if (isNotEmpty(paramValue)) {
+                String value = paramValue.trim();
+                profile.put(paramName, cleanseAttributes? StringEscapeUtils.escapeHtml4(value) : value);
+            }
         }
+
+        // change the id so the authentication object is updated
+        profile.put("id", new ObjectId().toHexString());
 
         session.setAttribute(PROFILE_SESSION_ATTRIBUTE, profile);
 
         return profile;
+    }
+
+    @SuppressWarnings("rawtypes")
+    protected boolean shouldCleanseAttributes() {
+        HierarchicalConfiguration siteConfig = ConfigUtils.getCurrentConfig();
+        return siteConfig != null && siteConfig.getBoolean(CLEANSE_ATTRS_CONFIG_KEY, true);
     }
 
 }

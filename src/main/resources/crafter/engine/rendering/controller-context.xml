@@ -63,17 +63,22 @@
         <property name="errorViewNamePrefix" value="${crafter.engine.error.viewName.prefix}"/>
     </bean>
 
-    <bean id="crafter.monitoringRenderController" class="org.craftercms.engine.controller.rest.MonitoringController"/>
+    <bean id="crafter.monitoringRenderController" class="org.craftercms.engine.controller.rest.MonitoringController">
+        <property name="configuredToken" value="${crafter.engine.management.authorizationToken}" />
+    </bean>
 
     <bean id="crafter.siteContextRestController" class="org.craftercms.engine.controller.rest.SiteContextRestController">
         <property name="contextManager" ref="crafter.siteContextManager"/>
+        <property name="configuredToken" value="${crafter.engine.management.authorizationToken}" />
     </bean>
 
     <bean id="crafter.siteContentStoreRestController" class="org.craftercms.engine.controller.rest.SiteContentStoreRestController">
         <property name="wrappedController" ref="crafter.contentStoreRestController"/>
     </bean>
 
-    <bean id="crafter.siteCacheRestController" class="org.craftercms.engine.controller.rest.SiteCacheRestController"/>
+    <bean id="crafter.siteCacheRestController" class="org.craftercms.engine.controller.rest.SiteCacheRestController">
+        <property name="configuredToken" value="${crafter.engine.management.authorizationToken}" />
+    </bean>
 
     <bean id="crafter.siteNavigationRestController" class="org.craftercms.engine.controller.rest.SiteNavigationController">
         <property name="navTreeBuilder" ref="crafter.navTreeBuilder"/>
@@ -96,13 +101,6 @@
 
     <bean id="crafter.siteConfigController" class="org.craftercms.engine.controller.rest.ConfigRestController">
         <property name="modePreview" value="${crafter.engine.preview}"/>
-    </bean>
-
-    <!-- Overwrite CacheRestController from core -->
-    <bean id="crafter.cacheRestController" class="org.craftercms.engine.controller.rest.FreeMarkerAwareCacheRestController">
-        <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
-        <property name="storeService" ref="crafter.contentStoreService"/>
-        <property name="siteContextManager" ref="crafter.siteContextManager"/>
     </bean>
 
     <util:map id="crafter.urlMappings">

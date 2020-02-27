@@ -15,41 +15,42 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.craftercms.engine.security;
+package org.craftercms.engine.util.spring.security;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.craftercms.engine.util.ConfigUtils;
-import org.craftercms.security.authentication.impl.LoginSuccessHandlerImpl;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 
 /**
- * Extension of {@link org.craftercms.security.authentication.impl.LoginSuccessHandlerImpl} that uses site config
- * to override the default properties.
+ * Extension of {@link SavedRequestAwareAuthenticationSuccessHandler} that uses site config to override properties
  *
- * @author avasquez
+ * @author joseross
+ * @since 3.1.5
  */
-public class ConfigAwareLoginSuccessHandler extends LoginSuccessHandlerImpl {
+public class ConfigAwareAuthenticationSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
     public static final String LOGIN_DEFAULT_SUCCESS_URL_KEY = "security.login.defaultSuccessUrl";
     public static final String LOGIN_ALWAYS_USE_DEFAULT_SUCCESS_URL_KEY = "security.login.alwaysUseDefaultSuccessUrl";
 
     @Override
-    protected String getDefaultTargetUrl() {
+    protected String determineTargetUrl(final HttpServletRequest request, final HttpServletResponse response) {
         HierarchicalConfiguration config = ConfigUtils.getCurrentConfig();
         if (config != null) {
-            return config.getString(LOGIN_DEFAULT_SUCCESS_URL_KEY, defaultTargetUrl);
-        } else {
-            return defaultTargetUrl;
+            return config.getString(LOGIN_DEFAULT_SUCCESS_URL_KEY, super.determineTargetUrl(request, response));
         }
+        return super.determineTargetUrl(request, response);
     }
 
     @Override
     protected boolean isAlwaysUseDefaultTargetUrl() {
         HierarchicalConfiguration config = ConfigUtils.getCurrentConfig();
         if (config != null) {
-            return config.getBoolean(LOGIN_ALWAYS_USE_DEFAULT_SUCCESS_URL_KEY, alwaysUseDefaultTargetUrl);
-        } else {
-            return alwaysUseDefaultTargetUrl;
+            return config.getBoolean(LOGIN_ALWAYS_USE_DEFAULT_SUCCESS_URL_KEY, super.isAlwaysUseDefaultTargetUrl());
         }
+        return super.isAlwaysUseDefaultTargetUrl();
     }
 
 }

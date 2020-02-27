@@ -21,11 +21,11 @@ import java.util.List;
 
 import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
+import org.craftercms.commons.config.ConfigUtils;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.test.utils.ContentStoreServiceMockUtils;
-import org.craftercms.engine.util.ConfigUtils;
 import org.craftercms.engine.util.quartz.JobContext;
 import org.junit.Before;
 import org.junit.Test;
@@ -93,7 +93,8 @@ public class ConfigurationScriptJobResolverTest {
     }
 
     private void setUpSiteContext(SiteContext siteContext, ContentStoreService storeService) throws Exception {
-        XMLConfiguration config = ConfigUtils.readXmlConfiguration(new ClassPathResource("config/site-config.xml"), ',');
+        XMLConfiguration config =
+            ConfigUtils.readXmlConfiguration(new ClassPathResource("config/site-config.xml"), ',', null);
         config.setListDelimiterHandler(new DefaultListDelimiterHandler(','));
 
         when(siteContext.getSiteName()).thenReturn("default");

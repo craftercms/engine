@@ -24,9 +24,9 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import groovy.util.GroovyScriptEngine;
 import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
+import org.craftercms.commons.config.ConfigUtils;
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
@@ -35,7 +35,6 @@ import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.test.utils.CacheTemplateMockUtils;
 import org.craftercms.engine.test.utils.ContentStoreServiceMockUtils;
-import org.craftercms.engine.util.ConfigUtils;
 import org.craftercms.engine.util.groovy.ContentStoreResourceConnector;
 import org.junit.Before;
 import org.junit.Test;
@@ -133,7 +132,8 @@ public class ScriptFilterTest {
         SiteContext siteContext = mock(SiteContext.class);
         ScriptFactory scriptFactory = createScriptFactory(siteContext);
 
-        XMLConfiguration config = ConfigUtils.readXmlConfiguration(new ClassPathResource("config/site-config.xml"), ',');
+        XMLConfiguration config =
+            ConfigUtils.readXmlConfiguration(new ClassPathResource("config/site-config.xml"), ',', null);
         config.setListDelimiterHandler(new DefaultListDelimiterHandler(','));
 
         when(siteContext.getSiteName()).thenReturn("default");
