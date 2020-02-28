@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2007-2019 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2020 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 3 as published by
+ * the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,10 +27,12 @@ import groovy.util.GroovyScriptEngine;
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
+import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.engine.controller.rest.RestScriptsController;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.scripting.impl.GroovyScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
+import org.craftercms.engine.test.utils.CacheTemplateMockUtils;
 import org.craftercms.engine.test.utils.ContentStoreServiceMockUtils;
 import org.craftercms.engine.util.groovy.ContentStoreResourceConnector;
 import org.junit.Before;
@@ -153,15 +154,17 @@ public class RestScriptsControllerTest {
 
     private SiteContext createSiteContext(ContentStoreService storeService) {
         SiteContext siteContext = mock(SiteContext.class);
+        CacheTemplate cacheTemplate = CacheTemplateMockUtils.createCacheTemplate();
 
         ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(siteContext);
-        ScriptFactory scriptFactory = new GroovyScriptFactory(resourceConnector, Collections.emptyMap());
+        ScriptFactory scriptFactory = new GroovyScriptFactory(siteContext, resourceConnector, Collections.emptyMap());
 
         when(siteContext.getSiteName()).thenReturn("test");
         when(siteContext.getContext()).thenReturn(mock(Context.class));
         when(siteContext.getRestScriptsPath()).thenReturn("/scripts");
         when(siteContext.getStoreService()).thenReturn(storeService);
         when(siteContext.getScriptFactory()).thenReturn(scriptFactory);
+        when(siteContext.getCacheTemplate()).thenReturn(cacheTemplate);
 
         return siteContext;
     }

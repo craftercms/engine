@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2007-2019 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2020 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 3 as published by
+ * the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,9 +15,11 @@
  */
 package org.craftercms.engine.cache;
 
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
+import org.craftercms.engine.properties.SiteProperties;
 import org.craftercms.engine.util.CacheUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +41,7 @@ public class ContentStoreServiceTreeBasedContextCacheWarmer implements ContextCa
 
     protected boolean warmUpEnabled;
     protected ContentStoreService contentStoreService;
-    protected Map<String, Integer> preloadFolders;
+    protected Map<String, Integer> descriptorPreloadFolders;
 
     /**
      * Sets if warm up is enabled
@@ -59,12 +60,12 @@ public class ContentStoreServiceTreeBasedContextCacheWarmer implements ContextCa
     }
 
     /**
-     * Sets the list of folder trees to preload in the cache. Each folder can have it's depth specifiedv
+     * Sets the list of descriptor folder trees to preload in the cache. Each folder can have it's depth specified
      * after a colon, like {@code PATH:DEPTH}
      */
     @Required
-    public void setPreloadFolders(String[] preloadFolders) {
-        this.preloadFolders = CacheUtils.parsePreloadFoldersList(preloadFolders);
+    public void setDescriptorPreloadFolders(String[] descriptorPreloadFolders) {
+        this.descriptorPreloadFolders = CacheUtils.parsePreloadFoldersList(descriptorPreloadFolders);
     }
 
     /**
@@ -72,7 +73,7 @@ public class ContentStoreServiceTreeBasedContextCacheWarmer implements ContextCa
      */
     @Override
     public void warmUpCache(Context context) {
-        for (Map.Entry<String, Integer> entry : preloadFolders.entrySet()) {
+        for (Map.Entry<String, Integer> entry : getDescriptorPreloadFolders().entrySet()) {
             String treeRoot = entry.getKey();
             int depth = entry.getValue();
             StopWatch stopWatch = new StopWatch();
@@ -91,6 +92,15 @@ public class ContentStoreServiceTreeBasedContextCacheWarmer implements ContextCa
 
             logger.info("Preload of tree [{}] with depth {} completed in {} secs", treeRoot, depth,
                         stopWatch.getTime(TimeUnit.SECONDS));
+        }
+    }
+
+    protected Map<String, Integer> getDescriptorPreloadFolders() {
+        Map<String, Integer> preloadFolders = SiteProperties.getDescriptorPreloadFolders();
+        if (MapUtils.isNotEmpty(preloadFolders)) {
+            return preloadFolders;
+        } else {
+            return descriptorPreloadFolders;
         }
     }
 

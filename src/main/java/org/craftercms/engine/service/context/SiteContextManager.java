@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2007-2019 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2020 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 3 as published by
+ * the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,6 +18,8 @@ package org.craftercms.engine.service.context;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.craftercms.commons.concurrent.locks.KeyBasedLockFactory;
+import org.craftercms.commons.concurrent.locks.WeakKeyBasedReentrantLockFactory;
 import org.craftercms.commons.entitlements.exception.EntitlementException;
 import org.craftercms.commons.entitlements.model.EntitlementType;
 import org.craftercms.commons.entitlements.validator.EntitlementValidator;
@@ -45,7 +46,7 @@ public class SiteContextManager {
 
     private static final Log logger = LogFactory.getLog(SiteContextManager.class);
 
-    protected SiteLockFactory siteLockFactory;
+    protected KeyBasedLockFactory<ReentrantLock> siteLockFactory;
     protected Map<String, SiteContext> contextRegistry;
     protected SiteContextFactory contextFactory;
     protected SiteContextFactory fallbackContextFactory;
@@ -56,7 +57,7 @@ public class SiteContextManager {
     protected String defaultSiteName;
 
     public SiteContextManager() {
-        siteLockFactory = new SiteLockFactory();
+        siteLockFactory = new WeakKeyBasedReentrantLockFactory();
         contextRegistry = new ConcurrentHashMap<>();
     }
 
@@ -378,26 +379,6 @@ public class SiteContextManager {
         } catch (EntitlementException e) {
             return false;
         }
-    }
-
-    protected static class SiteLockFactory {
-
-        protected Map<String, Lock> locks;
-
-        public SiteLockFactory() {
-            locks = new WeakHashMap<>();
-        }
-
-        public synchronized Lock getLock(String siteName) {
-            Lock lock = locks.get(siteName);
-            if (lock == null) {
-                lock = new ReentrantLock();
-                locks.put(siteName, lock);
-            }
-
-            return lock;
-        }
-
     }
 
 }

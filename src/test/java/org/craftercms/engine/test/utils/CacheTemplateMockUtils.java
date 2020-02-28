@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2007-2019 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2020 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 3 as published by
+ * the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -24,9 +23,7 @@ import org.craftercms.core.util.cache.CacheTemplate;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyVararg;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Test utils for mocking a {@link CacheTemplate}.
@@ -35,31 +32,27 @@ import static org.mockito.Mockito.when;
  */
 public class CacheTemplateMockUtils {
 
-    public static CacheTemplate setUpWithNoCaching(CacheTemplate mock) {
-        when(mock.getObject(any(Context.class), any(Callback.class), anyVararg())).then(new Answer<Object>() {
+    @SuppressWarnings("unchecked")
+    public static void setUpWithNoCaching(CacheTemplate mock) {
+        when(mock.getObject(any(Context.class), any(Callback.class), anyVararg())).then(invocation -> {
+            Object[] args = invocation.getArguments();
+            Callback<?> callback = (Callback<?>) args[1];
 
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                Object[] args = invocation.getArguments();
-                Callback<?> callback = (Callback<?>) args[1];
-
-                return callback.execute();
-            }
-
+            return callback.execute();
         });
         when(mock.getObject(any(Context.class), any(CachingOptions.class), any(Callback.class), anyVararg())).then(
-            new Answer<Object>() {
-
-                @Override
-                public Object answer(InvocationOnMock invocation) throws Throwable {
+                invocation -> {
                     Object[] args = invocation.getArguments();
                     Callback<?> callback = (Callback<?>) args[2];
 
                     return callback.execute();
                 }
-
-            }
         );
+    }
+
+    public static CacheTemplate createCacheTemplate() {
+        CacheTemplate mock = mock(CacheTemplate.class);
+        setUpWithNoCaching(mock);
 
         return mock;
     }

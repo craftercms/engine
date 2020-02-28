@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2007-2019 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2020 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 3 as published by
+ * the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -26,6 +25,7 @@ import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import org.craftercms.engine.macro.MacroResolver;
+import org.craftercms.engine.util.freemarker.CrafterCacheAwareConfiguration;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 /**
@@ -78,6 +78,11 @@ public class CrafterFreeMarkerConfigurer extends FreeMarkerConfigurer {
     protected void postProcessTemplateLoaders(List<TemplateLoader> templateLoaders) {
         // Overwrote to get rid of the log.info
         templateLoaders.add(new ClassTemplateLoader(FreeMarkerConfigurer.class, ""));
+    }
+
+    @Override
+    protected Configuration newConfiguration() {
+        return new CrafterCacheAwareConfiguration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
     }
 
 }
