@@ -15,11 +15,8 @@
  */
 package org.craftercms.engine.freemarker;
 
-import java.io.IOException;
-import java.util.List;
-
-import freemarker.cache.CacheStorage;
 import freemarker.cache.ClassTemplateLoader;
+import freemarker.cache.NullCacheStorage;
 import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
@@ -27,6 +24,9 @@ import freemarker.template.TemplateExceptionHandler;
 import org.craftercms.engine.macro.MacroResolver;
 import org.craftercms.engine.util.freemarker.CrafterCacheAwareConfiguration;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
+
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Extends {@link org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer} to:
@@ -41,7 +41,11 @@ public class CrafterFreeMarkerConfigurer extends FreeMarkerConfigurer {
 
     private MacroResolver macroResolver;
     private TemplateExceptionHandler templateExceptionHandler;
-    private CacheStorage cacheStorage;
+    private boolean cacheTemplates;
+
+    public CrafterFreeMarkerConfigurer() {
+        cacheTemplates = true;
+    }
 
     public void setMacroResolver(MacroResolver macroResolver) {
         this.macroResolver = macroResolver;
@@ -51,8 +55,8 @@ public class CrafterFreeMarkerConfigurer extends FreeMarkerConfigurer {
         this.templateExceptionHandler = templateExceptionHandler;
     }
 
-    public void setCacheStorage(final CacheStorage cacheStorage) {
-        this.cacheStorage = cacheStorage;
+    public void setCacheTemplates(boolean cacheTemplates) {
+        this.cacheTemplates = cacheTemplates;
     }
 
     @Override
@@ -60,8 +64,8 @@ public class CrafterFreeMarkerConfigurer extends FreeMarkerConfigurer {
         if (templateExceptionHandler != null) {
             config.setTemplateExceptionHandler(templateExceptionHandler);
         }
-        if (cacheStorage != null) {
-            config.setCacheStorage(cacheStorage);
+        if (!cacheTemplates) {
+            config.setCacheStorage(NullCacheStorage.INSTANCE);
         }
     }
 
@@ -82,7 +86,7 @@ public class CrafterFreeMarkerConfigurer extends FreeMarkerConfigurer {
 
     @Override
     protected Configuration newConfiguration() {
-        return new CrafterCacheAwareConfiguration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
+        return new CrafterCacheAwareConfiguration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS, cacheTemplates);
     }
 
 }
