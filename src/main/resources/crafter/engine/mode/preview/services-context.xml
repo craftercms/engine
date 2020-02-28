@@ -132,9 +132,7 @@
                 <ref bean="crafter.crafterFreeMarkerTemplateLoader"/>
             </array>
         </property>
-        <property name="cacheStorage">
-            <bean class="freemarker.cache.NullCacheStorage"/>
-        </property>
+        <property name="cacheTemplates" value="false"/>
     </bean>
 
 </beans>

@@ -35,23 +35,30 @@ import java.util.Locale;
  */
 public class CrafterCacheAwareConfiguration extends Configuration {
 
-    public CrafterCacheAwareConfiguration(Version incompatibleImprovements) {
+    protected boolean cacheTemplates;
+
+    public CrafterCacheAwareConfiguration(Version incompatibleImprovements, boolean cacheTemplates) {
         super(incompatibleImprovements);
+        this.cacheTemplates = cacheTemplates;
     }
 
     @Override
     public Template getTemplate(String name, Locale locale, Object customLookupCondition, String encoding,
                                 boolean parseAsFTL, boolean ignoreMissing) throws IOException {
-        try {
-            return SiteContext.getFromCurrentCache(() -> {
-                try {
-                    return super.getTemplate(name, locale, customLookupCondition, encoding, parseAsFTL, ignoreMissing);
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
-                }
-            }, name, locale, customLookupCondition, encoding, parseAsFTL);
-        } catch (UncheckedIOException e) {
-            throw e.getCause();
+        if (cacheTemplates) {
+            try {
+                return SiteContext.getFromCurrentCache(() -> {
+                    try {
+                        return super.getTemplate(name, locale, customLookupCondition, encoding, parseAsFTL, ignoreMissing);
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                }, name, locale, customLookupCondition, encoding, parseAsFTL);
+            } catch (UncheckedIOException e) {
+                throw e.getCause();
+            }
+        } else {
+            return super.getTemplate(name, locale, customLookupCondition, encoding, parseAsFTL, ignoreMissing);
         }
     }
 
