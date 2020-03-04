@@ -769,13 +769,14 @@
     <!--		Configuration Profiles 	    -->
     <!--									-->
     <!-- ////////////////////////////////// -->
-    
+
+    <bean id="crafter.s3ProfileMapper" class="org.craftercms.commons.config.profiles.aws.S3ProfileMapper">
+        <constructor-arg ref="crafter.configurationReader"/>
+    </bean>
+
     <bean id="crafter.s3ProfileLoader" class="org.craftercms.engine.util.config.profiles.ConfigurationProfileLoaderImpl">
         <property name="profilesUrl" value="${crafter.engine.site.default.config.aws.profiles.path}"/>
-        <property name="profileMapper">
-            <bean class="org.craftercms.commons.config.profiles.aws.S3ProfileMapper">
-                <constructor-arg ref="crafter.configurationReader"/>
-            </bean>
+        <property name="profileMapper" ref="crafter.s3ProfileMapper">
         </property>
         <property name="siteItemService" ref="crafter.siteItemService"/>
     </bean>
