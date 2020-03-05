@@ -770,10 +770,6 @@
     <!--									-->
     <!-- ////////////////////////////////// -->
 
-    <bean id="crafter.s3ProfileMapper" class="org.craftercms.commons.config.profiles.aws.S3ProfileMapper">
-        <constructor-arg ref="crafter.configurationReader"/>
-    </bean>
-
     <bean id="crafter.s3ProfileLoader" class="org.craftercms.engine.util.config.profiles.ConfigurationProfileLoaderImpl">
         <property name="profilesUrl" value="${crafter.engine.site.default.config.aws.profiles.path}"/>
         <property name="profileMapper" ref="crafter.s3ProfileMapper">
@@ -942,6 +938,11 @@
         <property name="typeFactory" ref="crafter.typeFactory"/>
         <property name="dataFetcher" ref="crafter.dataFetcher"/>
         <property name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
+    </bean>
+
+    <bean id="crafter.environmentResolver" class="org.craftercms.engine.util.blob.SiteAwareEnvironmentResolver">
+        <constructor-arg value="${crafter.engine.preview}"/>
+        <constructor-arg value="${crafter.engine.site.staging.pattern}"/>
     </bean>
 
     <import resource="${crafter.engine.extension.base}/services-overlay-context.xml"/>
