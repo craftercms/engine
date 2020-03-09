@@ -32,6 +32,7 @@ import graphql.schema.GraphQLType;
 import graphql.schema.StaticDataFetcher;
 import graphql.schema.TypeResolver;
 import org.apache.commons.lang3.StringUtils;
+import org.craftercms.engine.graphql.impl.fetchers.ConverterDataFetcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -150,7 +151,7 @@ public class SchemaCustomizer {
                         String.format("GraphQL schema already contains a field '%s'", fieldName));
                 }
                 rootTypeBuilder.field(builder.field);
-                codeRegistry.dataFetcher(coordinates(rootTypeName, fieldName), builder.fetcher);
+                codeRegistry.dataFetcher(coordinates(rootTypeName, fieldName), ConverterDataFetcher.of(builder.fetcher));
             } else {
                 // Add a field to a specific type
                 if (!types.containsKey(builder.typeName)) {
@@ -162,14 +163,16 @@ public class SchemaCustomizer {
                 }
                 logger.debug("Adding custom field & fetcher {}.{}", builder.typeName, fieldName);
                 types.get(builder.typeName).field(builder.field);
-                codeRegistry.dataFetcher(coordinates(builder.typeName, fieldName), builder.fetcher);
+                codeRegistry.dataFetcher(coordinates(builder.typeName, fieldName),
+                        ConverterDataFetcher.of(builder.fetcher));
             }
 
         });
 
         fetchers.forEach(builder -> {
             logger.debug("Adding custom fetcher for {}/{}", builder.typeName, builder.fieldName);
-            codeRegistry.dataFetcher(coordinates(builder.typeName, builder.fieldName), builder.dataFetcher);
+            codeRegistry.dataFetcher(coordinates(builder.typeName, builder.fieldName),
+                    ConverterDataFetcher.of(builder.dataFetcher));
         });
         resolvers.forEach(builder -> {
             logger.debug("Adding custom resolver for {}", builder.typeName);
