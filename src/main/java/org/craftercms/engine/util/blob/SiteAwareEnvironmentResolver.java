@@ -26,12 +26,12 @@ import org.craftercms.engine.service.context.SiteContext;
  */
 public class SiteAwareEnvironmentResolver implements EnvironmentResolver {
 
-    protected boolean isPreview;
+    protected boolean preview;
 
     protected String stagingPattern;
 
-    public SiteAwareEnvironmentResolver(boolean isPreview, String stagingPattern) {
-        this.isPreview = isPreview;
+    public SiteAwareEnvironmentResolver(boolean preview, String stagingPattern) {
+        this.preview = preview;
         this.stagingPattern = stagingPattern;
     }
 
@@ -41,7 +41,7 @@ public class SiteAwareEnvironmentResolver implements EnvironmentResolver {
         if (siteContext == null) {
             throw new IllegalStateException("Can't resolve the current site environment");
         }
-        if (isPreview) {
+        if (preview) {
             return PREVIEW;
         } else if(siteContext.getSiteName().matches(stagingPattern)) {
             return STAGING;
