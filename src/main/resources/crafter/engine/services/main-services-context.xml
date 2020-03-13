@@ -211,6 +211,22 @@
         </property>
     </bean>
 
+    <bean id="crafter.proxyFilter" class="org.craftercms.engine.servlet.filter.HttpProxyFilter">
+        <constructor-arg value="${crafter.engine.preview}"/>
+        <constructor-arg>
+            <bean class="org.craftercms.engine.util.spring.servlet.AppContextAwareServletWrappingController">
+                <property name="servletClass" value="org.craftercms.engine.util.servlet.ConfigAwareProxyServlet"/>
+                <property name="servletName" value="Proxy Servlet"/>
+                <property name="initParameters">
+                    <props>
+                        <prop key="preserveCookies">true</prop>
+                        <prop key="configPath">${crafter.engine.proxy.config.path}</prop>
+                    </props>
+                </property>
+            </bean>
+        </constructor-arg>
+    </bean>
+
     <!-- ////////////////////////////////// -->
     <!--								 	-->
     <!--			Services				-->

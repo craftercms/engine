@@ -13,20 +13,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.craftercms.engine.exception;
+package org.craftercms.engine.util.spring.servlet;
 
-import org.craftercms.core.exception.CrafterException;
-import org.craftercms.engine.util.servlet.ConfigAwareProxyServlet;
+import org.springframework.context.ApplicationContextAware;
+
+import javax.servlet.Servlet;
 
 /**
- * Used by {@link ConfigAwareProxyServlet}.
+ * Extension of {@link Servlet} that also implements {@link ApplicationContextAware}
  *
- * @author Alfonso Vásquez
+ * @author joseross
+ * @since 3.1.6
  */
-public class HttpProxyException extends CrafterException {
+public interface AppContextAwareServlet extends Servlet, ApplicationContextAware {
 
-    public HttpProxyException(String message) {
-        super(message);
-    }
+    // no additional methods needed
 
 }
