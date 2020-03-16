@@ -18,13 +18,10 @@ package org.craftercms.engine.service.context;
 import groovy.lang.GroovyClassLoader;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
-import org.apache.commons.configuration2.builder.ConfigurationBuilder;
-import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.craftercms.commons.config.MultiResourceConfigurationBuilder;
-import org.craftercms.commons.crypto.TextEncryptor;
-import org.craftercms.commons.crypto.impl.NoOpTextEncryptor;
+import org.craftercms.commons.config.ConfigurationException;
+import org.craftercms.commons.config.EncryptionAwareConfigurationReader;
 import org.craftercms.commons.spring.ApacheCommonsConfiguration2PropertySource;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
@@ -72,6 +69,7 @@ import java.util.concurrent.Executor;
  *
  * @author Alfonso Vásquez
  */
+@SuppressWarnings("rawtypes")
 public class SiteContextFactory implements ApplicationContextAware, ServletContextAware {
 
     public static final String DEFAULT_SITE_NAME_MACRO_NAME = "siteName";
@@ -106,11 +104,11 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected ApplicationContext globalApplicationContext;
     protected List<ScriptJobResolver> jobResolvers;
     protected Executor jobThreadPoolExecutor;
-    protected TextEncryptor textEncryptor;
     protected GraphQLFactory graphQLFactory;
     protected boolean cacheWarmUpEnabled;
     protected SiteCacheWarmer cacheWarmer;
     protected long initTimeout;
+    protected EncryptionAwareConfigurationReader configurationReader;
 
     public SiteContextFactory() {
         siteNameMacroName = DEFAULT_SITE_NAME_MACRO_NAME;
@@ -242,11 +240,6 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     }
 
     @Required
-    public void setTextEncryptor(TextEncryptor textEncryptor) {
-        this.textEncryptor = textEncryptor;
-    }
-
-    @Required
     public void setGraphQLFactory(GraphQLFactory graphQLFactory) {
         this.graphQLFactory = graphQLFactory;
     }
@@ -263,6 +256,11 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
 
     public void setInitTimeout(final long initTimeout) {
         this.initTimeout = initTimeout;
+    }
+
+    @Required
+    public void setConfigurationReader(EncryptionAwareConfigurationReader configurationReader) {
+        this.configurationReader = configurationReader;
     }
 
     @Override
@@ -353,16 +351,13 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         logger.info("--------------------------------------------------");
 
         try {
-
-            ConfigurationBuilder<HierarchicalConfiguration<?>> builder;
-
-            if (textEncryptor instanceof NoOpTextEncryptor) {
-                builder = new MultiResourceConfigurationBuilder(configPaths, resourceLoader);
-            } else {
-                builder = new MultiResourceConfigurationBuilder(configPaths, resourceLoader, textEncryptor);
+            for (int i = configPaths.length - 1; i >= 0; i--) {
+                Resource config = resourceLoader.getResource(configPaths[i]);
+                if (config.exists()) {
+                    return configurationReader.readXmlConfiguration(config);
+                }
             }
-
-            return builder.getConfiguration();
+            return null;
         } catch (ConfigurationException e) {
             throw new SiteContextCreationException("Unable to load configuration for site '" + siteName + "'", e);
         } finally {
@@ -393,16 +388,16 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         logger.info("--------------------------------------------------");
 
         try {
-            List<Resource> resources = new ArrayList<>();
+            Resource appContextResource = null;
 
-            for (String path : applicationContextPaths) {
-                Resource resource = resourceLoader.getResource(path);
+            for (int i = applicationContextPaths.length - 1; i >= 0; i--) {
+                Resource resource = resourceLoader.getResource(applicationContextPaths[i]);
                 if (resource.exists()) {
-                    resources.add(resource);
+                    appContextResource = resource;
                 }
             }
 
-            if (CollectionUtils.isNotEmpty(resources)) {
+            if (appContextResource != null) {
                 GenericApplicationContext appContext = new GenericApplicationContext(globalApplicationContext);
                 appContext.setClassLoader(classLoader);
 
@@ -415,9 +410,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
                 XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(appContext);
                 reader.setValidationMode(XmlBeanDefinitionReader.VALIDATION_XSD);
 
-                for (Resource resource : resources) {
-                    reader.loadBeanDefinitions(resource);
-                }
+                reader.loadBeanDefinitions(appContextResource);
 
                 appContext.refresh();
 
