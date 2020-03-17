@@ -17,29 +17,19 @@ package org.craftercms.engine.util.servlet;
 
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.http.client.utils.URIUtils;
-import org.craftercms.commons.config.ConfigUtils;
-import org.craftercms.commons.config.ConfigurationException;
 import org.craftercms.commons.lang.RegexUtils;
-import org.craftercms.core.service.Content;
-import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.engine.exception.HttpProxyException;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.util.spring.servlet.AppContextAwareServlet;
 import org.mitre.dsmiley.httpproxy.ProxyServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
-import java.util.Collections;
 import java.util.List;
-
-import static org.apache.commons.lang3.StringUtils.removeStart;
 
 /**
  * Extension of {@link ProxyServlet} that uses the current site configuration
@@ -47,11 +37,9 @@ import static org.apache.commons.lang3.StringUtils.removeStart;
  * @author joseross
  * @since 3.1.6
  */
-public class ConfigAwareProxyServlet extends ProxyServlet implements AppContextAwareServlet {
+public class ConfigAwareProxyServlet extends ProxyServlet {
 
     private static final Logger logger = LoggerFactory.getLogger(ConfigAwareProxyServlet.class);
-
-    public static final String PARAM_CONFIG_PATH = "configPath";
 
     public static final String CONFIG_KEY_SERVERS = "servers.server";
 
@@ -61,30 +49,10 @@ public class ConfigAwareProxyServlet extends ProxyServlet implements AppContextA
 
     public static final String CONFIG_KEY_URL = "url";
 
-    protected ApplicationContext applicationContext;
-
-    protected ContentStoreService contentStoreService;
-
-    protected String configPath;
-
     protected boolean preview;
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
-    }
-
-    @Override
-    public void init() throws ServletException {
-        super.init();
-
-        configPath = getInitParameter(PARAM_CONFIG_PATH);
-
-        contentStoreService = applicationContext.getBean(ContentStoreService.class);
-    }
-
-    @Override
-    protected void initTarget() throws ServletException {
+    protected void initTarget() {
         // Do nothing ... the target url will be resolved for each request
     }
 
@@ -126,33 +94,26 @@ public class ConfigAwareProxyServlet extends ProxyServlet implements AppContextA
     }
 
     @SuppressWarnings("rawtypes, unchecked")
-    protected String getTargetUrl(SiteContext siteContext, String requestUri) throws IOException, ServletException {
-        Content config = contentStoreService.findContent(siteContext.getContext(), configPath);
+    protected String getTargetUrl(SiteContext siteContext, String requestUri) {
+        HierarchicalConfiguration proxyConfig = siteContext.getProxyConfig();
 
-        if (config == null) {
+        if (proxyConfig == null) {
             throw new HttpProxyException("No proxy configuration found for site " + siteContext.getSiteName());
         }
 
-        try (InputStream is = config.getInputStream()) {
-            HierarchicalConfiguration proxyConfig = ConfigUtils.readXmlConfiguration(is, Collections.emptyMap());
-
-            List<HierarchicalConfiguration> servers = proxyConfig.configurationsAt(CONFIG_KEY_SERVERS);
-            for (HierarchicalConfiguration server : servers) {
-                List<String> patterns = server.getList(String.class, CONFIG_KEY_PATTERNS);
-                if (RegexUtils.matchesAny(requestUri, patterns)) {
-                    logger.debug("Found matching server {} for proxy request {}",
-                            server.getString(CONFIG_KEY_ID), requestUri);
-                    return server.getString(CONFIG_KEY_URL);
-                }
+        List<HierarchicalConfiguration> servers = proxyConfig.configurationsAt(CONFIG_KEY_SERVERS);
+        for (HierarchicalConfiguration server : servers) {
+            List<String> patterns = server.getList(String.class, CONFIG_KEY_PATTERNS);
+            if (RegexUtils.matchesAny(requestUri, patterns)) {
+                logger.debug("Found matching server {} for proxy request {}",
+                        server.getString(CONFIG_KEY_ID), requestUri);
+                return server.getString(CONFIG_KEY_URL);
             }
-        } catch (ConfigurationException e) {
-            logger.error("Error reading proxy configuration for site {}", siteContext.getSiteName(), e);
-            throw new ServletException("Error reading proxy configuration for site " + siteContext.getSiteName(), e);
         }
 
         // should never happen (unless there is an issue with the config)
-        throw new IllegalStateException("Invalid proxy configuration, no matching server found for request "
-                + requestUri);
+        throw new IllegalStateException("Invalid proxy configuration for site " + siteContext.getSiteName() +
+                ", no matching server found for request " + requestUri);
     }
 
 }
