@@ -29,6 +29,7 @@ import org.craftercms.engine.scripting.SiteItemScriptResolver;
 import org.craftercms.engine.service.SiteItemService;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.freemarker.HttpRequestHashModel;
+import org.craftercms.engine.util.freemarker.SiteContextHashModel;
 import org.craftercms.engine.util.spring.ApplicationContextAccessor;
 import org.craftercms.engine.util.spring.security.profile.ProfileUser;
 import org.springframework.beans.BeansException;
@@ -96,6 +97,9 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     protected String componentEmbeddedElementName;
     protected SiteItemScriptResolver componentScriptResolver;
 
+    // Needed because the field in the superclass is private
+    protected boolean exposeApplication;
+
     protected ServletContextHashModel servletContextHashModel;
     protected ApplicationContextAccessor applicationContextAccessor;
 
@@ -105,6 +109,12 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
 
         servletContextHashModel = new ServletContextHashModel(servletContext, getObjectWrapper());
         applicationContextAccessor = new ApplicationContextAccessor(getApplicationContext());
+    }
+
+    @Override
+    public void setExposeSpringMacroHelpers(boolean exposeSpringMacroHelpers) {
+        super.setExposeSpringMacroHelpers(exposeSpringMacroHelpers);
+        exposeApplication = exposeSpringMacroHelpers;
     }
 
     @Required
@@ -161,22 +171,26 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     protected SimpleHash buildTemplateModel(final Map<String, Object> model, final HttpServletRequest request,
                                             final HttpServletResponse response) {
         AllHttpScopesAndAppContextHashModel templateModel = new AllHttpScopesAndAppContextHashModel(
-            getObjectWrapper(), applicationContextAccessor, getServletContext(), request);
+            getObjectWrapper(), applicationContextAccessor, getServletContext(), request, exposeApplication);
         HttpSessionHashModel sessionModel = createSessionModel(request, response);
         HttpRequestHashModel requestModel = new HttpRequestHashModel(request, response, getObjectWrapper());
         HttpRequestParametersHashModel requestParamsModel = new HttpRequestParametersHashModel(request);
         Map<String, String> cookies = createCookieMap(request);
 
-        templateModel.put(KEY_APPLICATION_CAP, servletContextHashModel);
-        templateModel.put(KEY_APPLICATION, servletContextHashModel);
+        if (exposeApplication) {
+            templateModel.put(KEY_APPLICATION_CAP, servletContextHashModel);
+            templateModel.put(KEY_APPLICATION, servletContextHashModel);
+            templateModel.put(KEY_APP_CONTEXT_CAP, applicationContextAccessor);
+            templateModel.put(KEY_APP_CONTEXT, applicationContextAccessor);
+        }
+
         templateModel.put(KEY_SESSION_CAP, sessionModel);
         templateModel.put(KEY_SESSION, sessionModel);
         templateModel.put(KEY_REQUEST_CAP, requestModel);
         templateModel.put(KEY_REQUEST, requestModel);
         templateModel.put(KEY_REQUEST_PARAMS_CAP, requestParamsModel);
         templateModel.put(KEY_REQUEST_PARAMS, requestParamsModel);
-        templateModel.put(KEY_APP_CONTEXT_CAP, applicationContextAccessor);
-        templateModel.put(KEY_APP_CONTEXT, applicationContextAccessor);
+
         templateModel.put(KEY_COOKIES_CAP, cookies);
         templateModel.put(KEY_COOKIES, cookies);
 
@@ -198,6 +212,7 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
         SiteContext siteContext = SiteContext.getCurrent();
         Configuration siteConfig = siteContext.getConfig();
         Locale locale = LocaleContextHolder.getLocale();
+        SiteContextHashModel siteContextModel = new SiteContextHashModel(getObjectWrapper());
         TemplateHashModel staticModels = BeansWrapper.getDefaultInstance().getStaticModels();
         TemplateHashModel enumModels = BeansWrapper.getDefaultInstance().getEnumModels();
 
@@ -205,8 +220,8 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
         templateModel.put(KEY_STATICS, staticModels);
         templateModel.put(KEY_ENUMS_CAP, enumModels);
         templateModel.put(KEY_ENUMS, enumModels);
-        templateModel.put(KEY_SITE_CONTEXT_CAP, siteContext);
-        templateModel.put(KEY_SITE_CONTEXT, siteContext);
+        templateModel.put(KEY_SITE_CONTEXT_CAP, siteContextModel);
+        templateModel.put(KEY_SITE_CONTEXT, siteContextModel);
         templateModel.put(KEY_LOCALE_CAP, locale);
         templateModel.put(KEY_LOCALE, locale);
 
