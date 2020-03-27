@@ -23,8 +23,15 @@ import freemarker.template.ObjectWrapper;
 import freemarker.template.SimpleHash;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
+import org.apache.commons.configuration2.HierarchicalConfiguration;
+import org.craftercms.commons.lang.RegexUtils;
+import org.craftercms.engine.util.ConfigUtils;
 import org.craftercms.engine.util.spring.ApplicationContextAccessor;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+
+import java.util.List;
+
+import static java.util.Collections.emptyList;
 
 /**
  * Like {@link freemarker.ext.servlet.AllHttpScopesHashModel}, but also lookup keys in the Application Context.
@@ -33,18 +40,24 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
  */
 public class AllHttpScopesAndAppContextHashModel extends SimpleHash {
 
+    public static final String CONFIG_KEY_BEAN_PATTERNS = "publicBeans.bean";
+
     private ApplicationContextAccessor applicationContextAccessor;
     private ServletContext context;
     private HttpServletRequest request;
 
+    private boolean exposeApplication;
+
     public AllHttpScopesAndAppContextHashModel(ObjectWrapper wrapper,
                                                ApplicationContextAccessor applicationContextAccessor,
-                                               ServletContext context, HttpServletRequest request) {
+                                               ServletContext context, HttpServletRequest request,
+                                               boolean exposeApplication) {
         super(wrapper);
 
         this.applicationContextAccessor = applicationContextAccessor;
         this.context = context;
         this.request = request;
+        this.exposeApplication = exposeApplication;
     }
 
     @Override
@@ -70,16 +83,27 @@ public class AllHttpScopesAndAppContextHashModel extends SimpleHash {
             }
         }
 
-        // Lookup in application scope
-        obj = context.getAttribute(key);
-        if (obj != null) {
-            return wrap(obj);
+        if (exposeApplication) {
+            // Lookup in application scope
+            obj = context.getAttribute(key);
+            if (obj != null) {
+                return wrap(obj);
+            }
+        }
+
+        HierarchicalConfiguration<?> siteConfig = ConfigUtils.getCurrentConfig();
+        List<String> beanPatterns = emptyList();
+        if (siteConfig != null) {
+            beanPatterns = siteConfig.getList(String.class, CONFIG_KEY_BEAN_PATTERNS, emptyList());
         }
 
         // Lookup in application context
-        try {
-            return wrap(applicationContextAccessor.get(key));
-        } catch (NoSuchBeanDefinitionException e) {
+        if (exposeApplication || RegexUtils.matchesAny(key, beanPatterns)) {
+            try {
+                return wrap(applicationContextAccessor.get(key));
+            } catch (NoSuchBeanDefinitionException e) {
+                // do nothing...
+            }
         }
 
         // return wrapper's null object (probably null).
