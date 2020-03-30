@@ -82,7 +82,6 @@
                 <property name="componentTemplateXPathQuery" value="${crafter.engine.component.view.name.xpathQuery}" />
                 <property name="componentIncludeElementName" value="${crafter.engine.component.include.element.name}" />
                 <property name="componentEmbeddedElementName" value="${crafter.engine.component.embedded.element.name}" />
-                <property name="requestContextAttribute" value="requestContext" />
                 <property name="componentScriptResolver" ref="crafter.componentScriptResolver"/>
                 <property name="exposeSpringMacroHelpers" value="${crafter.engine.site.expose.application}"/>
             </bean>
