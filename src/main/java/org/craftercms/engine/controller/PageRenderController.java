@@ -40,6 +40,8 @@ import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 
+import static org.craftercms.engine.util.GroovyScriptUtils.addControllerScriptVariables;
+
 /**
  * Default controller for rendering Crafter pages. If the site context is the fallback context, a fallback page is
  * always rendered. The controller also tries to find a script controller for the page URL (when not fallback). If
@@ -56,6 +58,7 @@ public class PageRenderController extends AbstractController {
 
     protected String fallbackPageUrl;
     protected ContentStoreService storeService;
+    protected boolean exposeApplication;
 
     @Required
     public void setFallbackPageUrl(String fallbackPageUrl) {
@@ -65,6 +68,10 @@ public class PageRenderController extends AbstractController {
     @Required
     public void setStoreService(final ContentStoreService storeService) {
         this.storeService = storeService;
+    }
+
+    public void setExposeApplication(boolean exposeApplication) {
+        this.exposeApplication = exposeApplication;
     }
 
     @Override
@@ -168,7 +175,8 @@ public class PageRenderController extends AbstractController {
     protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response,
                                                         Map<String, Object> model) {
         Map<String, Object> variables = new HashMap<String, Object>();
-        GroovyScriptUtils.addControllerScriptVariables(variables, request, response, getServletContext(), model);
+        addControllerScriptVariables(variables, request, response,
+                exposeApplication? getServletContext() : null, model);
 
         return variables;
     }

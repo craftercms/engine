@@ -82,7 +82,6 @@ public class SiteContext {
     protected UrlTransformationEngine urlTransformationEngine;
     protected ScriptFactory scriptFactory;
     protected HierarchicalConfiguration config;
-    protected ServletContext servletContext;
     protected ApplicationContext globalApplicationContext;
     protected ConfigurableApplicationContext applicationContext;
     protected URLClassLoader classLoader;
@@ -96,6 +95,8 @@ public class SiteContext {
     protected ExecutorService maintenanceTaskExecutor;
     protected GraphQL graphQL;
     protected State state;
+
+    private ServletContext servletContext;
 
     /**
      * Returns the context for the current thread.
@@ -259,10 +260,6 @@ public class SiteContext {
 
     public void setConfig(HierarchicalConfiguration config) {
         this.config = config;
-    }
-
-    public ServletContext getServletContext() {
-        return servletContext;
     }
 
     public void setServletContext(ServletContext servletContext) {

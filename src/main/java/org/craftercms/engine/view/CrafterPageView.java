@@ -40,6 +40,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import static org.craftercms.engine.util.GroovyScriptUtils.addSiteItemScriptVariables;
+
 /**
  * @author Alfonso Vásquez
  */
@@ -66,6 +68,7 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
     protected String mimeTypeXPathQuery;
     protected List<Script> scripts;
     protected ViewResolver delegatedViewResolver;
+    protected boolean exposeApplication;
 
     public SiteItem getPage() {
         return page;
@@ -131,6 +134,10 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
         this.cachingTime = cachingTime;
     }
 
+    public void setExposeApplication(boolean exposeApplication) {
+        this.exposeApplication = exposeApplication;
+    }
+
     @Override
     public String toString() {
         return "CrafterPageView[" +
@@ -193,7 +200,8 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
     protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response,
                                                         Map<String, Object> model) {
         Map<String, Object> variables = new HashMap<>();
-        GroovyScriptUtils.addSiteItemScriptVariables(variables, request, response, getServletContext(), page, model);
+        addSiteItemScriptVariables(variables, request, response, exposeApplication? getServletContext() : null,
+                page, model);
 
         return variables;
     }
