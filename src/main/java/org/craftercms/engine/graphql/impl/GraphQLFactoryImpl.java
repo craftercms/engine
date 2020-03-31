@@ -103,6 +103,8 @@ public class GraphQLFactoryImpl implements GraphQLFactory, ServletContextAware {
      */
     protected ServletContext servletContext;
 
+    protected boolean exposeApplication;
+
     @Required
     public void setSchemaScriptPath(final String schemaScriptPath) {
         this.schemaScriptPath = schemaScriptPath;
@@ -141,6 +143,10 @@ public class GraphQLFactoryImpl implements GraphQLFactory, ServletContextAware {
     @Override
     public void setServletContext(final ServletContext servletContext) {
         this.servletContext = servletContext;
+    }
+
+    public void setExposeApplication(boolean exposeApplication) {
+        this.exposeApplication = exposeApplication;
     }
 
     /**
@@ -243,7 +249,7 @@ public class GraphQLFactoryImpl implements GraphQLFactory, ServletContextAware {
                                  GraphQLCodeRegistry.Builder codeRegistry, SchemaCustomizer customizer,
                                  Map<String, GraphQLObjectType.Builder> siteTypes) {
         Map<String, Object> variables = new HashMap<>();
-        GroovyScriptUtils.addJobScriptVariables(variables, servletContext);
+        GroovyScriptUtils.addJobScriptVariables(variables, exposeApplication? servletContext : null);
         variables.put(VARIABLE_SCHEMA, customizer);
 
         try {

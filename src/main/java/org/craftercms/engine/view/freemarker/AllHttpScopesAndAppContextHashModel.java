@@ -40,8 +40,6 @@ import static java.util.Collections.emptyList;
  */
 public class AllHttpScopesAndAppContextHashModel extends SimpleHash {
 
-    public static final String CONFIG_KEY_BEAN_PATTERNS = "publicBeans.bean";
-
     private ApplicationContextAccessor applicationContextAccessor;
     private ServletContext context;
     private HttpServletRequest request;
@@ -91,19 +89,11 @@ public class AllHttpScopesAndAppContextHashModel extends SimpleHash {
             }
         }
 
-        HierarchicalConfiguration<?> siteConfig = ConfigUtils.getCurrentConfig();
-        List<String> beanPatterns = emptyList();
-        if (siteConfig != null) {
-            beanPatterns = siteConfig.getList(String.class, CONFIG_KEY_BEAN_PATTERNS, emptyList());
-        }
-
         // Lookup in application context
-        if (exposeApplication || RegexUtils.matchesAny(key, beanPatterns)) {
-            try {
-                return wrap(applicationContextAccessor.get(key));
-            } catch (NoSuchBeanDefinitionException e) {
-                // do nothing...
-            }
+        try {
+            return wrap(applicationContextAccessor.get(key));
+        } catch (NoSuchBeanDefinitionException e) {
+            // do nothing...
         }
 
         // return wrapper's null object (probably null).

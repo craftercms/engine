@@ -62,6 +62,7 @@
                     <property name="userAgentTemplateDetector" ref="crafter.userAgentTemplateDetector" />
                     <property name="accessManager" ref="crafter.pageAccessManager"/>
                     <property name="scriptResolver" ref="crafter.pageScriptResolver"/>
+					<property name="exposeApplication" value="${crafter.engine.site.expose.application}"/>
                 </bean>
             </list>
         </property>

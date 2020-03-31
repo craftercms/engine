@@ -79,6 +79,7 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     protected SiteItemScriptResolver scriptResolver;
     protected UserAgentTemplateDetector userAgentTemplateDetector;
     protected CrafterPageAccessManager accessManager;
+    protected boolean exposeApplication;
 
     public CrafterPageViewResolver() {
         order = 10;
@@ -187,6 +188,10 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
         this.accessManager = accessManager;
     }
 
+    public void setExposeApplication(boolean exposeApplication) {
+        this.exposeApplication = exposeApplication;
+    }
+
     @Override
     public View resolveViewName(String renderUrl, Locale locale)  {
         String storeUrl = urlTransformationService.transform(renderUrlToStoreUrlTransformerName, renderUrl, cacheUrlTransformations);
@@ -209,6 +214,8 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
             }
 
             accessManager.checkAccess(pageView.getPage());
+
+            pageView.setExposeApplication(exposeApplication);
         }
 
         return view;
