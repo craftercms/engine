@@ -310,10 +310,6 @@ public class SiteContext {
         this.config = config;
     }
 
-    public ServletContext getServletContext() {
-        return servletContext;
-    }
-
     public void setServletContext(ServletContext servletContext) {
         this.servletContext = servletContext;
     }

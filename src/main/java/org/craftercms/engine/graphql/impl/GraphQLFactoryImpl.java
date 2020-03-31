@@ -36,7 +36,6 @@ import org.craftercms.core.service.Tree;
 import org.craftercms.engine.exception.ScriptNotFoundException;
 import org.craftercms.engine.graphql.GraphQLFactory;
 import org.craftercms.engine.graphql.GraphQLTypeFactory;
-import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.GroovyScriptUtils;
 import org.craftercms.engine.util.concurrent.SiteAwareThreadPoolExecutor;
@@ -103,6 +102,8 @@ public class GraphQLFactoryImpl implements GraphQLFactory, ServletContextAware {
      */
     protected ServletContext servletContext;
 
+    protected boolean disableVariableRestrictions;
+
     @Required
     public void setSchemaScriptPath(final String schemaScriptPath) {
         this.schemaScriptPath = schemaScriptPath;
@@ -141,6 +142,10 @@ public class GraphQLFactoryImpl implements GraphQLFactory, ServletContextAware {
     @Override
     public void setServletContext(final ServletContext servletContext) {
         this.servletContext = servletContext;
+    }
+
+    public void setDisableVariableRestrictions(boolean disableVariableRestrictions) {
+        this.disableVariableRestrictions = disableVariableRestrictions;
     }
 
     /**
@@ -243,7 +248,7 @@ public class GraphQLFactoryImpl implements GraphQLFactory, ServletContextAware {
                                  GraphQLCodeRegistry.Builder codeRegistry, SchemaCustomizer customizer,
                                  Map<String, GraphQLObjectType.Builder> siteTypes) {
         Map<String, Object> variables = new HashMap<>();
-        GroovyScriptUtils.addJobScriptVariables(variables, servletContext);
+        GroovyScriptUtils.addJobScriptVariables(variables, disableVariableRestrictions? servletContext : null);
         variables.put(VARIABLE_SCHEMA, customizer);
 
         try {
