@@ -63,8 +63,8 @@ public class SiteContext {
     private static ThreadLocal<SiteContext> threadLocal = new ThreadLocal<>();
 
     public enum State {
-        CREATED,
-        INITIALIZED,
+        INITIALIZING,
+        READY,
         DESTROYED
     }
 
@@ -145,7 +145,7 @@ public class SiteContext {
         // important when a cache warm is submitted and a GraphQL re-build needs to wait till the cache warm is
         // finished
         maintenanceTaskExecutor = Executors.newSingleThreadExecutor();
-        state = State.CREATED;
+        state = State.INITIALIZING;
         initializationLatch = new CountDownLatch(1);
     }
 
@@ -336,11 +336,11 @@ public class SiteContext {
     public boolean isValid() throws CrafterException {
 
         try {
-            if (state == State.CREATED) {
+            if (state == State.INITIALIZING) {
                 logger.debug("Waiting for initialization of {}", this);
                 initializationLatch.await(initTimeout, TimeUnit.MILLISECONDS);
             }
-            return state == State.INITIALIZED && storeService.validate(context);
+            return state == State.READY && storeService.validate(context);
         } catch (InterruptedException e) {
             throw new CrafterException("Error while waiting for initialization of " + this);
         }
@@ -351,7 +351,7 @@ public class SiteContext {
     }
 
     public void init(boolean waitTillFinished) throws SiteContextInitializationException {
-        if (state == State.CREATED) {
+        if (state == State.INITIALIZING) {
             publishEvent(new SiteContextCreatedEvent(this));
 
             Runnable initTask = () -> {
@@ -368,7 +368,7 @@ public class SiteContext {
                     buildGraphQLSchema();
                     executeInitScript();
 
-                    state = State.INITIALIZED;
+                    state = State.READY;
 
                     logger.info("--------------------------------------------------");
                     logger.info("</Initializing context site: " + siteName + ">");
