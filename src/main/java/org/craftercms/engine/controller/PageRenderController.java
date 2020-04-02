@@ -15,11 +15,6 @@
  */
 package org.craftercms.engine.controller;
 
-import java.util.HashMap;
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -40,6 +35,15 @@ import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Map;
+
+import static java.util.Collections.singletonMap;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.craftercms.core.controller.rest.RestControllerBase.createResponseMessage;
+
 /**
  * Default controller for rendering Crafter pages. If the site context is the fallback context, a fallback page is
  * always rendered. The controller also tries to find a script controller for the page URL (when not fallback). If
@@ -55,11 +59,16 @@ public class PageRenderController extends AbstractController {
     private static final String SCRIPT_URL_FORMAT = "%s.%s.%s"; // {url}.{method}.{scriptExt}
 
     protected String fallbackPageUrl;
+    protected String fallbackMessage;
     protected ContentStoreService storeService;
 
     @Required
     public void setFallbackPageUrl(String fallbackPageUrl) {
         this.fallbackPageUrl = fallbackPageUrl;
+    }
+
+    public void setFallbackMessage(String fallbackMessage) {
+        this.fallbackMessage = fallbackMessage;
     }
 
     @Required
@@ -79,7 +88,7 @@ public class PageRenderController extends AbstractController {
                     logger.debug("Rendering fallback page [" + fallbackPageUrl + "]");
                 }
 
-                pageUrl = fallbackPageUrl;
+                return new ModelAndView(fallbackPageUrl, singletonMap(EMPTY, createResponseMessage(fallbackMessage)));
             } else {
                 pageUrl = (String)request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
                 if (StringUtils.isEmpty(pageUrl)) {
