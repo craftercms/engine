@@ -47,8 +47,10 @@ public class SiteContextRestController extends RestControllerBase {
     public static final String URL_DESTROY = "/destroy";
     public static final String URL_REBUILD = "/rebuild";
     public static final String URL_GRAPHQL = "/graphql";
+    public static final String URL_STATUS = "/status";
 
     public static final String MODEL_ATTR_ID =  "id";
+    public static final String MODEL_ATTR_STATUS = "status";
 
     private SiteContextManager contextManager;
     private String configuredToken;
@@ -58,67 +60,74 @@ public class SiteContextRestController extends RestControllerBase {
         this.contextManager = contextManager;
     }
 
-    @GetMapping(value = URL_CONTEXT_ID)
-    public Map<String, String> getContextId(@RequestParam String token) throws InvalidManagementTokenException {
-        if (StringUtils.isNotEmpty(token) && StringUtils.equals(token, getConfiguredToken())) {
-            return Collections.singletonMap(MODEL_ATTR_ID, SiteContext.getCurrent().getContext().getId());
-        } else {
+    protected void validateToken(String token) throws InvalidManagementTokenException {
+        if(!StringUtils.equals(token, getConfiguredToken())) {
             throw new InvalidManagementTokenException("Management authorization failed, invalid token.");
         }
+    }
+
+    @GetMapping(value = URL_CONTEXT_ID)
+    public Map<String, String> getContextId(@RequestParam String token) throws InvalidManagementTokenException {
+        validateToken(token);
+
+        return Collections.singletonMap(MODEL_ATTR_ID, SiteContext.getCurrent().getContext().getId());
     }
 
     @GetMapping(value = URL_DESTROY)
     public Map<String, Object> destroy(@RequestParam String token) throws InvalidManagementTokenException {
-        if (StringUtils.isNotEmpty(token) && StringUtils.equals(token, getConfiguredToken())) {
-            String siteName = SiteContext.getCurrent().getSiteName();
+        validateToken(token);
 
-            contextManager.destroyContext(siteName);
+        String siteName = SiteContext.getCurrent().getSiteName();
 
-            return createResponseMessage("Site context for '" + siteName + "' destroyed. Will be recreated on next " +
-                    "request");
-        } else {
-            throw new InvalidManagementTokenException("Management authorization failed, invalid token.");
-        }
+        contextManager.destroyContext(siteName);
+
+        return createResponseMessage("Site context for '" + siteName + "' destroyed. Will be recreated on next " +
+                "request");
     }
 
     @GetMapping(value = URL_REBUILD)
-    public Map<String, Object> rebuild(HttpServletRequest request, @RequestParam String token) throws InvalidManagementTokenException {
-        if (StringUtils.equals(token, getConfiguredToken())) {
-            SiteContext siteContext = SiteContext.getCurrent();
-            String siteName = siteContext.getSiteName();
+    public Map<String, Object> rebuild(HttpServletRequest request, @RequestParam String token)
+            throws InvalidManagementTokenException {
+        validateToken(token);
 
-            // Don't rebuild context if the context was just created in this request
-            if (SiteEvent.getLatestRequestEvent(SiteContextCreatedEvent.class, request) != null) {
-                return createResponseMessage("Site context for '" + siteName + "' created during the request. " +
-                        "Context rebuild not necessary");
-            } else {
-                contextManager.startContextRebuild(siteName, siteContext.isFallback());
+        SiteContext siteContext = SiteContext.getCurrent();
+        String siteName = siteContext.getSiteName();
 
-                return createResponseMessage("Started rebuild for Site context for '" + siteName + "'");
-            }
+        // Don't rebuild context if the context was just created in this request
+        if (SiteEvent.getLatestRequestEvent(SiteContextCreatedEvent.class, request) != null) {
+            return createResponseMessage("Site context for '" + siteName + "' created during the request. " +
+                    "Context rebuild not necessary");
         } else {
-            throw new InvalidManagementTokenException("Management authorization failed, invalid token.");
+            contextManager.startContextRebuild(siteName, siteContext.isFallback());
+
+            return createResponseMessage("Started rebuild for Site context for '" + siteName + "'");
         }
     }
 
     @GetMapping(URL_GRAPHQL + URL_REBUILD)
-    public Map<String, Object> rebuildSchema(HttpServletRequest request, @RequestParam String token) throws InvalidManagementTokenException {
-        if (StringUtils.equals(token, getConfiguredToken())) {
-            SiteContext siteContext = SiteContext.getCurrent();
-            String siteName = siteContext.getSiteName();
+    public Map<String, Object> rebuildSchema(HttpServletRequest request, @RequestParam String token)
+            throws InvalidManagementTokenException {
+        validateToken(token);
 
-            // Don't rebuild GraphQL schema if the context was just created in this request
-            if (SiteEvent.getLatestRequestEvent(SiteContextCreatedEvent.class, request) != null) {
-                return createResponseMessage("Site context for '" + siteName + "' created during the request. " +
-                        "GraphQL schema rebuild not necessary");
-            } else {
-                siteContext.startGraphQLSchemaBuild();
+        SiteContext siteContext = SiteContext.getCurrent();
+        String siteName = siteContext.getSiteName();
 
-                return createResponseMessage("Rebuild of GraphQL schema started for '" + siteName + "'");
-            }
+        // Don't rebuild GraphQL schema if the context was just created in this request
+        if (SiteEvent.getLatestRequestEvent(SiteContextCreatedEvent.class, request) != null) {
+            return createResponseMessage("Site context for '" + siteName + "' created during the request. " +
+                    "GraphQL schema rebuild not necessary");
         } else {
-            throw new InvalidManagementTokenException("Management authorization failed, invalid token.");
+            siteContext.startGraphQLSchemaBuild();
+
+            return createResponseMessage("Rebuild of GraphQL schema started for '" + siteName + "'");
         }
+    }
+
+    @GetMapping(URL_STATUS)
+    public Map<String, Object> getStatus(@RequestParam String token) throws InvalidManagementTokenException {
+        validateToken(token);
+
+        return createSingletonModifiableMap(MODEL_ATTR_STATUS, SiteContext.getCurrent().getState());
     }
 
     public String getConfiguredToken() {
