@@ -31,6 +31,7 @@ import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.GroovyScriptUtils;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
@@ -88,7 +89,8 @@ public class PageRenderController extends AbstractController {
                     logger.debug("Rendering fallback page [" + fallbackPageUrl + "]");
                 }
 
-                return new ModelAndView(fallbackPageUrl, singletonMap(EMPTY, createResponseMessage(fallbackMessage)));
+                return new ModelAndView(fallbackPageUrl, singletonMap(EMPTY, createResponseMessage(fallbackMessage)),
+                                        HttpStatus.NOT_FOUND);
             } else {
                 pageUrl = (String)request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
                 if (StringUtils.isEmpty(pageUrl)) {
