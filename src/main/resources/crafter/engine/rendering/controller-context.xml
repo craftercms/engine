@@ -55,6 +55,7 @@
 
     <bean id="crafter.pageRenderController" class="org.craftercms.engine.controller.PageRenderController">
         <property name="fallbackPageUrl" value="/no-site.html"/>
+        <property name="fallbackMessage" value="${crafter.engine.site.fallback.message}"/>
         <property name="storeService" ref="crafter.contentStoreService"/>
     </bean>
 
