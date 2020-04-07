@@ -19,6 +19,7 @@ package org.craftercms.engine.util.concurrent;
 import java.util.concurrent.Executor;
 
 import org.craftercms.engine.service.context.SiteContext;
+import org.springframework.security.concurrent.DelegatingSecurityContextRunnable;
 
 /**
  * Utility class that wraps a {@link Executor} object to support {@link SiteContext} in reusable threads
@@ -45,7 +46,7 @@ public class SiteAwareThreadPoolExecutor implements Executor {
 
     @Override
     public void execute(final Runnable command) {
-        wrappedExecutor.execute(new SiteAwareRunnable(siteContext, command));
+        wrappedExecutor.execute(new DelegatingSecurityContextRunnable(new SiteAwareRunnable(siteContext, command)));
     }
 
 }
