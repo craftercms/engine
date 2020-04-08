@@ -17,14 +17,11 @@ package org.craftercms.engine.util.config.profiles;
 
 import org.craftercms.commons.config.ConfigurationException;
 import org.craftercms.commons.config.ConfigurationMapper;
+import org.craftercms.commons.config.ConfigurationProvider;
 import org.craftercms.commons.config.profiles.ConfigurationProfile;
 import org.craftercms.commons.config.profiles.ConfigurationProfileLoader;
-import org.craftercms.core.service.Content;
-import org.craftercms.engine.service.SiteItemService;
 import org.craftercms.engine.service.context.SiteContext;
 import org.springframework.beans.factory.annotation.Required;
-
-import java.nio.charset.StandardCharsets;
 
 /**
  * Implementation of {@link ConfigurationProfile} that loads profiles from a specific file in the current site.
@@ -33,9 +30,15 @@ import java.nio.charset.StandardCharsets;
  */
 public class ConfigurationProfileLoaderImpl<T extends ConfigurationProfile> implements ConfigurationProfileLoader<T> {
 
+    private String profilesModule;
     private String profilesUrl;
     private ConfigurationMapper<T> profileMapper;
-    private SiteItemService siteItemService;
+    private ConfigurationProvider configurationProvider;
+
+    @Required
+    public void setProfilesModule(String profilesModule) {
+        this.profilesModule = profilesModule;
+    }
 
     @Required
     public void setProfilesUrl(String profilesUrl) {
@@ -48,8 +51,8 @@ public class ConfigurationProfileLoaderImpl<T extends ConfigurationProfile> impl
     }
 
     @Required
-    public void setSiteItemService(SiteItemService siteItemService) {
-        this.siteItemService = siteItemService;
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider) {
+        this.configurationProvider = configurationProvider;
     }
 
     @Override
@@ -57,9 +60,7 @@ public class ConfigurationProfileLoaderImpl<T extends ConfigurationProfile> impl
         SiteContext siteContext = SiteContext.getCurrent();
         if (siteContext != null) {
             try {
-                Content content = siteItemService.getRawContent(profilesUrl);
-
-                return profileMapper.readConfig(content.getInputStream(), StandardCharsets.UTF_8.name(), id);
+                return profileMapper.readConfig(configurationProvider, profilesModule, profilesUrl, null, id);
             } catch (Exception e) {
                 throw new ConfigurationException("Error while loading profile " +  id + " from configuration at " +
                                                  profilesUrl, e);

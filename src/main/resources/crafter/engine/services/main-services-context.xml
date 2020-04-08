@@ -216,7 +216,7 @@
     <!--			Services				-->
     <!--									-->
     <!-- ////////////////////////////////// -->
-    
+
     <bean id="crafter.disabledItemPredicate" class="org.craftercms.engine.util.predicates.DisabledItemPredicate">
         <property name="disabledXPathQuery" value="${crafter.engine.model.disabled.xpathQuery}"/>
     </bean>
@@ -770,32 +770,48 @@
     <!--									-->
     <!-- ////////////////////////////////// -->
 
-    <bean id="crafter.s3ProfileLoader" class="org.craftercms.engine.util.config.profiles.ConfigurationProfileLoaderImpl">
-        <property name="profilesUrl" value="${crafter.engine.site.default.config.aws.profiles.path}"/>
-        <property name="profileMapper" ref="crafter.s3ProfileMapper">
-        </property>
-        <property name="siteItemService" ref="crafter.siteItemService"/>
+    <bean id="crafter.configurationProvider"
+          class="org.craftercms.engine.util.config.profiles.ConfigurationProviderImpl">
+        <constructor-arg ref="crafter.siteItemService"/>
     </bean>
 
-    <bean id="crafter.boxProfileLoader" class="org.craftercms.engine.util.config.profiles.ConfigurationProfileLoaderImpl">
+    <bean id="crafter.configurationResolver" class="org.craftercms.commons.config.ConfigurationResolverImpl">
+        <constructor-arg value="${crafter.engine.environment}"/>
+        <constructor-arg value="${crafter.engine.configuration.basePath}"/>
+        <constructor-arg value="${crafter.engine.configuration.envPath}"/>
+        <constructor-arg ref="crafter.configurationReader"/>
+    </bean>
+
+    <bean id="crafter.s3ProfileLoader"
+          class="org.craftercms.engine.util.config.profiles.ConfigurationProfileLoaderImpl">
+        <property name="profilesModule" value="${crafter.engine.site.default.config.aws.profiles.module}"/>
+        <property name="profilesUrl" value="${crafter.engine.site.default.config.aws.profiles.path}"/>
+        <property name="profileMapper" ref="crafter.s3ProfileMapper"/>
+        <property name="configurationProvider" ref="crafter.configurationProvider"/>
+    </bean>
+
+    <bean id="crafter.boxProfileLoader"
+          class="org.craftercms.engine.util.config.profiles.ConfigurationProfileLoaderImpl">
+        <property name="profilesModule" value="${crafter.engine.site.default.config.box.profiles.module}"/>
         <property name="profilesUrl" value="${crafter.engine.site.default.config.box.profiles.path}"/>
         <property name="profileMapper">
             <bean class="org.craftercms.commons.config.profiles.box.BoxProfileMapper">
-                <constructor-arg ref="crafter.configurationReader"/>
+                <constructor-arg ref="crafter.configurationResolver"/>
             </bean>
         </property>
-        <property name="siteItemService" ref="crafter.siteItemService"/>
+        <property name="configurationProvider" ref="crafter.configurationProvider"/>
     </bean>
 
     <bean id="crafter.webDavProfileLoader"
           class="org.craftercms.engine.util.config.profiles.ConfigurationProfileLoaderImpl">
+        <property name="profilesModule" value="${crafter.engine.site.default.config.box.profiles.module}"/>
         <property name="profilesUrl" value="${crafter.engine.site.default.config.webdav.profiles.path}"/>
         <property name="profileMapper">
             <bean class="org.craftercms.commons.config.profiles.webdav.WebDavProfileMapper">
-                <constructor-arg ref="crafter.configurationReader"/>
+                <constructor-arg ref="crafter.configurationResolver"/>
             </bean>
         </property>
-        <property name="siteItemService" ref="crafter.siteItemService"/>
+        <property name="configurationProvider" ref="crafter.configurationProvider"/>
     </bean>
 
     <!-- ////////////////////////////////// -->
