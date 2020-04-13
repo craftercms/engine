@@ -18,7 +18,8 @@ package org.craftercms.engine.util.servlet;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.http.client.utils.URIUtils;
 import org.craftercms.commons.lang.RegexUtils;
-import org.craftercms.engine.exception.HttpProxyException;
+import org.craftercms.engine.exception.proxy.HttpProxyException;
+import org.craftercms.engine.exception.proxy.LocalTargetUrlProxyException;
 import org.craftercms.engine.service.context.SiteContext;
 import org.mitre.dsmiley.httpproxy.ProxyServlet;
 import org.slf4j.Logger;
@@ -35,7 +36,7 @@ import java.util.List;
  * Extension of {@link ProxyServlet} that uses the current site configuration
  *
  * @author joseross
- * @since 3.1.6
+ * @since 3.1.7
  */
 public class ConfigAwareProxyServlet extends ProxyServlet {
 
@@ -80,7 +81,7 @@ public class ConfigAwareProxyServlet extends ProxyServlet {
 
         if (request.getRequestURL().toString().contains(targetUrl)) {
             logger.debug("Resolved target url for request {} is local, will skip proxy", requestUri);
-            throw new HttpProxyException("Local target url detected");
+            throw new LocalTargetUrlProxyException("Local target url detected");
         }
 
         // set the new target url

@@ -15,7 +15,7 @@
  */
 package org.craftercms.engine.servlet.filter;
 
-import org.craftercms.engine.exception.HttpProxyException;
+import org.craftercms.engine.exception.proxy.HttpProxyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -31,7 +31,7 @@ import java.io.IOException;
  * Implementation of {@link javax.servlet.Filter} that delegates requests to a proxy
  *
  * @author joseross
- * @since 3.1.6
+ * @since 3.1.7
  */
 public class HttpProxyFilter extends OncePerRequestFilter {
 

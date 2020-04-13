@@ -13,19 +13,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.craftercms.engine.exception;
-
-import org.craftercms.core.exception.CrafterException;
-import org.craftercms.engine.util.servlet.ConfigAwareProxyServlet;
+package org.craftercms.engine.exception.proxy;
 
 /**
- * Used by {@link ConfigAwareProxyServlet}.
+ * Exception thrown when the url resolved for a proxy is local
  *
- * @author Alfonso Vásquez
+ * @author joseross
+ * @since 3.1.7
  */
-public class HttpProxyException extends CrafterException {
+public class LocalTargetUrlProxyException extends HttpProxyException {
 
-    public HttpProxyException(String message) {
+    public LocalTargetUrlProxyException(String message) {
         super(message);
     }
 
