@@ -507,13 +507,12 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             while(iterator.hasPrevious()) {
                 Resource resource = resourceLoader.getResource(iterator.previous());
                 if (resource.exists()) {
-                    // TODO: Update when feature/3880 is merged
-//                    read the config
+                    return configurationReader.readXmlConfiguration(resource);
                 }
             }
             return null;
-//        } catch (ConfigurationException e) {
-//            throw new SiteContextCreationException("Unable to load configuration for site '" + siteName + "'", e);
+        } catch (ConfigurationException e) {
+            throw new SiteContextCreationException("Unable to load proxy configuration for site '" + siteName + "'", e);
         } finally {
             logger.info("---------------------------------------------------------");
             logger.info("</Loading proxy configuration for site: " + siteName + ">");
