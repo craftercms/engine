@@ -516,12 +516,12 @@
         <property name="groovyGlobalVars" ref="crafter.restScriptsVariables"/>
         <property name="jobResolvers" ref="crafter.scriptJobResolvers"/>
         <property name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
-        <property name="textEncryptor" ref="crafter.textEncryptor"/>
         <property name="storeType" value="${crafter.engine.store.type}"/>
         <property name="graphQLFactory" ref="crafter.graphQLFactory"/>
         <property name="cacheWarmUpEnabled" value="${crafter.engine.site.cache.warmUp.enabled}"/>
         <property name="cacheWarmer" ref="crafter.siteCacheWarmer"/>
         <property name="initTimeout" value="${crafter.engine.site.context.initTimeout}"/>
+        <property name="configurationReader" ref="crafter.configurationReader"/>
     </bean>
 
     <bean id="crafter.fallbackSiteContextFactory" class="org.craftercms.engine.service.context.SiteContextFactory">
@@ -544,12 +544,12 @@
         <property name="groovyGlobalVars" ref="crafter.restScriptsVariables"/>
         <property name="jobResolvers" ref="crafter.scriptJobResolvers"/>
         <property name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
-        <property name="textEncryptor" ref="crafter.textEncryptor"/>
         <property name="storeType" value="filesystem"/>
         <property name="graphQLFactory" ref="crafter.graphQLFactory"/>
         <property name="cacheWarmUpEnabled" value="false"/>
         <property name="cacheWarmer" ref="crafter.siteCacheWarmer"/>
         <property name="initTimeout" value="${crafter.engine.site.context.initTimeout}"/>
+        <property name="configurationReader" ref="crafter.configurationReader"/>
     </bean>
 
     <!-- ////////////////////////////////// -->
