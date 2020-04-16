@@ -36,7 +36,7 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
  * <ul>
  *     <li>If {@code alwaysEnabled} is {@code true}</li> the filter will be executed, even if there is no site
  *     configuration available
- *     <li>If the site configuration contains the {@code enabledConfigKey} with a value of {@link true} the filter
+ *     <li>If the site configuration contains the {@code enabledConfigKey} with a value of {@code true} the filter
  *     will be executed</li>
  * </ul>
  *
