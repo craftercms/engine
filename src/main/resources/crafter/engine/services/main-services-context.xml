@@ -654,6 +654,7 @@
         <entry key="globalProperties" value-ref="crafter.propertyResolver"/>
         <entry key="modePreview" value="#{T(java.lang.Boolean).valueOf(${crafter.engine.preview})}"/>
         <entry key="crafterEnv" value="${crafter.engine.environment}"/>
+        <entry key="applicationContext" value-ref="crafter.applicationContextAccessor"/>
 
         <!-- For backwards compatibility only, should not be used anymore -->
         <entry key="tenantsResolver" value-ref="crafter.tenantsResolver"/>
