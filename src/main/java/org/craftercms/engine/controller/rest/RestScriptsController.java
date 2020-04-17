@@ -43,6 +43,8 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 import org.springframework.web.util.UriTemplate;
 
+import static org.craftercms.engine.util.GroovyScriptUtils.addRestScriptVariables;
+
 /**
  * Controller for REST script requests.
  *
@@ -60,6 +62,7 @@ public class RestScriptsController extends AbstractController {
     protected String responseBodyModelAttributeName;
     protected String errorMessageModelAttributeName;
     protected ScriptUrlTemplateScanner urlTemplateScanner;
+    protected boolean disableVariableRestrictions;
 
     public RestScriptsController() {
         responseBodyModelAttributeName = DEFAULT_RESPONSE_BODY_MODEL_ATTR_NAME;
@@ -76,6 +79,10 @@ public class RestScriptsController extends AbstractController {
 
     public void setUrlTemplateScanner(ScriptUrlTemplateScanner urlTemplateScanner) {
         this.urlTemplateScanner = urlTemplateScanner;
+    }
+
+    public void setDisableVariableRestrictions(boolean disableVariableRestrictions) {
+        this.disableVariableRestrictions = disableVariableRestrictions;
     }
 
     @Override
@@ -153,7 +160,7 @@ public class RestScriptsController extends AbstractController {
 
     protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> variables = new HashMap<String, Object>();
-        GroovyScriptUtils.addRestScriptVariables(variables, request, response, getServletContext());
+        addRestScriptVariables(variables, request, response, disableVariableRestrictions? getServletContext() : null);
 
         return variables;
     }

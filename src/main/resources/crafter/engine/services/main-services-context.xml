@@ -197,6 +197,7 @@
 
     <bean id="crafter.scriptFilter" class="org.craftercms.engine.scripting.impl.ScriptFilter">
         <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
+        <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
     </bean>
 
     <bean id="crafter.urlRewriteFilter" class="org.craftercms.engine.url.rewrite.UrlRewriteFilter"/>
@@ -344,24 +345,28 @@
           class="org.craftercms.engine.scripting.impl.FolderBasedScriptJobResolver" parent="crafter.jobResolver">
         <property name="cronExpression" value="${crafter.engine.scripts.jobs.hourly.cron}"/>
         <property name="folderUrl" value="${crafter.engine.scripts.jobs.hourly.path}"/>
+		<property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
     </bean>
 
     <bean id="crafter.dailyScriptJobResolver"
           class="org.craftercms.engine.scripting.impl.FolderBasedScriptJobResolver" parent="crafter.jobResolver">
         <property name="cronExpression" value="${crafter.engine.scripts.jobs.daily.cron}"/>
         <property name="folderUrl" value="${crafter.engine.scripts.jobs.daily.path}"/>
+        <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
     </bean>
 
     <bean id="crafter.weeklyScriptJobResolver"
           class="org.craftercms.engine.scripting.impl.FolderBasedScriptJobResolver" parent="crafter.jobResolver">
         <property name="cronExpression" value="${crafter.engine.scripts.jobs.weekly.cron}"/>
         <property name="folderUrl" value="${crafter.engine.scripts.jobs.weekly.path}"/>
+        <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
     </bean>
 
     <bean id="crafter.monthlyScriptJobResolver"
           class="org.craftercms.engine.scripting.impl.FolderBasedScriptJobResolver" parent="crafter.jobResolver">
         <property name="cronExpression" value="${crafter.engine.scripts.jobs.monthly.cron}"/>
         <property name="folderUrl" value="${crafter.engine.scripts.jobs.monthly.path}"/>
+        <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
     </bean>
 
     <bean id="crafter.configurationScriptResolver"
@@ -522,6 +527,7 @@
         <property name="cacheWarmUpEnabled" value="${crafter.engine.site.cache.warmUp.enabled}"/>
         <property name="cacheWarmer" ref="crafter.siteCacheWarmer"/>
         <property name="initTimeout" value="${crafter.engine.site.context.initTimeout}"/>
+        <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
     </bean>
 
     <bean id="crafter.fallbackSiteContextFactory" class="org.craftercms.engine.service.context.SiteContextFactory">
