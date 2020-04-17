@@ -110,7 +110,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected SiteCacheWarmer cacheWarmer;
     protected long initTimeout;
     protected EncryptionAwareConfigurationReader configurationReader;
-    protected boolean exposeApplication;
+    protected boolean disableVariableRestrictions;
 
     public SiteContextFactory() {
         siteNameMacroName = DEFAULT_SITE_NAME_MACRO_NAME;
@@ -265,8 +265,8 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         this.configurationReader = configurationReader;
     }
 
-    public void setExposeApplication(boolean exposeApplication) {
-        this.exposeApplication = exposeApplication;
+    public void setDisableVariableRestrictions(boolean disableVariableRestrictions) {
+        this.disableVariableRestrictions = disableVariableRestrictions;
     }
 
     @Override
@@ -296,7 +296,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             siteContext.setRestScriptsPath(restScriptsPath);
             siteContext.setControllerScriptsPath(controllerScriptsPath);
             siteContext.setGraphQLFactory(graphQLFactory);
-            if (exposeApplication) {
+            if (disableVariableRestrictions) {
                 siteContext.setServletContext(servletContext);
             }
 
@@ -407,7 +407,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
 
             if (appContextResource != null) {
                 GenericApplicationContext appContext;
-                if (exposeApplication) {
+                if (disableVariableRestrictions) {
                     appContext = new GenericApplicationContext(globalApplicationContext);
                 } else {
                     appContext = new RestrictedApplicationContext(globalApplicationContext);

@@ -62,7 +62,7 @@ public class PageRenderController extends AbstractController {
     protected String fallbackPageUrl;
     protected String fallbackMessage;
     protected ContentStoreService storeService;
-    protected boolean exposeApplication;
+    protected boolean disableVariableRestrictions;
 
     @Required
     public void setFallbackPageUrl(String fallbackPageUrl) {
@@ -78,8 +78,8 @@ public class PageRenderController extends AbstractController {
         this.storeService = storeService;
     }
 
-    public void setExposeApplication(boolean exposeApplication) {
-        this.exposeApplication = exposeApplication;
+    public void setDisableVariableRestrictions(boolean disableVariableRestrictions) {
+        this.disableVariableRestrictions = disableVariableRestrictions;
     }
 
     @Override
@@ -185,7 +185,7 @@ public class PageRenderController extends AbstractController {
                                                         Map<String, Object> model) {
         Map<String, Object> variables = new HashMap<String, Object>();
         addControllerScriptVariables(variables, request, response,
-                exposeApplication? getServletContext() : null, model);
+                disableVariableRestrictions? getServletContext() : null, model);
 
         return variables;
     }

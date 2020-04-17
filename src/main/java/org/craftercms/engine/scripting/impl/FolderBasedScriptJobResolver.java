@@ -44,7 +44,7 @@ public class FolderBasedScriptJobResolver implements ScriptJobResolver, ServletC
     protected String cronExpression;
     protected String scriptSuffix;
     protected ServletContext servletContext;
-    protected boolean exposeApplication;
+    protected boolean disableVariableRestrictions;
 
     @Required
     public void setFolderUrl(String folderUrl) {
@@ -66,8 +66,8 @@ public class FolderBasedScriptJobResolver implements ScriptJobResolver, ServletC
         this.servletContext = servletContext;
     }
 
-    public void setExposeApplication(boolean exposeApplication) {
-        this.exposeApplication = exposeApplication;
+    public void setDisableVariableRestrictions(boolean disableVariableRestrictions) {
+        this.disableVariableRestrictions = disableVariableRestrictions;
     }
 
     @Override
@@ -84,7 +84,7 @@ public class FolderBasedScriptJobResolver implements ScriptJobResolver, ServletC
                     }
 
                     jobContexts.add(SchedulingUtils.createJobContext(siteContext, scriptUrl, cronExpression,
-                            exposeApplication? servletContext : null));
+                            disableVariableRestrictions? servletContext : null));
                 }
             }
         }

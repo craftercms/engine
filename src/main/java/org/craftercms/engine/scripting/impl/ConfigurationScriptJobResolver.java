@@ -60,7 +60,7 @@ public class ConfigurationScriptJobResolver implements ScriptJobResolver, Servle
 
     protected String scriptSuffix;
     protected ServletContext servletContext;
-    protected boolean exposeApplication;
+    protected boolean disableVariableRestrictions;
 
     @Required
     public void setScriptSuffix(String scriptSuffix) {
@@ -72,8 +72,8 @@ public class ConfigurationScriptJobResolver implements ScriptJobResolver, Servle
         this.servletContext = servletContext;
     }
 
-    public void setExposeApplication(boolean exposeApplication) {
-        this.exposeApplication = exposeApplication;
+    public void setDisableVariableRestrictions(boolean disableVariableRestrictions) {
+        this.disableVariableRestrictions = disableVariableRestrictions;
     }
 
     @Override
@@ -124,7 +124,7 @@ public class ConfigurationScriptJobResolver implements ScriptJobResolver, Servle
                         }
 
                         jobContexts.add(SchedulingUtils.createJobContext(siteContext, scriptPath, cronExpression,
-                                                                         exposeApplication? servletContext : null));
+                                                                         disableVariableRestrictions? servletContext : null));
                     }
                 }
             }
@@ -140,7 +140,7 @@ public class ConfigurationScriptJobResolver implements ScriptJobResolver, Servle
         if (StringUtils.isNotEmpty(scriptPath) && StringUtils.isNotEmpty(cronExpression)) {
             if (siteContext.getStoreService().exists(siteContext.getContext(), scriptPath)) {
                 return SchedulingUtils.createJobContext(siteContext, scriptPath, cronExpression,
-                        exposeApplication? servletContext: null);
+                        disableVariableRestrictions? servletContext: null);
             } else {
                 throw new SchedulingException("Script job " + scriptPath + " for site '" + siteContext.getSiteName() +
                                               "' not found");

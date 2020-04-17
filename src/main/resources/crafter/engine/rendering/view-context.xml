@@ -62,7 +62,7 @@
                     <property name="userAgentTemplateDetector" ref="crafter.userAgentTemplateDetector" />
                     <property name="accessManager" ref="crafter.pageAccessManager"/>
                     <property name="scriptResolver" ref="crafter.pageScriptResolver"/>
-					<property name="exposeApplication" value="${crafter.engine.site.expose.application}"/>
+					<property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
                 </bean>
             </list>
         </property>
@@ -84,7 +84,7 @@
                 <property name="componentIncludeElementName" value="${crafter.engine.component.include.element.name}" />
                 <property name="componentEmbeddedElementName" value="${crafter.engine.component.embedded.element.name}" />
                 <property name="componentScriptResolver" ref="crafter.componentScriptResolver"/>
-                <property name="exposeSpringMacroHelpers" value="${crafter.engine.site.expose.application}"/>
+                <property name="exposeSpringMacroHelpers" value="${crafter.engine.disableVariableRestrictions}"/>
             </bean>
         </property>
     </bean>

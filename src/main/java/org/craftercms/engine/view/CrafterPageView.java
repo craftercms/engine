@@ -25,7 +25,6 @@ import org.craftercms.engine.exception.HttpStatusCodeAwareException;
 import org.craftercms.engine.exception.RenderingException;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.scripting.Script;
-import org.craftercms.engine.util.GroovyScriptUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.http.MediaType;
@@ -68,7 +67,7 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
     protected String mimeTypeXPathQuery;
     protected List<Script> scripts;
     protected ViewResolver delegatedViewResolver;
-    protected boolean exposeApplication;
+    protected boolean disableVariableRestrictions;
 
     public SiteItem getPage() {
         return page;
@@ -134,8 +133,8 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
         this.cachingTime = cachingTime;
     }
 
-    public void setExposeApplication(boolean exposeApplication) {
-        this.exposeApplication = exposeApplication;
+    public void setDisableVariableRestrictions(boolean disableVariableRestrictions) {
+        this.disableVariableRestrictions = disableVariableRestrictions;
     }
 
     @Override
@@ -200,7 +199,7 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
     protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response,
                                                         Map<String, Object> model) {
         Map<String, Object> variables = new HashMap<>();
-        addSiteItemScriptVariables(variables, request, response, exposeApplication? getServletContext() : null,
+        addSiteItemScriptVariables(variables, request, response, disableVariableRestrictions? getServletContext() : null,
                 page, model);
 
         return variables;

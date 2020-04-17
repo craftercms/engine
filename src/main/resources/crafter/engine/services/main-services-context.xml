@@ -197,7 +197,7 @@
 
     <bean id="crafter.scriptFilter" class="org.craftercms.engine.scripting.impl.ScriptFilter">
         <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
-        <property name="exposeApplication" value="${crafter.engine.site.expose.application}"/>
+        <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
     </bean>
 
     <bean id="crafter.urlRewriteFilter" class="org.craftercms.engine.url.rewrite.UrlRewriteFilter"/>
@@ -345,33 +345,33 @@
           class="org.craftercms.engine.scripting.impl.FolderBasedScriptJobResolver" parent="crafter.jobResolver">
         <property name="cronExpression" value="${crafter.engine.scripts.jobs.hourly.cron}"/>
         <property name="folderUrl" value="${crafter.engine.scripts.jobs.hourly.path}"/>
-		<property name="exposeApplication" value="${crafter.engine.site.expose.application}"/>
+		<property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
     </bean>
 
     <bean id="crafter.dailyScriptJobResolver"
           class="org.craftercms.engine.scripting.impl.FolderBasedScriptJobResolver" parent="crafter.jobResolver">
         <property name="cronExpression" value="${crafter.engine.scripts.jobs.daily.cron}"/>
         <property name="folderUrl" value="${crafter.engine.scripts.jobs.daily.path}"/>
-        <property name="exposeApplication" value="${crafter.engine.site.expose.application}"/>
+        <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
     </bean>
 
     <bean id="crafter.weeklyScriptJobResolver"
           class="org.craftercms.engine.scripting.impl.FolderBasedScriptJobResolver" parent="crafter.jobResolver">
         <property name="cronExpression" value="${crafter.engine.scripts.jobs.weekly.cron}"/>
         <property name="folderUrl" value="${crafter.engine.scripts.jobs.weekly.path}"/>
-        <property name="exposeApplication" value="${crafter.engine.site.expose.application}"/>
+        <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
     </bean>
 
     <bean id="crafter.monthlyScriptJobResolver"
           class="org.craftercms.engine.scripting.impl.FolderBasedScriptJobResolver" parent="crafter.jobResolver">
         <property name="cronExpression" value="${crafter.engine.scripts.jobs.monthly.cron}"/>
         <property name="folderUrl" value="${crafter.engine.scripts.jobs.monthly.path}"/>
-        <property name="exposeApplication" value="${crafter.engine.site.expose.application}"/>
+        <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
     </bean>
 
     <bean id="crafter.configurationScriptResolver"
           class="org.craftercms.engine.scripting.impl.ConfigurationScriptJobResolver" parent="crafter.jobResolver">
-        <property name="exposeApplication" value="${crafter.engine.site.expose.application}"/>
+        <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
 	</bean>
 
     <util:list id="crafter.scriptJobResolvers">
@@ -529,7 +529,7 @@
         <property name="cacheWarmer" ref="crafter.siteCacheWarmer"/>
         <property name="initTimeout" value="${crafter.engine.site.context.initTimeout}"/>
         <property name="configurationReader" ref="crafter.configurationReader"/>
-        <property name="exposeApplication" value="${crafter.engine.site.expose.application}"/>
+        <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
     </bean>
 
     <bean id="crafter.fallbackSiteContextFactory" class="org.craftercms.engine.service.context.SiteContextFactory">
@@ -662,6 +662,7 @@
         <entry key="globalProperties" value-ref="crafter.propertyResolver"/>
         <entry key="modePreview" value="#{T(java.lang.Boolean).valueOf(${crafter.engine.preview})}"/>
         <entry key="crafterEnv" value="${crafter.engine.environment}"/>
+        <entry key="applicationContext" value-ref="crafter.applicationContextAccessor"/>
 
         <!-- For backwards compatibility only, should not be used anymore -->
         <entry key="tenantsResolver" value-ref="crafter.tenantsResolver"/>
@@ -962,7 +963,7 @@
         <property name="typeFactory" ref="crafter.typeFactory"/>
         <property name="dataFetcher" ref="crafter.dataFetcher"/>
         <property name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
-        <property name="exposeApplication" value="${crafter.engine.site.expose.application}"/>
+        <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
     </bean>
 
     <bean id="crafter.environmentResolver" class="org.craftercms.engine.util.blob.SiteAwareEnvironmentResolver">

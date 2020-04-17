@@ -23,15 +23,8 @@ import freemarker.template.ObjectWrapper;
 import freemarker.template.SimpleHash;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
-import org.apache.commons.configuration2.HierarchicalConfiguration;
-import org.craftercms.commons.lang.RegexUtils;
-import org.craftercms.engine.util.ConfigUtils;
 import org.craftercms.engine.util.spring.ApplicationContextAccessor;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-
-import java.util.List;
-
-import static java.util.Collections.emptyList;
 
 /**
  * Like {@link freemarker.ext.servlet.AllHttpScopesHashModel}, but also lookup keys in the Application Context.
@@ -44,18 +37,18 @@ public class AllHttpScopesAndAppContextHashModel extends SimpleHash {
     private ServletContext context;
     private HttpServletRequest request;
 
-    private boolean exposeApplication;
+    private boolean disableVariableRestrictions;
 
     public AllHttpScopesAndAppContextHashModel(ObjectWrapper wrapper,
                                                ApplicationContextAccessor applicationContextAccessor,
                                                ServletContext context, HttpServletRequest request,
-                                               boolean exposeApplication) {
+                                               boolean disableVariableRestrictions) {
         super(wrapper);
 
         this.applicationContextAccessor = applicationContextAccessor;
         this.context = context;
         this.request = request;
-        this.exposeApplication = exposeApplication;
+        this.disableVariableRestrictions = disableVariableRestrictions;
     }
 
     @Override
@@ -81,7 +74,7 @@ public class AllHttpScopesAndAppContextHashModel extends SimpleHash {
             }
         }
 
-        if (exposeApplication) {
+        if (disableVariableRestrictions) {
             // Lookup in application scope
             obj = context.getAttribute(key);
             if (obj != null) {

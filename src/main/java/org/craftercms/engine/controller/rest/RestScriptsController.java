@@ -62,7 +62,7 @@ public class RestScriptsController extends AbstractController {
     protected String responseBodyModelAttributeName;
     protected String errorMessageModelAttributeName;
     protected ScriptUrlTemplateScanner urlTemplateScanner;
-    protected boolean exposeApplication;
+    protected boolean disableVariableRestrictions;
 
     public RestScriptsController() {
         responseBodyModelAttributeName = DEFAULT_RESPONSE_BODY_MODEL_ATTR_NAME;
@@ -81,8 +81,8 @@ public class RestScriptsController extends AbstractController {
         this.urlTemplateScanner = urlTemplateScanner;
     }
 
-    public void setExposeApplication(boolean exposeApplication) {
-        this.exposeApplication = exposeApplication;
+    public void setDisableVariableRestrictions(boolean disableVariableRestrictions) {
+        this.disableVariableRestrictions = disableVariableRestrictions;
     }
 
     @Override
@@ -160,7 +160,7 @@ public class RestScriptsController extends AbstractController {
 
     protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> variables = new HashMap<String, Object>();
-        addRestScriptVariables(variables, request, response, exposeApplication? getServletContext() : null);
+        addRestScriptVariables(variables, request, response, disableVariableRestrictions? getServletContext() : null);
 
         return variables;
     }

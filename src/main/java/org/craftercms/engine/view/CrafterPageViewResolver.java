@@ -79,7 +79,7 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     protected SiteItemScriptResolver scriptResolver;
     protected UserAgentTemplateDetector userAgentTemplateDetector;
     protected CrafterPageAccessManager accessManager;
-    protected boolean exposeApplication;
+    protected boolean disableVariableRestrictions;
 
     public CrafterPageViewResolver() {
         order = 10;
@@ -188,8 +188,8 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
         this.accessManager = accessManager;
     }
 
-    public void setExposeApplication(boolean exposeApplication) {
-        this.exposeApplication = exposeApplication;
+    public void setDisableVariableRestrictions(boolean disableVariableRestrictions) {
+        this.disableVariableRestrictions = disableVariableRestrictions;
     }
 
     @Override
@@ -215,7 +215,7 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
 
             accessManager.checkAccess(pageView.getPage());
 
-            pageView.setExposeApplication(exposeApplication);
+            pageView.setDisableVariableRestrictions(disableVariableRestrictions);
         }
 
         return view;
