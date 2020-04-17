@@ -504,6 +504,7 @@
         <entry key="tenantsResolver" value-ref="crafter.tenantsResolver"/>
         <entry key="modePreview" value="#{T(java.lang.Boolean).valueOf(${crafter.engine.preview})}"/>
         <entry key="crafterEnv" value="${crafter.engine.environment}"/>
+        <entry key="applicationContext" value-ref="crafter.applicationContextAccessor"/>
     </util:map>
 
     <bean id="crafter.freeMarkerConfigFactory"

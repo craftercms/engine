@@ -47,18 +47,18 @@ public class AllHttpScopesAndAppContextHashModel extends SimpleHash {
     private ServletContext context;
     private HttpServletRequest request;
 
-    private boolean exposeApplication;
+    private boolean disableVariableRestrictions;
 
     public AllHttpScopesAndAppContextHashModel(ObjectWrapper wrapper,
                                                ApplicationContextAccessor applicationContextAccessor,
                                                ServletContext context, HttpServletRequest request,
-                                               boolean exposeApplication) {
+                                               boolean disableVariableRestrictions) {
         super(wrapper);
 
         this.applicationContextAccessor = applicationContextAccessor;
         this.context = context;
         this.request = request;
-        this.exposeApplication = exposeApplication;
+        this.disableVariableRestrictions = disableVariableRestrictions;
     }
 
     @Override
@@ -84,7 +84,7 @@ public class AllHttpScopesAndAppContextHashModel extends SimpleHash {
             }
         }
 
-        if (exposeApplication) {
+        if (disableVariableRestrictions) {
             // Lookup in application scope
             obj = context.getAttribute(key);
             if (obj != null) {
@@ -99,7 +99,7 @@ public class AllHttpScopesAndAppContextHashModel extends SimpleHash {
         }
 
         // Lookup in application context
-        if (exposeApplication || RegexUtils.matchesAny(key, beanPatterns)) {
+        if (disableVariableRestrictions || RegexUtils.matchesAny(key, beanPatterns)) {
             try {
                 return wrap(applicationContextAccessor.get(key));
             } catch (NoSuchBeanDefinitionException e) {

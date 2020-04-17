@@ -96,7 +96,7 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     protected SiteItemScriptResolver componentScriptResolver;
 
     // Needed because the field in the superclass is private
-    protected boolean exposeApplication;
+    protected boolean disableVariableRestrictions;
 
     protected ServletContextHashModel servletContextHashModel;
     protected ApplicationContextAccessor applicationContextAccessor;
@@ -112,7 +112,7 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     @Override
     public void setExposeSpringMacroHelpers(boolean exposeSpringMacroHelpers) {
         super.setExposeSpringMacroHelpers(exposeSpringMacroHelpers);
-        exposeApplication = exposeSpringMacroHelpers;
+        disableVariableRestrictions = exposeSpringMacroHelpers;
     }
 
     @Required
@@ -164,13 +164,13 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     protected SimpleHash buildTemplateModel(final Map<String, Object> model, final HttpServletRequest request,
                                             final HttpServletResponse response) {
         AllHttpScopesAndAppContextHashModel templateModel = new AllHttpScopesAndAppContextHashModel(
-            getObjectWrapper(), applicationContextAccessor, getServletContext(), request, exposeApplication);
+            getObjectWrapper(), applicationContextAccessor, getServletContext(), request, disableVariableRestrictions);
         HttpSessionHashModel sessionModel = createSessionModel(request, response);
         HttpRequestHashModel requestModel = new HttpRequestHashModel(request, response, getObjectWrapper());
         HttpRequestParametersHashModel requestParamsModel = new HttpRequestParametersHashModel(request);
         Map<String, String> cookies = createCookieMap(request);
 
-        if (exposeApplication) {
+        if (disableVariableRestrictions) {
             templateModel.put(KEY_APPLICATION_CAP, servletContextHashModel);
             templateModel.put(KEY_APPLICATION, servletContextHashModel);
             templateModel.put(KEY_APP_CONTEXT_CAP, applicationContextAccessor);
@@ -198,7 +198,8 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
         SiteContext siteContext = SiteContext.getCurrent();
         Configuration siteConfig = siteContext.getConfig();
         Locale locale = LocaleContextHolder.getLocale();
-        SiteContextHashModel siteContextModel = new SiteContextHashModel(getObjectWrapper());
+        Object siteContextObject = disableVariableRestrictions?
+                siteContext : new SiteContextHashModel(getObjectWrapper());
         TemplateHashModel staticModels = BeansWrapper.getDefaultInstance().getStaticModels();
         TemplateHashModel enumModels = BeansWrapper.getDefaultInstance().getEnumModels();
 
@@ -206,8 +207,8 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
         templateModel.put(KEY_STATICS, staticModels);
         templateModel.put(KEY_ENUMS_CAP, enumModels);
         templateModel.put(KEY_ENUMS, enumModels);
-        templateModel.put(KEY_SITE_CONTEXT_CAP, siteContextModel);
-        templateModel.put(KEY_SITE_CONTEXT, siteContextModel);
+        templateModel.put(KEY_SITE_CONTEXT_CAP, siteContextObject);
+        templateModel.put(KEY_SITE_CONTEXT, siteContextObject);
         templateModel.put(KEY_LOCALE_CAP, locale);
         templateModel.put(KEY_LOCALE, locale);
 
