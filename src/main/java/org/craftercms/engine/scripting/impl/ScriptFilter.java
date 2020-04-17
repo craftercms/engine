@@ -64,6 +64,7 @@ public class ScriptFilter implements Filter {
     private ServletContext servletContext;
     private CacheTemplate cacheTemplate;
     protected PathMatcher pathMatcher;
+    protected boolean disableVariableRestrictions;
 
     public ScriptFilter() {
         pathMatcher = new AntPathMatcher();
@@ -76,6 +77,10 @@ public class ScriptFilter implements Filter {
 
     public void setPathMatcher(PathMatcher pathMatcher) {
         this.pathMatcher = pathMatcher;
+    }
+
+    public void setDisableVariableRestrictions(boolean disableVariableRestrictions) {
+        this.disableVariableRestrictions = disableVariableRestrictions;
     }
 
     @Override
@@ -99,7 +104,7 @@ public class ScriptFilter implements Filter {
             }
 
             if (CollectionUtils.isNotEmpty(scripts)) {
-                chain = new ScriptFilterChainImpl(scripts.iterator(), chain, servletContext);
+                chain = new ScriptFilterChainImpl(scripts.iterator(), chain, disableVariableRestrictions? servletContext : null);
             }
         }
 

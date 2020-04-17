@@ -63,6 +63,7 @@
                     <property name="userAgentTemplateDetector" ref="crafter.userAgentTemplateDetector" />
                     <property name="accessManager" ref="crafter.pageAccessManager"/>
                     <property name="scriptResolver" ref="crafter.pageScriptResolver"/>
+					<property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
                 </bean>
             </list>
         </property>

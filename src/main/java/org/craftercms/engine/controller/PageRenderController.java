@@ -35,11 +35,12 @@ import org.craftercms.engine.properties.SiteProperties;
 import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.util.GroovyScriptUtils;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
+
+import static org.craftercms.engine.util.GroovyScriptUtils.addControllerScriptVariables;
 
 /**
  * Default controller for rendering Crafter pages. If the site context is the fallback context, a fallback page is
@@ -57,6 +58,7 @@ public class PageRenderController extends AbstractController {
 
     protected String fallbackPageUrl;
     protected ContentStoreService storeService;
+    protected boolean disableVariableRestrictions;
 
     @Required
     public void setFallbackPageUrl(String fallbackPageUrl) {
@@ -66,6 +68,10 @@ public class PageRenderController extends AbstractController {
     @Required
     public void setStoreService(final ContentStoreService storeService) {
         this.storeService = storeService;
+    }
+
+    public void setDisableVariableRestrictions(boolean disableVariableRestrictions) {
+        this.disableVariableRestrictions = disableVariableRestrictions;
     }
 
     @Override
@@ -166,7 +172,8 @@ public class PageRenderController extends AbstractController {
     protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response,
                                                         Map<String, Object> model) {
         Map<String, Object> variables = new HashMap<String, Object>();
-        GroovyScriptUtils.addControllerScriptVariables(variables, request, response, getServletContext(), model);
+        addControllerScriptVariables(variables, request, response,
+                disableVariableRestrictions? getServletContext() : null, model);
 
         return variables;
     }

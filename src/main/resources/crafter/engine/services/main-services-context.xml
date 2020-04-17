@@ -183,6 +183,7 @@
 
     <bean id="crafter.scriptFilter" class="org.craftercms.engine.scripting.impl.ScriptFilter">
         <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
+        <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
     </bean>
     
     <bean id="crafter.poweredByFilter" class="org.craftercms.commons.web.AddResponseHeaderFilter">
@@ -308,24 +309,28 @@
           class="org.craftercms.engine.scripting.impl.FolderBasedScriptJobResolver" parent="crafter.jobResolver">
         <property name="cronExpression" value="${crafter.engine.scripts.jobs.hourly.cron}"/>
         <property name="folderUrl" value="${crafter.engine.scripts.jobs.hourly.path}"/>
+		<property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
     </bean>
 
     <bean id="crafter.dailyScriptJobResolver"
           class="org.craftercms.engine.scripting.impl.FolderBasedScriptJobResolver" parent="crafter.jobResolver">
         <property name="cronExpression" value="${crafter.engine.scripts.jobs.daily.cron}"/>
         <property name="folderUrl" value="${crafter.engine.scripts.jobs.daily.path}"/>
+        <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
     </bean>
 
     <bean id="crafter.weeklyScriptJobResolver"
           class="org.craftercms.engine.scripting.impl.FolderBasedScriptJobResolver" parent="crafter.jobResolver">
         <property name="cronExpression" value="${crafter.engine.scripts.jobs.weekly.cron}"/>
         <property name="folderUrl" value="${crafter.engine.scripts.jobs.weekly.path}"/>
+        <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
     </bean>
 
     <bean id="crafter.monthlyScriptJobResolver"
           class="org.craftercms.engine.scripting.impl.FolderBasedScriptJobResolver" parent="crafter.jobResolver">
         <property name="cronExpression" value="${crafter.engine.scripts.jobs.monthly.cron}"/>
         <property name="folderUrl" value="${crafter.engine.scripts.jobs.monthly.path}"/>
+        <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
     </bean>
 
     <bean id="crafter.configurationScriptResolver"
@@ -387,6 +392,7 @@
         <property name="groovyGlobalVars" ref="crafter.restScriptsVariables"/>
         <property name="jobResolvers" ref="crafter.scriptJobResolvers"/>
         <property name="textEncryptor" ref="crafter.textEncryptor"/>
+        <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
     </bean>
 
     <bean id="crafter.fallbackSiteContextFactory" class="org.craftercms.engine.service.context.SiteContextFactory">

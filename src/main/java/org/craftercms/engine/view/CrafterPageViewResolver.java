@@ -26,7 +26,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.http.RequestContext;
-import org.craftercms.commons.lang.Callback;
 import org.craftercms.core.service.CachingOptions;
 import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.engine.mobile.UserAgentTemplateDetector;
@@ -81,6 +80,7 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     protected ViewResolver delegatedViewResolver;
     protected UserAgentTemplateDetector userAgentTemplateDetector;
     protected CrafterPageAccessManager accessManager;
+    protected boolean disableVariableRestrictions;
 
     public CrafterPageViewResolver() {
         order = 10;
@@ -189,6 +189,10 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
         this.accessManager = accessManager;
     }
 
+    public void setDisableVariableRestrictions(boolean disableVariableRestrictions) {
+        this.disableVariableRestrictions = disableVariableRestrictions;
+    }
+
     @Override
     public View resolveViewName(String renderUrl, Locale locale)  {
         String storeUrl = urlTransformationService.transform(renderUrlToStoreUrlTransformerName, renderUrl, cacheUrlTransformations);
@@ -211,6 +215,8 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
             }
 
             accessManager.checkAccess(pageView.getPage());
+
+            pageView.setDisableVariableRestrictions(disableVariableRestrictions);
         }
 
         return view;
