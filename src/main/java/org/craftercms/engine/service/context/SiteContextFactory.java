@@ -39,6 +39,7 @@ import org.craftercms.engine.util.groovy.ContentStoreGroovyResourceLoader;
 import org.craftercms.engine.util.groovy.ContentStoreResourceConnector;
 import org.craftercms.engine.util.quartz.JobContext;
 import org.craftercms.engine.util.spring.ContentStoreResourceLoader;
+import org.craftercms.engine.util.spring.context.RestrictedApplicationContext;
 import org.quartz.Scheduler;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectFactory;
@@ -109,6 +110,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected SiteCacheWarmer cacheWarmer;
     protected long initTimeout;
     protected EncryptionAwareConfigurationReader configurationReader;
+    protected boolean disableVariableRestrictions;
 
     public SiteContextFactory() {
         siteNameMacroName = DEFAULT_SITE_NAME_MACRO_NAME;
@@ -263,6 +265,10 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         this.configurationReader = configurationReader;
     }
 
+    public void setDisableVariableRestrictions(boolean disableVariableRestrictions) {
+        this.disableVariableRestrictions = disableVariableRestrictions;
+    }
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.globalApplicationContext = applicationContext;
@@ -290,7 +296,9 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             siteContext.setRestScriptsPath(restScriptsPath);
             siteContext.setControllerScriptsPath(controllerScriptsPath);
             siteContext.setGraphQLFactory(graphQLFactory);
-            siteContext.setServletContext(servletContext);
+            if (disableVariableRestrictions) {
+                siteContext.setServletContext(servletContext);
+            }
 
             if (cacheWarmUpEnabled) {
                 siteContext.setCacheWarmer(cacheWarmer);
@@ -398,7 +406,12 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             }
 
             if (appContextResource != null) {
-                GenericApplicationContext appContext = new GenericApplicationContext(globalApplicationContext);
+                GenericApplicationContext appContext;
+                if (disableVariableRestrictions) {
+                    appContext = new GenericApplicationContext(globalApplicationContext);
+                } else {
+                    appContext = new RestrictedApplicationContext(globalApplicationContext);
+                }
                 appContext.setClassLoader(classLoader);
 
                 if (config != null) {

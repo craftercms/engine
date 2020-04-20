@@ -25,7 +25,6 @@ import org.craftercms.engine.exception.HttpStatusCodeAwareException;
 import org.craftercms.engine.exception.RenderingException;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.scripting.Script;
-import org.craftercms.engine.util.GroovyScriptUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.http.MediaType;
@@ -39,6 +38,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import static org.craftercms.engine.util.GroovyScriptUtils.addSiteItemScriptVariables;
 
 /**
  * @author Alfonso Vásquez
@@ -66,6 +67,7 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
     protected String mimeTypeXPathQuery;
     protected List<Script> scripts;
     protected ViewResolver delegatedViewResolver;
+    protected boolean disableVariableRestrictions;
 
     public SiteItem getPage() {
         return page;
@@ -131,6 +133,10 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
         this.cachingTime = cachingTime;
     }
 
+    public void setDisableVariableRestrictions(boolean disableVariableRestrictions) {
+        this.disableVariableRestrictions = disableVariableRestrictions;
+    }
+
     @Override
     public String toString() {
         return "CrafterPageView[" +
@@ -193,7 +199,8 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
     protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response,
                                                         Map<String, Object> model) {
         Map<String, Object> variables = new HashMap<>();
-        GroovyScriptUtils.addSiteItemScriptVariables(variables, request, response, getServletContext(), page, model);
+        addSiteItemScriptVariables(variables, request, response, disableVariableRestrictions? getServletContext() : null,
+                page, model);
 
         return variables;
     }
