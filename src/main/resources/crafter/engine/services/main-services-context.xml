@@ -309,7 +309,7 @@
           class="org.craftercms.engine.scripting.impl.FolderBasedScriptJobResolver" parent="crafter.jobResolver">
         <property name="cronExpression" value="${crafter.engine.scripts.jobs.hourly.cron}"/>
         <property name="folderUrl" value="${crafter.engine.scripts.jobs.hourly.path}"/>
-		<property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
+        <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
     </bean>
 
     <bean id="crafter.dailyScriptJobResolver"
