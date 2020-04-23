@@ -23,15 +23,8 @@ import freemarker.template.ObjectWrapper;
 import freemarker.template.SimpleHash;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
-import org.apache.commons.configuration2.HierarchicalConfiguration;
-import org.craftercms.commons.lang.RegexUtils;
-import org.craftercms.engine.util.ConfigUtils;
 import org.craftercms.engine.util.spring.ApplicationContextAccessor;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-
-import java.util.List;
-
-import static java.util.Collections.emptyList;
 
 /**
  * Like {@link freemarker.ext.servlet.AllHttpScopesHashModel}, but also lookup keys in the Application Context.
