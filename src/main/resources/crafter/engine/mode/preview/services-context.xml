@@ -84,6 +84,7 @@
         <property name="cacheWarmUpEnabled" value="false"/>
         <property name="cacheWarmer" ref="crafter.siteCacheWarmer"/>
         <property name="initTimeout" value="${crafter.engine.site.context.initTimeout}"/>
+        <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
     </bean>
 
     <!-- ////////////////////////////////// -->
