@@ -78,6 +78,7 @@
         <property name="groovyGlobalVars" ref="crafter.restScriptsVariables"/>
         <property name="jobResolvers" ref="crafter.scriptJobResolvers"/>
         <property name="textEncryptor" ref="crafter.textEncryptor"/>
+        <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
     </bean>
 
     <!-- ////////////////////////////////// -->
