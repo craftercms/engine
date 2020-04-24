@@ -17,7 +17,7 @@ package org.craftercms.engine.util.spring.context;
 
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.craftercms.commons.lang.RegexUtils;
-import org.craftercms.engine.util.ConfigUtils;
+import org.craftercms.engine.service.context.SiteContext;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
@@ -41,7 +41,13 @@ public class RestrictedApplicationContext extends GenericApplicationContext {
     }
 
     protected boolean isAllowed(String name) {
-        HierarchicalConfiguration<?> siteConfig = ConfigUtils.getCurrentConfig();
+        // allow access to everything during site initialization
+        SiteContext siteContext = SiteContext.getCurrent();
+        if (siteContext == null) {
+            return true;
+        }
+
+        HierarchicalConfiguration<?> siteConfig = siteContext.getConfig();
         List<String> beanPatterns = emptyList();
         if (siteConfig != null) {
             beanPatterns = siteConfig.getList(String.class, CONFIG_KEY_BEAN_PATTERNS, emptyList());
