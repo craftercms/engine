@@ -65,10 +65,4 @@ public class RestrictedApplicationContext extends GenericApplicationContext {
         return null;
     }
 
-    @Override
-    public ApplicationContext getParent() {
-        // prevent direct access to the parent app context
-        return null;
-    }
-
 }
