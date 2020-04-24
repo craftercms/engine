@@ -76,6 +76,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     public static final String DEFAULT_SITE_NAME_MACRO_NAME = "siteName";
     public static final long DEFAULT_INIT_TIMEOUT = 300000L;
     public static final String CONFIG_BEAN_NAME = "siteConfig";
+    public static final long DEFAULT_SHUTDOWN_TIMEOUT = 5;
 
     private static final Log logger = LogFactory.getLog(SiteContextFactory.class);
 
@@ -112,6 +113,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected boolean disableVariableRestrictions;
     protected EncryptionAwareConfigurationReader configurationReader;
     protected List<String> defaultPublicBeans;
+    protected long shutdownTimeout;
 
     public SiteContextFactory() {
         siteNameMacroName = DEFAULT_SITE_NAME_MACRO_NAME;
@@ -121,6 +123,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         ignoreHiddenFiles = Context.DEFAULT_IGNORE_HIDDEN_FILES;
         initTimeout = DEFAULT_INIT_TIMEOUT;
         defaultPublicBeans = Collections.emptyList();
+        shutdownTimeout = DEFAULT_SHUTDOWN_TIMEOUT;
     }
 
     @Override
@@ -204,6 +207,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         this.maxAllowedItemsInCache = maxAllowedItemsInCache;
     }
 
+
     public void setIgnoreHiddenFiles(boolean ignoreHiddenFiles) {
         this.ignoreHiddenFiles = ignoreHiddenFiles;
     }
@@ -275,6 +279,10 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         this.defaultPublicBeans = defaultPublicBeans;
     }
 
+    public void setShutdownTimeout(long shutdownTimeout) {
+        this.shutdownTimeout = shutdownTimeout;
+    }
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.globalApplicationContext = applicationContext;
@@ -302,7 +310,10 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             siteContext.setRestScriptsPath(restScriptsPath);
             siteContext.setControllerScriptsPath(controllerScriptsPath);
             siteContext.setGraphQLFactory(graphQLFactory);
-            siteContext.setServletContext(servletContext);
+            siteContext.setShutdownTimeout(shutdownTimeout);
+            if (disableVariableRestrictions) {
+                siteContext.setServletContext(servletContext);
+            }
 
             if (cacheWarmUpEnabled) {
                 siteContext.setCacheWarmer(cacheWarmer);
