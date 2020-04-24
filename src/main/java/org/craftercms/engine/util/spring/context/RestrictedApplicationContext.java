@@ -22,6 +22,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import static java.util.Collections.emptyList;
@@ -36,8 +37,11 @@ public class RestrictedApplicationContext extends GenericApplicationContext {
 
     public static final String CONFIG_KEY_BEAN_PATTERNS = "publicBeans.bean";
 
-    public RestrictedApplicationContext(ApplicationContext parent) {
+    protected List<String> defaultPublicBeans;
+
+    public RestrictedApplicationContext(ApplicationContext parent, List<String> defaultPublicBeans) {
         super(parent);
+        this.defaultPublicBeans = defaultPublicBeans;
     }
 
     protected boolean isAllowed(String name) {
@@ -48,9 +52,9 @@ public class RestrictedApplicationContext extends GenericApplicationContext {
         }
 
         HierarchicalConfiguration<?> siteConfig = siteContext.getConfig();
-        List<String> beanPatterns = emptyList();
+        List<String> beanPatterns = new LinkedList<>(defaultPublicBeans);
         if (siteConfig != null) {
-            beanPatterns = siteConfig.getList(String.class, CONFIG_KEY_BEAN_PATTERNS, emptyList());
+            beanPatterns.addAll(siteConfig.getList(String.class, CONFIG_KEY_BEAN_PATTERNS, emptyList()));
         }
         return RegexUtils.matchesAny(name, beanPatterns);
     }
