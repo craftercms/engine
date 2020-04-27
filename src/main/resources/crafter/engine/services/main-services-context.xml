@@ -529,6 +529,7 @@
         <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
         <property name="configurationReader" ref="crafter.configurationReader"/>
         <property name="defaultPublicBeans" value="${creafter.engine.defaultPublicBeans}"/>
+        <property name="shutdownTimeout" value="${crafter.engine.site.context.shutdownTimeout}"/>
     </bean>
 
     <bean id="crafter.fallbackSiteContextFactory" class="org.craftercms.engine.service.context.SiteContextFactory">
