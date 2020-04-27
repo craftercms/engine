@@ -212,6 +212,21 @@
         </property>
     </bean>
 
+    <bean id="crafter.proxyFilter" class="org.craftercms.engine.servlet.filter.HttpProxyFilter">
+        <constructor-arg value="${crafter.engine.preview}"/>
+        <constructor-arg>
+            <bean class="org.springframework.web.servlet.mvc.ServletWrappingController">
+                <property name="servletClass" value="org.craftercms.engine.util.servlet.ConfigAwareProxyServlet"/>
+                <property name="servletName" value="Proxy Servlet"/>
+                <property name="initParameters">
+                    <props>
+                        <prop key="preserveCookies">true</prop>
+                    </props>
+                </property>
+            </bean>
+        </constructor-arg>
+    </bean>
+
     <!-- ////////////////////////////////// -->
     <!--								 	-->
     <!--			Services				-->
@@ -513,6 +528,7 @@
         <property name="configPaths" value="${crafter.engine.site.default.config.paths}"/>
         <property name="applicationContextPaths" value="${crafter.engine.site.default.config.appContext.paths}"/>
         <property name="urlRewriteConfPaths" value="${crafter.engine.site.default.urlrewrite.config.paths}"/>
+        <property name="proxyConfigPaths" value="${crafter.engine.site.default.proxy.config.paths}"/>
         <property name="groovyClassesPath" value="${crafter.engine.site.default.classes.groovy.path}"/>
         <property name="urlTransformationEngine" ref="crafter.urlTransformationEngine"/>
         <property name="storeService" ref="crafter.contentStoreService"/>
@@ -544,6 +560,7 @@
         <property name="configPaths" value="/config/site.xml"/>
         <property name="applicationContextPaths" value="/config/spring/application-context.xml"/>
         <property name="urlRewriteConfPaths" value="/config/engine/urlrewrite.xml"/>
+        <property name="proxyConfigPaths" value="${crafter.engine.site.default.proxy.config.paths}"/>
         <property name="groovyClassesPath" value="/classes/groovy"/>
         <property name="urlTransformationEngine" ref="crafter.urlTransformationEngine"/>
         <property name="storeService" ref="crafter.contentStoreService"/>

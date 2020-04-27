@@ -62,6 +62,9 @@ import java.io.InputStream;
 import java.net.URLClassLoader;
 import java.util.*;
 import java.util.concurrent.Executor;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * Factory for creating {@link SiteContext} with common properties. It also uses the {@link MacroResolver} to resolve
@@ -92,6 +95,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected String[] configPaths;
     protected String[] applicationContextPaths;
     protected String[] urlRewriteConfPaths;
+    protected String[] proxyConfPaths;
     protected String groovyClassesPath;
     protected Map<String, Object> groovyGlobalVars;
     protected boolean mergingOn;
@@ -183,6 +187,11 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     @Required
     public void setUrlRewriteConfPaths(String[] urlRewriteConfPaths) {
         this.urlRewriteConfPaths = urlRewriteConfPaths;
+    }
+
+    @Required
+    public void setProxyConfPaths(String[] proxyConfPaths) {
+        this.proxyConfPaths = proxyConfPaths;
     }
 
     @Required
@@ -334,6 +343,10 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
                 resolvedUrlRewriteConfPaths[i] = macroResolver.resolveMacros(urlRewriteConfPaths[i], macroValues);
             }
 
+            List<String> resolvedProxyConfPaths = Stream.of(proxyConfPaths)
+                    .map(path -> macroResolver.resolveMacros(path, macroValues))
+                    .collect(toList());
+
             ResourceLoader resourceLoader = new ContentStoreResourceLoader(siteContext);
             HierarchicalConfiguration<?> config = getConfig(siteContext, resolvedConfigPaths, resourceLoader);
             URLClassLoader classLoader = getClassLoader(siteContext);
@@ -341,6 +354,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             ConfigurableApplicationContext appContext = getApplicationContext(siteContext, classLoader, config,
                                                                               resolvedAppContextPaths, resourceLoader);
             UrlRewriter urlRewriter = getUrlRewriter(siteContext, resolvedUrlRewriteConfPaths, resourceLoader);
+            HierarchicalConfiguration proxyConfig = getProxyConfig(siteContext, resolvedProxyConfPaths, resourceLoader);
 
             siteContext.setScriptFactory(scriptFactory);
             siteContext.setConfig(config);
@@ -348,6 +362,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             siteContext.setApplicationContext(appContext);
             siteContext.setClassLoader(classLoader);
             siteContext.setUrlRewriter(urlRewriter);
+            siteContext.setProxyConfig(proxyConfig);
 
             Scheduler scheduler = scheduleJobs(siteContext);
             siteContext.setScheduler(scheduler);
@@ -362,8 +377,6 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             throw e;
         }
     }
-
-
 
     protected HierarchicalConfiguration getConfig(SiteContext siteContext, String[] configPaths,
                                                   ResourceLoader resourceLoader) {
@@ -506,6 +519,32 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             logger.info("--------------------------------------------------");
             logger.info("</Loading URL rewrite engine for site: " + siteName + ">");
             logger.info("--------------------------------------------------");
+        }
+    }
+
+    protected HierarchicalConfiguration getProxyConfig(SiteContext siteContext, List<String> configPaths,
+                                                       ResourceLoader resourceLoader) {
+        String siteName = siteContext.getSiteName();
+
+        logger.info("-------------------------------------------------------");
+        logger.info("<Loading proxy configuration for site: " + siteName + ">");
+        logger.info("-------------------------------------------------------");
+
+        try {
+            ListIterator<String> iterator = configPaths.listIterator(configPaths.size());
+            while(iterator.hasPrevious()) {
+                Resource resource = resourceLoader.getResource(iterator.previous());
+                if (resource.exists()) {
+                    return configurationReader.readXmlConfiguration(resource);
+                }
+            }
+            return null;
+        } catch (ConfigurationException e) {
+            throw new SiteContextCreationException("Unable to load proxy configuration for site '" + siteName + "'", e);
+        } finally {
+            logger.info("---------------------------------------------------------");
+            logger.info("</Loading proxy configuration for site: " + siteName + ">");
+            logger.info("---------------------------------------------------------");
         }
     }
 
