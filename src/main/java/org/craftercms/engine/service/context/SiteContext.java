@@ -105,8 +105,8 @@ public class SiteContext {
 
     private long shutdownTimeout;
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
-    private final Lock readLock = readWriteLock.readLock();
-    private final Lock writeLock = readWriteLock.writeLock();
+    private final Lock accessLock = readWriteLock.readLock();
+    private final Lock shutdownLock = readWriteLock.writeLock();
 
     /**
      * Returns the context for the current thread.
@@ -138,7 +138,7 @@ public class SiteContext {
      */
     public static void setCurrent(SiteContext current) {
         logger.debug("Getting read lock for context {}", current);
-        current.readLock.lock();
+        current.accessLock.lock();
 
         threadLocal.set(current);
 
@@ -153,7 +153,7 @@ public class SiteContext {
 
         SiteContext current = threadLocal.get();
         logger.debug("Releasing read lock for context {}", current);
-        current.readLock.unlock();
+        current.accessLock.unlock();
 
         threadLocal.remove();
     }
@@ -447,48 +447,51 @@ public class SiteContext {
         boolean locked;
         try {
             logger.debug("Getting write lock for context {}", this);
-            locked = writeLock.tryLock(shutdownTimeout, TimeUnit.MINUTES);
-
-            if (!locked) {
-                logger.debug("Time out reached, proceeding to destroy context {}", this);
-            } else {
-                logger.debug("All threads released, proceeding to destroy context {}", this);
-            }
-
-            state = State.DESTROYED;
-
-            publishEvent(new SiteContextDestroyedEvent(this));
-
-            maintenanceTaskExecutor.shutdownNow();
-
-            storeService.destroyContext(context);
-
-            if (scheduler != null) {
-                try {
-                    scheduler.shutdown();
-                } catch (SchedulerException e) {
-                    throw new CrafterException("Unable to shutdown scheduler", e);
+            locked = shutdownLock.tryLock(shutdownTimeout, TimeUnit.MINUTES);
+            try {
+                if (!locked) {
+                    logger.debug("Time out reached, proceeding to destroy context {}", this);
+                } else {
+                    logger.debug("All threads released, proceeding to destroy context {}", this);
                 }
-            }
-            if (applicationContext != null) {
-                try {
-                    applicationContext.close();
-                } catch (Exception e) {
-                    throw new CrafterException("Unable to close application context", e);
+
+                state = State.DESTROYED;
+
+                publishEvent(new SiteContextDestroyedEvent(this));
+
+                maintenanceTaskExecutor.shutdownNow();
+
+                storeService.destroyContext(context);
+
+                if (scheduler != null) {
+                    try {
+                        scheduler.shutdown();
+                    } catch (SchedulerException e) {
+                        throw new CrafterException("Unable to shutdown scheduler", e);
+                    }
                 }
-            }
-            if (classLoader != null) {
-                try {
-                    classLoader.close();
-                } catch (Exception e) {
-                    throw new CrafterException("Unable to close class loader", e);
+                if (applicationContext != null) {
+                    try {
+                        applicationContext.close();
+                    } catch (Exception e) {
+                        throw new CrafterException("Unable to close application context", e);
+                    }
                 }
+                if (classLoader != null) {
+                    try {
+                        classLoader.close();
+                    } catch (Exception e) {
+                        throw new CrafterException("Unable to close class loader", e);
+                    }
+                }
+            } catch (Exception e) {
+                logger.error("Error destroying context {}", this, e);
             }
         } catch (InterruptedException e) {
             throw new CrafterException("Unable to destroy context", e);
         } finally {
             logger.debug("Releasing write lock for context {}", this);
-            writeLock.unlock();
+            shutdownLock.unlock();
         }
     }
 
