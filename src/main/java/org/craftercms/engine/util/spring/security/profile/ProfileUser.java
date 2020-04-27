@@ -74,6 +74,11 @@ public class ProfileUser extends CustomUser {
     }
 
     @Override
+    public Map<String, Object> getAttributes() {
+        return profile.getAttributes();
+    }
+
+    @Override
     public boolean equals(final Object o) {
         if (this == o) {
             return true;
