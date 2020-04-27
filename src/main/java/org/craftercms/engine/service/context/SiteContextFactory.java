@@ -115,6 +115,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected long initTimeout;
     protected EncryptionAwareConfigurationReader configurationReader;
     protected boolean disableVariableRestrictions;
+    protected List<String> defaultPublicBeans;
 
     public SiteContextFactory() {
         siteNameMacroName = DEFAULT_SITE_NAME_MACRO_NAME;
@@ -123,6 +124,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         maxAllowedItemsInCache = Context.DEFAULT_MAX_ALLOWED_ITEMS_IN_CACHE;
         ignoreHiddenFiles = Context.DEFAULT_IGNORE_HIDDEN_FILES;
         initTimeout = DEFAULT_INIT_TIMEOUT;
+        defaultPublicBeans = Collections.emptyList();
     }
 
     @Override
@@ -278,6 +280,10 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         this.disableVariableRestrictions = disableVariableRestrictions;
     }
 
+    public void setDefaultPublicBeans(List<String> defaultPublicBeans) {
+        this.defaultPublicBeans = defaultPublicBeans;
+    }
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.globalApplicationContext = applicationContext;
@@ -423,7 +429,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
                 if (disableVariableRestrictions) {
                     appContext = new GenericApplicationContext(globalApplicationContext);
                 } else {
-                    appContext = new RestrictedApplicationContext(globalApplicationContext);
+                    appContext = new RestrictedApplicationContext(globalApplicationContext, defaultPublicBeans);
                 }
                 appContext.setClassLoader(classLoader);
 
