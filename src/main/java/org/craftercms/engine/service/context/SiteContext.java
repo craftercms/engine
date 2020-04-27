@@ -137,7 +137,7 @@ public class SiteContext {
      * Sets the context for the current thread.
      */
     public static void setCurrent(SiteContext current) {
-        logger.debug("Getting read lock for context {}", current);
+        logger.debug("Getting access lock for context {}", current);
         current.accessLock.lock();
 
         threadLocal.set(current);
@@ -152,7 +152,7 @@ public class SiteContext {
         MDC.remove(SITE_NAME_MDC_KEY);
 
         SiteContext current = threadLocal.get();
-        logger.debug("Releasing read lock for context {}", current);
+        logger.debug("Releasing access lock for context {}", current);
         current.accessLock.unlock();
 
         threadLocal.remove();
@@ -446,7 +446,7 @@ public class SiteContext {
     public void destroy() throws CrafterException {
         boolean locked;
         try {
-            logger.debug("Getting write lock for context {}", this);
+            logger.debug("Getting shutdown lock for context {}", this);
             locked = shutdownLock.tryLock(shutdownTimeout, TimeUnit.MINUTES);
             try {
                 if (!locked) {
@@ -486,12 +486,14 @@ public class SiteContext {
                 }
             } catch (Exception e) {
                 logger.error("Error destroying context {}", this, e);
+            } finally {
+                if (locked) {
+                    logger.debug("Releasing shutdown lock for context {}", this);
+                    shutdownLock.unlock();
+                }
             }
         } catch (InterruptedException e) {
             throw new CrafterException("Unable to destroy context", e);
-        } finally {
-            logger.debug("Releasing write lock for context {}", this);
-            shutdownLock.unlock();
         }
     }
 
