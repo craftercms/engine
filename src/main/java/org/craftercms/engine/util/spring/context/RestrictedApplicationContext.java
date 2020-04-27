@@ -45,7 +45,8 @@ public class RestrictedApplicationContext extends GenericApplicationContext {
     }
 
     protected boolean isAllowed(String name) {
-        // allow access to everything during site initialization
+        // allow access to everything during site initialization, needed because SiteContext is not available and it
+        // affects beans being injected
         SiteContext siteContext = SiteContext.getCurrent();
         if (siteContext == null) {
             return true;
