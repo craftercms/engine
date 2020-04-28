@@ -43,8 +43,7 @@ import org.springframework.web.servlet.ModelAndView;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Test for {@link org.craftercms.engine.controller.rest.RestScriptsController}
@@ -151,7 +150,7 @@ public class RestScriptsControllerTest {
     }
 
     private SiteContext createSiteContext(ContentStoreService storeService) {
-        SiteContext siteContext = mock(SiteContext.class);
+        SiteContext siteContext = spy(new SiteContext());
 
         ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(siteContext);
         ScriptFactory scriptFactory = new GroovyScriptFactory(resourceConnector,

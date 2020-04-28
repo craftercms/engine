@@ -79,7 +79,7 @@
         <property name="jobResolvers" ref="crafter.scriptJobResolvers"/>
         <property name="textEncryptor" ref="crafter.textEncryptor"/>
         <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
-        <property name="defaultPublicBeans" value="${creafter.engine.defaultPublicBeans}"/>
+        <property name="defaultPublicBeans" value="${crafter.engine.defaultPublicBeans}"/>
     </bean>
 
     <!-- ////////////////////////////////// -->
