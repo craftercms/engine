@@ -83,7 +83,7 @@ public class Dom4jExtensionTest {
     private SiteContext createSiteContext(ContentStoreService storeService) {
         CacheTemplate cacheTemplate = CacheTemplateMockUtils.createCacheTemplate();
 
-        SiteContext siteContext = mock(SiteContext.class);
+        SiteContext siteContext = spy( new SiteContext());
         when(siteContext.getSiteName()).thenReturn("default");
         when(siteContext.getStoreService()).thenReturn(storeService);
         when(siteContext.getCacheTemplate()).thenReturn(cacheTemplate);

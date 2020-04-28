@@ -546,7 +546,7 @@
         <property name="initTimeout" value="${crafter.engine.site.context.initTimeout}"/>
         <property name="configurationReader" ref="crafter.configurationReader"/>
         <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
-        <property name="defaultPublicBeans" value="${creafter.engine.defaultPublicBeans}"/>
+        <property name="defaultPublicBeans" value="${crafter.engine.defaultPublicBeans}"/>
         <property name="shutdownTimeout" value="${crafter.engine.site.context.shutdownTimeout}"/>
     </bean>
 
