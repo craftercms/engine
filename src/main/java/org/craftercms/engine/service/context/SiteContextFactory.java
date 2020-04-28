@@ -95,7 +95,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected String[] configPaths;
     protected String[] applicationContextPaths;
     protected String[] urlRewriteConfPaths;
-    protected String[] proxyConfPaths;
+    protected String[] proxyConfigPaths;
     protected String groovyClassesPath;
     protected Map<String, Object> groovyGlobalVars;
     protected boolean mergingOn;
@@ -190,8 +190,8 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     }
 
     @Required
-    public void setProxyConfPaths(String[] proxyConfPaths) {
-        this.proxyConfPaths = proxyConfPaths;
+    public void setProxyConfigPaths(String[] proxyConfigPaths) {
+        this.proxyConfigPaths = proxyConfigPaths;
     }
 
     @Required
@@ -342,7 +342,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
                 resolvedUrlRewriteConfPaths[i] = macroResolver.resolveMacros(urlRewriteConfPaths[i], macroValues);
             }
 
-            List<String> resolvedProxyConfPaths = Stream.of(proxyConfPaths)
+            List<String> resolvedProxyConfPaths = Stream.of(proxyConfigPaths)
                     .map(path -> macroResolver.resolveMacros(path, macroValues))
                     .collect(toList());
 
