@@ -57,6 +57,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  *
  * @author Alfonso Vásquez
  */
+@SuppressWarnings("rawtypes")
 public class SiteContext {
 
     private static final Logger logger = LoggerFactory.getLogger(SiteContext.class);
@@ -93,6 +94,7 @@ public class SiteContext {
     protected Scheduler scheduler;
     protected GraphQLFactory graphQLFactory;
     protected SiteCacheWarmer cacheWarmer;
+    protected HierarchicalConfiguration proxyConfig;
 
     protected long initTimeout;
     protected CountDownLatch initializationLatch;
@@ -350,6 +352,14 @@ public class SiteContext {
 
     public GraphQL getGraphQL() {
         return graphQL;
+    }
+
+    public HierarchicalConfiguration getProxyConfig() {
+        return proxyConfig;
+    }
+
+    public void setProxyConfig(HierarchicalConfiguration proxyConfig) {
+        this.proxyConfig = proxyConfig;
     }
 
     public boolean isValid() throws CrafterException {
