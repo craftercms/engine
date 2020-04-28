@@ -40,8 +40,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * @author Alfonso Vásquez
@@ -85,7 +84,7 @@ public class GroovyScriptFactoryTest {
     }
 
     private SiteContext createSiteContext(ContentStoreService storeService) {
-        SiteContext siteContext = mock(SiteContext.class);
+        SiteContext siteContext = spy(new SiteContext());
         when(siteContext.getSiteName()).thenReturn("default");
         when(siteContext.getContext()).thenReturn(mock(Context.class));
         when(siteContext.getStoreService()).thenReturn(storeService);
