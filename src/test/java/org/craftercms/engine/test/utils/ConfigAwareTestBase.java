@@ -24,6 +24,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -37,7 +38,7 @@ import static org.mockito.Mockito.when;
  */
 public class ConfigAwareTestBase {
 
-    @Mock
+    @Spy
     protected SiteContext siteContext;
     protected XMLConfiguration config;
 
