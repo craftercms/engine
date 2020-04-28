@@ -85,7 +85,7 @@
         <property name="initTimeout" value="${crafter.engine.site.context.initTimeout}"/>
         <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
         <property name="configurationReader" ref="crafter.configurationReader"/>
-        <property name="defaultPublicBeans" value="${creafter.engine.defaultPublicBeans}"/>
+        <property name="defaultPublicBeans" value="${crafter.engine.defaultPublicBeans}"/>
     </bean>
 
     <!-- ////////////////////////////////// -->

@@ -131,7 +131,7 @@ public class NavBreadcrumbBuilderImplTest {
     }
 
     private void setUpCurrentSiteContext() {
-        SiteContext siteContext = mock(SiteContext.class);
+        SiteContext siteContext = spy(new SiteContext());
         when(siteContext.getSiteName()).thenReturn("test");
 
         SiteContext.setCurrent(siteContext);

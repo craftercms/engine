@@ -26,8 +26,7 @@ import org.junit.Test;
 
 import static org.craftercms.engine.properties.SiteProperties.TARGETING_ENABLED_CONFIG_KEY;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Created by alfonsovasquez on 8/10/16.
@@ -82,7 +81,7 @@ public class ToCurrentTargetedVersionItemProcessorTest {
         XMLConfiguration config = mock(XMLConfiguration.class);
         when(config.getBoolean(TARGETING_ENABLED_CONFIG_KEY, false)).thenReturn(true);
 
-        SiteContext siteContext = mock(SiteContext.class);
+        SiteContext siteContext = spy(new SiteContext());
         when(siteContext.getSiteName()).thenReturn("test");
         when(siteContext.getConfig()).thenReturn(config);
 
