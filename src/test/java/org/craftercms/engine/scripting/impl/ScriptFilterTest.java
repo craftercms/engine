@@ -128,7 +128,7 @@ public class ScriptFilterTest {
     }
 
     private SiteContext createSiteContext(ContentStoreService storeService) throws Exception {
-        SiteContext siteContext = mock(SiteContext.class);
+        SiteContext siteContext = spy(new SiteContext());
         ScriptFactory scriptFactory = createScriptFactory(siteContext);
 
         XMLConfiguration config =
