@@ -546,6 +546,7 @@
         <property name="configurationReader" ref="crafter.configurationReader"/>
         <property name="defaultPublicBeans" value="${crafter.engine.defaultPublicBeans}"/>
         <property name="shutdownTimeout" value="${crafter.engine.site.context.shutdownTimeout}"/>
+        <property name="targetResolver" ref="crafter.targetResolver"/>
     </bean>
 
     <bean id="crafter.fallbackSiteContextFactory" class="org.craftercms.engine.service.context.SiteContextFactory">
@@ -575,6 +576,7 @@
         <property name="cacheWarmer" ref="crafter.siteCacheWarmer"/>
         <property name="initTimeout" value="${crafter.engine.site.context.initTimeout}"/>
         <property name="configurationReader" ref="crafter.configurationReader"/>
+        <property name="targetResolver" ref="crafter.targetResolver"/>
     </bean>
 
     <!-- ////////////////////////////////// -->
@@ -982,7 +984,7 @@
         <property name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
     </bean>
 
-    <bean id="crafter.environmentResolver" class="org.craftercms.engine.util.blob.SiteAwareEnvironmentResolver">
+    <bean id="crafter.targetResolver" class="org.craftercms.engine.util.config.SiteAwareTargetResolver">
         <constructor-arg value="${crafter.engine.preview}"/>
         <constructor-arg value="${crafter.engine.site.staging.pattern}"/>
     </bean>
