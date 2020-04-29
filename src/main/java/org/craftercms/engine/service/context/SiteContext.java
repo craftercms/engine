@@ -316,7 +316,6 @@ public class SiteContext {
     }
 
     public boolean isValid() throws CrafterException {
-
         try {
             if (state == State.CREATED) {
                 logger.debug("Waiting for initialization of {}", this);
