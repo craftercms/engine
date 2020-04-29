@@ -360,7 +360,6 @@ public class SiteContext {
     }
 
     public boolean isValid() throws CrafterException {
-
         try {
             if (state == State.INITIALIZING) {
                 logger.debug("Waiting for initialization of {}", this);
