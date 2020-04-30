@@ -13,37 +13,41 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.craftercms.engine.util.blob;
+package org.craftercms.engine.util.config;
 
-import org.craftercms.commons.file.blob.EnvironmentResolver;
+import org.craftercms.commons.config.PublishingTargetResolver;
 import org.craftercms.engine.service.context.SiteContext;
 
 /**
- * Implementation of {@link EnvironmentResolver} that uses the current {@link SiteContext}
+ * Implementation of {@link PublishingTargetResolver} that uses the current {@link SiteContext}
  *
  * @author joseross
  * @since 3.1.6
  */
-public class SiteAwareEnvironmentResolver implements EnvironmentResolver {
+public class SiteAwarePublishingTargetResolver implements PublishingTargetResolver {
 
     protected boolean preview;
 
     protected String stagingPattern;
 
-    public SiteAwareEnvironmentResolver(boolean preview, String stagingPattern) {
+    public SiteAwarePublishingTargetResolver(boolean preview, String stagingPattern) {
         this.preview = preview;
         this.stagingPattern = stagingPattern;
     }
 
     @Override
-    public String getEnvironment() {
+    public String getPublishingTarget() {
         SiteContext siteContext = SiteContext.getCurrent();
         if (siteContext == null) {
-            throw new IllegalStateException("Can't resolve the current site environment");
+            throw new IllegalStateException("Can't resolve the current site target");
         }
+        return getPublishingTarget(siteContext.getSiteName());
+    }
+
+    public String getPublishingTarget(String siteName) {
         if (preview) {
             return PREVIEW;
-        } else if(siteContext.getSiteName().matches(stagingPattern)) {
+        } else if(siteName.matches(stagingPattern)) {
             return STAGING;
         } else {
             return LIVE;

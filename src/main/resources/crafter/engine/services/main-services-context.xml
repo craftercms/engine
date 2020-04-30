@@ -548,6 +548,7 @@
         <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
         <property name="defaultPublicBeans" value="${crafter.engine.defaultPublicBeans}"/>
         <property name="shutdownTimeout" value="${crafter.engine.site.context.shutdownTimeout}"/>
+        <property name="publishingTargetResolver" ref="crafter.publishingTargetResolver"/>
     </bean>
 
     <bean id="crafter.fallbackSiteContextFactory" class="org.craftercms.engine.service.context.SiteContextFactory">
@@ -577,6 +578,7 @@
         <property name="cacheWarmer" ref="crafter.siteCacheWarmer"/>
         <property name="initTimeout" value="${crafter.engine.site.context.initTimeout}"/>
         <property name="configurationReader" ref="crafter.configurationReader"/>
+        <property name="publishingTargetResolver" ref="crafter.publishingTargetResolver"/>
     </bean>
 
     <!-- ////////////////////////////////// -->
@@ -985,7 +987,7 @@
         <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
     </bean>
 
-    <bean id="crafter.environmentResolver" class="org.craftercms.engine.util.blob.SiteAwareEnvironmentResolver">
+    <bean id="crafter.publishingTargetResolver" class="org.craftercms.engine.util.config.SiteAwarePublishingTargetResolver">
         <constructor-arg value="${crafter.engine.preview}"/>
         <constructor-arg value="${crafter.engine.site.staging.pattern}"/>
     </bean>
