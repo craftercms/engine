@@ -15,36 +15,36 @@
  */
 package org.craftercms.engine.util.config;
 
-import org.craftercms.commons.config.TargetResolver;
+import org.craftercms.commons.config.PublishingTargetResolver;
 import org.craftercms.engine.service.context.SiteContext;
 
 /**
- * Implementation of {@link TargetResolver} that uses the current {@link SiteContext}
+ * Implementation of {@link PublishingTargetResolver} that uses the current {@link SiteContext}
  *
  * @author joseross
  * @since 3.1.6
  */
-public class SiteAwareTargetResolver implements TargetResolver {
+public class SiteAwarePublishingTargetResolver implements PublishingTargetResolver {
 
     protected boolean preview;
 
     protected String stagingPattern;
 
-    public SiteAwareTargetResolver(boolean preview, String stagingPattern) {
+    public SiteAwarePublishingTargetResolver(boolean preview, String stagingPattern) {
         this.preview = preview;
         this.stagingPattern = stagingPattern;
     }
 
     @Override
-    public String getTarget() {
+    public String getPublishingTarget() {
         SiteContext siteContext = SiteContext.getCurrent();
         if (siteContext == null) {
             throw new IllegalStateException("Can't resolve the current site target");
         }
-        return getTarget(siteContext.getSiteName());
+        return getPublishingTarget(siteContext.getSiteName());
     }
 
-    public String getTarget(String siteName) {
+    public String getPublishingTarget(String siteName) {
         if (preview) {
             return PREVIEW;
         } else if(siteName.matches(stagingPattern)) {

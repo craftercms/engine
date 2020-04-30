@@ -22,7 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.config.ConfigurationException;
 import org.craftercms.commons.config.EncryptionAwareConfigurationReader;
-import org.craftercms.commons.config.TargetResolver;
+import org.craftercms.commons.config.PublishingTargetResolver;
 import org.craftercms.commons.spring.ApacheCommonsConfiguration2PropertySource;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
@@ -36,7 +36,7 @@ import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.scripting.ScriptJobResolver;
 import org.craftercms.engine.scripting.impl.GroovyScriptFactory;
 import org.craftercms.engine.util.SchedulingUtils;
-import org.craftercms.engine.util.config.SiteAwareTargetResolver;
+import org.craftercms.engine.util.config.SiteAwarePublishingTargetResolver;
 import org.craftercms.engine.util.groovy.ContentStoreGroovyResourceLoader;
 import org.craftercms.engine.util.groovy.ContentStoreResourceConnector;
 import org.craftercms.engine.util.quartz.JobContext;
@@ -82,6 +82,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     public static final long DEFAULT_INIT_TIMEOUT = 300000L;
     public static final String CONFIG_BEAN_NAME = "siteConfig";
     public static final long DEFAULT_SHUTDOWN_TIMEOUT = 5;
+    public static final String DEFAULT_PUBLISHING_TARGET_MACRO_NAME = "publishingTarget";
 
     private static final Log logger = LogFactory.getLog(SiteContextFactory.class);
 
@@ -120,7 +121,8 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected boolean disableVariableRestrictions;
     protected List<String> defaultPublicBeans;
     protected long shutdownTimeout;
-    protected TargetResolver targetResolver;
+    protected PublishingTargetResolver publishingTargetResolver;
+    protected String publishingTargetMacroName;
 
     public SiteContextFactory() {
         siteNameMacroName = DEFAULT_SITE_NAME_MACRO_NAME;
@@ -131,6 +133,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         initTimeout = DEFAULT_INIT_TIMEOUT;
         defaultPublicBeans = Collections.emptyList();
         shutdownTimeout = DEFAULT_SHUTDOWN_TIMEOUT;
+        publishingTargetMacroName = DEFAULT_PUBLISHING_TARGET_MACRO_NAME;
     }
 
     @Override
@@ -294,8 +297,8 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         this.shutdownTimeout = shutdownTimeout;
     }
 
-    public void setTargetResolver(TargetResolver targetResolver) {
-        this.targetResolver = targetResolver;
+    public void setPublishingTargetResolver(PublishingTargetResolver publishingTargetResolver) {
+        this.publishingTargetResolver = publishingTargetResolver;
     }
 
     @Override
@@ -307,9 +310,9 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         Map<String, String> macroValues = new HashMap<>();
         macroValues.put(siteNameMacroName, siteName);
 
-        if (targetResolver instanceof SiteAwareTargetResolver) {
-            String target = ((SiteAwareTargetResolver) targetResolver).getTarget(siteName);
-            macroValues.put("target", target);
+        if (publishingTargetResolver instanceof SiteAwarePublishingTargetResolver) {
+            String target = ((SiteAwarePublishingTargetResolver) publishingTargetResolver).getPublishingTarget(siteName);
+            macroValues.put(publishingTargetMacroName, target);
         }
 
         String resolvedRootFolderPath = macroResolver.resolveMacros(rootFolderPath, macroValues);
