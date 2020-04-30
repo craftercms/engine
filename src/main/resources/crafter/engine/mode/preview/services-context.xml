@@ -87,7 +87,7 @@
         <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
         <property name="configurationReader" ref="crafter.configurationReader"/>
         <property name="defaultPublicBeans" value="${crafter.engine.defaultPublicBeans}"/>
-        <property name="targetResolver" ref="crafter.targetResolver"/>
+        <property name="publishingTargetResolver" ref="crafter.publishingTargetResolver"/>
     </bean>
 
     <!-- ////////////////////////////////// -->
