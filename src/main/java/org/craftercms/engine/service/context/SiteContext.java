@@ -31,6 +31,7 @@ import org.craftercms.engine.exception.GraphQLBuildException;
 import org.craftercms.engine.exception.SiteContextInitializationException;
 import org.craftercms.engine.graphql.GraphQLFactory;
 import org.craftercms.engine.scripting.ScriptFactory;
+import org.craftercms.engine.scripting.impl.ScriptSandbox;
 import org.craftercms.engine.util.GroovyScriptUtils;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -108,6 +109,8 @@ public class SiteContext {
     private final Lock accessLock = readWriteLock.readLock();
     private final Lock shutdownLock = readWriteLock.writeLock();
 
+    protected ScriptSandbox scriptSandbox;
+
     /**
      * Returns the context for the current thread.
      */
@@ -140,6 +143,10 @@ public class SiteContext {
         logger.debug("Getting access lock for context {}", current);
         current.accessLock.lock();
 
+        if (current.scriptSandbox != null) {
+            current.scriptSandbox.register();
+        }
+
         threadLocal.set(current);
 
         MDC.put(SITE_NAME_MDC_KEY, current.getSiteName());
@@ -152,6 +159,11 @@ public class SiteContext {
         MDC.remove(SITE_NAME_MDC_KEY);
 
         SiteContext current = threadLocal.get();
+
+        if (current.scriptSandbox != null) {
+            current.scriptSandbox.unregister();
+        }
+
         logger.debug("Releasing access lock for context {}", current);
         current.accessLock.unlock();
 
