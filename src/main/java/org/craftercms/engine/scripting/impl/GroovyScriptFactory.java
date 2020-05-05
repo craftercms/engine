@@ -19,8 +19,6 @@ package org.craftercms.engine.scripting.impl;
 import groovy.util.GroovyScriptEngine;
 import groovy.util.ResourceConnector;
 import groovy.util.ResourceException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.craftercms.engine.exception.ScriptException;
 import org.craftercms.engine.exception.ScriptNotFoundException;
 import org.craftercms.engine.scripting.Script;
@@ -29,6 +27,8 @@ import org.craftercms.engine.service.context.SiteContext;
 
 import java.io.FileNotFoundException;
 import java.util.Map;
+
+import static org.craftercms.engine.util.GroovyScriptUtils.getCompilerConfiguration;
 
 /**
  * {@link org.craftercms.engine.scripting.ScriptFactory} used specifically for Groovy. Very useful when scripts
@@ -50,6 +50,7 @@ public class GroovyScriptFactory implements ScriptFactory {
                                Map<String, Object> globalVariables) {
         this.siteContext = siteContext;
         this.scriptEngine = new GroovyScriptEngine(resourceConnector);
+        this.scriptEngine.setConfig(getCompilerConfiguration());
         this.globalVariables = globalVariables;
     }
 
@@ -57,6 +58,7 @@ public class GroovyScriptFactory implements ScriptFactory {
                                ClassLoader parentClassLoader, Map<String, Object> globalVariables) {
         this.siteContext = siteContext;
         this.scriptEngine = new GroovyScriptEngine(resourceConnector, parentClassLoader);
+        this.scriptEngine.setConfig(getCompilerConfiguration());
         this.globalVariables = globalVariables;
     }
 
