@@ -25,6 +25,8 @@ import org.craftercms.engine.exception.ScriptException;
 import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.scripting.ScriptFactory;
 
+import static org.craftercms.engine.util.GroovyScriptUtils.getCompilerConfiguration;
+
 /**
  * {@link org.craftercms.engine.scripting.ScriptFactory} used specifically for Groovy. Very useful when scripts
  * have dependencies to other scripts.
@@ -40,12 +42,14 @@ public class GroovyScriptFactory implements ScriptFactory {
 
     public GroovyScriptFactory(ResourceConnector resourceConnector, Map<String, Object> globalVariables) {
         this.scriptEngine = new GroovyScriptEngine(resourceConnector);
+        this.scriptEngine.setConfig(getCompilerConfiguration());
         this.globalVariables = globalVariables;
     }
 
     public GroovyScriptFactory(ResourceConnector resourceConnector, ClassLoader parentClassLoader,
                                Map<String, Object> globalVariables) {
         this.scriptEngine = new GroovyScriptEngine(resourceConnector, parentClassLoader);
+        this.scriptEngine.setConfig(getCompilerConfiguration());
         this.globalVariables = globalVariables;
     }
 
