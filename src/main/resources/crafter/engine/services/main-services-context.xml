@@ -550,8 +550,7 @@
         <property name="shutdownTimeout" value="${crafter.engine.site.context.shutdownTimeout}"/>
         <property name="publishingTargetResolver" ref="crafter.publishingTargetResolver"/>
         <property name="enableScriptSandbox" value="${crafter.engine.groovy.sandbox.enable}"/>
-        <property name="globalSandboxBlacklist" value="${crafter.engine.groovy.sandbox.blacklist.global}"/>
-        <property name="siteSandboxBlacklist" value="${crafter.engine.groovy.sandbox.blacklist.site}"/>
+        <property name="sandboxBlacklist" value="${crafter.engine.groovy.sandbox.blacklist}"/>
     </bean>
 
     <bean id="crafter.fallbackSiteContextFactory" class="org.craftercms.engine.service.context.SiteContextFactory">
@@ -583,8 +582,7 @@
         <property name="configurationReader" ref="crafter.configurationReader"/>
         <property name="publishingTargetResolver" ref="crafter.publishingTargetResolver"/>
         <property name="enableScriptSandbox" value="${crafter.engine.groovy.sandbox.enable}"/>
-        <property name="globalSandboxBlacklist" value="${crafter.engine.groovy.sandbox.blacklist.global}"/>
-        <property name="siteSandboxBlacklist" value="${crafter.engine.groovy.sandbox.blacklist.site}"/>
+        <property name="sandboxBlacklist" value="${crafter.engine.groovy.sandbox.blacklist}"/>
     </bean>
 
     <!-- ////////////////////////////////// -->

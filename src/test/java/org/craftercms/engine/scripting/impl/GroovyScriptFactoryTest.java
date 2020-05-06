@@ -131,7 +131,8 @@ public class GroovyScriptFactoryTest {
     private ScriptFactory createScriptFactory(GroovyClassLoader parentClassLoader, Map<String, Object> globalVars) {
         ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(SiteContext.getCurrent());
 
-        return new GroovyScriptFactory(SiteContext.getCurrent(), resourceConnector, parentClassLoader, globalVars);
+        return new GroovyScriptFactory(SiteContext.getCurrent(), resourceConnector, parentClassLoader,
+                globalVars, true);
     }
 
     private void setCurrentSiteContext(SiteContext siteContext) {
