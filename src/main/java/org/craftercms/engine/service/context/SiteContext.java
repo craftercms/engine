@@ -31,7 +31,7 @@ import org.craftercms.engine.exception.GraphQLBuildException;
 import org.craftercms.engine.exception.SiteContextInitializationException;
 import org.craftercms.engine.graphql.GraphQLFactory;
 import org.craftercms.engine.scripting.ScriptFactory;
-import org.craftercms.engine.scripting.impl.ScriptSandbox;
+import org.craftercms.engine.scripting.impl.sandbox.ScriptSandbox;
 import org.craftercms.engine.util.GroovyScriptUtils;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;

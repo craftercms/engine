@@ -89,8 +89,7 @@
         <property name="defaultPublicBeans" value="${crafter.engine.defaultPublicBeans}"/>
         <property name="publishingTargetResolver" ref="crafter.publishingTargetResolver"/>
         <property name="enableScriptSandbox" value="${crafter.engine.groovy.sandbox.enable}"/>
-        <property name="globalSandboxBlacklist" value="${crafter.engine.groovy.sandbox.blacklist.global}"/>
-        <property name="siteSandboxBlacklist" value="${crafter.engine.groovy.sandbox.blacklist.site}"/>
+        <property name="sandboxBlacklist" value="${crafter.engine.groovy.sandbox.blacklist}"/>
     </bean>
 
     <!-- ////////////////////////////////// -->

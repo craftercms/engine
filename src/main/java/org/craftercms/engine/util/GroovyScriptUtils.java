@@ -121,9 +121,11 @@ public class GroovyScriptUtils {
         addSiteConfigVariable(variables);
     }
 
-    public static CompilerConfiguration getCompilerConfiguration() {
+    public static CompilerConfiguration getCompilerConfiguration(boolean enableScriptSandbox) {
         CompilerConfiguration config = new CompilerConfiguration();
-        config.addCompilationCustomizers(new SandboxTransformer());
+        if (enableScriptSandbox) {
+            config.addCompilationCustomizers(new SandboxTransformer());
+        }
         return config;
     }
 

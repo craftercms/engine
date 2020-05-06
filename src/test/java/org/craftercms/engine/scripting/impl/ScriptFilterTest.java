@@ -148,7 +148,7 @@ public class ScriptFilterTest {
     private ScriptFactory createScriptFactory(SiteContext siteContext) {
         ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(siteContext);
 
-        return new GroovyScriptFactory(siteContext, resourceConnector, Collections.emptyMap());
+        return new GroovyScriptFactory(siteContext, resourceConnector, Collections.emptyMap(), false);
     }
 
     private void setCurrentRequestContext(HttpServletRequest request, HttpServletResponse response) {
