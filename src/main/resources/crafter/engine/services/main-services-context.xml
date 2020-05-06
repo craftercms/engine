@@ -395,8 +395,7 @@
         <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
         <property name="defaultPublicBeans" value="${crafter.engine.defaultPublicBeans}"/>
         <property name="enableScriptSandbox" value="${crafter.engine.groovy.sandbox.enable}"/>
-        <property name="globalSandboxBlacklist" value="${crafter.engine.groovy.sandbox.blacklist.global}"/>
-        <property name="siteSandboxBlacklist" value="${crafter.engine.groovy.sandbox.blacklist.site}"/>
+        <property name="sandboxBlacklist" value="${crafter.engine.groovy.sandbox.blacklist}"/>
     </bean>
 
     <bean id="crafter.fallbackSiteContextFactory" class="org.craftercms.engine.service.context.SiteContextFactory">
@@ -421,8 +420,7 @@
         <property name="jobResolvers" ref="crafter.scriptJobResolvers"/>
         <property name="textEncryptor" ref="crafter.textEncryptor"/>
         <property name="enableScriptSandbox" value="${crafter.engine.groovy.sandbox.enable}"/>
-        <property name="globalSandboxBlacklist" value="${crafter.engine.groovy.sandbox.blacklist.global}"/>
-        <property name="siteSandboxBlacklist" value="${crafter.engine.groovy.sandbox.blacklist.site}"/>
+        <property name="sandboxBlacklist" value="${crafter.engine.groovy.sandbox.blacklist}"/>
     </bean>
 
     <!-- ////////////////////////////////// -->

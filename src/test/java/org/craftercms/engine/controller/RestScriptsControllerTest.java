@@ -154,7 +154,7 @@ public class RestScriptsControllerTest {
 
         ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(siteContext);
         ScriptFactory scriptFactory = new GroovyScriptFactory(resourceConnector,
-                                                              Collections.<String, Object>emptyMap());
+                                                              Collections.<String, Object>emptyMap(), false);
 
         when(siteContext.getSiteName()).thenReturn("test");
         when(siteContext.getContext()).thenReturn(mock(Context.class));

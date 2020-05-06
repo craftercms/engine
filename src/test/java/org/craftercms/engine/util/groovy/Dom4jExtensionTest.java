@@ -89,7 +89,7 @@ public class Dom4jExtensionTest {
     private ScriptFactory createScriptFactory(SiteContext siteContext, Map<String, Object> globalVars) {
         ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(siteContext);
 
-        return new GroovyScriptFactory(resourceConnector, globalVars);
+        return new GroovyScriptFactory(resourceConnector, globalVars, false);
     }
 
 }

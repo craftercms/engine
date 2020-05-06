@@ -40,16 +40,17 @@ public class GroovyScriptFactory implements ScriptFactory {
     protected GroovyScriptEngine scriptEngine;
     protected Map<String, Object> globalVariables;
 
-    public GroovyScriptFactory(ResourceConnector resourceConnector, Map<String, Object> globalVariables) {
+    public GroovyScriptFactory(ResourceConnector resourceConnector, Map<String, Object> globalVariables,
+                               boolean enableScriptSandbox) {
         this.scriptEngine = new GroovyScriptEngine(resourceConnector);
-        this.scriptEngine.setConfig(getCompilerConfiguration());
+        this.scriptEngine.setConfig(getCompilerConfiguration(enableScriptSandbox));
         this.globalVariables = globalVariables;
     }
 
     public GroovyScriptFactory(ResourceConnector resourceConnector, ClassLoader parentClassLoader,
-                               Map<String, Object> globalVariables) {
+                               Map<String, Object> globalVariables, boolean enableScriptSandbox) {
         this.scriptEngine = new GroovyScriptEngine(resourceConnector, parentClassLoader);
-        this.scriptEngine.setConfig(getCompilerConfiguration());
+        this.scriptEngine.setConfig(getCompilerConfiguration(enableScriptSandbox));
         this.globalVariables = globalVariables;
     }
 
