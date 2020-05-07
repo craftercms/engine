@@ -19,8 +19,6 @@ package org.craftercms.engine.scripting.impl;
 import groovy.util.GroovyScriptEngine;
 import groovy.util.ResourceConnector;
 import groovy.util.ResourceException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.craftercms.engine.exception.ScriptException;
 import org.craftercms.engine.exception.ScriptNotFoundException;
 import org.craftercms.engine.scripting.Script;
@@ -29,6 +27,8 @@ import org.craftercms.engine.service.context.SiteContext;
 
 import java.io.FileNotFoundException;
 import java.util.Map;
+
+import static org.craftercms.engine.util.GroovyScriptUtils.getCompilerConfiguration;
 
 /**
  * {@link org.craftercms.engine.scripting.ScriptFactory} used specifically for Groovy. Very useful when scripts
@@ -47,16 +47,19 @@ public class GroovyScriptFactory implements ScriptFactory {
     protected Map<String, Object> globalVariables;
 
     public GroovyScriptFactory(SiteContext siteContext, ResourceConnector resourceConnector,
-                               Map<String, Object> globalVariables) {
+                               Map<String, Object> globalVariables, boolean enableScriptSandbox) {
         this.siteContext = siteContext;
         this.scriptEngine = new GroovyScriptEngine(resourceConnector);
+        this.scriptEngine.setConfig(getCompilerConfiguration(enableScriptSandbox));
         this.globalVariables = globalVariables;
     }
 
     public GroovyScriptFactory(SiteContext siteContext, ResourceConnector resourceConnector,
-                               ClassLoader parentClassLoader, Map<String, Object> globalVariables) {
+                               ClassLoader parentClassLoader, Map<String, Object> globalVariables,
+                               boolean enableScriptSandbox) {
         this.siteContext = siteContext;
         this.scriptEngine = new GroovyScriptEngine(resourceConnector, parentClassLoader);
+        this.scriptEngine.setConfig(getCompilerConfiguration(enableScriptSandbox));
         this.globalVariables = globalVariables;
     }
 

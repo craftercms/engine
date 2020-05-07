@@ -549,6 +549,8 @@
         <property name="defaultPublicBeans" value="${crafter.engine.defaultPublicBeans}"/>
         <property name="shutdownTimeout" value="${crafter.engine.site.context.shutdownTimeout}"/>
         <property name="publishingTargetResolver" ref="crafter.publishingTargetResolver"/>
+        <property name="enableScriptSandbox" value="${crafter.engine.groovy.sandbox.enable}"/>
+        <property name="sandboxBlacklist" value="${crafter.engine.groovy.sandbox.blacklist}"/>
     </bean>
 
     <bean id="crafter.fallbackSiteContextFactory" class="org.craftercms.engine.service.context.SiteContextFactory">
@@ -579,6 +581,8 @@
         <property name="initTimeout" value="${crafter.engine.site.context.initTimeout}"/>
         <property name="configurationReader" ref="crafter.configurationReader"/>
         <property name="publishingTargetResolver" ref="crafter.publishingTargetResolver"/>
+        <property name="enableScriptSandbox" value="${crafter.engine.groovy.sandbox.enable}"/>
+        <property name="sandboxBlacklist" value="${crafter.engine.groovy.sandbox.blacklist}"/>
     </bean>
 
     <!-- ////////////////////////////////// -->

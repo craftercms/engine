@@ -22,12 +22,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.configuration2.Configuration;
+import org.codehaus.groovy.control.CompilerConfiguration;
 import org.craftercms.commons.http.HttpUtils;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.scripting.impl.GroovyScript;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.spring.ApplicationContextAccessor;
 import org.craftercms.engine.util.spring.security.profile.ProfileUser;
+import org.kohsuke.groovy.sandbox.SandboxTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -117,6 +119,14 @@ public class GroovyScriptUtils {
 
         addSiteContextVariable(variables);
         addSiteConfigVariable(variables);
+    }
+
+    public static CompilerConfiguration getCompilerConfiguration(boolean enableScriptSandbox) {
+        CompilerConfiguration config = new CompilerConfiguration();
+        if (enableScriptSandbox) {
+            config.addCompilationCustomizers(new SandboxTransformer());
+        }
+        return config;
     }
 
     private static void addCommonVariables(Map<String, Object> variables, HttpServletRequest request,
