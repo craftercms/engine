@@ -38,12 +38,12 @@ public class RestrictedApplicationContext extends GenericApplicationContext {
     }
 
     protected boolean isAllowed(String name) {
-        return RegexUtils.matchesAny(name, defaultPublicBeans);
+        return containsBeanDefinition(name) || RegexUtils.matchesAny(name, defaultPublicBeans);
     }
 
     @Override
     public Object getBean(String name) throws BeansException {
-        if (containsBeanDefinition(name) || isAllowed(name)) {
+        if (isAllowed(name)) {
             return super.getBean(name);
         }
         return null;
