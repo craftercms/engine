@@ -156,7 +156,8 @@ public class RestScriptsControllerTest {
         CacheTemplate cacheTemplate = CacheTemplateMockUtils.createCacheTemplate();
 
         ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(siteContext);
-        ScriptFactory scriptFactory = new GroovyScriptFactory(siteContext, resourceConnector, Collections.emptyMap());
+        ScriptFactory scriptFactory =
+                new GroovyScriptFactory(siteContext, resourceConnector, Collections.emptyMap(), false);
 
         when(siteContext.getSiteName()).thenReturn("test");
         when(siteContext.getContext()).thenReturn(mock(Context.class));
