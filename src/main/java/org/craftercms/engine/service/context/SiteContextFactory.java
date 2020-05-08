@@ -45,6 +45,7 @@ import org.craftercms.engine.scripting.ScriptJobResolver;
 import org.craftercms.engine.scripting.impl.GroovyScriptFactory;
 import org.craftercms.engine.service.PreviewOverlayCallback;
 import org.craftercms.engine.util.GroovyScriptUtils;
+import org.craftercms.engine.scripting.impl.sandbox.ScriptSandbox;
 import org.craftercms.engine.util.SchedulingUtils;
 import org.craftercms.engine.util.config.impl.MultiResourceConfigurationBuilder;
 import org.craftercms.engine.util.groovy.ContentStoreGroovyResourceLoader;
@@ -66,6 +67,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
+
+import static org.craftercms.engine.util.GroovyScriptUtils.getCompilerConfiguration;
 
 /**
  * Factory for creating {@link SiteContext} with common properties. It also uses the {@link MacroResolver} to resolve
@@ -110,6 +113,8 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected TextEncryptor textEncryptor;
     protected boolean disableVariableRestrictions;
     protected List<String> defaultPublicBeans;
+    protected boolean enableScriptSandbox;
+    protected String sandboxBlacklist;
 
     public SiteContextFactory() {
         siteNameMacroName = DEFAULT_SITE_NAME_MACRO_NAME;
@@ -257,6 +262,14 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         this.defaultPublicBeans = defaultPublicBeans;
     }
 
+    public void setEnableScriptSandbox(boolean enableScriptSandbox) {
+        this.enableScriptSandbox = enableScriptSandbox;
+    }
+
+    public void setSandboxBlacklist(String sandboxBlacklist) {
+        this.sandboxBlacklist = sandboxBlacklist;
+    }
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.globalApplicationContext = applicationContext;
@@ -294,6 +307,8 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
 
             ResourceLoader resourceLoader = new ContentStoreResourceLoader(siteContext);
             HierarchicalConfiguration<?> config = getConfig(siteContext, resolvedConfigPaths, resourceLoader);
+
+            configureScriptSandbox(siteContext, resourceLoader);
             URLClassLoader classLoader = getClassLoader(siteContext);
             ScriptFactory scriptFactory = getScriptFactory(siteContext, classLoader);
             ConfigurableApplicationContext appContext = getApplicationContext(siteContext, classLoader, config,
@@ -350,11 +365,19 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         }
     }
 
+    protected void configureScriptSandbox(SiteContext siteContext, ResourceLoader resourceLoader) {
+        if (enableScriptSandbox) {
+            Resource sandboxBlacklist = resourceLoader.getResource(this.sandboxBlacklist);
+            siteContext.scriptSandbox = new ScriptSandbox(sandboxBlacklist);
+        }
+    }
+
     protected URLClassLoader getClassLoader(SiteContext siteContext) {
         ContentStoreGroovyResourceLoader resourceLoader = new ContentStoreGroovyResourceLoader(siteContext,
                                                                                                groovyClassesPath);
 
-        GroovyClassLoader classLoader = new GroovyClassLoader(getClass().getClassLoader());
+        GroovyClassLoader classLoader =
+                new GroovyClassLoader(getClass().getClassLoader(), getCompilerConfiguration(enableScriptSandbox));
         classLoader.setResourceLoader(resourceLoader);
 
         return classLoader;
@@ -418,7 +441,8 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     }
 
     protected ScriptFactory getScriptFactory(SiteContext siteContext, URLClassLoader classLoader) {
-        return new GroovyScriptFactory(new ContentStoreResourceConnector(siteContext), classLoader, groovyGlobalVars);
+        return new GroovyScriptFactory(new ContentStoreResourceConnector(siteContext), classLoader,
+                groovyGlobalVars, enableScriptSandbox);
     }
 
     protected Scheduler scheduleJobs(SiteContext siteContext) {

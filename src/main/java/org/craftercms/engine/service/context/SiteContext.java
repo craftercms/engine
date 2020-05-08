@@ -26,6 +26,7 @@ import org.craftercms.core.service.Context;
 import org.craftercms.core.url.UrlTransformationEngine;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.PreviewOverlayCallback;
+import org.craftercms.engine.scripting.impl.sandbox.ScriptSandbox;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.slf4j.MDC;
@@ -65,6 +66,8 @@ public class SiteContext {
     protected URLClassLoader classLoader;
     protected Scheduler scheduler;
 
+    protected ScriptSandbox scriptSandbox;
+
     /**
      * Returns the context for the current thread.
      */
@@ -76,6 +79,9 @@ public class SiteContext {
      * Sets the context for the current thread.
      */
     public static void setCurrent(SiteContext current) {
+        if (current.scriptSandbox != null) {
+            current.scriptSandbox.register();
+        }
         threadLocal.set(current);
 
         MDC.put(SITE_NAME_MDC_KEY, current.getSiteName());
@@ -86,6 +92,12 @@ public class SiteContext {
      */
     public static void clear() {
         MDC.remove(SITE_NAME_MDC_KEY);
+
+        SiteContext current = threadLocal.get();
+
+        if (current.scriptSandbox != null) {
+            current.scriptSandbox.unregister();
+        }
 
         threadLocal.remove();
     }

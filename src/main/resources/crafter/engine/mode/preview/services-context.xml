@@ -80,6 +80,8 @@
         <property name="textEncryptor" ref="crafter.textEncryptor"/>
         <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
         <property name="defaultPublicBeans" value="${crafter.engine.defaultPublicBeans}"/>
+        <property name="enableScriptSandbox" value="${crafter.engine.groovy.sandbox.enable}"/>
+        <property name="sandboxBlacklist" value="${crafter.engine.groovy.sandbox.blacklist}"/>
     </bean>
 
     <!-- ////////////////////////////////// -->
