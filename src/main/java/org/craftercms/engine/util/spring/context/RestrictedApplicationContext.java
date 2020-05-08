@@ -15,17 +15,12 @@
  */
 package org.craftercms.engine.util.spring.context;
 
-import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.craftercms.commons.lang.RegexUtils;
-import org.craftercms.engine.service.context.SiteContext;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 
-import java.util.LinkedList;
 import java.util.List;
-
-import static java.util.Collections.emptyList;
 
 /**
  * Extension of {@link GenericApplicationContext} that only allows access to beans in the site config whitelist
@@ -35,8 +30,6 @@ import static java.util.Collections.emptyList;
  */
 public class RestrictedApplicationContext extends GenericApplicationContext {
 
-    public static final String CONFIG_KEY_BEAN_PATTERNS = "publicBeans.bean";
-
     protected List<String> defaultPublicBeans;
 
     public RestrictedApplicationContext(ApplicationContext parent, List<String> defaultPublicBeans) {
@@ -45,19 +38,7 @@ public class RestrictedApplicationContext extends GenericApplicationContext {
     }
 
     protected boolean isAllowed(String name) {
-        // allow access to everything during site initialization, needed because SiteContext is not available and it
-        // affects beans being injected
-        SiteContext siteContext = SiteContext.getCurrent();
-        if (siteContext == null) {
-            return true;
-        }
-
-        HierarchicalConfiguration<?> siteConfig = siteContext.getConfig();
-        List<String> beanPatterns = new LinkedList<>(defaultPublicBeans);
-        if (siteConfig != null) {
-            beanPatterns.addAll(siteConfig.getList(String.class, CONFIG_KEY_BEAN_PATTERNS, emptyList()));
-        }
-        return RegexUtils.matchesAny(name, beanPatterns);
+        return containsBeanDefinition(name) || RegexUtils.matchesAny(name, defaultPublicBeans);
     }
 
     @Override
