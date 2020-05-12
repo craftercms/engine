@@ -31,8 +31,8 @@ import org.craftercms.engine.exception.GraphQLBuildException;
 import org.craftercms.engine.exception.SiteContextInitializationException;
 import org.craftercms.engine.graphql.GraphQLFactory;
 import org.craftercms.engine.scripting.ScriptFactory;
-import org.craftercms.engine.scripting.impl.sandbox.ScriptSandbox;
 import org.craftercms.engine.util.GroovyScriptUtils;
+import org.jenkinsci.plugins.scriptsecurity.sandbox.groovy.SandboxInterceptor;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
@@ -109,7 +109,7 @@ public class SiteContext {
     private final Lock accessLock = readWriteLock.readLock();
     private final Lock shutdownLock = readWriteLock.writeLock();
 
-    protected ScriptSandbox scriptSandbox;
+    protected SandboxInterceptor scriptSandbox;
 
     /**
      * Returns the context for the current thread.
