@@ -47,7 +47,7 @@
         <log4j.version>1.2.17</log4j.version>
         <cglib.version>3.1</cglib.version>
         <groovy.version>2.4.10</groovy.version> <!-- When this version changes the policy file needs to be updated -->
-        <groovy.sandbox.version>1.25</groovy.sandbox.version>
+        <script.security.version>1.72.2</script.security.version>
         <gmongo.version>1.5</gmongo.version>
         <junit.version>4.12</junit.version>
         <mockito.version>1.9.5</mockito.version>
@@ -88,11 +88,6 @@
                 <updatePolicy>always</updatePolicy>
                 <checksumPolicy>warn</checksumPolicy>
             </releases>
-        </repository>
-        <repository>
-            <id>jenkins-releases</id>
-            <name>Jenkins Releases</name>
-            <url>https://repo.jenkins-ci.org/releases/</url>
         </repository>
     </repositories>
 
@@ -184,9 +179,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.kohsuke</groupId>
-            <artifactId>groovy-sandbox</artifactId>
-            <version>${groovy.sandbox.version}</version>
+            <groupId>org.craftercms</groupId>
+            <artifactId>script-security</artifactId>
+            <version>${script.security.version}</version>
         </dependency>
 
         <dependency>
