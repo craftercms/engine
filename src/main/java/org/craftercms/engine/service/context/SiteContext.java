@@ -26,7 +26,7 @@ import org.craftercms.core.service.Context;
 import org.craftercms.core.url.UrlTransformationEngine;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.PreviewOverlayCallback;
-import org.craftercms.engine.scripting.impl.sandbox.ScriptSandbox;
+import org.jenkinsci.plugins.scriptsecurity.sandbox.groovy.SandboxInterceptor;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.slf4j.MDC;
@@ -66,7 +66,7 @@ public class SiteContext {
     protected URLClassLoader classLoader;
     protected Scheduler scheduler;
 
-    protected ScriptSandbox scriptSandbox;
+    protected SandboxInterceptor scriptSandbox;
 
     /**
      * Returns the context for the current thread.
