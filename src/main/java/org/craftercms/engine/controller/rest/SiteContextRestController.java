@@ -79,9 +79,9 @@ public class SiteContextRestController extends RestControllerBase {
 
         String siteName = SiteContext.getCurrent().getSiteName();
 
-        contextManager.destroyContext(siteName);
+        contextManager.startDestroyContext(siteName);
 
-        return createResponseMessage("Site context for '" + siteName + "' destroyed. Will be recreated on next " +
+        return createResponseMessage("Started destroy site context  for '" + siteName + "'. Will be recreated on next " +
                 "request");
     }
 
