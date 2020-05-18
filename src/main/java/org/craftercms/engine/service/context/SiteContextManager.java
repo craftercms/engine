@@ -29,7 +29,6 @@ import javax.annotation.PreDestroy;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.WeakHashMap;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
@@ -280,28 +279,39 @@ public class SiteContextManager {
     }
 
     /**
+     * Starts a destroy context in the background
+     *
+     * @param siteName the site name of the context
+     */
+    public void startDestroyContext(String siteName) {
+        jobThreadPoolExecutor.execute(() -> destroyContext(siteName));
+    }
+
+    /**
      * Destroys the context for the specified site name
      *
      * @param siteName the site name of the context to destroy
      */
-    public void destroyContext(String siteName) {
+    protected void destroyContext(String siteName) {
+        SiteContext siteContext;
         Lock lock = siteLockFactory.getLock(siteName);
         lock.lock();
         try {
-            SiteContext siteContext = contextRegistry.remove(siteName);
-            if (siteContext != null) {
-                logger.info("==================================================");
-                logger.info("<Destroying site context: " + siteName + ">");
-                logger.info("==================================================");
-
-                destroyContext(siteContext);
-
-                logger.info("==================================================");
-                logger.info("</Destroying site context: " + siteName + ">");
-                logger.info("==================================================");
-            }
+            siteContext = contextRegistry.remove(siteName);
         } finally {
             lock.unlock();
+        }
+
+        if (siteContext != null) {
+            logger.info("==================================================");
+            logger.info("<Destroying site context: " + siteName + ">");
+            logger.info("==================================================");
+
+            destroyContext(siteContext);
+
+            logger.info("==================================================");
+            logger.info("</Destroying site context: " + siteName + ">");
+            logger.info("==================================================");
         }
     }
 
