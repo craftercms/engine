@@ -126,7 +126,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected long initTimeout;
     protected EncryptionAwareConfigurationReader configurationReader;
     protected boolean disableVariableRestrictions;
-    protected List<String> defaultPublicBeans;
+    protected String[] defaultPublicBeans;
     protected long shutdownTimeout;
     protected PublishingTargetResolver publishingTargetResolver;
     protected String publishingTargetMacroName;
@@ -140,7 +140,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         maxAllowedItemsInCache = Context.DEFAULT_MAX_ALLOWED_ITEMS_IN_CACHE;
         ignoreHiddenFiles = Context.DEFAULT_IGNORE_HIDDEN_FILES;
         initTimeout = DEFAULT_INIT_TIMEOUT;
-        defaultPublicBeans = Collections.emptyList();
+        defaultPublicBeans = new String[0];
         shutdownTimeout = DEFAULT_SHUTDOWN_TIMEOUT;
         publishingTargetMacroName = DEFAULT_PUBLISHING_TARGET_MACRO_NAME;
     }
@@ -298,7 +298,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         this.disableVariableRestrictions = disableVariableRestrictions;
     }
 
-    public void setDefaultPublicBeans(List<String> defaultPublicBeans) {
+    public void setDefaultPublicBeans(String[] defaultPublicBeans) {
         this.defaultPublicBeans = defaultPublicBeans;
     }
 
