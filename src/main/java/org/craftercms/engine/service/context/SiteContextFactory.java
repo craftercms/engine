@@ -118,7 +118,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected List<ScriptJobResolver> jobResolvers;
     protected TextEncryptor textEncryptor;
     protected boolean disableVariableRestrictions;
-    protected List<String> defaultPublicBeans;
+    protected String[] defaultPublicBeans;
     protected boolean enableScriptSandbox;
     protected String sandboxBlacklist;
 
@@ -132,7 +132,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         cacheOn = Context.DEFAULT_CACHE_ON;
         maxAllowedItemsInCache = Context.DEFAULT_MAX_ALLOWED_ITEMS_IN_CACHE;
         ignoreHiddenFiles = Context.DEFAULT_IGNORE_HIDDEN_FILES;
-        defaultPublicBeans = Collections.emptyList();
+        defaultPublicBeans = new String[0];
     }
 
     @Override
@@ -264,7 +264,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         this.disableVariableRestrictions = disableVariableRestrictions;
     }
 
-    public void setDefaultPublicBeans(List<String> defaultPublicBeans) {
+    public void setDefaultPublicBeans(String[] defaultPublicBeans) {
         this.defaultPublicBeans = defaultPublicBeans;
     }
 

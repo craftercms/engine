@@ -30,9 +30,9 @@ import java.util.List;
  */
 public class RestrictedApplicationContext extends GenericApplicationContext {
 
-    protected List<String> defaultPublicBeans;
+    protected String[] defaultPublicBeans;
 
-    public RestrictedApplicationContext(ApplicationContext parent, List<String> defaultPublicBeans) {
+    public RestrictedApplicationContext(ApplicationContext parent, String[] defaultPublicBeans) {
         super(parent);
         this.defaultPublicBeans = defaultPublicBeans;
     }
