@@ -518,7 +518,7 @@ public abstract class SchemaUtils {
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name(FIELD_NAME_COMPONENT)
             .description("The content of the item")
-            .type(nonNull(CONTENT_ITEM_INTERFACE_TYPE)))
+            .type(CONTENT_ITEM_INTERFACE_TYPE))
         .build();
 
     public static final GraphQLObjectType CONTENT_INCLUDE_WRAPPER_TYPE = GraphQLObjectType.newObject()
@@ -530,6 +530,7 @@ public abstract class SchemaUtils {
             .type(list(CONTENT_INCLUDE_TYPE)))
         .build();
 
+    @SuppressWarnings("rawtypes")
     public static final TypeResolver CONTENT_TYPE_BASED_TYPE_RESOLVER = env -> {
         Object item = env.getObject();
         if (item instanceof Map) {
