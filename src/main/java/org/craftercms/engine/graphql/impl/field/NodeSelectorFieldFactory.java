@@ -117,7 +117,7 @@ public class NodeSelectorFieldFactory implements GraphQLFieldFactory {
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name(FIELD_NAME_COMPONENT)
                     .description("The content of the item")
-                    .type(nonNull(GraphQLTypeReference.typeRef(itemGraphQLType))))
+                    .type(GraphQLTypeReference.typeRef(itemGraphQLType)))
                 .build();
 
             GraphQLObjectType wrapperType = GraphQLObjectType.newObject()
