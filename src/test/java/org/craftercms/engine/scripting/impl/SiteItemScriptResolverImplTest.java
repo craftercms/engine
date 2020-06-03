@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2007-2019 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2020 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 3 as published by
+ * the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -35,10 +34,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * @author Alfonso Vásquez
@@ -125,7 +121,7 @@ public class SiteItemScriptResolverImplTest {
     }
 
     private SiteContext createSiteContext()  {
-        SiteContext siteContext = mock(SiteContext.class);
+        SiteContext siteContext = spy(new SiteContext());
         when(siteContext.getSiteName()).thenReturn("test");
         when(siteContext.getContext()).thenReturn(mock(Context.class));
 

@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2007-2019 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2020 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 3 as published by
+ * the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,6 +19,7 @@ package org.craftercms.engine.util.concurrent;
 import java.util.concurrent.Executor;
 
 import org.craftercms.engine.service.context.SiteContext;
+import org.springframework.security.concurrent.DelegatingSecurityContextRunnable;
 
 /**
  * Utility class that wraps a {@link Executor} object to support {@link SiteContext} in reusable threads
@@ -46,7 +46,7 @@ public class SiteAwareThreadPoolExecutor implements Executor {
 
     @Override
     public void execute(final Runnable command) {
-        wrappedExecutor.execute(new SiteAwareRunnable(siteContext, command));
+        wrappedExecutor.execute(new DelegatingSecurityContextRunnable(new SiteAwareRunnable(siteContext, command)));
     }
 
 }

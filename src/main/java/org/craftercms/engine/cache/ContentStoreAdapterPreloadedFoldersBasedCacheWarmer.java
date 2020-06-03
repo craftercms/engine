@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2007-2019 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2020 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 3 as published by
+ * the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -17,11 +16,13 @@
 package org.craftercms.engine.cache;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.service.Item;
 import org.craftercms.core.util.ContentStoreUtils;
+import org.craftercms.engine.properties.SiteProperties;
 import org.craftercms.engine.util.CacheUtils;
 import org.craftercms.engine.util.store.decorators.DecoratedStoreAdapterContext;
 import org.slf4j.Logger;
@@ -84,11 +85,11 @@ public class ContentStoreAdapterPreloadedFoldersBasedCacheWarmer implements Cont
             throw new IllegalStateException("PreloadedFoldersAwareContext expected but not found");
         }
 
-        for (Map.Entry<String, Integer> entry : contentPreloadFolders.entrySet()) {
+        for (Map.Entry<String, Integer> entry : getContentPreloadFolders().entrySet()) {
             preloadFolder(contextWrapper, entry.getKey(), entry.getValue(), true, preloadedFolders);
         }
 
-        for (Map.Entry<String, Integer> entry : descriptorPreloadFolders.entrySet()) {
+        for (Map.Entry<String, Integer> entry : getDescriptorPreloadFolders().entrySet()) {
             preloadFolder(contextWrapper, entry.getKey(), entry.getValue(), false, preloadedFolders);
         }
 
@@ -170,6 +171,24 @@ public class ContentStoreAdapterPreloadedFoldersBasedCacheWarmer implements Cont
                     }
                 }
             }
+        }
+    }
+
+    protected Map<String, Integer> getDescriptorPreloadFolders() {
+        Map<String, Integer> preloadFolders = SiteProperties.getDescriptorPreloadFolders();
+        if (MapUtils.isNotEmpty(preloadFolders)) {
+            return preloadFolders;
+        } else {
+            return descriptorPreloadFolders;
+        }
+    }
+
+    protected Map<String, Integer> getContentPreloadFolders() {
+        Map<String, Integer> preloadFolders = SiteProperties.getContentPreloadFolders();
+        if (MapUtils.isNotEmpty(preloadFolders)) {
+            return preloadFolders;
+        } else {
+            return contentPreloadFolders;
         }
     }
 

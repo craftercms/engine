@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2007-2019 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2020 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 3 as published by
+ * the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -25,6 +24,7 @@ import groovy.lang.Binding;
 import groovy.util.GroovyScriptEngine;
 import groovy.util.ResourceException;
 import org.apache.commons.collections.MapUtils;
+import org.codehaus.groovy.runtime.InvokerHelper;
 import org.craftercms.core.util.cache.impl.AbstractCachingAwareObject;
 import org.craftercms.engine.exception.ScriptException;
 import org.craftercms.engine.exception.ScriptNotFoundException;
@@ -40,13 +40,13 @@ public class GroovyScript extends AbstractCachingAwareObject implements Script {
 
     private static final String SCRIPT_URL_MDC_KEY = "scriptUrl";
 
-    protected GroovyScriptEngine scriptEngine;
     protected String scriptUrl;
+    protected Class<?> scriptClass;
     protected Map<String, Object> globalVariables;
 
-    public GroovyScript(GroovyScriptEngine scriptEngine, String scriptUrl, Map<String, Object> globalVariables) {
-        this.scriptEngine = scriptEngine;
+    public GroovyScript(String scriptUrl, Class<?> scriptClass, Map<String, Object> globalVariables) {
         this.scriptUrl = scriptUrl;
+        this.scriptClass = scriptClass;
         this.globalVariables = globalVariables;
     }
 
@@ -69,14 +69,9 @@ public class GroovyScript extends AbstractCachingAwareObject implements Script {
         MDC.put(SCRIPT_URL_MDC_KEY, scriptUrl);
 
         try  {
-            return scriptEngine.run(scriptUrl, new Binding(allVariables));
+            return InvokerHelper.createScript(scriptClass, new Binding(allVariables)).run();
         } catch (Exception e) {
-            Throwable cause = e.getCause();
-            if (e instanceof ResourceException && cause instanceof FileNotFoundException) {
-                throw new ScriptNotFoundException(cause.getMessage(), cause);
-            } else {
-                throw new ScriptException(e.getMessage(), e);
-            }
+            throw new ScriptException(e.getMessage(), e);
         } finally {
             MDC.remove(SCRIPT_URL_MDC_KEY);
         }

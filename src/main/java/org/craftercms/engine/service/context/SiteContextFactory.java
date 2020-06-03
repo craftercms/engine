@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2007-2019 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2020 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 3 as published by
+ * the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,13 +18,11 @@ package org.craftercms.engine.service.context;
 import groovy.lang.GroovyClassLoader;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
-import org.apache.commons.configuration2.builder.ConfigurationBuilder;
-import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.craftercms.commons.config.MultiResourceConfigurationBuilder;
-import org.craftercms.commons.crypto.TextEncryptor;
-import org.craftercms.commons.crypto.impl.NoOpTextEncryptor;
+import org.craftercms.commons.config.ConfigurationException;
+import org.craftercms.commons.config.EncryptionAwareConfigurationReader;
+import org.craftercms.commons.config.PublishingTargetResolver;
 import org.craftercms.commons.spring.ApacheCommonsConfiguration2PropertySource;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
@@ -39,10 +36,15 @@ import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.scripting.ScriptJobResolver;
 import org.craftercms.engine.scripting.impl.GroovyScriptFactory;
 import org.craftercms.engine.util.SchedulingUtils;
+import org.craftercms.engine.util.config.SiteAwarePublishingTargetResolver;
 import org.craftercms.engine.util.groovy.ContentStoreGroovyResourceLoader;
 import org.craftercms.engine.util.groovy.ContentStoreResourceConnector;
+import org.craftercms.engine.util.groovy.Dom4jExtension;
 import org.craftercms.engine.util.quartz.JobContext;
 import org.craftercms.engine.util.spring.ContentStoreResourceLoader;
+import org.craftercms.engine.util.spring.context.RestrictedApplicationContext;
+import org.jenkinsci.plugins.scriptsecurity.sandbox.blacklists.Blacklist;
+import org.jenkinsci.plugins.scriptsecurity.sandbox.groovy.SandboxInterceptor;
 import org.quartz.Scheduler;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectFactory;
@@ -61,10 +63,17 @@ import org.tuckey.web.filters.urlrewrite.Conf;
 import org.tuckey.web.filters.urlrewrite.UrlRewriter;
 
 import javax.servlet.ServletContext;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URLClassLoader;
 import java.util.*;
 import java.util.concurrent.Executor;
+import java.util.stream.Stream;
+
+import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toList;
+import static org.craftercms.engine.util.GroovyScriptUtils.getCompilerConfiguration;
 
 /**
  * Factory for creating {@link SiteContext} with common properties. It also uses the {@link MacroResolver} to resolve
@@ -73,11 +82,14 @@ import java.util.concurrent.Executor;
  *
  * @author Alfonso Vásquez
  */
+@SuppressWarnings("rawtypes")
 public class SiteContextFactory implements ApplicationContextAware, ServletContextAware {
 
     public static final String DEFAULT_SITE_NAME_MACRO_NAME = "siteName";
     public static final long DEFAULT_INIT_TIMEOUT = 300000L;
     public static final String CONFIG_BEAN_NAME = "siteConfig";
+    public static final long DEFAULT_SHUTDOWN_TIMEOUT = 5;
+    public static final String DEFAULT_PUBLISHING_TARGET_MACRO_NAME = "publishingTarget";
 
     private static final Log logger = LogFactory.getLog(SiteContextFactory.class);
 
@@ -93,6 +105,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected String[] configPaths;
     protected String[] applicationContextPaths;
     protected String[] urlRewriteConfPaths;
+    protected String[] proxyConfigPaths;
     protected String groovyClassesPath;
     protected Map<String, Object> groovyGlobalVars;
     protected boolean mergingOn;
@@ -107,11 +120,18 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected ApplicationContext globalApplicationContext;
     protected List<ScriptJobResolver> jobResolvers;
     protected Executor jobThreadPoolExecutor;
-    protected TextEncryptor textEncryptor;
     protected GraphQLFactory graphQLFactory;
     protected boolean cacheWarmUpEnabled;
     protected SiteCacheWarmer cacheWarmer;
     protected long initTimeout;
+    protected boolean disableVariableRestrictions;
+    protected EncryptionAwareConfigurationReader configurationReader;
+    protected String[] defaultPublicBeans;
+    protected long shutdownTimeout;
+    protected PublishingTargetResolver publishingTargetResolver;
+    protected String publishingTargetMacroName;
+    protected boolean enableScriptSandbox;
+    protected String sandboxBlacklist;
 
     public SiteContextFactory() {
         siteNameMacroName = DEFAULT_SITE_NAME_MACRO_NAME;
@@ -120,6 +140,9 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         maxAllowedItemsInCache = Context.DEFAULT_MAX_ALLOWED_ITEMS_IN_CACHE;
         ignoreHiddenFiles = Context.DEFAULT_IGNORE_HIDDEN_FILES;
         initTimeout = DEFAULT_INIT_TIMEOUT;
+        defaultPublicBeans = new String[0];
+        shutdownTimeout = DEFAULT_SHUTDOWN_TIMEOUT;
+        publishingTargetMacroName = DEFAULT_PUBLISHING_TARGET_MACRO_NAME;
     }
 
     @Override
@@ -182,6 +205,11 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     }
 
     @Required
+    public void setProxyConfigPaths(String[] proxyConfigPaths) {
+        this.proxyConfigPaths = proxyConfigPaths;
+    }
+
+    @Required
     public void setGroovyClassesPath(String groovyClassesPath) {
         this.groovyClassesPath = groovyClassesPath;
     }
@@ -202,6 +230,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     public void setMaxAllowedItemsInCache(int maxAllowedItemsInCache) {
         this.maxAllowedItemsInCache = maxAllowedItemsInCache;
     }
+
 
     public void setIgnoreHiddenFiles(boolean ignoreHiddenFiles) {
         this.ignoreHiddenFiles = ignoreHiddenFiles;
@@ -243,11 +272,6 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     }
 
     @Required
-    public void setTextEncryptor(TextEncryptor textEncryptor) {
-        this.textEncryptor = textEncryptor;
-    }
-
-    @Required
     public void setGraphQLFactory(GraphQLFactory graphQLFactory) {
         this.graphQLFactory = graphQLFactory;
     }
@@ -266,13 +290,49 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         this.initTimeout = initTimeout;
     }
 
+    public void setDisableVariableRestrictions(boolean disableVariableRestrictions) {
+        this.disableVariableRestrictions = disableVariableRestrictions;
+    }
+
+    @Required
+    public void setConfigurationReader(EncryptionAwareConfigurationReader configurationReader) {
+        this.configurationReader = configurationReader;
+    }
+
+    public void setDefaultPublicBeans(String[] defaultPublicBeans) {
+        this.defaultPublicBeans = defaultPublicBeans;
+    }
+
+    public void setShutdownTimeout(long shutdownTimeout) {
+        this.shutdownTimeout = shutdownTimeout;
+    }
+
+    public void setPublishingTargetResolver(PublishingTargetResolver publishingTargetResolver) {
+        this.publishingTargetResolver = publishingTargetResolver;
+    }
+
+    public void setEnableScriptSandbox(boolean enableScriptSandbox) {
+        this.enableScriptSandbox = enableScriptSandbox;
+    }
+
+    public void setSandboxBlacklist(String sandboxBlacklist) {
+        this.sandboxBlacklist = sandboxBlacklist;
+    }
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.globalApplicationContext = applicationContext;
     }
 
     public SiteContext createContext(String siteName) {
-        Map<String, String> macroValues = Collections.singletonMap(siteNameMacroName, siteName);
+        Map<String, String> macroValues = new HashMap<>();
+        macroValues.put(siteNameMacroName, siteName);
+
+        if (publishingTargetResolver instanceof SiteAwarePublishingTargetResolver) {
+            String target = ((SiteAwarePublishingTargetResolver) publishingTargetResolver).getPublishingTarget(siteName);
+            macroValues.put(publishingTargetMacroName, target);
+        }
+
         String resolvedRootFolderPath = macroResolver.resolveMacros(rootFolderPath, macroValues);
 
         Context context = storeService.getContext(UUID.randomUUID().toString(), storeType, resolvedRootFolderPath,
@@ -293,7 +353,11 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             siteContext.setRestScriptsPath(restScriptsPath);
             siteContext.setControllerScriptsPath(controllerScriptsPath);
             siteContext.setGraphQLFactory(graphQLFactory);
-            siteContext.setServletContext(servletContext);
+            siteContext.setShutdownTimeout(shutdownTimeout);
+
+            if (disableVariableRestrictions) {
+                siteContext.setServletContext(servletContext);
+            }
 
             if (cacheWarmUpEnabled) {
                 siteContext.setCacheWarmer(cacheWarmer);
@@ -314,13 +378,20 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
                 resolvedUrlRewriteConfPaths[i] = macroResolver.resolveMacros(urlRewriteConfPaths[i], macroValues);
             }
 
+            List<String> resolvedProxyConfPaths = Stream.of(proxyConfigPaths)
+                    .map(path -> macroResolver.resolveMacros(path, macroValues))
+                    .collect(toList());
+
             ResourceLoader resourceLoader = new ContentStoreResourceLoader(siteContext);
             HierarchicalConfiguration<?> config = getConfig(siteContext, resolvedConfigPaths, resourceLoader);
+
+            configureScriptSandbox(siteContext, resourceLoader);
             URLClassLoader classLoader = getClassLoader(siteContext);
             ScriptFactory scriptFactory = getScriptFactory(siteContext, classLoader);
             ConfigurableApplicationContext appContext = getApplicationContext(siteContext, classLoader, config,
                                                                               resolvedAppContextPaths, resourceLoader);
             UrlRewriter urlRewriter = getUrlRewriter(siteContext, resolvedUrlRewriteConfPaths, resourceLoader);
+            HierarchicalConfiguration proxyConfig = getProxyConfig(siteContext, resolvedProxyConfPaths, resourceLoader);
 
             siteContext.setScriptFactory(scriptFactory);
             siteContext.setConfig(config);
@@ -328,6 +399,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             siteContext.setApplicationContext(appContext);
             siteContext.setClassLoader(classLoader);
             siteContext.setUrlRewriter(urlRewriter);
+            siteContext.setProxyConfig(proxyConfig);
 
             Scheduler scheduler = scheduleJobs(siteContext);
             siteContext.setScheduler(scheduler);
@@ -343,8 +415,6 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         }
     }
 
-
-
     protected HierarchicalConfiguration getConfig(SiteContext siteContext, String[] configPaths,
                                                   ResourceLoader resourceLoader) {
         String siteName = siteContext.getSiteName();
@@ -354,16 +424,13 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         logger.info("--------------------------------------------------");
 
         try {
-
-            ConfigurationBuilder<HierarchicalConfiguration<?>> builder;
-
-            if (textEncryptor instanceof NoOpTextEncryptor) {
-                builder = new MultiResourceConfigurationBuilder(configPaths, resourceLoader);
-            } else {
-                builder = new MultiResourceConfigurationBuilder(configPaths, resourceLoader, textEncryptor);
+            for (int i = configPaths.length - 1; i >= 0; i--) {
+                Resource config = resourceLoader.getResource(configPaths[i]);
+                if (config.exists()) {
+                    return configurationReader.readXmlConfiguration(config);
+                }
             }
-
-            return builder.getConfiguration();
+            return null;
         } catch (ConfigurationException e) {
             throw new SiteContextCreationException("Unable to load configuration for site '" + siteName + "'", e);
         } finally {
@@ -373,8 +440,22 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         }
     }
 
+    protected void configureScriptSandbox(SiteContext siteContext, ResourceLoader resourceLoader) {
+        if (enableScriptSandbox) {
+            Resource sandboxBlacklist = resourceLoader.getResource(this.sandboxBlacklist);
+            try(InputStream is = sandboxBlacklist.getInputStream()) {
+                Blacklist blacklist = new Blacklist(new InputStreamReader(is));
+                siteContext.scriptSandbox = new SandboxInterceptor(blacklist, singletonList(Dom4jExtension.class));
+            } catch (IOException e) {
+                throw new SiteContextCreationException("Unable to load sandbox blacklist for site '" +
+                        siteContext.getSiteName() + "'", e);
+            }
+        }
+    }
+
     protected URLClassLoader getClassLoader(SiteContext siteContext) {
-        GroovyClassLoader classLoader = new GroovyClassLoader(getClass().getClassLoader());
+        GroovyClassLoader classLoader =
+                new GroovyClassLoader(getClass().getClassLoader(), getCompilerConfiguration(enableScriptSandbox));
         ContentStoreGroovyResourceLoader resourceLoader = new ContentStoreGroovyResourceLoader(siteContext,
                                                                                                groovyClassesPath);
 
@@ -394,17 +475,22 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         logger.info("--------------------------------------------------");
 
         try {
-            List<Resource> resources = new ArrayList<>();
+            Resource appContextResource = null;
 
-            for (String path : applicationContextPaths) {
-                Resource resource = resourceLoader.getResource(path);
+            for (int i = applicationContextPaths.length - 1; i >= 0; i--) {
+                Resource resource = resourceLoader.getResource(applicationContextPaths[i]);
                 if (resource.exists()) {
-                    resources.add(resource);
+                    appContextResource = resource;
                 }
             }
 
-            if (CollectionUtils.isNotEmpty(resources)) {
-                GenericApplicationContext appContext = new GenericApplicationContext(globalApplicationContext);
+            if (appContextResource != null) {
+                GenericApplicationContext appContext;
+                if (disableVariableRestrictions) {
+                    appContext = new GenericApplicationContext(globalApplicationContext);
+                } else {
+                    appContext = new RestrictedApplicationContext(globalApplicationContext, defaultPublicBeans);
+                }
                 appContext.setClassLoader(classLoader);
 
                 if (config != null) {
@@ -416,9 +502,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
                 XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(appContext);
                 reader.setValidationMode(XmlBeanDefinitionReader.VALIDATION_XSD);
 
-                for (Resource resource : resources) {
-                    reader.loadBeanDefinitions(resource);
-                }
+                reader.loadBeanDefinitions(appContextResource);
 
                 appContext.refresh();
 
@@ -489,8 +573,35 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         }
     }
 
+    protected HierarchicalConfiguration getProxyConfig(SiteContext siteContext, List<String> configPaths,
+                                                       ResourceLoader resourceLoader) {
+        String siteName = siteContext.getSiteName();
+
+        logger.info("-------------------------------------------------------");
+        logger.info("<Loading proxy configuration for site: " + siteName + ">");
+        logger.info("-------------------------------------------------------");
+
+        try {
+            ListIterator<String> iterator = configPaths.listIterator(configPaths.size());
+            while(iterator.hasPrevious()) {
+                Resource resource = resourceLoader.getResource(iterator.previous());
+                if (resource.exists()) {
+                    return configurationReader.readXmlConfiguration(resource);
+                }
+            }
+            return null;
+        } catch (ConfigurationException e) {
+            throw new SiteContextCreationException("Unable to load proxy configuration for site '" + siteName + "'", e);
+        } finally {
+            logger.info("---------------------------------------------------------");
+            logger.info("</Loading proxy configuration for site: " + siteName + ">");
+            logger.info("---------------------------------------------------------");
+        }
+    }
+
     protected ScriptFactory getScriptFactory(SiteContext siteContext, URLClassLoader classLoader) {
-        return new GroovyScriptFactory(new ContentStoreResourceConnector(siteContext), classLoader, groovyGlobalVars);
+        return new GroovyScriptFactory(siteContext, new ContentStoreResourceConnector(siteContext), classLoader,
+                                       groovyGlobalVars, enableScriptSandbox);
     }
 
     protected Scheduler scheduleJobs(SiteContext siteContext) {

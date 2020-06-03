@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2007-2019 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2020 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 3 as published by
+ * the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,12 +22,13 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import groovy.lang.GroovyClassLoader;
-import groovy.util.GroovyScriptEngine;
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
+import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
+import org.craftercms.engine.test.utils.CacheTemplateMockUtils;
 import org.craftercms.engine.test.utils.ContentStoreServiceMockUtils;
 import org.craftercms.engine.util.groovy.ContentStoreGroovyResourceLoader;
 import org.craftercms.engine.util.groovy.ContentStoreResourceConnector;
@@ -41,8 +41,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * @author Alfonso Vásquez
@@ -86,10 +85,13 @@ public class GroovyScriptFactoryTest {
     }
 
     private SiteContext createSiteContext(ContentStoreService storeService) {
-        SiteContext siteContext = mock(SiteContext.class);
+        CacheTemplate cacheTemplate = CacheTemplateMockUtils.createCacheTemplate();
+
+        SiteContext siteContext = spy(new SiteContext());
         when(siteContext.getSiteName()).thenReturn("default");
         when(siteContext.getContext()).thenReturn(mock(Context.class));
         when(siteContext.getStoreService()).thenReturn(storeService);
+        when(siteContext.getCacheTemplate()).thenReturn(cacheTemplate);
 
         return siteContext;
     }
@@ -129,7 +131,8 @@ public class GroovyScriptFactoryTest {
     private ScriptFactory createScriptFactory(GroovyClassLoader parentClassLoader, Map<String, Object> globalVars) {
         ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(SiteContext.getCurrent());
 
-        return new GroovyScriptFactory(resourceConnector, parentClassLoader, globalVars);
+        return new GroovyScriptFactory(SiteContext.getCurrent(), resourceConnector, parentClassLoader,
+                globalVars, true);
     }
 
     private void setCurrentSiteContext(SiteContext siteContext) {

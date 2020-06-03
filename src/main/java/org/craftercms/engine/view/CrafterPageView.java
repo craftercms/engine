@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2007-2019 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2020 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 3 as published by
+ * the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,6 +15,13 @@
  */
 package org.craftercms.engine.view;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -26,7 +32,6 @@ import org.craftercms.engine.exception.HttpStatusCodeAwareException;
 import org.craftercms.engine.exception.RenderingException;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.scripting.Script;
-import org.craftercms.engine.util.GroovyScriptUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.http.MediaType;
@@ -34,12 +39,7 @@ import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.view.AbstractView;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import static org.craftercms.engine.util.GroovyScriptUtils.addSiteItemScriptVariables;
 
 /**
  * @author Alfonso Vásquez
@@ -67,6 +67,7 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
     protected String mimeTypeXPathQuery;
     protected List<Script> scripts;
     protected ViewResolver delegatedViewResolver;
+    protected boolean disableVariableRestrictions;
 
     public SiteItem getPage() {
         return page;
@@ -132,6 +133,10 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
         this.cachingTime = cachingTime;
     }
 
+    public void setDisableVariableRestrictions(boolean disableVariableRestrictions) {
+        this.disableVariableRestrictions = disableVariableRestrictions;
+    }
+
     @Override
     public String toString() {
         return "CrafterPageView[" +
@@ -194,7 +199,8 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
     protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response,
                                                         Map<String, Object> model) {
         Map<String, Object> variables = new HashMap<>();
-        GroovyScriptUtils.addSiteItemScriptVariables(variables, request, response, getServletContext(), page, model);
+        addSiteItemScriptVariables(variables, request, response, disableVariableRestrictions? getServletContext() : null,
+                page, model);
 
         return variables;
     }

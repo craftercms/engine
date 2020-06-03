@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2007-2019 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2020 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 3 as published by
+ * the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -144,7 +143,7 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
                                                     .withDelimiter(DELIMITER);
                 ListObjectsV2Result result = client.listObjectsV2(request);
                 if (!isResultEmpty(result)) {
-                    return new S3Prefix(StringUtils.appendIfMissing(key, DELIMITER));
+                    return new S3Prefix(key);
                 }
             } catch (AmazonS3Exception e) {
                 if(e.getStatusCode() == HttpStatus.SC_NOT_FOUND) {
@@ -198,7 +197,7 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
             } else {
                 result.getCommonPrefixes().stream()
                       .filter(p -> !context.ignoreHiddenFiles() || !isHidden(p))
-                      .forEach(p -> children.add(new S3Prefix(StringUtils.appendIfMissing(p, DELIMITER))));
+                      .forEach(p -> children.add(new S3Prefix(p)));
 
                 result.getObjectSummaries().stream()
                       .filter(s-> !context.ignoreHiddenFiles() || !isHidden(s.getKey()))

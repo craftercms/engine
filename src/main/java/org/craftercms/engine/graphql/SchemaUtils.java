@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2007-2019 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2020 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 3 as published by
+ * the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -519,7 +518,7 @@ public abstract class SchemaUtils {
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name(FIELD_NAME_COMPONENT)
             .description("The content of the item")
-            .type(nonNull(CONTENT_ITEM_INTERFACE_TYPE)))
+            .type(CONTENT_ITEM_INTERFACE_TYPE))
         .build();
 
     public static final GraphQLObjectType CONTENT_INCLUDE_WRAPPER_TYPE = GraphQLObjectType.newObject()
@@ -531,6 +530,7 @@ public abstract class SchemaUtils {
             .type(list(CONTENT_INCLUDE_TYPE)))
         .build();
 
+    @SuppressWarnings("rawtypes")
     public static final TypeResolver CONTENT_TYPE_BASED_TYPE_RESOLVER = env -> {
         Object item = env.getObject();
         if (item instanceof Map) {

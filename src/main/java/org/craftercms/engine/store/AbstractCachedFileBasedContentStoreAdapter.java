@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2007-2019 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2020 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 3 as published by
+ * the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -56,7 +55,7 @@ public abstract class AbstractCachedFileBasedContentStoreAdapter extends Abstrac
                                      ".findFile(%s, %s)", context, path);
             }
 
-        }, context, path, CONST_KEY_ELEM_FILE);
+        }, path, CONST_KEY_ELEM_FILE);
     }
 
     @Override
@@ -86,7 +85,7 @@ public abstract class AbstractCachedFileBasedContentStoreAdapter extends Abstrac
                                      ".getChildren(%s, %s)", context, dir);
             }
 
-        }, context, dir, CONST_KEY_ELEM_CHILDREN);
+        }, dir, CONST_KEY_ELEM_CHILDREN);
     }
 
     protected abstract File doFindFile(Context context, String path) throws InvalidContextException, StoreException;

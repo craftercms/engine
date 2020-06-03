@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2007-2019 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2020 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 3 as published by
+ * the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -27,8 +26,7 @@ import org.junit.Test;
 
 import static org.craftercms.engine.properties.SiteProperties.TARGETING_ENABLED_CONFIG_KEY;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Created by alfonsovasquez on 8/10/16.
@@ -83,7 +81,7 @@ public class ToCurrentTargetedVersionItemProcessorTest {
         XMLConfiguration config = mock(XMLConfiguration.class);
         when(config.getBoolean(TARGETING_ENABLED_CONFIG_KEY, false)).thenReturn(true);
 
-        SiteContext siteContext = mock(SiteContext.class);
+        SiteContext siteContext = spy(new SiteContext());
         when(siteContext.getSiteName()).thenReturn("test");
         when(siteContext.getConfig()).thenReturn(config);
 

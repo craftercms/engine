@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2007-2019 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2020 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 3 as published by
+ * the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -24,8 +23,15 @@ import freemarker.template.ObjectWrapper;
 import freemarker.template.SimpleHash;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
+import org.apache.commons.configuration2.HierarchicalConfiguration;
+import org.craftercms.commons.lang.RegexUtils;
+import org.craftercms.engine.util.ConfigUtils;
 import org.craftercms.engine.util.spring.ApplicationContextAccessor;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+
+import java.util.List;
+
+import static java.util.Collections.emptyList;
 
 /**
  * Like {@link freemarker.ext.servlet.AllHttpScopesHashModel}, but also lookup keys in the Application Context.
@@ -34,18 +40,24 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
  */
 public class AllHttpScopesAndAppContextHashModel extends SimpleHash {
 
+    public static final String CONFIG_KEY_BEAN_PATTERNS = "publicBeans.bean";
+
     private ApplicationContextAccessor applicationContextAccessor;
     private ServletContext context;
     private HttpServletRequest request;
 
+    private boolean disableVariableRestrictions;
+
     public AllHttpScopesAndAppContextHashModel(ObjectWrapper wrapper,
                                                ApplicationContextAccessor applicationContextAccessor,
-                                               ServletContext context, HttpServletRequest request) {
+                                               ServletContext context, HttpServletRequest request,
+                                               boolean disableVariableRestrictions) {
         super(wrapper);
 
         this.applicationContextAccessor = applicationContextAccessor;
         this.context = context;
         this.request = request;
+        this.disableVariableRestrictions = disableVariableRestrictions;
     }
 
     @Override
@@ -71,16 +83,27 @@ public class AllHttpScopesAndAppContextHashModel extends SimpleHash {
             }
         }
 
-        // Lookup in application scope
-        obj = context.getAttribute(key);
-        if (obj != null) {
-            return wrap(obj);
+        if (disableVariableRestrictions) {
+            // Lookup in application scope
+            obj = context.getAttribute(key);
+            if (obj != null) {
+                return wrap(obj);
+            }
+        }
+
+        HierarchicalConfiguration<?> siteConfig = ConfigUtils.getCurrentConfig();
+        List<String> beanPatterns = emptyList();
+        if (siteConfig != null) {
+            beanPatterns = siteConfig.getList(String.class, CONFIG_KEY_BEAN_PATTERNS, emptyList());
         }
 
         // Lookup in application context
-        try {
-            return wrap(applicationContextAccessor.get(key));
-        } catch (NoSuchBeanDefinitionException e) {
+        if (disableVariableRestrictions || RegexUtils.matchesAny(key, beanPatterns)) {
+            try {
+                return wrap(applicationContextAccessor.get(key));
+            } catch (NoSuchBeanDefinitionException e) {
+                // do nothing...
+            }
         }
 
         // return wrapper's null object (probably null).

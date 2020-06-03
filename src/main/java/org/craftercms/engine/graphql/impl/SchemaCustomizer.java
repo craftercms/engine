@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2007-2019 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2020 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 3 as published by
+ * the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -33,6 +32,7 @@ import graphql.schema.GraphQLType;
 import graphql.schema.StaticDataFetcher;
 import graphql.schema.TypeResolver;
 import org.apache.commons.lang3.StringUtils;
+import org.craftercms.engine.graphql.impl.fetchers.ConverterDataFetcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -151,7 +151,7 @@ public class SchemaCustomizer {
                         String.format("GraphQL schema already contains a field '%s'", fieldName));
                 }
                 rootTypeBuilder.field(builder.field);
-                codeRegistry.dataFetcher(coordinates(rootTypeName, fieldName), builder.fetcher);
+                codeRegistry.dataFetcher(coordinates(rootTypeName, fieldName), ConverterDataFetcher.of(builder.fetcher));
             } else {
                 // Add a field to a specific type
                 if (!types.containsKey(builder.typeName)) {
@@ -163,14 +163,16 @@ public class SchemaCustomizer {
                 }
                 logger.debug("Adding custom field & fetcher {}.{}", builder.typeName, fieldName);
                 types.get(builder.typeName).field(builder.field);
-                codeRegistry.dataFetcher(coordinates(builder.typeName, fieldName), builder.fetcher);
+                codeRegistry.dataFetcher(coordinates(builder.typeName, fieldName),
+                        ConverterDataFetcher.of(builder.fetcher));
             }
 
         });
 
         fetchers.forEach(builder -> {
             logger.debug("Adding custom fetcher for {}/{}", builder.typeName, builder.fieldName);
-            codeRegistry.dataFetcher(coordinates(builder.typeName, builder.fieldName), builder.dataFetcher);
+            codeRegistry.dataFetcher(coordinates(builder.typeName, builder.fieldName),
+                    ConverterDataFetcher.of(builder.dataFetcher));
         });
         resolvers.forEach(builder -> {
             logger.debug("Adding custom resolver for {}", builder.typeName);

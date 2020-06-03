@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2007-2019 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2020 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 3 as published by
+ * the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -45,6 +44,7 @@ public class FolderBasedScriptJobResolver implements ScriptJobResolver, ServletC
     protected String cronExpression;
     protected String scriptSuffix;
     protected ServletContext servletContext;
+    protected boolean disableVariableRestrictions;
 
     @Required
     public void setFolderUrl(String folderUrl) {
@@ -66,6 +66,10 @@ public class FolderBasedScriptJobResolver implements ScriptJobResolver, ServletC
         this.servletContext = servletContext;
     }
 
+    public void setDisableVariableRestrictions(boolean disableVariableRestrictions) {
+        this.disableVariableRestrictions = disableVariableRestrictions;
+    }
+
     @Override
     public List<JobContext> resolveJobs(SiteContext siteContext) throws SchedulingException {
         List<String> scriptUrls = ContentStoreUtils.findChildrenUrl(siteContext.getStoreService(),
@@ -79,7 +83,8 @@ public class FolderBasedScriptJobResolver implements ScriptJobResolver, ServletC
                         jobContexts = new ArrayList<>();
                     }
 
-                    jobContexts.add(SchedulingUtils.createJobContext(siteContext, scriptUrl, cronExpression, servletContext));
+                    jobContexts.add(SchedulingUtils.createJobContext(siteContext, scriptUrl, cronExpression,
+                            disableVariableRestrictions? servletContext : null));
                 }
             }
         }

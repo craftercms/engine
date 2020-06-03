@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2007-2019 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2020 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 3 as published by
+ * the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -44,6 +43,8 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 import org.springframework.web.util.UriTemplate;
 
+import static org.craftercms.engine.util.GroovyScriptUtils.addRestScriptVariables;
+
 /**
  * Controller for REST script requests.
  *
@@ -61,6 +62,7 @@ public class RestScriptsController extends AbstractController {
     protected String responseBodyModelAttributeName;
     protected String errorMessageModelAttributeName;
     protected ScriptUrlTemplateScanner urlTemplateScanner;
+    protected boolean disableVariableRestrictions;
 
     public RestScriptsController() {
         responseBodyModelAttributeName = DEFAULT_RESPONSE_BODY_MODEL_ATTR_NAME;
@@ -77,6 +79,10 @@ public class RestScriptsController extends AbstractController {
 
     public void setUrlTemplateScanner(ScriptUrlTemplateScanner urlTemplateScanner) {
         this.urlTemplateScanner = urlTemplateScanner;
+    }
+
+    public void setDisableVariableRestrictions(boolean disableVariableRestrictions) {
+        this.disableVariableRestrictions = disableVariableRestrictions;
     }
 
     @Override
@@ -154,7 +160,7 @@ public class RestScriptsController extends AbstractController {
 
     protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> variables = new HashMap<String, Object>();
-        GroovyScriptUtils.addRestScriptVariables(variables, request, response, getServletContext());
+        addRestScriptVariables(variables, request, response, disableVariableRestrictions? getServletContext() : null);
 
         return variables;
     }

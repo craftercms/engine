@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2007-2019 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2020 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 3 as published by
+ * the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -17,17 +16,20 @@
 
 package org.craftercms.engine.search;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.craftercms.profile.api.Profile;
 import org.craftercms.search.elasticsearch.impl.AbstractElasticsearchWrapper;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.security.utils.SecurityUtils;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
+import static java.util.stream.Collectors.joining;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.existsQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
@@ -79,17 +81,27 @@ public class SiteAwareElasticsearchService extends AbstractElasticsearchWrapper 
 
         BoolQueryBuilder mainQuery = (BoolQueryBuilder) request.source().query();
 
-        Profile profile = SecurityUtils.getCurrentProfile();
-        if (profile != null && CollectionUtils.isNotEmpty(profile.getRoles())) {
-            logger.debug("Filtering search results for roles: {}", profile.getRoles());
-            mainQuery.filter(boolQuery().must(boolQuery()
+        Authentication auth = null;
+        SecurityContext context = SecurityContextHolder.getContext();
+        if (context != null) {
+            auth = context.getAuthentication();
+        }
+
+        // Include all public items
+        BoolQueryBuilder securityQuery = boolQuery()
                 .should(boolQuery().mustNot(existsQuery(roleFieldName)))
-                .should(matchQuery(roleFieldName, String.join(" ", profile.getRoles())))
-            ));
+                .should(matchQuery(roleFieldName, "anonymous"));
+
+        if (auth != null && !(auth instanceof AnonymousAuthenticationToken) && isNotEmpty(auth.getAuthorities())) {
+            logger.debug("Filtering search results for roles: {}", auth.getAuthorities());
+            securityQuery.should(matchQuery(roleFieldName, auth.getAuthorities().stream()
+                            .map(Object::toString)
+                            .collect(joining(" "))));
         } else {
             logger.debug("Filtering search to show only public items");
-            mainQuery.filter(boolQuery().mustNot(existsQuery(roleFieldName)));
         }
+
+        mainQuery.filter(boolQuery().must(securityQuery));
     }
 
 }

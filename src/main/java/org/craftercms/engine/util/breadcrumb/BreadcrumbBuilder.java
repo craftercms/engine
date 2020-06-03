@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2007-2019 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2020 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 3 as published by
+ * the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -71,40 +70,35 @@ public class BreadcrumbBuilder {
     public List<BreadcrumbItem> buildBreadcrumb(final String url) {
         final Context context = SiteContext.getCurrent().getContext();
 
-        return cacheTemplate.getObject(context, new Callback<List<BreadcrumbItem>>() {
+        return cacheTemplate.getObject(context, (Callback<List<BreadcrumbItem>>) () -> {
+            String indexFileName = SiteProperties.getIndexFileName();
+            CachingAwareList<BreadcrumbItem> breadcrumb = new CachingAwareList<BreadcrumbItem>();
+            String breadcrumbUrl = StringUtils.substringBeforeLast(StringUtils.substringAfter(url, homePath), indexFileName);
+            String[] breadcrumbUrlComponents = breadcrumbUrl.split("/");
+            String currentUrl = homePath;
 
-            @Override
-            public List<BreadcrumbItem> execute() {
-                String indexFileName = SiteProperties.getIndexFileName();
-                CachingAwareList<BreadcrumbItem> breadcrumb = new CachingAwareList<BreadcrumbItem>();
-                String breadcrumbUrl = StringUtils.substringBeforeLast(StringUtils.substringAfter(url, homePath), indexFileName);
-                String[] breadcrumbUrlComponents = breadcrumbUrl.split("/");
-                String currentUrl = homePath;
-
-                for (String breadcrumbUrlComponent : breadcrumbUrlComponents) {
-                    if (StringUtils.isNotEmpty(breadcrumbUrlComponent)) {
-                        currentUrl += "/" + breadcrumbUrlComponent;
-                    }
-
-                    SiteItem siteItem = siteItemService.getSiteItem(UrlUtils.concat(currentUrl, indexFileName));
-
-                    if (siteItem != null && siteItem.getDom() != null) {
-                        String breadcrumbName = siteItem.queryValue(breadcrumbNameXPathQuery);
-                        if (StringUtils.isEmpty(breadcrumbName)) {
-                            if (StringUtils.isNotEmpty(breadcrumbUrlComponent)) {
-                                breadcrumbName = StringUtils.capitalize(breadcrumbUrlComponent.replace("-", " ").replace(".xml", ""));
-                            } else {
-                                breadcrumbName = HOME_BREADCRUMB_NAME;
-                            }
-                        }
-
-                        breadcrumb.add(new BreadcrumbItem(currentUrl, breadcrumbName));
-                    }
+            for (String breadcrumbUrlComponent : breadcrumbUrlComponents) {
+                if (StringUtils.isNotEmpty(breadcrumbUrlComponent)) {
+                    currentUrl += "/" + breadcrumbUrlComponent;
                 }
 
-                return breadcrumb;
+                SiteItem siteItem = siteItemService.getSiteItem(UrlUtils.concat(currentUrl, indexFileName));
+
+                if (siteItem != null && siteItem.getDom() != null) {
+                    String breadcrumbName = siteItem.queryValue(breadcrumbNameXPathQuery);
+                    if (StringUtils.isEmpty(breadcrumbName)) {
+                        if (StringUtils.isNotEmpty(breadcrumbUrlComponent)) {
+                            breadcrumbName = StringUtils.capitalize(breadcrumbUrlComponent.replace("-", " ").replace(".xml", ""));
+                        } else {
+                            breadcrumbName = HOME_BREADCRUMB_NAME;
+                        }
+                    }
+
+                    breadcrumb.add(new BreadcrumbItem(currentUrl, breadcrumbName));
+                }
             }
 
+            return breadcrumb;
         }, url, BREADCRUMB_CONST_KEY_ELEM);
     }
 

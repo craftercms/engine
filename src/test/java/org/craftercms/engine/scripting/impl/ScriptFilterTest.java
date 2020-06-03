@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2007-2019 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2020 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 3 as published by
+ * the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -129,7 +128,7 @@ public class ScriptFilterTest {
     }
 
     private SiteContext createSiteContext(ContentStoreService storeService) throws Exception {
-        SiteContext siteContext = mock(SiteContext.class);
+        SiteContext siteContext = spy(new SiteContext());
         ScriptFactory scriptFactory = createScriptFactory(siteContext);
 
         XMLConfiguration config =
@@ -141,6 +140,7 @@ public class ScriptFilterTest {
         when(siteContext.getStoreService()).thenReturn(storeService);
         when(siteContext.getConfig()).thenReturn(config);
         when(siteContext.getScriptFactory()).thenReturn(scriptFactory);
+        when(siteContext.getCacheTemplate()).thenReturn(cacheTemplate);
 
         return siteContext;
     }
@@ -148,7 +148,7 @@ public class ScriptFilterTest {
     private ScriptFactory createScriptFactory(SiteContext siteContext) {
         ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(siteContext);
 
-        return new GroovyScriptFactory(resourceConnector, Collections.emptyMap());
+        return new GroovyScriptFactory(siteContext, resourceConnector, Collections.emptyMap(), false);
     }
 
     private void setCurrentRequestContext(HttpServletRequest request, HttpServletResponse response) {

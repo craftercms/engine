@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2007-2019 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2020 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 3 as published by
+ * the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,6 +19,7 @@ import graphql.GraphQL;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.lang3.time.StopWatch;
 import org.craftercms.commons.http.RequestContext;
+import org.craftercms.commons.lang.Callback;
 import org.craftercms.core.exception.CrafterException;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
@@ -32,6 +32,7 @@ import org.craftercms.engine.exception.SiteContextInitializationException;
 import org.craftercms.engine.graphql.GraphQLFactory;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.util.GroovyScriptUtils;
+import org.jenkinsci.plugins.scriptsecurity.sandbox.groovy.SandboxInterceptor;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
@@ -48,12 +49,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Wrapper for a {@link Context} that adds properties specific to Crafter Engine.
  *
  * @author Alfonso Vásquez
  */
+@SuppressWarnings("rawtypes")
 public class SiteContext {
 
     private static final Logger logger = LoggerFactory.getLogger(SiteContext.class);
@@ -63,8 +68,8 @@ public class SiteContext {
     private static ThreadLocal<SiteContext> threadLocal = new ThreadLocal<>();
 
     public enum State {
-        CREATED,
-        INITIALIZED,
+        INITIALIZING,
+        READY,
         DESTROYED
     }
 
@@ -90,12 +95,20 @@ public class SiteContext {
     protected Scheduler scheduler;
     protected GraphQLFactory graphQLFactory;
     protected SiteCacheWarmer cacheWarmer;
+    protected HierarchicalConfiguration proxyConfig;
 
     protected long initTimeout;
     protected CountDownLatch initializationLatch;
     protected ExecutorService maintenanceTaskExecutor;
     protected GraphQL graphQL;
     protected State state;
+
+    private long shutdownTimeout;
+    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+    private final Lock accessLock = readWriteLock.readLock();
+    private final Lock shutdownLock = readWriteLock.writeLock();
+
+    protected SandboxInterceptor scriptSandbox;
 
     /**
      * Returns the context for the current thread.
@@ -105,9 +118,34 @@ public class SiteContext {
     }
 
     /**
+     * Returns the item from the cache of the current site context. If there's no current site context, the loader
+     * is called directly to get the item.
+     *
+     * @param loader        the loader used to retrieve the item if it's not in cache
+     * @param keyElements   the elements that conform the key
+     *
+     * @return the cached item
+     */
+    public static <T> T getFromCurrentCache(Callback<T> loader, Object... keyElements) {
+        SiteContext siteContext = getCurrent();
+        if (siteContext != null) {
+            return siteContext.getFromCache(loader, keyElements);
+        } else {
+            return loader.execute();
+        }
+    }
+
+    /**
      * Sets the context for the current thread.
      */
     public static void setCurrent(SiteContext current) {
+        logger.debug("Getting access lock for context {}", current);
+        current.accessLock.lock();
+
+        if (current.scriptSandbox != null) {
+            current.scriptSandbox.register();
+        }
+
         threadLocal.set(current);
 
         MDC.put(SITE_NAME_MDC_KEY, current.getSiteName());
@@ -119,6 +157,15 @@ public class SiteContext {
     public static void clear() {
         MDC.remove(SITE_NAME_MDC_KEY);
 
+        SiteContext current = threadLocal.get();
+
+        if (current.scriptSandbox != null) {
+            current.scriptSandbox.unregister();
+        }
+
+        logger.debug("Releasing access lock for context {}", current);
+        current.accessLock.unlock();
+
         threadLocal.remove();
     }
 
@@ -127,7 +174,7 @@ public class SiteContext {
         // important when a cache warm is submitted and a GraphQL re-build needs to wait till the cache warm is
         // finished
         maintenanceTaskExecutor = Executors.newSingleThreadExecutor();
-        state = State.CREATED;
+        state = State.INITIALIZING;
         initializationLatch = new CountDownLatch(1);
     }
 
@@ -311,18 +358,30 @@ public class SiteContext {
         this.initTimeout = initTimeout;
     }
 
+    public void setShutdownTimeout(long shutdownTimeout) {
+        this.shutdownTimeout = shutdownTimeout;
+    }
+
     public GraphQL getGraphQL() {
         return graphQL;
+    }
+
+    public HierarchicalConfiguration getProxyConfig() {
+        return proxyConfig;
+    }
+
+    public void setProxyConfig(HierarchicalConfiguration proxyConfig) {
+        this.proxyConfig = proxyConfig;
     }
 
     public boolean isValid() throws CrafterException {
 
         try {
-            if (state == State.CREATED) {
+            if (state == State.INITIALIZING) {
                 logger.debug("Waiting for initialization of {}", this);
                 initializationLatch.await(initTimeout, TimeUnit.MILLISECONDS);
             }
-            return state == State.INITIALIZED && storeService.validate(context);
+            return state == State.READY && storeService.validate(context);
         } catch (InterruptedException e) {
             throw new CrafterException("Error while waiting for initialization of " + this);
         }
@@ -333,7 +392,7 @@ public class SiteContext {
     }
 
     public void init(boolean waitTillFinished) throws SiteContextInitializationException {
-        if (state == State.CREATED) {
+        if (state == State.INITIALIZING) {
             publishEvent(new SiteContextCreatedEvent(this));
 
             Runnable initTask = () -> {
@@ -350,7 +409,7 @@ public class SiteContext {
                     buildGraphQLSchema();
                     executeInitScript();
 
-                    state = State.INITIALIZED;
+                    state = State.READY;
 
                     logger.info("--------------------------------------------------");
                     logger.info("</Initializing context site: " + siteName + ">");
@@ -400,35 +459,61 @@ public class SiteContext {
     }
 
     public void destroy() throws CrafterException {
-        state = State.DESTROYED;
-
-        publishEvent(new SiteContextDestroyedEvent(this));
-
-        maintenanceTaskExecutor.shutdownNow();
-
-        storeService.destroyContext(context);
-
-        if (applicationContext != null) {
+        boolean locked;
+        try {
+            logger.debug("Getting shutdown lock for context {}", this);
+            locked = shutdownLock.tryLock(shutdownTimeout, TimeUnit.MINUTES);
             try {
-                applicationContext.close();
+                if (!locked) {
+                    logger.debug("Time out reached, proceeding to destroy context {}", this);
+                } else {
+                    logger.debug("All threads released, proceeding to destroy context {}", this);
+                }
+
+                state = State.DESTROYED;
+
+                publishEvent(new SiteContextDestroyedEvent(this));
+
+                maintenanceTaskExecutor.shutdownNow();
+
+                storeService.destroyContext(context);
+
+                if (scheduler != null) {
+                    try {
+                        scheduler.shutdown();
+                    } catch (SchedulerException e) {
+                        throw new CrafterException("Unable to shutdown scheduler", e);
+                    }
+                }
+                if (applicationContext != null) {
+                    try {
+                        applicationContext.close();
+                    } catch (Exception e) {
+                        throw new CrafterException("Unable to close application context", e);
+                    }
+                }
+                if (classLoader != null) {
+                    try {
+                        classLoader.close();
+                    } catch (Exception e) {
+                        throw new CrafterException("Unable to close class loader", e);
+                    }
+                }
             } catch (Exception e) {
-                throw new CrafterException("Unable to close application context", e);
+                logger.error("Error destroying context {}", this, e);
+            } finally {
+                if (locked) {
+                    logger.debug("Releasing shutdown lock for context {}", this);
+                    shutdownLock.unlock();
+                }
             }
+        } catch (InterruptedException e) {
+            throw new CrafterException("Unable to destroy context", e);
         }
-        if (classLoader != null) {
-            try {
-                classLoader.close();
-            } catch (Exception e) {
-                throw new CrafterException("Unable to close class loader", e);
-            }
-        }
-        if (scheduler != null) {
-            try {
-                scheduler.shutdown();
-            } catch (SchedulerException e) {
-                throw new CrafterException("Unable to shutdown scheduler", e);
-            }
-        }
+    }
+
+    public <T> T getFromCache(Callback<T> loader, Object... keyElements) {
+        return cacheTemplate.getObject(context, loader, keyElements);
     }
 
     protected void cacheClear() {

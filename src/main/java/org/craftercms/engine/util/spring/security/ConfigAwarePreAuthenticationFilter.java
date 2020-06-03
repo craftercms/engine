@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2007-2019 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2020 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 3 as published by
+ * the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -37,7 +36,7 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
  * <ul>
  *     <li>If {@code alwaysEnabled} is {@code true}</li> the filter will be executed, even if there is no site
  *     configuration available
- *     <li>If the site configuration contains the {@code enabledConfigKey} with a value of {@link true} the filter
+ *     <li>If the site configuration contains the {@code enabledConfigKey} with a value of {@code true} the filter
  *     will be executed</li>
  * </ul>
  *

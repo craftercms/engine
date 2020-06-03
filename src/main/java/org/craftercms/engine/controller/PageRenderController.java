@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2007-2019 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2020 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 3 as published by
+ * the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,11 +14,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.craftercms.engine.controller;
-
-import java.util.HashMap;
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -35,11 +29,21 @@ import org.craftercms.engine.properties.SiteProperties;
 import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
-import org.craftercms.engine.util.GroovyScriptUtils;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Map;
+
+import static java.util.Collections.singletonMap;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.craftercms.core.controller.rest.RestControllerBase.createResponseMessage;
+import static org.craftercms.engine.util.GroovyScriptUtils.addControllerScriptVariables;
 
 /**
  * Default controller for rendering Crafter pages. If the site context is the fallback context, a fallback page is
@@ -56,16 +60,26 @@ public class PageRenderController extends AbstractController {
     private static final String SCRIPT_URL_FORMAT = "%s.%s.%s"; // {url}.{method}.{scriptExt}
 
     protected String fallbackPageUrl;
+    protected String fallbackMessage;
     protected ContentStoreService storeService;
+    protected boolean disableVariableRestrictions;
 
     @Required
     public void setFallbackPageUrl(String fallbackPageUrl) {
         this.fallbackPageUrl = fallbackPageUrl;
     }
 
+    public void setFallbackMessage(String fallbackMessage) {
+        this.fallbackMessage = fallbackMessage;
+    }
+
     @Required
     public void setStoreService(final ContentStoreService storeService) {
         this.storeService = storeService;
+    }
+
+    public void setDisableVariableRestrictions(boolean disableVariableRestrictions) {
+        this.disableVariableRestrictions = disableVariableRestrictions;
     }
 
     @Override
@@ -80,7 +94,8 @@ public class PageRenderController extends AbstractController {
                     logger.debug("Rendering fallback page [" + fallbackPageUrl + "]");
                 }
 
-                pageUrl = fallbackPageUrl;
+                return new ModelAndView(fallbackPageUrl, singletonMap(EMPTY, createResponseMessage(fallbackMessage)),
+                                        HttpStatus.NOT_FOUND);
             } else {
                 pageUrl = (String)request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
                 if (StringUtils.isEmpty(pageUrl)) {
@@ -169,7 +184,8 @@ public class PageRenderController extends AbstractController {
     protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response,
                                                         Map<String, Object> model) {
         Map<String, Object> variables = new HashMap<String, Object>();
-        GroovyScriptUtils.addControllerScriptVariables(variables, request, response, getServletContext(), model);
+        addControllerScriptVariables(variables, request, response,
+                disableVariableRestrictions? getServletContext() : null, model);
 
         return variables;
     }

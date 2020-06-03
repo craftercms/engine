@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2007-2019 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2020 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 3 as published by
+ * the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -24,9 +23,11 @@ import java.util.Map;
 
 import groovy.util.GroovyScriptEngine;
 import org.craftercms.core.service.ContentStoreService;
+import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.scripting.impl.GroovyScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
+import org.craftercms.engine.test.utils.CacheTemplateMockUtils;
 import org.craftercms.engine.test.utils.ContentStoreServiceMockUtils;
 import org.dom4j.io.SAXReader;
 import org.junit.Before;
@@ -80,9 +81,12 @@ public class Dom4jExtensionTest {
     }
 
     private SiteContext createSiteContext(ContentStoreService storeService) {
-        SiteContext siteContext = mock(SiteContext.class);
+        CacheTemplate cacheTemplate = CacheTemplateMockUtils.createCacheTemplate();
+
+        SiteContext siteContext = spy( new SiteContext());
         when(siteContext.getSiteName()).thenReturn("default");
         when(siteContext.getStoreService()).thenReturn(storeService);
+        when(siteContext.getCacheTemplate()).thenReturn(cacheTemplate);
 
         return siteContext;
     }
@@ -90,7 +94,7 @@ public class Dom4jExtensionTest {
     private ScriptFactory createScriptFactory(SiteContext siteContext, Map<String, Object> globalVars) {
         ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(siteContext);
 
-        return new GroovyScriptFactory(resourceConnector, globalVars);
+        return new GroovyScriptFactory(siteContext, resourceConnector, globalVars, false);
     }
 
 }

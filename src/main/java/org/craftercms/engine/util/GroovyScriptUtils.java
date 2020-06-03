@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2007-2019 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2020 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 3 as published by
+ * the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,12 +22,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.configuration2.Configuration;
+import org.codehaus.groovy.control.CompilerConfiguration;
 import org.craftercms.commons.http.HttpUtils;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.scripting.impl.GroovyScript;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.spring.ApplicationContextAccessor;
 import org.craftercms.engine.util.spring.security.profile.ProfileUser;
+import org.kohsuke.groovy.sandbox.SandboxTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -118,6 +119,14 @@ public class GroovyScriptUtils {
 
         addSiteContextVariable(variables);
         addSiteConfigVariable(variables);
+    }
+
+    public static CompilerConfiguration getCompilerConfiguration(boolean enableScriptSandbox) {
+        CompilerConfiguration config = new CompilerConfiguration();
+        if (enableScriptSandbox) {
+            config.addCompilationCustomizers(new SandboxTransformer());
+        }
+        return config;
     }
 
     private static void addCommonVariables(Map<String, Object> variables, HttpServletRequest request,

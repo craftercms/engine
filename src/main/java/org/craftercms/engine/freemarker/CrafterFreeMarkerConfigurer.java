@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2007-2019 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2020 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU General Public License version 3 as published by
+ * the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,17 +15,18 @@
  */
 package org.craftercms.engine.freemarker;
 
-import java.io.IOException;
-import java.util.List;
-
-import freemarker.cache.CacheStorage;
 import freemarker.cache.ClassTemplateLoader;
+import freemarker.cache.NullCacheStorage;
 import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import org.craftercms.engine.macro.MacroResolver;
+import org.craftercms.engine.util.freemarker.CrafterCacheAwareConfiguration;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
+
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Extends {@link org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer} to:
@@ -41,7 +41,11 @@ public class CrafterFreeMarkerConfigurer extends FreeMarkerConfigurer {
 
     private MacroResolver macroResolver;
     private TemplateExceptionHandler templateExceptionHandler;
-    private CacheStorage cacheStorage;
+    private boolean cacheTemplates;
+
+    public CrafterFreeMarkerConfigurer() {
+        cacheTemplates = true;
+    }
 
     public void setMacroResolver(MacroResolver macroResolver) {
         this.macroResolver = macroResolver;
@@ -51,8 +55,8 @@ public class CrafterFreeMarkerConfigurer extends FreeMarkerConfigurer {
         this.templateExceptionHandler = templateExceptionHandler;
     }
 
-    public void setCacheStorage(final CacheStorage cacheStorage) {
-        this.cacheStorage = cacheStorage;
+    public void setCacheTemplates(boolean cacheTemplates) {
+        this.cacheTemplates = cacheTemplates;
     }
 
     @Override
@@ -60,8 +64,8 @@ public class CrafterFreeMarkerConfigurer extends FreeMarkerConfigurer {
         if (templateExceptionHandler != null) {
             config.setTemplateExceptionHandler(templateExceptionHandler);
         }
-        if (cacheStorage != null) {
-            config.setCacheStorage(cacheStorage);
+        if (!cacheTemplates) {
+            config.setCacheStorage(NullCacheStorage.INSTANCE);
         }
     }
 
@@ -78,6 +82,11 @@ public class CrafterFreeMarkerConfigurer extends FreeMarkerConfigurer {
     protected void postProcessTemplateLoaders(List<TemplateLoader> templateLoaders) {
         // Overwrote to get rid of the log.info
         templateLoaders.add(new ClassTemplateLoader(FreeMarkerConfigurer.class, ""));
+    }
+
+    @Override
+    protected Configuration newConfiguration() {
+        return new CrafterCacheAwareConfiguration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS, cacheTemplates);
     }
 
 }
