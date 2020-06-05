@@ -31,10 +31,6 @@ Crafter CMS Authoring Scripts
   <#return attributes + $attrs>
 </#function>
 
-<#--
-TODO:
-Should we put content types on the context so we can extract the content type name automatically?
--->
 <#macro tag $tag="div" $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
   <#assign nested><#nested/></#assign>
   <#assign attributes = mergeAttributes(attrs, $attrs)>
