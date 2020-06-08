@@ -81,6 +81,7 @@ public class SiteContextRestController {
 
         lock.lock();
         try {
+            SiteContext.clear();
             contextRegistry.destroyContext(siteName);
 
             siteContext = contextRegistry.getContext(siteName, fallback);
