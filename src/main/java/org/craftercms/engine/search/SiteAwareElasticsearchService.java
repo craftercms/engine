@@ -19,10 +19,10 @@ package org.craftercms.engine.search;
 import org.craftercms.search.elasticsearch.impl.AbstractElasticsearchWrapper;
 import org.craftercms.engine.service.context.SiteContext;
 import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -53,8 +53,8 @@ public class SiteAwareElasticsearchService extends AbstractElasticsearchWrapper 
 
     protected String roleFieldName = DEFAULT_ROLE_FIELD_NAME;
 
-    @Required
-    public void setIndexIdFormat(final String indexIdFormat) {
+    public SiteAwareElasticsearchService(RestHighLevelClient client, String indexIdFormat) {
+        super(client);
         this.indexIdFormat = indexIdFormat;
     }
 
