@@ -324,7 +324,10 @@ public class ContentTypeBasedDataFetcher extends RequestAwareDataFetcher<Object>
                 }
                 break;
             default:
-                query.filter(getFilterQueryFromObjectField(path, filter, env));
+                QueryBuilder builder = getFilterQueryFromObjectField(path, filter, env);
+                if (builder != null) {
+                    query.filter(builder);
+                }
         }
     }
 
@@ -361,23 +364,27 @@ public class ContentTypeBasedDataFetcher extends RequestAwareDataFetcher<Object>
 
     protected QueryBuilder getFilterQueryFromObjectField(String fieldPath, ObjectField filter,
                                                          DataFetchingEnvironment env) {
+        Object value = getRealValue(filter.getValue(), env);
+        if (value == null) {
+            return null;
+        }
         switch (filter.getName()) {
             case ARG_NAME_EQUALS:
-                return termQuery(fieldPath, getRealValue(filter.getValue(), env));
+                return termQuery(fieldPath, value);
             case ARG_NAME_MATCHES:
-                return matchQuery(fieldPath, getRealValue(filter.getValue(), env));
+                return matchQuery(fieldPath, value);
             case ARG_NAME_REGEX:
-                return regexpQuery(fieldPath, getRealValue(filter.getValue(), env).toString());
+                return regexpQuery(fieldPath, value.toString());
             case ARG_NAME_LT:
-                return rangeQuery(fieldPath).lt(getRealValue(filter.getValue(), env));
+                return rangeQuery(fieldPath).lt(value);
             case ARG_NAME_GT:
-                return rangeQuery(fieldPath).gt(getRealValue(filter.getValue(), env));
+                return rangeQuery(fieldPath).gt(value);
             case ARG_NAME_LTE:
-                return rangeQuery(fieldPath).lte(getRealValue(filter.getValue(), env));
+                return rangeQuery(fieldPath).lte(value);
             case ARG_NAME_GTE:
-                return rangeQuery(fieldPath).gte(getRealValue(filter.getValue(), env));
+                return rangeQuery(fieldPath).gte(value);
             case ARG_NAME_EXISTS:
-                boolean exists = (boolean) getRealValue(filter.getValue(), env);
+                boolean exists = (boolean) value;
                 if (exists) {
                     return existsQuery(fieldPath);
                 } else {
