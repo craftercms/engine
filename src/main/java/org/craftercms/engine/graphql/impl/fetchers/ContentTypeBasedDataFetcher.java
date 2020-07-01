@@ -193,8 +193,8 @@ public class ContentTypeBasedDataFetcher extends RequestAwareDataFetcher<Object>
         watch.stop();
 
         watch.start("processing items");
-        result.put(FIELD_NAME_TOTAL, response.getHits().totalHits);
-        if (response.getHits().totalHits > 0) {
+        result.put(FIELD_NAME_TOTAL, response.getHits().getTotalHits().value);
+        if (response.getHits().getTotalHits().value > 0) {
             for(SearchHit hit :  response.getHits().getHits()) {
                 items.add(fixItems(hit.getSourceAsMap()));
             }
