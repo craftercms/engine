@@ -15,7 +15,6 @@
  */
 package org.craftercms.engine.controller.rest;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +42,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 import org.springframework.web.util.UriTemplate;
 
+import static java.util.Collections.singletonMap;
 import static org.craftercms.engine.util.GroovyScriptUtils.addRestScriptVariables;
 
 /**
@@ -174,43 +174,40 @@ public class RestScriptsController extends AbstractController {
 
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
-            return Collections.singletonMap(errorMessageModelAttributeName, "REST script not found");
+            return singletonMap(errorMessageModelAttributeName, "REST script not found");
         } catch (Exception e) {
             logger.error("Error executing REST script at " + scriptUrl, e);
 
-            String errorMsg = checkHttpStatusCodeAwareException(e, response);
+            Throwable cause = checkHttpStatusCodeAwareException(e, response);
 
-            if (StringUtils.isEmpty(errorMsg)) {
-                errorMsg = checkValidationException(e, response);
-
-                if (StringUtils.isEmpty(errorMsg)) {
+            if (cause == null) {
+                cause = checkValidationException(e, response);
+                if (cause == null) {
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-
-                    errorMsg = e.getMessage();
                 }
             }
 
-            return Collections.singletonMap(errorMessageModelAttributeName, errorMsg);
+            return singletonMap(errorMessageModelAttributeName, cause != null? cause.getMessage() : e.getMessage());
         }
     }
 
-    protected String checkHttpStatusCodeAwareException(Exception e, HttpServletResponse response) {
+    protected Throwable checkHttpStatusCodeAwareException(Exception e, HttpServletResponse response) {
         HttpStatusCodeAwareException cause = ExceptionUtils.getThrowableOfType(e, HttpStatusCodeAwareException.class);
         if (cause != null) {
             response.setStatus(cause.getStatusCode());
 
-            return ((Exception) cause).getMessage();
+            return (Throwable) cause;
         } else {
             return null;
         }
     }
 
-    protected String checkValidationException(Exception e, HttpServletResponse response) {
+    protected Throwable checkValidationException(Exception e, HttpServletResponse response) {
         Throwable cause = ExceptionUtils.getRootCause(e);
         if (cause instanceof ValidationException || cause instanceof ValidationRuntimeException) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
-            return cause.getMessage();
+            return cause;
         } else {
             return null;
         }
