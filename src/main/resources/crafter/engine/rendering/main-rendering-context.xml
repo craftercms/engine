@@ -121,8 +121,13 @@
     </util:list>
 
     <!-- This needs to be named localeResolver so that the DispatcherServlet can find it -->
-    <bean id="localeResolver" class="org.craftercms.engine.targeting.impl.ConfigAwareCookieLocaleResolver">
-        <property name="cookieName" value="${crafter.engine.locale.cookie.name}"/>
+    <bean id="localeResolver" class="org.craftercms.engine.util.spring.servlet.i18n.DelegatingLocaleResolver">
+        <constructor-arg>
+            <!-- The standalone resolver used when there is no translation config -->
+            <bean class="org.craftercms.engine.targeting.impl.ConfigAwareCookieLocaleResolver">
+                <property name="cookieName" value="${crafter.engine.locale.cookie.name}"/>
+            </bean>
+        </constructor-arg>
     </bean>
 
     <import resource="${crafter.engine.extension.base}/rendering-overlay-context.xml"/>

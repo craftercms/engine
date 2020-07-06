@@ -43,6 +43,7 @@ import org.craftercms.engine.util.groovy.Dom4jExtension;
 import org.craftercms.engine.util.quartz.JobContext;
 import org.craftercms.engine.util.spring.ContentStoreResourceLoader;
 import org.craftercms.engine.util.spring.context.RestrictedApplicationContext;
+import org.craftercms.engine.util.spring.servlet.i18n.ChainLocaleResolver;
 import org.jenkinsci.plugins.scriptsecurity.sandbox.blacklists.Blacklist;
 import org.jenkinsci.plugins.scriptsecurity.sandbox.groovy.SandboxInterceptor;
 import org.quartz.Scheduler;
@@ -58,6 +59,7 @@ import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.web.context.ServletContextAware;
+import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
 import org.tuckey.web.filters.urlrewrite.Conf;
 import org.tuckey.web.filters.urlrewrite.UrlRewriter;
@@ -73,6 +75,7 @@ import java.util.stream.Stream;
 
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
+import static org.craftercms.commons.locale.LocaleUtils.CONFIG_KEY_DEFAULT_LOCALE;
 import static org.craftercms.engine.util.GroovyScriptUtils.getCompilerConfiguration;
 
 /**
@@ -106,6 +109,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected String[] applicationContextPaths;
     protected String[] urlRewriteConfPaths;
     protected String[] proxyConfigPaths;
+    protected String[] translationConfigPaths;
     protected String groovyClassesPath;
     protected Map<String, Object> groovyGlobalVars;
     protected boolean mergingOn;
@@ -207,6 +211,10 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     @Required
     public void setProxyConfigPaths(String[] proxyConfigPaths) {
         this.proxyConfigPaths = proxyConfigPaths;
+    }
+
+    public void setTranslationConfigPaths(String[] translationConfigPaths) {
+        this.translationConfigPaths = translationConfigPaths;
     }
 
     @Required
@@ -381,6 +389,10 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
                     .map(path -> macroResolver.resolveMacros(path, macroValues))
                     .collect(toList());
 
+            List<String> resolvedTranslationConfPaths = Stream.of(translationConfigPaths)
+                    .map(path -> macroResolver.resolveMacros(path, macroValues))
+                    .collect(toList());
+
             ResourceLoader resourceLoader = new ContentStoreResourceLoader(siteContext);
             HierarchicalConfiguration<?> config = getConfig(siteContext, resolvedConfigPaths, resourceLoader);
 
@@ -391,6 +403,8 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
                                                                               resolvedAppContextPaths, resourceLoader);
             UrlRewriter urlRewriter = getUrlRewriter(siteContext, resolvedUrlRewriteConfPaths, resourceLoader);
             HierarchicalConfiguration proxyConfig = getProxyConfig(siteContext, resolvedProxyConfPaths, resourceLoader);
+            HierarchicalConfiguration translationConfig =
+                    getTranslationConfig(siteContext, resolvedTranslationConfPaths, resourceLoader);
 
             siteContext.setScriptFactory(scriptFactory);
             siteContext.setConfig(config);
@@ -399,6 +413,8 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             siteContext.setClassLoader(classLoader);
             siteContext.setUrlRewriter(urlRewriter);
             siteContext.setProxyConfig(proxyConfig);
+            siteContext.setTranslationConfig(translationConfig);
+            siteContext.setLocaleResolver(buildLocaleResolver(translationConfig));
 
             Scheduler scheduler = scheduleJobs(siteContext);
             siteContext.setScheduler(scheduler);
@@ -596,6 +612,40 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             logger.info("</Loading proxy configuration for site: " + siteName + ">");
             logger.info("---------------------------------------------------------");
         }
+    }
+
+    protected HierarchicalConfiguration getTranslationConfig(SiteContext siteContext, List<String> configPaths,
+                                                       ResourceLoader resourceLoader) {
+        String siteName = siteContext.getSiteName();
+
+        logger.info("-------------------------------------------------------");
+        logger.info("<Loading translation configuration for site: " + siteName + ">");
+        logger.info("-------------------------------------------------------");
+
+        try {
+            ListIterator<String> iterator = configPaths.listIterator(configPaths.size());
+            while(iterator.hasPrevious()) {
+                Resource resource = resourceLoader.getResource(iterator.previous());
+                if (resource.exists()) {
+                    return configurationReader.readXmlConfiguration(resource);
+                }
+            }
+            return null;
+        } catch (ConfigurationException e) {
+            throw new SiteContextCreationException("Unable to load translation configuration for site '" + siteName +
+                                                    "'", e);
+        } finally {
+            logger.info("---------------------------------------------------------");
+            logger.info("</Loading translation configuration for site: " + siteName + ">");
+            logger.info("---------------------------------------------------------");
+        }
+    }
+
+    protected LocaleResolver buildLocaleResolver(HierarchicalConfiguration<?> configuration) {
+        if (configuration != null && configuration.containsKey(CONFIG_KEY_DEFAULT_LOCALE)) {
+            return new ChainLocaleResolver(globalApplicationContext, configuration);
+        }
+        return null;
     }
 
     protected ScriptFactory getScriptFactory(SiteContext siteContext, URLClassLoader classLoader) {

@@ -211,6 +211,10 @@
 			<param-name>contextConfigLocation</param-name>
 			<param-value>classpath:crafter/engine/rendering/main-rendering-context.xml</param-value>
 		</init-param>
+		<init-param>
+			<param-name>threadContextInheritable</param-name>
+			<param-value>true</param-value>
+		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 
