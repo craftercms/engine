@@ -275,36 +275,59 @@ public class ContentTypeBasedDataFetcher extends RequestAwareDataFetcher<Object>
 
     protected void addFieldFilterFromObjectField(String path, ObjectField filter, BoolQueryBuilder query,
                                                  DataFetchingEnvironment env) {
-        if (filter.getValue() instanceof ArrayValue) {
-            ArrayValue actualFilters = (ArrayValue) filter.getValue();
-            switch (filter.getName()) {
-                case ARG_NAME_NOT:
-                    BoolQueryBuilder notQuery = boolQuery();
-                    actualFilters.getValues()
-                        .forEach(notFilter -> ((ObjectValue) notFilter).getObjectFields()
-                            .forEach(notField -> addFieldFilterFromObjectField(path, notField, notQuery, env)));
+        boolean isVariable = filter.getValue() instanceof VariableReference;
+        switch (filter.getName()) {
+            case ARG_NAME_NOT:
+                BoolQueryBuilder notQuery = boolQuery();
+                if(isVariable) {
+                    ((List<Map<String, Object>>) env.getVariables()
+                            .get(((VariableReference) filter.getValue()).getName()))
+                            .forEach(notFilter -> notFilter.entrySet()
+                                    .forEach(entry -> addFieldFilterFromMapEntry(path, entry, notQuery, env)));
+                } else {
+                    ((ArrayValue) filter.getValue()).getValues()
+                            .forEach(notFilter -> ((ObjectValue) notFilter).getObjectFields()
+                                    .forEach(notField -> addFieldFilterFromObjectField(path, notField, notQuery, env)));
+                }
+                if (!notQuery.filter().isEmpty()) {
                     notQuery.filter().forEach(query::mustNot);
-                    break;
-                case ARG_NAME_AND:
-                    actualFilters.getValues()
-                        .forEach(andFilter -> ((ObjectValue) andFilter).getObjectFields()
-                            .forEach(andField -> addFieldFilterFromObjectField(path, andField, query, env)));
-                    break;
-                case ARG_NAME_OR:
-                    BoolQueryBuilder tempQuery = boolQuery();
+                }
+                break;
+            case ARG_NAME_AND:
+                if (isVariable) {
+                    ((List<Map<String, Object>>) env.getVariables()
+                            .get(((VariableReference) filter.getValue()).getName()))
+                            .forEach(andFilter -> andFilter.entrySet()
+                                    .forEach(entry -> addFieldFilterFromMapEntry(path, entry, query, env)));
+                } else {
+                    ((ArrayValue) filter.getValue()).getValues()
+                            .forEach(andFilter -> ((ObjectValue) andFilter).getObjectFields()
+                                    .forEach(andField -> addFieldFilterFromObjectField(path, andField, query, env)));
+                }
+                break;
+            case ARG_NAME_OR:
+                BoolQueryBuilder tempQuery = boolQuery();
+                if (isVariable) {
+                    ((List<Map<String, Object>>) env.getVariables()
+                            .get(((VariableReference) filter.getValue()).getName()))
+                            .forEach(orFilter -> orFilter.entrySet()
+                                    .forEach(entry -> addFieldFilterFromMapEntry(path, entry, tempQuery, env)));
+                } else {
+                    ((ArrayValue) filter.getValue()).getValues().forEach(orFilter ->
+                            ((ObjectValue) orFilter).getObjectFields()
+                                    .forEach(orField -> addFieldFilterFromObjectField(path, orField, tempQuery, env)));
+                }
+                if (!tempQuery.filter().isEmpty()) {
                     BoolQueryBuilder orQuery = boolQuery();
-                    actualFilters.getValues().forEach(orFilter ->
-                        ((ObjectValue) orFilter).getObjectFields()
-                            .forEach(orField -> addFieldFilterFromObjectField(path, orField, tempQuery, env)));
                     tempQuery.filter().forEach(orQuery::should);
                     query.filter(boolQuery().must(orQuery));
-                    break;
-                default:
-                    // never happens
-            }
-        } else if (!(filter.getValue() instanceof VariableReference) ||
-                    env.getVariables().containsKey(((VariableReference)filter.getValue()).getName())) {
-            query.filter(getFilterQueryFromObjectField(path, filter, env));
+                }
+                break;
+            default:
+                QueryBuilder builder = getFilterQueryFromObjectField(path, filter, env);
+                if (builder != null) {
+                    query.filter(builder);
+                }
         }
     }
 
@@ -341,23 +364,27 @@ public class ContentTypeBasedDataFetcher extends RequestAwareDataFetcher<Object>
 
     protected QueryBuilder getFilterQueryFromObjectField(String fieldPath, ObjectField filter,
                                                          DataFetchingEnvironment env) {
+        Object value = getRealValue(filter.getValue(), env);
+        if (value == null) {
+            return null;
+        }
         switch (filter.getName()) {
             case ARG_NAME_EQUALS:
-                return termQuery(fieldPath, getRealValue(filter.getValue(), env));
+                return termQuery(fieldPath, value);
             case ARG_NAME_MATCHES:
-                return matchQuery(fieldPath, getRealValue(filter.getValue(), env));
+                return matchQuery(fieldPath, value);
             case ARG_NAME_REGEX:
-                return regexpQuery(fieldPath, getRealValue(filter.getValue(), env).toString());
+                return regexpQuery(fieldPath, value.toString());
             case ARG_NAME_LT:
-                return rangeQuery(fieldPath).lt(getRealValue(filter.getValue(), env));
+                return rangeQuery(fieldPath).lt(value);
             case ARG_NAME_GT:
-                return rangeQuery(fieldPath).gt(getRealValue(filter.getValue(), env));
+                return rangeQuery(fieldPath).gt(value);
             case ARG_NAME_LTE:
-                return rangeQuery(fieldPath).lte(getRealValue(filter.getValue(), env));
+                return rangeQuery(fieldPath).lte(value);
             case ARG_NAME_GTE:
-                return rangeQuery(fieldPath).gte(getRealValue(filter.getValue(), env));
+                return rangeQuery(fieldPath).gte(value);
             case ARG_NAME_EXISTS:
-                boolean exists = (boolean) getRealValue(filter.getValue(), env);
+                boolean exists = (boolean) value;
                 if (exists) {
                     return existsQuery(fieldPath);
                 } else {
