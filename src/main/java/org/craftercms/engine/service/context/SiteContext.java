@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
 import org.tuckey.web.filters.urlrewrite.UrlRewriter;
 
@@ -52,6 +53,11 @@ import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.craftercms.commons.locale.LocaleUtils.CONFIG_KEY_DEFAULT_LOCALE;
+import static org.craftercms.commons.locale.LocaleUtils.CONFIG_KEY_LOCALE_RESOLVER;
+import static org.craftercms.commons.locale.LocaleUtils.CONFIG_KEY_SUPPORTED_LOCALES;
 
 /**
  * Wrapper for a {@link Context} that adds properties specific to Crafter Engine.
@@ -95,6 +101,8 @@ public class SiteContext {
     protected GraphQLFactory graphQLFactory;
     protected SiteCacheWarmer cacheWarmer;
     protected HierarchicalConfiguration proxyConfig;
+    protected HierarchicalConfiguration translationConfig;
+    protected LocaleResolver localeResolver;
 
     protected long initTimeout;
     protected CountDownLatch initializationLatch;
@@ -369,6 +377,29 @@ public class SiteContext {
 
     public void setProxyConfig(HierarchicalConfiguration proxyConfig) {
         this.proxyConfig = proxyConfig;
+    }
+
+    public HierarchicalConfiguration getTranslationConfig() {
+        return translationConfig;
+    }
+
+    public void setTranslationConfig(HierarchicalConfiguration translationConfig) {
+        this.translationConfig = translationConfig;
+    }
+
+    public boolean isTranslationEnabled() {
+        return translationConfig != null &&
+                translationConfig.containsKey(CONFIG_KEY_DEFAULT_LOCALE) &&
+                isNotEmpty(translationConfig.configurationsAt(CONFIG_KEY_SUPPORTED_LOCALES)) &&
+                isNotEmpty(translationConfig.configurationsAt(CONFIG_KEY_LOCALE_RESOLVER));
+    }
+
+    public LocaleResolver getLocaleResolver() {
+        return localeResolver;
+    }
+
+    public void setLocaleResolver(LocaleResolver localeResolver) {
+        this.localeResolver = localeResolver;
     }
 
     public boolean isValid() throws CrafterException {

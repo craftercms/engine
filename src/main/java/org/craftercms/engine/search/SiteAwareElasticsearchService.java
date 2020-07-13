@@ -16,20 +16,27 @@
 
 package org.craftercms.engine.search;
 
-import org.craftercms.search.elasticsearch.impl.AbstractElasticsearchWrapper;
 import org.craftercms.engine.service.context.SiteContext;
+import org.craftercms.search.elasticsearch.impl.AbstractElasticsearchWrapper;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.craftercms.commons.locale.LocaleUtils.CONFIG_KEY_DEFAULT_LOCALE;
+import static org.craftercms.commons.locale.LocaleUtils.CONFIG_KEY_FALLBACK;
+import static org.craftercms.commons.locale.LocaleUtils.appendLocale;
+import static org.craftercms.commons.locale.LocaleUtils.parseLocale;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.existsQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
@@ -41,8 +48,6 @@ import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
  * @since 3.1
  */
 public class SiteAwareElasticsearchService extends AbstractElasticsearchWrapper {
-
-    private static final Logger logger = LoggerFactory.getLogger(SiteAwareElasticsearchService.class);
 
     private static final String DEFAULT_ROLE_FIELD_NAME = "authorizedRoles.item.role";
 
@@ -68,10 +73,43 @@ public class SiteAwareElasticsearchService extends AbstractElasticsearchWrapper 
     @Override
     protected void updateIndex(final SearchRequest request) {
         SiteContext siteContext = SiteContext.getCurrent();
-        if (siteContext != null) {
-            request.indices(String.format(indexIdFormat, siteContext.getSiteName()));
-        } else {
+        if (siteContext == null) {
             throw new IllegalStateException("Current site context not found");
+        }
+
+        String aliasName = String.format(indexIdFormat, siteContext.getSiteName());
+
+        // list of aliases to query
+        List<String> aliases = new LinkedList<>();
+        // the original alias will always be included for backward compatibility
+        aliases.add(aliasName);
+
+        if (siteContext.isTranslationEnabled()) {
+            boolean fallbackToDefault = siteContext.getTranslationConfig().getBoolean(CONFIG_KEY_FALLBACK);
+            Locale defaultLocale = parseLocale(siteContext.getTranslationConfig().getString(CONFIG_KEY_DEFAULT_LOCALE));
+            Locale currentLocale = LocaleContextHolder.getLocaleContext().getLocale();
+
+            if (fallbackToDefault && defaultLocale != null) {
+                // if fallback is enabled, add the default locale
+                aliases.add(appendLocale(aliasName, defaultLocale));
+            }
+
+            if (currentLocale != null && !currentLocale.equals(defaultLocale)) {
+                // if the current locale is other than the default, include the alias for it
+                aliases.add(appendLocale(aliasName, currentLocale));
+            }
+        }
+
+        logger.debug("Executing query for aliases: {}", aliases);
+
+        // Override the indices field in the request
+        request.indices(aliases.toArray(new String[0]));
+
+        // Boost the results based on the locale
+        float boost = 1;
+        for (String alias : aliases) {
+            request.source().indexBoost(alias, boost);
+            boost *= 5;
         }
     }
 
