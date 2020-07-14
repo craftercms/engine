@@ -19,6 +19,8 @@ package org.craftercms.engine.search;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.search.elasticsearch.impl.AbstractElasticsearchWrapper;
 import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.action.support.IndicesOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -29,10 +31,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Locale;
 
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.lang3.LocaleUtils.localeLookupList;
 import static org.craftercms.commons.locale.LocaleUtils.CONFIG_KEY_DEFAULT_LOCALE;
 import static org.craftercms.commons.locale.LocaleUtils.CONFIG_KEY_FALLBACK;
 import static org.craftercms.commons.locale.LocaleUtils.appendLocale;
@@ -81,35 +85,46 @@ public class SiteAwareElasticsearchService extends AbstractElasticsearchWrapper 
 
         // list of aliases to query
         List<String> aliases = new LinkedList<>();
-        // the original alias will always be included for backward compatibility
-        aliases.add(aliasName);
 
         if (siteContext.isTranslationEnabled()) {
             boolean fallbackToDefault = siteContext.getTranslationConfig().getBoolean(CONFIG_KEY_FALLBACK);
             Locale defaultLocale = parseLocale(siteContext.getTranslationConfig().getString(CONFIG_KEY_DEFAULT_LOCALE));
             Locale currentLocale = LocaleContextHolder.getLocaleContext().getLocale();
 
-            if (fallbackToDefault && defaultLocale != null) {
-                // if fallback is enabled, add the default locale
-                aliases.add(appendLocale(aliasName, defaultLocale));
-            }
-
             if (currentLocale != null && !currentLocale.equals(defaultLocale)) {
                 // if the current locale is other than the default, include the alias for it
-                aliases.add(appendLocale(aliasName, currentLocale));
+                localeLookupList(currentLocale).forEach(locale -> aliases.add(appendLocale(aliasName, locale)));
+            }
+
+            if (fallbackToDefault && defaultLocale != null) {
+                // if fallback is enabled, add the default locale
+                localeLookupList(defaultLocale).forEach(locale -> aliases.add(appendLocale(aliasName, locale)));
             }
         }
+
+        // the original alias will always be included for backward compatibility
+        aliases.add(aliasName);
 
         logger.debug("Executing query for aliases: {}", aliases);
 
         // Override the indices field in the request
         request.indices(aliases.toArray(new String[0]));
 
-        // Boost the results based on the locale
-        float boost = 1;
-        for (String alias : aliases) {
-            request.source().indexBoost(alias, boost);
-            boost *= 5;
+        if (aliases.size() > 1) {
+            // Boost the results based on the index
+            float boost = 1;
+            ListIterator<String> iterator = aliases.listIterator(aliases.size());
+            while (iterator.hasPrevious()) {
+                request.source().indexBoost(iterator.previous(), boost);
+                // TODO: Make this value configurable per site
+                boost += 0.05;
+            }
+
+            // Don't fail if one of the indices doesn't exist
+            request.indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
+
+            // Fix scores across multiple indices
+            request.searchType(SearchType.DFS_QUERY_THEN_FETCH);
         }
     }
 
