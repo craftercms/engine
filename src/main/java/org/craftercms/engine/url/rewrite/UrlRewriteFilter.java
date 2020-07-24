@@ -21,11 +21,11 @@ import org.craftercms.engine.service.context.SiteContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.InitializingBean;
 import org.tuckey.web.filters.urlrewrite.UrlRewriteWrappedResponse;
 import org.tuckey.web.filters.urlrewrite.UrlRewriter;
 import org.tuckey.web.filters.urlrewrite.utils.Log;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,7 +41,7 @@ import java.io.IOException;
  *
  * @see <a href="http://tuckey.org/urlrewrite/">Tuckey URL Rewrite</a>
  */
-public class UrlRewriteFilter implements Filter {
+public class UrlRewriteFilter implements Filter, InitializingBean {
 
     private static final Logger logger = LoggerFactory.getLogger(UrlRewriteFilter.class);
 
@@ -50,8 +50,7 @@ public class UrlRewriteFilter implements Filter {
         // Do nothing
     }
 
-    @PostConstruct
-    public void init() {
+    public void afterPropertiesSet() {
         // Set Tuckey logging to use slf4j
         Log.setLevel("slf4j");
     }

@@ -17,18 +17,18 @@
 package org.craftercms.engine.util.servlet;
 
 import java.util.Map;
-import javax.annotation.PostConstruct;
 import javax.servlet.ServletContext;
 
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.context.ServletContextAware;
+import org.springframework.beans.factory.InitializingBean;
 
 /**
  * A simple class that adds a bunch of attributes passed as a property to the current servlet context.
  *
  * @author avasquez
  */
-public class ServletContextAttributesBootstrap implements ServletContextAware {
+public class ServletContextAttributesBootstrap implements ServletContextAware, InitializingBean {
 
     private ServletContext servletContext;
     private Map<String, Object> attributes;
@@ -43,8 +43,7 @@ public class ServletContextAttributesBootstrap implements ServletContextAware {
         this.attributes = attributes;
     }
 
-    @PostConstruct
-    public void init() {
+    public void afterPropertiesSet() {
         if (servletContext == null) {
             throw new IllegalStateException("There's no current ServletContext");
         }

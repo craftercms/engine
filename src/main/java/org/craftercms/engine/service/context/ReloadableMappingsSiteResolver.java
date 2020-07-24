@@ -21,8 +21,8 @@ import org.apache.commons.logging.LogFactory;
 import org.craftercms.core.exception.CrafterException;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.io.Resource;
+import org.springframework.beans.factory.InitializingBean;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.*;
@@ -35,7 +35,7 @@ import java.util.*;
  *
  * @author avasquez
  */
-public class ReloadableMappingsSiteResolver implements SiteListResolver, SiteResolver {
+public class ReloadableMappingsSiteResolver implements SiteListResolver, SiteResolver, InitializingBean {
 
     private static final Log logger = LogFactory.getLog(ReloadableMappingsSiteResolver.class);
 
@@ -54,8 +54,7 @@ public class ReloadableMappingsSiteResolver implements SiteListResolver, SiteRes
         this.siteContextManager = siteContextManager;
     }
 
-    @PostConstruct
-    public void init() throws Exception {
+    public void afterPropertiesSet() throws Exception {
         loadMappings();
     }
 

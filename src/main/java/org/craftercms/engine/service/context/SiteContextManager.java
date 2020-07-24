@@ -24,8 +24,8 @@ import org.craftercms.commons.entitlements.exception.EntitlementException;
 import org.craftercms.commons.entitlements.model.EntitlementType;
 import org.craftercms.commons.entitlements.validator.EntitlementValidator;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.DisposableBean;
 
-import javax.annotation.PreDestroy;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -41,7 +41,7 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * @author Alfonso Vásquez
  */
-public class SiteContextManager {
+public class SiteContextManager implements DisposableBean {
 
     private static final Log logger = LogFactory.getLog(SiteContextManager.class);
 
@@ -95,7 +95,6 @@ public class SiteContextManager {
         this.defaultSiteName = defaultSiteName;
     }
 
-    @PreDestroy
     public void destroy() {
         destroyAllContexts();
     }

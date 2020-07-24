@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.logging.Log;
@@ -31,6 +30,7 @@ import org.craftercms.engine.macro.MacroResolver;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.beans.factory.InitializingBean;
 
 /**
  * Default implementation of {@link SiteListResolver}. Basically, parses the site root folder path to separate
@@ -45,7 +45,7 @@ import org.springframework.core.io.ResourceLoader;
  *
  * @author avasquez
  */
-public class FolderScanningSiteListResolver implements SiteListResolver, ResourceLoaderAware {
+public class FolderScanningSiteListResolver implements SiteListResolver, ResourceLoaderAware, InitializingBean {
 
     private static final Log logger = LogFactory.getLog(FolderScanningSiteListResolver.class);
 
@@ -84,8 +84,7 @@ public class FolderScanningSiteListResolver implements SiteListResolver, Resourc
         this.resourceLoader = resourceLoader;
     }
 
-    @PostConstruct
-    public void init() {
+    public void afterPropertiesSet() {
         String siteRootFolderPathRegex = String.format(SITE_ROOT_FOLDER_PATH_REGEX, siteNameMacroName);
         Pattern siteRootFolderPathPattern = Pattern.compile(siteRootFolderPathRegex);
         Matcher siteRootFolderPathMatcher = siteRootFolderPathPattern.matcher(siteRootFolderPath);

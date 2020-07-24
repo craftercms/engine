@@ -74,7 +74,7 @@ public class FolderScanningSiteListResolverTest {
         siteListResolver.setSiteNameMacroName(SITE_NAME_MACRO_NAME);
         siteListResolver.setSiteRootFolderPath(siteRootFolderPath);
 
-        siteListResolver.init();
+        siteListResolver.afterPropertiesSet();
     }
 
     @Test

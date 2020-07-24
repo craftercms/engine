@@ -15,9 +15,8 @@
  */
 package org.craftercms.engine.macro.impl;
 
-import javax.annotation.PostConstruct;
-
 import org.craftercms.engine.macro.Macro;
+import org.springframework.beans.factory.InitializingBean;
 
 /**
  * Abstract {@link org.craftercms.engine.macro.Macro} that provides a macro name attribute to hold the macro name (when the macro's name
@@ -25,12 +24,11 @@ import org.craftercms.engine.macro.Macro;
  *
  * @author Alfonso Vásquez
  */
-public abstract class AbstractMacro implements Macro {
+public abstract class AbstractMacro implements Macro, InitializingBean {
 
     protected String macroName;
 
-    @PostConstruct
-    public void init() {
+    public void afterPropertiesSet() {
         macroName = createMacroName();
     }
 
