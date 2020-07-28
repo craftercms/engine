@@ -1,20 +1,23 @@
 language: java
 jdk:
-  - openjdk8
+- openjdk11
 branches:
-  except:
-    - travis
+  only:
+  - develop
+  - support/.*
+  - master
 notifications:
   irc:
     channels:
-      - "chat.freenode.net#craftercms"
+    - chat.freenode.net#craftercms
     use_notice: true
     skip_join: true
   slack: craftersoftware:7YiSb41ZG5rfMgiAY7Qgprc7
+script:
+- if [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; then bash -c  "mvn deploy --settings
+  .travis-settings.xml";  fi
+- if [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then bash -c "mvn clean install" ;fi
 env:
   global:
-    - secure: "OOqd7HDGtfcJGPZ53d3gPcbPIO9CN/Ed0WHKaAxfg6uN4+8173COZBQd0b99Vs8C91iPHnMDnXi0YZEV+MJcoPNLGKdzK6wn7bhZgWmEn72x5DBRDWPuxQVIPHpjm80l+n76VFSmCSrO7VlkzQkb2nw2UbHudATqAhhwHo0XlzM="
-    - secure: "D4QQtkjmQ2LHESmxRuw3VVIvutGhspYsppNQaf+5cOktukeWV/9Wcw0QblzCRDY/EifP9JkCSiDyPW1JmluVcTDjZ7cdCylFz1XpWKDdhT4LiMvaRDHNuIzp2z6wVa9APHhmyf16swXbtFpfgxuv8JFf+nE3mVFRYezYqLMrSBg="
-script:
-  - 'if [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; then bash -c  "mvn deploy --settings .travis-settings.xml";  fi'
-  - 'if [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then bash -c "mvn clean install" ;fi'
+  - secure: F95ItQNJf1p37o0uWIpw2CtRbJHq2YpRrTt84BHbjZgO5Vu5kKpaVxLWYPM0lJ/fppDy6ZyJyrJG1AqXuNuDZoxid46EkYzhMSSwPKnvk0WoEu/wIp9V8iycbYbh0dT1whECIP6X0DjXrTLRRfxSLcfh/IXuwFZaecE89nXelBA=
+  - secure: CfiWubt7r/wC4Qo8d6QB/qmLkA3vTs8Gz7h6MFn3c9zaB6tpAqu4cNo7J2NNH0vgMocQtVCS1KB9zTeJDn17e7cdaO8tw2uCh0jgZzFfukkQq5AumPi5FXVtvngVeQT0PXDdESdt+dGkx/fvTOl7sTZaRCBBgkghHcPF5KMitUM=
