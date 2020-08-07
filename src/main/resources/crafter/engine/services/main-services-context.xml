@@ -175,12 +175,16 @@
     <!--									-->
     <!-- ////////////////////////////////// -->
 
-    <bean id="cloudfrontForwardedHeaderFilter" class="org.craftercms.commons.web.CloudfrontForwardedHeaderFilter">
+    <bean id="crafter.cloudfrontForwardedHeaderFilter" class="org.craftercms.commons.web.CloudfrontForwardedHeaderFilter">
         <constructor-arg value="${crafter.engine.forwarded.headers.enabled}"/>
     </bean>
 
-    <bean id="forwardedHeaderFilter" class="org.craftercms.commons.web.ForwardedHeaderFilter">
+    <bean id="crafter.forwardedHeaderFilter" class="org.craftercms.commons.web.ForwardedHeaderFilter">
         <constructor-arg value="${crafter.engine.forwarded.headers.enabled}"/>
+    </bean>
+
+    <bean id="crafter.contentCachingFilter" class="org.craftercms.engine.servlet.filter.ContentCachingFilter">
+        <constructor-arg value="${crafter.engine.preview}"/>
     </bean>
 
     <bean id="crafter.exceptionHandlingFilter" class="org.craftercms.engine.servlet.filter.ExceptionHandlingFilter">
