@@ -15,7 +15,16 @@
  */
 package org.craftercms.engine.util.servlet;
 
+import org.apache.http.HttpEntityEnclosingRequest;
+import org.apache.http.HttpRequest;
+import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.mitre.dsmiley.httpproxy.ProxyServlet;
+import org.springframework.web.util.ContentCachingRequestWrapper;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 /**
  * Extension of {@link ProxyServlet} that uses the current site configuration
@@ -32,6 +41,27 @@ public class ConfigAwareProxyServlet extends ProxyServlet {
     @Override
     protected void initTarget() {
         // Do nothing ... the target url will be resolved for each request
+    }
+
+    @Override
+    protected HttpRequest newProxyRequestWithEntity(String method, String proxyRequestUri, HttpServletRequest request)
+            throws IOException {
+        // Check if the request was cached
+        if (request instanceof ContentCachingRequestWrapper) {
+            // Use the cached content instead of the input stream
+            HttpEntityEnclosingRequest proxyRequest =
+                    new BasicHttpEntityEnclosingRequest(method, proxyRequestUri);
+            byte[] cachedContent = ((ContentCachingRequestWrapper) request).getContentAsByteArray();
+            // If the cache is empty, the input stream has not been consumed
+            if (cachedContent.length != 0) {
+                proxyRequest.setEntity(
+                        new InputStreamEntity(new ByteArrayInputStream(cachedContent), cachedContent.length));
+                return proxyRequest;
+            }
+        }
+
+        // Use the input stream as usual
+        return super.newProxyRequestWithEntity(method, proxyRequestUri, request);
     }
 
 }
