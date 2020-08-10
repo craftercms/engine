@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
+import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.craftercms.engine.util.servlet.ConfigAwareProxyServlet.ATTR_TARGET_HOST;
 import static org.craftercms.engine.util.servlet.ConfigAwareProxyServlet.ATTR_TARGET_URI;
 
@@ -80,7 +81,7 @@ public class HttpProxyFilter extends OncePerRequestFilter {
                 // get the target url from the site config
                 String targetUrl = getTargetUrl(SiteContext.getCurrent(), request.getRequestURI());
 
-                if (request.getRequestURL().toString().contains(targetUrl)) {
+                if (isEmpty(targetUrl) || request.getRequestURL().toString().contains(targetUrl)) {
                     logger.debug("Resolved target url for request {} is local, will skip proxy", requestUri);
                 } else {
                     logger.debug("Resolved target url {} for proxy request {}", targetUrl, requestUri);
@@ -120,15 +121,13 @@ public class HttpProxyFilter extends OncePerRequestFilter {
         for (HierarchicalConfiguration server : servers) {
             List<String> patterns = server.getList(String.class, CONFIG_KEY_PATTERNS);
             if (RegexUtils.matchesAny(requestUri, patterns)) {
-                logger.debug("Found matching server {} for proxy request {}",
+                logger.debug("Found matching server '{}' for proxy request {}",
                         server.getString(CONFIG_KEY_ID), requestUri);
-                return server.getString(CONFIG_KEY_URL);
+                return server.getString(CONFIG_KEY_URL, null);
             }
         }
 
-        // should never happen (unless there is an issue with the config)
-        throw new IllegalStateException("Invalid proxy configuration for site " + siteContext.getSiteName() +
-                ", no matching server found for request " + requestUri);
+        return null;
     }
 
 }
