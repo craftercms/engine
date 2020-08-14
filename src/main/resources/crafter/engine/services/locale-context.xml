@@ -33,4 +33,7 @@
         <constructor-arg value="${crafter.engine.locale.cookie.name}"/>
     </bean>
 
+    <bean id="crafter.principalLocaleResolver" scope="prototype"
+          class="org.craftercms.engine.util.spring.servlet.i18n.PrincipalLocaleResolver"/>
+
 </beans>

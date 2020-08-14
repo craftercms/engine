@@ -56,7 +56,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.craftercms.commons.locale.LocaleUtils.CONFIG_KEY_DEFAULT_LOCALE;
-import static org.craftercms.commons.locale.LocaleUtils.CONFIG_KEY_LOCALE_RESOLVER;
 import static org.craftercms.commons.locale.LocaleUtils.CONFIG_KEY_SUPPORTED_LOCALES;
 
 /**
@@ -390,8 +389,7 @@ public class SiteContext {
     public boolean isTranslationEnabled() {
         return translationConfig != null &&
                 translationConfig.containsKey(CONFIG_KEY_DEFAULT_LOCALE) &&
-                isNotEmpty(translationConfig.configurationsAt(CONFIG_KEY_SUPPORTED_LOCALES)) &&
-                isNotEmpty(translationConfig.configurationsAt(CONFIG_KEY_LOCALE_RESOLVER));
+                isNotEmpty(translationConfig.configurationsAt(CONFIG_KEY_SUPPORTED_LOCALES));
     }
 
     public LocaleResolver getLocaleResolver() {

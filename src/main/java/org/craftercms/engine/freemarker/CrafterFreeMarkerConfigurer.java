@@ -23,6 +23,7 @@ import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import org.craftercms.engine.macro.MacroResolver;
 import org.craftercms.engine.util.freemarker.CrafterCacheAwareConfiguration;
+import org.craftercms.engine.view.freemarker.SiteAwareTemplateLookupStrategy;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import java.io.IOException;
@@ -67,6 +68,8 @@ public class CrafterFreeMarkerConfigurer extends FreeMarkerConfigurer {
         if (!cacheTemplates) {
             config.setCacheStorage(NullCacheStorage.INSTANCE);
         }
+
+        config.setTemplateLookupStrategy(new SiteAwareTemplateLookupStrategy());
     }
 
     @Override

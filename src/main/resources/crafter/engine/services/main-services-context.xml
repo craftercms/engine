@@ -672,7 +672,6 @@
         <property name="freemarkerSettings">
             <props>
                 <prop key="output_encoding">UTF-8</prop>
-                <prop key="localized_lookup">false</prop>
                 <prop key="object_wrapper">org.craftercms.engine.freemarker.CrafterObjectWrapper</prop>
                 <prop key="datetime_format">${crafter.engine.model.datetime.pattern}</prop>
                 <prop key="time_zone">${crafter.engine.model.datetime.timeZone}</prop>
@@ -770,6 +769,10 @@
         <property name="targetIdManager" ref="crafter.proxyTargetIdManager"/>
     </bean>
 
+    <bean id="crafter.localeItemProcessor" class="org.craftercms.engine.navigation.impl.LocaleItemProcessor">
+        <constructor-arg ref="crafter.contentStoreService"/>
+    </bean>
+
     <bean id="crafter.rejectIndexFilesItemFilter"
           class="org.craftercms.engine.navigation.impl.RejectIndexFilesItemFilter">
         <property name="targetedUrlStrategy" ref="crafter.proxyTargetedUrlStrategy"/>
@@ -784,12 +787,19 @@
         <constructor-arg value="true"/>
     </bean>
 
+    <bean id="crafter.localeItemFilter" class="org.craftercms.engine.navigation.impl.LocaleItemFilter">
+        <constructor-arg value="${crafter.engine.model.locale.xpathQuery}"/>
+        <constructor-arg ref="crafter.contentStoreService"/>
+    </bean>
+
     <util:list id="crafter.navTreeProcessors">
         <ref bean="crafter.folderToIndexItemProcessor"/>
         <ref bean="crafter.currentTargetedVersionItemProcessor"/>
+        <ref bean="crafter.localeItemProcessor"/>
     </util:list>
 
     <util:list id="crafter.navTreeFilters">
+        <ref bean="crafter.localeItemFilter"/>
         <ref bean="crafter.rejectIndexFilesItemFilter"/>
         <ref bean="crafter.rejectDuplicatesItemFilter"/>
         <ref bean="crafter.acceptPlaceInNavItemFilter"/>
