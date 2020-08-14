@@ -43,7 +43,7 @@ public class TargetingPreAuthenticatedFilter extends ConfigAwarePreAuthenticatio
         // always enabled
         super(null);
         setAlwaysEnabled(true);
-        setSupportedPrincipalClass(ProfileUser.class);
+        setSupportedPrincipalClass(TargetingUser.class);
 
         setCheckForPrincipalChanges(true);
     }
@@ -82,7 +82,7 @@ public class TargetingPreAuthenticatedFilter extends ConfigAwarePreAuthenticatio
 
                 profile.setAttributes(customAttributes);
 
-                return new ProfileUser(new TargetingAuthentication(profile));
+                return new TargetingUser(new TargetingAuthentication(profile));
             }
         }
         if (logger.isDebugEnabled()) {

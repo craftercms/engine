@@ -25,7 +25,7 @@
     <!-- Add beans & overrides needed to support Targeting -->
 
     <bean id="crafter.targetingAuthenticationProvider"
-          class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
+          class="org.craftercms.engine.util.spring.security.targeting.TargetingAuthenticationProvider">
         <property name="preAuthenticatedUserDetailsService" ref="crafter.preAuthenticatedUserDetailsService"/>
     </bean>
 
