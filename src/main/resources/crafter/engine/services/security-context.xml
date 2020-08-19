@@ -260,6 +260,25 @@
         <constructor-arg ref="crafter.securityFilterChain"/>
     </bean>
 
+    <!-- Security Headers -->
+
+    <util:list id="crafter.secureHeaderWriters">
+        <bean class="org.springframework.security.web.header.writers.CacheControlHeadersWriter"/>
+        <bean class="org.springframework.security.web.header.writers.HstsHeaderWriter"/>
+        <bean class="org.springframework.security.web.header.writers.XXssProtectionHeaderWriter"/>
+        <bean class="org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter">
+            <constructor-arg value="${crafter.security.headers.xframeOptions.value}"/>
+        </bean>
+        <bean class="org.springframework.security.web.header.writers.XContentTypeOptionsHeaderWriter"/>
+    </util:list>
+
+    <!-- Filter separate from the securityFilter since we want to run it in all requests -->
+    <bean id="crafter.secureHeaderWriterFilter"
+          class="org.craftercms.engine.util.spring.security.ConditionalHeaderWriterFilter">
+        <constructor-arg value="${crafter.security.headers.enabled}"/>
+        <constructor-arg ref="crafter.secureHeaderWriters"/>
+    </bean>
+
     <!-- Include additional security contexts -->
     <import resource="classpath*:crafter/engine/security/*-context.xml"/>
 
