@@ -260,7 +260,7 @@
         <constructor-arg ref="crafter.securityFilterChain"/>
     </bean>
 
-    <!-- Security Headers -->
+    <!-- Secure Headers -->
 
     <util:list id="crafter.secureHeaderWriters">
         <bean class="org.springframework.security.web.header.writers.CacheControlHeadersWriter"/>
