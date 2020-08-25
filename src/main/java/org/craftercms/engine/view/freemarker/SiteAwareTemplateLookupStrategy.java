@@ -24,7 +24,6 @@ import java.io.IOException;
 import static org.craftercms.commons.locale.LocaleUtils.localizePath;
 import static org.craftercms.engine.util.LocaleUtils.getCompatibleLocales;
 
-
 /**
  * Extension of {@link TemplateLookupStrategy} that looks for locale specific templates
  *

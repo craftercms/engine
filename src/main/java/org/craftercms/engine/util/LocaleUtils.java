@@ -35,8 +35,7 @@ import static java.util.Collections.emptyList;
  * @since 3.2.0
  */
 public abstract class LocaleUtils extends org.craftercms.commons.locale.LocaleUtils {
-
-
+    
     public static Locale getCurrentLocale() {
         return LocaleContextHolder.getLocale();
     }
