@@ -75,7 +75,7 @@
     </bean>
 
     <bean id="crafter.siteContentStoreRestController" class="org.craftercms.engine.controller.rest.SiteContentStoreRestController">
-        <property name="wrappedController" ref="crafter.contentStoreRestController"/>
+        <constructor-arg name="wrappedController" ref="crafter.contentStoreRestController"/>
     </bean>
 
     <bean id="crafter.siteCacheRestController" class="org.craftercms.engine.controller.rest.SiteCacheRestController">
