@@ -25,7 +25,6 @@ import org.craftercms.core.service.Item;
 import org.craftercms.core.service.Tree;
 import org.craftercms.engine.service.context.SiteContext;
 import org.dom4j.Document;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -53,35 +52,37 @@ public class SiteContentStoreRestController extends RestControllerBase {
 
     private ContentStoreRestController wrappedController;
 
-    @Required
-    public void setWrappedController(ContentStoreRestController wrappedController) {
+    public SiteContentStoreRestController(ContentStoreRestController wrappedController) {
         this.wrappedController = wrappedController;
     }
 
     @RequestMapping(value = URL_DESCRIPTOR, method = RequestMethod.GET)
     public Document getDescriptor(WebRequest request, HttpServletResponse response,
-                                  @RequestParam(REQUEST_PARAM_URL) String url) {
-        return wrappedController.getDescriptor(request, response, getCurrentContextId(), url);
+                                  @RequestParam(REQUEST_PARAM_URL) String url,
+                                  @RequestParam(required = false, defaultValue = "false") boolean flatten) {
+        return wrappedController.getDescriptor(request, response, getCurrentContextId(), url, flatten);
     }
 
     @RequestMapping(value = URL_ITEM, method = RequestMethod.GET)
     public Item getItem(WebRequest request, HttpServletResponse response,
-                        @RequestParam(REQUEST_PARAM_URL) String url) {
-        return wrappedController.getItem(request, response, getCurrentContextId(), url);
+                        @RequestParam(REQUEST_PARAM_URL) String url,
+                        @RequestParam(required = false, defaultValue = "false") boolean flatten) {
+        return wrappedController.getItem(request, response, getCurrentContextId(), url, flatten);
     }
 
     @RequestMapping(value = URL_CHILDREN, method = RequestMethod.GET)
     public List<Item> getChildren(WebRequest request, HttpServletResponse response,
-                                  @RequestParam(REQUEST_PARAM_URL) String url) {
-        return wrappedController.getChildren(request, response, getCurrentContextId(), url);
+                                  @RequestParam(REQUEST_PARAM_URL) String url,
+                                  @RequestParam(required = false, defaultValue = "false") boolean flatten) {
+        return wrappedController.getChildren(request, response, getCurrentContextId(), url, flatten);
     }
 
     @RequestMapping(value = URL_TREE, method = RequestMethod.GET)
     public Tree getTree(WebRequest request, HttpServletResponse response,
                         @RequestParam(REQUEST_PARAM_URL) String url,
-                        @RequestParam(value = REQUEST_PARAM_TREE_DEPTH, required = false)
-                                       Integer depth) {
-        return wrappedController.getTree(request, response, getCurrentContextId(), url, depth);
+                        @RequestParam(value = REQUEST_PARAM_TREE_DEPTH, required = false) Integer depth,
+                        @RequestParam(required = false, defaultValue = "false") boolean flatten) {
+        return wrappedController.getTree(request, response, getCurrentContextId(), url, depth, flatten);
     }
 
     protected String getCurrentContextId() {
