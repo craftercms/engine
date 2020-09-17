@@ -184,6 +184,7 @@
         <constructor-arg ref="crafter.cacheTemplate"/>
         <property name="authenticationManager" ref="crafter.authenticationManager"/>
         <property name="authenticationDetailsSource" ref="crafter.defaultDetailsSource"/>
+        <property name="defaultTokenValue" value="${crafter.security.header.token}"/>
     </bean>
 
     <bean id="crafter.formLoginFilter"
