@@ -240,6 +240,11 @@
         </constructor-arg>
     </bean>
 
+    <bean id="crafter.etagFilter" class="org.craftercms.engine.servlet.filter.ConfigAwareEtagFilter">
+        <constructor-arg value="${crafter.engine.header.etag.enable}"/>
+        <constructor-arg value="${crafter.engine.header.etag.include.urls}"/>
+    </bean>
+
     <!-- ////////////////////////////////// -->
     <!--								 	-->
     <!--			Services				-->
