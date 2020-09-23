@@ -39,19 +39,14 @@
         </property>
     </bean>
 
-    <bean id="crafter.authenticationCacheConfig" class="net.sf.ehcache.config.CacheConfiguration">
-        <property name="name" value="authenticationCache"/>
-        <property name="maxEntriesLocalHeap" value="${crafter.security.authentication.cache.maxElementsInMemory}"/>
-        <property name="timeToIdleSeconds" value="${crafter.security.authentication.cache.timeToIdle}"/>
-    </bean>
-
-    <bean id="crafter.ehCacheAuthenticationCache" class="org.craftercms.commons.cache.EhCacheFactoryBean">
-        <property name="configuration" ref="crafter.authenticationCacheConfig"/>
+    <bean id="crafter.guavaCacheAuthenticationCache" class="org.craftercms.commons.cache.GuavaCacheFactoryBean">
+        <property name="maxSize" value="${crafter.security.authentication.cache.maxElementsInMemory}"/>
+        <property name="timeToIdle" value="${crafter.security.authentication.cache.timeToIdle}"/>
     </bean>
 
     <bean id="crafter.authenticationCache"
-          class="org.craftercms.security.authentication.impl.EhCacheAuthenticationCache">
-        <property name="cache" ref="crafter.ehCacheAuthenticationCache"/>
+          class="org.craftercms.security.authentication.impl.GuavaAuthenticationCache">
+        <constructor-arg ref="crafter.guavaCacheAuthenticationCache"/>
     </bean>
 
     <bean id="crafter.profileAuthenticationManager"
