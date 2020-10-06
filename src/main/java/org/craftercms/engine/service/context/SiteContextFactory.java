@@ -481,6 +481,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
                 Resource resource = resourceLoader.getResource(applicationContextPaths[i]);
                 if (resource.exists()) {
                     appContextResource = resource;
+                    break;
                 }
             }
 
