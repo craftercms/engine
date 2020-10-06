@@ -38,7 +38,7 @@
         <crafter.core.version>${project.version}</crafter.core.version>
         <crafter.profile.version>${project.version}</crafter.profile.version>
         <crafter.commons.version>${project.version}</crafter.commons.version>
-        <spring.version>4.3.18.RELEASE</spring.version>
+        <spring.version>4.3.29.RELEASE</spring.version>
         <spring.security.version>4.2.13.RELEASE</spring.security.version>
         <httpcomponents.version>4.5.2</httpcomponents.version>
         <commons.configuration.version>2.7</commons.configuration.version>
