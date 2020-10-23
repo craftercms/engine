@@ -238,6 +238,7 @@
                 </property>
             </bean>
         </constructor-arg>
+        <constructor-arg value="${crafter.engine.proxy.excludedUrls}"/>
     </bean>
 
     <bean id="crafter.etagFilter" class="org.craftercms.engine.servlet.filter.ConfigAwareEtagFilter">
