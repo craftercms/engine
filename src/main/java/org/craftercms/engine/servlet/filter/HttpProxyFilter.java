@@ -22,6 +22,9 @@ import org.craftercms.engine.exception.proxy.HttpProxyException;
 import org.craftercms.engine.service.context.SiteContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.mvc.Controller;
 
@@ -32,7 +35,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.craftercms.engine.util.servlet.ConfigAwareProxyServlet.ATTR_TARGET_HOST;
 import static org.craftercms.engine.util.servlet.ConfigAwareProxyServlet.ATTR_TARGET_URI;
@@ -65,47 +70,53 @@ public class HttpProxyFilter extends OncePerRequestFilter {
      */
     protected Controller proxyController;
 
-    public HttpProxyFilter(boolean enabled, Controller proxyController) {
+    protected RequestMatcher excludedMatcher;
+
+    public HttpProxyFilter(boolean enabled, Controller proxyController, String[] excludedUrls) {
         this.enabled = enabled;
         this.proxyController = proxyController;
+        excludedMatcher = new OrRequestMatcher(Stream.of(excludedUrls)
+                .map(AntPathRequestMatcher::new)
+                .collect(toList()));
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return !enabled || excludedMatcher.matches(request);
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        if (enabled) {
             logger.debug("Trying to execute proxy request for {}", request.getRequestURI());
-            try {
-                String requestUri = request.getRequestURI();
+        try {
+            String requestUri = request.getRequestURI();
 
-                // get the target url from the site config
-                String targetUrl = getTargetUrl(SiteContext.getCurrent(), request.getRequestURI());
+            // get the target url from the site config
+            String targetUrl = getTargetUrl(SiteContext.getCurrent(), request.getRequestURI());
 
-                if (isEmpty(targetUrl) || request.getRequestURL().toString().contains(targetUrl)) {
-                    logger.debug("Resolved target url for request {} is local, will skip proxy", requestUri);
-                } else {
-                    logger.debug("Resolved target url {} for proxy request {}", targetUrl, requestUri);
-                    // set the new target url
-                    request.setAttribute(ATTR_TARGET_URI, targetUrl);
+            if (isEmpty(targetUrl) || request.getRequestURL().toString().contains(targetUrl)) {
+                logger.debug("Resolved target url for request {} is local, will skip proxy", requestUri);
+            } else {
+                logger.debug("Resolved target url {} for proxy request {}", targetUrl, requestUri);
+                // set the new target url
+                request.setAttribute(ATTR_TARGET_URI, targetUrl);
 
-                    // set the new target host
-                    request.setAttribute(ATTR_TARGET_HOST, URIUtils.extractHost(URI.create(targetUrl)));
+                // set the new target host
+                request.setAttribute(ATTR_TARGET_HOST, URIUtils.extractHost(URI.create(targetUrl)));
 
-                    // execute the proxy request
-                    logger.debug("Starting execution of proxy request for {}", requestUri);
-                    proxyController.handleRequest(request, response);
-                    return;
-                }
-            } catch (HttpProxyException e) {
-                logger.debug("Continue with local execution for request " + request.getRequestURI(), e);
-            } catch (Exception e) {
-                throw new ServletException("Error executing proxy request for " + request.getRequestURI(), e);
+                // execute the proxy request
+                logger.debug("Starting execution of proxy request for {}", requestUri);
+                proxyController.handleRequest(request, response);
+                return;
             }
-        } else {
-            logger.debug("Proxy is not enabled");
+        } catch (HttpProxyException e) {
+            logger.debug("Continue with local execution for request " + request.getRequestURI(), e);
+        } catch (Exception e) {
+            throw new ServletException("Error executing proxy request for " + request.getRequestURI(), e);
         }
 
-        // Not enabled or proxy url is local, continue with normal execution
+        // Proxy url is local, continue with normal execution
         filterChain.doFilter(request, response);
     }
 
