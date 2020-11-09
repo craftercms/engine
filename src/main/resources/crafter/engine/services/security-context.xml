@@ -79,6 +79,7 @@
         <ref bean="crafter.standaloneHeadersAuthenticationProvider"/>
         <ref bean="crafter.profileAuthenticationProvider"/>
         <ref bean="crafter.rememberMeAuthenticationProvider"/>
+        <ref bean="crafter.anonymousAuthenticationProvider"/>
     </util:list>
 
     <bean id="crafter.authenticationManager" class="org.springframework.security.authentication.ProviderManager">
@@ -88,6 +89,11 @@
     <bean id="crafter.rememberMeAuthenticationProvider"
           class="org.springframework.security.authentication.RememberMeAuthenticationProvider">
         <constructor-arg value="${crafter.security.rememberme.key}"/>
+    </bean>
+
+    <bean id="crafter.anonymousAuthenticationProvider"
+          class="org.springframework.security.authentication.AnonymousAuthenticationProvider">
+        <constructor-arg value="${crafter.security.anonymous.token}"/>
     </bean>
 
     <bean id="crafter.standaloneHeadersAuthenticationProvider"
@@ -234,6 +240,11 @@
         <property name="accessDecisionManager" ref="crafter.accessDecisionManager"/>
     </bean>
 
+    <bean id="crafter.anonymousFilter"
+          class="org.springframework.security.web.authentication.AnonymousAuthenticationFilter">
+        <constructor-arg value="${crafter.security.anonymous.token}"/>
+    </bean>
+
     <util:list id="crafter.securityFilters">
         <ref bean="crafter.securityContextFilter"/>
         <ref bean="crafter.logoutFilter"/>
@@ -241,6 +252,7 @@
         <ref bean="crafter.profileHeadersAuthenticationFilter"/>
         <ref bean="crafter.formLoginFilter"/>
         <ref bean="crafter.rememberMeFilter"/>
+        <ref bean="crafter.anonymousFilter"/>
         <ref bean="crafter.requestCacheFilter"/>
         <ref bean="crafter.servletApiFilter"/>
         <ref bean="crafter.sessionManagementFilter"/>
