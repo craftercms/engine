@@ -33,6 +33,7 @@ import org.kohsuke.groovy.sandbox.SandboxTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -165,8 +166,12 @@ public class GroovyScriptUtils {
     }
 
     private static void addSecurityVariables(Map<String, Object> variables) {
+        variables.put(VARIABLE_AUTH_TOKEN, null);
+
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        variables.put(VARIABLE_AUTH_TOKEN, auth);
+        if (!(auth instanceof AnonymousAuthenticationToken)) {
+            variables.put(VARIABLE_AUTH_TOKEN, auth);
+        }
 
         // for backwards compatibility with Profile ...
 
