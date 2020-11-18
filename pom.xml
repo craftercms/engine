@@ -46,7 +46,7 @@
         <commons.collections.version>4.1</commons.collections.version>
         <cglib.version>3.1</cglib.version>
         <groovy.version>2.4.15</groovy.version> <!-- When this version changes the policy file needs to be updated -->
-        <script.security.version>1.72.5</script.security.version>
+        <script.security.version>1.72.6</script.security.version>
         <gmongo.version>1.5</gmongo.version>
         <junit.version>4.13.1</junit.version>
         <mockito.version>1.9.5</mockito.version>
