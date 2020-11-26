@@ -42,7 +42,8 @@ Crafter CMS Authoring Scripts
     ${attr}="${value}"
   </#list>
   <#if modePreview && $model?has_content>
-    data-craftercms-model-id="${$model.objectId}"
+    data-craftercms-model-path="${$model.storeUrl!"__PATH_NOT_FOUND__"}"
+    data-craftercms-model-id="${$model.objectId!"__ID_NOT_FOUND__"}"
     <#if $field?has_content>
     <#---->data-craftercms-field-id="${$field}"
     </#if>
