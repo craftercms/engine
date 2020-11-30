@@ -47,6 +47,7 @@
         <ref bean="crafter.targetingAuthenticationFilter"/>
 
         <ref bean="crafter.rememberMeFilter"/>
+        <ref bean="crafter.anonymousFilter"/>
         <ref bean="crafter.requestCacheFilter"/>
         <ref bean="crafter.servletApiFilter"/>
         <ref bean="crafter.sessionManagementFilter"/>
@@ -62,6 +63,7 @@
         <ref bean="crafter.standaloneHeadersAuthenticationProvider"/>
         <ref bean="crafter.profileAuthenticationProvider"/>
         <ref bean="crafter.rememberMeAuthenticationProvider"/>
+        <ref bean="crafter.anonymousAuthenticationProvider"/>
 
     </util:list>
 
