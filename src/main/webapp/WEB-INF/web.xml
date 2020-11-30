@@ -111,7 +111,7 @@
     </filter>
 
     <filter>
-        <filter-name>crafter.siteAwareCORSFilter</filter-name>
+        <filter-name>crafter.corsFilter</filter-name>
         <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
     </filter>
 
@@ -207,8 +207,8 @@
     </filter-mapping>
 
     <filter-mapping>
-        <filter-name>crafter.siteAwareCORSFilter</filter-name>
-        <url-pattern>/api/*</url-pattern>
+        <filter-name>crafter.corsFilter</filter-name>
+        <url-pattern>/*</url-pattern>
         <dispatcher>REQUEST</dispatcher>
         <dispatcher>FORWARD</dispatcher>
         <dispatcher>INCLUDE</dispatcher>
