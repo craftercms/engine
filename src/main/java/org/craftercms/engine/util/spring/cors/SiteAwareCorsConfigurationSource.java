@@ -22,9 +22,10 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.List;
 
-import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
 
 /**
  * Implementation of {@link CorsConfigurationSource} that uses the current site configuration
@@ -89,7 +90,7 @@ public class SiteAwareCorsConfigurationSource implements CorsConfigurationSource
     }
 
     protected List<String> getValues(HierarchicalConfiguration<?> config, String key, String defaultValue) {
-        return asList(config.getString(key, defaultValue).split(","));
+        return Arrays.stream(config.getString(key, defaultValue).split(",")).map(String::trim).collect(toList());
     }
 
 }
