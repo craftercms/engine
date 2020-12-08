@@ -203,8 +203,12 @@
         <property name="freeMarkerConfigFactory" ref="crafter.freeMarkerConfigFactory"/>
     </bean>
 
-    <bean id="crafter.siteAwareCORSFilter"
-          class="org.craftercms.engine.servlet.filter.SiteAwareCORSFilter">
+    <bean id="crafter.corsConfigSource" class="org.craftercms.engine.util.spring.cors.SiteAwareCorsConfigurationSource">
+        <constructor-arg ref="crafter.cacheTemplate"/>
+    </bean>
+
+    <bean id="crafter.corsFilter" class="org.springframework.web.filter.CorsFilter">
+        <constructor-arg ref="crafter.corsConfigSource"/>
     </bean>
 
     <bean id="crafter.scriptFilter" class="org.craftercms.engine.scripting.impl.ScriptFilter">
