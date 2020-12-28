@@ -662,6 +662,7 @@
         <property name="connectTimeout" value="${crafter.engine.elasticsearch.timeout.connect}"/>
         <property name="socketTimeout" value="${crafter.engine.elasticsearch.timeout.socket}"/>
         <property name="threadCount" value="${crafter.engine.elasticsearch.threads}"/>
+        <property name="socketKeepAlive" value="${crafter.engine.elasticsearch.keepAlive}"/>
     </bean>
 
     <bean id="crafter.elasticsearchService" class="org.craftercms.engine.search.SiteAwareElasticsearchService">
