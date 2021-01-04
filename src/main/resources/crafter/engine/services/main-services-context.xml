@@ -396,6 +396,7 @@
         <property name="defaultPublicBeans" value="${crafter.engine.defaultPublicBeans}"/>
         <property name="enableScriptSandbox" value="${crafter.engine.groovy.sandbox.enable}"/>
         <property name="sandboxBlacklist" value="${crafter.engine.groovy.sandbox.blacklist}"/>
+        <property name="enableExpressions" value="${crafter.engine.context.expressions.enable}"/>
     </bean>
 
     <bean id="crafter.fallbackSiteContextFactory" class="org.craftercms.engine.service.context.SiteContextFactory">
@@ -421,6 +422,7 @@
         <property name="textEncryptor" ref="crafter.textEncryptor"/>
         <property name="enableScriptSandbox" value="${crafter.engine.groovy.sandbox.enable}"/>
         <property name="sandboxBlacklist" value="${crafter.engine.groovy.sandbox.blacklist}"/>
+        <property name="enableExpressions" value="${crafter.engine.context.expressions.enable}"/>
     </bean>
 
     <!-- ////////////////////////////////// -->

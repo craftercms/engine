@@ -121,6 +121,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected String[] defaultPublicBeans;
     protected boolean enableScriptSandbox;
     protected String sandboxBlacklist;
+    protected boolean enableExpressions;
 
     public SiteContextFactory() {
         siteNameMacroName = DEFAULT_SITE_NAME_MACRO_NAME;
@@ -276,6 +277,10 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         this.sandboxBlacklist = sandboxBlacklist;
     }
 
+    public void setEnableExpressions(boolean enableExpressions) {
+        this.enableExpressions = enableExpressions;
+    }
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.globalApplicationContext = applicationContext;
@@ -423,6 +428,10 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
                     appContext = new RestrictedApplicationContext(globalApplicationContext, defaultPublicBeans);
                 }
                 appContext.setClassLoader(classLoader);
+
+                if (!enableExpressions) {
+                    appContext.addBeanFactoryPostProcessor(factory -> factory.setBeanExpressionResolver(null));
+                }
 
                 if (config != null) {
                     MutablePropertySources propertySources = appContext.getEnvironment().getPropertySources();
