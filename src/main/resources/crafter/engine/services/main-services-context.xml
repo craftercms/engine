@@ -571,6 +571,7 @@
         <property name="publishingTargetResolver" ref="crafter.publishingTargetResolver"/>
         <property name="enableScriptSandbox" value="${crafter.engine.groovy.sandbox.enable}"/>
         <property name="sandboxBlacklist" value="${crafter.engine.groovy.sandbox.blacklist}"/>
+        <property name="enableExpressions" value="${crafter.engine.context.expressions.enable}"/>
     </bean>
 
     <bean id="crafter.fallbackSiteContextFactory" class="org.craftercms.engine.service.context.SiteContextFactory">
@@ -603,6 +604,7 @@
         <property name="publishingTargetResolver" ref="crafter.publishingTargetResolver"/>
         <property name="enableScriptSandbox" value="${crafter.engine.groovy.sandbox.enable}"/>
         <property name="sandboxBlacklist" value="${crafter.engine.groovy.sandbox.blacklist}"/>
+        <property name="enableExpressions" value="${crafter.engine.context.expressions.enable}"/>
     </bean>
 
     <!-- ////////////////////////////////// -->
