@@ -40,7 +40,7 @@
         <crafter.commons.version>${project.version}</crafter.commons.version>
         <spring.version>4.3.29.RELEASE</spring.version>
         <spring.security.version>4.2.19.RELEASE</spring.security.version>
-        <httpcomponents.version>4.5.2</httpcomponents.version>
+        <httpcomponents.version>4.5.13</httpcomponents.version>
         <commons.configuration.version>2.7</commons.configuration.version>
         <commons.lang3.version>3.5</commons.lang3.version>
         <commons.collections.version>4.1</commons.collections.version>
