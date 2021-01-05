@@ -29,6 +29,7 @@ import org.craftercms.engine.scripting.impl.GroovyScript;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.spring.ApplicationContextAccessor;
 import org.craftercms.engine.util.spring.security.profile.ProfileUser;
+import org.jenkinsci.plugins.scriptsecurity.sandbox.groovy.RejectASTTransformsCustomizer;
 import org.kohsuke.groovy.sandbox.SandboxTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -125,7 +126,7 @@ public class GroovyScriptUtils {
     public static CompilerConfiguration getCompilerConfiguration(boolean enableScriptSandbox) {
         CompilerConfiguration config = new CompilerConfiguration();
         if (enableScriptSandbox) {
-            config.addCompilationCustomizers(new SandboxTransformer());
+            config.addCompilationCustomizers(new RejectASTTransformsCustomizer(), new SandboxTransformer());
         }
         return config;
     }
