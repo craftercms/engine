@@ -24,7 +24,7 @@
     <description>Crafter Content Delivery Engine</description>
     <url>https://github.com/craftercms/engine</url>
     <packaging>war</packaging>
-    <version>3.1.11-SNAPSHOT</version><!-- craftercms version flag -->
+    <version>3.1.12-SNAPSHOT</version><!-- craftercms version flag -->
     <organization>
         <name>CrafterCMS</name>
         <url>http://craftercms.org</url>
@@ -40,13 +40,13 @@
         <crafter.commons.version>${project.version}</crafter.commons.version>
         <spring.version>4.3.29.RELEASE</spring.version>
         <spring.security.version>4.2.19.RELEASE</spring.security.version>
-        <httpcomponents.version>4.5.2</httpcomponents.version>
+        <httpcomponents.version>4.5.13</httpcomponents.version>
         <commons.configuration.version>2.7</commons.configuration.version>
         <commons.lang3.version>3.5</commons.lang3.version>
         <commons.collections.version>4.1</commons.collections.version>
         <cglib.version>3.1</cglib.version>
-        <groovy.version>2.4.15</groovy.version> <!-- When this version changes the policy file needs to be updated -->
-        <script.security.version>1.72.5</script.security.version>
+        <groovy.version>2.4.19</groovy.version>
+        <script.security.version>1.72.8</script.security.version>
         <gmongo.version>1.5</gmongo.version>
         <junit.version>4.13.1</junit.version>
         <mockito.version>1.9.5</mockito.version>
