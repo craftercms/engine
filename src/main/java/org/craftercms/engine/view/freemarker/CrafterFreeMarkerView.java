@@ -36,6 +36,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
@@ -195,7 +196,7 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
         templateModel.put(KEY_COOKIES, cookies);
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null) {
+        if (auth != null && !(auth instanceof AnonymousAuthenticationToken)) {
             templateModel.put(KEY_AUTH_TOKEN, auth);
 
             // for backwards compatibility with Profile ...
