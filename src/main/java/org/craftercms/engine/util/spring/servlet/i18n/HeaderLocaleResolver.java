@@ -37,7 +37,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
  *  </ul>
  * </p>
  * @author joseross
- * @since 3.2.0
+ * @since 4.0.0
  */
 public class HeaderLocaleResolver extends ConfigAwareLocaleResolver {
 

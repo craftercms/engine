@@ -27,7 +27,7 @@ import java.util.Locale;
  * available or to a default object. This provides backward compatibility for sites without translation configuration.
  *
  * @author joseross
- * @since 3.2.0
+ * @since 4.0.0
  */
 public class DelegatingLocaleResolver implements LocaleResolver {
 

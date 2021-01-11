@@ -28,7 +28,7 @@ import static org.craftercms.engine.util.LocaleUtils.resolveLocalePath;
  * Implementation of {@link ItemProcessor} that looks for a localized version of an {@link Item}
  *
  * @author joseross
- * @since 3.2.0
+ * @since 4.0.0
  */
 public class LocaleItemProcessor implements ItemProcessor {
 

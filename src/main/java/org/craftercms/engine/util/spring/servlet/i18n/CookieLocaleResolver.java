@@ -36,7 +36,7 @@ import static org.craftercms.commons.locale.LocaleUtils.parseLocale;
  * </p>
  *
  * @author joseross
- * @since 3.2.0
+ * @since 4.0.0
  */
 public class CookieLocaleResolver extends ConfigAwareLocaleResolver {
 

@@ -28,7 +28,7 @@ import static org.craftercms.engine.util.LocaleUtils.getCompatibleLocales;
  * Extension of {@link TemplateLookupStrategy} that looks for locale specific templates
  *
  * @author joseross
- * @since 3.2.0
+ * @since 4.0.0
  */
 public class SiteAwareTemplateLookupStrategy extends TemplateLookupStrategy {
 

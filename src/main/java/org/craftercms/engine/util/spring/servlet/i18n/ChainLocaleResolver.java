@@ -47,7 +47,7 @@ import static org.craftercms.engine.util.LocaleUtils.getCompatibleLocales;
  * response completed.</p>
  *
  * @author joseross
- * @since 3.2.0
+ * @since 4.0.0
  */
 public class ChainLocaleResolver extends AbstractLocaleResolver {
 

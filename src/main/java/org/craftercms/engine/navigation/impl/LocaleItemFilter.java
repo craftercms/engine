@@ -31,7 +31,7 @@ import static org.craftercms.engine.util.LocaleUtils.getCompatibleLocales;
  * Implementation of {@link ItemFilter} that checks if a given {@link Item} is compatible with the configured locales
  *
  * @author joseross
- * @since 3.2.0
+ * @since 4.0.0
  */
 public class LocaleItemFilter implements ItemFilter {
 

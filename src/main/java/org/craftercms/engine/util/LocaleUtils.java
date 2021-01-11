@@ -32,7 +32,7 @@ import static java.util.Collections.emptyList;
  * according to the site configuration
  *
  * @author joseross
- * @since 3.2.0
+ * @since 4.0.0
  */
 public abstract class LocaleUtils extends org.craftercms.commons.locale.LocaleUtils {
     

@@ -35,7 +35,7 @@ import static org.apache.commons.collections4.CollectionUtils.isEmpty;
  * the {@code setLocale} method because the {@link ChainLocaleResolver} handles that.</p>
  *
  * @author joseross
- * @since 3.2.0
+ * @since 4.0.0
  */
 public abstract class ConfigAwareLocaleResolver implements LocaleResolver {
 
