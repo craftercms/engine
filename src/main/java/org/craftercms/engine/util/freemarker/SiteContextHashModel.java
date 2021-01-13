@@ -18,7 +18,7 @@ package org.craftercms.engine.util.freemarker;
 import freemarker.template.*;
 import org.craftercms.engine.service.context.SiteContext;
 
-import static freemarker.template.utility.Collections12.singletonList;
+import static java.util.Arrays.asList;
 
 /**
  * Implementation of {@link TemplateHashModelEx} to safely expose the {@link SiteContext} instance in templates
@@ -29,6 +29,8 @@ public class SiteContextHashModel implements TemplateHashModelEx {
 
     public static final String SITE_NAME_KEY = "siteName";
 
+    public static final String OVERLAY_CALLBACK_KEY = "overlayCallback";
+
     protected ObjectWrapper objectWrapper;
 
     public SiteContextHashModel(ObjectWrapper objectWrapper) {
@@ -37,23 +39,27 @@ public class SiteContextHashModel implements TemplateHashModelEx {
 
     @Override
     public int size() throws TemplateModelException {
-        return 1;
+        return 2;
     }
 
     @Override
     public TemplateCollectionModel keys() throws TemplateModelException {
-        return new SimpleCollection(singletonList(SITE_NAME_KEY), objectWrapper);
+        return new SimpleCollection(asList(SITE_NAME_KEY, OVERLAY_CALLBACK_KEY), objectWrapper);
     }
 
     @Override
     public TemplateCollectionModel values() throws TemplateModelException {
-        return new SimpleCollection(singletonList(SiteContext.getCurrent().getSiteName()), objectWrapper);
+        return new SimpleCollection(asList(SiteContext.getCurrent().getSiteName(),
+                SiteContext.getCurrent().getOverlayCallback()), objectWrapper);
     }
 
     @Override
     public TemplateModel get(String key) throws TemplateModelException {
         if (SITE_NAME_KEY.equals(key)) {
             return objectWrapper.wrap(SiteContext.getCurrent().getSiteName());
+        }
+        if (OVERLAY_CALLBACK_KEY.equals(key)) {
+            return objectWrapper.wrap(SiteContext.getCurrent().getOverlayCallback());
         }
         return objectWrapper.wrap(null);
     }
