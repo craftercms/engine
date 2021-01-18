@@ -148,13 +148,18 @@ public class SiteContext {
         logger.debug("Getting access lock for context {}", siteContext);
         siteContext.accessLock.lock();
 
-        if (siteContext.scriptSandbox != null) {
-            siteContext.scriptSandbox.register();
+        try {
+            if (siteContext.scriptSandbox != null) {
+                siteContext.scriptSandbox.register();
+            }
+
+            threadLocal.set(siteContext);
+
+            MDC.put(SITE_NAME_MDC_KEY, siteContext.getSiteName());
+        } catch (RuntimeException | Error e) {
+            siteContext.accessLock.unlock();
+            throw e;
         }
-
-        threadLocal.set(siteContext);
-
-        MDC.put(SITE_NAME_MDC_KEY, siteContext.getSiteName());
     }
 
     /**
