@@ -138,17 +138,28 @@ public class SiteContext {
     /**
      * Sets the context for the current thread.
      */
-    public static void setCurrent(SiteContext current) {
-        logger.debug("Getting access lock for context {}", current);
-        current.accessLock.lock();
-
-        if (current.scriptSandbox != null) {
-            current.scriptSandbox.register();
+    public static void setCurrent(SiteContext siteContext) {
+        SiteContext current = threadLocal.get();
+        if (current != null) {
+            logger.debug("Overwriting previous site context {}", current);
+            release(current);
         }
 
-        threadLocal.set(current);
+        logger.debug("Getting access lock for context {}", siteContext);
+        siteContext.accessLock.lock();
 
-        MDC.put(SITE_NAME_MDC_KEY, current.getSiteName());
+        try {
+            if (siteContext.scriptSandbox != null) {
+                siteContext.scriptSandbox.register();
+            }
+
+            threadLocal.set(siteContext);
+
+            MDC.put(SITE_NAME_MDC_KEY, siteContext.getSiteName());
+        } catch (RuntimeException | Error e) {
+            siteContext.accessLock.unlock();
+            throw e;
+        }
     }
 
     /**
@@ -159,14 +170,23 @@ public class SiteContext {
 
         SiteContext current = threadLocal.get();
 
-        if (current.scriptSandbox != null) {
-            current.scriptSandbox.unregister();
+        if (current == null) {
+            logger.debug("Current site context was already cleared");
+            return;
         }
 
-        logger.debug("Releasing access lock for context {}", current);
-        current.accessLock.unlock();
+        release(current);
 
         threadLocal.remove();
+    }
+
+    protected static void release(SiteContext siteContext) {
+        if (siteContext.scriptSandbox != null) {
+            siteContext.scriptSandbox.unregister();
+        }
+
+        logger.debug("Releasing access lock for context {}", siteContext);
+        siteContext.accessLock.unlock();
     }
 
     public SiteContext() {
