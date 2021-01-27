@@ -16,9 +16,7 @@
 package org.craftercms.engine.util.spring;
 
 import org.craftercms.engine.service.context.SiteContext;
-import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 /**
  * Bean that provide simple access to the Spring application context's beans: first it uses the site's own context.
@@ -27,30 +25,16 @@ import org.springframework.context.ApplicationContextAware;
  *
  * @author Alfonso Vásquez
  */
-public class ApplicationContextAccessor implements ApplicationContextAware {
-
-    private ApplicationContext defaultApplicationContext;
+public class ApplicationContextAccessor extends org.craftercms.commons.spring.context.ApplicationContextAccessor {
 
     public ApplicationContextAccessor() {
     }
 
-    public ApplicationContextAccessor(ApplicationContext defaultApplicationContext) {
-        this.defaultApplicationContext = defaultApplicationContext;
+    public ApplicationContextAccessor(ApplicationContext actualApplicationContext) {
+        super(actualApplicationContext);
     }
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.defaultApplicationContext = applicationContext;
-    }
-
-    public Object get(String beanName) {
-        return getApplicationContext().getBean(beanName);
-    }
-
-    public <T> T get(String beanName, Class<T> requiredType) {
-        return getApplicationContext().getBean(beanName, requiredType);
-    }
-
     protected ApplicationContext getApplicationContext() {
         SiteContext siteContext = SiteContext.getCurrent();
         if (siteContext != null) {
@@ -60,7 +44,7 @@ public class ApplicationContextAccessor implements ApplicationContextAware {
             }
         }
 
-        return defaultApplicationContext;
+        return super.getApplicationContext();
     }
 
 }
