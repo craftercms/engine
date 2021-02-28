@@ -57,11 +57,6 @@ Crafter CMS Authoring Scripts
   >${nested}</${$tag}>
 </#macro>
 
-<#macro componentRootTag $tag="div" $model=($model!contentModel) $field=($field!"") $index=($index!"") $label=($label!"") $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag=$tag $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
-</#macro>
-
 <#macro article $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
   <#assign attributes = mergeAttributes(attrs, $attrs)>
   <@tag $tag="article" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
@@ -317,16 +312,31 @@ Crafter CMS Authoring Scripts
   <@tag $tag="source" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
 </#macro>
 
-<#macro renderComponentCollection $field $tag="div" $model=contentModel $attrs={} arguments={} attrs...>
+<#macro componentRootTag $tag="div" $model=($model!contentModel) $field=($field!"") $label=($label!"") $attrs={} attrs...>
   <#assign attributes = mergeAttributes(attrs, $attrs)>
+    <@tag $tag=$tag $model=$model $field=$field $label=$label $attrs=$attributes><#nested></@tag>
+</#macro>
+
+<#macro renderComponentCollection
+<#---->$field
+<#---->$tag="div"
+<#---->$itemTag="div"
+<#---->$model=contentModel
+<#---->$attrs={}
+<#---->$itemAttrs={}
+<#---->arguments={}
+<#---->attrs...
+>
+  <#assign attributes = mergeAttributes(attrs, $attrs)>
+  <#-- Field container element -->
   <@studio.tag $tag=$tag $field=$field $model=$model $attrs=attributes>
     <#if $model[$field]?? && $model[$field].item??>
       <#list $model[$field].item as item>
-        <@renderComponent component=item additionalModel=({
-        <#---->'$index': item?index,
-        <#---->'$model': $model,
-        <#---->'$field': $field
-        } + arguments) />
+        <#-- Item container element -->
+        <@studio.tag $tag=$itemTag $model=$model $field=$field $index=item?index $attrs=$itemAttrs>
+          <#-- Component element -->
+          <@renderComponent component=item additionalModel=arguments />
+        </@studio.tag>
       </#list>
     </#if>
   </@studio.tag>
@@ -340,14 +350,16 @@ Crafter CMS Authoring Scripts
 <#---->$itemTag="li"
 <#---->$itemAttributes={}
 >
+  <#-- Field container element -->
   <@studio.tag $model=$model $field=$field $index="" $tag=$containerTag $attrs=$containerAttributes>
     <#if $model[$field]?? && $model[$field].item??>
       <#list $model[$field].item as item>
         <#assign index = item?index>
+        <#-- Item container element -->
         <@studio.tag
         <#---->$model=$model
         <#---->$field=$field
-        <#---->$index="${index}"
+        <#---->$index=index
         <#---->$tag=$itemTag
         <#---->$attrs=$itemAttributes
         >
