@@ -20,8 +20,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 
-import java.util.List;
-
 /**
  * Extension of {@link GenericApplicationContext} that only allows access to beans in the site config whitelist
  *
