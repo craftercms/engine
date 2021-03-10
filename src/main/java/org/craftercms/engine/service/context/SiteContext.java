@@ -432,6 +432,10 @@ public class SiteContext {
                     logger.info("--------------------------------------------------");
 
                     publishEvent(new SiteContextInitializedEvent(this));
+                } catch (Exception e) {
+                    // If there is any exception during the init process then release the resources created so far
+                    this.destroy();
+                    throw e;
                 } finally {
                     initializationLatch.countDown();
                     SiteContext.clear();
