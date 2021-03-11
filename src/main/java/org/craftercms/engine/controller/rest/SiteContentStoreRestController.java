@@ -56,6 +56,9 @@ public class SiteContentStoreRestController extends RestControllerBase {
         this.wrappedController = wrappedController;
     }
 
+    /**
+     * @deprecated Will be removed in 4.1, use {@code getItem} instead
+     */
     @RequestMapping(value = URL_DESCRIPTOR, method = RequestMethod.GET)
     public Document getDescriptor(WebRequest request, HttpServletResponse response,
                                   @RequestParam(REQUEST_PARAM_URL) String url,
