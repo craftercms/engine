@@ -163,13 +163,11 @@
         <constructor-arg ref="crafter.profileAuthenticationManager"/>
     </bean>
 
-    <bean id="crafter.profileHeadersAuthenticationFilter"
+    <bean id="crafter.profileHeadersAuthenticationFilter" parent="crafter.abstractHeadersAuthenticationFilter"
           class="org.craftercms.engine.util.spring.security.profile.ProfileHeadersAuthenticationFilter">
         <constructor-arg ref="crafter.profileServiceRestClient"/>
         <constructor-arg ref="crafter.tenantServiceRestClient"/>
         <constructor-arg ref="crafter.tenantsResolver"/>
-        <property name="authenticationManager" ref="crafter.authenticationManager"/>
-        <property name="defaultTokenValue" value="${crafter.security.header.token}"/>
     </bean>
 
     <!-- Security Filters -->
@@ -185,12 +183,21 @@
         <property name="filterProcessesUrl" value="${crafter.security.logout.url}"/>
     </bean>
 
-    <bean id="crafter.standaloneHeadersAuthenticationFilter"
+    <bean id="crafter.abstractHeadersAuthenticationFilter" abstract="true"
+          class="org.craftercms.engine.util.spring.security.headers.AbstractHeadersAuthenticationFilter">
+        <property name="headerPrefix" value="${crafter.security.header.names.prefix}"/>
+        <property name="usernameHeaderName" value="${crafter.security.header.names.username}"/>
+        <property name="emailHeaderName" value="${crafter.security.header.names.email}"/>
+        <property name="groupsHeaderName" value="${crafter.security.header.names.groups}"/>
+        <property name="tokenHeaderName" value="${crafter.security.header.names.token}"/>
+        <property name="defaultTokenValue" value="${crafter.security.header.token}"/>
+        <property name="authenticationManager" ref="crafter.authenticationManager"/>
+    </bean>
+
+    <bean id="crafter.standaloneHeadersAuthenticationFilter" parent="crafter.abstractHeadersAuthenticationFilter"
           class="org.craftercms.engine.util.spring.security.headers.StandaloneHeadersAuthenticationFilter">
         <constructor-arg ref="crafter.cacheTemplate"/>
-        <property name="authenticationManager" ref="crafter.authenticationManager"/>
         <property name="authenticationDetailsSource" ref="crafter.defaultDetailsSource"/>
-        <property name="defaultTokenValue" value="${crafter.security.header.token}"/>
     </bean>
 
     <bean id="crafter.formLoginFilter"
