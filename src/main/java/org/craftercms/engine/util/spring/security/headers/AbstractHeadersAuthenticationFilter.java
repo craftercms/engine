@@ -36,12 +36,6 @@ public abstract class AbstractHeadersAuthenticationFilter extends ConfigAwarePre
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractHeadersAuthenticationFilter.class);
 
-    public static final String DEFAULT_HEADER_PREFIX = "MELLON_";
-    public static final String DEFAULT_USERNAME_HEADER_NAME = DEFAULT_HEADER_PREFIX + "username";
-    public static final String DEFAULT_EMAIL_HEADER_NAME = DEFAULT_HEADER_PREFIX + "email";
-    public static final String DEFAULT_GROUPS_HEADER_NAME = DEFAULT_HEADER_PREFIX + "groups";
-    public static final String DEFAULT_TOKEN_HEADER_NAME = DEFAULT_HEADER_PREFIX + "secure_key";
-
     public static final String HEADERS_CONFIG_KEY = "security.headers";
     public static final String HEADERS_TOKEN_CONFIG_KEY = HEADERS_CONFIG_KEY + ".token";
     public static final String HEADERS_ATTRS_CONFIG_KEY = HEADERS_CONFIG_KEY + ".attributes";
@@ -59,11 +53,11 @@ public abstract class AbstractHeadersAuthenticationFilter extends ConfigAwarePre
     public static final String FIELD_CONFIG_KEY = "field";
     public static final String ROLE_CONFIG_KEY = "role";
 
-    private String headerPrefix = DEFAULT_HEADER_PREFIX;
-    private String usernameHeaderName = DEFAULT_USERNAME_HEADER_NAME;
-    private String emailHeaderName = DEFAULT_EMAIL_HEADER_NAME;
-    private String groupsHeaderName = DEFAULT_GROUPS_HEADER_NAME;
-    private String tokenHeaderName = DEFAULT_TOKEN_HEADER_NAME;
+    private String headerPrefix;
+    private String usernameHeaderName;
+    private String emailHeaderName;
+    private String groupsHeaderName;
+    private String tokenHeaderName;
     protected String defaultTokenValue;
 
     public AbstractHeadersAuthenticationFilter(String enabledConfigKey) {
