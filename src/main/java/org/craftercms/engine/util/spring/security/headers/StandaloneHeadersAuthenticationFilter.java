@@ -51,7 +51,7 @@ public class StandaloneHeadersAuthenticationFilter extends AbstractHeadersAuthen
 
     public static final String STANDALONE_CONFIG_KEY = HEADERS_CONFIG_KEY + ".standalone";
 
-    protected CacheTemplate cacheTemplate;
+    protected final CacheTemplate cacheTemplate;
 
     public StandaloneHeadersAuthenticationFilter(final CacheTemplate cacheTemplate) {
         super(STANDALONE_CONFIG_KEY);
@@ -62,10 +62,10 @@ public class StandaloneHeadersAuthenticationFilter extends AbstractHeadersAuthen
 
     @Override
     protected Object doGetPreAuthenticatedPrincipal(final HttpServletRequest request) {
-        String username = request.getHeader(usernameHeaderName);
+        String username = request.getHeader(getUsernameHeaderName());
 
         if (isNotEmpty(username)) {
-            HierarchicalConfiguration siteConfig = ConfigUtils.getCurrentConfig();
+            HierarchicalConfiguration<?> siteConfig = ConfigUtils.getCurrentConfig();
             Collection<GrantedAuthority> authorities = getAuthorities(request, siteConfig);
             CustomUser user = new CustomUser(username, username, authorities);
             addAttributes(user, request, siteConfig);
@@ -78,10 +78,10 @@ public class StandaloneHeadersAuthenticationFilter extends AbstractHeadersAuthen
     /**
      * Gets the roles based on the requests headers, applying and optional mapping based on the site configuration
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked,rawtypes")
     protected Collection<GrantedAuthority> getAuthorities(final HttpServletRequest request,
                                                           final HierarchicalConfiguration config) {
-        String groups = request.getHeader(groupsHeaderName);
+        String groups = request.getHeader(getGroupsHeaderName());
         if (StringUtils.isNotEmpty(groups)) {
             Map<String, String> roleMapping = cacheTemplate.getObject(SiteContext.getCurrent().getContext(), () -> {
                 List<HierarchicalConfiguration> groupsConfig = config.childConfigurationsAt(HEADERS_GROUPS_CONFIG_KEY);
@@ -101,7 +101,7 @@ public class StandaloneHeadersAuthenticationFilter extends AbstractHeadersAuthen
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toSet());
         } else {
-            logger.debug("Groups header '{}' was not present in the request", groupsHeaderName);
+            logger.debug("Groups header '{}' was not present in the request", getGroupsHeaderName());
             return emptySet();
         }
     }
@@ -109,7 +109,7 @@ public class StandaloneHeadersAuthenticationFilter extends AbstractHeadersAuthen
     /**
      * Sets additional attributes on the given user based on the requests headers and the site configuration
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked,rawtypes")
     protected void addAttributes(final CustomUser user, final HttpServletRequest request,
                                  final HierarchicalConfiguration config) {
         List<HierarchicalConfiguration> attrsConfig = config.childConfigurationsAt(HEADERS_ATTRS_CONFIG_KEY);
@@ -117,7 +117,7 @@ public class StandaloneHeadersAuthenticationFilter extends AbstractHeadersAuthen
             attrsConfig.forEach(attrConfig -> {
                 String headerName = attrConfig.getString(NAME_CONFIG_KEY);
                 String fieldName = attrConfig.getString(FIELD_CONFIG_KEY);
-                String fieldValue = request.getHeader(headerPrefix + headerName);
+                String fieldValue = request.getHeader(getHeaderPrefix() + headerName);
 
                 if (isNotEmpty(fieldValue)) {
                     logger.debug("Adding attribute '{}' with value '{}'", fieldName, fieldValue);

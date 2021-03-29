@@ -45,11 +45,11 @@ public class ProfileHeadersAuthenticationFilter extends AbstractHeadersAuthentic
 
     private static final Logger logger = LoggerFactory.getLogger(ProfileHeadersAuthenticationFilter.class);
 
-    protected ProfileService profileService;
+    protected final ProfileService profileService;
 
-    protected TenantService tenantService;
+    protected final TenantService tenantService;
 
-    protected TenantsResolver tenantsResolver;
+    protected final TenantsResolver tenantsResolver;
 
     public ProfileHeadersAuthenticationFilter(final ProfileService profileService,
                                               final TenantService tenantService,
@@ -66,8 +66,8 @@ public class ProfileHeadersAuthenticationFilter extends AbstractHeadersAuthentic
 
     @Override
     protected Object doGetPreAuthenticatedPrincipal(final HttpServletRequest request) {
-        String username = request.getHeader(usernameHeaderName);
-        String email = request.getHeader(emailHeaderName);
+        String username = request.getHeader(getUsernameHeaderName());
+        String email = request.getHeader(getEmailHeaderName());
 
         if (isNoneEmpty(username, email)) {
             try {
@@ -83,7 +83,7 @@ public class ProfileHeadersAuthenticationFilter extends AbstractHeadersAuthentic
                     return new ProfileUser(profile);
                 } else {
                     logger.warn("A SSO login was attempted, but none of the tenants [{}] is enabled for SSO",
-                        tenantNames);
+                            (Object) tenantNames);
                 }
             } catch (ProfileException e) {
                 logger.error("Error processing headers authentication for '{}'", username, e);
@@ -108,11 +108,11 @@ public class ProfileHeadersAuthenticationFilter extends AbstractHeadersAuthentic
         Map<String, Object> attributes = null;
         List<AttributeDefinition> attributeDefinitions = tenant.getAttributeDefinitions();
 
-        String email = request.getHeader(emailHeaderName);
+        String email = request.getHeader(getEmailHeaderName());
 
         for (AttributeDefinition attributeDefinition : attributeDefinitions) {
             String attributeName = attributeDefinition.getName();
-            String attributeValue = request.getHeader(headerPrefix + attributeName);
+            String attributeValue = request.getHeader(getHeaderPrefix() + attributeName);
 
             if (StringUtils.isNotEmpty(attributeValue)) {
                 if (attributes == null) {
