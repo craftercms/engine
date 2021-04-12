@@ -31,7 +31,7 @@ public class S3ClientBuilder {
 
     protected S3Profile profile;
 
-    public S3ClientBuilder(String endpoint, String region, String accessKey, String secretKey) {
+    public S3ClientBuilder(String endpoint, String region, String accessKey, String secretKey, boolean pathStyle) {
         profile = new S3Profile();
         profile.setEndpoint(endpoint);
         profile.setRegion(region);
@@ -39,6 +39,7 @@ public class S3ClientBuilder {
             profile.setCredentialsProvider(
                 new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKey, secretKey)));
         }
+        profile.setPathStyleAccessEnabled(pathStyle);
     }
 
     /**
