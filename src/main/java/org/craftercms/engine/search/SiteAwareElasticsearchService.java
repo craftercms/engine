@@ -28,6 +28,7 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -38,9 +39,11 @@ import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.collections4.list.SetUniqueList.setUniqueList;
+import static org.apache.commons.lang3.StringUtils.appendIfMissing;
+import static org.apache.commons.lang3.StringUtils.removeStart;
+import static org.apache.commons.lang3.StringUtils.startsWith;
 import static org.craftercms.commons.locale.LocaleUtils.appendLocale;
 import static org.craftercms.commons.locale.LocaleUtils.getCompatibleLocales;
 import static org.craftercms.engine.util.LocaleUtils.getCurrentLocale;
@@ -63,6 +66,9 @@ public class SiteAwareElasticsearchService extends AbstractElasticsearchWrapper 
     private static final String DEFAULT_LOCALES_PARAM_NAME = "locales";
 
     private static final String DEFAULT_FALLBACK_PARAM_NAME = "localeFallback";
+
+    private static final String ROLE_PREFIX = "ROLE_";
+
 
     /**
      * Format used to build the index id
@@ -190,7 +196,10 @@ public class SiteAwareElasticsearchService extends AbstractElasticsearchWrapper 
         if (auth != null && !(auth instanceof AnonymousAuthenticationToken) && isNotEmpty(auth.getAuthorities())) {
             logger.debug("Filtering search results for roles: {}", auth.getAuthorities());
             securityQuery.should(matchQuery(roleFieldName, auth.getAuthorities().stream()
-                            .map(Object::toString)
+                            .map(GrantedAuthority::getAuthority)
+                            .map(role -> role +  " " +
+                                    (startsWith(role, ROLE_PREFIX)? removeStart(role, ROLE_PREFIX)
+                                            : appendIfMissing(role, ROLE_PREFIX)))
                             .collect(joining(" "))));
         } else {
             logger.debug("Filtering search to show only public items");

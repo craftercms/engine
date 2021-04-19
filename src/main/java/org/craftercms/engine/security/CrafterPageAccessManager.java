@@ -18,7 +18,6 @@ package org.craftercms.engine.security;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.security.annotations.RunIfSecurityEnabled;
 import org.springframework.beans.factory.annotation.Required;
@@ -29,6 +28,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import static org.apache.commons.lang3.StringUtils.removeStart;
+
 /**
  * Manages access to Crafter pages, depending on the roles specified in the page and the current user's roles.
  *
@@ -36,6 +37,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
  * @author Alfonso Vásquez
  */
 public class CrafterPageAccessManager {
+
+    private static final String ROLE_PREFIX = "ROLE_";
 
     protected String authorizedRolesXPathQuery;
 
@@ -84,7 +87,7 @@ public class CrafterPageAccessManager {
 
     protected boolean containsRole(String role, List<String> roles) {
         for (String r : roles) {
-            if (r.equalsIgnoreCase(role)) {
+            if (removeStart(r, ROLE_PREFIX).equalsIgnoreCase(role)) {
                 return true;
             }
         }
@@ -95,7 +98,7 @@ public class CrafterPageAccessManager {
     protected boolean hasAnyRole(Authentication auth, List<String> roles) {
         return auth.getAuthorities().stream()
             .map(GrantedAuthority::getAuthority)
-            .map(authority -> StringUtils.removeStart(authority, "ROLE_"))
+            .map(authority -> removeStart(authority, ROLE_PREFIX))
             .anyMatch(authority -> containsRole(authority, roles));
     }
 
