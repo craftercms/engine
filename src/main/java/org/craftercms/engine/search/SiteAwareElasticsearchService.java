@@ -25,11 +25,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.appendIfMissing;
+import static org.apache.commons.lang3.StringUtils.removeStart;
+import static org.apache.commons.lang3.StringUtils.startsWith;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.existsQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
@@ -45,6 +49,8 @@ public class SiteAwareElasticsearchService extends AbstractElasticsearchWrapper 
     private static final Logger logger = LoggerFactory.getLogger(SiteAwareElasticsearchService.class);
 
     private static final String DEFAULT_ROLE_FIELD_NAME = "authorizedRoles.item.role";
+
+    private static final String ROLE_PREFIX = "ROLE_";
 
     /**
      * Format used to build the index id
@@ -95,7 +101,10 @@ public class SiteAwareElasticsearchService extends AbstractElasticsearchWrapper 
         if (auth != null && !(auth instanceof AnonymousAuthenticationToken) && isNotEmpty(auth.getAuthorities())) {
             logger.debug("Filtering search results for roles: {}", auth.getAuthorities());
             securityQuery.should(matchQuery(roleFieldName, auth.getAuthorities().stream()
-                            .map(Object::toString)
+                            .map(GrantedAuthority::getAuthority)
+                            .map(role -> role +  " " +
+                                    (startsWith(role, ROLE_PREFIX)? removeStart(role, ROLE_PREFIX)
+                                            : appendIfMissing(role, ROLE_PREFIX)))
                             .collect(joining(" "))));
         } else {
             logger.debug("Filtering search to show only public items");
