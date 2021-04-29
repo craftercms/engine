@@ -24,7 +24,6 @@ import org.craftercms.engine.util.ConfigUtils;
 import org.craftercms.engine.util.spring.security.ConfigAwarePreAuthenticationFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 
 /**
@@ -37,26 +36,28 @@ public abstract class AbstractHeadersAuthenticationFilter extends ConfigAwarePre
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractHeadersAuthenticationFilter.class);
 
-    public static final String DEFAULT_HEADER_PREFIX = "MELLON_";
-    public static final String DEFAULT_USERNAME_HEADER_NAME = DEFAULT_HEADER_PREFIX + "username";
-    public static final String DEFAULT_EMAIL_HEADER_NAME = DEFAULT_HEADER_PREFIX + "email";
-    public static final String DEFAULT_GROUPS_HEADER_NAME = DEFAULT_HEADER_PREFIX + "groups";
-    public static final String DEFAULT_TOKEN_HEADER_NAME = DEFAULT_HEADER_PREFIX + "secure_key";
-
     public static final String HEADERS_CONFIG_KEY = "security.headers";
     public static final String HEADERS_TOKEN_CONFIG_KEY = HEADERS_CONFIG_KEY + ".token";
     public static final String HEADERS_ATTRS_CONFIG_KEY = HEADERS_CONFIG_KEY + ".attributes";
     public static final String HEADERS_GROUPS_CONFIG_KEY = HEADERS_CONFIG_KEY + ".groups";
 
+    public static final String HEADER_NAME_CONFIG_KEY = HEADERS_CONFIG_KEY + ".names";
+    public static final String HEADERS_NAME_PREFIX_CONFIG_KEY = HEADER_NAME_CONFIG_KEY + ".prefix";
+    public static final String HEADERS_NAME_USERNAME_CONFIG_KEY = HEADER_NAME_CONFIG_KEY + ".username";
+    public static final String HEADERS_NAME_EMAIL_CONFIG_KEY = HEADER_NAME_CONFIG_KEY + ".email";
+    public static final String HEADERS_NAME_GROUPS_CONFIG_KEY = HEADER_NAME_CONFIG_KEY + ".groups";
+    public static final String HEADERS_NAME_TOKEN_CONFIG_KEY = HEADER_NAME_CONFIG_KEY + ".token";
+
+
     public static final String NAME_CONFIG_KEY = "name";
     public static final String FIELD_CONFIG_KEY = "field";
     public static final String ROLE_CONFIG_KEY = "role";
 
-    protected String headerPrefix = DEFAULT_HEADER_PREFIX;
-    protected String usernameHeaderName = DEFAULT_USERNAME_HEADER_NAME;
-    protected String emailHeaderName = DEFAULT_EMAIL_HEADER_NAME;
-    protected String groupsHeaderName = DEFAULT_GROUPS_HEADER_NAME;
-    protected String tokenHeaderName = DEFAULT_TOKEN_HEADER_NAME;
+    private String headerPrefix;
+    private String usernameHeaderName;
+    private String emailHeaderName;
+    private String groupsHeaderName;
+    private String tokenHeaderName;
     protected String defaultTokenValue;
 
     public AbstractHeadersAuthenticationFilter(String enabledConfigKey) {
@@ -88,6 +89,26 @@ public abstract class AbstractHeadersAuthenticationFilter extends ConfigAwarePre
         this.defaultTokenValue = defaultTokenValue;
     }
 
+    public String getHeaderPrefix() {
+        return getConfigProperty(HEADERS_NAME_PREFIX_CONFIG_KEY, headerPrefix);
+    }
+
+    public String getUsernameHeaderName() {
+        return getHeaderPrefix() + getConfigProperty(HEADERS_NAME_USERNAME_CONFIG_KEY, usernameHeaderName);
+    }
+
+    public String getEmailHeaderName() {
+        return getHeaderPrefix() + getConfigProperty(HEADERS_NAME_EMAIL_CONFIG_KEY, emailHeaderName);
+    }
+
+    public String getGroupsHeaderName() {
+        return getHeaderPrefix() + getConfigProperty(HEADERS_NAME_GROUPS_CONFIG_KEY, groupsHeaderName);
+    }
+
+    public String getTokenHeaderName() {
+        return getHeaderPrefix() + getConfigProperty(HEADERS_NAME_TOKEN_CONFIG_KEY, tokenHeaderName);
+    }
+
     protected abstract Object doGetPreAuthenticatedPrincipal(final HttpServletRequest request);
 
     @Override
@@ -107,16 +128,12 @@ public abstract class AbstractHeadersAuthenticationFilter extends ConfigAwarePre
     }
 
     protected String getTokenExpectedValue() {
-        HierarchicalConfiguration config = ConfigUtils.getCurrentConfig();
-        if (config != null && config.containsKey(HEADERS_TOKEN_CONFIG_KEY)) {
-            return config.getString(HEADERS_TOKEN_CONFIG_KEY);
-        }
-        return defaultTokenValue;
+        return getConfigProperty(HEADERS_TOKEN_CONFIG_KEY, defaultTokenValue);
     }
 
     protected boolean hasValidToken(HttpServletRequest request) {
         logger.debug("Checking security token from request headers");
-        String tokenHeaderValue = request.getHeader(tokenHeaderName);
+        String tokenHeaderValue = request.getHeader(getTokenHeaderName());
         if (StringUtils.isEmpty(tokenHeaderValue)) {
             logger.debug("No security token found for request from '{}'", request.getRemoteAddr());
             return false;
@@ -125,6 +142,14 @@ public abstract class AbstractHeadersAuthenticationFilter extends ConfigAwarePre
             return false;
         }
         return true;
+    }
+
+    protected String getConfigProperty(String key, String defaultValue) {
+        HierarchicalConfiguration<?> config = ConfigUtils.getCurrentConfig();
+        if (config != null && config.containsKey(key)) {
+            return config.getString(key);
+        }
+        return defaultValue;
     }
 
 }

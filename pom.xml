@@ -24,7 +24,7 @@
     <description>Crafter Content Delivery Engine</description>
     <url>https://github.com/craftercms/engine</url>
     <packaging>war</packaging>
-    <version>3.1.13-SNAPSHOT</version><!-- craftercms version flag -->
+    <version>3.1.14-SNAPSHOT</version><!-- craftercms version flag -->
     <organization>
         <name>CrafterCMS</name>
         <url>http://craftercms.org</url>
@@ -33,13 +33,13 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <servlet.api.version>3.0.1</servlet.api.version>
-        <javax.mail.version>1.4.7</javax.mail.version>
+        <javax.mail.version>1.6.2</javax.mail.version>
         <crafter.search.version>${project.version}</crafter.search.version>
         <crafter.core.version>${project.version}</crafter.core.version>
         <crafter.profile.version>${project.version}</crafter.profile.version>
         <crafter.commons.version>${project.version}</crafter.commons.version>
         <spring.version>4.3.29.RELEASE</spring.version>
-        <spring.security.version>4.2.19.RELEASE</spring.security.version>
+        <spring.security.version>4.2.20.RELEASE</spring.security.version>
         <httpcomponents.version>4.5.13</httpcomponents.version>
         <commons.configuration.version>2.7</commons.configuration.version>
         <commons.lang3.version>3.5</commons.lang3.version>
@@ -54,9 +54,9 @@
         <java.version>1.8</java.version>
         <bouncycastle.version>1.61</bouncycastle.version>
         <urlrewrite.version>4.0.4</urlrewrite.version>
-        <aws.version>1.11.435</aws.version>
+        <aws.version>1.11.994</aws.version>
         <box.sdk.version>2.28.1</box.sdk.version>
-        <jackson.dataformat.version>2.10.3</jackson.dataformat.version>
+        <jackson.dataformat.version>2.10.5</jackson.dataformat.version>
         <log4j.version>2.11.2</log4j.version>
         <graphql.version>12.0</graphql.version>
         <graphql.extended.scalars.version>1.0</graphql.extended.scalars.version>
@@ -108,8 +108,8 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
             <version>${javax.mail.version}</version>
         </dependency>
         <dependency>
@@ -272,6 +272,10 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-sts</artifactId>
         </dependency>
 
         <!-- Box -->
