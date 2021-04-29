@@ -33,7 +33,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <servlet.api.version>3.0.1</servlet.api.version>
-        <javax.mail.version>1.4.7</javax.mail.version>
+        <javax.mail.version>1.6.2</javax.mail.version>
         <crafter.search.version>${project.version}</crafter.search.version>
         <crafter.core.version>${project.version}</crafter.core.version>
         <crafter.profile.version>${project.version}</crafter.profile.version>
@@ -108,8 +108,8 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
             <version>${javax.mail.version}</version>
         </dependency>
         <dependency>
