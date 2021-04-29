@@ -407,7 +407,9 @@
     </bean>
 
     <bean id="crafter.configurationScriptResolver"
-          class="org.craftercms.engine.scripting.impl.ConfigurationScriptJobResolver" parent="crafter.jobResolver"/>
+          class="org.craftercms.engine.scripting.impl.ConfigurationScriptJobResolver" parent="crafter.jobResolver">
+        <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
+	</bean>
 
     <util:list id="crafter.scriptJobResolvers">
         <ref bean="crafter.hourlyScriptJobResolver"/>
@@ -1019,6 +1021,7 @@
         <property name="typeFactory" ref="crafter.typeFactory"/>
         <property name="dataFetcher" ref="crafter.dataFetcher"/>
         <property name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
+        <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
     </bean>
 
     <bean id="crafter.publishingTargetResolver" class="org.craftercms.engine.util.config.SiteAwarePublishingTargetResolver">

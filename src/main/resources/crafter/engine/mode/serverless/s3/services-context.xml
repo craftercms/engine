@@ -38,6 +38,7 @@
         <constructor-arg value="${crafter.engine.s3.region:}"/>
         <constructor-arg value="${crafter.engine.s3.accessKey:}"/>
         <constructor-arg value="${crafter.engine.s3.secretKey:}"/>
+        <constructor-arg value="${crafter.engine.s3.pathStyle:false}"/>
     </bean>
 
     <!-- AWS S3 Site List Resolver -->
