@@ -192,6 +192,12 @@
             <groupId>org.craftercms</groupId>
             <artifactId>script-security</artifactId>
             <version>${script.security.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava-collections</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
