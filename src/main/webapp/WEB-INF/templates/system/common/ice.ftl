@@ -1,4 +1,4 @@
-<#macro initPageBuilder isAuthoring=(modePreview) addReact=false>
+<#macro initPageBuilder isAuthoring=(modePreview) addReact=false props="{}" other...>
 <#if isAuthoring>
 <!--
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -15,7 +15,8 @@ Crafter CMS Authoring Scripts
 <script>
   window.craftercms.guest.initPageBuilder({
     path: '${model.getItem().descriptorUrl!''}',
-    modelId: '${model.objectId!''}'
+    modelId: '${model.objectId!''}',
+    ...${props}
   });
 </script>
 <!--
