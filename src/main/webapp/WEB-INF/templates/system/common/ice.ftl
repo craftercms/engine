@@ -1,4 +1,4 @@
-<#macro initPageBuilder isAuthoring=(modePreview) addReact=false>
+<#macro initPageBuilder isAuthoring=(modePreview) addReact=false props="{}" other...>
 <#if isAuthoring>
 <!--
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -15,7 +15,8 @@ Crafter CMS Authoring Scripts
 <script>
   window.craftercms.guest.initPageBuilder({
     path: '${model.getItem().descriptorUrl!''}',
-    modelId: '${model.objectId!''}'
+    modelId: '${model.objectId!''}',
+    ...${props}
   });
 </script>
 <!--
@@ -314,7 +315,7 @@ Crafter CMS Authoring Scripts
 
 <#macro componentRootTag $tag="div" $model=($model!contentModel) $field=($field!"") $label=($label!"") $attrs={} attrs...>
   <#assign attributes = mergeAttributes(attrs, $attrs)>
-    <@tag $tag=$tag $model=$model $field=$field $label=$label $attrs=$attributes><#nested></@tag>
+  <@tag $tag=$tag $model=$model $field=$field $label=$label $attrs=$attributes><#nested></@tag>
 </#macro>
 
 <#macro renderComponentCollection
