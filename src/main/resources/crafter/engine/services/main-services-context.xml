@@ -687,6 +687,7 @@
     <bean id="crafter.crafterFreeMarkerTemplateLoader"
           class="org.craftercms.engine.freemarker.CrafterFreeMarkerTemplateLoader">
         <property name="contentStoreService" ref="crafter.contentStoreService"/>
+        <property name="globalAllowedPaths" value="${crafter.engine.site.default.templates.allowed.paths}"/>
     </bean>
 
     <!-- Declared with scope="prototype" so that a new one is created for every SiteContext -->
