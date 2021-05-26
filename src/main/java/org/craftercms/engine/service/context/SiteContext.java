@@ -85,6 +85,7 @@ public class SiteContext {
     protected boolean fallback;
     protected String staticAssetsPath;
     protected String templatesPath;
+    protected String[] allowedTemplatePaths;
     protected String restScriptsPath;
     protected String controllerScriptsPath;
     protected String initScriptPath;
@@ -260,6 +261,14 @@ public class SiteContext {
 
     public void setTemplatesPath(String templatesPath) {
         this.templatesPath = templatesPath;
+    }
+
+    public String[] getAllowedTemplatePaths() {
+        return allowedTemplatePaths;
+    }
+
+    public void setAllowedTemplatePaths(String[] allowedTemplatePaths) {
+        this.allowedTemplatePaths = allowedTemplatePaths;
     }
 
     public String getRestScriptsPath() {
