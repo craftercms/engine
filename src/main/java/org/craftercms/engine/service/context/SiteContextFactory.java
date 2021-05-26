@@ -90,6 +90,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     public static final String CONFIG_BEAN_NAME = "siteConfig";
     public static final long DEFAULT_SHUTDOWN_TIMEOUT = 5;
     public static final String DEFAULT_PUBLISHING_TARGET_MACRO_NAME = "publishingTarget";
+    public static final String CONFIG_KEY_ALLOWED_TEMPLATE_PATHS = "templates.allowed";
 
     private static final Log logger = LogFactory.getLog(SiteContextFactory.class);
 
@@ -405,6 +406,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             siteContext.setClassLoader(classLoader);
             siteContext.setUrlRewriter(urlRewriter);
             siteContext.setProxyConfig(proxyConfig);
+            siteContext.setAllowedTemplatePaths(config.getStringArray(CONFIG_KEY_ALLOWED_TEMPLATE_PATHS));
 
             Scheduler scheduler = scheduleJobs(siteContext);
             siteContext.setScheduler(scheduler);
