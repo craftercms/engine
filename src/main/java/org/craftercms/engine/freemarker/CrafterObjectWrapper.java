@@ -23,6 +23,11 @@ import org.craftercms.engine.util.ContentModelUtils;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.craftercms.engine.model.Dom4jNodeModel;
+import org.jenkinsci.plugins.scriptsecurity.sandbox.whitelists.StaticWhitelist;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 /**
  * Extends {@link freemarker.template.DefaultObjectWrapper} to wrap Dom4j {@code Node}s. If it's an {@code Element},
@@ -32,6 +37,12 @@ import org.craftercms.engine.model.Dom4jNodeModel;
  */
 @SuppressWarnings("deprecation")
 public class CrafterObjectWrapper extends DefaultObjectWrapper {
+
+    protected final boolean enableSandbox;
+
+    public CrafterObjectWrapper(boolean enableSandbox) {
+        this.enableSandbox = enableSandbox;
+    }
 
     @Override
     public TemplateModel wrap(Object obj) throws TemplateModelException {
@@ -47,6 +58,25 @@ public class CrafterObjectWrapper extends DefaultObjectWrapper {
         } else {
             return super.wrap(obj);
         }
+    }
+
+    @Override
+    protected TemplateModel invokeMethod(Object object, Method method, Object[] args) throws InvocationTargetException, IllegalAccessException, TemplateModelException {
+        if (enableSandbox) {
+            boolean blocked;
+
+            if (Modifier.isStatic(method.getModifiers())) {
+                blocked = StaticWhitelist.isPermanentlyBlacklistedStaticMethod(method);
+            } else {
+                blocked = StaticWhitelist.isPermanentlyBlacklistedMethod(method);
+            }
+
+            if (blocked) {
+                return null;
+            }
+        }
+
+        return super.invokeMethod(object, method, args);
     }
 
 }

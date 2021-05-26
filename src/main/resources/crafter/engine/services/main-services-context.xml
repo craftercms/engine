@@ -574,7 +574,8 @@
         <property name="shutdownTimeout" value="${crafter.engine.site.context.shutdownTimeout}"/>
         <property name="publishingTargetResolver" ref="crafter.publishingTargetResolver"/>
         <property name="enableScriptSandbox" value="${crafter.engine.groovy.sandbox.enable}"/>
-        <property name="sandboxBlacklist" value="${crafter.engine.groovy.sandbox.blacklist}"/>
+        <property name="enableSandboxBlacklist" value="${crafter.engine.groovy.sandbox.blacklist.enable}"/>
+        <property name="sandboxBlacklist" value="${crafter.engine.groovy.sandbox.blacklist.path}"/>
         <property name="enableExpressions" value="${crafter.engine.context.expressions.enable}"/>
     </bean>
 
@@ -608,7 +609,8 @@
         <property name="configurationReader" ref="crafter.configurationReader"/>
         <property name="publishingTargetResolver" ref="crafter.publishingTargetResolver"/>
         <property name="enableScriptSandbox" value="${crafter.engine.groovy.sandbox.enable}"/>
-        <property name="sandboxBlacklist" value="${crafter.engine.groovy.sandbox.blacklist}"/>
+        <property name="enableSandboxBlacklist" value="${crafter.engine.groovy.sandbox.blacklist.enable}"/>
+        <property name="sandboxBlacklist" value="${crafter.engine.groovy.sandbox.blacklist.path}"/>
         <property name="enableExpressions" value="${crafter.engine.context.expressions.enable}"/>
     </bean>
 
@@ -698,7 +700,7 @@
         <property name="freemarkerSettings">
             <props>
                 <prop key="output_encoding">UTF-8</prop>
-                <prop key="object_wrapper">org.craftercms.engine.freemarker.CrafterObjectWrapper</prop>
+                <prop key="object_wrapper">org.craftercms.engine.freemarker.CrafterObjectWrapper(${crafter.engine.groovy.sandbox.enable})</prop>
                 <prop key="datetime_format">${crafter.engine.model.datetime.pattern}</prop>
                 <prop key="time_zone">${crafter.engine.model.datetime.timeZone}</prop>
                 <prop key="new_builtin_class_resolver">safer</prop>
