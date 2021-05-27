@@ -649,6 +649,8 @@
         <property name="actualSearchService">
             <bean class="org.craftercms.search.service.impl.v2.SolrRestClientSearchService">
                 <property name="serverUrl" value="${crafter.engine.search.server.url}"/>
+                <property name="accessTokenParameter" value="${crafter.engine.search.server.accessToken.parameter}"/>
+                <property name="accessTokenValue" value="${crafter.engine.search.server.accessToken.value}"/>
             </bean>
         </property>
     </bean>
