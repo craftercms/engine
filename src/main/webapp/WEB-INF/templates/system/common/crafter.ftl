@@ -11,5 +11,5 @@
 
 <#macro body_bottom>
     <#include "/templates/system/plugins/body_bottom.ftl" ignore_missing=true />
-    <@crafter.initPageBuilder/>
+    <@initPageBuilder/>
 </#macro>
