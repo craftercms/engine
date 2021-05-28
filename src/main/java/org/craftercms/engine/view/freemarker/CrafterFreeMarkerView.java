@@ -168,7 +168,6 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     }
 
     @Override
-    @SuppressWarnings("deprecation")
     protected SimpleHash buildTemplateModel(final Map<String, Object> model, final HttpServletRequest request,
                                             final HttpServletResponse response) {
         AllHttpScopesAndAppContextHashModel templateModel = new AllHttpScopesAndAppContextHashModel(
@@ -215,8 +214,8 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
         Locale locale = LocaleContextHolder.getLocale();
         Object siteContextObject = disableVariableRestrictions?
                 siteContext : new SiteContextHashModel(getObjectWrapper());
-        TemplateHashModel staticModels = BeansWrapper.getDefaultInstance().getStaticModels();
-        TemplateHashModel enumModels = BeansWrapper.getDefaultInstance().getEnumModels();
+        TemplateHashModel staticModels = ((BeansWrapper) getObjectWrapper()).getStaticModels();
+        TemplateHashModel enumModels = ((BeansWrapper) getObjectWrapper()).getEnumModels();
 
         templateModel.put(KEY_STATICS_CAP, staticModels);
         templateModel.put(KEY_STATICS, staticModels);
