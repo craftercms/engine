@@ -9,7 +9,9 @@
     <#include "/templates/system/plugins/body_top.ftl" ignore_missing=true />
 </#macro>
 
-<#macro body_bottom>
+<#macro body_bottom initializePageBuilder=true pageBuilderProps="{}">
     <#include "/templates/system/plugins/body_bottom.ftl" ignore_missing=true />
-    <@initPageBuilder/>
+    <#if initializePageBuilder>
+        <@initPageBuilder props=pageBuilderProps />
+    </#if>
 </#macro>
