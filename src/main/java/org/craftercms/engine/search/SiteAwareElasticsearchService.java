@@ -32,6 +32,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.beans.ConstructorProperties;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -81,6 +82,7 @@ public class SiteAwareElasticsearchService extends AbstractElasticsearchWrapper 
 
     protected String fallbackParameterName = DEFAULT_FALLBACK_PARAM_NAME;
 
+    @ConstructorProperties({"client", "indexIdFormat"})
     public SiteAwareElasticsearchService(RestHighLevelClient client, String indexIdFormat) {
         super(client);
         this.indexIdFormat = indexIdFormat;

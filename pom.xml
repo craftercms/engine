@@ -19,7 +19,6 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.craftercms</groupId>
     <artifactId>crafter-engine</artifactId>
 
     <name>Crafter Engine</name>
@@ -56,16 +55,6 @@
         <dependency>
             <groupId>org.craftercms</groupId>
             <artifactId>crafter-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.craftercms</groupId>
-            <artifactId>crafter-search-solr-client</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.craftercms</groupId>
-            <artifactId>crafter-search-solr-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
