@@ -428,7 +428,9 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             siteContext.setProxyConfig(proxyConfig);
             siteContext.setTranslationConfig(translationConfig);
             siteContext.setLocaleResolver(buildLocaleResolver(translationConfig));
-            siteContext.setAllowedTemplatePaths(config.getStringArray(CONFIG_KEY_ALLOWED_TEMPLATE_PATHS));
+            if (config != null) {
+                siteContext.setAllowedTemplatePaths(config.getStringArray(CONFIG_KEY_ALLOWED_TEMPLATE_PATHS));
+            }
 
             Scheduler scheduler = scheduleJobs(siteContext);
             siteContext.setScheduler(scheduler);
