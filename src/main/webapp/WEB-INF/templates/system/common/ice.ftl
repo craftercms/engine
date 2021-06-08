@@ -334,10 +334,10 @@ Crafter CMS Authoring Scripts
     <#if $model[$field]?? && $model[$field].item??>
       <#list $model[$field].item as item>
         <#-- Item container element -->
-        <@studio.tag $tag=$itemTag $model=$model $field=$field $index=item?index $attrs=$itemAttrs>
+        <@tag $tag=$itemTag $model=$model $field=$field $index=item?index $attrs=$itemAttrs>
           <#-- Component element -->
           <@renderComponent component=item additionalModel=arguments />
-        </@studio.tag>
+        </@tag>
       </#list>
     </#if>
   </@tag>
@@ -357,7 +357,7 @@ Crafter CMS Authoring Scripts
       <#list $model[$field].item as item>
         <#assign index = item?index>
         <#-- Item container element -->
-        <@studio.tag
+        <@tag
         <#---->$model=$model
         <#---->$field=$field
         <#---->$index=index
@@ -365,7 +365,7 @@ Crafter CMS Authoring Scripts
         <#---->$attrs=$itemAttributes
         >
           <#nested item, index>
-        </@studio.tag>
+        </@tag>
       </#list>
     </#if>
   </@tag>
