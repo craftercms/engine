@@ -330,7 +330,7 @@ Crafter CMS Authoring Scripts
 >
   <#assign attributes = mergeAttributes(attrs, $attrs)>
   <#-- Field container element -->
-  <@studio.tag $tag=$tag $field=$field $model=$model $attrs=attributes>
+  <@tag $tag=$tag $field=$field $model=$model $attrs=attributes>
     <#if $model[$field]?? && $model[$field].item??>
       <#list $model[$field].item as item>
         <#-- Item container element -->
@@ -340,7 +340,7 @@ Crafter CMS Authoring Scripts
         </@studio.tag>
       </#list>
     </#if>
-  </@studio.tag>
+  </@tag>
 </#macro>
 
 <#macro renderRepeatCollection
@@ -352,7 +352,7 @@ Crafter CMS Authoring Scripts
 <#---->$itemAttributes={}
 >
   <#-- Field container element -->
-  <@studio.tag $model=$model $field=$field $index="" $tag=$containerTag $attrs=$containerAttributes>
+  <@tag $model=$model $field=$field $index="" $tag=$containerTag $attrs=$containerAttributes>
     <#if $model[$field]?? && $model[$field].item??>
       <#list $model[$field].item as item>
         <#assign index = item?index>
@@ -368,5 +368,5 @@ Crafter CMS Authoring Scripts
         </@studio.tag>
       </#list>
     </#if>
-  </@studio.tag>
+  </@tag>
 </#macro>
