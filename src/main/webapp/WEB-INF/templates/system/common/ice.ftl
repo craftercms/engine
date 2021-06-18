@@ -386,6 +386,7 @@ Crafter CMS Authoring Scripts
 <#---->deepItemClassPrefix=""
 <#---->deepItemWrapperClassPrefix=""
 <#---->depth=1
+<#---->includeRoot=true
 <#---->inlineHomeWithImmediateChildren=true
 >
   <#assign navTree = navTreeBuilder.getNavTree(url, depth, Request.pageUrl)/>
@@ -406,6 +407,7 @@ Crafter CMS Authoring Scripts
       depth=depth
       currentDepth=0
       navItem=navTree
+      includeRoot=includeRoot
       inlineHomeWithImmediateChildren=inlineHomeWithImmediateChildren
     />
   <#if containerEl != ""></${containerEl}></#if>
@@ -427,6 +429,7 @@ Crafter CMS Authoring Scripts
 <#---->depth=1
 <#---->currentDepth=0
 <#---->navItem={}
+<#---->includeRoot=true
 <#---->inlineHomeWithImmediateChildren=true
 >
   <#if itemWrapperEl != "">
@@ -440,14 +443,16 @@ Crafter CMS Authoring Scripts
     <#assign storeUrl = urlTransformationService.transform('renderUrlToStoreUrl', navItem.url)>
     <#assign item = siteItemService.getSiteItem(storeUrl) />
 
-    <@a
-      class="${navItem.active?then(itemActiveClass, '')} ${itemClass}"
-      $model=item
-      href="${navItem.url}"
-      $attrs=itemAttributes
-    >
-      ${navItem.label}
-    </@a>
+    <#if ((currentDepth == 0) && includeRoot) || (currentDepth > 0)>
+      <@a
+        class="${navItem.active?then(itemActiveClass, '')} ${itemClass}"
+        $model=item
+        href="${navItem.url}"
+        $attrs=itemAttributes
+        >
+          ${navItem.label}
+      </@a>
+    </#if>
     <#if (itemWrapperEl != "") && (inlineHomeWithImmediateChildren)></${itemWrapperEl}></#if>
     <#assign subItems = navItem.subItems/>
     <#if (depth > 0) && (currentDepth < depth) && (subItems?size > 0)>
