@@ -38,10 +38,8 @@ public class S3ClientBuilder {
         profile = new S3Profile();
         profile.setEndpoint(endpoint);
         profile.setRegion(region);
-        if (StringUtils.isNotEmpty(accessKey) && StringUtils.isNotEmpty(secretKey)) {
-            profile.setCredentialsProvider(
-                new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKey, secretKey)));
-        }
+        profile.setAccessKey(accessKey);
+        profile.setSecretKey(secretKey);
         profile.setPathStyleAccessEnabled(pathStyle);
     }
 
