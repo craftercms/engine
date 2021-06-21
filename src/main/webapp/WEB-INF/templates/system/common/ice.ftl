@@ -393,7 +393,7 @@ Crafter CMS Authoring Scripts
 <#---->inlineHomeWithImmediateChildren=true
 >
   <#assign navTree = navTreeBuilder.getNavTree(url, depth, Request.pageUrl)/>
-  <#if omitNavElement != false><nav <#if navElementClass != ''>class="${navElementClass}"</#if></#if>
+  <#if omitNavElement != false><nav <#if navElementClass != ''>class="${navElementClass}"</#if>></#if>
   <#if (containerElement != "") && (includeRoot)><${containerElement} <#if containerElementClass != ''>class="${containerElementClass}"</#if>></#if>
     <@navigationItem
       containerElement=containerElement
@@ -445,9 +445,8 @@ Crafter CMS Authoring Scripts
       </#list>
     >
   </#if>
-  <#assign storeUrl = urlTransformationService.transform('renderUrlToStoreUrl', navItem.url)>
-
   <#if ((currentDepth == 0) && includeRoot) || (currentDepth > 0)>
+    <#assign storeUrl = urlTransformationService.transform('renderUrlToStoreUrl', navItem.url)>
     <#assign item = siteItemService.getSiteItem(storeUrl) />
     <#assign itemDepthClass = (currentDepth == 0)?then(
       itemClass,
@@ -467,7 +466,7 @@ Crafter CMS Authoring Scripts
   <#if (itemWrapperElement != "") && (inlineHomeWithImmediateChildren)></${itemWrapperElement}></#if>
   <#assign subItems = navItem.subItems/>
   <#if (depth > 0) && (currentDepth < depth) && (subItems?size > 0)>
-    <#if (containerElement != "") && (!inlineHomeWithImmediateChildren)><${containerElement}></#if>
+    <#if (containerElement != "") && (!inlineHomeWithImmediateChildren)><${containerElement} class="${deepItemWrapperClass}"></#if>
     <#list subItems as subItem>
       <@navigationItem
         containerElement=containerElement
