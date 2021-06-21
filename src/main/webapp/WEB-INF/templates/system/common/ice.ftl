@@ -373,9 +373,11 @@ Crafter CMS Authoring Scripts
 
 <#macro navigation
 <#---->url="/"
+<#---->navElementClass=""
 <#---->omitNavElement=false
-<#---->containerEl="ul"
-<#---->itemWrapperEl="li"
+<#---->containerElement="ul"
+<#---->containerElementClass=""
+<#---->itemWrapperElement="li"
 <#---->itemWrapperClass=""
 <#---->itemWrapperActiveClass="active"
 <#---->itemWrapperAttributes={}
@@ -383,18 +385,19 @@ Crafter CMS Authoring Scripts
 <#---->itemActiveClass="active"
 <#---->itemAttributes={}
 <#---->deepItemClass=""
-<#---->deepItemClassPrefix=""
+<#---->deepItemClassPrefix="" <#-- a prefix like {class}-[0|1|2...] blah blah -->
+<#---->deepItemWrapperClass="" <#-- static class for subitems containers -->
 <#---->deepItemWrapperClassPrefix=""
 <#---->depth=1
 <#---->includeRoot=true
 <#---->inlineHomeWithImmediateChildren=true
 >
   <#assign navTree = navTreeBuilder.getNavTree(url, depth, Request.pageUrl)/>
-  <#if omitNavElement != false><nav></#if>
-  <#if containerEl != ""><${containerEl}></#if>
+  <#if omitNavElement != false><nav <#if navElementClass != ''>class="${navElementClass}"</#if></#if>
+  <#if (containerElement != "") && (includeRoot)><${containerElement} <#if containerElementClass != ''>class="${containerElementClass}"</#if>></#if>
     <@navigationItem
-      containerEl=containerEl
-      itemWrapperEl=itemWrapperEl
+      containerElement=containerElement
+      itemWrapperElement=itemWrapperElement
       itemWrapperClass=itemWrapperClass
       itemWrapperActiveClass=itemWrapperActiveClass
       itemWrapperAttributes=itemWrapperAttributes
@@ -403,6 +406,7 @@ Crafter CMS Authoring Scripts
       itemAttributes=itemAttributes
       deepItemClass=deepItemClass
       deepItemClassPrefix=deepItemClassPrefix
+      deepItemWrapperClass=deepItemWrapperClass
       deepItemWrapperClassPrefix=deepItemWrapperClassPrefix
       depth=depth
       currentDepth=0
@@ -410,13 +414,13 @@ Crafter CMS Authoring Scripts
       includeRoot=includeRoot
       inlineHomeWithImmediateChildren=inlineHomeWithImmediateChildren
     />
-  <#if containerEl != ""></${containerEl}></#if>
+  <#if containerElement != ""></${containerElement}></#if>
   <#if omitNavElement != false></nav></#if>
 </#macro>
 
 <#macro navigationItem
-<#---->containerEl="ul"
-<#---->itemWrapperEl="li"
+<#---->containerElement="ul"
+<#---->itemWrapperElement="li"
 <#---->itemWrapperClass=""
 <#---->itemWrapperActiveClass="active"
 <#---->itemWrapperAttributes={}
@@ -425,6 +429,7 @@ Crafter CMS Authoring Scripts
 <#---->itemAttributes={}
 <#---->deepItemClass=""
 <#---->deepItemClassPrefix=""
+<#---->deepItemWrapperClass=""
 <#---->deepItemWrapperClassPrefix=""
 <#---->depth=1
 <#---->currentDepth=0
@@ -432,51 +437,58 @@ Crafter CMS Authoring Scripts
 <#---->includeRoot=true
 <#---->inlineHomeWithImmediateChildren=true
 >
-  <#if itemWrapperEl != "">
-    <${itemWrapperEl}
-    class="${navItem.active?then(itemWrapperActiveClass, '')} ${itemWrapperClass}"
+  <#if itemWrapperElement != "">
+    <${itemWrapperElement}
+      class="${navItem.active?then(itemWrapperActiveClass, '')} ${itemWrapperClass}"
       <#list itemWrapperAttributes as attr, value>
           ${attr}="${value}"
       </#list>
     >
   </#if>
-    <#assign storeUrl = urlTransformationService.transform('renderUrlToStoreUrl', navItem.url)>
-    <#assign item = siteItemService.getSiteItem(storeUrl) />
+  <#assign storeUrl = urlTransformationService.transform('renderUrlToStoreUrl', navItem.url)>
 
-    <#if ((currentDepth == 0) && includeRoot) || (currentDepth > 0)>
-      <@a
-        class="${navItem.active?then(itemActiveClass, '')} ${itemClass}"
-        $model=item
-        href="${navItem.url}"
-        $attrs=itemAttributes
-        >
-          ${navItem.label}
-      </@a>
-    </#if>
-    <#if (itemWrapperEl != "") && (inlineHomeWithImmediateChildren)></${itemWrapperEl}></#if>
-    <#assign subItems = navItem.subItems/>
-    <#if (depth > 0) && (currentDepth < depth) && (subItems?size > 0)>
-      <#if (containerEl != "") && (!inlineHomeWithImmediateChildren)><${containerEl}></#if>
-      <#list subItems as subItem>
-        <@navigationItem
-          containerEl=containerEl
-          itemWrapperEl=itemWrapperEl
-          itemWrapperClass=itemWrapperClass
-          itemWrapperActiveClass=itemWrapperActiveClass
-          itemWrapperAttributes=itemWrapperAttributes
-          itemClass=itemClass
-          itemActiveClass=itemActiveClass
-          itemAttributes=itemAttributes
-          deepItemClass=deepItemClass
-          deepItemClassPrefix=deepItemClassPrefix
-          deepItemWrapperClassPrefix=deepItemWrapperClassPrefix
-          depth=depth
-          currentDepth=currentDepth + 1
-          navItem=subItem
-          inlineHomeWithImmediateChildren=false
-        />
-      </#list>
-      <#if (containerEl != "") && (!inlineHomeWithImmediateChildren)></${containerEl}></#if>
-    </#if>
-  <#if (itemWrapperEl != "")  && (!inlineHomeWithImmediateChildren)></${itemWrapperEl}></#if>
+  <#if ((currentDepth == 0) && includeRoot) || (currentDepth > 0)>
+    <#assign item = siteItemService.getSiteItem(storeUrl) />
+    <#assign itemDepthClass = (currentDepth == 0)?then(
+      itemClass,
+      '${deepItemClass} ${(deepItemClassPrefix != "")?then("${deepItemClassPrefix}_${currentDepth}", "")}'
+    )/>
+
+    <@a
+      class="${navItem.active?then(itemActiveClass, '')} ${itemDepthClass}"
+      $model=item
+      href="${navItem.url}"
+      $attrs=itemAttributes
+    >
+      ${navItem.label}
+    </@a>
+  </#if>
+
+  <#if (itemWrapperElement != "") && (inlineHomeWithImmediateChildren)></${itemWrapperElement}></#if>
+  <#assign subItems = navItem.subItems/>
+  <#if (depth > 0) && (currentDepth < depth) && (subItems?size > 0)>
+    <#if (containerElement != "") && (!inlineHomeWithImmediateChildren)><${containerElement}></#if>
+    <#list subItems as subItem>
+      <@navigationItem
+        containerElement=containerElement
+        itemWrapperElement=itemWrapperElement
+        itemWrapperClass=itemWrapperClass
+        itemWrapperActiveClass=itemWrapperActiveClass
+        itemWrapperAttributes=itemWrapperAttributes
+        itemClass=itemClass
+        itemActiveClass=itemActiveClass
+        itemAttributes=itemAttributes
+        deepItemClass=deepItemClass
+        deepItemClassPrefix=deepItemClassPrefix
+        deepItemWrapperClass=deepItemWrapperClass
+        deepItemWrapperClassPrefix=deepItemWrapperClassPrefix
+        depth=depth
+        currentDepth=(inlineHomeWithImmediateChildren && currentDepth == 0)?then(currentDepth, currentDepth + 1)
+        navItem=subItem
+        inlineHomeWithImmediateChildren=false
+      />
+    </#list>
+    <#if (containerElement != "") && (!inlineHomeWithImmediateChildren)></${containerElement}></#if>
+  </#if>
+  <#if (itemWrapperElement != "")  && (!inlineHomeWithImmediateChildren)></${itemWrapperElement}></#if>
 </#macro>
