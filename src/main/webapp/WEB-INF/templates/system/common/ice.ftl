@@ -374,7 +374,7 @@ Crafter CMS Authoring Scripts
 <#macro navigation
 <#---->url="/"
 <#---->navElementClass=""
-<#---->omitNavElement=false
+<#---->showNavElement=false
 <#---->containerElement="ul"
 <#---->containerElementClass=""
 <#---->itemWrapperElement="li"
@@ -385,18 +385,23 @@ Crafter CMS Authoring Scripts
 <#---->itemActiveClass="active"
 <#---->itemAttributes={}
 <#---->deepItemClass=""
-<#---->deepItemClassPrefix="" <#-- a prefix like {class}-[0|1|2...] blah blah -->
-<#---->deepItemWrapperClass="" <#-- static class for subitems containers -->
+<#---->deepItemClassPrefix=""
+<#---->deepItemWrapperClass=""
 <#---->deepItemWrapperClassPrefix=""
 <#---->depth=1
 <#---->includeRoot=true
 <#---->inlineHomeWithImmediateChildren=true
 >
   <#assign navTree = navTreeBuilder.getNavTree(url, depth, Request.pageUrl)/>
-  <#if omitNavElement != false><nav <#if navElementClass != ''>class="${navElementClass}"</#if>></#if>
+  <#-- navElement will be rendered if: showNavElement = true -->
+  <#if showNavElement != false><nav <#if navElementClass != ''>class="${navElementClass}"</#if>></#if>
+
+  <#-- containerElement will be rendered if containerElement has no empty value, and includeRoot is set to true -->
+  <#-- if includeRoot is false, then the first container will be the one containing the root subitems -->
   <#if (containerElement != "") && (includeRoot)><${containerElement} <#if containerElementClass != ''>class="${containerElementClass}"</#if>></#if>
     <@navigationItem
       containerElement=containerElement
+      containerElementClass=containerElementClass
       itemWrapperElement=itemWrapperElement
       itemWrapperClass=itemWrapperClass
       itemWrapperActiveClass=itemWrapperActiveClass
@@ -415,11 +420,12 @@ Crafter CMS Authoring Scripts
       inlineHomeWithImmediateChildren=inlineHomeWithImmediateChildren
     />
   <#if containerElement != ""></${containerElement}></#if>
-  <#if omitNavElement != false></nav></#if>
+  <#if showNavElement != false></nav></#if>
 </#macro>
 
 <#macro navigationItem
 <#---->containerElement="ul"
+<#---->containerElementClass=""
 <#---->itemWrapperElement="li"
 <#---->itemWrapperClass=""
 <#---->itemWrapperActiveClass="active"
@@ -437,11 +443,18 @@ Crafter CMS Authoring Scripts
 <#---->includeRoot=true
 <#---->inlineHomeWithImmediateChildren=true
 >
-  <#if itemWrapperElement != "">
+    <#-- itemWrapperElement will be rendered if itemWrapperElement has no empty value and rootItem is set to true -->
+    <#-- if no rootItem is rendered, then the itemWrapper is not rendered (it would be empty) -->
+    <#if itemWrapperElement != "" && includeRoot>
+    <#assign itemWrapperDepthClass = (currentDepth == 0)?then(
+      itemWrapperClass,
+      '${deepItemWrapperClass} ${(deepItemWrapperClassPrefix != "")?then("${deepItemClassPrefix}_${currentDepth}", "")}'
+    )/>
+
     <${itemWrapperElement}
-      class="${navItem.active?then(itemWrapperActiveClass, '')} ${itemWrapperClass}"
+      class="${navItem.active?then(itemWrapperActiveClass, '')} ${itemWrapperDepthClass}"
       <#list itemWrapperAttributes as attr, value>
-          ${attr}="${value}"
+        ${attr}="${value}"
       </#list>
     >
   </#if>
@@ -463,10 +476,15 @@ Crafter CMS Authoring Scripts
     </@a>
   </#if>
 
+  <#-- itemWrapperElement will not be rendered if itemWrapperElement is not empty and if root and root first level
+  children are set to be in same level-->
   <#if (itemWrapperElement != "") && (inlineHomeWithImmediateChildren)></${itemWrapperElement}></#if>
   <#assign subItems = navItem.subItems/>
+  <#-- if current item has subitems: -->
   <#if (depth > 0) && (currentDepth < depth) && (subItems?size > 0)>
-    <#if (containerElement != "") && (!inlineHomeWithImmediateChildren)><${containerElement} class="${deepItemWrapperClass}"></#if>
+    <#if ((containerElement != "") && (!inlineHomeWithImmediateChildren) || !includeRoot)>
+      <${containerElement} class="${(currentDepth == 0 && !includeRoot)?then(containerElementClass, deepItemWrapperClass)}">
+    </#if>
     <#list subItems as subItem>
       <@navigationItem
         containerElement=containerElement
