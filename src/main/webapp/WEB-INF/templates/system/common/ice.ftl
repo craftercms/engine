@@ -388,7 +388,7 @@ Crafter CMS Authoring Scripts
 <#---->hasSubItemWrapperClass=""
 <#---->hasSubItemItemAttributes={}
 <#---->subItemClass=""
-<#---->subItemClassPrefix=""
+<#---->subItemClassPrefix="nav-level"
 <#---->subItemAttributes={}
 <#---->subItemWrapperClass=""
 <#---->subItemWrapperClassPrefix=""
@@ -447,7 +447,7 @@ Crafter CMS Authoring Scripts
 <#---->hasSubItemWrapperClass=""
 <#---->hasSubItemItemAttributes={}
 <#---->subItemClass=""
-<#---->subItemClassPrefix=""
+<#---->subItemClassPrefix="nav-level"
 <#---->subItemAttributes={}
 <#---->subItemWrapperClass=""
 <#---->subItemWrapperClassPrefix=""
@@ -465,7 +465,7 @@ Crafter CMS Authoring Scripts
     <#assign addSubItemData = hasSubItems && currentDepth < depth && !inlineHomeWithImmediateChildren/>
     <#assign itemWrapperDepthClass = (currentDepth == 0)?then(
       itemWrapperClass,
-      '${subItemWrapperClass} ${(subItemWrapperClassPrefix != "")?then("${subItemClassPrefix}_${currentDepth}", "")}'
+      '${subItemWrapperClass} ${(subItemWrapperClassPrefix != "")?then("${subItemClassPrefix}-${currentDepth}", "")}'
     )/>
 
     <${itemWrapperElement}
@@ -480,7 +480,7 @@ Crafter CMS Authoring Scripts
     <#assign item = siteItemService.getSiteItem(storeUrl) />
     <#assign itemDepthClass = (currentDepth == 0)?then(
       itemClass,
-      '${subItemClass} ${(subItemClassPrefix != "")?then("${subItemClassPrefix}_${currentDepth}", "")}'
+      '${subItemClass} ${(subItemClassPrefix != "")?then("${subItemClassPrefix}-${currentDepth}", "")}'
     )/>
 
     <@a
