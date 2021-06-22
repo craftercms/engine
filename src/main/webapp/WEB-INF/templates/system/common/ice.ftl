@@ -374,7 +374,7 @@ Crafter CMS Authoring Scripts
 <#macro navigation
 <#---->url="/"
 <#---->navElementClass=""
-<#---->showNavElement=false
+<#---->showNavElement=true
 <#---->containerElement="ul"
 <#---->containerElementClass=""
 <#---->itemWrapperElement="li"
