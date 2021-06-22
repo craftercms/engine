@@ -384,10 +384,15 @@ Crafter CMS Authoring Scripts
 <#---->itemClass=""
 <#---->itemActiveClass="active"
 <#---->itemAttributes={}
-<#---->deepItemClass=""
-<#---->deepItemClassPrefix=""
-<#---->deepItemWrapperClass=""
-<#---->deepItemWrapperClassPrefix=""
+<#---->hasSubItemItemClass=""
+<#---->hasSubItemWrapperClass=""
+<#---->hasSubItemItemAttributes={}
+<#---->subItemClass=""
+<#---->subItemClassPrefix=""
+<#---->subItemAttributes={}
+<#---->subItemWrapperClass=""
+<#---->subItemWrapperClassPrefix=""
+<#---->subItemContainerClass=""
 <#---->depth=1
 <#---->includeRoot=true
 <#---->inlineHomeWithImmediateChildren=true
@@ -409,10 +414,15 @@ Crafter CMS Authoring Scripts
       itemClass=itemClass
       itemActiveClass=itemActiveClass
       itemAttributes=itemAttributes
-      deepItemClass=deepItemClass
-      deepItemClassPrefix=deepItemClassPrefix
-      deepItemWrapperClass=deepItemWrapperClass
-      deepItemWrapperClassPrefix=deepItemWrapperClassPrefix
+      hasSubItemItemClass=hasSubItemItemClass
+      hasSubItemWrapperClass=hasSubItemWrapperClass
+      hasSubItemItemAttributes=hasSubItemItemAttributes
+      subItemClass=subItemClass
+      subItemClassPrefix=subItemClassPrefix
+      subItemAttributes=subItemAttributes
+      subItemWrapperClass=subItemWrapperClass
+      subItemWrapperClassPrefix=subItemWrapperClassPrefix
+      subItemContainerClass=subItemContainerClass
       depth=depth
       currentDepth=0
       navItem=navTree
@@ -433,10 +443,15 @@ Crafter CMS Authoring Scripts
 <#---->itemClass=""
 <#---->itemActiveClass="active"
 <#---->itemAttributes={}
-<#---->deepItemClass=""
-<#---->deepItemClassPrefix=""
-<#---->deepItemWrapperClass=""
-<#---->deepItemWrapperClassPrefix=""
+<#---->hasSubItemItemClass=""
+<#---->hasSubItemWrapperClass=""
+<#---->hasSubItemItemAttributes={}
+<#---->subItemClass=""
+<#---->subItemClassPrefix=""
+<#---->subItemAttributes={}
+<#---->subItemWrapperClass=""
+<#---->subItemWrapperClassPrefix=""
+<#---->subItemContainerClass=""
 <#---->depth=1
 <#---->currentDepth=0
 <#---->navItem={}
@@ -446,13 +461,15 @@ Crafter CMS Authoring Scripts
     <#-- itemWrapperElement will be rendered if itemWrapperElement has no empty value and rootItem is set to true -->
     <#-- if no rootItem is rendered, then the itemWrapper is not rendered (it would be empty) -->
     <#if itemWrapperElement != "" && includeRoot>
+    <#assign hasSubItems = ((navItem.subItems)?size > 0) />
+    <#assign addSubItemData = hasSubItems && currentDepth < depth && !inlineHomeWithImmediateChildren/>
     <#assign itemWrapperDepthClass = (currentDepth == 0)?then(
       itemWrapperClass,
-      '${deepItemWrapperClass} ${(deepItemWrapperClassPrefix != "")?then("${deepItemClassPrefix}_${currentDepth}", "")}'
+      '${subItemWrapperClass} ${(subItemWrapperClassPrefix != "")?then("${subItemClassPrefix}_${currentDepth}", "")}'
     )/>
 
     <${itemWrapperElement}
-      class="${navItem.active?then(itemWrapperActiveClass, '')} ${itemWrapperDepthClass}"
+      class="${navItem.active?then(itemWrapperActiveClass, '')} ${itemWrapperDepthClass} ${(addSubItemData && hasSubItemWrapperClass != '')?then(hasSubItemWrapperClass, '')}"
       <#list itemWrapperAttributes as attr, value>
         ${attr}="${value}"
       </#list>
@@ -463,14 +480,14 @@ Crafter CMS Authoring Scripts
     <#assign item = siteItemService.getSiteItem(storeUrl) />
     <#assign itemDepthClass = (currentDepth == 0)?then(
       itemClass,
-      '${deepItemClass} ${(deepItemClassPrefix != "")?then("${deepItemClassPrefix}_${currentDepth}", "")}'
+      '${subItemClass} ${(subItemClassPrefix != "")?then("${subItemClassPrefix}_${currentDepth}", "")}'
     )/>
 
     <@a
-      class="${navItem.active?then(itemActiveClass, '')} ${itemDepthClass}"
+      class="${navItem.active?then(itemActiveClass, '')} ${(addSubItemData)?then(hasSubItemItemClass, itemDepthClass)}"
       $model=item
       href="${navItem.url}"
-      $attrs=itemAttributes
+      $attrs=(addSubItemData)?then(hasSubItemItemAttributes, itemAttributes)
     >
       ${navItem.label}
     </@a>
@@ -483,7 +500,9 @@ Crafter CMS Authoring Scripts
   <#-- if current item has subitems: -->
   <#if (depth > 0) && (currentDepth < depth) && (subItems?size > 0)>
     <#if ((containerElement != "") && (!inlineHomeWithImmediateChildren) || !includeRoot)>
-      <${containerElement} class="${(currentDepth == 0 && !includeRoot)?then(containerElementClass, deepItemWrapperClass)}">
+      <${containerElement}
+        class="${(currentDepth == 0 && !includeRoot)?then(containerElementClass, subItemContainerClass)}"
+      >
     </#if>
     <#list subItems as subItem>
       <@navigationItem
@@ -495,11 +514,15 @@ Crafter CMS Authoring Scripts
         itemClass=itemClass
         itemActiveClass=itemActiveClass
         itemAttributes=itemAttributes
-        deepItemClass=deepItemClass
-        deepItemClassPrefix=deepItemClassPrefix
-        deepItemWrapperClass=deepItemWrapperClass
-        deepItemWrapperClassPrefix=deepItemWrapperClassPrefix
-        depth=depth
+        hasSubItemItemClass=hasSubItemItemClass
+        hasSubItemWrapperClass=hasSubItemWrapperClass
+        hasSubItemItemAttributes=hasSubItemItemAttributes
+        subItemClass=subItemClass
+        subItemClassPrefix=subItemClassPrefix
+        subItemWrapperClass=subItemWrapperClass
+        subItemWrapperClassPrefix=subItemWrapperClassPrefix
+        subItemContainerClass=subItemContainerClass
+        depth=(inlineHomeWithImmediateChildren && currentDepth == 0)?then(depth - 1, currentDepth +1)
         currentDepth=(inlineHomeWithImmediateChildren && currentDepth == 0)?then(currentDepth, currentDepth + 1)
         navItem=subItem
         inlineHomeWithImmediateChildren=false
