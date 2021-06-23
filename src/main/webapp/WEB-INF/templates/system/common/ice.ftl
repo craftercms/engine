@@ -372,7 +372,7 @@ Crafter CMS Authoring Scripts
 </#macro>
 
 <#macro navigation
-<#---->url="/"
+<#---->url="/site/website"
 <#---->navElementClass=""
 <#---->showNavElement=true
 <#---->containerElement="ul"
@@ -395,7 +395,7 @@ Crafter CMS Authoring Scripts
 <#---->subItemContainerClass=""
 <#---->depth=1
 <#---->includeRoot=true
-<#---->inlineHomeWithImmediateChildren=true
+<#---->inlineRootWithImmediateChildren=true
 >
   <#assign navTree = navTreeBuilder.getNavTree(url, depth, Request.pageUrl)/>
   <#-- navElement will be rendered if: showNavElement = true -->
@@ -427,7 +427,7 @@ Crafter CMS Authoring Scripts
       currentDepth=0
       navItem=navTree
       includeRoot=includeRoot
-      inlineHomeWithImmediateChildren=inlineHomeWithImmediateChildren
+      inlineRootWithImmediateChildren=inlineRootWithImmediateChildren
     />
   <#if containerElement != ""></${containerElement}></#if>
   <#if showNavElement != false></nav></#if>
@@ -456,13 +456,13 @@ Crafter CMS Authoring Scripts
 <#---->currentDepth=0
 <#---->navItem={}
 <#---->includeRoot=true
-<#---->inlineHomeWithImmediateChildren=true
+<#---->inlineRootWithImmediateChildren=true
 >
     <#-- itemWrapperElement will be rendered if itemWrapperElement has no empty value and rootItem is set to true -->
     <#-- if no rootItem is rendered, then the itemWrapper is not rendered (it would be empty) -->
     <#if itemWrapperElement != "" && includeRoot>
     <#assign hasSubItems = ((navItem.subItems)?size > 0) />
-    <#assign addSubItemData = hasSubItems && currentDepth < depth && !inlineHomeWithImmediateChildren/>
+    <#assign addSubItemData = hasSubItems && currentDepth < depth && !inlineRootWithImmediateChildren/>
     <#assign itemWrapperDepthClass = (currentDepth == 0)?then(
       itemWrapperClass,
       '${subItemWrapperClass} ${(subItemWrapperClassPrefix != "")?then("${subItemClassPrefix}-${currentDepth}", "")}'
@@ -495,11 +495,11 @@ Crafter CMS Authoring Scripts
 
   <#-- itemWrapperElement will not be rendered if itemWrapperElement is not empty and if root and root first level
   children are set to be in same level-->
-  <#if (itemWrapperElement != "") && (inlineHomeWithImmediateChildren)></${itemWrapperElement}></#if>
+  <#if (itemWrapperElement != "") && (inlineRootWithImmediateChildren)></${itemWrapperElement}></#if>
   <#assign subItems = navItem.subItems/>
   <#-- if current item has subitems: -->
   <#if (depth > 0) && (currentDepth < depth) && (subItems?size > 0)>
-    <#if ((containerElement != "") && (!inlineHomeWithImmediateChildren) || !includeRoot)>
+    <#if ((containerElement != "") && (!inlineRootWithImmediateChildren) || !includeRoot)>
       <${containerElement}
         class="${(currentDepth == 0 && !includeRoot)?then(containerElementClass, subItemContainerClass)}"
       >
@@ -522,13 +522,13 @@ Crafter CMS Authoring Scripts
         subItemWrapperClass=subItemWrapperClass
         subItemWrapperClassPrefix=subItemWrapperClassPrefix
         subItemContainerClass=subItemContainerClass
-        depth=(inlineHomeWithImmediateChildren && currentDepth == 0)?then(depth - 1, currentDepth +1)
-        currentDepth=(inlineHomeWithImmediateChildren && currentDepth == 0)?then(currentDepth, currentDepth + 1)
+        depth=(inlineRootWithImmediateChildren && currentDepth == 0)?then(depth - 1, currentDepth +1)
+        currentDepth=(inlineRootWithImmediateChildren && currentDepth == 0)?then(currentDepth, currentDepth + 1)
         navItem=subItem
-        inlineHomeWithImmediateChildren=false
+        inlineRootWithImmediateChildren=false
       />
     </#list>
-    <#if (containerElement != "") && (!inlineHomeWithImmediateChildren)></${containerElement}></#if>
+    <#if (containerElement != "") && (!inlineRootWithImmediateChildren)></${containerElement}></#if>
   </#if>
-  <#if (itemWrapperElement != "")  && (!inlineHomeWithImmediateChildren)></${itemWrapperElement}></#if>
+  <#if (itemWrapperElement != "")  && (!inlineRootWithImmediateChildren)></${itemWrapperElement}></#if>
 </#macro>
