@@ -43,8 +43,10 @@ import org.craftercms.engine.util.groovy.Dom4jExtension;
 import org.craftercms.engine.util.quartz.JobContext;
 import org.craftercms.engine.util.spring.ContentStoreResourceLoader;
 import org.craftercms.engine.util.spring.context.RestrictedApplicationContext;
+import org.jenkinsci.plugins.scriptsecurity.sandbox.Whitelist;
 import org.jenkinsci.plugins.scriptsecurity.sandbox.blacklists.Blacklist;
 import org.jenkinsci.plugins.scriptsecurity.sandbox.groovy.SandboxInterceptor;
+import org.jenkinsci.plugins.scriptsecurity.sandbox.whitelists.PermitAllWhitelist;
 import org.quartz.Scheduler;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectFactory;
@@ -90,6 +92,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     public static final String CONFIG_BEAN_NAME = "siteConfig";
     public static final long DEFAULT_SHUTDOWN_TIMEOUT = 5;
     public static final String DEFAULT_PUBLISHING_TARGET_MACRO_NAME = "publishingTarget";
+    public static final String CONFIG_KEY_ALLOWED_TEMPLATE_PATHS = "templates.allowed";
 
     private static final Log logger = LogFactory.getLog(SiteContextFactory.class);
 
@@ -131,6 +134,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected PublishingTargetResolver publishingTargetResolver;
     protected String publishingTargetMacroName;
     protected boolean enableScriptSandbox;
+    protected boolean enableSandboxBlacklist;
     protected String sandboxBlacklist;
     protected boolean enableExpressions;
 
@@ -316,6 +320,10 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         this.enableScriptSandbox = enableScriptSandbox;
     }
 
+    public void setEnableSandboxBlacklist(boolean enableSandboxBlacklist) {
+        this.enableSandboxBlacklist = enableSandboxBlacklist;
+    }
+
     public void setSandboxBlacklist(String sandboxBlacklist) {
         this.sandboxBlacklist = sandboxBlacklist;
     }
@@ -405,6 +413,9 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             siteContext.setClassLoader(classLoader);
             siteContext.setUrlRewriter(urlRewriter);
             siteContext.setProxyConfig(proxyConfig);
+            if (config != null) {
+                siteContext.setAllowedTemplatePaths(config.getStringArray(CONFIG_KEY_ALLOWED_TEMPLATE_PATHS));
+            }
 
             Scheduler scheduler = scheduleJobs(siteContext);
             siteContext.setScheduler(scheduler);
@@ -446,15 +457,22 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     }
 
     protected void configureScriptSandbox(SiteContext siteContext, ResourceLoader resourceLoader) {
-        if (enableScriptSandbox) {
-            Resource sandboxBlacklist = resourceLoader.getResource(this.sandboxBlacklist);
-            try(InputStream is = sandboxBlacklist.getInputStream()) {
-                Blacklist blacklist = new Blacklist(new InputStreamReader(is));
-                siteContext.scriptSandbox = new SandboxInterceptor(blacklist, singletonList(Dom4jExtension.class));
-            } catch (IOException e) {
-                throw new SiteContextCreationException("Unable to load sandbox blacklist for site '" +
-                        siteContext.getSiteName() + "'", e);
+        try {
+            // Enable both hardcoded & configurable blacklists
+            if (enableScriptSandbox && enableSandboxBlacklist) {
+                Resource sandboxBlacklist = resourceLoader.getResource(this.sandboxBlacklist);
+                try (InputStream is = sandboxBlacklist.getInputStream()) {
+                    Blacklist blacklist = new Blacklist(new InputStreamReader(is));
+                    siteContext.scriptSandbox = new SandboxInterceptor(blacklist, singletonList(Dom4jExtension.class));
+                }
+            // Enable only the hardcoded blacklist
+            } else if (enableScriptSandbox) {
+                Whitelist whitelist = new PermitAllWhitelist();
+                siteContext.scriptSandbox = new SandboxInterceptor(whitelist, singletonList(Dom4jExtension.class));
             }
+        } catch (IOException e) {
+            throw new SiteContextCreationException("Unable to load sandbox blacklist for site '" +
+                    siteContext.getSiteName() + "'", e);
         }
     }
 
