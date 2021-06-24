@@ -20,6 +20,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 
 import freemarker.cache.TemplateLoader;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.lang.UrlUtils;
@@ -28,6 +29,8 @@ import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.engine.service.context.SiteContext;
 import org.springframework.beans.factory.annotation.Required;
+
+import static org.craftercms.commons.lang.RegexUtils.matchesAny;
 
 /**
  * Freemarker {@link freemarker.cache.TemplateLoader} similar to {@link org.springframework.ui.freemarker.SpringTemplateLoader} but instead of using
@@ -41,9 +44,16 @@ public class CrafterFreeMarkerTemplateLoader implements TemplateLoader {
 
     private ContentStoreService contentStoreService;
 
+    private String[] globalAllowedPaths;
+
     @Required
     public void setContentStoreService(ContentStoreService contentStoreService) {
         this.contentStoreService = contentStoreService;
+    }
+
+    @Required
+    public void setGlobalAllowedPaths(String[] globalAllowedPaths) {
+        this.globalAllowedPaths = globalAllowedPaths;
     }
 
     @Override
@@ -85,7 +95,14 @@ public class CrafterFreeMarkerTemplateLoader implements TemplateLoader {
     }
 
     protected String getTemplatePath(SiteContext siteContext, String name) {
-        return UrlUtils.concat(siteContext.getTemplatesPath(), name);
+        String templatesPath = siteContext.getTemplatesPath();
+        if (StringUtils.startsWith(name, StringUtils.removeStart(templatesPath, "/")) ||
+                matchesAny(name, globalAllowedPaths) ||
+                matchesAny(name, siteContext.getAllowedTemplatePaths())) {
+            return name;
+        } else {
+            return UrlUtils.concat(templatesPath, name);
+        }
     }
 
 }
