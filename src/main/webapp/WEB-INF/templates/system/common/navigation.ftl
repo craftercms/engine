@@ -1,5 +1,3 @@
-<#include "/templates/system/common/ice.ftl"/>
-
 <#macro navigation
 <#---->url="/site/website"
 <#---->navElementClass=""
