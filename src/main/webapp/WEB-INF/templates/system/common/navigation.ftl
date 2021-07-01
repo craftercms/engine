@@ -103,8 +103,7 @@
     >
   </#if>
   <#if ((currentDepth == 0) && includeRoot) || (currentDepth > 0)>
-    <#assign isAuthoring = modePreview />
-    <#if isAuthoring>
+    <#if modePreview>
       <#assign storeUrl = urlTransformationService.transform('renderUrlToStoreUrl', navItem.url)>
       <#assign item = siteItemService.getSiteItem(storeUrl) />
     </#if>
