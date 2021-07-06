@@ -1,5 +1,6 @@
 <#include "/templates/system/common/ice.ftl"/>
 <#include "/templates/system/common/navigation.ftl"/>
+<#include "/templates/system/common/breadcrumb.ftl"/>
 <#include "/templates/system/plugins/definitions.ftl" ignore_missing=true />
 
 <#macro head>
