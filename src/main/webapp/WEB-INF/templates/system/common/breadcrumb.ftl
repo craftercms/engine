@@ -25,8 +25,10 @@
       </#list>
     >
   </#if>
+  <#-- containerElement will be rendered if containerElement has no empty value -->
   <#if (containerElement != "")><${containerElement} class="${containerElementClass}"></#if>
     <#list breadcrumb as item>
+      <#-- itemWrapperElement will not be rendered if itemWrapperElement has no empty value -->
       <#if (itemWrapperElement != "")>
         <${itemWrapperElement}
           class="${(item.active)?then(itemWrapperActiveClass, '')} ${itemWrapperClass}"
@@ -35,17 +37,25 @@
           </#list>
         >
       </#if>
+        <#if modePreview>
+          <#assign storeUrl = urlTransformationService.transform('renderUrlToStoreUrl', item.url)>
+          <#assign siteItem = siteItemService.getSiteItem(storeUrl) />
+        </#if>
+
         <#if !(item.active) || includeLinkInActiveItem>
-          <a
+          <@a
+            $model=siteItem
             class="${itemClass}"
             href="${item.url}"
-            <#list itemAttributes as attr, value>
-              ${attr}="${value}"
-            </#list>
+            $attrs=itemAttributes
           >
+            ${item.label}
+          </@a>
+        <#else>
+          <@span $model=siteItem>
+            ${item.label}
+          </@span>
         </#if>
-          ${item.label}
-        <#if !(item.active) || includeLinkInActiveItem></a></#if>
       <#if (itemWrapperElement != "")>
         </${itemWrapperElement}>
       </#if>
