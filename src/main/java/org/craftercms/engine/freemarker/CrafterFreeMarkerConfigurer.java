@@ -89,7 +89,7 @@ public class CrafterFreeMarkerConfigurer extends FreeMarkerConfigurer {
 
     @Override
     protected Configuration newConfiguration() {
-        return new CrafterCacheAwareConfiguration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS, cacheTemplates);
+        return new CrafterCacheAwareConfiguration(Configuration.VERSION_2_3_30, cacheTemplates);
     }
 
 }
