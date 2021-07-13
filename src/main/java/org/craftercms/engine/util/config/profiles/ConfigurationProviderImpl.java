@@ -18,6 +18,7 @@ package org.craftercms.engine.util.config.profiles;
 import org.craftercms.commons.config.ConfigurationProvider;
 import org.craftercms.engine.service.SiteItemService;
 
+import java.beans.ConstructorProperties;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -31,6 +32,7 @@ public class ConfigurationProviderImpl implements ConfigurationProvider {
 
     protected SiteItemService siteItemService;
 
+    @ConstructorProperties({"siteItemService"})
     public ConfigurationProviderImpl(SiteItemService siteItemService) {
         this.siteItemService = siteItemService;
     }

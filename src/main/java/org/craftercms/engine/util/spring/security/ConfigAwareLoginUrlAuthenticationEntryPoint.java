@@ -24,6 +24,8 @@ import org.craftercms.engine.util.ConfigUtils;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
+import java.beans.ConstructorProperties;
+
 /**
  * Extension of {@link LoginUrlAuthenticationEntryPoint} that uses site config to override properties
  *
@@ -34,6 +36,7 @@ public class ConfigAwareLoginUrlAuthenticationEntryPoint extends LoginUrlAuthent
 
     public static final String LOGIN_FORM_URL_KEY = "security.login.formUrl";
 
+    @ConstructorProperties({"loginFormUrl"})
     public ConfigAwareLoginUrlAuthenticationEntryPoint(final String loginFormUrl) {
         super(loginFormUrl);
     }
@@ -42,7 +45,7 @@ public class ConfigAwareLoginUrlAuthenticationEntryPoint extends LoginUrlAuthent
     protected String determineUrlToUseForThisRequest(final HttpServletRequest request,
                                                      final HttpServletResponse response,
                                                      final AuthenticationException exception) {
-        HierarchicalConfiguration siteConfig = ConfigUtils.getCurrentConfig();
+        HierarchicalConfiguration<?> siteConfig = ConfigUtils.getCurrentConfig();
         if (siteConfig != null && siteConfig.containsKey(LOGIN_FORM_URL_KEY)) {
             return siteConfig.getString(LOGIN_FORM_URL_KEY);
         }

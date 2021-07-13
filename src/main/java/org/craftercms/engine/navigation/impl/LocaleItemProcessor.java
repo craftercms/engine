@@ -22,6 +22,8 @@ import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.service.Item;
 
+import java.beans.ConstructorProperties;
+
 import static org.craftercms.engine.util.LocaleUtils.resolveLocalePath;
 
 /**
@@ -34,6 +36,7 @@ public class LocaleItemProcessor implements ItemProcessor {
 
     protected ContentStoreService storeService;
 
+    @ConstructorProperties({"storeService"})
     public LocaleItemProcessor(ContentStoreService storeService) {
         this.storeService = storeService;
     }

@@ -20,6 +20,7 @@ import org.springframework.web.servlet.LocaleResolver;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.beans.ConstructorProperties;
 import java.util.Locale;
 
 /**
@@ -36,6 +37,7 @@ public class DelegatingLocaleResolver implements LocaleResolver {
      */
     protected LocaleResolver defaultLocaleResolver;
 
+    @ConstructorProperties({"defaultLocaleResolver"})
     public DelegatingLocaleResolver(LocaleResolver defaultLocaleResolver) {
         this.defaultLocaleResolver = defaultLocaleResolver;
     }

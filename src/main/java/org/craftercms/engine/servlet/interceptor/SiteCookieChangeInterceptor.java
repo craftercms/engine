@@ -27,6 +27,8 @@ import org.craftercms.engine.service.context.SiteContext;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
+import java.beans.ConstructorProperties;
+
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
@@ -54,6 +56,8 @@ public class SiteCookieChangeInterceptor extends HandlerInterceptorAdapter {
 
     protected boolean secure;
 
+    @ConstructorProperties({"enabled", "cookieName", "cookieDomain", "cookiePath", "cookieMaxAge", "httpOnly",
+            "secure"})
     public SiteCookieChangeInterceptor(final boolean enabled, final String cookieName, final String cookieDomain,
                                        final String cookiePath, final int cookieMaxAge, final boolean httpOnly,
                                        final boolean secure) {

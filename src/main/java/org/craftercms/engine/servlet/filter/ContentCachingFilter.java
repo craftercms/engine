@@ -22,6 +22,7 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.beans.ConstructorProperties;
 import java.io.IOException;
 
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
@@ -39,6 +40,7 @@ public class ContentCachingFilter extends OncePerRequestFilter {
 
     protected boolean enabled;
 
+    @ConstructorProperties({"enabled"})
     public ContentCachingFilter(boolean enabled) {
         this.enabled = enabled;
     }

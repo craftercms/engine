@@ -21,6 +21,7 @@ import org.springframework.web.filter.ShallowEtagHeaderFilter;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import java.beans.ConstructorProperties;
 import java.util.stream.Stream;
 
 /**
@@ -46,6 +47,7 @@ public class ConfigAwareEtagFilter extends ShallowEtagHeaderFilter {
      */
     protected PathMatcher pathMatcher;
 
+    @ConstructorProperties({"enabled", "includedUrls"})
     public ConfigAwareEtagFilter(boolean enabled, String[] includedUrls) {
         this.enabled = enabled;
         this.includedUrls = includedUrls;

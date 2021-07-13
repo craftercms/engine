@@ -16,6 +16,7 @@
 
 package org.craftercms.engine.util.predicates;
 
+import java.beans.ConstructorProperties;
 import java.util.List;
 
 import org.apache.commons.collections4.Predicate;
@@ -31,6 +32,7 @@ public class PredicateBasedFilter implements ItemFilter {
 
     protected Predicate<Item> predicate;
 
+    @ConstructorProperties({"predicate"})
     public PredicateBasedFilter(Predicate<Item> predicate) {
         this.predicate = predicate;
     }

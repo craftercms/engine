@@ -16,6 +16,7 @@
 
 package org.craftercms.engine.util.spring.security.profile;
 
+import java.beans.ConstructorProperties;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +52,7 @@ public class ProfileHeadersAuthenticationFilter extends AbstractHeadersAuthentic
 
     protected final TenantsResolver tenantsResolver;
 
+    @ConstructorProperties({"profileService", "tenantService", "tenantsResolver"})
     public ProfileHeadersAuthenticationFilter(final ProfileService profileService,
                                               final TenantService tenantService,
                                               final TenantsResolver tenantsResolver) {

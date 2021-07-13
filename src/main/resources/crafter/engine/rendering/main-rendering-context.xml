@@ -96,7 +96,7 @@
     </bean>
 
     <bean id="crafter.xmlMsgConverter" class="org.springframework.http.converter.xml.MarshallingHttpMessageConverter">
-        <constructor-arg ref="crafter.xmlMarshaller"/>
+        <constructor-arg index="0" ref="crafter.xmlMarshaller"/>
     </bean>
 
     <!-- Use the default message converters, overwrite if need to specify new message converters -->
@@ -122,7 +122,7 @@
 
     <!-- This needs to be named localeResolver so that the DispatcherServlet can find it -->
     <bean id="localeResolver" class="org.craftercms.engine.util.spring.servlet.i18n.DelegatingLocaleResolver">
-        <constructor-arg>
+        <constructor-arg name="defaultLocaleResolver">
             <!-- The standalone resolver used when there is no translation config -->
             <bean class="org.craftercms.engine.targeting.impl.ConfigAwareCookieLocaleResolver">
                 <property name="cookieName" value="${crafter.engine.locale.cookie.name}"/>

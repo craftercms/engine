@@ -18,6 +18,8 @@ package org.craftercms.engine.util.config;
 import org.craftercms.commons.config.PublishingTargetResolver;
 import org.craftercms.engine.service.context.SiteContext;
 
+import java.beans.ConstructorProperties;
+
 /**
  * Implementation of {@link PublishingTargetResolver} that uses the current {@link SiteContext}
  *
@@ -30,6 +32,7 @@ public class SiteAwarePublishingTargetResolver implements PublishingTargetResolv
 
     protected String stagingPattern;
 
+    @ConstructorProperties({"preview", "stagingPattern"})
     public SiteAwarePublishingTargetResolver(boolean preview, String stagingPattern) {
         this.preview = preview;
         this.stagingPattern = stagingPattern;

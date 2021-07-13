@@ -21,6 +21,7 @@ import org.springframework.web.util.WebUtils;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.beans.ConstructorProperties;
 import java.util.Locale;
 
 import static org.craftercms.commons.locale.LocaleUtils.parseLocale;
@@ -52,6 +53,7 @@ public class CookieLocaleResolver extends ConfigAwareLocaleResolver {
      */
     protected String defaultCookieName;
 
+    @ConstructorProperties({"defaultCookieName"})
     public CookieLocaleResolver(String defaultCookieName) {
         this.defaultCookieName = defaultCookieName;
     }

@@ -44,7 +44,7 @@
     </bean>
 
     <bean id="crafter.renderUrlToStoreUrlTransformer" class="org.craftercms.core.url.impl.UrlTransformerPipeline">
-        <constructor-arg>
+        <constructor-arg name="transformers">
             <list>
                 <ref bean="crafter.addIndexIfFolderUrlTransformer"/>
                 <ref bean="crafter.replacePageExtWithDescriptorExtUrlTransformer"/>
@@ -54,7 +54,7 @@
     </bean>
 
     <bean id="crafter.renderUrlToTargetedStoreUrlTransformer" class="org.craftercms.core.url.impl.UrlTransformerPipeline">
-        <constructor-arg>
+        <constructor-arg name="transformers">
             <list>
                 <ref bean="crafter.renderUrlToStoreUrlTransformer"/>
                 <ref bean="crafter.toTargetedUrlTransformer"/>
@@ -63,7 +63,7 @@
     </bean>
 
     <bean id="crafter.storeUrlToFullRenderUrlTransformer" class="org.craftercms.core.url.impl.UrlTransformerPipeline">
-        <constructor-arg>
+        <constructor-arg name="transformers">
             <list>
                 <ref bean="crafter.storeUrlToRenderUrlTransformer"/>
                 <ref bean="crafter.addSchemeAndDomainAndServerPortUrlTransformer"/>
@@ -72,7 +72,7 @@
     </bean>
 
     <bean id="crafter.storeUrlToRenderUrlTransformer" class="org.craftercms.core.url.impl.UrlTransformerPipeline">
-        <constructor-arg>
+        <constructor-arg name="transformers">
             <list>
                 <ref bean="crafter.removeIndexUrlTransformer"/>
                 <ref bean="crafter.removeTrailingSlash"/>
@@ -133,7 +133,7 @@
     </bean>
 
     <bean id="crafter.toServletRelativeUrlTransfomerPipeline" class="org.craftercms.core.url.impl.UrlTransformerPipeline">
-        <constructor-arg>
+        <constructor-arg name="transformers">
             <list>
                 <ref bean="crafter.addServletPathUrlTransformer"/>
                 <ref bean="crafter.addContextPathUrlTransformer"/>
@@ -142,7 +142,7 @@
     </bean>
 
     <bean id="crafter.toFullUrlTransformerPipeline" class="org.craftercms.core.url.impl.UrlTransformerPipeline">
-        <constructor-arg>
+        <constructor-arg name="transformers">
             <list>
                 <ref bean="crafter.addServletPathUrlTransformer"/>
                 <ref bean="crafter.addContextPathUrlTransformer"/>
@@ -152,7 +152,7 @@
     </bean>
 
     <bean id="crafter.toFullHttpsUrlTransformerPipeline" class="org.craftercms.core.url.impl.UrlTransformerPipeline">
-        <constructor-arg>
+        <constructor-arg name="transformers">
             <list>
                 <ref bean="crafter.addServletPathUrlTransformer"/>
                 <ref bean="crafter.addContextPathUrlTransformer"/>
@@ -166,7 +166,7 @@
     <bean id="crafter.addContextPathUrlTransformer" class="org.craftercms.core.url.impl.AddContextPathUrlTransformer"/>
 
     <bean id="crafter.folderToIndexUrlTransformer" class="org.craftercms.core.url.impl.UrlTransformerPipeline">
-        <constructor-arg>
+        <constructor-arg name="transformers">
             <list>
                 <ref bean="crafter.addIndexIfFolderUrlTransformer"/>
                 <ref bean="crafter.toCurrentTargetedUrlTransformer"/>

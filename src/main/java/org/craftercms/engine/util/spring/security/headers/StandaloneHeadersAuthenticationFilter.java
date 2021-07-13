@@ -16,6 +16,7 @@
 
 package org.craftercms.engine.util.spring.security.headers;
 
+import java.beans.ConstructorProperties;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -53,6 +54,7 @@ public class StandaloneHeadersAuthenticationFilter extends AbstractHeadersAuthen
 
     protected final CacheTemplate cacheTemplate;
 
+    @ConstructorProperties({"cacheTemplate"})
     public StandaloneHeadersAuthenticationFilter(final CacheTemplate cacheTemplate) {
         super(STANDALONE_CONFIG_KEY);
         setSupportedPrincipalClass(CustomUser.class);

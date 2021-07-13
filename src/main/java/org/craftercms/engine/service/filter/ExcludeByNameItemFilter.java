@@ -15,6 +15,7 @@
  */
 package org.craftercms.engine.service.filter;
 
+import java.beans.ConstructorProperties;
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,6 +31,7 @@ public class ExcludeByNameItemFilter implements ItemFilter {
 
     private String[] excludeRegexes;
 
+    @ConstructorProperties({"excludeRegex"})
     public ExcludeByNameItemFilter(String excludeRegex) {
         excludeRegexes = new String[1];
         excludeRegexes[0] = excludeRegex;

@@ -26,6 +26,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 
+import java.beans.ConstructorProperties;
+
 /**
  * Implementation of {@link LogoutHandler} for Profile
  *
@@ -38,6 +40,7 @@ public class ProfileLogoutHandler implements LogoutHandler {
 
     protected AuthenticationManager profileAuthenticationManager;
 
+    @ConstructorProperties({"profileAuthenticationManager"})
     public ProfileLogoutHandler(final AuthenticationManager profileAuthenticationManager) {
         this.profileAuthenticationManager = profileAuthenticationManager;
     }

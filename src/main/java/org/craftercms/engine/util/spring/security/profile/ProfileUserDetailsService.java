@@ -27,6 +27,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import java.beans.ConstructorProperties;
+
 /**
  * Implementation of {@link UserDetailsService} that uses {@link ProfileService}
  *
@@ -41,6 +43,7 @@ public class ProfileUserDetailsService implements UserDetailsService {
 
     protected ProfileService profileService;
 
+    @ConstructorProperties({"tenantsResolver", "profileService"})
     public ProfileUserDetailsService(final TenantsResolver tenantsResolver, final ProfileService profileService) {
         this.tenantsResolver = tenantsResolver;
         this.profileService = profileService;

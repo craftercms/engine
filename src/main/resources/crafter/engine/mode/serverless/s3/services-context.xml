@@ -34,11 +34,11 @@
 
     <!-- AWS S3 client builder -->
     <bean id="crafter.s3ClientBuilder" class="org.craftercms.engine.store.s3.util.S3ClientBuilder">
-        <constructor-arg value="${crafter.engine.s3.endpoint:}"/>
-        <constructor-arg value="${crafter.engine.s3.region:}"/>
-        <constructor-arg value="${crafter.engine.s3.accessKey:}"/>
-        <constructor-arg value="${crafter.engine.s3.secretKey:}"/>
-        <constructor-arg value="${crafter.engine.s3.pathStyle:false}"/>
+        <constructor-arg name="endpoint" value="${crafter.engine.s3.endpoint:}"/>
+        <constructor-arg name="region" value="${crafter.engine.s3.region:}"/>
+        <constructor-arg name="accessKey" value="${crafter.engine.s3.accessKey:}"/>
+        <constructor-arg name="secretKey" value="${crafter.engine.s3.secretKey:}"/>
+        <constructor-arg name="pathStyle" value="${crafter.engine.s3.pathStyle:false}"/>
     </bean>
 
     <!-- AWS S3 Site List Resolver -->
@@ -65,7 +65,7 @@
         <property name="descriptorFileExtension" value="${crafter.core.store.descriptorFile.extension}"/>
         <property name="pathValidator">
             <bean class="org.craftercms.commons.validation.validators.impl.SecurePathValidator">
-                <constructor-arg value="path"/>
+                <constructor-arg name="targetKey" value="path"/>
             </bean>
         </property>
         <property name="clientBuilder" ref="crafter.s3ClientBuilder"/>
