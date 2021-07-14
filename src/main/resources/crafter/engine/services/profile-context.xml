@@ -46,7 +46,7 @@
 
     <bean id="crafter.authenticationCache"
           class="org.craftercms.security.authentication.impl.GuavaAuthenticationCache">
-        <constructor-arg ref="crafter.guavaCacheAuthenticationCache"/>
+        <constructor-arg name="cache" ref="crafter.guavaCacheAuthenticationCache"/>
     </bean>
 
     <bean id="crafter.profileAuthenticationManager"
@@ -58,8 +58,8 @@
 
     <bean id="crafter.profileAuthenticationProvider"
           class="org.craftercms.engine.util.spring.security.profile.ProfileAuthenticationProvider">
-        <constructor-arg ref="crafter.tenantsResolver"/>
-        <constructor-arg ref="crafter.profileAuthenticationManager"/>
+        <constructor-arg name="tenantsResolver" ref="crafter.tenantsResolver"/>
+        <constructor-arg name="authenticationManager" ref="crafter.profileAuthenticationManager"/>
     </bean>
 
 </beans>
