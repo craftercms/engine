@@ -22,6 +22,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 import javax.servlet.http.HttpServletRequest;
+import java.beans.ConstructorProperties;
 import java.util.Arrays;
 import java.util.List;
 
@@ -53,6 +54,7 @@ public class SiteAwareCorsConfigurationSource implements CorsConfigurationSource
 
     protected CacheTemplate cacheTemplate;
 
+    @ConstructorProperties({"cacheTemplate"})
     public SiteAwareCorsConfigurationSource(CacheTemplate cacheTemplate) {
         this.cacheTemplate = cacheTemplate;
     }

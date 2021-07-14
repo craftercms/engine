@@ -69,12 +69,14 @@
         <property name="configuredToken" value="${crafter.engine.management.authorizationToken}" />
     </bean>
 
-    <bean id="crafter.siteContextRestController" class="org.craftercms.engine.controller.rest.SiteContextRestController">
+    <bean id="crafter.siteContextRestController"
+          class="org.craftercms.engine.controller.rest.SiteContextRestController">
         <property name="contextManager" ref="crafter.siteContextManager"/>
         <property name="configuredToken" value="${crafter.engine.management.authorizationToken}" />
     </bean>
 
-    <bean id="crafter.siteContentStoreRestController" class="org.craftercms.engine.controller.rest.SiteContentStoreRestController">
+    <bean id="crafter.siteContentStoreRestController"
+          class="org.craftercms.engine.controller.rest.SiteContentStoreRestController">
         <constructor-arg name="wrappedController" ref="crafter.contentStoreRestController"/>
     </bean>
 
@@ -82,7 +84,8 @@
         <property name="configuredToken" value="${crafter.engine.management.authorizationToken}" />
     </bean>
 
-    <bean id="crafter.siteNavigationRestController" class="org.craftercms.engine.controller.rest.SiteNavigationController">
+    <bean id="crafter.siteNavigationRestController"
+          class="org.craftercms.engine.controller.rest.SiteNavigationController">
         <property name="navTreeBuilder" ref="crafter.navTreeBuilder"/>
         <property name="navBreadcrumbBuilder" ref="crafter.navBreadcrumbBuilder"/>
     </bean>
@@ -107,7 +110,10 @@
 
     <util:map id="crafter.urlMappings">
         <entry key="/api/**" value-ref="crafter.restScriptsController"/>
-        <entry key="/api/1/services/**" value-ref="crafter.restScriptsController"/> <!-- Deprecated mapping, might be removed in a later version -->
+
+        <!-- Deprecated mapping, might be removed in a later version -->
+        <entry key="/api/1/services/**" value-ref="crafter.restScriptsController"/>
+
         <entry key="/static-assets/**" value-ref="crafter.staticAssetsRequestHandler"/>
         <entry key="/remote-assets/**" value-ref="crafter.remoteAssetsRequestHandler"/>
         <entry key="/*" value-ref="crafter.pageRenderController"/>

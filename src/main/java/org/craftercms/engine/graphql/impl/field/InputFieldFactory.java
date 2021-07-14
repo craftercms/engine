@@ -24,6 +24,8 @@ import org.craftercms.engine.graphql.GraphQLFieldFactory;
 import org.dom4j.Document;
 import org.dom4j.Node;
 
+import java.beans.ConstructorProperties;
+
 import static graphql.Scalars.GraphQLString;
 import static org.craftercms.engine.graphql.SchemaUtils.FIELD_SEPARATOR;
 import static org.craftercms.engine.graphql.SchemaUtils.FIELD_SUFFIX_TOKENIZED;
@@ -43,6 +45,7 @@ public class InputFieldFactory implements GraphQLFieldFactory {
      */
     protected String tokenizeXPath;
 
+    @ConstructorProperties({"tokenizeXPath"})
     public InputFieldFactory(final String tokenizeXPath) {
         this.tokenizeXPath = tokenizeXPath;
     }

@@ -16,6 +16,7 @@
 
 package org.craftercms.engine.controller.rest;
 
+import java.beans.ConstructorProperties;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
@@ -52,6 +53,7 @@ public class SiteContentStoreRestController extends RestControllerBase {
 
     private ContentStoreRestController wrappedController;
 
+    @ConstructorProperties({"wrappedController"})
     public SiteContentStoreRestController(ContentStoreRestController wrappedController) {
         this.wrappedController = wrappedController;
     }

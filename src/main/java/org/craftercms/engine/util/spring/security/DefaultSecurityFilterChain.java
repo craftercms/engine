@@ -16,6 +16,7 @@
 
 package org.craftercms.engine.util.spring.security;
 
+import java.beans.ConstructorProperties;
 import java.util.List;
 import java.util.stream.Stream;
 import javax.servlet.Filter;
@@ -40,6 +41,7 @@ public class DefaultSecurityFilterChain implements SecurityFilterChain {
 
     protected List<Filter> filters;
 
+    @ConstructorProperties({"securityEnabled", "urlsToExclude", "filters"})
     public DefaultSecurityFilterChain(final boolean securityEnabled, final String[] urlsToExclude,
                                       final List<Filter> filters) {
         this.securityEnabled = securityEnabled;

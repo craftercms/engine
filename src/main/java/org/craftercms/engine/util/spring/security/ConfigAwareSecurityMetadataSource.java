@@ -16,6 +16,7 @@
 
 package org.craftercms.engine.util.spring.security;
 
+import java.beans.ConstructorProperties;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -59,6 +60,7 @@ public class ConfigAwareSecurityMetadataSource implements FilterInvocationSecuri
 
     protected CacheTemplate cacheTemplate;
 
+    @ConstructorProperties({"cacheTemplate"})
     public ConfigAwareSecurityMetadataSource(final CacheTemplate cacheTemplate) {
         this.cacheTemplate = cacheTemplate;
     }

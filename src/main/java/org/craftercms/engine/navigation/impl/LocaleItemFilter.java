@@ -22,6 +22,7 @@ import org.craftercms.core.service.ItemFilter;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.LocaleUtils;
 
+import java.beans.ConstructorProperties;
 import java.util.List;
 
 import static org.craftercms.commons.locale.LocaleUtils.parseLocale;
@@ -39,6 +40,7 @@ public class LocaleItemFilter implements ItemFilter {
 
     protected ContentStoreService contentStoreService;
 
+    @ConstructorProperties({"localeCodeSelector", "contentStoreService"})
     public LocaleItemFilter(String localeCodeSelector, ContentStoreService contentStoreService) {
         this.localeCodeXPathQuery = localeCodeSelector;
         this.contentStoreService = contentStoreService;

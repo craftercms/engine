@@ -23,6 +23,8 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 
+import java.beans.ConstructorProperties;
+
 /**
  * Utility class to build the AWS S3 client instances.
  * @author joseross
@@ -31,6 +33,7 @@ public class S3ClientBuilder {
 
     protected S3Profile profile;
 
+    @ConstructorProperties({"endpoint", "region", "accessKey", "secretKey", "pathStyle"})
     public S3ClientBuilder(String endpoint, String region, String accessKey, String secretKey, boolean pathStyle) {
         profile = new S3Profile();
         profile.setEndpoint(endpoint);

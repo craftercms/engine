@@ -15,6 +15,7 @@
  */
 package org.craftercms.engine.service.filter;
 
+import java.beans.ConstructorProperties;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -31,6 +32,7 @@ public class ExpectedNodeValueItemFilter implements ItemFilter {
     private String nodeXPathQuery;
     private String expectedValueRegex;
 
+    @ConstructorProperties({"nodeXPathQuery", "expectedValueRegex"})
     public ExpectedNodeValueItemFilter(String nodeXPathQuery, String expectedValueRegex) {
         this.nodeXPathQuery = nodeXPathQuery;
         this.expectedValueRegex = expectedValueRegex;

@@ -22,6 +22,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 
+import java.beans.ConstructorProperties;
+
 /**
  * Implementation of {@link AuthenticationProvider} that handles pre-authenticated profiles
  *
@@ -32,6 +34,7 @@ public class PreAuthenticatedProfileProvider implements AuthenticationProvider {
 
     protected AuthenticationManager authenticationManager;
 
+    @ConstructorProperties({"authenticationManager"})
     public PreAuthenticatedProfileProvider(final AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
     }
