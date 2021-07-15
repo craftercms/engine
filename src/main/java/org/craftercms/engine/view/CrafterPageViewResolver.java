@@ -256,7 +256,7 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
                     String forceHttps = page.queryValue(forceHttpsXPathQuery);
 
                     if (StringUtils.isNotEmpty(contentType) &&
-                        StringUtils.equalsIgnoreCase(redirectContentType, contentType) &&
+                        contentType.matches(redirectContentType) &&
                         StringUtils.isNotEmpty(redirectUrl)) {
                         if (logger.isDebugEnabled()) {
                             logger.debug("Redirecting page @ " + url + " to URL " + redirectUrl);
