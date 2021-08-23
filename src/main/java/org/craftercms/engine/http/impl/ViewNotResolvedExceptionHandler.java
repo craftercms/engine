@@ -16,6 +16,7 @@
 package org.craftercms.engine.http.impl;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.servlet.ServletException;
@@ -25,6 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.engine.http.ExceptionHandler;
+import org.springframework.web.util.UriUtils;
 
 /**
  * Handles {@link javax.servlet.ServletException}s that are thrown when a view can't be resolved.
@@ -42,7 +44,8 @@ public class ViewNotResolvedExceptionHandler implements ExceptionHandler {
         if (ex instanceof ServletException) {
             Matcher viewNotResolvedMsgMatcher = viewNotResolvedMsgPattern.matcher(ex.getMessage());
             if (viewNotResolvedMsgMatcher.matches()) {
-                logger.warn("Resource '" + viewNotResolvedMsgMatcher.group(1) + "' not found");
+                logger.warn("Resource '" + UriUtils.encodePathSegment(viewNotResolvedMsgMatcher.group(1),
+                        StandardCharsets.UTF_8.name()) + "' not found");
 
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
 
