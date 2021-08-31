@@ -141,6 +141,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected boolean enableSandboxBlacklist;
     protected String sandboxBlacklist;
     protected boolean enableExpressions;
+    protected boolean enableTranslation;
 
     public SiteContextFactory() {
         siteNameMacroName = DEFAULT_SITE_NAME_MACRO_NAME;
@@ -337,6 +338,10 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
 
     public void setEnableExpressions(boolean enableExpressions) {
         this.enableExpressions = enableExpressions;
+    }
+
+    public void setEnableTranslation(boolean enableTranslation) {
+        this.enableTranslation = enableTranslation;
     }
 
     @Override
@@ -670,7 +675,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     }
 
     protected LocaleResolver buildLocaleResolver(HierarchicalConfiguration<?> configuration) {
-        if (configuration != null && configuration.containsKey(CONFIG_KEY_DEFAULT_LOCALE)) {
+        if (enableTranslation && configuration != null && configuration.containsKey(CONFIG_KEY_DEFAULT_LOCALE)) {
             return new ChainLocaleResolver(globalApplicationContext, configuration);
         }
         return null;

@@ -578,6 +578,7 @@
         <property name="enableSandboxBlacklist" value="${crafter.engine.groovy.sandbox.blacklist.enable}"/>
         <property name="sandboxBlacklist" value="${crafter.engine.groovy.sandbox.blacklist.path}"/>
         <property name="enableExpressions" value="${crafter.engine.context.expressions.enable}"/>
+        <property name="enableTranslation" value="${crafter.engine.translation.enable}"/>
     </bean>
 
     <bean id="crafter.fallbackSiteContextFactory" class="org.craftercms.engine.service.context.SiteContextFactory">
@@ -613,6 +614,7 @@
         <property name="enableSandboxBlacklist" value="${crafter.engine.groovy.sandbox.blacklist.enable}"/>
         <property name="sandboxBlacklist" value="${crafter.engine.groovy.sandbox.blacklist.path}"/>
         <property name="enableExpressions" value="${crafter.engine.context.expressions.enable}"/>
+        <property name="enableTranslation" value="${crafter.engine.translation.enable}"/>
     </bean>
 
     <!-- ////////////////////////////////// -->
@@ -663,6 +665,7 @@
             </bean>
         </constructor-arg>
         <constructor-arg name="indexIdFormat" value="${crafter.engine.search.index.format}"/>
+        <constructor-arg name="enableTranslation" value="${crafter.engine.translation.enable}"/>
         <property name="filterQueries" value="${crafter.engine.elasticsearch.filters}"/>
     </bean>
 
