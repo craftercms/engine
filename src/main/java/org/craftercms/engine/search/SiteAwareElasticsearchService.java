@@ -82,10 +82,13 @@ public class SiteAwareElasticsearchService extends AbstractElasticsearchWrapper 
 
     protected String fallbackParameterName = DEFAULT_FALLBACK_PARAM_NAME;
 
-    @ConstructorProperties({"client", "indexIdFormat"})
-    public SiteAwareElasticsearchService(RestHighLevelClient client, String indexIdFormat) {
+    protected final boolean enableTranslation;
+
+    @ConstructorProperties({"client", "indexIdFormat", "enableTranslation"})
+    public SiteAwareElasticsearchService(RestHighLevelClient client, String indexIdFormat, boolean enableTranslation) {
         super(client);
         this.indexIdFormat = indexIdFormat;
+        this.enableTranslation = enableTranslation;
     }
 
     public void setRoleFieldName(final String roleFieldName) {
@@ -101,7 +104,7 @@ public class SiteAwareElasticsearchService extends AbstractElasticsearchWrapper 
     }
 
     protected List<Locale> getLocales() {
-        if (!isTranslationEnabled()) {
+        if (!(enableTranslation && isTranslationEnabled())) {
             return emptyList();
         }
         var locales = setUniqueList(new LinkedList<Locale>());
