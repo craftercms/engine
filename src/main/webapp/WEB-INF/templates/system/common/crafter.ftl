@@ -11,9 +11,9 @@
     <#include "/templates/system/plugins/body_top.ftl" ignore_missing=true />
 </#macro>
 
-<#macro body_bottom initializePageBuilder=true pageBuilderProps="{}">
+<#macro body_bottom initializeInContextEditing=true ICEProps="{}">
     <#include "/templates/system/plugins/body_bottom.ftl" ignore_missing=true />
-    <#if initializePageBuilder>
-        <@initPageBuilder props=pageBuilderProps />
+    <#if initializeInContextEditing>
+        <@initInContextEditing props=ICEProps />
     </#if>
 </#macro>
