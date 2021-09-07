@@ -11,9 +11,9 @@
     <#include "/templates/system/plugins/body_top.ftl" ignore_missing=true />
 </#macro>
 
-<#macro body_bottom initializeInContextEditing=true ICEProps="{}">
+<#macro body_bottom initializeInContextEditing=true iceProps="{}">
     <#include "/templates/system/plugins/body_bottom.ftl" ignore_missing=true />
     <#if initializeInContextEditing>
-        <@initInContextEditing props=ICEProps />
+        <@initInContextEditing props=iceProps />
     </#if>
 </#macro>
