@@ -85,6 +85,7 @@
                 <property name="componentEmbeddedElementName" value="${crafter.engine.component.embedded.element.name}" />
                 <property name="componentScriptResolver" ref="crafter.componentScriptResolver"/>
                 <property name="exposeSpringMacroHelpers" value="${crafter.engine.disableVariableRestrictions}"/>
+                <property name="enableStatics" value="${crafter.engine.freemarker.statics.enable}"/>
             </bean>
         </property>
     </bean>
