@@ -1,4 +1,4 @@
-version: ~> 1.0
+version: "~> 1.0"
 git:
   depth: 1
   quiet: true
@@ -12,7 +12,7 @@ branches:
   - master
 cache:
   directories:
-    - $HOME/.m2
+  - "$HOME/.m2"
 notifications:
   irc:
     channels:
@@ -26,3 +26,5 @@ script:
 - if [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then bash -c "mvn clean install" ;fi
 env:
   global:
+  - secure: GQM/PGuY6WvMYRSlY/hvq/0fYZyT2kIa1c8IMzP7TXgLFwb/kje+xVSN0w76HOuPkbB/XfJUdEBXxchQGlCbJT55sQhBRjvux691M3T9FT4ozZJctdYfUVK3wnlD4yqThghTVLjLwdAXU9/1BofXRHJ/jmGlWQfQoVCDLiazXO8=
+  - secure: R2LYdT8iRuf6mTUjUbX+nevCVRMz2HvDjrOh58tQ6IDLtzcjy+LeK9STqUVTooKPAq2vttI30Bvt/LqKJn6X+BbHhZ0/nokldMgNORQDJCrGejQItvErMvQAz1Lq4h40sOLHb4FJi/zBNHX47aF6g58Z2rJxRhdIPWdko/yWRGg=
