@@ -55,7 +55,11 @@ Crafter CMS Authoring Scripts
     <#---->data-craftercms-label="${$label}"
     </#if>
   </#if>
+  <#if ["img","link","br","hr","area","col","hr","meta","source","track","input"]?seq_contains($tag)>
+  >
+  <#else>
   >${nested}</${$tag}>
+  </#if>
 </#macro>
 
 <#macro article $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
@@ -320,9 +324,14 @@ Crafter CMS Authoring Scripts
 
 <#macro renderComponentCollection
 <#---->$field
+<#-- Used when rendering nested node selectors (e.g. a node selector inside of a repeat group)
+------>$fieldCarryover=""
+<#-- Used when rendering nested node selectors (e.g. a node selector inside of a repeat group)
+------>$indexCarryover=""
 <#---->$tag="div"
 <#---->$itemTag="div"
 <#---->$model=contentModel
+<#---->$collection=$model[$field]
 <#---->$attrs={}
 <#---->$itemAttrs={}
 <#---->arguments={}
@@ -330,11 +339,22 @@ Crafter CMS Authoring Scripts
 >
   <#assign attributes = mergeAttributes(attrs, $attrs)>
   <#-- Field container element -->
-  <@tag $tag=$tag $field=$field $model=$model $attrs=attributes>
-    <#if $model[$field]?? && $model[$field].item??>
-      <#list $model[$field].item as item>
+  <@tag
+    $tag=$tag
+    $field=cleanDotNotationString("${$fieldCarryover}.${$field}")
+    $index=$indexCarryover
+    $model=$model $attrs=attributes
+  >
+    <#if $collection?? && $collection.item??>
+      <#list $collection.item as item>
         <#-- Item container element -->
-        <@tag $tag=$itemTag $model=$model $field=$field $index=item?index $attrs=$itemAttrs>
+        <@tag
+          $tag=$itemTag
+          $model=$model
+          $field=cleanDotNotationString("${$fieldCarryover}.${$field}")
+          $index=cleanDotNotationString("${$indexCarryover}.${item?index}")
+          $attrs=$itemAttrs
+        >
           <#-- Component element -->
           <@renderComponent component=item additionalModel=arguments />
         </@tag>
@@ -360,7 +380,7 @@ Crafter CMS Authoring Scripts
         <@tag
         <#---->$model=$model
         <#---->$field=$field
-        <#---->$index=index
+        <#---->$index="${index}"
         <#---->$tag=$itemTag
         <#---->$attrs=$itemAttributes
         >
@@ -370,3 +390,23 @@ Crafter CMS Authoring Scripts
     </#if>
   </@tag>
 </#macro>
+
+<#function cleanDotNotationString str>
+  <#return str?replace('^[.]+|[.]+$', '', 'r')?replace('[.]{2,}', '.', 'r')>
+</#function>
+
+<#function isEmptyCollection collection>
+    <#return collection?has_content && collection.item?has_content>
+</#function>
+
+<#function shouldAddEmptyStyles collection>
+    <#return modePreview && !isEmptyCollection(collection)>
+</#function>
+
+<#function printIfIsEmptyCollection collection output="craftercms-is-empty">
+    <#return shouldAddEmptyStyles(collection)?then(output, '')>
+</#function>
+
+<#function printIfPreview output>
+    <#return modePreview?then(output, '')>
+</#function>
