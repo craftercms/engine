@@ -1,4 +1,4 @@
-version: ~> 1.0
+version: "~> 1.0"
 git:
   depth: 1
   quiet: true
@@ -12,7 +12,7 @@ branches:
   - master
 cache:
   directories:
-    - $HOME/.m2
+  - "$HOME/.m2"
 notifications:
   irc:
     channels:
@@ -26,5 +26,5 @@ script:
 - if [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then bash -c "mvn clean install" ;fi
 env:
   global:
-  - secure: F95ItQNJf1p37o0uWIpw2CtRbJHq2YpRrTt84BHbjZgO5Vu5kKpaVxLWYPM0lJ/fppDy6ZyJyrJG1AqXuNuDZoxid46EkYzhMSSwPKnvk0WoEu/wIp9V8iycbYbh0dT1whECIP6X0DjXrTLRRfxSLcfh/IXuwFZaecE89nXelBA=
-  - secure: CfiWubt7r/wC4Qo8d6QB/qmLkA3vTs8Gz7h6MFn3c9zaB6tpAqu4cNo7J2NNH0vgMocQtVCS1KB9zTeJDn17e7cdaO8tw2uCh0jgZzFfukkQq5AumPi5FXVtvngVeQT0PXDdESdt+dGkx/fvTOl7sTZaRCBBgkghHcPF5KMitUM=
+  - secure: GQM/PGuY6WvMYRSlY/hvq/0fYZyT2kIa1c8IMzP7TXgLFwb/kje+xVSN0w76HOuPkbB/XfJUdEBXxchQGlCbJT55sQhBRjvux691M3T9FT4ozZJctdYfUVK3wnlD4yqThghTVLjLwdAXU9/1BofXRHJ/jmGlWQfQoVCDLiazXO8=
+  - secure: R2LYdT8iRuf6mTUjUbX+nevCVRMz2HvDjrOh58tQ6IDLtzcjy+LeK9STqUVTooKPAq2vttI30Bvt/LqKJn6X+BbHhZ0/nokldMgNORQDJCrGejQItvErMvQAz1Lq4h40sOLHb4FJi/zBNHX47aF6g58Z2rJxRhdIPWdko/yWRGg=
