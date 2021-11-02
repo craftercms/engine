@@ -25,6 +25,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
@@ -50,13 +51,14 @@ public class SiteElasticsearchController extends RestControllerBase {
     }
 
     @PostMapping(URL_SEARCH)
-    public void search(@RequestBody Map<String, Object> request, HttpServletResponse response)
+    public void search(@RequestBody Map<String, Object> request, @RequestParam Map<String, Object> parameters,
+                       HttpServletResponse response)
             throws IOException {
         // This is needed because we are writing manually the response
         response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE);
 
         // Execute the query
-        SearchResponse searchResponse = elasticsearchService.search(request);
+        SearchResponse searchResponse = elasticsearchService.search(request, parameters);
 
         // Write the response in ES format
         response.getWriter().write(searchResponse.toString());

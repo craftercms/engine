@@ -16,11 +16,14 @@
 
 package org.craftercms.engine.search;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.craftercms.search.elasticsearch.impl.AbstractElasticsearchWrapper;
 import org.craftercms.engine.service.context.SiteContext;
 import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.support.IndicesOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -28,6 +31,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
@@ -74,11 +80,51 @@ public class SiteAwareElasticsearchService extends AbstractElasticsearchWrapper 
     @Override
     protected void updateIndex(final SearchRequest request) {
         SiteContext siteContext = SiteContext.getCurrent();
-        if (siteContext != null) {
-            request.indices(String.format(indexIdFormat, siteContext.getSiteName()));
-        } else {
+        if (siteContext == null) {
             throw new IllegalStateException("Current site context not found");
         }
+
+        // Generate the default alias for the current site
+        String aliasName = String.format(indexIdFormat, siteContext.getSiteName());
+        // Get the requested indices
+        String[] currentIndices = request.indices();
+        String[] updatedIndices;
+
+        if (ArrayUtils.isNotEmpty(currentIndices)) {
+            updatedIndices = new String[currentIndices.length + 1];
+
+            // Add the site name prefix for all indices
+            for(int i = 0; i < currentIndices.length; i++) {
+                updatedIndices[i] = addPrefix(siteContext, currentIndices[i]);
+            }
+
+            // Also add the default index
+            updatedIndices[currentIndices.length] = aliasName;
+
+            // Add the site name prefix for the boosting if needed
+            List<SearchSourceBuilder.IndexBoost> indexBoosts = new ArrayList<>(request.source().indexBoosts());
+            if (isNotEmpty(indexBoosts)) {
+                indexBoosts.forEach(indexBoost ->
+                        request.source().indexBoost(addPrefix(siteContext, indexBoost.getIndex()),
+                                                    indexBoost.getBoost()));
+
+                // Prevent missing index errors, this is needed because the original index boost can't be removed
+                IndicesOptions originalOptions = request.indicesOptions();
+                request.indicesOptions(IndicesOptions.fromOptions(true, originalOptions.allowNoIndices(),
+                        originalOptions.expandWildcardsOpen(), originalOptions.expandWildcardsClosed(),
+                        originalOptions.allowAliasesToMultipleIndices(), originalOptions.forbidClosedIndices(),
+                        originalOptions.ignoreAliases(), originalOptions.ignoreThrottled()));
+            }
+        } else {
+            // Only query the default index
+            updatedIndices = new String[] { aliasName };
+        }
+
+        request.indices(updatedIndices);
+    }
+
+    protected String addPrefix(SiteContext siteContext, String name) {
+        return String.format("%s_%s", siteContext.getSiteName(), name);
     }
 
     @Override
