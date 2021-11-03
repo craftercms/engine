@@ -337,58 +337,76 @@ Crafter CMS Authoring Scripts
 <#---->arguments={}
 <#---->attrs...
 >
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
+  <#local attributes = mergeAttributes(attrs, $attrs)>
   <#-- Field container element -->
   <@tag
     $tag=$tag
     $field=cleanDotNotationString("${$fieldCarryover}.${$field}")
     $index=$indexCarryover
-    $model=$model $attrs=attributes
+    $model=$model
+    $attrs=attributes
   >
-    <#if $collection?? && $collection.item??>
-      <#list $collection.item as item>
-        <#-- Item container element -->
-        <@tag
-          $tag=$itemTag
-          $model=$model
-          $field=cleanDotNotationString("${$fieldCarryover}.${$field}")
-          $index=cleanDotNotationString("${$indexCarryover}.${item?index}")
-          $attrs=$itemAttrs
-        >
-          <#-- Component element -->
-          <@renderComponent component=item additionalModel=arguments />
-        </@tag>
-      </#list>
-    </#if>
+    <@forEach $collection; item, index>
+      <#-- Item container element -->
+      <@tag
+        $tag=$itemTag
+        $model=$model
+        $field=cleanDotNotationString("${$fieldCarryover}.${$field}")
+        $index=cleanDotNotationString("${$indexCarryover}.${index}")
+        $attrs=$itemAttrs
+      >
+        <#-- Component element -->
+        <@renderComponent component=item additionalModel=arguments />
+      </@tag>
+    </@forEach>
   </@tag>
 </#macro>
 
 <#macro renderRepeatCollection
 <#---->$field
+<#-- Used when rendering nested node selectors (e.g. a node selector inside of a repeat group)
+------>$fieldCarryover=""
+<#-- Used when rendering nested node selectors (e.g. a node selector inside of a repeat group)
+------>$indexCarryover=""
+<#---->$containerTag="div"
+<#---->$itemTag="div"
 <#---->$model=contentModel
-<#---->$containerTag="ul"
+<#---->$collection=$model[$field]
 <#---->$containerAttributes={}
-<#---->$itemTag="li"
 <#---->$itemAttributes={}
+<#---->$nthItemAttributes={}
 >
   <#-- Field container element -->
-  <@tag $model=$model $field=$field $index="" $tag=$containerTag $attrs=$containerAttributes>
-    <#if $model[$field]?? && $model[$field].item??>
-      <#list $model[$field].item as item>
-        <#assign index = item?index>
-        <#-- Item container element -->
-        <@tag
-        <#---->$model=$model
-        <#---->$field=$field
-        <#---->$index="${index}"
-        <#---->$tag=$itemTag
-        <#---->$attrs=$itemAttributes
-        >
-          <#nested item, index>
-        </@tag>
-      </#list>
-    </#if>
+  <@tag
+    $tag=$containerTag
+    $field=cleanDotNotationString("${$fieldCarryover}.${$field}")
+    $index=$indexCarryover
+    $model=$model
+    $attrs=$containerAttributes
+  >
+    <@forEach $collection; item, index>
+      <#local additionalAttributes = $nthItemAttributes["${index}"]!{} />
+      <#-- Item container element -->
+      <@tag
+      <#---->$model=$model
+      <#---->$field=$field
+      <#---->$index="${index}"
+      <#---->$tag=$itemTag
+      <#---->$attrs=($itemAttributes + additionalAttributes)
+      >
+        <#nested item, index>
+      </@tag>
+    </@forEach>
   </@tag>
+</#macro>
+
+<#macro forEach collection>
+  <#if collection?? && collection.item??>
+    <#list collection.item as item>
+      <#local index = item?index>
+      <#nested item, index>
+    </#list>
+  </#if>
 </#macro>
 
 <#function cleanDotNotationString str>
