@@ -254,6 +254,11 @@
             <artifactId>graphql-java-extended-scalars</artifactId>
             <version>${graphql.extended.scalars.version}</version>
         </dependency>
+	<dependency>
+	    <groupId>org.locationtech.spatial4j</groupId>
+	    <artifactId>spatial4j</artifactId>
+	    <version>${spatial4j.version}</version>
+	</dependency>
 
         <dependency>
             <groupId>org.mitre.dsmiley.httpproxy</groupId>
