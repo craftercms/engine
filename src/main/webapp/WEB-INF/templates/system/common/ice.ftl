@@ -322,47 +322,7 @@ Crafter CMS Authoring Scripts
   <@tag $tag=$tag $model=$model $field=$field $label=$label $attrs=$attributes><#nested></@tag>
 </#macro>
 
-<#macro renderComponentCollection
-<#---->$field
-<#-- Used when rendering nested node selectors (e.g. a node selector inside of a repeat group)
------->$fieldCarryover=""
-<#-- Used when rendering nested node selectors (e.g. a node selector inside of a repeat group)
------->$indexCarryover=""
-<#---->$tag="div"
-<#---->$itemTag="div"
-<#---->$model=contentModel
-<#---->$collection=$model[$field]
-<#---->$attrs={}
-<#---->$itemAttrs={}
-<#---->arguments={}
-<#---->attrs...
->
-  <#local attributes = mergeAttributes(attrs, $attrs)>
-  <#-- Field container element -->
-  <@tag
-    $tag=$tag
-    $field=cleanDotNotationString("${$fieldCarryover}.${$field}")
-    $index=$indexCarryover
-    $model=$model
-    $attrs=attributes
-  >
-    <@forEach $collection; item, index>
-      <#-- Item container element -->
-      <@tag
-        $tag=$itemTag
-        $model=$model
-        $field=cleanDotNotationString("${$fieldCarryover}.${$field}")
-        $index=cleanDotNotationString("${$indexCarryover}.${index}")
-        $attrs=$itemAttrs
-      >
-        <#-- Component element -->
-        <@renderComponent component=item additionalModel=arguments />
-      </@tag>
-    </@forEach>
-  </@tag>
-</#macro>
-
-<#macro renderRepeatCollection
+<#macro renderCollection
 <#---->$field
 <#-- Used when rendering nested node selectors (e.g. a node selector inside of a repeat group)
 ------>$fieldCarryover=""
@@ -388,16 +348,79 @@ Crafter CMS Authoring Scripts
       <#local additionalAttributes = $nthItemAttributes["${index}"]!{} />
       <#-- Item container element -->
       <@tag
-      <#---->$tag=$itemTag
-      <#---->$model=$model
-      <#---->$field=cleanDotNotationString("${$fieldCarryover}.${$field}")
-      <#---->$index=cleanDotNotationString("${$indexCarryover}.${index}")
-      <#---->$attrs=($itemAttributes + additionalAttributes)
+        $tag=$itemTag
+        $model=$model
+        $field=cleanDotNotationString("${$fieldCarryover}.${$field}")
+        $index=cleanDotNotationString("${$indexCarryover}.${index}")
+        $attrs=($itemAttributes + additionalAttributes)
       >
         <#nested item, index>
       </@tag>
     </@forEach>
   </@tag>
+</#macro>
+
+<#macro renderComponentCollection
+<#---->$field
+<#-- Used when rendering nested node selectors (e.g. a node selector inside of a repeat group)
+------>$fieldCarryover=""
+<#-- Used when rendering nested node selectors (e.g. a node selector inside of a repeat group)
+------>$indexCarryover=""
+<#---->$containerTag="div"
+<#---->$itemTag="div"
+<#---->$model=contentModel
+<#---->$collection=$model[$field]
+<#---->$containerAttributes={}
+<#---->$itemAttributes={}
+<#---->$nthItemAttributes={}
+<#---->arguments={}
+>
+  <@renderCollection
+    $field=$field
+    $fieldCarryover=$fieldCarryover
+    $indexCarryover=$indexCarryover
+    $containerTag=$containerTag
+    $itemTag=$itemTag
+    $model=$model
+    $collection=$collection
+    $containerAttributes=$containerAttributes
+    $itemAttributes=$itemAttributes
+    $nthItemAttributes=$nthItemAttributes;
+    item, index
+  >
+    <@renderComponent component=item additionalModel=arguments />
+  </@renderCollection>
+</#macro>
+
+<#macro renderRepeatGroup
+<#---->$field
+<#-- Used when rendering nested node selectors (e.g. a node selector inside of a repeat group)
+------>$fieldCarryover=""
+<#-- Used when rendering nested node selectors (e.g. a node selector inside of a repeat group)
+------>$indexCarryover=""
+<#---->$containerTag="div"
+<#---->$itemTag="div"
+<#---->$model=contentModel
+<#---->$collection=$model[$field]
+<#---->$containerAttributes={}
+<#---->$itemAttributes={}
+<#---->$nthItemAttributes={}
+>
+  <@renderCollection
+    $field=$field
+    $fieldCarryover=$fieldCarryover
+    $indexCarryover=$indexCarryover
+    $containerTag=$containerTag
+    $itemTag=$itemTag
+    $model=$model
+    $collection=$collection
+    $containerAttributes=$containerAttributes
+    $itemAttributes=$itemAttributes
+    $nthItemAttributes=$nthItemAttributes;
+    item, index
+  >
+    <#nested item, index>
+  </@renderCollection>
 </#macro>
 
 <#macro forEach collection>
