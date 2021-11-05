@@ -4,7 +4,7 @@ git:
   quiet: true
 language: java
 jdk:
-- openjdk11
+  - openjdk11
 branches:
   only:
   - develop
@@ -21,9 +21,9 @@ notifications:
     skip_join: true
   slack: craftersoftware:7YiSb41ZG5rfMgiAY7Qgprc7
 script:
-- if [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; then bash -c  "mvn deploy --settings
+  - if [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; then bash -c  "mvn deploy --settings
   .travis-settings.xml";  fi
-- if [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then bash -c "mvn clean install" ;fi
+  - if [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then bash -c "mvn clean install" ;fi
 env:
   global:
   - secure: GQM/PGuY6WvMYRSlY/hvq/0fYZyT2kIa1c8IMzP7TXgLFwb/kje+xVSN0w76HOuPkbB/XfJUdEBXxchQGlCbJT55sQhBRjvux691M3T9FT4ozZJctdYfUVK3wnlD4yqThghTVLjLwdAXU9/1BofXRHJ/jmGlWQfQoVCDLiazXO8=
