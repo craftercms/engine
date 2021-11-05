@@ -388,10 +388,10 @@ Crafter CMS Authoring Scripts
       <#local additionalAttributes = $nthItemAttributes["${index}"]!{} />
       <#-- Item container element -->
       <@tag
-      <#---->$model=$model
-      <#---->$field=$field
-      <#---->$index="${index}"
       <#---->$tag=$itemTag
+      <#---->$model=$model
+      <#---->$field=cleanDotNotationString("${$fieldCarryover}.${$field}")
+      <#---->$index=cleanDotNotationString("${$indexCarryover}.${index}")
       <#---->$attrs=($itemAttributes + additionalAttributes)
       >
         <#nested item, index>
