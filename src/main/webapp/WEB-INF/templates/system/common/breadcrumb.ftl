@@ -47,7 +47,7 @@
             $model=siteItem
             class="${itemClass}"
             href="${item.url}"
-            $attrs=itemAttributes
+            $attributes=itemAttributes
           >
             ${item.label}
           </@a>

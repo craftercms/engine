@@ -32,14 +32,14 @@ Crafter CMS Authoring Scripts
   <#return attributes + $attrs>
 </#function>
 
-<#macro tag $tag="div" $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
+<#macro tag $tag="div" $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
   <#assign nested><#nested/></#assign>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
   <#if nested?has_content>
     <#assign nested = "\n${nested}  ">
   </#if>
   <${$tag}
-  <#list $attributes as attr, value>
+  <#list mergedAttributes as attr, value>
     ${attr}="${value}"
   </#list>
   <#if modePreview && $model?has_content>
@@ -62,264 +62,259 @@ Crafter CMS Authoring Scripts
   </#if>
 </#macro>
 
-<#macro article $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="article" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro article $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="article" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro a $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="a" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro a $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="a" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro img $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="img" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro img $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="img" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro header $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="header" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro header $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="header" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro footer $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="footer" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro footer $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="footer" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro div $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="div" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro div $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="div" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro section $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-    <@tag $tag="section" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro section $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+    <@tag $tag="section" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro span $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="span" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro span $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="span" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro h1 $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="h1" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro h1 $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="h1" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro h2 $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="h2" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro h2 $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="h2" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro h3 $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="h3" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro h3 $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="h3" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro h4 $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="h4" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro h4 $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="h4" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro h5 $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="h5" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro h5 $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="h5" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro h6 $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="h6" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro h6 $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="h6" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro ul $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="ul" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro ul $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="ul" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro html $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="html" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro html $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="html" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro body $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="body" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro body $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="body" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro head $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="head" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro head $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="head" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro p $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="p" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro p $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="p" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro ul $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="ul" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro ul $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="ul" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro ol $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="ol" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro ol $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="ol" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro li $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="li" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro li $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="li" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro iframe $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="iframe" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro iframe $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="iframe" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro em $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="em" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro em $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="em" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro strong $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="strong" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro strong $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="strong" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro b $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="em" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro b $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="em" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro i $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="i" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro i $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="i" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro small $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="small" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro small $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="small" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro em $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="th" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro em $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="th" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro caption $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="caption" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro caption $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="caption" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro tr $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="tr" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro tr $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="tr" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro td $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="td" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro td $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="td" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro abbr $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="abbr" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro abbr $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="abbr" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro address $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="address" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro address $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="address" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro aside $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="aside" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro aside $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="aside" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro audio $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="audio" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro audio $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="audio" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro video $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="video" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro video $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="video" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro em $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="em" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro em $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="em" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro blockquote $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="blockquote" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro blockquote $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="blockquote" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro cite $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="cite" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro cite $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="cite" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro em $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="em" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro em $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="em" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro code $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="code" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro code $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="code" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro nav $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="nav" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro nav $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="nav" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro em $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="em" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro em $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="em" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro figure $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="figure" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro figure $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="figure" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro figcaption $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="figcaption" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro figcaption $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="figcaption" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro pre $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="pre" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro pre $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="pre" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro time $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="time" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro time $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="time" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro map $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="map" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro map $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="map" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro picture $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="picture" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
+<#macro picture $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="picture" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro source $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag="source" $model=$model $field=$field $index=$index $label=$label $attrs=$attributes><#nested></@tag>
-</#macro>
-
-<#macro componentRootTag $tag="div" $model=($model!contentModel) $field=($field!"") $label=($label!"") $attrs={} attrs...>
-  <#assign attributes = mergeAttributes(attrs, $attrs)>
-  <@tag $tag=$tag $model=$model $field=$field $label=$label $attrs=$attributes><#nested></@tag>
+<#macro source $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+  <@tag $tag="source" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
 <#macro renderCollection
@@ -342,7 +337,7 @@ Crafter CMS Authoring Scripts
     $field=cleanDotNotationString("${$fieldCarryover}.${$field}")
     $index=$indexCarryover
     $model=$model
-    $attrs=$containerAttributes
+    $attributes=$containerAttributes
   >
     <@forEach $collection; item, index>
       <#local additionalAttributes = $nthItemAttributes["${index}"]!{} />
@@ -352,7 +347,7 @@ Crafter CMS Authoring Scripts
         $model=$model
         $field=cleanDotNotationString("${$fieldCarryover}.${$field}")
         $index=cleanDotNotationString("${$indexCarryover}.${index}")
-        $attrs=($itemAttributes + additionalAttributes)
+        $attributes=($itemAttributes + additionalAttributes)
       >
         <#nested item, index>
       </@tag>
