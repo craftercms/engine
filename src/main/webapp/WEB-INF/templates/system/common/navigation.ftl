@@ -116,7 +116,7 @@
       class="${navItem.active?then(itemActiveClass, '')} ${(addSubItemData)?then(hasSubItemItemClass, itemDepthClass)}"
       $model=item
       href="${navItem.url}"
-      $attrs=(addSubItemData)?then(hasSubItemItemAttributes, itemAttributes)
+      $attributes=(addSubItemData)?then(hasSubItemItemAttributes, itemAttributes)
     >
       ${navItem.label}
     </@a>
