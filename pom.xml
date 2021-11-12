@@ -63,6 +63,7 @@
         <sardine.version>5.9</sardine.version>
         <xerces.version>2.12.0</xerces.version>
         <httpproxy.version>1.11</httpproxy.version>
+	<spatial4j.version>0.8</spatial4j.version>
     </properties>
 
     <licenses>
@@ -167,6 +168,11 @@
             <groupId>cglib</groupId>
             <artifactId>cglib</artifactId>
             <version>${cglib.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.locationtech.spatial4j</groupId>
+            <artifactId>spatial4j</artifactId>
+            <version>${spatial4j.version}</version>
         </dependency>
 
         <!-- Groovy -->
