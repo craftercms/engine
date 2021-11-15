@@ -152,6 +152,16 @@ Crafter CMS Authoring Scripts
   <@tag $tag="head" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
+<#macro meta $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+    <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+    <@tag $tag="meta" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
+</#macro>
+
+<#macro title $model=contentModel $field="" $index="" $label="" $attrs={} attrs...>
+    <#assign mergedAttributes = mergeAttributes(attrs, $attrs)>
+    <@tag $tag="title" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
+</#macro>
+
 <#macro p $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
   <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
   <@tag $tag="p" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
@@ -189,7 +199,7 @@ Crafter CMS Authoring Scripts
 
 <#macro b $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
   <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
-  <@tag $tag="em" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
+  <@tag $tag="b" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
 <#macro i $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
@@ -202,7 +212,7 @@ Crafter CMS Authoring Scripts
   <@tag $tag="small" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro em $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+<#macro th $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
   <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
   <@tag $tag="th" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
@@ -220,6 +230,11 @@ Crafter CMS Authoring Scripts
 <#macro td $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
   <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
   <@tag $tag="td" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
+</#macro>
+
+<#macro table $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+    <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+    <@tag $tag="table" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
 <#macro abbr $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
@@ -247,11 +262,6 @@ Crafter CMS Authoring Scripts
   <@tag $tag="video" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro em $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
-  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
-  <@tag $tag="em" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
-</#macro>
-
 <#macro blockquote $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
   <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
   <@tag $tag="blockquote" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
@@ -262,11 +272,6 @@ Crafter CMS Authoring Scripts
   <@tag $tag="cite" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro em $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
-  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
-  <@tag $tag="em" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
-</#macro>
-
 <#macro code $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
   <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
   <@tag $tag="code" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
@@ -275,11 +280,6 @@ Crafter CMS Authoring Scripts
 <#macro nav $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
   <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
   <@tag $tag="nav" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
-</#macro>
-
-<#macro em $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
-  <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
-  <@tag $tag="em" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
 <#macro figure $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
@@ -368,7 +368,7 @@ Crafter CMS Authoring Scripts
 <#---->$containerAttributes={}
 <#---->$itemAttributes={}
 <#---->$nthItemAttributes={}
-<#---->arguments={}
+<#---->renderComponentArguments={}
 >
   <@renderCollection
     $field=$field
@@ -383,7 +383,7 @@ Crafter CMS Authoring Scripts
     $nthItemAttributes=$nthItemAttributes;
     item, index
   >
-    <@renderComponent component=item additionalModel=arguments />
+    <@renderComponent component=item additionalModel=renderComponentArguments />
   </@renderCollection>
 </#macro>
 
@@ -432,11 +432,11 @@ Crafter CMS Authoring Scripts
 </#function>
 
 <#function isEmptyCollection collection>
-    <#return collection?has_content && collection.item?has_content>
+    <#return !(collection?has_content && collection.item?has_content)>
 </#function>
 
 <#function shouldAddEmptyStyles collection>
-    <#return modePreview && !isEmptyCollection(collection)>
+    <#return modePreview && isEmptyCollection(collection)>
 </#function>
 
 <#function printIfIsEmptyCollection collection output="craftercms-is-empty">
