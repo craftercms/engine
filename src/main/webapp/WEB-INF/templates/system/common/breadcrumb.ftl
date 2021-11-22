@@ -52,7 +52,7 @@
             ${item.label}
           </@a>
         <#else>
-          <@span $model=siteItem>
+          <@span $model=siteItem $attributes=itemAttributes>
             ${item.label}
           </@span>
         </#if>
