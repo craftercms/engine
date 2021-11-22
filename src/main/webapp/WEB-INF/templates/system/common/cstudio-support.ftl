@@ -1,7 +1,7 @@
 
 <#macro toolSupport>
   <#if modePreview>
-    <script src="/studio/static-assets/libs/requirejs/require.js" data-main="/studio/overlayhook?site=NOTUSED&page=NOTUSED&cs.js"></script>
+    <script src="/studio/static-assets/libs/requirejs/require.js" data-main="/studio/overlayhook?.js"></script>
   </#if>
 </#macro>
 
