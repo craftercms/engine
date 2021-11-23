@@ -182,9 +182,39 @@ Crafter CMS Authoring Scripts
   <@tag $tag="li" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
 </#macro>
 
-<#macro iframe $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
+<#macro iframe $model=contentModel $field="" $index="" $label="" $attributes={} $omitEventCaptureOverlay=false $eventCaptureOverlayProps={} attrs...>
   <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
-  <@tag $tag="iframe" $model=$model $field=$field $index=$index $label=$label $attributes=mergedAttributes><#nested></@tag>
+  <#assign output>
+    <@tag
+      $tag="iframe"
+      $model=$model
+      $field=$field
+      $index=$index
+      $label=$label
+      $attributes=mergedAttributes
+    />
+  </#assign>
+  <#if $omitEventCaptureOverlay>
+    ${output}
+  <#else>
+    <#local eventCaptureOverlayAttributes = {} />
+    <#list $eventCaptureOverlayProps as attr, value>
+      <#if attr != '$tag' && attr != '$onlyInPreview' && attr != '$attributes'>
+        <#local eventCaptureOverlayAttributes += { attr: value } />
+      <#elseif attr == '$attributes'>
+        <#list value as _attr, _value>
+          <#local eventCaptureOverlayAttributes += { _attr: _value } />
+        </#list>
+      </#if>
+    </#list>
+    <@eventCaptureOverlay
+      $tag=($eventCaptureOverlayProps['$tag']!'div')
+      $onlyInPreview=($eventCaptureOverlayProps['$onlyInPreview']!false)
+      $attributes=eventCaptureOverlayAttributes
+    >
+      ${output}
+    </@eventCaptureOverlay>
+  </#if>
 </#macro>
 
 <#macro em $model=contentModel $field="" $index="" $label="" $attributes={} attrs...>
@@ -424,6 +454,23 @@ Crafter CMS Authoring Scripts
       <#local index = item?index>
       <#nested item, index>
     </#list>
+  </#if>
+</#macro>
+
+<#macro eventCaptureOverlay $onlyInPreview=false $tag="div" $attributes={} attrs...>
+  <#assign nested><#nested/></#assign>
+  <#if (!$onlyInPreview) || ($onlyInPreview && modePreview)>
+    <#assign mergedAttributes = mergeAttributes(attrs, $attributes)>
+    <${$tag}
+      <#list mergedAttributes as attr, value>
+      ${attr}="${value}"
+      </#list>
+      <#if modePreview>data-craftercms-event-capture-overlay</#if>
+    >
+      ${nested}
+    </${$tag}>
+  <#else>
+    ${nested}
   </#if>
 </#macro>
 
