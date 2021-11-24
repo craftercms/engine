@@ -502,6 +502,6 @@ Crafter CMS Authoring Scripts
     <#return modePreview?then(output, '')>
 </#function>
 
-<#function printIfDelivery output>
+<#function printIfNotPreview output>
     <#return (!modePreview)?then(output, '')>
 </#function>
