@@ -361,6 +361,10 @@ Crafter CMS Authoring Scripts
 <#---->$itemAttributes={}
 <#---->$nthItemAttributes={}
 >
+  <#local $containerAttributes += { 'data-craftercms-type': 'collection' } />
+  <#if isEmptyCollection($collection)>
+      <#local $containerAttributes += { "class": "${emptyCollectionClass($collection)} ${$containerAttributes['class']!''}" } />
+  </#if>
   <#-- Field container element -->
   <@tag
     $tag=$containerTag
@@ -486,10 +490,18 @@ Crafter CMS Authoring Scripts
     <#return modePreview && isEmptyCollection(collection)>
 </#function>
 
-<#function printIfIsEmptyCollection collection output="craftercms-is-empty">
-    <#return shouldAddEmptyStyles(collection)?then(output, '')>
+<#function emptyCollectionClass collection>
+    <#return shouldAddEmptyStyles(collection)?then('craftercms-empty-collection', '')>
+</#function>
+
+<#function emptyFieldClass fieldValue>
+    <#return (!fieldValue?has_content)?then('craftercms-empty-field', '')>
 </#function>
 
 <#function printIfPreview output>
     <#return modePreview?then(output, '')>
+</#function>
+
+<#function printIfDelivery output>
+    <#return (!modePreview)?then(output, '')>
 </#function>
