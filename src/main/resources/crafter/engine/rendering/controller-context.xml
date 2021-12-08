@@ -40,6 +40,7 @@
     <bean id="crafter.restScriptsController" class="org.craftercms.engine.controller.rest.RestScriptsController">
         <property name="urlTemplateScanner" ref="crafter.scriptUrlTemplateScanner"/>
         <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
+        <property name="pluginService" ref="crafter.pluginService"/>
     </bean>
 
     <bean id="crafter.staticAssetsRequestHandler" class="org.craftercms.engine.controller.StaticAssetsRequestHandler"
@@ -59,6 +60,7 @@
         <property name="fallbackMessage" value="${crafter.engine.site.fallback.message}"/>
         <property name="storeService" ref="crafter.contentStoreService"/>
         <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
+        <property name="pluginService" ref="crafter.pluginService"/>
     </bean>
 
     <bean id="crafter.errorPageRenderController" class="org.craftercms.engine.controller.ErrorPageRenderController">

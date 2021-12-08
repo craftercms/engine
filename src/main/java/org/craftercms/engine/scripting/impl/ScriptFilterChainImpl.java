@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.engine.exception.ScriptException;
+import org.craftercms.engine.plugin.PluginService;
 import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.util.GroovyScriptUtils;
 
@@ -47,12 +48,14 @@ public class ScriptFilterChainImpl implements FilterChain {
     private Iterator<Script> scriptIterator;
     private FilterChain delegateChain;
     private ServletContext servletContext;
+    private PluginService pluginService;
 
     public ScriptFilterChainImpl(Iterator<Script> scriptIterator, FilterChain delegateChain,
-                                 ServletContext servletContext) {
+                                 ServletContext servletContext, PluginService pluginService) {
         this.scriptIterator = scriptIterator;
         this.delegateChain = delegateChain;
         this.servletContext = servletContext;
+        this.pluginService = pluginService;
     }
 
     @Override
@@ -69,6 +72,8 @@ public class ScriptFilterChainImpl implements FilterChain {
             Map<String, Object> variables = new HashMap<>();
 
             GroovyScriptUtils.addFilterScriptVariables(variables, httpRequest, httpResponse, servletContext, this);
+
+            pluginService.addPluginVariables(script.getUrl(), variables::put);
 
             try {
                 script.execute(variables);

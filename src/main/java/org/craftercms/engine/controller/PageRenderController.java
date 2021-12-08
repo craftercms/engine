@@ -25,6 +25,7 @@ import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.util.ExceptionUtils;
 import org.craftercms.engine.exception.HttpStatusCodeAwareException;
 import org.craftercms.engine.exception.ScriptException;
+import org.craftercms.engine.plugin.PluginService;
 import org.craftercms.engine.properties.SiteProperties;
 import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.scripting.ScriptFactory;
@@ -64,6 +65,8 @@ public class PageRenderController extends AbstractController {
     protected ContentStoreService storeService;
     protected boolean disableVariableRestrictions;
 
+    protected PluginService pluginService;
+
     @Required
     public void setFallbackPageUrl(String fallbackPageUrl) {
         this.fallbackPageUrl = fallbackPageUrl;
@@ -80,6 +83,10 @@ public class PageRenderController extends AbstractController {
 
     public void setDisableVariableRestrictions(boolean disableVariableRestrictions) {
         this.disableVariableRestrictions = disableVariableRestrictions;
+    }
+
+    public void setPluginService(PluginService pluginService) {
+        this.pluginService = pluginService;
     }
 
     @Override
@@ -108,6 +115,9 @@ public class PageRenderController extends AbstractController {
                 if (controllerScript != null) {
                     Map<String, Object> model = new HashMap<>();
                     Map<String, Object> variables = createScriptVariables(request, response, model);
+
+                    pluginService.addPluginVariables(controllerScript.getUrl(), variables::put);
+
                     String viewName = executeScript(controllerScript, variables);
 
                     if (StringUtils.isNotEmpty(viewName)) {
