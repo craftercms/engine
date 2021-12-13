@@ -25,6 +25,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.craftercms.engine.freemarker.ExecuteControllerDirective;
 import org.craftercms.engine.freemarker.RenderComponentDirective;
 import org.craftercms.engine.freemarker.ServletContextHashModel;
+import org.craftercms.engine.plugin.PluginService;
 import org.craftercms.engine.scripting.SiteItemScriptResolver;
 import org.craftercms.engine.service.SiteItemService;
 import org.craftercms.engine.service.context.SiteContext;
@@ -97,6 +98,7 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     protected String componentIncludeElementName;
     protected String componentEmbeddedElementName;
     protected SiteItemScriptResolver componentScriptResolver;
+    protected PluginService pluginService;
 
     // Needed because the field in the superclass is private
     protected boolean disableVariableRestrictions;
@@ -160,6 +162,10 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     @Required
     public void setComponentScriptResolver(SiteItemScriptResolver componentScriptResolver) {
         this.componentScriptResolver = componentScriptResolver;
+    }
+
+    public void setPluginService(PluginService pluginService) {
+        this.pluginService = pluginService;
     }
 
     /**
@@ -245,6 +251,8 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
         }
 
         templateModel.putAll(model);
+
+        pluginService.addPluginVariables(getUrl(), templateModel::put);
 
         ObjectFactory<SimpleHash> componentModelFactory = new ObjectFactory<SimpleHash>() {
             public SimpleHash getObject() {

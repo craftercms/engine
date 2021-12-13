@@ -86,6 +86,7 @@
                 <property name="componentScriptResolver" ref="crafter.componentScriptResolver"/>
                 <property name="exposeSpringMacroHelpers" value="${crafter.engine.disableVariableRestrictions}"/>
                 <property name="enableStatics" value="${crafter.engine.freemarker.statics.enable}"/>
+                <property name="pluginService" ref="crafter.pluginService"/>
             </bean>
         </property>
     </bean>

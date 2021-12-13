@@ -37,6 +37,7 @@ import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.scripting.ScriptUrlTemplateScanner;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.GroovyScriptUtils;
+import org.craftercms.engine.plugin.PluginService;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
@@ -64,6 +65,8 @@ public class RestScriptsController extends AbstractController {
     protected ScriptUrlTemplateScanner urlTemplateScanner;
     protected boolean disableVariableRestrictions;
 
+    protected PluginService pluginService;
+
     public RestScriptsController() {
         responseBodyModelAttributeName = DEFAULT_RESPONSE_BODY_MODEL_ATTR_NAME;
         errorMessageModelAttributeName = DEFAULT_ERROR_MESSAGE_MODEL_ATTR_NAME;
@@ -85,6 +88,10 @@ public class RestScriptsController extends AbstractController {
         this.disableVariableRestrictions = disableVariableRestrictions;
     }
 
+    public void setPluginService(PluginService pluginService) {
+        this.pluginService = pluginService;
+    }
+
     @Override
     protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
         throws Exception {
@@ -99,6 +106,8 @@ public class RestScriptsController extends AbstractController {
         String serviceUrl = getServiceUrl(request);
         String scriptUrl = getScriptUrl(scriptFactory, siteContext, request, serviceUrl);
         Map<String, Object> scriptVariables = createScriptVariables(request, response);
+
+        pluginService.addPluginVariables(scriptUrl, scriptVariables::put);
 
         scriptUrl = parseScriptUrlForVariables(siteContext, scriptUrl, scriptVariables);
 

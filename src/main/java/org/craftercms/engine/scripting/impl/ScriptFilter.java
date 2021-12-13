@@ -38,6 +38,7 @@ import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.core.util.cache.impl.CachingAwareList;
 import org.craftercms.engine.exception.ConfigurationException;
+import org.craftercms.engine.plugin.PluginService;
 import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
@@ -65,6 +66,8 @@ public class ScriptFilter implements Filter {
     protected PathMatcher pathMatcher;
     protected boolean disableVariableRestrictions;
 
+    protected PluginService pluginService;
+
     public ScriptFilter() {
         pathMatcher = new AntPathMatcher();
     }
@@ -80,6 +83,10 @@ public class ScriptFilter implements Filter {
 
     public void setDisableVariableRestrictions(boolean disableVariableRestrictions) {
         this.disableVariableRestrictions = disableVariableRestrictions;
+    }
+
+    public void setPluginService(PluginService pluginService) {
+        this.pluginService = pluginService;
     }
 
     @Override
@@ -103,7 +110,10 @@ public class ScriptFilter implements Filter {
             }
 
             if (CollectionUtils.isNotEmpty(scripts)) {
-                chain = new ScriptFilterChainImpl(scripts.iterator(), chain, disableVariableRestrictions? servletContext : null);
+                chain = new ScriptFilterChainImpl(scripts.iterator(),
+                                                  chain,
+                                                  disableVariableRestrictions? servletContext : null,
+                                                  pluginService);
             }
         }
 

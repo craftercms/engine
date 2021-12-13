@@ -215,6 +215,7 @@
     <bean id="crafter.scriptFilter" class="org.craftercms.engine.scripting.impl.ScriptFilter">
         <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
         <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
+        <property name="pluginService" ref="crafter.pluginService"/>
     </bean>
 
     <bean id="crafter.urlRewriteFilter" class="org.craftercms.engine.url.rewrite.UrlRewriteFilter"/>
@@ -1037,6 +1038,12 @@
           class="org.craftercms.engine.util.config.SiteAwarePublishingTargetResolver">
         <constructor-arg name="preview" value="${crafter.engine.preview}"/>
         <constructor-arg name="stagingPattern" value="${crafter.engine.site.staging.pattern}"/>
+    </bean>
+
+    <bean id="crafter.pluginService" class="org.craftercms.engine.plugin.impl.PluginServiceImpl">
+        <constructor-arg name="contentStoreService" ref="crafter.contentStoreService"/>
+        <constructor-arg name="configurationReader" ref="crafter.configurationReader"/>
+        <constructor-arg name="configurationPathPattern" value="${crafter.engine.plugins.config.pattern}"/>
     </bean>
 
     <import resource="${crafter.engine.extension.base}/services-overlay-context.xml"/>
