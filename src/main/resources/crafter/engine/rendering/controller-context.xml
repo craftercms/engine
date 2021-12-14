@@ -35,6 +35,8 @@
         <property name="order" value="#{T(org.springframework.core.Ordered).LOWEST_PRECEDENCE}"/>
         <property name="interceptors" ref="crafter.interceptors"/>
         <property name="urlMap" ref="crafter.urlMappings"/>
+        <!-- This property became false by default in Spring 5.3 -->
+        <property name="useTrailingSlashMatch" value="true"/>
     </bean>
 
     <bean id="crafter.restScriptsController" class="org.craftercms.engine.controller.rest.RestScriptsController">
