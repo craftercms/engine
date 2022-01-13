@@ -101,6 +101,11 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     // Needed because the field in the superclass is private
     protected boolean disableVariableRestrictions;
 
+    /**
+     * Indicates if access for static methods should be allowed in Freemarker templates
+     */
+    protected boolean enableStatics;
+
     protected ServletContextHashModel servletContextHashModel;
     protected ApplicationContextAccessor applicationContextAccessor;
 
@@ -116,6 +121,10 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     public void setExposeSpringMacroHelpers(boolean exposeSpringMacroHelpers) {
         super.setExposeSpringMacroHelpers(exposeSpringMacroHelpers);
         disableVariableRestrictions = exposeSpringMacroHelpers;
+    }
+
+    public void setEnableStatics(boolean enableStatics) {
+        this.enableStatics = enableStatics;
     }
 
     @Required
@@ -214,13 +223,17 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
         Locale locale = LocaleContextHolder.getLocale();
         Object siteContextObject = disableVariableRestrictions?
                 siteContext : new SiteContextHashModel(getObjectWrapper());
-        TemplateHashModel staticModels = ((BeansWrapper) getObjectWrapper()).getStaticModels();
-        TemplateHashModel enumModels = ((BeansWrapper) getObjectWrapper()).getEnumModels();
 
-        templateModel.put(KEY_STATICS_CAP, staticModels);
-        templateModel.put(KEY_STATICS, staticModels);
+        if (enableStatics) {
+            TemplateHashModel staticModels = ((BeansWrapper) getObjectWrapper()).getStaticModels();
+            templateModel.put(KEY_STATICS_CAP, staticModels);
+            templateModel.put(KEY_STATICS, staticModels);
+        }
+
+        TemplateHashModel enumModels = ((BeansWrapper) getObjectWrapper()).getEnumModels();
         templateModel.put(KEY_ENUMS_CAP, enumModels);
         templateModel.put(KEY_ENUMS, enumModels);
+
         templateModel.put(KEY_SITE_CONTEXT_CAP, siteContextObject);
         templateModel.put(KEY_SITE_CONTEXT, siteContextObject);
         templateModel.put(KEY_LOCALE_CAP, locale);

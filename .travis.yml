@@ -1,21 +1,22 @@
 language: java
 jdk:
-  - openjdk8
+- openjdk8
 branches:
   except:
-    - travis
+  - travis
 notifications:
   irc:
     channels:
-      - "chat.freenode.net#craftercms"
+    - chat.freenode.net#craftercms
     use_notice: true
     skip_join: true
   slack: craftersoftware:7YiSb41ZG5rfMgiAY7Qgprc7
 env:
   global:
-    - secure: "OOqd7HDGtfcJGPZ53d3gPcbPIO9CN/Ed0WHKaAxfg6uN4+8173COZBQd0b99Vs8C91iPHnMDnXi0YZEV+MJcoPNLGKdzK6wn7bhZgWmEn72x5DBRDWPuxQVIPHpjm80l+n76VFSmCSrO7VlkzQkb2nw2UbHudATqAhhwHo0XlzM="
-    - secure: "D4QQtkjmQ2LHESmxRuw3VVIvutGhspYsppNQaf+5cOktukeWV/9Wcw0QblzCRDY/EifP9JkCSiDyPW1JmluVcTDjZ7cdCylFz1XpWKDdhT4LiMvaRDHNuIzp2z6wVa9APHhmyf16swXbtFpfgxuv8JFf+nE3mVFRYezYqLMrSBg="
-before_install: "git clone -b travis `git config --get remote.origin.url` target/travis"
+  - secure: TQ4CFpqfWC3XedmCbt9+SCBQtS5ZW3AsoEKVwfMElthiHRDZIDpH/Oa3DKhYyT7aN1EYvMs3Wyr9lRyJK9h/9iJXp8vtFXhQV5Pda8QFJAvefosP9EQfyCMhTCIubVkT+EbCZGk3KaKNLm9VUXYxZNIWHPC77t7/EsKk40+H10E=
+  - secure: Kih+Chec71C/haqSFlE62aKx0jjitjr2AEYTzzpqAAS++SVsirML2q+sqV6KLnQ372MZFfaJVIW6n/tH7bIxZdrlQlOJxrSp44YLzMS8qSER8l6/hmaaHKv3iOiKQZmP3UkqhoZ5tTmmAozw2gNgwA8cUKxuZHiNAAFnOCldh0s=
+before_install: git clone -b travis `git config --get remote.origin.url` target/travis
 script:
-  - 'if [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; then bash -c  "mvn deploy --settings target/travis/settings.xml";  fi'
-  - 'if [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then bash -c "mvn clean install" ;fi'
+- if [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; then bash -c  "mvn deploy --settings
+  target/travis/settings.xml";  fi
+- if [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then bash -c "mvn clean install" ;fi
