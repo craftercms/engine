@@ -102,6 +102,10 @@
 
     <util:list id="crafter.defaultItemPredicates"/>
 
+    <bean id="crafter.cacheTemplate" class="org.craftercms.core.util.cache.impl.NoopCacheTemplate">
+        <property name="cacheService" ref="crafter.cacheService" />
+    </bean>
+
     <!-- ////////////////////////////////// -->
     <!--								 	-->
     <!--		     Security   			-->

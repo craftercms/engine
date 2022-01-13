@@ -34,6 +34,11 @@ public class CrafterFreeMarkerViewResolver extends FreeMarkerViewResolver {
     protected String componentEmbeddedElementName;
     protected SiteItemScriptResolver componentScriptResolver;
 
+    /**
+     * Indicates if access for static methods should be allowed in Freemarker templates
+     */
+    protected boolean enableStatics;
+
     @Required
     public void setSiteItemService(SiteItemService siteItemService) {
         this.siteItemService = siteItemService;
@@ -59,6 +64,10 @@ public class CrafterFreeMarkerViewResolver extends FreeMarkerViewResolver {
         this.componentScriptResolver = componentScriptResolver;
     }
 
+    public void setEnableStatics(boolean enableStatics) {
+        this.enableStatics = enableStatics;
+    }
+
     @Override
     protected Class requiredViewClass() {
         return CrafterFreeMarkerView.class;
@@ -74,6 +83,7 @@ public class CrafterFreeMarkerViewResolver extends FreeMarkerViewResolver {
         view.setComponentIncludeElementName(componentIncludeElementName);
         view.setComponentEmbeddedElementName(componentEmbeddedElementName);
         view.setComponentScriptResolver(componentScriptResolver);
+        view.setEnableStatics(enableStatics);
 
         return view;
     }
