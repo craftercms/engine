@@ -49,12 +49,15 @@ public class StaticAssetsRequestHandler extends ResourceHttpRequestHandler {
     private boolean disableCaching;
 
     protected void init() {
-        if (disableCaching) {
-            // fully disable cache in the browser
-            setCacheControl(CacheControl.noStore());
-        } else {
-            // make the browser check for changes before using a cached version
-            setCacheControl(CacheControl.noCache());
+        // if there is a cache control set explicitly don't change it
+        if (getCacheControl() == null) {
+            if (disableCaching) {
+                // fully disable cache in the browser
+                setCacheControl(CacheControl.noStore());
+            } else {
+                // make the browser check for changes before using a cached version
+                setCacheControl(CacheControl.noCache());
+            }
         }
         setRequireSession(false);
     }

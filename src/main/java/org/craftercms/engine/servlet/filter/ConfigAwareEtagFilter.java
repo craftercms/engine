@@ -56,7 +56,7 @@ public class ConfigAwareEtagFilter extends ShallowEtagHeaderFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        return !enabled || Stream.of(includedUrls).noneMatch(url -> pathMatcher.match(url, request.getRequestURI()))
+        return !enabled || Stream.of(includedUrls).noneMatch(url -> pathMatcher.match(url, request.getPathInfo()))
                 || super.shouldNotFilter(request);
     }
 
