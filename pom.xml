@@ -54,7 +54,7 @@
         <java.version>1.8</java.version>
         <bouncycastle.version>1.61</bouncycastle.version>
         <urlrewrite.version>4.0.4</urlrewrite.version>
-	<aws.sdk.version>1.12.139</aws.sdk.version>
+	<aws.version>1.12.139</aws.version>
 	<box.sdk.version>2.58.0</box.sdk.version>
         <jackson.dataformat.version>2.10.5</jackson.dataformat.version>
         <log4j.version>2.17.1</log4j.version>
