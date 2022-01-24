@@ -17,7 +17,7 @@
 package org.craftercms.engine.controller.rest;
 
 import org.craftercms.core.controller.rest.RestControllerBase;
-import org.craftercms.engine.search.SiteAwareElasticsearchService;
+import org.craftercms.engine.search.legacy.SiteAwareElasticsearchService;
 import org.elasticsearch.action.search.SearchResponse;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.http.HttpHeaders;
