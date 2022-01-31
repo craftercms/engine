@@ -653,7 +653,25 @@
     <!--									-->
     <!-- ////////////////////////////////// -->
 
-    <bean id="crafter.elasticsearchService" class="org.craftercms.engine.search.SiteAwareElasticsearchService">
+    <!-- Deprecated, in process to be removed -->
+    <bean id="crafter.elasticsearchService" class="org.craftercms.engine.search.legacy.SiteAwareElasticsearchService">
+        <constructor-arg name="client">
+            <bean class="org.craftercms.search.elasticsearch.spring.RestHighLevelClientFactory">
+                <constructor-arg name="serverUrls" value="${crafter.engine.elasticsearch.urls}"/>
+                <property name="username" value="${crafter.engine.elasticsearch.username}"/>
+                <property name="password" value="${crafter.engine.elasticsearch.password}"/>
+                <property name="connectTimeout" value="${crafter.engine.elasticsearch.timeout.connect}"/>
+                <property name="socketTimeout" value="${crafter.engine.elasticsearch.timeout.socket}"/>
+                <property name="threadCount" value="${crafter.engine.elasticsearch.threads}"/>
+                <property name="socketKeepAlive" value="${crafter.engine.elasticsearch.keepAlive}"/>
+            </bean>
+        </constructor-arg>
+        <constructor-arg name="indexIdFormat" value="${crafter.engine.search.index.format}"/>
+        <constructor-arg name="enableTranslation" value="${crafter.engine.translation.enable}"/>
+        <property name="filterQueries" value="${crafter.engine.elasticsearch.filters}"/>
+    </bean>
+
+    <bean id="crafter.elasticsearchClient" class="org.craftercms.engine.search.SiteAwareElasticsearchClient">
         <constructor-arg name="client">
             <bean class="org.craftercms.search.elasticsearch.spring.ElasticsearchClientFactory">
                 <constructor-arg name="serverUrls" value="${crafter.engine.elasticsearch.urls}"/>
@@ -715,6 +733,7 @@
         <entry key="navTreeBuilder" value-ref="crafter.navTreeBuilder"/>
         <entry key="navBreadcrumbBuilder" value-ref="crafter.navBreadcrumbBuilder"/>
         <entry key="elasticsearch" value-ref="crafter.elasticsearchService"/>
+        <entry key="elasticsearchClient" value-ref="crafter.elasticsearchClient"/>
         <entry key="breadcrumbBuilder" value-ref="crafter.breadcrumbBuilder"/>
         <entry key="globalProperties" value-ref="crafter.propertyResolver"/>
         <entry key="modePreview" value="#{T(java.lang.Boolean).valueOf(${crafter.engine.preview})}"/>
@@ -950,7 +969,7 @@
         <property name="defaultLimit" value="${crafter.engine.graphql.query.limit}"/>
         <property name="defaultSortField" value="${crafter.engine.graphql.query.sort.field}"/>
         <property name="defaultSortOrder" value="${crafter.engine.graphql.query.sort.order}"/>
-        <property name="elasticsearch" ref="crafter.elasticsearchService"/>
+        <property name="elasticsearchClient" ref="crafter.elasticsearchClient"/>
     </bean>
 
     <bean id="crafter.urlTransformDataFetcher" class="org.craftercms.engine.graphql.impl.fetchers.UrlTransformDataFetcher">
