@@ -16,6 +16,7 @@
 package org.craftercms.engine.plugin.impl;
 
 import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.RegExUtils;
@@ -75,6 +76,23 @@ public class PluginServiceImpl implements PluginService {
         this.configurationPathPattern = configurationPathPattern;
     }
 
+    @Override
+    public HierarchicalConfiguration<?> getPluginConfig(String pluginId) {
+        Context context = getCurrentContext();
+        String pluginPath = pluginId.replaceAll("\\.", File.separator);
+        return loadPluginConfiguration(context, getPluginConfigPath(pluginPath));
+    }
+
+    protected HierarchicalConfiguration<?> loadPluginConfiguration(Context context, String pluginPath) {
+        try (InputStream is =
+                     contentStoreService.getContent(context, pluginPath).getInputStream()) {
+            return configurationReader.readXmlConfiguration(is);
+        } catch (ConfigurationException | IOException e) {
+            logger.error("Error loading plugin configuration", e);
+            return new XMLConfiguration();
+        }
+    }
+
     public void addPluginVariables(String url, BiConsumer<String, Object> setter) {
         Context context = getCurrentContext();
         Matcher matcher = pattern.matcher(url);
@@ -97,15 +115,7 @@ public class PluginServiceImpl implements PluginService {
         }
 
         String pluginId = getPluginId(parentUrl);
-        Configuration pluginConfig;
-
-        try (InputStream is =
-                     contentStoreService.getContent(context, getPluginConfigPath(parentUrl)).getInputStream()) {
-            pluginConfig = configurationReader.readXmlConfiguration(is);
-        } catch (ConfigurationException | IOException e) {
-            logger.error("Error loading plugin configuration", e);
-            pluginConfig = new XMLConfiguration();
-        }
+        Configuration pluginConfig = loadPluginConfiguration(context, getPluginConfigPath(parentUrl));
 
         setter.accept(PLUGIN_ID_KEY, pluginId);
         setter.accept(PLUGIN_CONFIG_KEY, pluginConfig);

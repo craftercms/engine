@@ -15,6 +15,8 @@
  */
 package org.craftercms.engine.plugin;
 
+import org.apache.commons.configuration2.HierarchicalConfiguration;
+
 import java.util.function.BiConsumer;
 
 /**
@@ -24,6 +26,13 @@ import java.util.function.BiConsumer;
  * @since 4.0.0
  */
 public interface PluginService {
+
+    /**
+     * Loads the configuration for a given plugin
+     * @param pluginId the id of the plugin
+     * @return the configuration object
+     */
+    HierarchicalConfiguration<?> getPluginConfig(String pluginId);
 
     /**
      * Adds variables related to plugins if the given URL belongs to a plugin
