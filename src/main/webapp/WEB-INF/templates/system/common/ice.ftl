@@ -8,7 +8,7 @@ Crafter CMS Authoring Scripts
 <script src="/studio/static-assets/modules/editors/tinymce/v5/tinymce/tinymce.min.js"></script>
 <script src="/studio/static-assets/scripts/craftercms-xb.umd.js"></script>
 <script>
-  window.craftercms.xb.initInContextEditing({
+  window.craftercms.xb.initExperienceBuilder({
     path: '${model.getItem().descriptorUrl!''}',
     ...${props}
   });
