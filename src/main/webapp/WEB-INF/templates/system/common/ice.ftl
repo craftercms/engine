@@ -1,4 +1,4 @@
-<#macro initInContextEditing isAuthoring=(modePreview) addReact=false props="{}" other...>
+<#macro initInContextEditing isAuthoring=(modePreview) props="{}" other...>
 <#if isAuthoring>
 <!--
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -6,16 +6,10 @@ Crafter CMS Authoring Scripts
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 -->
 <script src="/studio/static-assets/modules/editors/tinymce/v5/tinymce/tinymce.min.js"></script>
-<#if addReact>
-<#-- TODO: Import minified script -->
-<#else>
-<#-- TODO: Create Reactless build -->
-<script src="/studio/static-assets/scripts/craftercms-guest.umd.js"></script>
-</#if>
+<script src="/studio/static-assets/scripts/craftercms-xb.umd.js"></script>
 <script>
-  window.craftercms.guest.initInContextEditing({
+  window.craftercms.xb.initInContextEditing({
     path: '${model.getItem().descriptorUrl!''}',
-    modelId: '${model.objectId!''}',
     ...${props}
   });
 </script>
