@@ -16,7 +16,7 @@
 <!doctype html>
 <head>
 	<meta charset="utf-8">
-	<title>Crafter CMS: No Site Set</title>
+	<title>CrafterCMS: No Site Set</title>
 
 	<!-- start CSS -->
 	<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600" rel="stylesheet">
@@ -89,12 +89,12 @@
 <main id="main">
 
 	<a href="https://craftercms.org">
-		<img src="${urlTransformationService.transform('toWebAppRelativeUrl', '/static-assets/img/logo.svg')}" alt="Crafter CMS"/>
+		<img src="${urlTransformationService.transform('toWebAppRelativeUrl', '/static-assets/img/logo.svg')}" alt="CrafterCMS"/>
 	</a>
 
 	<div class="no-site-message">
 		<p>
-			Crafter CMS has no site configured for this domain.
+			CrafterCMS has no site configured for this domain.
 			Please configure the site you want to show or select a site on <a href="/studio">the authoring environment</a>.
 		</p>
 	</div>
@@ -103,13 +103,13 @@
 		<h2 class="navigation--title">Helpful links:</h2>
 		<a class="navigation--link" href="/studio">Authoring environment</a>
 		<a class="navigation--link" href="http://docs.craftercms.org">Docs Homepage</a>
-		<a class="navigation--link" href="http://www.craftersoftware.com/resources">Tutorials &amp; Screencasts</a>
-		<a class="navigation--link" href="http://www.craftersoftware.com/about/partners">Professional Services</a>
+		<a class="navigation--link" href="http://www.craftercms.com/resources">Tutorials &amp; Screencasts</a>
+		<a class="navigation--link" href="http://www.craftercms.com/about/partners">Professional Services</a>
 	</nav>
 
 	<footer class="footer">
 		Copyright &copy; 2007 - ${.now?string('yyyy')}, Crafter Software Corporation. All rights reserved.
-		Crafter CMS is open source software licensed under the GNU General Public License (GPL) version 3.0.
+		CrafterCMS is open source software licensed under the GNU General Public License (GPL) version 3.0.
 	</footer>
 
 </main>
