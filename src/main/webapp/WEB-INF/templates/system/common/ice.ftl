@@ -1,9 +1,9 @@
 <#macro initInContextEditing isAuthoring=(modePreview) props="{}" other...>
 <#if isAuthoring>
 <!--
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-Crafter CMS Authoring Scripts
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+CrafterCMS Authoring Scripts
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 -->
 <script src="/studio/static-assets/modules/editors/tinymce/v5/tinymce/tinymce.min.js"></script>
 <script src="/studio/static-assets/scripts/craftercms-xb.umd.js"></script>
