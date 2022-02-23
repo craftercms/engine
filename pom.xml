@@ -61,7 +61,7 @@
         <graphql.version>12.0</graphql.version>
         <graphql.extended.scalars.version>1.0</graphql.extended.scalars.version>
         <sardine.version>5.10</sardine.version>
-        <xerces.version>2.12.0</xerces.version>
+        <xerces.version>2.12.2</xerces.version>
         <httpproxy.version>1.12.1</httpproxy.version>
         <spatial4j.version>0.8</spatial4j.version>
     </properties>
