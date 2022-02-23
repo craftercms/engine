@@ -24,7 +24,7 @@
     <description>Crafter Content Delivery Engine</description>
     <url>https://github.com/craftercms/engine</url>
     <packaging>war</packaging>
-    <version>3.1.19-SNAPSHOT</version><!-- craftercms version flag -->
+    <version>3.1.22-SNAPSHOT</version><!-- craftercms version flag -->
     <organization>
         <name>CrafterCMS</name>
         <url>http://craftercms.org</url>
@@ -56,12 +56,12 @@
         <urlrewrite.version>4.0.4</urlrewrite.version>
 	<aws.version>1.12.139</aws.version>
 	<box.sdk.version>2.58.0</box.sdk.version>
-        <jackson.dataformat.version>2.10.5</jackson.dataformat.version>
+        <jackson.dataformat.version>2.13.1</jackson.dataformat.version>
         <log4j.version>2.17.1</log4j.version>
         <graphql.version>12.0</graphql.version>
         <graphql.extended.scalars.version>1.0</graphql.extended.scalars.version>
         <sardine.version>5.10</sardine.version>
-        <xerces.version>2.12.0</xerces.version>
+        <xerces.version>2.12.2</xerces.version>
         <httpproxy.version>1.12.1</httpproxy.version>
         <spatial4j.version>0.8</spatial4j.version>
     </properties>
