@@ -75,8 +75,6 @@
     <!-- Authentication -->
 
     <util:list id="crafter.authenticationProviders">
-        <ref bean="crafter.profilePreAuthenticationProvider"/>
-        <ref bean="crafter.standaloneHeadersAuthenticationProvider"/>
         <ref bean="crafter.profileAuthenticationProvider"/>
         <ref bean="crafter.rememberMeAuthenticationProvider"/>
         <ref bean="crafter.anonymousAuthenticationProvider"/>
@@ -94,11 +92,6 @@
     <bean id="crafter.anonymousAuthenticationProvider"
           class="org.springframework.security.authentication.AnonymousAuthenticationProvider">
         <constructor-arg index="0" value="${crafter.security.anonymous.token}"/>
-    </bean>
-
-    <bean id="crafter.standaloneHeadersAuthenticationProvider"
-          class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
-        <property name="preAuthenticatedUserDetailsService" ref="crafter.preAuthenticatedUserDetailsService"/>
     </bean>
 
     <!-- Authorization -->
@@ -158,18 +151,6 @@
         <constructor-arg name="profileService" ref="crafter.profileServiceRestClient"/>
     </bean>
 
-    <bean id="crafter.profilePreAuthenticationProvider"
-          class="org.craftercms.engine.util.spring.security.profile.PreAuthenticatedProfileProvider">
-        <constructor-arg name="authenticationManager" ref="crafter.profileAuthenticationManager"/>
-    </bean>
-
-    <bean id="crafter.profileHeadersAuthenticationFilter" parent="crafter.abstractHeadersAuthenticationFilter"
-          class="org.craftercms.engine.util.spring.security.profile.ProfileHeadersAuthenticationFilter">
-        <constructor-arg name="profileService" ref="crafter.profileServiceRestClient"/>
-        <constructor-arg name="tenantService" ref="crafter.tenantServiceRestClient"/>
-        <constructor-arg name="tenantsResolver" ref="crafter.tenantsResolver"/>
-    </bean>
-
     <!-- Security Filters -->
 
     <bean id="crafter.securityContextFilter"
@@ -181,23 +162,6 @@
         <constructor-arg index="0" ref="crafter.logoutSuccessHandler"/>
         <constructor-arg index="1" ref="crafter.logoutHandlers"/>
         <property name="filterProcessesUrl" value="${crafter.security.logout.url}"/>
-    </bean>
-
-    <bean id="crafter.abstractHeadersAuthenticationFilter" abstract="true"
-          class="org.craftercms.engine.util.spring.security.headers.AbstractHeadersAuthenticationFilter">
-        <property name="headerPrefix" value="${crafter.security.header.names.prefix}"/>
-        <property name="usernameHeaderName" value="${crafter.security.header.names.username}"/>
-        <property name="emailHeaderName" value="${crafter.security.header.names.email}"/>
-        <property name="groupsHeaderName" value="${crafter.security.header.names.groups}"/>
-        <property name="tokenHeaderName" value="${crafter.security.header.names.token}"/>
-        <property name="defaultTokenValue" value="${crafter.security.header.token}"/>
-        <property name="authenticationManager" ref="crafter.authenticationManager"/>
-    </bean>
-
-    <bean id="crafter.standaloneHeadersAuthenticationFilter" parent="crafter.abstractHeadersAuthenticationFilter"
-          class="org.craftercms.engine.util.spring.security.headers.StandaloneHeadersAuthenticationFilter">
-        <constructor-arg name="cacheTemplate" ref="crafter.cacheTemplate"/>
-        <property name="authenticationDetailsSource" ref="crafter.defaultDetailsSource"/>
     </bean>
 
     <bean id="crafter.formLoginFilter"
@@ -255,8 +219,6 @@
     <util:list id="crafter.securityFilters">
         <ref bean="crafter.securityContextFilter"/>
         <ref bean="crafter.logoutFilter"/>
-        <ref bean="crafter.standaloneHeadersAuthenticationFilter"/>
-        <ref bean="crafter.profileHeadersAuthenticationFilter"/>
         <ref bean="crafter.formLoginFilter"/>
         <ref bean="crafter.rememberMeFilter"/>
         <ref bean="crafter.anonymousFilter"/>
