@@ -28,6 +28,8 @@ import freemarker.template.TemplateHashModelEx;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 
+import static org.apache.commons.lang3.StringUtils.startsWith;
+
 /**
  * Just like {@link freemarker.ext.servlet.HttpRequestHashModel}, but besides returning request attributes, it also
  * returns values for the following properties of the request:
@@ -54,21 +56,25 @@ public class HttpRequestHashModel implements TemplateHashModelEx {
     public static final String KEY_REQUEST_URI = "requestURI";
     public static final String KEY_QUERY_STRING = "queryString";
 
+    public static final String NAMESPACE_SPRING = "org.springframework";
+
     private final HttpServletRequest request;
     private final HttpServletResponse response;
     private final ObjectWrapper wrapper;
+    private final boolean disableRestrictions;
 
-    public HttpRequestHashModel(HttpServletRequest request, ObjectWrapper wrapper) {
-        this(request, null, wrapper);
-    }
-
-    public HttpRequestHashModel(HttpServletRequest request, HttpServletResponse response, ObjectWrapper wrapper) {
+    public HttpRequestHashModel(HttpServletRequest request, HttpServletResponse response, ObjectWrapper wrapper,
+                                boolean disableRestrictions) {
         this.request = request;
         this.response = response;
         this.wrapper = wrapper;
+        this.disableRestrictions = disableRestrictions;
     }
 
     public TemplateModel get(String key) throws TemplateModelException {
+        if (!disableRestrictions && startsWith(key, NAMESPACE_SPRING)) {
+            return null;
+        }
         switch (key) {
             case KEY_SCHEME:
                 return wrapper.wrap(request.getScheme());
@@ -97,7 +103,7 @@ public class HttpRequestHashModel implements TemplateHashModelEx {
     public int size() {
         int result = 0;
 
-        for (Enumeration enumeration = request.getAttributeNames(); enumeration.hasMoreElements();) {
+        for (Enumeration<String> enumeration = request.getAttributeNames(); enumeration.hasMoreElements();) {
             enumeration.nextElement();
             ++result;
         }
