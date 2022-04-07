@@ -19,8 +19,7 @@
 </#macro>
 
 <#-- Performs an include also making available the plugin variables in that scope -->
-<#macro plugin_include id path>
-    <#assign pluginId = id/>
-    <#assign pluginConfig = pluginService.getPluginConfig(id)/>
-    <#include path ignore_missing=true/>
+<#macro plugin_include pluginId pluginPath>
+    <#assign pluginConfig = pluginService.getPluginConfig(pluginId)/>
+    <#include pluginPath ignore_missing=true/>
 </#macro>
