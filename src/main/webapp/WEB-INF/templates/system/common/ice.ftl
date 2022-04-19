@@ -1,4 +1,4 @@
-<#macro initInContextEditing isAuthoring=(modePreview) props="{}" other...>
+<#macro initExperienceBuilder isAuthoring=(modePreview) props="{}" other...>
 <#if isAuthoring>
 <!--
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -18,6 +18,14 @@ CrafterCMS Authoring Scripts
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 -->
 </#if>
+</#macro>
+
+<#macro initInContextEditing args...>
+  <#if modePreview>
+    <p style="font-size: 2em; text-align: center; color: red; margin: 1em;">
+      Developer note: <em>initInContextEditing</em> was renamed to <em>initExperienceBuilder</em>. Please update your freemarker template.
+    </p>
+  </#if>
 </#macro>
 
 <#function mergeAttributes attrs $attrs>
