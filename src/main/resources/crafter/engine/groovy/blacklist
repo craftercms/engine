@@ -110,3 +110,22 @@ new org.kohsuke.groovy.sandbox.impl.Checker$ThisConstructorWrapper java.lang.Obj
 
 # Custom for Crafter CMS
 field org.craftercms.engine.service.context.SiteContext scriptSandbox
+
+# JSR-223 API
+method javax.script.ScriptEngine eval java.io.Reader
+method javax.script.ScriptEngine eval java.io.Reader javax.script.Bindings
+method javax.script.ScriptEngine eval java.io.Reader javax.script.ScriptContext
+
+method javax.script.ScriptEngine eval java.lang.String
+method javax.script.ScriptEngine eval java.lang.String javax.script.Bindings
+method javax.script.ScriptEngine eval java.lang.String javax.script.ScriptContext
+
+method javax.script.ScriptEngineFactory getScriptEngine
+
+method javax.script.ScriptEngineManager getEngineFactories
+method javax.script.ScriptEngineManager getEngineByExtension java.lang.String
+method javax.script.ScriptEngineManager getEngineByMimeType java.lang.String
+method javax.script.ScriptEngineManager getEngineByName java.lang.String
+
+new javax.script.ScriptEngineManager
+new javax.script.ScriptEngineManager java.lang.ClassLoader
