@@ -182,7 +182,8 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
         AllHttpScopesAndAppContextHashModel templateModel = new AllHttpScopesAndAppContextHashModel(
             getObjectWrapper(), applicationContextAccessor, getServletContext(), request, disableVariableRestrictions);
         HttpSessionHashModel sessionModel = createSessionModel(request, response);
-        HttpRequestHashModel requestModel = new HttpRequestHashModel(request, response, getObjectWrapper());
+        HttpRequestHashModel requestModel =
+                new HttpRequestHashModel(request, response, getObjectWrapper(), disableVariableRestrictions);
         HttpRequestParametersHashModel requestParamsModel = new HttpRequestParametersHashModel(request);
         Map<String, String> cookies = createCookieMap(request);
 
@@ -246,11 +247,7 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
 
         templateModel.putAll(model);
 
-        ObjectFactory<SimpleHash> componentModelFactory = new ObjectFactory<SimpleHash>() {
-            public SimpleHash getObject() {
-                return buildTemplateModel(model, request, response);
-            }
-        };
+        ObjectFactory<SimpleHash> componentModelFactory = () -> buildTemplateModel(model, request, response);
 
         RenderComponentDirective renderComponentDirective = new RenderComponentDirective();
         renderComponentDirective.setSiteItemService(siteItemService);

@@ -442,6 +442,8 @@ public class SiteContext {
 
                     publishEvent(new SiteContextInitializedEvent(this));
                 } catch (Exception e) {
+                    // to avoid a deadlock during destroy()
+                    SiteContext.clear();
                     // If there is any exception during the init process then release the resources created so far
                     this.destroy();
                     throw e;
