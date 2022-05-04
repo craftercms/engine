@@ -80,7 +80,7 @@ public class SiteAwareCorsConfigurationSource implements CorsConfigurationSource
     protected CorsConfiguration getConfiguration(HierarchicalConfiguration<?> corsConfig) {
         if (corsConfig.getBoolean(ENABLE_KEY, false)) {
             CorsConfiguration config = new CorsConfiguration();
-            config.setAllowedOrigins(getValues(corsConfig, ALLOW_ORIGIN_KEY, ALLOW_ORIGIN_DEFAULT));
+            config.setAllowedOriginPatterns(getValues(corsConfig, ALLOW_ORIGIN_KEY, ALLOW_ORIGIN_DEFAULT));
             config.setAllowedMethods(getValues(corsConfig, ALLOW_METHODS_KEY, ALLOW_METHODS_DEFAULT));
             config.setAllowedHeaders(getValues(corsConfig, ALLOW_HEADERS_KEY, ALLOW_HEADERS_DEFAULT));
             config.setMaxAge(corsConfig.getLong(MAX_AGE_KEY, MAX_AGE_DEFAULT));
