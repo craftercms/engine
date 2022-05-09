@@ -101,6 +101,11 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     // Needed because the field in the superclass is private
     protected boolean disableVariableRestrictions;
 
+    /**
+     * Indicates if access for static methods should be allowed in Freemarker templates
+     */
+    protected boolean enableStatics;
+
     protected ServletContextHashModel servletContextHashModel;
     protected ApplicationContextAccessor applicationContextAccessor;
 
@@ -116,6 +121,10 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
     public void setExposeSpringMacroHelpers(boolean exposeSpringMacroHelpers) {
         super.setExposeSpringMacroHelpers(exposeSpringMacroHelpers);
         disableVariableRestrictions = exposeSpringMacroHelpers;
+    }
+
+    public void setEnableStatics(boolean enableStatics) {
+        this.enableStatics = enableStatics;
     }
 
     @Required
@@ -173,7 +182,8 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
         AllHttpScopesAndAppContextHashModel templateModel = new AllHttpScopesAndAppContextHashModel(
             getObjectWrapper(), applicationContextAccessor, getServletContext(), request, disableVariableRestrictions);
         HttpSessionHashModel sessionModel = createSessionModel(request, response);
-        HttpRequestHashModel requestModel = new HttpRequestHashModel(request, response, getObjectWrapper());
+        HttpRequestHashModel requestModel =
+                new HttpRequestHashModel(request, response, getObjectWrapper(), disableVariableRestrictions);
         HttpRequestParametersHashModel requestParamsModel = new HttpRequestParametersHashModel(request);
         Map<String, String> cookies = createCookieMap(request);
 
@@ -214,13 +224,17 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
         Locale locale = LocaleContextHolder.getLocale();
         Object siteContextObject = disableVariableRestrictions?
                 siteContext : new SiteContextHashModel(getObjectWrapper());
-        TemplateHashModel staticModels = ((BeansWrapper) getObjectWrapper()).getStaticModels();
-        TemplateHashModel enumModels = ((BeansWrapper) getObjectWrapper()).getEnumModels();
 
-        templateModel.put(KEY_STATICS_CAP, staticModels);
-        templateModel.put(KEY_STATICS, staticModels);
+        if (enableStatics) {
+            TemplateHashModel staticModels = ((BeansWrapper) getObjectWrapper()).getStaticModels();
+            templateModel.put(KEY_STATICS_CAP, staticModels);
+            templateModel.put(KEY_STATICS, staticModels);
+        }
+
+        TemplateHashModel enumModels = ((BeansWrapper) getObjectWrapper()).getEnumModels();
         templateModel.put(KEY_ENUMS_CAP, enumModels);
         templateModel.put(KEY_ENUMS, enumModels);
+
         templateModel.put(KEY_SITE_CONTEXT_CAP, siteContextObject);
         templateModel.put(KEY_SITE_CONTEXT, siteContextObject);
         templateModel.put(KEY_LOCALE_CAP, locale);
@@ -233,11 +247,7 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
 
         templateModel.putAll(model);
 
-        ObjectFactory<SimpleHash> componentModelFactory = new ObjectFactory<SimpleHash>() {
-            public SimpleHash getObject() {
-                return buildTemplateModel(model, request, response);
-            }
-        };
+        ObjectFactory<SimpleHash> componentModelFactory = () -> buildTemplateModel(model, request, response);
 
         RenderComponentDirective renderComponentDirective = new RenderComponentDirective();
         renderComponentDirective.setSiteItemService(siteItemService);
