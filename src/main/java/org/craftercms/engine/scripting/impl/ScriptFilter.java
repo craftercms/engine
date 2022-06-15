@@ -16,21 +16,6 @@
 
 package org.craftercms.engine.scripting.impl;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.collections.ListUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.lang3.ArrayUtils;
@@ -50,6 +35,14 @@ import org.springframework.beans.factory.annotation.Required;
 import org.springframework.security.web.util.matcher.*;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
+
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Servlet filter that passes the request through a series of scripts that act as filters too.
@@ -108,11 +101,12 @@ public class ScriptFilter implements Filter {
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
+    public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain originalChain) throws IOException,
         ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
+        FilterChain chain = originalChain;
         if (!excludedUrlsMatcher.matches(httpRequest)) {
-            chain = getScriptFilterChain(httpRequest, chain);
+            chain = getScriptFilterChain(httpRequest, originalChain);
         }
         chain.doFilter(request, response);
     }
