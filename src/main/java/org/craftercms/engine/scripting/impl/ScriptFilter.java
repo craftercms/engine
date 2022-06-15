@@ -18,7 +18,9 @@ package org.craftercms.engine.scripting.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -28,6 +30,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.lang3.ArrayUtils;
@@ -44,6 +47,7 @@ import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.ConfigUtils;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.security.web.util.matcher.*;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
 
@@ -68,8 +72,11 @@ public class ScriptFilter implements Filter {
 
     protected PluginService pluginService;
 
+    protected RequestMatcher excludedUrlsMatcher;
+
     public ScriptFilter() {
         pathMatcher = new AntPathMatcher();
+        excludedUrlsMatcher = new NegatedRequestMatcher(AnyRequestMatcher.INSTANCE);
     }
 
     @Required
@@ -89,6 +96,12 @@ public class ScriptFilter implements Filter {
         this.pluginService = pluginService;
     }
 
+    public void setExcludedUrls(String[] excludedUrls) {
+        this.excludedUrlsMatcher = new OrRequestMatcher(Arrays.stream(excludedUrls)
+                .map(AntPathRequestMatcher::new)
+                .collect(Collectors.toList()));
+    }
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         this.servletContext = filterConfig.getServletContext();
@@ -97,14 +110,21 @@ public class ScriptFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
         ServletException {
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        if (!excludedUrlsMatcher.matches(httpRequest)) {
+            chain = getScriptFilterChain(httpRequest, chain);
+        }
+        chain.doFilter(request, response);
+    }
+
+    protected FilterChain getScriptFilterChain(HttpServletRequest httpRequest, FilterChain chain) {
         List<FilterMapping> filterMappings = getFilterMappings();
         if (CollectionUtils.isNotEmpty(filterMappings)) {
-            HttpServletRequest httpRequest = (HttpServletRequest)request;
             String requestUri = HttpUtils.getRequestUriWithoutContextPath(httpRequest);
             List<Script> scripts = new ArrayList<>();
 
             for (FilterMapping mapping : filterMappings) {
-                if (!excludeRequest(requestUri, mapping.excludes) && includeRequest(requestUri, mapping.includes)) {
+                if (!excludeFilter(requestUri, mapping.excludes) && includeFilter(requestUri, mapping.includes)) {
                     scripts.add(mapping.script);
                 }
             }
@@ -112,12 +132,11 @@ public class ScriptFilter implements Filter {
             if (CollectionUtils.isNotEmpty(scripts)) {
                 chain = new ScriptFilterChainImpl(scripts.iterator(),
                                                   chain,
-                                                  disableVariableRestrictions? servletContext : null,
+                                                  disableVariableRestrictions ? servletContext : null,
                                                   pluginService);
             }
         }
-
-        chain.doFilter(request, response);
+        return chain;
     }
 
     @Override
@@ -173,7 +192,7 @@ public class ScriptFilter implements Filter {
         }
     }
 
-    protected boolean excludeRequest(String requestUri, String[] excludes) {
+    protected boolean excludeFilter(String requestUri, String[] excludes) {
         if (ArrayUtils.isNotEmpty(excludes)) {
             for (String uriPattern : excludes) {
                 if (pathMatcher.match(uriPattern, requestUri)) {
@@ -185,7 +204,7 @@ public class ScriptFilter implements Filter {
         return false;
     }
 
-    protected boolean includeRequest(String requestUri, String[] includes) {
+    protected boolean includeFilter(String requestUri, String[] includes) {
         if (ArrayUtils.isNotEmpty(includes)) {
             for (String uriPattern : includes) {
                 if (pathMatcher.match(uriPattern, requestUri)) {

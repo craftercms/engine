@@ -16,10 +16,12 @@
 
 package org.craftercms.engine.scripting.impl;
 
+import java.io.IOException;
 import java.util.Collections;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -30,6 +32,7 @@ import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.util.cache.CacheTemplate;
+import org.craftercms.engine.plugin.PluginService;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.test.utils.CacheTemplateMockUtils;
@@ -75,7 +78,12 @@ public class ScriptFilterTest {
         servletContext = new MockServletContext();
 
         filter = new ScriptFilter();
+        filter.setPluginService(mock(PluginService.class));
         filter.setCacheTemplate(cacheTemplate);
+        filter.setExcludedUrls(new String[]{
+                "/api/1/monitoring/**",
+                "/api/1/site/context/**",
+                "/api/1/site/cache/**"});
 
         when(filterConfig.getServletContext()).thenReturn(servletContext);
 
@@ -125,6 +133,48 @@ public class ScriptFilterTest {
         verify(filterChain).doFilter(request, response);
 
         clearCurrentRequestContext();
+    }
+
+    @Test
+    public void testRebuildContextIsIgnored() throws ServletException, IOException {
+        ScriptFilter filterSpy = spy(filter);
+        String url = "/api/1/site/context/rebuild?token=defaultManagementToken";
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", url);
+        request.setServletPath(url);
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        FilterChain filterChain = mock(FilterChain.class);
+
+        setCurrentRequestContext(request, response);
+        setCurrentSiteContext(siteContext);
+
+        filterSpy.doFilter(request, response, filterChain);
+
+        String greeting = (String)request.getAttribute("greeting");
+
+        assertNull(greeting);
+
+        verify(filterSpy, never()).getScriptFilterChain(any(HttpServletRequest.class), any(FilterChain.class));
+    }
+
+    @Test
+    public void testNotMatchedRequestIsProcessed() throws ServletException, IOException {
+        ScriptFilter filterSpy = spy(filter);
+        String url = "/myPage";
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", url);
+        request.setServletPath(url);
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        FilterChain filterChain = mock(FilterChain.class);
+
+        setCurrentRequestContext(request, response);
+        setCurrentSiteContext(siteContext);
+
+        filterSpy.doFilter(request, response, filterChain);
+
+        String greeting = (String)request.getAttribute("greeting");
+
+        assertNotNull(greeting);
+
+        verify(filterSpy, times(1)).getScriptFilterChain(any(HttpServletRequest.class), any(FilterChain.class));
     }
 
     private SiteContext createSiteContext(ContentStoreService storeService) throws Exception {
