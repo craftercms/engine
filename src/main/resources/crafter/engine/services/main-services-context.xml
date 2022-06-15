@@ -216,6 +216,7 @@
         <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
         <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
         <property name="pluginService" ref="crafter.pluginService"/>
+        <property name="excludedUrls" value="${crafter.engine.api.excludedUrls}"/>
     </bean>
 
     <bean id="crafter.urlRewriteFilter" class="org.craftercms.engine.url.rewrite.UrlRewriteFilter"/>
@@ -243,7 +244,7 @@
                 </property>
             </bean>
         </constructor-arg>
-        <constructor-arg name="excludedUrls" value="${crafter.engine.proxy.excludedUrls}"/>
+        <constructor-arg name="excludedUrls" value="${crafter.engine.api.excludedUrls}"/>
     </bean>
 
     <bean id="crafter.etagFilter" class="org.craftercms.engine.servlet.filter.ConfigAwareEtagFilter">
