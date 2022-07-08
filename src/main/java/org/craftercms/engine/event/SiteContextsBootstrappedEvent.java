@@ -15,22 +15,22 @@
  */
 package org.craftercms.engine.event;
 
-import org.craftercms.engine.service.context.SiteContext;
+import org.springframework.context.ApplicationEvent;
 
 /**
- * Event published when a site's cache clear has started.
+ * Application event triggered when all site contexts have been created in startup.
  *
  * @author avasquez
  */
-public class CacheClearStartedEvent extends SiteEvent {
+public class SiteContextsBootstrappedEvent extends ApplicationEvent {
 
     /**
-     * Create a new event.
+     * Create a new ApplicationEvent.
      *
-     * @param siteContext   the site's context
+     * @param source the object on which the event initially occurred (never {@code null})
      */
-    public CacheClearStartedEvent(SiteContext siteContext) {
-        super(siteContext);
+    public SiteContextsBootstrappedEvent(Object source) {
+        super(source);
     }
 
 }

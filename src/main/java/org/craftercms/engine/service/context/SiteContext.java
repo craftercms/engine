@@ -497,10 +497,17 @@ public class SiteContext {
     }
 
     public void startCacheClear() {
+        startCacheClear(null);
+    }
+
+    public void startCacheClear(Runnable callback) {
         maintenanceTaskExecutor.execute(() -> {
             SiteContext.setCurrent(this);
             try {
                 cacheClear();
+                if (callback != null) {
+                    callback.run();
+                }
             } finally {
                 SiteContext.clear();
             }
@@ -508,10 +515,17 @@ public class SiteContext {
     }
 
     public void startGraphQLSchemaBuild() throws GraphQLBuildException {
+        startGraphQLSchemaBuild(null);
+    }
+
+    public void startGraphQLSchemaBuild(Runnable callback) throws GraphQLBuildException {
         maintenanceTaskExecutor.execute(() -> {
             SiteContext.setCurrent(this);
             try {
                 buildGraphQLSchema();
+                if (callback != null) {
+                    callback.run();
+                }
             } finally {
                 SiteContext.clear();
             }
@@ -577,8 +591,6 @@ public class SiteContext {
     }
 
     protected void cacheClear() {
-        publishEvent(new CacheClearStartedEvent(this));
-
         // If there's a cache warmer, do a content cache switch instead of aclear
         if (cacheWarmer != null) {
             cacheWarmer.warmUpCache(this, true);
@@ -590,7 +602,7 @@ public class SiteContext {
             freeMarkerConfig.getConfiguration().clearTemplateCache();
         }
 
-        publishEvent(new CacheClearCompletedEvent(this));
+        publishEvent(new CacheClearedEvent(this));
     }
 
     protected void buildGraphQLSchema() {
@@ -599,14 +611,12 @@ public class SiteContext {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
-        publishEvent(new GraphQLBuildStartedEvent(this));
-
         try {
             GraphQL graphQL = graphQLFactory.getInstance(this);
             if (Objects.nonNull(graphQL)) {
                 this.graphQL = graphQL;
 
-                publishEvent(new GraphQLBuildCompletedEvent(this));
+                publishEvent(new GraphQLBuiltEvent(this));
             }
         } catch (Exception e) {
             logger.error("Error building the GraphQL schema for site '" + siteName + "'", e);
