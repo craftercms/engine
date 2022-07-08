@@ -81,8 +81,8 @@ public class SiteContextRestController extends RestControllerBase {
 
         contextManager.startDestroyContext(siteName);
 
-        return createResponseMessage("Started destroy site context  for '" + siteName + "'. Will be recreated on next " +
-                "request");
+        return createResponseMessage("Started destroy site context  for '" + siteName + "'. Will be recreated on " +
+                                     "next request");
     }
 
     @GetMapping(value = URL_REBUILD)

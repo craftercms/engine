@@ -23,7 +23,10 @@ import org.craftercms.commons.concurrent.locks.WeakKeyBasedReentrantLockFactory;
 import org.craftercms.commons.entitlements.exception.EntitlementException;
 import org.craftercms.commons.entitlements.model.EntitlementType;
 import org.craftercms.commons.entitlements.validator.EntitlementValidator;
+import org.craftercms.engine.event.SiteContextPurgedEvent;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 import javax.annotation.PreDestroy;
 import java.util.Collection;
@@ -35,16 +38,18 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Consumer;
 
 /**
  * Registry and lifecycle manager of {@link SiteContext}s.
  *
  * @author Alfonso Vásquez
  */
-public class SiteContextManager {
+public class SiteContextManager implements ApplicationContextAware {
 
     private static final Log logger = LogFactory.getLog(SiteContextManager.class);
 
+    protected ApplicationContext applicationContext;
     protected KeyBasedLockFactory<ReentrantLock> siteLockFactory;
     protected Map<String, SiteContext> contextRegistry;
     protected SiteContextFactory contextFactory;
@@ -58,6 +63,11 @@ public class SiteContextManager {
     public SiteContextManager() {
         siteLockFactory = new WeakKeyBasedReentrantLockFactory();
         contextRegistry = new ConcurrentHashMap<>();
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
     }
 
     @Required
@@ -275,7 +285,23 @@ public class SiteContextManager {
      * @param fallback if the new context should be a fallback context
      */
     public void startContextRebuild(String siteName, boolean fallback) {
-        jobThreadPoolExecutor.execute(() -> rebuildContext(siteName, fallback));
+        startContextRebuild(siteName, fallback, null);
+    }
+
+    /**
+     * Starts a context rebuild in the background
+     *
+     * @param siteName the site name of the context
+     * @param fallback if the new context should be a fallback context
+     * @param callback function to call with the new context after it has been rebuilt
+     */
+    public void startContextRebuild(String siteName, boolean fallback, Consumer<SiteContext> callback) {
+        jobThreadPoolExecutor.execute(() -> {
+            SiteContext siteContext = rebuildContext(siteName, fallback);
+            if (callback != null ){
+                callback.accept(siteContext);
+            }
+        });
     }
 
     /**
@@ -288,7 +314,7 @@ public class SiteContextManager {
     }
 
     /**
-     * Destroys the context for the specified site name
+     * Destroys the context for the specified site name, and removes it from the registry, effectively purging it
      *
      * @param siteName the site name of the context to destroy
      */
@@ -307,7 +333,11 @@ public class SiteContextManager {
             logger.info("<Destroying site context: " + siteName + ">");
             logger.info("==================================================");
 
-            destroyContext(siteContext);
+            try {
+                destroyContext(siteContext);
+            } finally {
+                applicationContext.publishEvent(new SiteContextPurgedEvent(siteContext));
+            }
 
             logger.info("==================================================");
             logger.info("</Destroying site context: " + siteName + ">");
@@ -354,7 +384,7 @@ public class SiteContextManager {
         return siteContext;
     }
 
-    protected void rebuildContext(String siteName, boolean fallback) {
+    protected SiteContext rebuildContext(String siteName, boolean fallback) {
         Lock lock = siteLockFactory.getLock(siteName);
         lock.lock();
         try {
@@ -363,14 +393,15 @@ public class SiteContextManager {
             logger.info("==================================================");
 
             SiteContext oldSiteContext = contextRegistry.get(siteName);
-
-            createContext(siteName, fallback);
+            SiteContext newContext = createContext(siteName, fallback);
 
             oldSiteContext.destroy();
 
             logger.info("==================================================");
             logger.info("</Rebuilding site context: " + siteName + ">");
             logger.info("==================================================");
+
+            return newContext;
         } finally {
             lock.unlock();
         }
