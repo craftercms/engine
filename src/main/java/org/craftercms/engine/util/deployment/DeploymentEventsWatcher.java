@@ -33,6 +33,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -59,12 +60,14 @@ public class DeploymentEventsWatcher implements ApplicationListener<ApplicationE
     private SiteContextManager siteContextManager;
 
     private volatile boolean startupCompleted;
-    private Map<String, SiteEvent> latestEvents;
+    private Map<String, Properties> latestDeploymentEvents;
+    private Map<String, SiteEvent> latestSiteContextEvents;
 
     public DeploymentEventsWatcher() {
         this.deploymentEventsFileUrl = DEFAULT_DEPLOYMENT_EVENTS_FILE_URL;
         this.startupCompleted = false;
-        this.latestEvents = new ConcurrentHashMap<>();
+        this.latestDeploymentEvents = new ConcurrentHashMap<>();
+        this.latestSiteContextEvents = new ConcurrentHashMap<>();
     }
 
     public void setDeploymentEventsFileUrl(String deploymentEventsFileUrl) {
@@ -89,76 +92,99 @@ public class DeploymentEventsWatcher implements ApplicationListener<ApplicationE
     }
 
     public void checkForSiteEvents(SiteContext siteContext) {
+        boolean rebuildContextTriggered = false;
         String siteName = siteContext.getSiteName();
-        Properties deploymentEvents;
+        Properties pastDeploymentEvents = latestDeploymentEvents.get(siteName);
+        Properties currentDeploymentEvents;
 
         try {
-            deploymentEvents = loadDeploymentEvents(siteContext);
+            currentDeploymentEvents = loadDeploymentEvents(siteContext);
         } catch (IOException e) {
             logger.error("Unable to load deployment events for site '{}'", siteName, e);
             return;
         }
 
-        boolean rebuildContextTriggered = false;
-
         logger.debug("Checking deployment events for site {}...", siteName);
 
-        long lastContextBuildEvent = getLatestEventTimestamp(siteName, SiteContextCreatedEvent.class);
-        
-        if (deploymentEvents.containsKey(REBUILD_CONTEXT_EVENT_KEY)) {
-            long rebuildContextEvent = getEventProperty(deploymentEvents, REBUILD_CONTEXT_EVENT_KEY);
-            
-            if (lastContextBuildEvent < rebuildContextEvent) {
-                logger.info("Rebuild context deployment event received. Rebuilding context for site {}...", siteName);
+        if (Objects.equals(currentDeploymentEvents, pastDeploymentEvents)) {
+            logger.debug("No new deployment events for site {}", siteName);
+        } else {
+            logger.debug("New deployment events received for site {}", siteName);
 
-                siteContextManager.startContextRebuild(siteContext.getSiteName(), siteContext.isFallback());
+            latestDeploymentEvents.put(siteName, currentDeploymentEvents);
 
-                rebuildContextTriggered = true;
+            long lastContextBuildEvent = getLatestEventTimestamp(siteName, SiteContextCreatedEvent.class);
+
+            if (currentDeploymentEvents.containsKey(REBUILD_CONTEXT_EVENT_KEY)) {
+                long rebuildContextEvent = getEventProperty(currentDeploymentEvents, REBUILD_CONTEXT_EVENT_KEY);
+
+                if (lastContextBuildEvent < rebuildContextEvent) {
+                    logger.info("Rebuild context deployment event received. Rebuilding context for site {}...", siteName);
+
+                    siteContextManager.startContextRebuild(
+                            siteContext.getSiteName(),
+                            siteContext.isFallback(),
+                            newContext -> logger.info("Context rebuild for site {} completed", siteName));
+
+                    rebuildContextTriggered = true;
+                }
             }
-        }
 
-        if (!rebuildContextTriggered && deploymentEvents.containsKey(CLEAR_CACHE_EVENT_KEY)) {
-            long clearCacheEvent = getEventProperty(deploymentEvents, CLEAR_CACHE_EVENT_KEY);
-            long lastCacheClearEvent = getLatestEventTimestamp(siteName, CacheClearStartedEvent.class);
+            if (!rebuildContextTriggered && currentDeploymentEvents.containsKey(CLEAR_CACHE_EVENT_KEY)) {
+                long clearCacheEvent = getEventProperty(currentDeploymentEvents, CLEAR_CACHE_EVENT_KEY);
+                long lastCacheClearEvent = getLatestEventTimestamp(siteName, CacheClearedEvent.class);
 
-            if (lastContextBuildEvent < clearCacheEvent && lastCacheClearEvent < clearCacheEvent) {
-                logger.info("Clear cache deployment event received. Clearing cache for site {}...", siteName);
+                if (lastContextBuildEvent < clearCacheEvent && lastCacheClearEvent < clearCacheEvent) {
+                    logger.info("Clear cache deployment event received. Clearing cache for site {}...", siteName);
 
-                siteContext.startCacheClear();
+                    siteContext.startCacheClear(
+                            () -> logger.info("Clear cache for site {} completed", siteName));
+                }
             }
-        }
 
-        if(!rebuildContextTriggered && deploymentEvents.containsKey(REBUILD_GRAPHQL_EVENT_KEY)) {
-            long rebuildGraphQLEvent = getEventProperty(deploymentEvents, REBUILD_GRAPHQL_EVENT_KEY);
-            long lastRebuildGraphQLEvent = getLatestEventTimestamp(siteName, GraphQLBuildStartedEvent.class);
+            if (!rebuildContextTriggered && currentDeploymentEvents.containsKey(REBUILD_GRAPHQL_EVENT_KEY)) {
+                long rebuildGraphQLEvent = getEventProperty(currentDeploymentEvents, REBUILD_GRAPHQL_EVENT_KEY);
+                long lastRebuildGraphQLEvent = getLatestEventTimestamp(siteName, GraphQLBuiltEvent.class);
 
-            if (lastContextBuildEvent < rebuildGraphQLEvent && lastRebuildGraphQLEvent < rebuildGraphQLEvent) {
-                logger.info("Rebuild GraphQL deployment event received. Rebuilding schema for site {}...", siteName);
+                if (lastContextBuildEvent < rebuildGraphQLEvent && lastRebuildGraphQLEvent < rebuildGraphQLEvent) {
+                    logger.info("Rebuild GraphQL deployment event received. Rebuilding schema for site {}...", siteName);
 
-                siteContext.startGraphQLSchemaBuild();
+                    siteContext.startGraphQLSchemaBuild(
+                            () -> logger.info("GraphQL schema rebuild for site {} completed", siteName));
+                }
             }
         }
     }
 
     @Override
     public void onApplicationEvent(ApplicationEvent event) {
-        if (event instanceof SiteContextInitializedEvent) {
+        if (event instanceof SiteContextsBootstrappedEvent) {
             startupCompleted = true;
+        } else if (event instanceof SiteContextPurgedEvent) {
+            String siteName = ((SiteEvent) event).getSiteContext().getSiteName();
+
+            logger.debug("Clearing all deployment events info for removed site '{}'", siteName);
+
+            // The site was completely removed, so remove all related event info
+            latestDeploymentEvents.remove(siteName);
+            latestSiteContextEvents.remove(String.format(LATEST_EVENT_KEY_FORMAT, siteName, SiteContextCreatedEvent.class));
+            latestSiteContextEvents.remove(String.format(LATEST_EVENT_KEY_FORMAT, siteName, CacheClearedEvent.class));
+            latestSiteContextEvents.remove(String.format(LATEST_EVENT_KEY_FORMAT, siteName, GraphQLBuiltEvent.class));
         } else if (event instanceof SiteEvent) {
             SiteEvent siteEvent = (SiteEvent) event;
             String siteName = siteEvent.getSiteContext().getSiteName();
             Class<? extends SiteEvent> eventClass = siteEvent.getClass();
 
             if (eventClass.equals(SiteContextCreatedEvent.class) ||
-                eventClass.equals(CacheClearStartedEvent.class) ||
-                eventClass.equals(GraphQLBuildStartedEvent.class)) {
-                latestEvents.put(String.format(LATEST_EVENT_KEY_FORMAT, siteName, eventClass), siteEvent);
+                eventClass.equals(CacheClearedEvent.class) ||
+                eventClass.equals(GraphQLBuiltEvent.class)) {
+                latestSiteContextEvents.put(String.format(LATEST_EVENT_KEY_FORMAT, siteName, eventClass), siteEvent);
             }
         }
     }
 
     private long getLatestEventTimestamp(String siteName, Class<? extends SiteEvent> eventClass) {
-        SiteEvent event = latestEvents.get(String.format(LATEST_EVENT_KEY_FORMAT, siteName, eventClass));
+        SiteEvent event = latestSiteContextEvents.get(String.format(LATEST_EVENT_KEY_FORMAT, siteName, eventClass));
         if (event != null) {
             return event.getTimestamp();
         } else {
