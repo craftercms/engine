@@ -36,6 +36,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.ServletContextAware;
+import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.UriTemplate;
 
 import javax.servlet.ServletContext;
@@ -124,7 +125,12 @@ public class RestScriptsController implements ServletContextAware {
     }
 
     protected String getServiceUrl(HttpServletRequest request) {
-        return StringUtils.removeStart(request.getRequestURI(), REST_SERVICES_ROOT);
+        String url = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+        if (StringUtils.isEmpty(url)) {
+            throw new IllegalStateException(
+                format("Required request attribute '%s' is not set", HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE));
+        }
+        return StringUtils.removeStart(url, REST_SERVICES_ROOT);
     }
 
     protected String parseScriptUrlForVariables(SiteContext siteContext, String scriptUrl,
