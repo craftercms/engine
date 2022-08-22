@@ -34,6 +34,7 @@ import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.GroovyScriptUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.servlet.HandlerMapping;
@@ -48,7 +49,8 @@ import java.util.Map;
 
 import static java.lang.String.format;
 import static java.util.Collections.singletonMap;
-import static org.craftercms.engine.controller.rest.RestScriptsController.REST_SERVICES_ROOT;
+import static org.craftercms.engine.controller.rest.RestScriptsController.API_1_SERVICES_ROOT;
+import static org.craftercms.engine.controller.rest.RestScriptsController.API_ROOT;
 import static org.craftercms.engine.util.GroovyScriptUtils.addRestScriptVariables;
 
 /**
@@ -56,7 +58,7 @@ import static org.craftercms.engine.util.GroovyScriptUtils.addRestScriptVariable
  *
  * @author Alfonso Vásquez
  */
-@RequestMapping(REST_SERVICES_ROOT)
+@RequestMapping(path = {API_ROOT, API_1_SERVICES_ROOT})
 public class RestScriptsController implements ServletContextAware {
 
     private static final Log logger = LogFactory.getLog(RestScriptsController.class);
@@ -66,7 +68,9 @@ public class RestScriptsController implements ServletContextAware {
 
     private static final String SCRIPT_URL_FORMAT = "%s.%s.%s"; // {url}.{method}.{scriptExt}
 
-    protected static final String REST_SERVICES_ROOT = "/api/1/services";
+    protected static final String API_ROOT = "/api";
+
+    protected static final String API_1_SERVICES_ROOT = "/api/1/services";
 
     protected String responseBodyModelAttributeName;
     protected String errorMessageModelAttributeName;
@@ -76,9 +80,12 @@ public class RestScriptsController implements ServletContextAware {
     protected PluginService pluginService;
     private ServletContext servletContext;
 
+    private AntPathMatcher antPathMatcher;
+
     public RestScriptsController() {
         responseBodyModelAttributeName = DEFAULT_RESPONSE_BODY_MODEL_ATTR_NAME;
         errorMessageModelAttributeName = DEFAULT_ERROR_MESSAGE_MODEL_ATTR_NAME;
+        this.antPathMatcher = new AntPathMatcher();
     }
 
     public void setResponseBodyModelAttributeName(String responseBodyModelAttributeName) {
@@ -128,9 +135,10 @@ public class RestScriptsController implements ServletContextAware {
         String url = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         if (StringUtils.isEmpty(url)) {
             throw new IllegalStateException(
-                format("Required request attribute '%s' is not set", HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE));
+                    format("Required request attribute '%s' is not set", HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE));
         }
-        return StringUtils.removeStart(url, REST_SERVICES_ROOT);
+        String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+        return antPathMatcher.extractPathWithinPattern(pattern, url);
     }
 
     protected String parseScriptUrlForVariables(SiteContext siteContext, String scriptUrl,

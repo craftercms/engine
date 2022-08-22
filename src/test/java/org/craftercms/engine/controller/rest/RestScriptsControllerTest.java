@@ -186,6 +186,7 @@ public class RestScriptsControllerTest {
         request.setCookies(testCookie);
 
         request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, serviceUrl);
+        request.setAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE, "/**");
 
         return request;
     }
