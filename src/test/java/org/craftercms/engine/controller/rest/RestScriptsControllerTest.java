@@ -14,21 +14,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.craftercms.engine.controller;
+package org.craftercms.engine.controller.rest;
 
-import java.util.Collections;
-import java.util.Map;
-import javax.servlet.ServletContext;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import groovy.util.GroovyScriptEngine;
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.util.cache.CacheTemplate;
-import org.craftercms.engine.controller.rest.RestScriptsController;
+import org.craftercms.engine.plugin.PluginService;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.scripting.impl.GroovyScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
@@ -37,14 +29,19 @@ import org.craftercms.engine.test.utils.ContentStoreServiceMockUtils;
 import org.craftercms.engine.util.groovy.ContentStoreResourceConnector;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.web.servlet.HandlerMapping;
-import org.springframework.web.servlet.ModelAndView;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import javax.servlet.ServletContext;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Collections;
+import java.util.Map;
+
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -63,6 +60,9 @@ public class RestScriptsControllerTest {
 
         controller = new RestScriptsController();
         controller.setServletContext(createServletContext());
+
+        PluginService pluginService = mock(PluginService.class);
+        controller.setPluginService(pluginService);
     }
 
     @Test
@@ -73,11 +73,11 @@ public class RestScriptsControllerTest {
         setCurrentRequest(request);
         setCurrentSiteContext(storeService);
 
-        ModelAndView modelAndView = controller.handleRequest(request, response);
+        ResponseEntity<Map<String,Object>> responseEntity = controller.handleRequest(request, response);
 
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
 
-        Map<String, Object> responseBody = (Map<String, Object>) modelAndView.getModel().get("responseBody");
+        Map<String, Object> responseBody = responseEntity.getBody();
         assertEquals("test", responseBody.get("test-param"));
         assertEquals("test", responseBody.get("test-header"));
         assertEquals("test", responseBody.get("test-cookie"));
@@ -88,7 +88,7 @@ public class RestScriptsControllerTest {
 
     @Test
     public void testScriptNotFound() throws Exception {
-        testError("/testErrorNotFound.json", HttpServletResponse.SC_BAD_REQUEST, "REST script not found");
+        testError("/testErrorNotFound.json", HttpServletResponse.SC_NOT_FOUND, "REST script not found");
     }
 
     @Test
@@ -109,9 +109,9 @@ public class RestScriptsControllerTest {
         setCurrentRequest(request);
         setCurrentSiteContext(storeService);
 
-        ModelAndView modelAndView = controller.handleRequest(request, response);
+        ResponseEntity responseEntity = controller.handleRequest(request, response);
 
-        assertNull(modelAndView);
+        assertNull(responseEntity.getBody());
         assertTrue(response.isCommitted());
         assertEquals(HttpServletResponse.SC_MOVED_TEMPORARILY, response.getStatus());
         assertEquals("/api/1/services/test.json", response.getRedirectedUrl());
@@ -128,12 +128,11 @@ public class RestScriptsControllerTest {
         setCurrentRequest(request);
         setCurrentSiteContext(storeService);
 
-        ModelAndView modelAndView = controller.handleRequest(request, response);
+        ResponseEntity responseEntity = controller.handleRequest(request, response);
 
         assertEquals(statusCode, response.getStatus());
 
-        Map<String, Object> responseBody = (Map<String, Object>) modelAndView.getModel().get(
-            RestScriptsController.DEFAULT_RESPONSE_BODY_MODEL_ATTR_NAME);
+        Map<String, Object> responseBody = (Map<String, Object>) responseEntity.getBody();
         assertEquals(message, responseBody.get(RestScriptsController.DEFAULT_ERROR_MESSAGE_MODEL_ATTR_NAME));
 
         removeCurrentRequest();
@@ -178,8 +177,7 @@ public class RestScriptsControllerTest {
     }
 
     private MockHttpServletRequest createRequest(String serviceUrl) {
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", "http://localhost:8080/api/1/services/" +
-                                                                           serviceUrl);
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", serviceUrl);
 
         request.setParameter("test-param", "test");
         request.addHeader("test-header", "test");
@@ -188,6 +186,7 @@ public class RestScriptsControllerTest {
         request.setCookies(testCookie);
 
         request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, serviceUrl);
+        request.setAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE, "/**");
 
         return request;
     }

@@ -55,8 +55,6 @@
     </bean>
 
     <util:map id="crafter.urlMappings">
-        <entry key="/api/**" value-ref="crafter.restScriptsController"/>
-        <entry key="/api/1/services/**" value-ref="crafter.restScriptsController"/> <!-- Deprecated mapping, might be removed in a later version -->
         <entry key="/static-assets/**" value-ref="crafter.staticAssetsRequestHandler"/>
         <entry key="/remote-assets/**" value-ref="crafter.remoteAssetsRequestHandler"/>
 
