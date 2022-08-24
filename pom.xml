@@ -64,6 +64,7 @@
         <xerces.version>2.12.2</xerces.version>
         <httpproxy.version>1.12.1</httpproxy.version>
         <spatial4j.version>0.8</spatial4j.version>
+        <guava.version>31.1-jre</guava.version>
     </properties>
 
     <licenses>
@@ -396,6 +397,13 @@
                     <artifactId>spring-core</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <!-- Guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
         </dependency>
 
         <!-- Test dependencies -->
