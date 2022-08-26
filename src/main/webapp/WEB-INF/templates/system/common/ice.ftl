@@ -1,22 +1,21 @@
 <#macro initExperienceBuilder isAuthoring=(modePreview) props="{}" other...>
-<#if isAuthoring>
-<!--
->>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<#assign noXb = ((requestParameters["xb"]!'') == 'off')>
+<#if isAuthoring && model?? && !noXb>
+<!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>
 CrafterCMS Authoring Scripts
->>>>>>>>>>>>>>>>>>>>>>>>>>>>
--->
-<script src="/studio/static-assets/modules/editors/tinymce/v5/tinymce/tinymce.min.js"></script>
-<script src="/studio/static-assets/scripts/craftercms-xb.umd.js"></script>
+>>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
+<script defer src="/studio/static-assets/modules/editors/tinymce/v5/tinymce/tinymce.min.js"></script>
+<script defer src="/studio/static-assets/scripts/craftercms-xb.umd.js"></script>
 <script>
-  window.craftercms.xb.initExperienceBuilder({
-    path: '${model.getItem().descriptorUrl!''}',
-    ...${props}
+  document.addEventListener('craftercms.xb:loaded', () => {
+    window.craftercms.xb.initExperienceBuilder({
+      path: '${model.getItem().descriptorUrl!''}',
+      ...${props}
+    });
   });
 </script>
-<!--
-<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
--->
+<!-- <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<< -->
 </#if>
 </#macro>
 
