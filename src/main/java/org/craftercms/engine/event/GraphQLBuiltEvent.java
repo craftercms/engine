@@ -18,18 +18,18 @@ package org.craftercms.engine.event;
 import org.craftercms.engine.service.context.SiteContext;
 
 /**
- * Event published when a site's cache clear has started.
+ * Event published when a site's GraphQL schema build has completed.
  *
  * @author avasquez
  */
-public class CacheClearStartedEvent extends SiteEvent {
+public class GraphQLBuiltEvent extends SiteEvent {
 
     /**
      * Create a new event.
      *
      * @param siteContext   the site's context
      */
-    public CacheClearStartedEvent(SiteContext siteContext) {
+    public GraphQLBuiltEvent(SiteContext siteContext) {
         super(siteContext);
     }
 

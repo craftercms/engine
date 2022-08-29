@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2020 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -15,22 +15,22 @@
  */
 package org.craftercms.engine.event;
 
-import org.craftercms.engine.service.context.SiteContext;
+import org.springframework.context.ApplicationEvent;
 
 /**
- * Event published when a site's GraphQL schema build has started.
+ * Application event triggered when all site contexts have been created in startup.
  *
  * @author avasquez
  */
-public class GraphQLBuildStartedEvent extends SiteEvent {
+public class SiteContextsBootstrappedEvent extends ApplicationEvent {
 
     /**
-     * Create a new event.
+     * Create a new ApplicationEvent.
      *
-     * @param siteContext   the site's context
+     * @param source the object on which the event initially occurred (never {@code null})
      */
-    public GraphQLBuildStartedEvent(SiteContext siteContext) {
-        super(siteContext);
+    public SiteContextsBootstrappedEvent(Object source) {
+        super(source);
     }
 
 }

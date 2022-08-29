@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2020 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -17,19 +17,14 @@ package org.craftercms.engine.event;
 
 import org.craftercms.engine.service.context.SiteContext;
 
-/**
- * Event published when a site's cache clear has completed.
- *
- * @author avasquez
- */
-public class CacheClearCompletedEvent extends SiteEvent {
+public class SiteContextPurgedEvent extends SiteEvent {
 
     /**
      * Create a new event.
      *
      * @param siteContext   the site's context
      */
-    public CacheClearCompletedEvent(SiteContext siteContext) {
+    public SiteContextPurgedEvent(SiteContext siteContext) {
         super(siteContext);
     }
 
