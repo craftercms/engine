@@ -15,6 +15,12 @@
  */
 package org.craftercms.engine.controller.rest;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -27,30 +33,17 @@ import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.util.ExceptionUtils;
 import org.craftercms.engine.exception.HttpStatusCodeAwareException;
 import org.craftercms.engine.exception.ScriptNotFoundException;
-import org.craftercms.engine.plugin.PluginService;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.scripting.ScriptUrlTemplateScanner;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.GroovyScriptUtils;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.util.AntPathMatcher;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.ServletContextAware;
+import org.craftercms.engine.plugin.PluginService;
 import org.springframework.web.servlet.HandlerMapping;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.AbstractController;
 import org.springframework.web.util.UriTemplate;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static java.lang.String.format;
 import static java.util.Collections.singletonMap;
-import static org.craftercms.engine.controller.rest.RestScriptsController.API_1_SERVICES_ROOT;
-import static org.craftercms.engine.controller.rest.RestScriptsController.API_ROOT;
 import static org.craftercms.engine.util.GroovyScriptUtils.addRestScriptVariables;
 
 /**
@@ -58,8 +51,7 @@ import static org.craftercms.engine.util.GroovyScriptUtils.addRestScriptVariable
  *
  * @author Alfonso Vásquez
  */
-@RequestMapping(path = {API_ROOT, API_1_SERVICES_ROOT})
-public class RestScriptsController implements ServletContextAware {
+public class RestScriptsController extends AbstractController {
 
     private static final Log logger = LogFactory.getLog(RestScriptsController.class);
 
@@ -68,24 +60,16 @@ public class RestScriptsController implements ServletContextAware {
 
     private static final String SCRIPT_URL_FORMAT = "%s.%s.%s"; // {url}.{method}.{scriptExt}
 
-    protected static final String API_ROOT = "/api";
-
-    protected static final String API_1_SERVICES_ROOT = "/api/1/services";
-
     protected String responseBodyModelAttributeName;
     protected String errorMessageModelAttributeName;
     protected ScriptUrlTemplateScanner urlTemplateScanner;
     protected boolean disableVariableRestrictions;
 
     protected PluginService pluginService;
-    private ServletContext servletContext;
-
-    private AntPathMatcher antPathMatcher;
 
     public RestScriptsController() {
         responseBodyModelAttributeName = DEFAULT_RESPONSE_BODY_MODEL_ATTR_NAME;
         errorMessageModelAttributeName = DEFAULT_ERROR_MESSAGE_MODEL_ATTR_NAME;
-        this.antPathMatcher = new AntPathMatcher();
     }
 
     public void setResponseBodyModelAttributeName(String responseBodyModelAttributeName) {
@@ -108,14 +92,15 @@ public class RestScriptsController implements ServletContextAware {
         this.pluginService = pluginService;
     }
 
-    @RequestMapping(path = "/**", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    protected ResponseEntity handleRequest(final HttpServletRequest request, final HttpServletResponse response) {
+    @Override
+    protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
+        throws Exception {
         SiteContext siteContext = SiteContext.getCurrent();
         ScriptFactory scriptFactory = siteContext.getScriptFactory();
 
         if (scriptFactory == null) {
-            throw new IllegalStateException(format("No script factory associate to current site context '%s'",
-                    siteContext.getSiteName()));
+            throw new IllegalStateException(
+                "No script factory associate to current site context '" + siteContext.getSiteName() + "'");
         }
 
         String serviceUrl = getServiceUrl(request);
@@ -128,17 +113,29 @@ public class RestScriptsController implements ServletContextAware {
 
         Object responseBody = executeScript(scriptFactory, scriptVariables, response, scriptUrl);
 
-        return ResponseEntity.status(response.getStatus()).body(responseBody);
+        if (response.isCommitted()) {
+            // If response has been already committed by the script, just return null
+            logger.debug("Response already committed by script " + scriptUrl);
+
+            return null;
+        }
+
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject(responseBodyModelAttributeName, responseBody);
+
+        return modelAndView;
     }
 
     protected String getServiceUrl(HttpServletRequest request) {
-        String url = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+        String pathWithinHandlerMappingAttr = HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE;
+        String url = (String) request.getAttribute(pathWithinHandlerMappingAttr);
+
         if (StringUtils.isEmpty(url)) {
             throw new IllegalStateException(
-                    format("Required request attribute '%s' is not set", HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE));
+                "Required request attribute '" + pathWithinHandlerMappingAttr + "' is not set");
         }
-        String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
-        return antPathMatcher.extractPathWithinPattern(pattern, url);
+
+        return url;
     }
 
     protected String parseScriptUrlForVariables(SiteContext siteContext, String scriptUrl,
@@ -167,12 +164,12 @@ public class RestScriptsController implements ServletContextAware {
                                   String serviceUrl) {
         String baseUrl = UrlUtils.concat(siteContext.getRestScriptsPath(), FilenameUtils.removeExtension(serviceUrl));
 
-        return format(SCRIPT_URL_FORMAT, baseUrl, request.getMethod().toLowerCase(), scriptFactory.getScriptFileExtension());
+        return String.format(SCRIPT_URL_FORMAT, baseUrl, request.getMethod().toLowerCase(), scriptFactory.getScriptFileExtension());
     }
 
     protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response) {
-        Map<String, Object> variables = new HashMap<>();
-        addRestScriptVariables(variables, request, response, disableVariableRestrictions ? servletContext : null);
+        Map<String, Object> variables = new HashMap<String, Object>();
+        addRestScriptVariables(variables, request, response, disableVariableRestrictions? getServletContext() : null);
 
         return variables;
     }
@@ -182,13 +179,13 @@ public class RestScriptsController implements ServletContextAware {
         try {
             return scriptFactory.getScript(scriptUrl).execute(scriptVariables);
         } catch (ScriptNotFoundException e) {
-            logger.error(format("Script not found at %s", scriptUrl), e);
+            logger.error("Script not found at " + scriptUrl, e);
 
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
             return singletonMap(errorMessageModelAttributeName, "REST script not found");
         } catch (Exception e) {
-            logger.error(format("Error executing REST script at %s", scriptUrl), e);
+            logger.error("Error executing REST script at " + scriptUrl, e);
 
             Throwable cause = checkHttpStatusCodeAwareException(e, response);
 
@@ -199,7 +196,7 @@ public class RestScriptsController implements ServletContextAware {
                 }
             }
 
-            return singletonMap(errorMessageModelAttributeName, cause != null ? cause.getMessage() : e.getMessage());
+            return singletonMap(errorMessageModelAttributeName, cause != null? cause.getMessage() : e.getMessage());
         }
     }
 
@@ -225,8 +222,4 @@ public class RestScriptsController implements ServletContextAware {
         }
     }
 
-    @Override
-    public void setServletContext(ServletContext servletContext) {
-        this.servletContext = servletContext;
-    }
 }
