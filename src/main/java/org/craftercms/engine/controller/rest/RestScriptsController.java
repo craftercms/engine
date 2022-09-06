@@ -127,6 +127,12 @@ public class RestScriptsController implements ServletContextAware {
         scriptUrl = parseScriptUrlForVariables(siteContext, scriptUrl, scriptVariables);
 
         Object responseBody = executeScript(scriptFactory, scriptVariables, response, scriptUrl);
+        if (response.isCommitted()) {
+            // If response has been already committed by the script, just return null
+            logger.debug(format("Response already committed by script %s", scriptUrl));
+
+            return null;
+        }
 
         return ResponseEntity.status(response.getStatus()).body(responseBody);
     }
