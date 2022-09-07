@@ -31,8 +31,6 @@
             <bean class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
                 <!-- We ignore accept header since most of the time views that can't be resolved will be resolved as application/xml -->
                 <property name="ignoreAcceptHeader" value="true" />
-                <!-- This property became false by default in Spring 5.3 -->
-                <property name="favorPathExtension" value="true" />
                 <property name="defaultContentType" value="text/html" />
                 <property name="mediaTypes">
                     <map>
@@ -66,12 +64,6 @@
                     <property name="scriptResolver" ref="crafter.pageScriptResolver"/>
 					<property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
                 </bean>
-            </list>
-        </property>
-        <property name="defaultViews">
-            <list>
-                <ref bean="crafter.jsonView"/>
-                <ref bean="crafter.xmlView"/>
             </list>
         </property>
     </bean>
