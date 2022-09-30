@@ -24,7 +24,7 @@
     <description>Crafter Content Delivery Engine</description>
     <url>https://github.com/craftercms/engine</url>
     <packaging>war</packaging>
-    <version>3.1.26-SNAPSHOT</version><!-- craftercms version flag -->
+    <version>3.1.27-SNAPSHOT</version><!-- craftercms version flag -->
     <organization>
         <name>CrafterCMS</name>
         <url>http://craftercms.org</url>
@@ -41,7 +41,7 @@
         <spring.version>4.3.30.RELEASE</spring.version>
         <spring.security.version>4.2.20.RELEASE</spring.security.version>
         <httpcomponents.version>4.5.13</httpcomponents.version>
-        <commons.configuration.version>2.7</commons.configuration.version>
+        <commons.configuration.version>2.8.0</commons.configuration.version>
         <commons.lang3.version>3.5</commons.lang3.version>
         <commons.collections.version>4.1</commons.collections.version>
         <cglib.version>3.1</cglib.version>
