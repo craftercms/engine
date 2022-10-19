@@ -25,21 +25,25 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.util.LinkedCaseInsensitiveMap;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.mvc.Controller;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import java.beans.ConstructorProperties;
 import java.io.IOException;
 import java.net.URI;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 
+import static java.util.Collections.*;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.apache.commons.lang.StringUtils.isNotEmpty;
 import static org.craftercms.engine.util.servlet.ConfigAwareProxyServlet.ATTR_TARGET_HOST;
 import static org.craftercms.engine.util.servlet.ConfigAwareProxyServlet.ATTR_TARGET_URI;
 
@@ -60,6 +64,11 @@ public class HttpProxyFilter extends OncePerRequestFilter {
     public static final String CONFIG_KEY_ID = "id";
 
     public static final String CONFIG_KEY_URL = "url";
+    public static final String CONFIG_KEY_HEADERS_SERVER = "headersToServer";
+    public static final String CONFIG_KEY_HEADERS_CLIENT = "headersToClient";
+    public static final String CONFIG_KEY_HEADER = "header";
+    public static final String CONFIG_KEY_NAME = "name";
+    public static final String CONFIG_KEY_VALUE = "value";
 
     /**
      * Indicates if the proxy is enabled
@@ -107,9 +116,21 @@ public class HttpProxyFilter extends OncePerRequestFilter {
                 // set the new target host
                 request.setAttribute(ATTR_TARGET_HOST, URIUtils.extractHost(URI.create(targetUrl)));
 
+                // set headers to the request
+                Map<String, String> requestHeaders = getHeaders(SiteContext.getCurrent(), request.getRequestURI(), CONFIG_KEY_HEADERS_SERVER);
+                HttpProxyServletRequestWrapper requestWrapper = new HttpProxyServletRequestWrapper(request, requestHeaders);
+
+                // set headers to the response
+                Map<String, String> responseHeaders = getHeaders(SiteContext.getCurrent(), requestWrapper.getRequestURI(), CONFIG_KEY_HEADERS_CLIENT);
+                if (!responseHeaders.isEmpty()) {
+                    for (Map.Entry<String, String> header: responseHeaders.entrySet()) {
+                        response.setHeader(header.getKey(), header.getValue());
+                    }
+                }
+
                 // execute the proxy request
                 logger.debug("Starting execution of proxy request for {}", requestUri);
-                proxyController.handleRequest(request, response);
+                proxyController.handleRequest(requestWrapper, response);
                 return;
             }
         } catch (HttpProxyException e) {
@@ -143,4 +164,73 @@ public class HttpProxyFilter extends OncePerRequestFilter {
         return null;
     }
 
+    @SuppressWarnings("rawtypes, unchecked")
+    protected Map<String, String> getHeaders(SiteContext siteContext, String requestUri, String headerType) {
+        HierarchicalConfiguration proxyConfig = siteContext.getProxyConfig();
+
+        if (proxyConfig == null) {
+            throw new HttpProxyException("No proxy configuration found for site " + siteContext.getSiteName());
+        }
+
+        Map<String, String> headers = new HashMap<>();
+        List<HierarchicalConfiguration> servers = proxyConfig.configurationsAt(CONFIG_KEY_SERVERS);
+        for (HierarchicalConfiguration server : servers) {
+            List<String> patterns = server.getList(String.class, CONFIG_KEY_PATTERNS);
+            if (RegexUtils.matchesAny(requestUri, patterns)) {
+                logger.debug("Found matching server '{}' for proxy request {}",
+                        server.getString(CONFIG_KEY_ID), requestUri);
+                List<HierarchicalConfiguration> headersConfigList = server.configurationsAt(headerType);
+                for (HierarchicalConfiguration headersConfig: headersConfigList) {
+                    List<HierarchicalConfiguration> list = headersConfig.configurationsAt(CONFIG_KEY_HEADER);
+                    for (HierarchicalConfiguration header: list) {
+                        String name = header.getString(CONFIG_KEY_NAME, null);
+                        String value = header.getString(CONFIG_KEY_VALUE, null);
+                        if (isNotEmpty(name) && isNotEmpty(value)) {
+                            headers.put(name, value);
+                        }
+                    }
+                }
+            }
+        }
+
+        return headers;
+    }
+
+    /**
+     * A wrapper to request object to add additional request headers
+     */
+    private static class HttpProxyServletRequestWrapper extends HttpServletRequestWrapper {
+
+        protected Map<String, List<String>> headers = new LinkedCaseInsensitiveMap<>();
+
+        public HttpProxyServletRequestWrapper(HttpServletRequest request, Map<String, String> additionalHeaders) {
+            super(request);
+
+            Enumeration<String> headerNames = request.getHeaderNames();
+            while (headerNames.hasMoreElements()) {
+                String headerName = headerNames.nextElement();
+                headers.put(headerName, list(request.getHeaders(headerName)));
+            }
+
+            for (Map.Entry<String, String> header: additionalHeaders.entrySet()) {
+                headers.put(header.getKey(), singletonList(header.getValue()));
+            }
+        }
+
+        @Override
+        public String getHeader(String name) {
+            return headers.getOrDefault(name, singletonList(null)).get(0);
+        }
+
+        @Override
+        public Enumeration<String> getHeaders(String name) {
+            return enumeration(headers.getOrDefault(name, emptyList()));
+        }
+
+        @Override
+        public Enumeration<String> getHeaderNames() {
+            return enumeration(headers.keySet());
+        }
+
+    }
 }
