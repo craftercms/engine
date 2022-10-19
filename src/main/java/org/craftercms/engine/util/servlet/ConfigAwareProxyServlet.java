@@ -15,14 +15,17 @@
  */
 package org.craftercms.engine.util.servlet;
 
+import org.apache.http.Header;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpRequest;
+import org.apache.http.HttpResponse;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.mitre.dsmiley.httpproxy.ProxyServlet;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
@@ -62,6 +65,23 @@ public class ConfigAwareProxyServlet extends ProxyServlet {
 
         // Use the input stream as usual
         return super.newProxyRequestWithEntity(method, proxyRequestUri, request);
+    }
+
+    /**
+     * Override how ProxyServlet copy response headers.
+     * If a header is added via HttpProxyFilter, do not add it again
+     * @param proxyResponse
+     * @param servletRequest
+     * @param servletResponse
+     */
+    @Override
+    protected void copyResponseHeaders(HttpResponse proxyResponse, HttpServletRequest servletRequest,
+                                       HttpServletResponse servletResponse) {
+        for (Header header : proxyResponse.getAllHeaders()) {
+            if (!servletResponse.containsHeader(header.getName())) {
+                copyResponseHeader(servletRequest, servletResponse, header);
+            }
+        }
     }
 
 }
