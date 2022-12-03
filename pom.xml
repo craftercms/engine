@@ -88,6 +88,11 @@
         </dependency>
         <dependency>
             <groupId>org.craftercms</groupId>
+            <artifactId>crafter-commons-validation</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.craftercms</groupId>
             <artifactId>crafter-search-elasticsearch</artifactId>
             <version>${project.version}</version>
         </dependency>
