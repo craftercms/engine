@@ -106,7 +106,7 @@ public class ExecuteControllerDirective implements TemplateDirectiveModel {
     }
 
     protected Map<String, Object> createScriptVariables(Environment env) throws TemplateException {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         RequestContext context = RequestContext.getCurrent();
         SiteItem contentModel = getContentModel(env);
         Object templateModel = getTemplateModel(env);

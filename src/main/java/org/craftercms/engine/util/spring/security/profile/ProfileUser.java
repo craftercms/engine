@@ -22,7 +22,6 @@ import java.util.Objects;
 import org.craftercms.engine.util.spring.security.CustomUser;
 import org.craftercms.profile.api.Profile;
 import org.craftercms.security.authentication.Authentication;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import static java.util.stream.Collectors.toSet;
