@@ -15,12 +15,9 @@
  */
 package org.craftercms.engine.url.rewrite;
 
-import org.craftercms.engine.http.impl.DefaultExceptionHandler;
-import org.craftercms.engine.service.SiteItemService;
 import org.craftercms.engine.service.context.SiteContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.beans.factory.InitializingBean;
 import org.tuckey.web.filters.urlrewrite.UrlRewriteWrappedResponse;
 import org.tuckey.web.filters.urlrewrite.UrlRewriter;

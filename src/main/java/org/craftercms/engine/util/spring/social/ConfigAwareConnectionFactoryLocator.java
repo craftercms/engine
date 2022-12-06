@@ -86,7 +86,7 @@ public class ConfigAwareConnectionFactoryLocator implements ConnectionFactoryLoc
     }
 
     protected ConnectionFactoryLocator getCurrentConnectionFactoryLocator() {
-        Callback<ConnectionFactoryLocator> callback = new Callback<ConnectionFactoryLocator>() {
+        Callback<ConnectionFactoryLocator> callback = new Callback<>() {
 
             @Override
             public ConnectionFactoryLocator execute() {
@@ -97,7 +97,7 @@ public class ConfigAwareConnectionFactoryLocator implements ConnectionFactoryLoc
                     try {
                         HierarchicalConfiguration socialConnectionsConfig = config.configurationAt(SOCIAL_CONNECTIONS_KEY);
                         for (ConfigurationParser<?> parser : configParsers) {
-                            ConnectionFactory<?> factory = (ConnectionFactory<?>)parser.parse(socialConnectionsConfig);
+                            ConnectionFactory<?> factory = (ConnectionFactory<?>) parser.parse(socialConnectionsConfig);
                             if (factory != null) {
                                 if (registry == null) {
                                     registry = new ConnectionFactoryRegistry();

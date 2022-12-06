@@ -16,11 +16,8 @@
 
 package org.craftercms.engine.store.s3.util;
 
-import org.apache.commons.lang3.StringUtils;
 import org.craftercms.commons.config.profiles.aws.S3Profile;
 import org.craftercms.commons.file.stores.S3Utils;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 
 import java.beans.ConstructorProperties;

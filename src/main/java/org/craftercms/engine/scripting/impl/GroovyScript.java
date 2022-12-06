@@ -16,18 +16,14 @@
 
 package org.craftercms.engine.scripting.impl;
 
-import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 
 import groovy.lang.Binding;
-import groovy.util.GroovyScriptEngine;
-import groovy.util.ResourceException;
 import org.apache.commons.collections.MapUtils;
 import org.codehaus.groovy.runtime.InvokerHelper;
 import org.craftercms.core.util.cache.impl.AbstractCachingAwareObject;
 import org.craftercms.engine.exception.ScriptException;
-import org.craftercms.engine.exception.ScriptNotFoundException;
 import org.craftercms.engine.scripting.Script;
 import org.slf4j.MDC;
 
@@ -57,7 +53,7 @@ public class GroovyScript extends AbstractCachingAwareObject implements Script {
 
     @Override
     public Object execute(Map<String, Object> variables) throws ScriptException {
-        Map<String, Object> allVariables = new HashMap<String, Object>();
+        Map<String, Object> allVariables = new HashMap<>();
 
         if (MapUtils.isNotEmpty(globalVariables)) {
             allVariables.putAll(globalVariables);

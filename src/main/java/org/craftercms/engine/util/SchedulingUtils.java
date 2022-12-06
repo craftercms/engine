@@ -15,7 +15,6 @@
  */
 package org.craftercms.engine.util;
 
-import java.util.Properties;
 import java.util.concurrent.Executor;
 
 import javax.servlet.ServletContext;
@@ -27,10 +26,7 @@ import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.SchedulerFactory;
 import org.quartz.Trigger;
-import org.quartz.impl.StdSchedulerFactory;
-import org.quartz.simpl.SimpleThreadPool;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
 import static org.craftercms.engine.scripting.impl.ScriptJob.*;
