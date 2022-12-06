@@ -26,7 +26,6 @@ import javax.servlet.http.HttpSession;
 import org.bson.types.ObjectId;
 import org.craftercms.engine.controller.rest.preview.ProfileRestController;
 import org.craftercms.engine.util.spring.security.ConfigAwarePreAuthenticationFilter;
-import org.craftercms.engine.util.spring.security.profile.ProfileUser;
 import org.craftercms.profile.api.Profile;
 
 import static org.apache.commons.collections4.MapUtils.isNotEmpty;

@@ -64,7 +64,7 @@ public class ProfileRestController {
     public Map<String, String> setProfile(HttpServletRequest request, HttpSession session) {
         boolean cleanseAttributes = shouldCleanseAttributes();
 
-        Map<String, String> profile = new HashMap<String, String>();
+        Map<String, String> profile = new HashMap<>();
         Enumeration<String> paramNamesEnum = request.getParameterNames();
 
         while (paramNamesEnum.hasMoreElements()) {

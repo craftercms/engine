@@ -42,7 +42,7 @@ public abstract class AbstractCachedFileBasedContentStoreAdapter extends Abstrac
                             String path) throws InvalidContextException, StoreException {
         final CachingOptions actualCachingOptions = cachingOptions != null? cachingOptions: defaultCachingOptions;
 
-        return cacheTemplate.getObject(context, actualCachingOptions, new Callback<File>() {
+        return cacheTemplate.getObject(context, actualCachingOptions, new Callback<>() {
 
             @Override
             public File execute() {
@@ -52,7 +52,7 @@ public abstract class AbstractCachedFileBasedContentStoreAdapter extends Abstrac
             @Override
             public String toString() {
                 return String.format(AbstractCachedFileBasedContentStoreAdapter.this.getClass().getName() +
-                                     ".findFile(%s, %s)", context, path);
+                        ".findFile(%s, %s)", context, path);
             }
 
         }, path, CONST_KEY_ELEM_FILE);
@@ -63,7 +63,7 @@ public abstract class AbstractCachedFileBasedContentStoreAdapter extends Abstrac
                                      File dir) throws InvalidContextException, StoreException {
         final CachingOptions actualCachingOptions = cachingOptions != null? cachingOptions: defaultCachingOptions;
 
-        return cacheTemplate.getObject(context, actualCachingOptions, new Callback<List<File>>() {
+        return cacheTemplate.getObject(context, actualCachingOptions, new Callback<>() {
 
             @Override
             public List<File> execute() {
@@ -82,7 +82,7 @@ public abstract class AbstractCachedFileBasedContentStoreAdapter extends Abstrac
             @Override
             public String toString() {
                 return String.format(AbstractCachedFileBasedContentStoreAdapter.this.getClass().getName() +
-                                     ".getChildren(%s, %s)", context, dir);
+                        ".getChildren(%s, %s)", context, dir);
             }
 
         }, dir, CONST_KEY_ELEM_CHILDREN);
