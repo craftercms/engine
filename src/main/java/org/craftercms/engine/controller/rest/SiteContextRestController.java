@@ -16,20 +16,20 @@
 
 package org.craftercms.engine.controller.rest;
 
-import org.apache.commons.lang3.StringUtils;
 import org.craftercms.commons.exceptions.InvalidManagementTokenException;
+import org.craftercms.commons.rest.ManagementTokenAware;
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.engine.event.SiteContextCreatedEvent;
 import org.craftercms.engine.event.SiteEvent;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.service.context.SiteContextManager;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.beans.ConstructorProperties;
 import java.util.Collections;
 import java.util.Map;
 
@@ -40,7 +40,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(RestControllerBase.REST_BASE_URI + SiteContextRestController.URL_ROOT)
-public class SiteContextRestController extends RestControllerBase {
+public class SiteContextRestController extends RestControllerBase implements ManagementTokenAware {
 
     public static final String URL_ROOT = "/site/context";
     public static final String URL_CONTEXT_ID = "/id";
@@ -49,21 +49,16 @@ public class SiteContextRestController extends RestControllerBase {
     public static final String URL_GRAPHQL = "/graphql";
     public static final String URL_STATUS = "/status";
 
-    public static final String MODEL_ATTR_ID =  "id";
+    public static final String MODEL_ATTR_ID = "id";
     public static final String MODEL_ATTR_STATUS = "status";
 
-    private SiteContextManager contextManager;
-    private String configuredToken;
+    private final SiteContextManager contextManager;
+    private final String configuredToken;
 
-    @Required
-    public void setContextManager(SiteContextManager contextManager) {
+    @ConstructorProperties({"contextManager", "configuredToken"})
+    public SiteContextRestController(final SiteContextManager contextManager, final String configuredToken) {
+        this.configuredToken = configuredToken;
         this.contextManager = contextManager;
-    }
-
-    protected void validateToken(String token) throws InvalidManagementTokenException {
-        if(!StringUtils.equals(token, getConfiguredToken())) {
-            throw new InvalidManagementTokenException("Management authorization failed, invalid token.");
-        }
     }
 
     @GetMapping(value = URL_CONTEXT_ID)
@@ -82,7 +77,7 @@ public class SiteContextRestController extends RestControllerBase {
         contextManager.startDestroyContext(siteName);
 
         return createResponseMessage("Started destroy site context  for '" + siteName + "'. Will be recreated on " +
-                                     "next request");
+                "next request");
     }
 
     @GetMapping(value = URL_REBUILD)
@@ -130,12 +125,8 @@ public class SiteContextRestController extends RestControllerBase {
         return createSingletonModifiableMap(MODEL_ATTR_STATUS, SiteContext.getCurrent().getState());
     }
 
+    @Override
     public String getConfiguredToken() {
         return configuredToken;
-    }
-
-    @Required
-    public void setConfiguredToken(String configuredToken) {
-        this.configuredToken = configuredToken;
     }
 }

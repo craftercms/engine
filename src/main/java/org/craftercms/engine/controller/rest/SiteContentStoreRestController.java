@@ -55,7 +55,7 @@ public class SiteContentStoreRestController extends RestControllerBase {
 
     public static final String URL_ROOT = "/site/content_store";
 
-    private ContentStoreRestController wrappedController;
+    private final ContentStoreRestController wrappedController;
 
     @ConstructorProperties({"wrappedController"})
     public SiteContentStoreRestController(ContentStoreRestController wrappedController) {
