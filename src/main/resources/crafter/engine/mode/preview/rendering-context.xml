@@ -40,7 +40,7 @@
     <!-- ////////////////////////////////// -->
 
     <bean id="crafter.componentRenderController" class="org.craftercms.engine.controller.ComponentRenderController">
-        <property name="renderComponentViewName" value="/templates/web/render-component.ftl"/>
+        <constructor-arg name="renderComponentViewName" value="/templates/web/render-component.ftl"/>
     </bean>
 
     <bean id="crafter.profileRestController" class="org.craftercms.engine.controller.rest.preview.ProfileRestController"/>
