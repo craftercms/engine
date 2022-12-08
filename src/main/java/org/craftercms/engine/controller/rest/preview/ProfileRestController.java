@@ -15,20 +15,20 @@
  */
 package org.craftercms.engine.controller.rest.preview;
 
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
 import org.apache.commons.configuration2.HierarchicalConfiguration;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.bson.types.ObjectId;
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.engine.util.ConfigUtils;
+import org.owasp.esapi.ESAPI;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
@@ -72,7 +72,7 @@ public class ProfileRestController {
             String paramValue = request.getParameter(paramName);
             if (isNotEmpty(paramValue)) {
                 String value = paramValue.trim();
-                profile.put(paramName, cleanseAttributes? StringEscapeUtils.escapeHtml4(value) : value);
+                profile.put(paramName, cleanseAttributes ? ESAPI.encoder().encodeForHTML(value) : value);
             }
         }
 
@@ -80,14 +80,13 @@ public class ProfileRestController {
         profile.put("id", new ObjectId().toHexString());
 
         session.setAttribute(PROFILE_SESSION_ATTRIBUTE, profile);
-
         return profile;
     }
 
     @SuppressWarnings("rawtypes")
     protected boolean shouldCleanseAttributes() {
         HierarchicalConfiguration siteConfig = ConfigUtils.getCurrentConfig();
-        return siteConfig != null && siteConfig.getBoolean(CLEANSE_ATTRS_CONFIG_KEY, true);
+        return siteConfig == null || siteConfig.getBoolean(CLEANSE_ATTRS_CONFIG_KEY, true);
     }
 
 }

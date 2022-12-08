@@ -42,6 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static graphql.ExecutionInput.newExecutionInput;
+import static java.lang.String.format;
 
 /**
  * Exposes the current site {@link GraphQL} instance to perform queries.
@@ -84,11 +85,11 @@ public class SiteGraphQLController extends RestControllerBase {
         RequestContext requestContext = RequestContext.getCurrent();
         GraphQL graphQL = siteContext.getGraphQL();
         if (Objects.isNull(graphQL)) {
-            logger.warn("GraphQL schema has not been initialized for site {}", siteContext.getSiteName());
+            logger.warn("GraphQL schema has not been initialized for site '{}'", siteContext.getSiteName());
             return Collections.singletonMap("errors",
                 Collections.singletonList(
                     Collections.singletonMap("message",
-                        "GraphQL schema has not been initialized for site " + siteContext.getSiteName())
+                            format("GraphQL schema has not been initialized for site '%s'", siteContext.getSiteName()))
                 )
             );
         }

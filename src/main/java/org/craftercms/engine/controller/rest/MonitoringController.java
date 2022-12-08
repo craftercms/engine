@@ -16,17 +16,21 @@
 
 package org.craftercms.engine.controller.rest;
 
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
 import org.craftercms.commons.exceptions.InvalidManagementTokenException;
 import org.craftercms.commons.monitoring.rest.MonitoringRestControllerBase;
+import org.craftercms.commons.validation.annotations.param.EsapiValidatedParam;
+import org.craftercms.commons.validation.annotations.param.ValidateParams;
 import org.craftercms.engine.util.logging.CircularQueueLogAppender;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.beans.ConstructorProperties;
+import java.util.List;
+import java.util.Map;
+
+import static org.craftercms.commons.validation.annotations.param.EsapiValidationType.SITE_ID;
 
 /**
  * Rest controller to provide monitoring information & site logs
@@ -38,24 +42,25 @@ public class MonitoringController extends MonitoringRestControllerBase {
     public final static String URL_ROOT = "/api/1";
     public final static String LOG_URL = "/log";
 
-    private String configuredToken;
+    private final String configuredToken;
+
+    @ConstructorProperties({"configuredToken"})
+    public MonitoringController(final String configuredToken) {
+        this.configuredToken = configuredToken;
+    }
 
     @GetMapping(MonitoringRestControllerBase.ROOT_URL + LOG_URL)
-    public List<Map<String,Object>> getLoggedEvents(@RequestParam String site, @RequestParam long since,
-                                                    @RequestParam String token) throws InvalidManagementTokenException {
-        if (StringUtils.isNotEmpty(token) && StringUtils.equals(token, getConfiguredToken())) {
-            return CircularQueueLogAppender.getLoggedEvents(site, since);
-        } else {
-            throw new InvalidManagementTokenException("Management authorization failed, invalid token.");
-        }
+    @ValidateParams
+    public List<Map<String, Object>> getLoggedEvents(@RequestParam @EsapiValidatedParam(maxLength = 50, type = SITE_ID) String site,
+                                                     @RequestParam long since,
+                                                     @RequestParam String token) throws InvalidManagementTokenException {
+        validateToken(token);
+        return CircularQueueLogAppender.getLoggedEvents(site, since);
     }
 
     @Override
-    protected String getConfiguredToken() {
+    public String getConfiguredToken() {
         return configuredToken;
     }
 
-    public void setConfiguredToken(String configuredToken) {
-        this.configuredToken = configuredToken;
-    }
 }
