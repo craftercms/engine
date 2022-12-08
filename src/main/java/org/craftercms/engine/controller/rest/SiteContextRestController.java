@@ -33,6 +33,8 @@ import java.beans.ConstructorProperties;
 import java.util.Collections;
 import java.util.Map;
 
+import static java.lang.String.format;
+
 /**
  * REST controller for operations related for the {@link org.craftercms.engine.service.context.SiteContext}
  *
@@ -76,8 +78,8 @@ public class SiteContextRestController extends RestControllerBase implements Man
 
         contextManager.startDestroyContext(siteName);
 
-        return createResponseMessage("Started destroy site context  for '" + siteName + "'. Will be recreated on " +
-                "next request");
+        return createResponseMessage(format("Started destroy site context  for '%s'. " +
+                "Will be recreated on next request", siteName));
     }
 
     @GetMapping(value = URL_REBUILD)
@@ -90,12 +92,12 @@ public class SiteContextRestController extends RestControllerBase implements Man
 
         // Don't rebuild context if the context was just created in this request
         if (SiteEvent.getLatestRequestEvent(SiteContextCreatedEvent.class, request) != null) {
-            return createResponseMessage("Site context for '" + siteName + "' created during the request. " +
-                    "Context rebuild not necessary");
+            return createResponseMessage(format("Site context for '%s' created during the request. " +
+                    "Context rebuild not necessary", siteName));
         } else {
             contextManager.startContextRebuild(siteName, siteContext.isFallback());
 
-            return createResponseMessage("Started rebuild for Site context for '" + siteName + "'");
+            return createResponseMessage(format("Started rebuild for Site context for '%s'", siteName));
         }
     }
 
@@ -109,12 +111,12 @@ public class SiteContextRestController extends RestControllerBase implements Man
 
         // Don't rebuild GraphQL schema if the context was just created in this request
         if (SiteEvent.getLatestRequestEvent(SiteContextCreatedEvent.class, request) != null) {
-            return createResponseMessage("Site context for '" + siteName + "' created during the request. " +
-                    "GraphQL schema rebuild not necessary");
+            return createResponseMessage(format("Site context for '%s' created during the request. " +
+                    "GraphQL schema rebuild not necessary", siteName));
         } else {
             siteContext.startGraphQLSchemaBuild();
 
-            return createResponseMessage("Rebuild of GraphQL schema started for '" + siteName + "'");
+            return createResponseMessage(format("Rebuild of GraphQL schema started for '%s'", siteName));
         }
     }
 

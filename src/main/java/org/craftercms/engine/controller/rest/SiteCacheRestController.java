@@ -34,6 +34,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.beans.ConstructorProperties;
 import java.util.Map;
 
+import static java.lang.String.format;
+
 /**
  * REST controller for operations related to a site's cache.
  *
@@ -65,11 +67,10 @@ public class SiteCacheRestController extends RestControllerBase implements Manag
 
         // Don't clear cache if the context was just created in this request
         if (SiteEvent.getLatestRequestEvent(SiteContextCreatedEvent.class, request) != null) {
-            return createResponseMessage("Site context for '" + siteName + "' created during the request. " +
-                    "Cache clear not necessary");
+            return createResponseMessage(format("Site context for '%s' created during the request. Cache clear not necessary", siteName));
         } else {
             siteContext.startCacheClear();
-            msg = "Cache clear for site '" + siteName + "' started";
+            msg = format("Cache clear for site '%s' started", siteName);
         }
 
         logger.debug(msg);

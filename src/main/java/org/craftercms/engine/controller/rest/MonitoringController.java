@@ -51,7 +51,7 @@ public class MonitoringController extends MonitoringRestControllerBase {
 
     @GetMapping(MonitoringRestControllerBase.ROOT_URL + LOG_URL)
     @ValidateParams
-    public List<Map<String, Object>> getLoggedEvents(@RequestParam @EsapiValidatedParam(maxLength = 4000, type = SITE_ID) String site,
+    public List<Map<String, Object>> getLoggedEvents(@RequestParam @EsapiValidatedParam(maxLength = 50, type = SITE_ID) String site,
                                                      @RequestParam long since,
                                                      @RequestParam String token) throws InvalidManagementTokenException {
         validateToken(token);
