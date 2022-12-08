@@ -16,17 +16,22 @@
 
 package org.craftercms.engine.controller.rest;
 
-import java.util.List;
-
+import org.craftercms.commons.validation.annotations.param.EsapiValidatedParam;
+import org.craftercms.commons.validation.annotations.param.ValidateParams;
+import org.craftercms.commons.validation.annotations.param.ValidateSecurePathParam;
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.engine.navigation.NavBreadcrumbBuilder;
 import org.craftercms.engine.navigation.NavItem;
 import org.craftercms.engine.navigation.NavTreeBuilder;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.beans.ConstructorProperties;
+import java.util.List;
+
+import static org.craftercms.commons.validation.annotations.param.EsapiValidationType.HTTPURI;
 
 /**
  * REST controller to access site navigation services.
@@ -41,28 +46,30 @@ public class SiteNavigationController extends RestControllerBase {
     public static final String URL_TREE = "/tree";
     public static final String URL_BREADCRUMB = "/breadcrumb";
 
-    protected NavTreeBuilder navTreeBuilder;
-    protected NavBreadcrumbBuilder navBreadcrumbBuilder;
+    protected final NavTreeBuilder navTreeBuilder;
+    protected final NavBreadcrumbBuilder navBreadcrumbBuilder;
 
-    @Required
-    public void setNavTreeBuilder(final NavTreeBuilder navTreeBuilder) {
+    @ConstructorProperties({"navTreeBuilder", "navBreadcrumbBuilder"})
+    public SiteNavigationController(final NavTreeBuilder navTreeBuilder, final NavBreadcrumbBuilder navBreadcrumbBuilder) {
         this.navTreeBuilder = navTreeBuilder;
-    }
-
-    @Required
-    public void setNavBreadcrumbBuilder(final NavBreadcrumbBuilder navBreadcrumbBuilder) {
         this.navBreadcrumbBuilder = navBreadcrumbBuilder;
     }
 
     @GetMapping(URL_TREE)
-    public NavItem getNavTree(@RequestParam String url,
+    @ValidateParams
+    public NavItem getNavTree(@ValidateSecurePathParam @EsapiValidatedParam(type = HTTPURI) @RequestParam String url,
                               @RequestParam(required = false, defaultValue = "1") int depth,
-                              @RequestParam(required = false, defaultValue = "") String currentPageUrl) {
+                              @ValidateSecurePathParam @EsapiValidatedParam(type = HTTPURI) @RequestParam(required = false, defaultValue = "") String currentPageUrl) {
         return navTreeBuilder.getNavTree(url, depth, currentPageUrl);
     }
 
     @GetMapping(URL_BREADCRUMB)
-    public List<NavItem> getNavBreadcrumb(@RequestParam String url,
+    @ValidateParams
+    public List<NavItem> getNavBreadcrumb(@ValidateSecurePathParam
+                                          @EsapiValidatedParam(type = HTTPURI)
+                                          @RequestParam String url,
+                                          @ValidateSecurePathParam
+                                          @EsapiValidatedParam(type = HTTPURI, notEmpty = false, notBlank = false, notNull = false)
                                           @RequestParam(required = false, defaultValue = "") String root) {
         return navBreadcrumbBuilder.getBreadcrumb(url, root);
     }
