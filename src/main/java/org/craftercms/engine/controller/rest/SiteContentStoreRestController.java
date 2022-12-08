@@ -20,6 +20,9 @@ import java.beans.ConstructorProperties;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
+import org.craftercms.commons.validation.annotations.param.EsapiValidatedParam;
+import org.craftercms.commons.validation.annotations.param.ValidateParams;
+import org.craftercms.commons.validation.annotations.param.ValidateSecurePathParam;
 import org.craftercms.core.controller.rest.ContentStoreRestController;
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.core.service.Item;
@@ -32,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 
+import static org.craftercms.commons.validation.annotations.param.EsapiValidationType.HTTPURI;
 import static org.craftercms.core.controller.rest.ContentStoreRestController.REQUEST_PARAM_TREE_DEPTH;
 import static org.craftercms.core.controller.rest.ContentStoreRestController.REQUEST_PARAM_URL;
 import static org.craftercms.core.controller.rest.ContentStoreRestController.URL_CHILDREN;
@@ -51,7 +55,7 @@ public class SiteContentStoreRestController extends RestControllerBase {
 
     public static final String URL_ROOT = "/site/content_store";
 
-    private ContentStoreRestController wrappedController;
+    private final ContentStoreRestController wrappedController;
 
     @ConstructorProperties({"wrappedController"})
     public SiteContentStoreRestController(ContentStoreRestController wrappedController) {
@@ -62,28 +66,40 @@ public class SiteContentStoreRestController extends RestControllerBase {
      * @deprecated Will be removed in 4.1, use {@code getItem} instead
      */
     @RequestMapping(value = URL_DESCRIPTOR, method = RequestMethod.GET)
+    @ValidateParams
     public Document getDescriptor(WebRequest request, HttpServletResponse response,
+                                  @ValidateSecurePathParam
+                                  @EsapiValidatedParam(maxLength = 4000, type = HTTPURI)
                                   @RequestParam(REQUEST_PARAM_URL) String url,
                                   @RequestParam(required = false, defaultValue = "false") boolean flatten) {
         return wrappedController.getDescriptor(request, response, getCurrentContextId(), url, flatten);
     }
 
     @RequestMapping(value = URL_ITEM, method = RequestMethod.GET)
+    @ValidateParams
     public Item getItem(WebRequest request, HttpServletResponse response,
+                        @ValidateSecurePathParam
+                        @EsapiValidatedParam(maxLength = 4000, type = HTTPURI)
                         @RequestParam(REQUEST_PARAM_URL) String url,
                         @RequestParam(required = false, defaultValue = "false") boolean flatten) {
         return wrappedController.getItem(request, response, getCurrentContextId(), url, flatten);
     }
 
     @RequestMapping(value = URL_CHILDREN, method = RequestMethod.GET)
+    @ValidateParams
     public List<Item> getChildren(WebRequest request, HttpServletResponse response,
+                                  @ValidateSecurePathParam
+                                  @EsapiValidatedParam(maxLength = 4000, type = HTTPURI)
                                   @RequestParam(REQUEST_PARAM_URL) String url,
                                   @RequestParam(required = false, defaultValue = "false") boolean flatten) {
         return wrappedController.getChildren(request, response, getCurrentContextId(), url, flatten);
     }
 
     @RequestMapping(value = URL_TREE, method = RequestMethod.GET)
+    @ValidateParams
     public Tree getTree(WebRequest request, HttpServletResponse response,
+                        @ValidateSecurePathParam
+                        @EsapiValidatedParam(maxLength = 4000, type = HTTPURI)
                         @RequestParam(REQUEST_PARAM_URL) String url,
                         @RequestParam(value = REQUEST_PARAM_TREE_DEPTH, required = false) Integer depth,
                         @RequestParam(required = false, defaultValue = "false") boolean flatten) {
