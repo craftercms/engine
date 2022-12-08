@@ -15,12 +15,18 @@
  */
 package org.craftercms.engine.controller;
 
-import org.springframework.beans.factory.annotation.Required;
+import org.craftercms.commons.validation.annotations.param.EsapiValidatedParam;
+import org.craftercms.commons.validation.annotations.param.ValidateParams;
+import org.craftercms.commons.validation.annotations.param.ValidateSecurePathParam;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+
+import java.beans.ConstructorProperties;
+
+import static org.craftercms.commons.validation.annotations.param.EsapiValidationType.HTTPURI;
 
 /**
  * @author Alfonso Vásquez
@@ -33,15 +39,18 @@ public class ComponentRenderController {
 
     public final String COMPONENT_PATH_MODEL_NAME = "componentPath";
 
-    private String renderComponentViewName;
+    private final String renderComponentViewName;
 
-    @Required
-    public void setRenderComponentViewName(String renderComponentViewName) {
+    @ConstructorProperties({"renderComponentViewName"})
+    public ComponentRenderController(String renderComponentViewName) {
         this.renderComponentViewName = renderComponentViewName;
     }
 
     @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST})
-    protected ModelAndView render(@RequestParam("path") String path) throws Exception {
+    @ValidateParams
+    protected ModelAndView render(@ValidateSecurePathParam
+                                  @EsapiValidatedParam(maxLength = 4000, type = HTTPURI)
+                                  @RequestParam("path") String path) throws Exception {
         return new ModelAndView(renderComponentViewName, COMPONENT_PATH_MODEL_NAME, path);
     }
 
