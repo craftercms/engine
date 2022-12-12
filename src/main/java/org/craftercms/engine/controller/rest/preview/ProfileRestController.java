@@ -16,21 +16,27 @@
 package org.craftercms.engine.controller.rest.preview;
 
 import org.apache.commons.configuration2.HierarchicalConfiguration;
+import org.apache.commons.lang3.ArrayUtils;
 import org.bson.types.ObjectId;
+import org.craftercms.commons.validation.ValidationResult;
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.engine.util.ConfigUtils;
 import org.owasp.esapi.ESAPI;
+import org.owasp.esapi.Encoder;
+import org.owasp.esapi.Validator;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.Enumeration;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static java.lang.String.format;
+import static org.craftercms.commons.validation.annotations.param.EsapiValidationType.HTTPParameterName;
 
 /**
  * REST controller for integration with Crafter Profile.
@@ -43,10 +49,15 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 public class ProfileRestController {
 
     public static final String URL_ROOT = "/profile";
-
+    public static final int MAXIMUM_PROPERTY_COUNT = 100;
+    public static final int MAXIMUM_PROPERTY_KEY_LENGTH = 64;
+    public static final int MAXIMUM_PROPERTY_VALUE_LENGTH = 2048;
     public static final String PROFILE_SESSION_ATTRIBUTE = "_cr_profile_state";
-
     public static final String CLEANSE_ATTRS_CONFIG_KEY = "preview.targeting.cleanseAttributes";
+    public static final String ERROR_MESSAGE_MODEL_ATTR_NAME = "message";
+
+    private final Validator validator = ESAPI.validator();
+    private final Encoder encoder = ESAPI.encoder();
 
     @RequestMapping(value = "/get", method = RequestMethod.GET)
     @SuppressWarnings("unchecked")
@@ -61,26 +72,44 @@ public class ProfileRestController {
     }
 
     @RequestMapping(value = "/set", method = RequestMethod.GET)
-    public Map<String, String> setProfile(HttpServletRequest request, HttpSession session) {
+    public ResponseEntity<Map<String, String>> setProfile(HttpServletRequest request, HttpSession session) {
         boolean cleanseAttributes = shouldCleanseAttributes();
 
-        Map<String, String> profile = new HashMap<String, String>();
-        Enumeration<String> paramNamesEnum = request.getParameterNames();
+        Map<String, String[]> parameterMap = request.getParameterMap();
+        if (parameterMap.size() > MAXIMUM_PROPERTY_COUNT) {
+            String message = format("Parameter count should not exceed %d. %d parameters were found.",
+                    MAXIMUM_PROPERTY_COUNT, parameterMap.size());
+            return ResponseEntity.badRequest().body(Collections.singletonMap(ERROR_MESSAGE_MODEL_ATTR_NAME, message));
+        }
 
-        while (paramNamesEnum.hasMoreElements()) {
-            String paramName = paramNamesEnum.nextElement();
-            String paramValue = request.getParameter(paramName);
-            if (isNotEmpty(paramValue)) {
-                String value = paramValue.trim();
-                profile.put(paramName, cleanseAttributes ? ESAPI.encoder().encodeForHTML(value) : value);
+        Map<String, String> profile = new HashMap<>(parameterMap.size());
+        try {
+            for (String paramName : parameterMap.keySet()) {
+                String[] paramValueArray = parameterMap.get(paramName);
+                String value = ArrayUtils.isEmpty(paramValueArray) ? null : paramValueArray[0];
+                if (value != null) {
+                    value = value.trim();
+                    validateParameter(paramName, value);
+                    profile.put(paramName, cleanseAttributes ? encoder.encodeForHTML(value) : value);
+                }
             }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Collections.singletonMap(ERROR_MESSAGE_MODEL_ATTR_NAME, e.getMessage()));
         }
 
         // change the id so the authentication object is updated
         profile.put("id", new ObjectId().toHexString());
-
         session.setAttribute(PROFILE_SESSION_ATTRIBUTE, profile);
-        return profile;
+        return ResponseEntity.ok(profile);
+    }
+
+    private void validateParameter(final String paramName, final String value) throws Exception {
+        String paramNameValidationKey = HTTPParameterName.typeKey;
+        validator.getValidInput(paramNameValidationKey, paramName, paramNameValidationKey, MAXIMUM_PROPERTY_KEY_LENGTH, false);
+        if (value.length() > MAXIMUM_PROPERTY_VALUE_LENGTH) {
+            throw new org.craftercms.commons.validation.ValidationException(new ValidationResult(
+                    format("Invalid input. The maximum length of %d characters was exceeded", MAXIMUM_PROPERTY_VALUE_LENGTH)));
+        }
     }
 
     @SuppressWarnings("rawtypes")
