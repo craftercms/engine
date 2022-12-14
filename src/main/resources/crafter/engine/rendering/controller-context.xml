@@ -66,12 +66,12 @@
     </bean>
 
     <bean id="crafter.monitoringRenderController" class="org.craftercms.engine.controller.rest.MonitoringController">
-        <property name="configuredToken" value="${crafter.engine.management.authorizationToken}" />
+        <constructor-arg name="configuredToken" value="${crafter.engine.management.authorizationToken}" />
     </bean>
 
     <bean id="crafter.siteContextRestController" class="org.craftercms.engine.controller.rest.SiteContextRestController">
-        <property name="contextManager" ref="crafter.siteContextManager"/>
-        <property name="configuredToken" value="${crafter.engine.management.authorizationToken}" />
+        <constructor-arg name="contextManager" ref="crafter.siteContextManager"/>
+        <constructor-arg name="configuredToken" value="${crafter.engine.management.authorizationToken}" />
     </bean>
 
     <bean id="crafter.siteContentStoreRestController" class="org.craftercms.engine.controller.rest.SiteContentStoreRestController">
@@ -79,19 +79,19 @@
     </bean>
 
     <bean id="crafter.siteCacheRestController" class="org.craftercms.engine.controller.rest.SiteCacheRestController">
-        <property name="configuredToken" value="${crafter.engine.management.authorizationToken}" />
+        <constructor-arg name="configuredToken" value="${crafter.engine.management.authorizationToken}" />
     </bean>
 
     <bean id="crafter.siteNavigationRestController" class="org.craftercms.engine.controller.rest.SiteNavigationController">
-        <property name="navTreeBuilder" ref="crafter.navTreeBuilder"/>
-        <property name="navBreadcrumbBuilder" ref="crafter.navBreadcrumbBuilder"/>
+        <constructor-arg name="navTreeBuilder" ref="crafter.navTreeBuilder"/>
+        <constructor-arg name="navBreadcrumbBuilder" ref="crafter.navBreadcrumbBuilder"/>
     </bean>
 
     <bean id="crafter.siteScheduledJobsController"
           class="org.craftercms.engine.controller.rest.SiteScheduledJobsController"/>
 
     <bean id="crafter.siteUrlRestController" class="org.craftercms.engine.controller.rest.SiteUrlController">
-        <property name="urlTransformationService" ref="crafter.urlTransformationService"/>
+        <constructor-arg name="urlTransformationService" ref="crafter.urlTransformationService"/>
     </bean>
 
     <bean id="crafter.siteElasticsearchController"
