@@ -95,7 +95,7 @@
     <!-- ////////////////////////////////// -->
 
 
-    <bean id="crafter.jsonMsgConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+    <bean id="crafter.jsonMsgConverter" class="org.craftercms.engine.util.spring.converter.MappingJackson2HttpMessageConverterFactoryBean">
         <property name="objectMapper" ref="crafter.coreObjectMapper"/>
     </bean>
 
