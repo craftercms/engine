@@ -147,30 +147,46 @@ public class ContentStoreAdapterPreloadedFoldersBasedCacheWarmer implements Cont
             List<Item> children = context.getStoreAdapter().findItems(context, null, path);
             if (CollectionUtils.isNotEmpty(children)) {
                 for (Item item : children) {
-                    String childPath = item.getUrl();
-
-                    if (item.isFolder()) {
-                        logger.debug("Preloading folder [{}]", childPath);
-                        if (!contentOnly) {
-                            context.getStoreAdapter().findItem(context, null, childPath, true);
-                        }
-
-                        preloadedPaths.add(childPath);
-
-                        preloadFolderChildren(context, childPath, depth, contentOnly, preloadedPaths);
-                    } else if (contentOnly) {
-                        logger.debug("Preloading content [{}]", childPath);
-                        context.getStoreAdapter().findContent(context, null, childPath);
-
-                        preloadedPaths.add(childPath);
-                    } else {
-                        logger.debug("Preloading item [{}]", childPath);
-                        context.getStoreAdapter().findItem(context, null, childPath, true);
-
-                        preloadedPaths.add(childPath);
-                    }
+                    preloadFolderChild(item, context, depth, contentOnly, preloadedPaths);
                 }
             }
+        }
+    }
+
+    /**
+     * Preload a child of folder.
+     * Catch any exception while perform preload in order to not interrupt the whole process
+     * @param child item to perform preload
+     * @param context the context
+     * @param depth perform preload a folder with depth
+     * @param contentOnly true if only content, false otherwise
+     * @param preloadedPaths collection of preloaded paths
+     */
+    private void preloadFolderChild(Item child, Context context, int depth, boolean contentOnly, Set<String> preloadedPaths) {
+        String childPath = child.getUrl();
+        try {
+            if (child.isFolder()) {
+                logger.debug("Preloading folder [{}]", childPath);
+                if (!contentOnly) {
+                    context.getStoreAdapter().findItem(context, null, childPath, true);
+                }
+
+                preloadedPaths.add(childPath);
+
+                preloadFolderChildren(context, childPath, depth, contentOnly, preloadedPaths);
+            } else if (contentOnly) {
+                logger.debug("Preloading content [{}]", childPath);
+                context.getStoreAdapter().findContent(context, null, childPath);
+
+                preloadedPaths.add(childPath);
+            } else {
+                logger.debug("Preloading item [{}]", childPath);
+                context.getStoreAdapter().findItem(context, null, childPath, true);
+
+                preloadedPaths.add(childPath);
+            }
+        } catch (Exception e) {
+            logger.error("Error while preload path '{}'", childPath, e);
         }
     }
 
