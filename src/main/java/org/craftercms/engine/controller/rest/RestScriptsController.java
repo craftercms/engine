@@ -220,9 +220,8 @@ public class RestScriptsController implements ServletContextAware {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
             return cause;
-        } else {
-            return null;
         }
+        return null;
     }
 
     @Override

@@ -17,17 +17,18 @@
 package org.craftercms.engine.controller.rest;
 
 import org.craftercms.commons.validation.annotations.param.EsapiValidatedParam;
-import org.craftercms.commons.validation.annotations.param.ValidateParams;
 import org.craftercms.commons.validation.annotations.param.ValidateSecurePathParam;
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.engine.navigation.NavBreadcrumbBuilder;
 import org.craftercms.engine.navigation.NavItem;
 import org.craftercms.engine.navigation.NavTreeBuilder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.beans.ConstructorProperties;
 import java.util.List;
 
@@ -38,6 +39,7 @@ import static org.craftercms.commons.validation.annotations.param.EsapiValidatio
  *
  * @author joseross
  */
+@Validated
 @RestController
 @RequestMapping(RestControllerBase.REST_BASE_URI + SiteNavigationController.URL_ROOT)
 public class SiteNavigationController extends RestControllerBase {
@@ -56,7 +58,6 @@ public class SiteNavigationController extends RestControllerBase {
     }
 
     @GetMapping(URL_TREE)
-    @ValidateParams
     public NavItem getNavTree(@ValidateSecurePathParam @EsapiValidatedParam(type = HTTPURI) @RequestParam String url,
                               @RequestParam(required = false, defaultValue = "1") int depth,
                               @ValidateSecurePathParam @EsapiValidatedParam(type = HTTPURI) @RequestParam(required = false, defaultValue = "") String currentPageUrl) {
@@ -64,12 +65,11 @@ public class SiteNavigationController extends RestControllerBase {
     }
 
     @GetMapping(URL_BREADCRUMB)
-    @ValidateParams
     public List<NavItem> getNavBreadcrumb(@ValidateSecurePathParam
                                           @EsapiValidatedParam(type = HTTPURI)
                                           @RequestParam String url,
                                           @ValidateSecurePathParam
-                                          @EsapiValidatedParam(type = HTTPURI, notEmpty = false, notBlank = false, notNull = false)
+                                          @EsapiValidatedParam(type = HTTPURI)
                                           @RequestParam(required = false, defaultValue = "") String root) {
         return navBreadcrumbBuilder.getBreadcrumb(url, root);
     }

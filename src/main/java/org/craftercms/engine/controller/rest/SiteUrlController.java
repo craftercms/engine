@@ -17,17 +17,20 @@
 package org.craftercms.engine.controller.rest;
 
 import org.craftercms.commons.validation.annotations.param.EsapiValidatedParam;
-import org.craftercms.commons.validation.annotations.param.ValidateParams;
 import org.craftercms.commons.validation.annotations.param.ValidateSecurePathParam;
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.engine.service.UrlTransformationService;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Size;
 import java.beans.ConstructorProperties;
 
+import static org.craftercms.commons.validation.annotations.param.EsapiValidationType.ALPHANUMERIC;
 import static org.craftercms.commons.validation.annotations.param.EsapiValidationType.HTTPURI;
 
 /**
@@ -35,6 +38,7 @@ import static org.craftercms.commons.validation.annotations.param.EsapiValidatio
  *
  * @author joseross
  */
+@Validated
 @RestController
 @RequestMapping(RestControllerBase.REST_BASE_URI + SiteUrlController.URL_ROOT)
 public class SiteUrlController extends RestControllerBase {
@@ -50,10 +54,9 @@ public class SiteUrlController extends RestControllerBase {
     }
 
     @GetMapping(URL_TRANSFORM)
-    @ValidateParams
-    public String transformUrl(@RequestParam String transformerName,
+    public String transformUrl(@EsapiValidatedParam(type = ALPHANUMERIC) @RequestParam String transformerName,
                                @ValidateSecurePathParam
-                               @EsapiValidatedParam(maxLength = 4000, type = HTTPURI)
+                               @EsapiValidatedParam(type = HTTPURI)
                                @RequestParam String url) {
         return urlTransformationService.transform(transformerName, url);
     }

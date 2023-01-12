@@ -16,7 +16,6 @@
 package org.craftercms.engine.controller;
 
 import org.craftercms.commons.validation.annotations.param.EsapiValidatedParam;
-import org.craftercms.commons.validation.annotations.param.ValidateParams;
 import org.craftercms.commons.validation.annotations.param.ValidateSecurePathParam;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Size;
 import java.beans.ConstructorProperties;
 
 import static org.craftercms.commons.validation.annotations.param.EsapiValidationType.HTTPURI;
@@ -47,9 +48,10 @@ public class ComponentRenderController {
     }
 
     @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST})
-    @ValidateParams
+    @Valid
     protected ModelAndView render(@ValidateSecurePathParam
-                                  @EsapiValidatedParam(maxLength = 4000, type = HTTPURI)
+    @Size(max = 4000)
+                                  @EsapiValidatedParam(type = HTTPURI)
                                   @RequestParam("path") String path) throws Exception {
         return new ModelAndView(renderComponentViewName, COMPONENT_PATH_MODEL_NAME, path);
     }

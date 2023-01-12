@@ -65,7 +65,6 @@
         <property name="descriptorFileExtension" value="${crafter.core.store.descriptorFile.extension}"/>
         <property name="pathValidator">
             <bean class="org.craftercms.commons.validation.validators.impl.SecurePathValidator">
-                <constructor-arg name="targetKey" value="path"/>
             </bean>
         </property>
         <property name="clientBuilder" ref="crafter.s3ClientBuilder"/>
