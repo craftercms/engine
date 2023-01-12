@@ -170,7 +170,7 @@ public class RestScriptsController extends AbstractController {
         try {
             return scriptFactory.getScript(scriptUrl).execute(scriptVariables);
         } catch (ScriptNotFoundException e) {
-            logger.error("Script not found at " + scriptUrl, e);
+            logger.error("Script not found at " + scriptUrl);
 
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
