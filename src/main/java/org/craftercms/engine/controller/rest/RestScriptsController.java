@@ -182,13 +182,13 @@ public class RestScriptsController implements ServletContextAware {
         try {
             return scriptFactory.getScript(scriptUrl).execute(scriptVariables);
         } catch (ScriptNotFoundException e) {
-            logger.error(format("Script not found at %s", scriptUrl), e);
+            logger.error(format("Script not found at '%s'", scriptUrl));
 
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 
             return singletonMap(errorMessageModelAttributeName, "REST script not found");
         } catch (Exception e) {
-            logger.error(format("Error executing REST script at %s", scriptUrl), e);
+            logger.error(format("Error executing REST script at '%s'", scriptUrl), e);
 
             Throwable cause = checkHttpStatusCodeAwareException(e, response);
 
