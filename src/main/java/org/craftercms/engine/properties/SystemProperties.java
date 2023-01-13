@@ -15,8 +15,6 @@
  */
 package org.craftercms.engine.properties;
 
-import org.apache.commons.lang3.StringUtils;
-
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 /**

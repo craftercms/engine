@@ -20,8 +20,6 @@ import org.craftercms.commons.exceptions.InvalidManagementTokenException;
 import org.craftercms.commons.monitoring.rest.MonitoringRestControllerBase;
 import org.craftercms.commons.validation.annotations.param.EsapiValidatedParam;
 import org.craftercms.engine.util.logging.CircularQueueLogAppender;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
