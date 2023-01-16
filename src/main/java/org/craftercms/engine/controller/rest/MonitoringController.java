@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -19,13 +19,15 @@ package org.craftercms.engine.controller.rest;
 import org.craftercms.commons.exceptions.InvalidManagementTokenException;
 import org.craftercms.commons.monitoring.rest.MonitoringRestControllerBase;
 import org.craftercms.commons.validation.annotations.param.EsapiValidatedParam;
-import org.craftercms.commons.validation.annotations.param.ValidateParams;
 import org.craftercms.engine.util.logging.CircularQueueLogAppender;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 import java.beans.ConstructorProperties;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +37,7 @@ import static org.craftercms.commons.validation.annotations.param.EsapiValidatio
 /**
  * Rest controller to provide monitoring information & site logs
  */
+@Validated
 @RestController
 @RequestMapping(MonitoringController.URL_ROOT)
 public class MonitoringController extends MonitoringRestControllerBase {
@@ -42,25 +45,18 @@ public class MonitoringController extends MonitoringRestControllerBase {
     public final static String URL_ROOT = "/api/1";
     public final static String LOG_URL = "/log";
 
-    private final String configuredToken;
 
     @ConstructorProperties({"configuredToken"})
     public MonitoringController(final String configuredToken) {
-        this.configuredToken = configuredToken;
+        super(configuredToken);
     }
 
     @GetMapping(MonitoringRestControllerBase.ROOT_URL + LOG_URL)
-    @ValidateParams
-    public List<Map<String, Object>> getLoggedEvents(@RequestParam @EsapiValidatedParam(maxLength = 50, type = SITE_ID) String site,
-                                                     @RequestParam long since,
+    public List<Map<String, Object>> getLoggedEvents(@RequestParam @Size(max = 50) @EsapiValidatedParam(type = SITE_ID) String site,
+                                                     @Positive @RequestParam long since,
                                                      @RequestParam String token) throws InvalidManagementTokenException {
         validateToken(token);
         return CircularQueueLogAppender.getLoggedEvents(site, since);
-    }
-
-    @Override
-    public String getConfiguredToken() {
-        return configuredToken;
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -16,10 +16,10 @@
 
 package org.craftercms.engine.controller.rest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.exceptions.InvalidManagementTokenException;
-import org.craftercms.commons.rest.ManagementTokenAware;
 import org.craftercms.core.cache.CacheStatistics;
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.engine.event.SiteContextCreatedEvent;
@@ -43,7 +43,7 @@ import static java.lang.String.format;
  */
 @RestController
 @RequestMapping(RestControllerBase.REST_BASE_URI + SiteCacheRestController.URL_ROOT)
-public class SiteCacheRestController extends RestControllerBase implements ManagementTokenAware {
+public class SiteCacheRestController extends RestControllerBase {
 
     private static final Log logger = LogFactory.getLog(SiteCacheRestController.class);
 
@@ -86,8 +86,9 @@ public class SiteCacheRestController extends RestControllerBase implements Manag
         return siteContext.getCacheTemplate().getCacheService().getStatistics(siteContext.getContext());
     }
 
-    @Override
-    public String getConfiguredToken() {
-        return configuredToken;
+    protected final void validateToken(final String requestToken) throws InvalidManagementTokenException {
+        if (!StringUtils.equals(requestToken, configuredToken)) {
+            throw new InvalidManagementTokenException("Management authorization failed, invalid token.");
+        }
     }
 }

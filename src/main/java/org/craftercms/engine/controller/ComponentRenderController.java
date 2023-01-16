@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -16,9 +16,9 @@
 package org.craftercms.engine.controller;
 
 import org.craftercms.commons.validation.annotations.param.EsapiValidatedParam;
-import org.craftercms.commons.validation.annotations.param.ValidateParams;
 import org.craftercms.commons.validation.annotations.param.ValidateSecurePathParam;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,6 +32,7 @@ import static org.craftercms.commons.validation.annotations.param.EsapiValidatio
  * @author Alfonso Vásquez
  */
 @Controller
+@Validated
 @RequestMapping(ComponentRenderController.URL_ROOT)
 public class ComponentRenderController {
 
@@ -47,9 +48,8 @@ public class ComponentRenderController {
     }
 
     @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST})
-    @ValidateParams
     protected ModelAndView render(@ValidateSecurePathParam
-                                  @EsapiValidatedParam(maxLength = 4000, type = HTTPURI)
+                                  @EsapiValidatedParam(type = HTTPURI)
                                   @RequestParam("path") String path) throws Exception {
         return new ModelAndView(renderComponentViewName, COMPONENT_PATH_MODEL_NAME, path);
     }
