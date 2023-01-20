@@ -18,10 +18,12 @@ package org.craftercms.engine.servlet.filter;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.http.client.utils.URIUtils;
 import org.craftercms.commons.lang.RegexUtils;
+import org.craftercms.commons.proxy.ProxyUtils;
 import org.craftercms.engine.exception.proxy.HttpProxyException;
 import org.craftercms.engine.service.context.SiteContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -116,11 +118,11 @@ public class HttpProxyFilter extends OncePerRequestFilter {
                 // set the new target host
                 request.setAttribute(ATTR_TARGET_HOST, URIUtils.extractHost(URI.create(targetUrl)));
 
-                // set headers to the request
+                // Additional request headers from configuration
                 Map<String, String> requestHeaders = getHeaders(SiteContext.getCurrent(), request.getRequestURI(), CONFIG_KEY_HEADERS_SERVER);
                 HttpProxyServletRequestWrapper requestWrapper = new HttpProxyServletRequestWrapper(request, requestHeaders);
 
-                // set headers to the response
+                // Additional response headers from configuration
                 Map<String, String> responseHeaders = getHeaders(SiteContext.getCurrent(), requestWrapper.getRequestURI(), CONFIG_KEY_HEADERS_CLIENT);
                 if (!responseHeaders.isEmpty()) {
                     for (Map.Entry<String, String> header: responseHeaders.entrySet()) {
@@ -206,12 +208,19 @@ public class HttpProxyFilter extends OncePerRequestFilter {
         public HttpProxyServletRequestWrapper(HttpServletRequest request, Map<String, String> additionalHeaders) {
             super(request);
 
+            // Add all headers except an ignored list and the cookie header
             Enumeration<String> headerNames = request.getHeaderNames();
             while (headerNames.hasMoreElements()) {
                 String headerName = headerNames.nextElement();
-                headers.put(headerName, list(request.getHeaders(headerName)));
+                if (!ProxyUtils.IGNORE_REQUEST_HEADERS.contains(headerName.toLowerCase()) && !headerName.equalsIgnoreCase(HttpHeaders.COOKIE)) {
+                    headers.put(headerName, list(request.getHeaders(headerName)));
+                }
             }
 
+            // rebuild cookie headers to remove ignored list of cookies keys
+            headers.put(HttpHeaders.COOKIE, singletonList(ProxyUtils.getProxyCookieHeader(request)));
+
+            // Additional headers from configuration
             for (Map.Entry<String, String> header: additionalHeaders.entrySet()) {
                 headers.put(header.getKey(), singletonList(header.getValue()));
             }
