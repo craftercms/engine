@@ -253,6 +253,10 @@
         <constructor-arg name="includedUrls" value="${crafter.engine.header.etag.include.urls}"/>
     </bean>
 
+    <bean id="crafter.httpHeadersRewriteFilter" class="org.craftercms.engine.servlet.filter.HttpHeadersRewriteFilter">
+        <constructor-arg name="cacheTemplate" ref="crafter.cacheTemplate"/>
+    </bean>
+
     <!-- ////////////////////////////////// -->
     <!--								 	-->
     <!--			Services				-->
