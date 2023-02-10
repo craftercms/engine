@@ -49,17 +49,18 @@ public class StaticAssetsRequestHandler extends ResourceHttpRequestHandler {
     private boolean disableCaching;
 
     protected void init() {
-        // if there is a cache control set explicitly don't change it
-        if (getCacheControl() == null) {
-            if (disableCaching) {
-                // fully disable cache in the browser
-                setCacheControl(CacheControl.noStore());
-            } else {
-                // make the browser check for changes before using a cached version
-                setCacheControl(CacheControl.noCache());
-            }
-        }
+        // Don't require a session for static-assets
         setRequireSession(false);
+
+        // If cache-control is set explicitly, don't change it
+        if (getCacheControl() != null) {
+            return;
+        }
+
+        // If caching is disabled, tell the browser not to cache
+        if (disableCaching) {
+            setCacheControl(CacheControl.noStore());
+        }
     }
 
     @Required
