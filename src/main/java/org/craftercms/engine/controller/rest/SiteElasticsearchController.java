@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
@@ -61,6 +62,7 @@ public class SiteElasticsearchController extends RestControllerBase {
         SearchResponse searchResponse = elasticsearchService.search(request, parameters);
 
         // Write the response in ES format
+        response.setCharacterEncoding(StandardCharsets.UTF_8.toString());
         response.getWriter().write(searchResponse.toString());
     }
 
