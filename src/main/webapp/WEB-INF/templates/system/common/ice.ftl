@@ -454,8 +454,7 @@ CrafterCMS Authoring Scripts
     $nthItemAttributes=$nthItemAttributes;
     item, index
   >
-    <#local renderComponentArguments += { 'itemIndex': index } />
-    <@renderComponent component=item additionalModel=renderComponentArguments />
+    <@renderComponent component=item additionalModel=({ 'itemIndex': index } + renderComponentArguments) />
   </@renderCollection>
 </#macro>
 
