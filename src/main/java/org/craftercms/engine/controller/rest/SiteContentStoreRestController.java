@@ -16,8 +16,7 @@
 
 package org.craftercms.engine.controller.rest;
 
-import org.craftercms.commons.validation.annotations.param.EsapiValidatedParam;
-import org.craftercms.commons.validation.annotations.param.ValidateSecurePathParam;
+import org.craftercms.commons.validation.annotations.param.ValidExistingContentPath;
 import org.craftercms.core.controller.rest.ContentStoreRestController;
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.core.service.Item;
@@ -36,7 +35,6 @@ import javax.validation.constraints.Size;
 import java.beans.ConstructorProperties;
 import java.util.List;
 
-import static org.craftercms.commons.validation.annotations.param.EsapiValidationType.HTTPURI;
 import static org.craftercms.core.controller.rest.ContentStoreRestController.*;
 
 /**
@@ -64,9 +62,8 @@ public class SiteContentStoreRestController extends RestControllerBase {
      */
     @RequestMapping(value = URL_DESCRIPTOR, method = RequestMethod.GET)
     public Document getDescriptor(WebRequest request, HttpServletResponse response,
-                                  @ValidateSecurePathParam
                                   @Size(max = 4000)
-                                  @EsapiValidatedParam(type = HTTPURI)
+                                  @ValidExistingContentPath
                                   @RequestParam(REQUEST_PARAM_URL) String url,
                                   @RequestParam(required = false, defaultValue = "false") boolean flatten) {
         return wrappedController.getDescriptor(request, response, getCurrentContextId(), url, flatten);
@@ -74,8 +71,7 @@ public class SiteContentStoreRestController extends RestControllerBase {
 
     @RequestMapping(value = URL_ITEM, method = RequestMethod.GET)
     public Item getItem(WebRequest request, HttpServletResponse response,
-                        @ValidateSecurePathParam
-                        @EsapiValidatedParam(type = HTTPURI)
+                        @ValidExistingContentPath
                         @RequestParam(REQUEST_PARAM_URL) String url,
                         @RequestParam(required = false, defaultValue = "false") boolean flatten) {
         return wrappedController.getItem(request, response, getCurrentContextId(), url, flatten);
@@ -83,8 +79,7 @@ public class SiteContentStoreRestController extends RestControllerBase {
 
     @RequestMapping(value = URL_CHILDREN, method = RequestMethod.GET)
     public List<Item> getChildren(WebRequest request, HttpServletResponse response,
-                                  @ValidateSecurePathParam
-                                  @EsapiValidatedParam(type = HTTPURI)
+                                  @ValidExistingContentPath
                                   @RequestParam(REQUEST_PARAM_URL) String url,
                                   @RequestParam(required = false, defaultValue = "false") boolean flatten) {
         return wrappedController.getChildren(request, response, getCurrentContextId(), url, flatten);
@@ -92,8 +87,7 @@ public class SiteContentStoreRestController extends RestControllerBase {
 
     @RequestMapping(value = URL_TREE, method = RequestMethod.GET)
     public Tree getTree(WebRequest request, HttpServletResponse response,
-                        @ValidateSecurePathParam
-                        @EsapiValidatedParam(type = HTTPURI)
+                        @ValidExistingContentPath
                         @RequestParam(REQUEST_PARAM_URL) String url,
                         @RequestParam(value = REQUEST_PARAM_TREE_DEPTH, required = false) Integer depth,
                         @RequestParam(required = false, defaultValue = "false") boolean flatten) {

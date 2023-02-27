@@ -16,8 +16,7 @@
 
 package org.craftercms.engine.controller.rest;
 
-import org.craftercms.commons.validation.annotations.param.EsapiValidatedParam;
-import org.craftercms.commons.validation.annotations.param.ValidateSecurePathParam;
+import org.craftercms.commons.validation.annotations.param.ValidExistingContentPath;
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.engine.navigation.NavBreadcrumbBuilder;
 import org.craftercms.engine.navigation.NavItem;
@@ -30,8 +29,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.beans.ConstructorProperties;
 import java.util.List;
-
-import static org.craftercms.commons.validation.annotations.param.EsapiValidationType.HTTPURI;
 
 /**
  * REST controller to access site navigation services.
@@ -57,18 +54,16 @@ public class SiteNavigationController extends RestControllerBase {
     }
 
     @GetMapping(URL_TREE)
-    public NavItem getNavTree(@ValidateSecurePathParam @EsapiValidatedParam(type = HTTPURI) @RequestParam String url,
+    public NavItem getNavTree(@ValidExistingContentPath @RequestParam String url,
                               @RequestParam(required = false, defaultValue = "1") int depth,
-                              @ValidateSecurePathParam @EsapiValidatedParam(type = HTTPURI) @RequestParam(required = false, defaultValue = "") String currentPageUrl) {
+                              @ValidExistingContentPath @RequestParam(required = false, defaultValue = "") String currentPageUrl) {
         return navTreeBuilder.getNavTree(url, depth, currentPageUrl);
     }
 
     @GetMapping(URL_BREADCRUMB)
-    public List<NavItem> getNavBreadcrumb(@ValidateSecurePathParam
-                                          @EsapiValidatedParam(type = HTTPURI)
+    public List<NavItem> getNavBreadcrumb(@ValidExistingContentPath
                                           @RequestParam String url,
-                                          @ValidateSecurePathParam
-                                          @EsapiValidatedParam(type = HTTPURI)
+                                          @ValidExistingContentPath
                                           @RequestParam(required = false, defaultValue = "") String root) {
         return navBreadcrumbBuilder.getBreadcrumb(url, root);
     }

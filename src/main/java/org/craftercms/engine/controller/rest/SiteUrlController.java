@@ -17,7 +17,7 @@
 package org.craftercms.engine.controller.rest;
 
 import org.craftercms.commons.validation.annotations.param.EsapiValidatedParam;
-import org.craftercms.commons.validation.annotations.param.ValidateSecurePathParam;
+import org.craftercms.commons.validation.annotations.param.ValidExistingContentPath;
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.engine.service.UrlTransformationService;
 import org.springframework.validation.annotation.Validated;
@@ -29,7 +29,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.beans.ConstructorProperties;
 
 import static org.craftercms.commons.validation.annotations.param.EsapiValidationType.ALPHANUMERIC;
-import static org.craftercms.commons.validation.annotations.param.EsapiValidationType.HTTPURI;
 
 /**
  * REST controller to access the URL transformation service.
@@ -53,8 +52,7 @@ public class SiteUrlController extends RestControllerBase {
 
     @GetMapping(URL_TRANSFORM)
     public String transformUrl(@EsapiValidatedParam(type = ALPHANUMERIC) @RequestParam String transformerName,
-                               @ValidateSecurePathParam
-                               @EsapiValidatedParam(type = HTTPURI)
+                               @ValidExistingContentPath
                                @RequestParam String url) {
         return urlTransformationService.transform(transformerName, url);
     }
