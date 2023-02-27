@@ -18,7 +18,7 @@ package org.craftercms.engine.controller.rest;
 
 import org.craftercms.commons.exceptions.InvalidManagementTokenException;
 import org.craftercms.commons.monitoring.rest.MonitoringRestControllerBase;
-import org.craftercms.commons.validation.annotations.param.EsapiValidatedParam;
+import org.craftercms.commons.validation.annotations.param.ValidSiteId;
 import org.craftercms.engine.util.logging.CircularQueueLogAppender;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,12 +27,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.Positive;
-import javax.validation.constraints.Size;
 import java.beans.ConstructorProperties;
 import java.util.List;
 import java.util.Map;
-
-import static org.craftercms.commons.validation.annotations.param.EsapiValidationType.SITE_ID;
 
 /**
  * Rest controller to provide monitoring information & site logs
@@ -52,7 +49,7 @@ public class MonitoringController extends MonitoringRestControllerBase {
     }
 
     @GetMapping(MonitoringRestControllerBase.ROOT_URL + LOG_URL)
-    public List<Map<String, Object>> getLoggedEvents(@RequestParam @Size(max = 50) @EsapiValidatedParam(type = SITE_ID) String site,
+    public List<Map<String, Object>> getLoggedEvents(@RequestParam @ValidSiteId String site,
                                                      @Positive @RequestParam long since,
                                                      @RequestParam String token) throws InvalidManagementTokenException {
         validateToken(token);
