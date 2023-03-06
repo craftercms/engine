@@ -1,0 +1,885 @@
+openapi: 3.0.0
+servers:
+  - url: 'http://localhost:8080/api/1'
+info:
+  description: |-
+    Crafter Engine API
+  version: '4.0.3.0'
+  title: Crafter Engine
+  termsOfService: ''
+  contact:
+    email: info@craftercms.org
+  license:
+    name: GPL 3.0
+    url: 'https://www.gnu.org/licenses/gpl-3.0.en.html'
+externalDocs:
+  description: CrafterCMS - Engine
+  url: 'https://docs.craftercms.org/current/developers/projects/engine/index.html'
+tags:
+  - name: site
+    description: Site/project operations
+  - name: profile
+    description: Current user operations  
+  - name: config
+    description: Mode operations
+
+paths:
+
+  /site/context/id:
+    get:
+      tags:
+        - site
+      summary: Get the ID for the site context
+      operationId: getSiteContextID
+      description: Get the ID for the site context resolved for the current request, the value returned will depend on the SiteResolver implementation used.
+      parameters:
+        - name: token
+          in: query
+          description: The authorization token
+          required: true
+          schema:
+            type: string
+          example: defaultManagementToken
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The site context Id     
+                    example: 405ffc233d075b010536bd2eb786b86c 
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /site/context/status:
+    get:
+      tags:
+        - site
+      summary: Get the site context status
+      operationId: getSiteContextStatus
+      description: Get the status for the site context resolved for the current request, the value returned will depend on the SiteResolver implementation used.
+      parameters:
+        - name: token
+          in: query
+          description: The authorization token
+          required: true
+          schema:
+            type: string
+          example: defaultManagementToken  
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: The site context status     
+                    example: READY
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /site/context/destroy:
+    get:
+      tags:
+        - site
+      summary: Destroy the site context
+      operationId: destroySiteContext
+      description: Destroy the site context resolved for the current request. Destroying the context involves clearing the cache, destroying any loaded configuration and Spring beans for the site, and destroying the Groovy classloader for the site.
+      parameters:
+        - name: token
+          in: query
+          description: The authorization token
+          required: true
+          schema:
+            type: string
+          example: defaultManagementToken  
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Site context successfully destroyed     
+                    example: Site context for 'sample' destroyed. Will be recreated on next request
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /site/context/rebuild:
+    get:
+      tags:
+        - site
+      summary: Rebuild the site context
+      operationId: rebuildSiteContext
+      description: Rebuild the site context resolved for the current request, which means destroying and then creating the context again.
+      parameters:
+        - name: token
+          in: query
+          description: The authorization token
+          required: true
+          schema:
+            type: string
+          example: defaultManagementToken  
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Site context rebuild started
+                    example: Started rebuild for site context for 'sample'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'          
+
+  /site/context/graphql/rebuild:
+    get:
+      tags:
+        - site
+      summary: Rebuild GraphQL schema for site context
+      operationId: rebuildGraphQLSchema
+      description: Rebuild the GraphQL schema for the site context resolved for the current request.
+      parameters:
+        - name: token
+          in: query
+          description: The authorization token
+          required: true
+          schema:
+            type: string
+          example: defaultManagementToken  
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: GraphQL schema rebuild started message
+                    example: Rebuild of GraphQL schema started for 'sample'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'          
+
+  /site/context/jobs/list:
+    get:
+      tags:
+        - site
+      summary: List jobs
+      operationId: listJobs
+      description: Get a list of all scheduled jobs for the current site.
+      parameters:
+        - name: token
+          in: query
+          description: The authorization token
+          required: true
+          schema:
+            type: string
+          example: defaultManagementToken  
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      description: Name of job                        
+                    nextFireTime:
+                      type: string
+                      description: Time when job will be executed
+                example:
+                  - name: editorial:/scripts/jobs/hourly/hourly-job.groovy
+                    nextFireTime: 2022-05-08T00:00:00Z                                
+                  - name: editorial:/scripts/jobs/custom-job.groovy
+                    nextFireTime: 2022-05-08T00:00:00Z  
+                        
+        '500':
+          $ref: '#/components/responses/InternalServerError'          
+
+  /site/mappings/reload:
+    get:
+      tags:
+        - site
+      summary: Reload the mappings
+      operationId: mappingsReload
+      description: Reload the mappings used to resolve sites by Crafter Engine. This endpoint is only available when Crafter Engine is in mapped multi-tenant mode.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Successful reloading of mappings message
+                    example: Mappings reloaded
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: The current resolver is not a ReloadableMappingsSiteResolver. No mappings to reload
+  
+  /site/cache/clear:
+    get:
+      tags:
+        - site
+      summary: Clear content cache
+      operationId: cacheClear
+      description: Clear the content cache scope and the Freemarker cache for the current site context.
+      parameters:
+        - name: token
+          in: query
+          description: The authorization token
+          required: true
+          schema:
+            type: string
+          example: defaultManagementToken  
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string                    
+                    example: Cache clear for site 'sample' started
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'          
+
+  /site/cache/statistics:
+    get:
+      tags:
+        - site
+      summary: Statistics
+      operationId: cacheStatistics
+      description: Get the statistics for all cache scopes for the current site context. <br><br> <i>Note:</i> <br> <i>The result of this call can change based on the configuration of the system, for example when Crafter Engine is configured in preview mode the cache will be disabled and the result will always be an empty object. There could be also different statistics returned depending on the cache implementation that is being used.</i>
+      parameters:
+        - name: token
+          in: query
+          description: The authorization token
+          required: true
+          schema:
+            type: string
+          example: defaultManagementToken  
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Statistics'            
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'   
+
+  /site/content_store/item:
+    get:
+      tags:
+        - site
+      summary: Content store get item
+      operationId: getItem
+      description: Get an Item from the content store. <br> This API is used to get pages, components and folders. It returns the content and other metadata such as url, descriptorUrl, folder flag, and extra properties
+      parameters:
+        - name: url
+          in: query
+          description: The item’s url (e.g. /site/website/index.xml)
+          required: true
+          schema:
+            type: string
+        - name: flatten
+          in: query
+          description: Indicates if included descriptors should be flattened
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentStoreItems'
+              examples:
+                Folder:
+                  value:
+                    name: website
+                    url: /site/website
+                    descriptorUrl: /site/website.meta.xml
+                    descriptorDom: null          
+                    properties: null
+                    folder: true
+                WithAdditionalProperties:
+                  value:
+                    name: index.xml
+                    url: /site/website/index.xml
+                    descriptorUrl: /site/website.meta.xml
+                    descriptorDom: 
+                      page: 
+                        content-type: /page/home
+                        display-template: /templates/web/pages/home.ftl
+                        merge-strategy: inherit-levels
+                        placeInNav: false
+                        file-name: index.xml
+                        objectGroupId: 8d7f
+                        objectId: 8d7f21fa-5e09-00aa-8340-853b7db302da
+                        folder-name: null
+                        header: 
+                          item: 
+                            key: /site/components/headers/header.xml
+                            value: Header
+                            include: /site/components/headers/header.xml
+                            disableFlattening: false
+                        createdDate: "1/31/2022 16:18:14"
+                        createdDate_dt: "1/31/2022 16:18:14"
+                        lastModifiedDate: "5/18/2022 15:52:21"
+                        lastModifiedDate_dt: "5/18/2022 15:52:21"
+                        left-rail:
+                          item:
+                            key: /site/components/left-rails/left-rail-with-latest-articles.xml
+                            value: "Left Rail with Latest Articles"
+                            include: /site/components/left-rails/left-rail-with-latest-articles.xml
+                            disableFlattening: false
+                        internal-name: Home
+                        orderDefault_f: -1
+                        title: Editorial
+                        hero_text: "<p>Aenean ornare velit lacus, ac varius enim ullamcorper eu. Proin aliquam facilisis ante interdum congue. Integer mollis, nisl amet convallis, porttitor magna ullamcorper, amet egestas mauris. Ut magna finibus nisi nec lacinia. Nam maximus erat id euismod egestas. Pellentesque sapien ac quam. Lorem ipsum dolor sit nullam.</p>"
+                        hero_title: "<h1><span>Hi, I&rsquo;m Editorial</span></h1>\n<h3><span style=\"font-size: 1.5em;\">by HTML5 UP</span></h3>"
+                        features: 
+                          item: 
+                            -
+                              value: "Quam lorem ipsum"
+                              key: /site/components/features/quam-lorem-ipsum.xml
+                              include: /site/components/features/quam-lorem-ipsum.xml
+                              disableFlattening: false
+                            -
+                              key: /site/components/features/sapien-veroeros.xml
+                              value: "Sapien Veroeros"
+                              include: /site/components/features/sapien-veroeros.xml
+                              disableFlattening": false
+                        hero_image: /static-assets/images/strawberries.jpg
+                        features_title: "Erat lacinia"          
+                    properties: 
+                      //page/merge-strategy: inherit-levels
+                      //page/content-type: /page/home
+                    folder: false      
+                WithoutAdditionalProperties:
+                  value:
+                    name: index.xml
+                    url: /site/website/index.xml
+                    descriptorUrl: /site/website.meta.xml
+                    descriptorDom: 
+                      page:
+                        content-type: /page/home
+                        display-template: /templates/web/pages/home.ftl
+                        merge-strategy: inherit-levels
+                        placeInNav: false
+                        file-name: index.xml
+                        objectGroupId: 8d7f
+                        objectId: 8d7f21fa-5e09-00aa-8340-853b7db302da
+                        folder-name: null
+                        header: 
+                          item: 
+                            key: /site/components/headers/header.xml
+                            value: Header
+                            include: /site/components/headers/header.xml
+                            disableFlattening: false
+                        createdDate: 1/31/2022 16:18:14
+                        createdDate_dt: 1/31/2022 16:18:14
+                        lastModifiedDate: 5/18/2022 15:52:21
+                        lastModifiedDate_dt: 5/18/2022 15:52:21
+                        left-rail: 
+                          item: 
+                            key: /site/components/left-rails/left-rail-with-latest-articles.xml
+                            value: Left Rail with Latest Articles
+                            include: /site/components/left-rails/left-rail-with-latest-articles.xml
+                            disableFlattening: false
+                        internal-name: Home
+                        orderDefault_f: -1
+                        title: Editorial
+                        hero_text: "<p>Aenean ornare velit lacus, ac varius enim ullamcorper eu. Proin aliquam facilisis ante interdum congue. Integer mollis, nisl amet convallis, porttitor magna ullamcorper, amet egestas mauris. Ut magna finibus nisi nec lacinia. Nam maximus erat id euismod egestas. Pellentesque sapien ac quam. Lorem ipsum dolor sit nullam.</p>"
+                        hero_title: "<h1><span>Hi, I&rsquo;m Editorial</span></h1>\n<h3><span style=\"font-size: 1.5em;\">by HTML5 UP</span></h3>"
+                        features: 
+                          item: 
+                            -
+                              key: "/site/components/features/quam-lorem-ipsum.xml"
+                              value: "Quam lorem ipsum"
+                              include: /site/components/features/quam-lorem-ipsum.xml
+                              disableFlattening: false},
+                            -
+                              key: /site/components/features/sapien-veroeros.xml
+                              value: "Sapien Veroeros"
+                              include: "/site/components/features/sapien-veroeros.xml"
+                              disableFlattening: false}                         
+                        hero_image: "/static-assets/images/strawberries.jpg"
+                        features_title: "Erat lacinia"  
+                    properties: null
+                    folder: false                  
+        '404':
+          $ref: '#/components/responses/NotFound'
+          example: No item found at /site/website/index.xml
+        '500':
+          $ref: '#/components/responses/InternalServerError'                      
+
+  /site/content_store/children:
+    get:
+      tags:
+        - site
+      summary: Content store get children
+      operationId: getChildren
+      description: Get the list of Items directly under a folder in the content store.
+      parameters:
+        - name: url
+          in: query
+          description: The folder’s url (e.g. /site/website/index.xml)
+          required: true
+          schema:
+            type: string
+        - name: flatten
+          in: query
+          description: Indicates if included descriptors should be flattened
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentStoreItems'
+              example: 
+                - name: website
+                  url: /site/website
+                  descriptorUrl: /site/website.meta.xml
+                  descriptorDom: null          
+                  properties: null
+                  folder: true
+                - name: crafter-component.xml
+                  url: /site/website/crafter-component.xml
+                  descriptorUrl: /site/website/crafter-component.xml
+                  descriptorDom:
+                    page:
+                      display-template: 
+                        nil: false
+                        text: /templates/system/common/component.ftl
+                      merge-strategy: inherit-levels
+                      content-type: /component/level-descriptor
+                      placeInNav: false
+                      file-name: crafter-level-descriptor.level.xml
+                      objectGroupId: 0a68
+                      objectId: 0a68e8ad-77d8-0a58-e7bf-09a71fb3077b
+                      folder-name: null
+                      header: 
+                        item: 
+                          key: /site/components/headers/header.xml
+                          value: Header
+                          include: /site/components/headers/header.xml
+                          disableFlattening: false
+                      createdDate: 3/13/2022 20:26:50
+                      createdDate_dt: 3/13/2022 20:26:50
+                      lastModifiedDate: 5/18/2022 15:38:58
+                      lastModifiedDate_dt: 5/18/2022 15:38:58
+                      left-rail: 
+                        item: 
+                          key: /site/components/left-rails/left-rail-with-no-articles.xml
+                          value: Left Rail with No Articles
+                          include: /site/components/left-rails/left-rail-with-no-articles.xml
+                          disableFlattening: false
+                      hideInAuthoring: true
+                  properties: null,
+                  folder: false   
+        '404':
+          $ref: '#/components/responses/NotFound'
+          example: No item found at /site/website/index.xml
+        '500':
+          $ref: '#/components/responses/InternalServerError'        
+
+  /site/content_store/tree:
+    get:
+      tags:
+        - site
+      summary: Content store get tree
+      operationId: getTree
+      description: Get the complete Item hierarchy under the specified folder in the content store.
+      parameters:
+        - name: url
+          in: query
+          description: The folder’s url (e.g. /site/website/index.xml)
+          required: true
+          schema:
+            type: string
+        - name: depth
+          in: query
+          description: Amount of levels to include (unlimited by default)
+          required: false
+          schema:
+            type: integer    
+        - name: flatten
+          in: query
+          description: Indicates if included descriptors should be flattened
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentStoreItems'
+        '404':
+          $ref: '#/components/responses/NotFound'
+          example: No folder found at /site/website/index.xml
+        '500':
+          $ref: '#/components/responses/InternalServerError'     
+
+  /profile/get:
+    get:
+      tags:
+        - profile
+      summary: Get Profile
+      operationId: getProfile
+      description: Get the current user’s profile from the session, if no profile is set an empty one will be created. Only use it in conjunction with Studio’s Personas.
+      parameters:
+        - name: url
+          in: query
+          description: The folder’s url (e.g. /site/website/index.xml)
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'  
+              examples:
+                userProfileExample:
+                  $ref: '#/components/examples/userProfileExample'         
+        '500':
+          $ref: '#/components/responses/InternalServerError'        
+  
+  /profile/set:
+    get:
+      tags:
+        - profile
+      summary: Set Profile
+      operationId: setProfile
+      description: Set the current user’s profile, all parameters are added to the profile and stored in the session. Only use it in conjunction with Studio’s Personas. <br><br> <i>Note:</i> <br> <i>Any parameter included in the request will be added as a property for the user profile, if the request is made without any parameter then profile will be cleared.</i>
+      parameters:
+        - name: age
+          in: query
+          description: The user age
+          schema:
+            type: integer
+        - name: username
+          in: query
+          description: The user name
+          schema:
+            type: string
+        - name: lastname
+          in: query
+          description: The user last name
+          schema:
+            type: string        
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string                    
+                    example: john       
+        '500':
+          $ref: '#/components/responses/InternalServerError'        
+
+  /navigation/breadcrumb:
+    get:
+      tags:
+        - site
+      summary: Breadcrumb
+      operationId: breadcrumb
+      description: Returns the navigation items that form the breadcrumb for the specified store URL.
+      parameters:
+        - name: url
+          in: query
+          required: true
+          description: The URL used to build the breadcrumb
+          schema:
+            type: string
+        - name: root
+          in: query
+          description: The starting point of the breadcrumb
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  $ref: '#/components/schemas/NavigationTreeNode'  
+              example:
+                - label: Home
+                  url: /
+                  active: false
+                  subItem: null
+                - label: Style
+                  url: /style
+                  active: false
+                  subItem: null         
+        '500':
+          $ref: '#/components/responses/InternalServerError'        
+
+  /navigation/tree:
+    get:
+      tags:
+        - site
+      summary: Tree
+      operationId: tree
+      description: Returns the navigation tree with the specified depth for the specified store URL.
+      parameters:
+        - name: url
+          in: query
+          required: true
+          description: The root folder of the tree
+          schema:
+            type: string
+          example: /site/website  
+        - name: depth
+          in: query
+          description: The depth of the tree (defaults to 1)
+          schema:
+            type: integer    
+        - name: currentPageUrl
+          in: query
+          description: The URL of the current page
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/NavigationTreeNode'  
+              example:
+                - label: Home
+                  url: /
+                  active: false
+                  subItem: 
+                    - label: Style
+                      url: /style
+                      active: false
+                      subItem: []
+                    - label: Health
+                      url: /health
+                      active: false
+                      subItem: []  
+                    - label: Entertainment
+                      url: /entertainment
+                      active: false
+                      subItem: []
+                    - label: Technology
+                      url: /technology
+                      active: false
+                      subItem: []        
+        '500':
+          $ref: '#/components/responses/InternalServerError'        
+
+components:
+  schemas:
+    Statistics:
+      type: object
+      properties:
+        size:
+          type: integer                                          
+        localHeapSize:
+          type: integer                                          
+        localOffHeapSize:
+          type: integer                                        
+        localDiskSize:
+          type: integer                                          
+        cacheHitRatio:
+          type: integer                                         
+        cacheHitCount:
+          type: integer                                         
+        cacheMissCount:
+          type: integer                                          
+        cacheMissExpiredCount:
+          type: integer                                          
+        cacheMissNotFoundCount:
+          type: integer
+      example:
+        size: 17
+        localHeapSize: 17
+        localOffHeapSize: 0
+        localDiskSize: 0
+        cacheHitRatio: 1
+        cacheHitCount: 4
+        cacheMissCount: 25
+        cacheMissExpiredCount: 0
+        cacheMissNotFoundCount: 25
+
+    ContentStoreItems:
+      type: object
+      properties:
+        name:
+          description: Name of item being retrieved (e.g. index.xml) 
+          type: string                                          
+        url:
+          description: The item’s URL (e.g. /site/website/index.xml)
+          type: string                                          
+        descriptorUrl:
+          description: "The item’s descriptor URL (e.g. for a folder: /site/website.meta.xml, for a page: /site/website/index.xml)"
+          type: string                                        
+        descriptorDom:
+          description: Contains the content of item being retrieved (DOM of xml)
+          type: string                                          
+        properties:
+          description: Contains additional properties that are generated by an ItemProcessor
+          type: string                                         
+        folder:
+          description: Indicates whether the item is a folder (true or false)
+          type: string 
+
+    UserProfile:
+      type: object
+      properties:
+        age: 
+          description:
+          type: integer
+        username: 
+          description:
+          type: string
+        lastname: 
+          description:
+          type: string
+
+    NavigationTreeNode:
+      type: object
+      properties:
+        label:
+          type: string                    
+        url: 
+          type: string 
+        active:
+          type: boolean
+        subItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/NavigationTreeNode' 
+      
+  responses:
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: No item found at /site/website/index.xml
+
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Required String parameter 'token' is not present
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Management authorization failed, invalid token.
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Internal Server Error
+
+  examples:
+    userProfileExample:
+      value:
+        age: 30
+        username: john
+        lastname: doe
+    
