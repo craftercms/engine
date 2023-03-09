@@ -16,47 +16,26 @@
 
 package org.craftercms.engine.graphql.impl.fetchers;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import co.elastic.clients.elasticsearch._types.SortOrder;
-import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import co.elastic.clients.elasticsearch.core.SearchResponse;
-import co.elastic.clients.elasticsearch.core.search.Hit;
-import co.elastic.clients.json.JsonData;
-import graphql.language.Argument;
-import graphql.language.ArrayValue;
-import graphql.language.BooleanValue;
-import graphql.language.Field;
-import graphql.language.FloatValue;
-import graphql.language.FragmentDefinition;
-import graphql.language.FragmentSpread;
-import graphql.language.InlineFragment;
-import graphql.language.IntValue;
-import graphql.language.ObjectField;
-import graphql.language.ObjectValue;
-import graphql.language.Selection;
-import graphql.language.StringValue;
-import graphql.language.Value;
-import graphql.language.VariableReference;
+import graphql.language.*;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.craftercms.search.elasticsearch.client.ElasticsearchClientWrapper;
+import org.craftercms.search.opensearch.client.OpenSearchClientWrapper;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch._types.SortOrder;
+import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
+import org.opensearch.client.opensearch._types.query_dsl.Query;
+import org.opensearch.client.opensearch.core.SearchResponse;
+import org.opensearch.client.opensearch.core.search.Hit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.util.StopWatch;
+
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.craftercms.engine.graphql.SchemaUtils.*;
 
@@ -93,9 +72,9 @@ public class ContentTypeBasedDataFetcher extends RequestAwareDataFetcher<Object>
     protected String defaultSortOrder;
 
     /**
-     * The instance of {@link ElasticsearchClientWrapper}
+     * The instance of {@link OpenSearchClientWrapper}
      */
-    protected ElasticsearchClientWrapper elasticsearchClient;
+    protected OpenSearchClientWrapper openSearchClient;
 
     @Required
     public void setDefaultLimit(final int defaultLimit) {
@@ -113,8 +92,8 @@ public class ContentTypeBasedDataFetcher extends RequestAwareDataFetcher<Object>
     }
 
     @Required
-    public void setElasticsearchClient(final ElasticsearchClientWrapper elasticsearchClient) {
-        this.elasticsearchClient = elasticsearchClient;
+    public void setOpenSearchClient(final OpenSearchClientWrapper openSearchClient) {
+        this.openSearchClient = openSearchClient;
     }
 
     /**
@@ -200,7 +179,7 @@ public class ContentTypeBasedDataFetcher extends RequestAwareDataFetcher<Object>
         logger.debug("Executing query: {}", query);
 
         watch.start("searching items");
-        SearchResponse<Map> response = elasticsearchClient.search(r -> r
+        SearchResponse<Map> response = openSearchClient.search(r -> r
             .query(Query.of(q -> q
                 .bool(query.build())
             ))

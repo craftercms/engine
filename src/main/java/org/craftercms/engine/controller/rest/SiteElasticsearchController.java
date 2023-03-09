@@ -17,8 +17,8 @@
 package org.craftercms.engine.controller.rest;
 
 import org.craftercms.core.controller.rest.RestControllerBase;
-import org.craftercms.engine.search.legacy.SiteAwareElasticsearchService;
-import org.elasticsearch.action.search.SearchResponse;
+import org.craftercms.engine.search.legacy.SiteAwareOpenSearchService;
+import org.opensearch.action.search.SearchResponse;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -44,11 +44,11 @@ public class SiteElasticsearchController extends RestControllerBase {
     public static final String URL_ROOT = "/site/elasticsearch";
     public static final String URL_SEARCH = "/search";
 
-    protected SiteAwareElasticsearchService elasticsearchService;
+    protected SiteAwareOpenSearchService openSearchService;
 
     @Required
-    public void setElasticsearchService(final SiteAwareElasticsearchService elasticsearchService) {
-        this.elasticsearchService = elasticsearchService;
+    public void setOpenSearchService(final SiteAwareOpenSearchService openSearchService) {
+        this.openSearchService = openSearchService;
     }
 
     @PostMapping(URL_SEARCH)
@@ -59,7 +59,7 @@ public class SiteElasticsearchController extends RestControllerBase {
         response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
         // Execute the query
-        SearchResponse searchResponse = elasticsearchService.search(request, parameters);
+        SearchResponse searchResponse = openSearchService.search(request, parameters);
 
         // Write the response in ES format
         response.setCharacterEncoding(StandardCharsets.UTF_8.toString());

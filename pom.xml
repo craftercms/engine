@@ -93,7 +93,7 @@
         </dependency>
         <dependency>
             <groupId>org.craftercms</groupId>
-            <artifactId>crafter-search-elasticsearch</artifactId>
+            <artifactId>crafter-search-opensearch</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

@@ -659,9 +659,9 @@
     <!-- ////////////////////////////////// -->
 
     <!-- Deprecated, in process to be removed -->
-    <bean id="crafter.elasticsearchService" class="org.craftercms.engine.search.legacy.SiteAwareElasticsearchService">
+    <bean id="crafter.elasticsearchService" class="org.craftercms.engine.search.legacy.SiteAwareOpenSearchService">
         <constructor-arg name="client">
-            <bean class="org.craftercms.search.elasticsearch.spring.RestHighLevelClientFactory">
+            <bean class="org.craftercms.search.opensearch.spring.RestHighLevelClientFactory">
                 <constructor-arg name="serverUrls" value="${crafter.engine.elasticsearch.urls}"/>
                 <property name="username" value="${crafter.engine.elasticsearch.username}"/>
                 <property name="password" value="${crafter.engine.elasticsearch.password}"/>
@@ -676,9 +676,9 @@
         <property name="filterQueries" value="${crafter.engine.elasticsearch.filters}"/>
     </bean>
 
-    <bean id="crafter.elasticsearchClient" class="org.craftercms.engine.search.SiteAwareElasticsearchClient">
+    <bean id="crafter.elasticsearchClient" class="org.craftercms.engine.search.SiteAwareOpenSearchClient">
         <constructor-arg name="client">
-            <bean class="org.craftercms.search.elasticsearch.spring.ElasticsearchClientFactory">
+            <bean class="org.craftercms.search.opensearch.spring.OpenSearchClientFactory">
                 <constructor-arg name="serverUrls" value="${crafter.engine.elasticsearch.urls}"/>
                 <property name="username" value="${crafter.engine.elasticsearch.username}"/>
                 <property name="password" value="${crafter.engine.elasticsearch.password}"/>
@@ -975,7 +975,7 @@
         <property name="defaultLimit" value="${crafter.engine.graphql.query.limit}"/>
         <property name="defaultSortField" value="${crafter.engine.graphql.query.sort.field}"/>
         <property name="defaultSortOrder" value="${crafter.engine.graphql.query.sort.order}"/>
-        <property name="elasticsearchClient" ref="crafter.elasticsearchClient"/>
+        <property name="openSearchClient" ref="crafter.elasticsearchClient"/>
     </bean>
 
     <bean id="crafter.urlTransformDataFetcher" class="org.craftercms.engine.graphql.impl.fetchers.UrlTransformDataFetcher">
