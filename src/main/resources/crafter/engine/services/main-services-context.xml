@@ -659,7 +659,7 @@
     <!-- ////////////////////////////////// -->
 
     <!-- Deprecated, in process to be removed -->
-    <bean id="crafter.elasticsearchService" class="org.craftercms.engine.search.legacy.SiteAwareOpenSearchService">
+    <bean id="crafter.searchService" class="org.craftercms.engine.search.legacy.SiteAwareOpenSearchService">
         <constructor-arg name="client">
             <bean class="org.craftercms.search.opensearch.spring.RestHighLevelClientFactory">
                 <constructor-arg name="serverUrls" value="${crafter.engine.elasticsearch.urls}"/>
@@ -676,7 +676,7 @@
         <property name="filterQueries" value="${crafter.engine.elasticsearch.filters}"/>
     </bean>
 
-    <bean id="crafter.elasticsearchClient" class="org.craftercms.engine.search.SiteAwareOpenSearchClient">
+    <bean id="crafter.searchClient" class="org.craftercms.engine.search.SiteAwareOpenSearchClient">
         <constructor-arg name="client">
             <bean class="org.craftercms.search.opensearch.spring.OpenSearchClientFactory">
                 <constructor-arg name="serverUrls" value="${crafter.engine.elasticsearch.urls}"/>
@@ -737,8 +737,8 @@
         <entry key="urlTransformationService" value-ref="crafter.urlTransformationService"/>
         <entry key="navTreeBuilder" value-ref="crafter.navTreeBuilder"/>
         <entry key="navBreadcrumbBuilder" value-ref="crafter.navBreadcrumbBuilder"/>
-        <entry key="elasticsearch" value-ref="crafter.elasticsearchService"/>
-        <entry key="elasticsearchClient" value-ref="crafter.elasticsearchClient"/>
+        <entry key="search" value-ref="crafter.searchService"/>
+        <entry key="searchClient" value-ref="crafter.searchClient"/>
         <entry key="breadcrumbBuilder" value-ref="crafter.breadcrumbBuilder"/>
         <entry key="globalProperties" value-ref="crafter.propertyResolver"/>
         <entry key="modePreview" value="#{T(java.lang.Boolean).valueOf(${crafter.engine.preview})}"/>
@@ -975,7 +975,7 @@
         <property name="defaultLimit" value="${crafter.engine.graphql.query.limit}"/>
         <property name="defaultSortField" value="${crafter.engine.graphql.query.sort.field}"/>
         <property name="defaultSortOrder" value="${crafter.engine.graphql.query.sort.order}"/>
-        <property name="openSearchClient" ref="crafter.elasticsearchClient"/>
+        <property name="searchClient" ref="crafter.searchClient"/>
     </bean>
 
     <bean id="crafter.urlTransformDataFetcher" class="org.craftercms.engine.graphql.impl.fetchers.UrlTransformDataFetcher">

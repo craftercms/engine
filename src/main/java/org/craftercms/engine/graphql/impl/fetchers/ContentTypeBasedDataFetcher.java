@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -74,7 +74,7 @@ public class ContentTypeBasedDataFetcher extends RequestAwareDataFetcher<Object>
     /**
      * The instance of {@link OpenSearchClientWrapper}
      */
-    protected OpenSearchClientWrapper openSearchClient;
+    protected OpenSearchClientWrapper searchClient;
 
     @Required
     public void setDefaultLimit(final int defaultLimit) {
@@ -92,8 +92,8 @@ public class ContentTypeBasedDataFetcher extends RequestAwareDataFetcher<Object>
     }
 
     @Required
-    public void setOpenSearchClient(final OpenSearchClientWrapper openSearchClient) {
-        this.openSearchClient = openSearchClient;
+    public void setSearchClient(final OpenSearchClientWrapper searchClient) {
+        this.searchClient = searchClient;
     }
 
     /**
@@ -179,7 +179,7 @@ public class ContentTypeBasedDataFetcher extends RequestAwareDataFetcher<Object>
         logger.debug("Executing query: {}", query);
 
         watch.start("searching items");
-        SearchResponse<Map> response = openSearchClient.search(r -> r
+        SearchResponse<Map> response = searchClient.search(r -> r
             .query(Query.of(q -> q
                 .bool(query.build())
             ))
