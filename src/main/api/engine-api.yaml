@@ -1,6 +1,6 @@
 openapi: 3.0.0
 servers:
-  - url: 'http://localhost:8080/api/1'
+  - url: 'http://localhost:8080'
 info:
   description: |-
     Crafter Engine API
@@ -22,11 +22,16 @@ tags:
     description: Current user operations  
   - name: config
     description: Mode operations
+  - name: monitoring
+    description: Monitoring operations  
+  - name: crafter-controller
+    description: Component operation  
 
 paths:
 
-  /site/context/id:
+  /api/1/site/context/id:
     get:
+      security: []
       tags:
         - site
       summary: Get the ID for the site context
@@ -59,8 +64,9 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
-  /site/context/status:
+  /api/1/site/context/status:
     get:
+      security: []
       tags:
         - site
       summary: Get the site context status
@@ -93,8 +99,9 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
-  /site/context/destroy:
+  /api/1/site/context/destroy:
     get:
+      security: []
       tags:
         - site
       summary: Destroy the site context
@@ -127,8 +134,9 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
-  /site/context/rebuild:
+  /api/1/site/context/rebuild:
     get:
+      security: []
       tags:
         - site
       summary: Rebuild the site context
@@ -161,11 +169,12 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'          
 
-  /site/context/graphql/rebuild:
+  /api/1/site/context/graphql/rebuild:
     get:
+      security: []
       tags:
         - site
-      summary: Rebuild GraphQL schema for site context
+      summary: Rebuild GraphQL Schema 
       operationId: rebuildGraphQLSchema
       description: Rebuild the GraphQL schema for the site context resolved for the current request.
       parameters:
@@ -195,8 +204,9 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'          
 
-  /site/context/jobs/list:
+  /api/1/site/context/jobs/list:
     get:
+      security: []
       tags:
         - site
       summary: List jobs
@@ -235,8 +245,9 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'          
 
-  /site/mappings/reload:
+  /api/1/site/mappings/reload:
     get:
+      security: []
       tags:
         - site
       summary: Reload the mappings
@@ -265,8 +276,9 @@ paths:
                     type: string
                     example: The current resolver is not a ReloadableMappingsSiteResolver. No mappings to reload
   
-  /site/cache/clear:
+  /api/1/site/cache/clear:
     get:
+      security: []
       tags:
         - site
       summary: Clear content cache
@@ -298,8 +310,9 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'          
 
-  /site/cache/statistics:
+  /api/1/site/cache/statistics:
     get:
+      security: []
       tags:
         - site
       summary: Statistics
@@ -327,11 +340,12 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'   
 
-  /site/content_store/item:
+  /api/1/site/content_store/item:
     get:
+      security: []
       tags:
         - site
-      summary: Content store get item
+      summary: Get Item
       operationId: getItem
       description: Get an Item from the content store. <br> This API is used to get pages, components and folders. It returns the content and other metadata such as url, descriptorUrl, folder flag, and extra properties
       parameters:
@@ -412,7 +426,7 @@ paths:
                               include: /site/components/features/sapien-veroeros.xml
                               disableFlattening": false
                         hero_image: /static-assets/images/strawberries.jpg
-                        features_title: "Erat lacinia"          
+                        features_title: "Erat lacinia"         
                     properties: 
                       //page/merge-strategy: inherit-levels
                       //page/content-type: /page/home
@@ -475,11 +489,12 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'                      
 
-  /site/content_store/children:
+  /api/1/site/content_store/children:
     get:
+      security: []
       tags:
         - site
-      summary: Content store get children
+      summary: Get Children
       operationId: getChildren
       description: Get the list of Items directly under a folder in the content store.
       parameters:
@@ -549,11 +564,12 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'        
 
-  /site/content_store/tree:
+  /api/1/site/content_store/tree:
     get:
+      security: []
       tags:
         - site
-      summary: Content store get tree
+      summary: Get Tree
       operationId: getTree
       description: Get the complete Item hierarchy under the specified folder in the content store.
       parameters:
@@ -588,8 +604,9 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'     
 
-  /profile/get:
+  /api/1/profile/get:
     get:
+      security: []
       tags:
         - profile
       summary: Get Profile
@@ -615,8 +632,9 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'        
   
-  /profile/set:
+  /api/1/profile/set:
     get:
+      security: []
       tags:
         - profile
       summary: Set Profile
@@ -652,8 +670,9 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'        
 
-  /navigation/breadcrumb:
+  /api/1/site/navigation/breadcrumb:
     get:
+      security: []
       tags:
         - site
       summary: Breadcrumb
@@ -693,8 +712,9 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'        
 
-  /navigation/tree:
+  /api/1/site/navigation/tree:
     get:
+      security: []
       tags:
         - site
       summary: Tree
@@ -713,6 +733,7 @@ paths:
           description: The depth of the tree (defaults to 1)
           schema:
             type: integer    
+          example: 2  
         - name: currentPageUrl
           in: query
           description: The URL of the current page
@@ -727,28 +748,589 @@ paths:
                 type: object
                 $ref: '#/components/schemas/NavigationTreeNode'  
               example:
-                - label: Home
-                  url: /
-                  active: false
-                  subItem: 
-                    - label: Style
-                      url: /style
-                      active: false
-                      subItem: []
-                    - label: Health
-                      url: /health
-                      active: false
-                      subItem: []  
-                    - label: Entertainment
-                      url: /entertainment
-                      active: false
-                      subItem: []
-                    - label: Technology
-                      url: /technology
-                      active: false
-                      subItem: []        
+                label: Home
+                url: /
+                active: false
+                subItem: 
+                  - label: Style
+                    url: /style
+                    active: false
+                    subItem: []
+                  - label: Health
+                    url: /health
+                    active: false
+                    subItem: []  
+                  - label: Entertainment
+                    url: /entertainment
+                    active: false
+                    subItem: []
+                  - label: Technology
+                    url: /technology
+                    active: false
+                    subItem: []        
         '500':
           $ref: '#/components/responses/InternalServerError'        
+
+  /api/1/site/url/transform:
+    get:
+      security: []
+      tags:
+        - site
+      summary: Transform
+      operationId: transform
+      description: Transforms a URL, based on the current site’s configuration.
+      parameters:
+        - name: url
+          in: query
+          required: true
+          description: The URL to be transformed
+          schema:
+            type: string
+          example: /site/website/style/index.xml
+        - name: transformerName
+          in: query
+          required: true
+          description: The name of the transformer to apply
+          schema:
+            type: string
+          example: storeUrlToRenderUrl  
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string    
+              example: /style
+                
+        '500':
+          $ref: '#/components/responses/InternalServerError'        
+
+  /api/1/site/elasticsearch/search:
+    post:
+      security: []
+      tags:
+        - site
+      summary: Search
+      operationId: search
+      description: Performs a search operation in the Elasticsearch index of the current site resolved for the request and optional other indexes. See <a class="reference external" href="https://docs.craftercms.org/en/4.0/developers/search-elasticsearch.html#search-elasticsearch-multi-index-query" rel="noopener noreferrer" target="_blank">Multi-index Query</a> for more information on performing a multiple index search. <br><br> <i>Note:</i> <br> <i>The request body must be a valid Elasticsearch JSON query as described in the</i> <a class="reference external" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/search-search.html" rel="noopener noreferrer" target="_blank">official docs</a>
+      parameters:
+        - name: index
+          in: query          
+          description: Comma separated list of index names to be searched in addition to the current site
+          schema:
+            type: string          
+      requestBody:    
+        description: User entity to create
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                _source:
+                  type: string
+                  example: "localId"
+                size:
+                  type: integer
+                  example: 1
+                query:
+                  type:  string
+                  example: '"match_all" : {}'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string    
+              example:
+                { 
+                  "took": 41,
+                  "timed_out": false,
+                  "_shards": {
+                    "total": 5,
+                    "successful": 5,
+                    "skipped": 0,
+                    "failed": 0
+                  },
+                  "hits": {
+                    "total": 28,
+                    "max_score": 1.0,
+                    "hits": [
+                      {
+                        "_index": "editorial-preview_v1",
+                        "_type": "_doc",
+                        "_id": "f4a1af43fed0b4e246abb3a8c7d7323d",
+                        "_score": 1.0,
+                        "_source": {
+                          "localId": "/site/components/articles-widget/latest-articles-widget.xml"
+                        }
+                      }
+                    ]
+                  }
+                }        
+        '500':
+          $ref: '#/components/responses/InternalServerError'        
+
+  /api/1/site/graphql:
+    get:
+      security: []
+      tags:
+        - site
+      summary: Query (GET)
+      operationId: query
+      description: Performs a query in the GraphQL instance of the current site resolved for the request. <br><br> <i>Note:</i> <br> <i>The query string must be a valid GraphQL query as described in the</i> <a class="reference external" href="https://graphql.org/learn/queries/" rel="noopener noreferrer" target="_blank">official docs</a>      
+      parameters:
+        - name: query
+          in: query 
+          required: true         
+          description: The GraphQL query
+          schema:
+            type: string
+          example: "{page_article{items{title_t}}}"
+        - name: operationName
+          in: query                   
+          description: The GraphQL operation name
+          schema:
+            type: string              
+        - name: variables
+          in: query                   
+          description: A JSON object containing variables for the query
+          schema:
+            type: string                    
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string   
+              example: 
+                {
+                  "data": {
+                    "page_article": {
+                      "items": [
+                        {
+                          "title_t": "New ACME Phone Released Today"
+                        },
+                        {
+                           "title_t": "Top Clubs In Virginia"
+                        },
+                        {
+                           "title_t": "Coffee is Good for Your Health"
+                        },
+                        {
+                          "title_t": "5 Popular Diets for Women"
+                        },
+                        {
+                          "title_t": "Top Romantic Valentine Movies"
+                        },
+                        {
+                          "title_t": "10 Tips to Get a Six Pack"
+                        },
+                        {
+                          "title_t": "Women Styles for Winter"
+                        },
+                        {
+                          "title_t": "Men Styles For Winter"
+                        },
+                        {
+                          "title_t": "Top Books For Young Women"
+                        }
+                      ]
+                    }
+                  }
+                }                                
+        '500':
+          $ref: '#/components/responses/InternalServerError'     
+    post:
+      security: []
+      tags:
+        - site
+      summary: Query (POST)
+      operationId: queryPost
+      description: Performs a query in the GraphQL instance of the current site resolved for the request. <br><br> <i>Note:</i> <br> <i>The query string must be a valid GraphQL query as described in the</i> <a class="reference external" href="https://graphql.org/learn/queries/" rel="noopener noreferrer" target="_blank">official docs</a>       
+      requestBody:
+        description: Search Parameters
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  description: The GraphQL query
+                  type: string
+                  example: 
+                    "query ArticlesByAuthor($author:String) {
+                      page_article {
+                        total
+                        items {
+                          title_t
+                          author_s(filter:{equals:$author})
+                          date_dt
+                        }
+                      }
+                    }"
+                variables:
+                  description: A JSON object containing variables for the query
+                  type: string
+                  example: 
+                    "{
+                       \"author\": \"Jane Doe\"
+                    }"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+              example: 
+                {
+                  "data": {
+                    "page_article": {
+                      "total": 4,
+                      "items": [
+                        {
+                          "title_t": "Women Styles for Winter",
+                          "author_s": "Jane Doe",
+                          "date_dt": "2021-01-03T05:00:00Z"
+                        },
+                        {
+                          "title_t": "Top Books For Young Women",
+                          "author_s": "Jane Doe",
+                          "date_dt": "2020-12-28T05:00:00Z"
+                        },
+                        {
+                          "title_t": "5 Popular Diets for Women",
+                          "author_s": "Jane Doe",
+                          "date_dt": "2021-03-14T04:00:00Z"
+                        },
+                        {
+                          "title_t": "Top Romantic Valentine Movies",
+                          "author_s": "Jane Doe",
+                          "date_dt": "2021-02-14T05:00:00Z"
+                        }
+                      ]
+                    }
+                  }
+                }                                 
+        '500':
+          $ref: '#/components/responses/InternalServerError'   
+
+  /api/1/config/preview:
+    get:
+      security: []
+      tags:
+        - config
+      summary: Preview
+      operationId: preview
+      description: Indicates if Engine is configured in preview mode.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  preview:
+                    type: boolean                    
+                    example: true
+
+  /api/1/monitoring/memory:
+    get:
+      security: []
+      tags:
+        - monitoring
+      summary: Get Memory Stats
+      operationId: memory
+      description: Returns the Crafter Engine JVM memory details.
+      parameters:
+        - name: token
+          in: query
+          description: The authorization token
+          required: true
+          schema:
+            type: string
+          example: defaultManagementToken
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalJvmMemory:
+                    type: integer                    
+                    example: 2017984512
+                  freeJvmMemory:
+                    type: integer                    
+                    example: 1113921056
+                  maxJvmMemory:
+                    type: integer                    
+                    example: 3817865216
+                  totalOsMemory:
+                    type: integer                    
+                    example: 17179869184          
+                  freeOsMemory:
+                    type: integer                    
+                    example: 2669301760            
+                  totalSwapMemory:
+                    type: integer                    
+                    example: 2147483648              
+                  freeSwapMemory:
+                    type: integer                    
+                    example: 1026555904                
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'                      
+                                    
+  /api/1/monitoring/status:
+    get:
+      security: []
+      tags:
+        - monitoring
+      summary: Get Status
+      operationId: status
+      description: Returns the Crafter Engine JVM status details.
+      parameters:
+        - name: token
+          in: query
+          description: The authorization token
+          required: true
+          schema:
+            type: string
+          example: defaultManagementToken
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  uptime:
+                    type: integer                    
+                    example: 2017984512
+                  startup:
+                    type: string                    
+                    example: "2019-03-07T21:29:11.049Z"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/1/monitoring/version:
+    get:
+      security: []
+      tags:
+        - monitoring
+      summary: Get Version
+      operationId: version
+      description: Returns the Crafter Engine JVM status details.
+      parameters:
+        - name: token
+          in: query
+          description: The authorization token
+          required: true
+          schema:
+            type: string
+          example: defaultManagementToken
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  packageName:
+                    type: string                    
+                    example: "Crafter Engine"
+                  packageVersion:
+                    type: string                    
+                    example: "4.0.3-SNAPSHOT"
+                  packageBuild:
+                    type: string                    
+                    example: "48d29a56c6011f2908fb160f7648f66785d44b81"  
+                  packageBuildDate:
+                    type: string                    
+                    example: "2023-03-08T21:53:22.558Z"      
+                  osName:
+                    type: string                    
+                    example: "Mac OS X"        
+                  osVersion:
+                    type: string                    
+                    example: "11.2"          
+                  osArch:
+                    type: string                    
+                    example: "x86_64"            
+                  javaVersion:
+                    type: string                    
+                    example: "11"
+                  javaVendor:
+                    type: string                    
+                    example: "Oracle Corporation"
+                  javaVm:
+                    type: string                    
+                    example: "OpenJDK 64-Bit Server VM"                  
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  
+  /api/1/monitoring/log:
+    get:
+      security: []
+      tags:
+        - monitoring
+      summary: Get Log Events
+      operationId: log
+      description: Returns all events recorded in the Crafter Engine log for a given site in a specific time period.
+      parameters:
+        - name: site
+          in: query
+          description: The name of the site
+          required: true
+          schema:
+            type: string
+          example: my-editorial
+        - name: since
+          in: query
+          description: The time in milliseconds from which events should be fetched
+          required: true
+          schema:
+            type: long
+          example: 1396772083660  
+        - name: token
+          in: query
+          description: The authorization token
+          required: true
+          schema:
+            type: string
+          example: defaultManagementToken
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    exception:
+                      type: string                        
+                    site:
+                      type: string
+                    level:
+                      type: string
+                    thread:
+                      type: string
+                    message:
+                      type: string
+                    timestampm:
+                      type: long 
+                    timestaamp:
+                      type: string
+                example: 
+                  - exception: ""
+                    site: "editorial"
+                    level: "INFO"                  
+                    thread: "pool-16-thread-1"
+                    message: "--------------------------------------------------"
+                    timestampm: 1678683085456
+                    timestamp: "2023-03-13T04:51:25.456+0000"
+                  - exception: ""
+                    site: "editorial"
+                    level: "INFO"                  
+                    thread: "pool-16-thread-1"
+                    message: "<Initializing context site: editorial>"
+                    timestampm: 1678683085477
+                    timestamp: "2023-03-13T04:51:25.477+0000"
+                  - exception: ""
+                    site: "editorial"
+                    level: "INFO"                  
+                    thread: "pool-16-thread-1"
+                    message: "--------------------------------------------------"
+                    timestampm: 1678683085498
+                    timestamp: "2023-03-13T04:51:25.498+0000"
+                  - exception: ""
+                    site: "editorial"
+                    level: "INFO"                  
+                    thread: "pool-16-thread-1"
+                    message: "Starting GraphQL schema build for site 'editorial'"
+                    timestampm: 1678683085499
+                    timestamp: "2023-03-13T04:51:25.499+0000"                                 
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+          
+  /crafter-controller/component:
+    get:
+      security: []
+      tags:
+        - crafter-controller
+      summary: Get Component
+      operationId: getComponent
+      description: Get a component.
+      parameters:
+        - name: path
+          in: query
+          description: Path to the component <br> (e.g. /site/components/headers/header.xml)
+          required: true
+          schema:
+            type: string
+          example: /site/components/features/4be0a368-783c-8f73-7469-63a62636bd4c.xml
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string   
+              example: 
+                  <!-- Feature Component -->\n
+                    <article
+                      class="feature"
+                      data-craftercms-model-path="/site/components/features/4be0a368-783c-8f73-7469-63a62636bd4c.xml"
+                      data-craftercms-model-id="4be0a368-783c-8f73-7469-63a62636bd4c"
+                    >  <span
+                       class="icon fa-smile far"
+                       data-craftercms-model-path="/site/components/features/4be0a368-783c-8f73-7469-63a62636bd4c.xml"
+                       data-craftercms-model-id="4be0a368-783c-8f73-7469-63a62636bd4c"
+                       data-craftercms-field-id="icon_s"
+                    ></span>
+                    <div class="content">
+                      <h3
+                        data-craftercms-model-path="/site/components/features/4be0a368-783c-8f73-7469-63a62636bd4c.xml"
+                        data-craftercms-model-id="4be0a368-783c-8f73-7469-63a62636bd4c"
+                        data-craftercms-field-id="title_t"
+                        >      Smile
+                      </h3>
+                      <div
+                        data-craftercms-model-path="/site/components/features/4be0a368-783c-8f73-7469-63a62636bd4c.xml"
+                        data-craftercms-model-id="4be0a368-783c-8f73-7469-63a62636bd4c"
+                        data-craftercms-field-id="body_html"
+                        >      <p>Smile, aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
+                      </div>
+                    </div>
+                  </article>
+                  <!-- /Feature Component -->
 
 components:
   schemas:
@@ -809,14 +1391,11 @@ components:
     UserProfile:
       type: object
       properties:
-        age: 
-          description:
+        age:           
           type: integer
-        username: 
-          description:
+        username:
           type: string
-        lastname: 
-          description:
+        lastname:           
           type: string
 
     NavigationTreeNode:
@@ -833,6 +1412,7 @@ components:
           items:
             $ref: '#/components/schemas/NavigationTreeNode' 
       
+          
   responses:
     NotFound:
       description: Resource not found
