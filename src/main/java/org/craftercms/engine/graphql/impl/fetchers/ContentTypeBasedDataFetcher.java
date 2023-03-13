@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 import static org.craftercms.engine.graphql.SchemaUtils.*;
 
 /**
- * Implementation of {@link DataFetcher} that queries Elasticsearch to retrieve content based on a content type.
+ * Implementation of {@link DataFetcher} that queries OpenSearch to retrieve content based on a content type.
  * @author joseross
  * @since 3.1
  */

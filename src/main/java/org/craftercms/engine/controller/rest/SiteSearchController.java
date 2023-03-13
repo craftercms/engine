@@ -34,14 +34,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
- * REST controller to expose the Elasticsearch service
+ * REST controller to expose the Search service
  * @author joseross
  */
 @RestController
-@RequestMapping(RestControllerBase.REST_BASE_URI + SiteElasticsearchController.URL_ROOT)
-public class SiteElasticsearchController extends RestControllerBase {
+@RequestMapping(RestControllerBase.REST_BASE_URI + SiteSearchController.URL_ROOT)
+public class SiteSearchController extends RestControllerBase {
 
-    public static final String URL_ROOT = "/site/elasticsearch";
+    public static final String URL_ROOT = "/site/search";
     public static final String URL_SEARCH = "/search";
 
     protected SiteAwareOpenSearchService openSearchService;

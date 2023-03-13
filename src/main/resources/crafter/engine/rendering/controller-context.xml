@@ -115,8 +115,8 @@
         <constructor-arg name="urlTransformationService" ref="crafter.urlTransformationService"/>
     </bean>
 
-    <bean id="crafter.siteElasticsearchController"
-          class="org.craftercms.engine.controller.rest.SiteElasticsearchController">
+    <bean id="crafter.siteSearchController"
+          class="org.craftercms.engine.controller.rest.SiteSearchController">
         <property name="openSearchService" ref="crafter.searchService"/>
     </bean>
 
