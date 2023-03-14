@@ -19,22 +19,19 @@ package org.craftercms.engine.controller.rest;
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.engine.search.legacy.SiteAwareOpenSearchService;
 import org.opensearch.action.search.SearchResponse;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.beans.ConstructorProperties;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
  * REST controller to expose the Search service
+ *
  * @author joseross
  */
 @RestController
@@ -44,11 +41,11 @@ public class SiteSearchController extends RestControllerBase {
     public static final String URL_ROOT = "/site/search";
     public static final String URL_SEARCH = "/search";
 
-    protected SiteAwareOpenSearchService openSearchService;
+    protected final SiteAwareOpenSearchService searchService;
 
-    @Required
-    public void setOpenSearchService(final SiteAwareOpenSearchService openSearchService) {
-        this.openSearchService = openSearchService;
+    @ConstructorProperties({"searchService"})
+    public SiteSearchController(final SiteAwareOpenSearchService searchService) {
+        this.searchService = searchService;
     }
 
     @PostMapping(URL_SEARCH)
@@ -59,7 +56,7 @@ public class SiteSearchController extends RestControllerBase {
         response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
         // Execute the query
-        SearchResponse searchResponse = openSearchService.search(request, parameters);
+        SearchResponse searchResponse = searchService.search(request, parameters);
 
         // Write the response in ES format
         response.setCharacterEncoding(StandardCharsets.UTF_8.toString());

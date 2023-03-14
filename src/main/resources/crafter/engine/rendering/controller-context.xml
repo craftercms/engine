@@ -117,7 +117,7 @@
 
     <bean id="crafter.siteSearchController"
           class="org.craftercms.engine.controller.rest.SiteSearchController">
-        <property name="openSearchService" ref="crafter.searchService"/>
+        <constructor-arg name="searchService" ref="crafter.searchService"/>
     </bean>
 
     <bean id="crafter.siteGraphQLController" class="org.craftercms.engine.controller.rest.SiteGraphQLController"/>
