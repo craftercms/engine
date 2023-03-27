@@ -20,7 +20,7 @@ tags:
     description: Content retrieval operations
   - name: navigation
     description: Navigation and structure operations
-  - name: Search
+  - name: search
     description: Search operations
   - name: cache
     description: Cache operations
