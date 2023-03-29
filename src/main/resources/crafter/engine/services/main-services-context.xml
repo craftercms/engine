@@ -192,7 +192,7 @@
             <list>
                 <bean class="org.craftercms.engine.http.impl.ViewNotResolvedExceptionHandler"/>
                 <bean class="org.craftercms.engine.http.impl.HttpStatusCodeAwareExceptionHandler"/>
-                <bean class="org.craftercms.engine.http.impl.ConstraintViolationException"/>
+                <bean class="org.craftercms.engine.http.impl.ConstraintViolationExceptionHandler"/>
                 <bean class="org.craftercms.engine.http.impl.DefaultExceptionHandler"/>
             </list>
         </property>
