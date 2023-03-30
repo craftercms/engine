@@ -32,6 +32,7 @@
     <import resource="classpath:crafter/engine/services/url-transformation-context.xml"/>
     <import resource="classpath:crafter/engine/services/targeting-context.xml"/>
     <import resource="classpath:crafter/engine/services/locale-context.xml"/>
+    <import resource="classpath:crafter/engine/services/search-legacy-context.xml"/>
 
     <!-- ////////////////////////////////// -->
     <!--								 	-->
@@ -662,13 +663,13 @@
     <bean id="crafter.searchService" class="org.craftercms.engine.search.legacy.SiteAwareOpenSearchService">
         <constructor-arg name="client">
             <bean class="org.craftercms.search.opensearch.spring.RestHighLevelClientFactory">
-                <constructor-arg name="serverUrls" value="${crafter.engine.search.urls}"/>
-                <property name="username" value="${crafter.engine.search.username}"/>
-                <property name="password" value="${crafter.engine.search.password}"/>
-                <property name="connectTimeout" value="${crafter.engine.search.timeout.connect}"/>
-                <property name="socketTimeout" value="${crafter.engine.search.timeout.socket}"/>
-                <property name="threadCount" value="${crafter.engine.search.threads}"/>
-                <property name="socketKeepAlive" value="${crafter.engine.search.keepAlive}"/>
+                <constructor-arg name="serverUrls" ref="crafter.searchUrls"/>
+                <property name="username" ref="crafter.searchUsername"/>
+                <property name="password" ref="crafter.searchPassword"/>
+                <property name="connectTimeout" ref="crafter.searchConnectTimeout"/>
+                <property name="socketTimeout" ref="crafter.searchSocketTimeout"/>
+                <property name="threadCount" ref="crafter.searchThreadCount"/>
+                <property name="socketKeepAlive" ref="crafter.searchSocketKeepAlive"/>
             </bean>
         </constructor-arg>
         <constructor-arg name="indexIdFormat" value="${crafter.engine.search.index.format}"/>
@@ -679,13 +680,13 @@
     <bean id="crafter.searchClient" class="org.craftercms.engine.search.SiteAwareOpenSearchClient">
         <constructor-arg name="client">
             <bean class="org.craftercms.search.opensearch.spring.OpenSearchClientFactory">
-                <constructor-arg name="serverUrls" value="${crafter.engine.search.urls}"/>
-                <property name="username" value="${crafter.engine.search.username}"/>
-                <property name="password" value="${crafter.engine.search.password}"/>
-                <property name="connectTimeout" value="${crafter.engine.search.timeout.connect}"/>
-                <property name="socketTimeout" value="${crafter.engine.search.timeout.socket}"/>
-                <property name="threadCount" value="${crafter.engine.search.threads}"/>
-                <property name="socketKeepAlive" value="${crafter.engine.search.keepAlive}"/>
+                <constructor-arg name="serverUrls" ref="crafter.searchUrls"/>
+                <property name="username" ref="crafter.searchUsername"/>
+                <property name="password" ref="crafter.searchPassword"/>
+                <property name="connectTimeout" ref="crafter.searchConnectTimeout"/>
+                <property name="socketTimeout" ref="crafter.searchSocketTimeout"/>
+                <property name="threadCount" ref="crafter.searchThreadCount"/>
+                <property name="socketKeepAlive" ref="crafter.searchSocketKeepAlive"/>
             </bean>
         </constructor-arg>
         <constructor-arg name="indexIdFormat" value="${crafter.engine.search.index.format}"/>
