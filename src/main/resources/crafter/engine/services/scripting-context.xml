@@ -70,6 +70,9 @@
         <entry key="crafter.authenticationManager" value-ref="crafter.profileAuthenticationManager"/>
         <entry key="connectionFactoryLocator" value-ref="crafter.connectionFactoryLocator"/>
         <entry key="providerLoginSupport" value-ref="crafter.providerLoginSupport"/>
+
+        <entry key="elasticsearch" value-ref="crafter.searchService"/>
+        <entry key="elasticsearchClient" value-ref="crafter.searchClient"/>
     </util:map>
 
 </beans>
