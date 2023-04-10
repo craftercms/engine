@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License version 3 as published by
+  ~ the Free Software Foundation.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <bean id="crafter.searchUrls" class="org.craftercms.engine.util.spring.properties.FallbackPropertyFactory">
+        <constructor-arg>
+            <util:list>
+                <value>crafter.engine.search.urls</value>
+                <value>crafter.engine.elasticsearch.urls</value>
+                <value>crafter.engine.search.urls.default</value>
+            </util:list>
+        </constructor-arg>
+        <constructor-arg name="type" value="java.lang.String"/>
+    </bean>
+
+    <bean id="crafter.searchUsername" class="org.craftercms.engine.util.spring.properties.FallbackPropertyFactory">
+        <constructor-arg>
+            <util:list>
+                <value>crafter.engine.search.username</value>
+                <value>crafter.engine.elasticsearch.username</value>
+            </util:list>
+        </constructor-arg>
+        <constructor-arg name="type" value="java.lang.String"/>
+        <property name="defaultValue" value=""/>
+    </bean>
+
+    <bean id="crafter.searchPassword" class="org.craftercms.engine.util.spring.properties.FallbackPropertyFactory">
+        <constructor-arg>
+            <util:list>
+                <value>crafter.engine.search.password</value>
+                <value>crafter.engine.elasticsearch.password</value>
+            </util:list>
+        </constructor-arg>
+        <constructor-arg name="type" value="java.lang.String"/>
+        <property name="defaultValue" value=""/>
+    </bean>
+
+    <bean id="crafter.searchConnectTimeout" class="org.craftercms.engine.util.spring.properties.FallbackPropertyFactory">
+        <constructor-arg>
+            <util:list>
+                <value>crafter.engine.search.timeout.connect</value>
+                <value>crafter.engine.elasticsearch.timeout.connect</value>
+            </util:list>
+        </constructor-arg>
+        <constructor-arg name="type" value="java.lang.Integer"/>
+    </bean>
+
+    <bean id="crafter.searchSocketTimeout" class="org.craftercms.engine.util.spring.properties.FallbackPropertyFactory">
+        <constructor-arg>
+            <util:list>
+                <value>crafter.engine.search.timeout.socket</value>
+                <value>crafter.engine.elasticsearch.timeout.socket</value>
+            </util:list>
+        </constructor-arg>
+        <constructor-arg name="type" value="java.lang.Integer"/>
+    </bean>
+
+    <bean id="crafter.searchThreadCount" class="org.craftercms.engine.util.spring.properties.FallbackPropertyFactory">
+        <constructor-arg>
+            <util:list>
+                <value>crafter.engine.search.threads</value>
+                <value>crafter.engine.elasticsearch.threads</value>
+            </util:list>
+        </constructor-arg>
+        <constructor-arg name="type" value="java.lang.Integer"/>
+    </bean>
+
+    <bean id="crafter.searchSocketKeepAlive" class="org.craftercms.engine.util.spring.properties.FallbackPropertyFactory">
+        <constructor-arg>
+            <util:list>
+                <value>crafter.engine.search.keepAlive</value>
+                <value>crafter.engine.elasticsearch.keepAlive</value>
+            </util:list>
+        </constructor-arg>
+        <constructor-arg name="type" value="java.lang.Boolean"/>
+    </bean>
+
+    <bean id="crafter.searchFilters" class="org.craftercms.engine.util.spring.properties.FallbackPropertyFactory">
+        <constructor-arg>
+            <util:list>
+                <value>crafter.engine.search.filters</value>
+                <value>crafter.engine.elasticsearch.filters</value>
+            </util:list>
+        </constructor-arg>
+        <constructor-arg name="type" value="java.lang.String"/>
+    </bean>
+</beans>

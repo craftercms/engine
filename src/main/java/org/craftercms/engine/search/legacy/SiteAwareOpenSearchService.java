@@ -13,54 +13,51 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.craftercms.engine.search;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.SearchType;
-import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
-import co.elastic.clients.elasticsearch.core.SearchRequest;
-import org.apache.commons.collections4.list.SetUniqueList;
+package org.craftercms.engine.search.legacy;
+
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.LocaleUtils;
-import org.craftercms.search.elasticsearch.impl.client.AbstractElasticsearchClientWrapper;
+import org.craftercms.search.opensearch.impl.AbstractOpenSearchWrapper;
+import org.opensearch.action.search.SearchRequest;
+import org.opensearch.action.search.SearchType;
+import org.opensearch.action.support.IndicesOptions;
+import org.opensearch.client.RestHighLevelClient;
+import org.opensearch.index.query.BoolQueryBuilder;
+import org.opensearch.search.builder.SearchSourceBuilder;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import javax.servlet.http.HttpServletRequest;
 import java.beans.ConstructorProperties;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.collections4.list.SetUniqueList.setUniqueList;
-import static org.apache.commons.lang3.StringUtils.appendIfMissing;
-import static org.apache.commons.lang3.StringUtils.removeStart;
-import static org.apache.commons.lang3.StringUtils.startsWith;
+import static org.apache.commons.lang3.StringUtils.*;
 import static org.craftercms.commons.locale.LocaleUtils.appendLocale;
 import static org.craftercms.commons.locale.LocaleUtils.getCompatibleLocales;
-import static org.craftercms.engine.util.LocaleUtils.getCurrentLocale;
-import static org.craftercms.engine.util.LocaleUtils.getDefaultLocale;
-import static org.craftercms.engine.util.LocaleUtils.isTranslationEnabled;
+import static org.craftercms.engine.util.LocaleUtils.*;
+import static org.opensearch.index.query.QueryBuilders.*;
 
 /**
- * Implementation of {@link AbstractElasticsearchClientWrapper} that sets the index and security filters based on the
- * current site context for all search requests.
- *
+ * Implementation of {@link org.craftercms.search.opensearch.OpenSearchWrapper}
+ * that sets the index based on the current site context for all search requests.
  * @author joseross
- * @since 4.0.0
+ * @since 3.1
  */
-public class SiteAwareElasticsearchClient extends AbstractElasticsearchClientWrapper {
+public class SiteAwareOpenSearchService extends AbstractOpenSearchWrapper {
 
     private static final String DEFAULT_ROLE_FIELD_NAME = "authorizedRoles.item.role";
 
@@ -69,6 +66,7 @@ public class SiteAwareElasticsearchClient extends AbstractElasticsearchClientWra
     private static final String DEFAULT_FALLBACK_PARAM_NAME = "localeFallback";
 
     private static final String ROLE_PREFIX = "ROLE_";
+
 
     /**
      * Format used to build the index id
@@ -84,7 +82,7 @@ public class SiteAwareElasticsearchClient extends AbstractElasticsearchClientWra
     protected final boolean enableTranslation;
 
     @ConstructorProperties({"client", "indexIdFormat", "enableTranslation"})
-    public SiteAwareElasticsearchClient(ElasticsearchClient client, String indexIdFormat, boolean enableTranslation) {
+    public SiteAwareOpenSearchService(RestHighLevelClient client, String indexIdFormat, boolean enableTranslation) {
         super(client);
         this.indexIdFormat = indexIdFormat;
         this.enableTranslation = enableTranslation;
@@ -106,12 +104,12 @@ public class SiteAwareElasticsearchClient extends AbstractElasticsearchClientWra
         if (!(enableTranslation && isTranslationEnabled())) {
             return emptyList();
         }
-        SetUniqueList<Locale> locales = setUniqueList(new LinkedList<>());
-        RequestContext requestContext = RequestContext.getCurrent();
+        var locales = setUniqueList(new LinkedList<Locale>());
+        var requestContext = RequestContext.getCurrent();
         String useFallback = null;
         if (requestContext != null) {
-            HttpServletRequest httpRequest = requestContext.getRequest();
-            String requestedLocales = httpRequest.getParameter(localesParameterName);
+            var httpRequest = requestContext.getRequest();
+            var requestedLocales = httpRequest.getParameter(localesParameterName);
             useFallback = httpRequest.getParameter(fallbackParameterName);
             if (StringUtils.isNotEmpty(requestedLocales)) {
                 // split the locales and add all compatible versions to the list
@@ -132,15 +130,11 @@ public class SiteAwareElasticsearchClient extends AbstractElasticsearchClientWra
         return locales;
     }
 
-    protected String addPrefix(SiteContext siteContext, String name) {
-        return String.format("%s_%s", siteContext.getSiteName(), name);
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected void updateIndex(SearchRequest request, Map<String, Object> parameters, RequestUpdates updates) {
-        // Call the parent to support custom index search
-        super.updateIndex(request, parameters, updates);
-
+    protected void updateIndex(final SearchRequest request) {
         SiteContext siteContext = SiteContext.getCurrent();
         if (siteContext == null) {
             throw new IllegalStateException("Current site context not found");
@@ -149,7 +143,7 @@ public class SiteAwareElasticsearchClient extends AbstractElasticsearchClientWra
         // Generate the default alias for the current site
         String aliasName = String.format(indexIdFormat, siteContext.getSiteName());
         // Get the requested indices
-        List<String> currentIndices = updates.getIndex();
+        String[] currentIndices = request.indices();
 
         // list of aliases to query
         var aliases = new LinkedList<String>();
@@ -164,101 +158,80 @@ public class SiteAwareElasticsearchClient extends AbstractElasticsearchClientWra
         // the original alias will always be included for backward compatibility
         aliases.add(aliasName);
 
-        List<Map<String, Double>> boosting = new LinkedList<>();
-
-        if (isNotEmpty(currentIndices)) {
+        if (ArrayUtils.isNotEmpty(currentIndices)) {
             // Add the site name prefix for all indices
-            currentIndices.stream().map(index -> addPrefix(siteContext, index)).forEach(aliases::add);
+            Stream.of(currentIndices).map(index -> addPrefix(siteContext, index)).forEach(aliases::add);
 
             // Add the site name prefix for the boosting if needed
-            List<Map<String, Double>> existingBoosting = request.indicesBoost();
-            if (isNotEmpty(existingBoosting)) {
-                existingBoosting.stream()
-                                .map(boost -> boost.entrySet().stream()
-                                        .collect(toMap(entry -> addPrefix(siteContext, entry.getKey()),
-                                                       Map.Entry::getValue)))
-                                .forEach(boosting::add);
+            List<SearchSourceBuilder.IndexBoost> indexBoosts = new ArrayList<>(request.source().indexBoosts());
+            if (isNotEmpty(indexBoosts)) {
+                indexBoosts.forEach(indexBoost ->
+                        request.source().indexBoost(addPrefix(siteContext, indexBoost.getIndex()),
+                                indexBoost.getBoost()));
             }
         }
 
         logger.debug("Executing query for aliases: {}", aliases);
 
         // Override the indices field in the request
-        updates.setIndex(aliases);
+        request.indices(aliases.toArray(new String[0]));
 
         if (aliases.size() > 1) {
             // Boost the results based on the index
-            var boost = 1d;
+            var boost = 1f;
             var iterator = aliases.listIterator(aliases.size());
             while (iterator.hasPrevious()) {
-                boosting.add(Map.of(iterator.previous(), boost));
+                request.source().indexBoost(iterator.previous(), boost);
                 // TODO: Make this value configurable per site
                 boost += 0.05;
             }
-            updates.setIndicesBoost(boosting);
 
             // Don't fail if one of the indices doesn't exist
-            updates.setIgnoreUnavailable(true);
+            IndicesOptions originalOptions = request.indicesOptions();
+            request.indicesOptions(IndicesOptions.fromOptions(true, originalOptions.allowNoIndices(),
+                    originalOptions.expandWildcardsOpen(), originalOptions.expandWildcardsClosed(),
+                    originalOptions.allowAliasesToMultipleIndices(), originalOptions.forbidClosedIndices(),
+                    originalOptions.ignoreAliases(), originalOptions.ignoreThrottled()));
 
             // Fix scores across multiple indices
-            updates.setSearchType(SearchType.DfsQueryThenFetch);
+            request.searchType(SearchType.DFS_QUERY_THEN_FETCH);
         }
     }
 
+    protected String addPrefix(SiteContext siteContext, String name) {
+        return String.format("%s_%s", siteContext.getSiteName(), name);
+    }
+
     @Override
-    protected void updateQuery(SearchRequest request, Map<String, Object> parameters, RequestUpdates updates) {
-        super.updateQuery(request, parameters, updates);
+    protected void updateFilters(final SearchRequest request) {
+        super.updateFilters(request);
 
-        // Use the updated if it exists
-        BoolQuery mainQuery = Optional.ofNullable(updates.getQuery()).orElse(request.query()).bool();
+        BoolQueryBuilder mainQuery = (BoolQueryBuilder) request.source().query();
 
-        Authentication auth = SecurityContextHolder.getContext() != null?
-                                SecurityContextHolder.getContext().getAuthentication() : null;
+        Authentication auth = null;
+        SecurityContext context = SecurityContextHolder.getContext();
+        if (context != null) {
+            auth = context.getAuthentication();
+        }
 
         // Include all public items
-        BoolQuery.Builder securityQuery = new BoolQuery.Builder()
-            .should(s -> s
-                .bool(b -> b
-                    .mustNot(n -> n
-                        .exists(e -> e
-                            .field(roleFieldName)
-                        )
-                    )
-                )
-            )
-            .should(s -> s
-                .match(m -> m
-                    .field(roleFieldName)
-                    .query(q -> q
-                        .stringValue("anonymous")
-                    )
-                )
-            );
+        BoolQueryBuilder securityQuery = boolQuery()
+                .should(boolQuery().mustNot(existsQuery(roleFieldName)))
+                .should(matchQuery(roleFieldName, "anonymous"));
 
         if (auth != null && !(auth instanceof AnonymousAuthenticationToken) && isNotEmpty(auth.getAuthorities())) {
             logger.debug("Filtering search results for roles: {}", auth.getAuthorities());
-            securityQuery.should(s -> s
-                .match(m -> m
-                    .field(roleFieldName)
-                    .query(q -> q
-                        .stringValue(auth.getAuthorities().stream()
+            securityQuery.should(matchQuery(roleFieldName, auth.getAuthorities().stream()
                             .map(GrantedAuthority::getAuthority)
-                            .map(role -> role +  StringUtils.SPACE +
-                                (startsWith(role, ROLE_PREFIX)? removeStart(role, ROLE_PREFIX)
-                                                                : appendIfMissing(role, ROLE_PREFIX)))
-                            .collect(joining(StringUtils.SPACE)))
-                    )
-                )
-            );
+                            .map(role -> role +  " " +
+                                    (startsWith(role, ROLE_PREFIX)? removeStart(role, ROLE_PREFIX)
+                                            : appendIfMissing(role, ROLE_PREFIX)))
+                            .collect(joining(" "))));
         } else {
             logger.debug("Filtering search to show only public items");
         }
-        updates.setQuery(q -> q
-            .bool(b -> b
-                .must(mainQuery._toQuery())
-                .filter(securityQuery.build()._toQuery())
-            )
-        );
+
+        mainQuery.filter(boolQuery().must(securityQuery));
     }
 
 }
