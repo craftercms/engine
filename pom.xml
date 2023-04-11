@@ -154,11 +154,6 @@
             <artifactId>commons-collections4</artifactId>
             <version>${commons.collections4.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-text</artifactId>
-            <version>${commons.text.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>com.gmongo</groupId>
