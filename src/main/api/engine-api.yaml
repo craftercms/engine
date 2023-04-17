@@ -49,6 +49,13 @@ paths:
           schema:
             type: string
           example: defaultManagementToken
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"  
       responses:
         '200':
           description: OK
@@ -83,7 +90,14 @@ paths:
           required: true
           schema:
             type: string
-          example: defaultManagementToken  
+          example: defaultManagementToken
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"  
       responses:
         '200':
           description: OK
@@ -118,7 +132,14 @@ paths:
           required: true
           schema:
             type: string
-          example: defaultManagementToken  
+          example: defaultManagementToken
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"    
       responses:
         '200':
           description: OK
@@ -154,6 +175,13 @@ paths:
           schema:
             type: string
           example: defaultManagementToken  
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"      
       responses:
         '200':
           description: OK
@@ -189,6 +217,13 @@ paths:
           schema:
             type: string
           example: defaultManagementToken  
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"      
       responses:
         '200':
           description: OK
@@ -208,11 +243,11 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'          
 
-  /api/1/site/context/jobs/list:
+  /api/1/site/jobs/list:
     get:
       security: []
       tags:
-        - context
+        - other
       summary: List jobs
       operationId: listJobs
       description: Get a list of all scheduled jobs for the current site.
@@ -224,6 +259,13 @@ paths:
           schema:
             type: string
           example: defaultManagementToken  
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"      
       responses:
         '200':
           description: OK
@@ -257,6 +299,14 @@ paths:
       summary: Reload the mappings
       operationId: mappingsReload
       description: Reload the mappings used to resolve sites by Crafter Engine. This endpoint is only available when Crafter Engine is in mapped multi-tenant mode.
+      parameters: 
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"      
       responses:
         '200':
           description: OK
@@ -295,7 +345,14 @@ paths:
           required: true
           schema:
             type: string
-          example: defaultManagementToken  
+          example: defaultManagementToken
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"        
       responses:
         '200':
           description: OK
@@ -330,6 +387,13 @@ paths:
           schema:
             type: string
           example: defaultManagementToken  
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"      
       responses:
         '200':
           description: OK
@@ -365,6 +429,13 @@ paths:
           required: false
           schema:
             type: boolean
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"        
       responses:
         '200':
           description: OK
@@ -378,7 +449,7 @@ paths:
                     name: website
                     url: /site/website
                     descriptorUrl: /site/website.meta.xml
-                    descriptorDom: null          
+                    descriptorDom: null
                     properties: null
                     folder: true
                 WithAdditionalProperties:
@@ -432,8 +503,8 @@ paths:
                         hero_image: /static-assets/images/strawberries.jpg
                         features_title: "Erat lacinia"         
                     properties: 
-                      //page/merge-strategy: inherit-levels
-                      //page/content-type: /page/home
+                      "//page/merge-strategy: inherit-levels
+                      //page/content-type: /page/home"
                     folder: false      
                 WithoutAdditionalProperties:
                   value:
@@ -485,7 +556,7 @@ paths:
                               disableFlattening: false}                         
                         hero_image: "/static-assets/images/strawberries.jpg"
                         features_title: "Erat lacinia"  
-                    properties: null
+                    properties: "null"
                     folder: false                  
         '404':
           $ref: '#/components/responses/NotFound'
@@ -514,54 +585,241 @@ paths:
           required: false
           schema:
             type: boolean
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"        
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ContentStoreItems'
+                type: array
+                items:
+                  $ref: '#/components/schemas/ContentStoreItems'
               example: 
-                - name: website
-                  url: /site/website
-                  descriptorUrl: /site/website.meta.xml
-                  descriptorDom: null          
-                  properties: null
-                  folder: true
-                - name: crafter-component.xml
-                  url: /site/website/crafter-component.xml
-                  descriptorUrl: /site/website/crafter-component.xml
-                  descriptorDom:
-                    page:
-                      display-template: 
-                        nil: false
-                        text: /templates/system/common/component.ftl
-                      merge-strategy: inherit-levels
-                      content-type: /component/level-descriptor
-                      placeInNav: false
-                      file-name: crafter-level-descriptor.level.xml
-                      objectGroupId: 0a68
-                      objectId: 0a68e8ad-77d8-0a58-e7bf-09a71fb3077b
-                      folder-name: null
-                      header: 
-                        item: 
-                          key: /site/components/headers/header.xml
-                          value: Header
-                          include: /site/components/headers/header.xml
-                          disableFlattening: false
-                      createdDate: 3/13/2022 20:26:50
-                      createdDate_dt: 3/13/2022 20:26:50
-                      lastModifiedDate: 5/18/2022 15:38:58
-                      lastModifiedDate_dt: 5/18/2022 15:38:58
-                      left-rail: 
-                        item: 
-                          key: /site/components/left-rails/left-rail-with-no-articles.xml
-                          value: Left Rail with No Articles
-                          include: /site/components/left-rails/left-rail-with-no-articles.xml
-                          disableFlattening: false
-                      hideInAuthoring: true
-                  properties: null,
-                  folder: false   
+                [
+                  {
+                    "name": "articles",
+                    "url": "/site/website/articles",
+                    "descriptorUrl": "/site/website/articles.meta.xml",
+                    "descriptorDom": null,
+                    "properties": null,
+                    "folder": true
+                  },
+                  {
+                    "name": "crafter-level-descriptor.level.xml",
+                    "url": "/site/website/crafter-level-descriptor.level.xml",
+                    "descriptorUrl": "/site/website/crafter-level-descriptor.level.xml",
+                    "descriptorDom": {
+                        "component": {
+                          "content-type": "/component/level-descriptor",
+                          "display-template": {
+                             "crafter-source": "/site/website/crafter-level-descriptor.level.xml",
+                             "crafter-source-content-type-id": "/component/level-descriptor"
+                          },
+                          "merge-strategy": "inherit-levels",
+                          "file-name": "crafter-level-descriptor.level.xml",
+                          "objectGroupId": "0a68",
+                          "objectId": "0a68e8ad-77d8-0a58-e7bf-09a71fb3077b",
+                          "folder-name": {
+                            "crafter-source": "/site/website/crafter-level-descriptor.level.xml",
+                            "crafter-source-content-type-id": "/component/level-descriptor"
+                          },
+                          "header_o": {
+                            "item": {
+                              "key": "/site/components/headers/header.xml",
+                              "value": "Header",
+                              "include": "/site/components/headers/header.xml",
+                              "disableFlattening": "false"
+                          }
+                        },
+                        "createdDate": "2017-03-13T20:26:50.000Z",
+                        "createdDate_dt": "2017-03-13T20:26:50.000Z",
+                        "lastModifiedDate": "2017-05-18T15:38:58.000Z",
+                        "lastModifiedDate_dt": "2017-05-18T15:38:58.000Z",
+                        "left_rail_o": {
+                          "item": {
+                            "key": "/site/components/left-rails/left-rail-with-no-articles.xml",
+                            "value": "Left Rail with No Articles",
+                            "include": "/site/components/left-rails/left-rail-with-no-articles.xml",
+                            "disableFlattening": "false"
+                          }
+                        }
+                      }
+                    },
+                    "properties": null,
+                    "folder": false
+                  },
+                  {
+                    "name": "entertainment",
+                    "url": "/site/website/entertainment",
+                    "descriptorUrl": "/site/website/entertainment.meta.xml",
+                    "descriptorDom": null,
+                    "properties": null,
+                    "folder": true
+                  },
+                  {
+                    "name": "health",
+                    "url": "/site/website/health",
+                    "descriptorUrl": "/site/website/health.meta.xml",
+                    "descriptorDom": null,
+                    "properties": null,
+                    "folder": true
+                  },
+                  {
+                    "name": "index.xml",
+                    "url": "/site/website/index.xml",
+                    "descriptorUrl": "/site/website/index.xml",
+                    "descriptorDom": {
+                      "page": {
+                        "content-type": "/page/home",
+                        "display-template": "/templates/web/pages/home.ftl",
+                        "merge-strategy": "inherit-levels",
+                        "file-name": "index.xml",
+                        "objectGroupId": "8d7f",
+                        "objectId": "8d7f21fa-5e09-00aa-8340-853b7db302da",
+                        "folder-name": {
+                          "crafter-source": "/site/website/crafter-level-descriptor.level.xml",
+                          "crafter-source-content-type-id": "/component/level-descriptor"
+                        },
+                        "header_o": {
+                          "crafter-source": "/site/website/crafter-level-descriptor.level.xml",
+                          "crafter-source-content-type-id": "/component/level-descriptor",
+                          "item": {
+                            "key": "/site/components/headers/header.xml",
+                            "value": "Header",
+                            "include": "/site/components/headers/header.xml",
+                            "disableFlattening": "false"
+                          }
+                        },
+                        "createdDate": "2017-01-31T16:18:14.000Z",
+                        "createdDate_dt": "2017-01-31T16:18:14.000Z",
+                        "lastModifiedDate": "2021-03-31T18:08:03.196Z",
+                        "lastModifiedDate_dt": "2021-03-31T18:20:09.599Z",
+                        "left_rail_o": {
+                          "item": [
+                            {
+                              "key": "/site/components/left-rails/left-rail-with-latest-articles.xml",
+                              "value": "Left Rail with Latest Articles",
+                              "include": "/site/components/left-rails/left-rail-with-latest-articles.xml",
+                              "disableFlattening": "false"
+                            }
+                          ]
+                        },
+                        "no-template-required": null,
+                        "internal-name": "Home",
+                        "orderDefault_f": "-1",
+                        "title_t": "Editorial",
+                        "hero_text_html": "<p>Aenean ornare velit lacus, ac varius enim ullamcorper eu. Proin aliquam facilisis ante interdum congue. Integer mollis, nisl amet convallis, porttitor magna ullamcorper, amet egestas mauris. Ut magna finibus nisi nec lacinia. Nam maximus erat id euismod egestas. Pellentesque sapien ac quam. Lorem ipsum dolor sit nullam.</p>",
+                        "hero_title_html": "<h1>Hi, I&rsquo;m Editorial</h1>\n    <h3><span style=\"font-size: 1.5em;\">by HTML5 UP</span></h3>",
+                        "features_o": {
+                          "item": [
+                            {
+                              "datasource": "features",
+                              "key": "/site/components/features/4be0a368-783c-8f73-7469-63a62636bd4c.xml",
+                              "value": "Smile",
+                              "include": "/site/components/features/4be0a368-783c-8f73-7469-63a62636bd4c.xml",
+                              "disableFlattening": "false"
+                            },
+                            {
+                              "datasource": "features",
+                              "inline": "true",
+                              "key": "310b0c87-c3ca-4da0-4aa2-7002a318d7ce",
+                              "value": "Download",
+                              "disableFlattening": "false",
+                              "component": {
+                                "id": "310b0c87-c3ca-4da0-4aa2-7002a318d7ce",
+                                "content-type": "/component/feature",
+                                "display-template": "/templates/web/components/feature.ftl",
+                                "no-template-required": null,
+                                "merge-strategy": "inherit-levels",
+                                "objectGroupId": "310b",
+                                "objectId": "310b0c87-c3ca-4da0-4aa2-7002a318d7ce",
+                                "file-name": "310b0c87-c3ca-4da0-4aa2-7002a318d7ce.xml",
+                                "internal-name": "Download",
+                                "title_t": "Download",
+                                "disabled": "false",
+                                "icon_s": "fa-arrow-alt-circle-down far",
+                                "body_html": "<p>Download ornare velit lacus, ac varius enim lorem ullamcorper dolore.\n          Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>\n        ",
+                                "createdDate": "2019-10-11T19:20:07.555Z",
+                                "createdDate_dt": "2019-10-11T19:20:07.555Z",
+                                "lastModifiedDate": "2019-12-22T11:56:51.172Z",
+                                "lastModifiedDate_dt": "2019-12-22T11:56:51.172Z"
+                              }
+                            },
+                            {
+                              "datasource": "features",
+                              "inline": "true",
+                              "key": "a89386c4-a205-2681-2db1-c3606f714411",
+                              "value": "Build",
+                              "disableFlattening": "false",
+                              "component": {
+                                "id": "a89386c4-a205-2681-2db1-c3606f714411",
+                                "content-type": "/component/feature",
+                                "display-template": "/templates/web/components/feature.ftl",
+                                "no-template-required": null,
+                                "merge-strategy": "inherit-levels",
+                                "objectGroupId": "a893",
+                                "objectId": "a89386c4-a205-2681-2db1-c3606f714411",
+                                "file-name": "a89386c4-a205-2681-2db1-c3606f714411.xml",
+                                "internal-name": "Build",
+                                "title_t": "Build",
+                                "disabled": "false",
+                                "icon_s": "fa-building far",
+                                "body_html": "<p>Build enean ornare velit lacus, ac varius enim lorem ullamcorper dolore.\n          Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>\n        ",
+                                "createdDate": "2019-10-11T19:19:53.590Z",
+                                "createdDate_dt": "2019-10-11T19:19:53.590Z",
+                                "lastModifiedDate": "2019-12-22T11:56:34.603Z",
+                                "lastModifiedDate_dt": "2019-12-22T11:56:34.603Z"
+                              }
+                            },
+                            {
+                              "datasource": "features",
+                              "key": "/site/components/features/72ef047f-02b7-89e2-bbd5-4763ac7dbca8.xml",
+                              "value": "Closed captioning",
+                              "include": "/site/components/features/72ef047f-02b7-89e2-bbd5-4763ac7dbca8.xml",
+                              "disableFlattening": "false"
+                            }
+                          ]
+                        },
+                        "hero_image_s": "/static-assets/images/strawberries.jpg",
+                        "features_title_t": "Erat lacinia",
+                        "disabled": "false"
+                      }
+                    },
+                    "properties": null,
+                    "folder": false
+                  },
+                  {
+                    "name": "search-results",
+                    "url": "/site/website/search-results",
+                    "descriptorUrl": "/site/website/search-results.meta.xml",
+                    "descriptorDom": null,
+                    "properties": null,
+                    "folder": true
+                  },
+                  {
+                    "name": "style",
+                    "url": "/site/website/style",
+                    "descriptorUrl": "/site/website/style.meta.xml",
+                    "descriptorDom": null,
+                    "properties": null,
+                    "folder": true
+                  },
+                  {
+                    "name": "technology",
+                    "url": "/site/website/technology",
+                    "descriptorUrl": "/site/website/technology.meta.xml",
+                    "descriptorDom": null,
+                    "properties": null,
+                    "folder": true
+                  }
+                ]
         '404':
           $ref: '#/components/responses/NotFound'
           example: No item found at /site/website/index.xml
@@ -595,6 +853,13 @@ paths:
           required: false
           schema:
             type: boolean
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"        
       responses:
         '200':
           description: OK
@@ -623,6 +888,13 @@ paths:
           required: true
           schema:
             type: string
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"        
       responses:
         '200':
           description: OK
@@ -660,6 +932,13 @@ paths:
           description: The user last name
           schema:
             type: string        
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"        
       responses:
         '200':
           description: OK
@@ -694,6 +973,13 @@ paths:
           description: The starting point of the breadcrumb
           schema:
             type: string
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"        
       responses:
         '200':
           description: OK
@@ -712,7 +998,7 @@ paths:
                 - label: Style
                   url: /style
                   active: false
-                  subItem: null         
+                  subItem: null
         '500':
           $ref: '#/components/responses/InternalServerError'        
 
@@ -743,6 +1029,13 @@ paths:
           description: The URL of the current page
           schema:
             type: string
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"        
       responses:
         '200':
           description: OK
@@ -798,6 +1091,13 @@ paths:
           schema:
             type: string
           example: storeUrlToRenderUrl  
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"      
       responses:
         '200':
           description: OK
@@ -824,6 +1124,13 @@ paths:
           description: Comma separated list of index names to be searched in addition to the current site
           schema:
             type: string          
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"        
       requestBody:    
         description: User entity to create
         required: true
@@ -847,7 +1154,7 @@ paths:
           content:
             application/json:
               schema:
-                type: string    
+                type: object    
               example:
                 { 
                   "took": 41,
@@ -903,13 +1210,20 @@ paths:
           description: A JSON object containing variables for the query
           schema:
             type: string                    
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"        
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                type: string   
+                type: object   
               example: 
                 {
                   "data": {
@@ -955,6 +1269,14 @@ paths:
       summary: Query (POST)
       operationId: queryPost
       description: Performs a query in the GraphQL instance of the current site resolved for the request. <br><br> <i>Note:</i> <br> <i>The query string must be a valid GraphQL query as described in the</i> <a class="reference external" href="https://graphql.org/learn/queries/" rel="noopener noreferrer" target="_blank">official docs</a>       
+      parameters:
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"        
       requestBody:
         description: Search Parameters
         required: true
@@ -964,8 +1286,8 @@ paths:
               type: object
               properties:
                 query:
-                  description: The GraphQL query
-                  type: string
+                  description: "The GraphQL query"                  
+                  type: string                  
                   example: 
                     "query ArticlesByAuthor($author:String) {
                       page_article {
@@ -978,19 +1300,23 @@ paths:
                       }
                     }"
                 variables:
-                  description: A JSON object containing variables for the query
-                  type: string
+                  description: "A JSON object containing variables for the query"
+                  type: object
                   example: 
-                    "{
-                       \"author\": \"Jane Doe\"
-                    }"
+                    { "author": "Jane Doe" }
+                operationName:
+                  description: "Name you give to your query <br><br> <i>Required when there are multiple operations in the document (query)</i>"
+                  type: string 
+                  example: ArticlesByAuthor   
+              required: 
+                -  query      
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                type: string
+                type: object
               example: 
                 {
                   "data": {
@@ -1032,6 +1358,14 @@ paths:
       summary: Preview
       operationId: preview
       description: Indicates if Engine is configured in preview mode.
+      parameters:
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"    
       responses:
         '200':
           description: OK
@@ -1060,6 +1394,13 @@ paths:
           schema:
             type: string
           example: defaultManagementToken
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"      
       responses:
         '200':
           description: OK
@@ -1112,6 +1453,13 @@ paths:
           schema:
             type: string
           example: defaultManagementToken
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"      
       responses:
         '200':
           description: OK
@@ -1149,6 +1497,13 @@ paths:
           schema:
             type: string
           example: defaultManagementToken
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"      
       responses:
         '200':
           description: OK
@@ -1215,7 +1570,7 @@ paths:
           description: The time in milliseconds from which events should be fetched
           required: true
           schema:
-            type: long
+            type: integer
           example: 1396772083660  
         - name: token
           in: query
@@ -1224,6 +1579,13 @@ paths:
           schema:
             type: string
           example: defaultManagementToken
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"      
       responses:
         '200':
           description: OK
@@ -1245,7 +1607,7 @@ paths:
                     message:
                       type: string
                     timestampm:
-                      type: long 
+                      type: integer 
                     timestaamp:
                       type: string
                 example: 
@@ -1300,6 +1662,13 @@ paths:
           schema:
             type: string
           example: /site/components/features/4be0a368-783c-8f73-7469-63a62636bd4c.xml
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"      
       responses:
         '200':
           description: OK
@@ -1384,13 +1753,15 @@ components:
           type: string                                        
         descriptorDom:
           description: Contains the content of item being retrieved (DOM of xml)
-          type: string                                          
+          type: object
+          nullable: true
         properties:
           description: Contains additional properties that are generated by an ItemProcessor
-          type: string                                         
+          type: string
+          nullable: true
         folder:
           description: Indicates whether the item is a folder (true or false)
-          type: string 
+          type: boolean 
 
     UserProfile:
       type: object
@@ -1412,10 +1783,8 @@ components:
         active:
           type: boolean
         subItems:
-          type: array
-          items:
-            $ref: '#/components/schemas/NavigationTreeNode' 
-      
+          type: object             
+   
           
   responses:
     NotFound:
