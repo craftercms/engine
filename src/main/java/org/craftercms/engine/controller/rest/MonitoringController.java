@@ -17,9 +17,13 @@
 package org.craftercms.engine.controller.rest;
 
 import org.craftercms.commons.exceptions.InvalidManagementTokenException;
+import org.craftercms.commons.monitoring.StatusInfo;
 import org.craftercms.commons.monitoring.rest.MonitoringRestControllerBase;
 import org.craftercms.commons.validation.annotations.param.ValidSiteId;
+import org.craftercms.engine.exception.HttpStatusCodeException;
+import org.craftercms.engine.service.context.SiteContextManager;
 import org.craftercms.engine.util.logging.CircularQueueLogAppender;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,10 +46,12 @@ public class MonitoringController extends MonitoringRestControllerBase {
     public final static String URL_ROOT = "/api/1";
     public final static String LOG_URL = "/log";
 
+    private final SiteContextManager contextManager;
 
-    @ConstructorProperties({"configuredToken"})
-    public MonitoringController(final String configuredToken) {
+    @ConstructorProperties({"contextManager", "configuredToken"})
+    public MonitoringController(final SiteContextManager contextManager, final String configuredToken) {
         super(configuredToken);
+        this.contextManager = contextManager;
     }
 
     @GetMapping(MonitoringRestControllerBase.ROOT_URL + LOG_URL)
@@ -54,6 +60,17 @@ public class MonitoringController extends MonitoringRestControllerBase {
                                                      @RequestParam String token) throws InvalidManagementTokenException {
         validateToken(token);
         return CircularQueueLogAppender.getLoggedEvents(site, since);
+    }
+
+    @GetMapping(MonitoringRestControllerBase.ROOT_URL + STATUS_URL)
+    public StatusInfo getCurrentStatus(@RequestParam(name = "token", required = true) String token)
+            throws InvalidManagementTokenException {
+        validateToken(token);
+        if (!contextManager.hasValidContexts()) {
+            throw new HttpStatusCodeException(HttpStatus.NOT_FOUND, "Invalid contexts.");
+        }
+
+        return StatusInfo.getCurrentStatus();
     }
 
 }
