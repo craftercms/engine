@@ -378,7 +378,16 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
     }
 
     /**
-     * Determine if current engine has valid site contexts or not.
+     * Determine if a site has valid context
+     * @param siteId the site id
+     * @return true if site has valid context, false otherwise
+     */
+    public boolean hasValidContext(String siteId) {
+        return contextRegistry.get(siteId) != null;
+    }
+
+    /**
+     * Determine if current engine has valid site contexts
      * Engine has valid site contexts when:
      * 1. There are no contexts at all
      * 2. There is one or more valid contexts
