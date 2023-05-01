@@ -59,8 +59,8 @@
 	<jose4j.version>0.9.3</jose4j.version>
         <jackson.dataformat.version>2.13.1</jackson.dataformat.version>
         <log4j.version>2.17.1</log4j.version>
-        <graphql.version>16.0</graphql.version>
-        <graphql.extended.scalars.version>16.0.1</graphql.extended.scalars.version>
+        <graphql.version>20.2</graphql.version>
+        <graphql.extended.scalars.version>20.2</graphql.extended.scalars.version>
         <sardine.version>5.10</sardine.version>
         <xerces.version>2.12.2</xerces.version>
         <httpproxy.version>1.12.1</httpproxy.version>
