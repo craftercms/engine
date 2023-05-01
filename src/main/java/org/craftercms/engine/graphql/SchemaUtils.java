@@ -18,13 +18,14 @@ package org.craftercms.engine.graphql;
 
 import java.util.*;
 
+import graphql.scalars.ExtendedScalars;
 import graphql.schema.*;
 import org.apache.commons.collections4.ListUtils;
 
 import static graphql.Scalars.GraphQLBoolean;
 import static graphql.Scalars.GraphQLFloat;
 import static graphql.Scalars.GraphQLInt;
-import static graphql.Scalars.GraphQLLong;
+import static graphql.scalars.ExtendedScalars.GraphQLLong;
 import static graphql.Scalars.GraphQLString;
 import static graphql.scalars.ExtendedScalars.DateTime;
 import static graphql.schema.GraphQLList.list;
