@@ -84,6 +84,7 @@
     </bean>
 
     <bean id="crafter.monitoringRenderController" class="org.craftercms.engine.controller.rest.MonitoringController">
+        <constructor-arg name="contextManager" ref="crafter.siteContextManager"/>
         <constructor-arg name="configuredToken" value="${crafter.engine.management.authorizationToken}" />
     </bean>
 
