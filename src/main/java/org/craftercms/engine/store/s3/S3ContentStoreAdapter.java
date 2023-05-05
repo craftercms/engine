@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -18,10 +18,14 @@ package org.craftercms.engine.store.s3;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3URI;
-import com.amazonaws.services.s3.model.*;
+import com.amazonaws.services.s3.model.AmazonS3Exception;
+import com.amazonaws.services.s3.model.ListObjectsV2Request;
+import com.amazonaws.services.s3.model.ListObjectsV2Result;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
+import org.craftercms.commons.lang.RegexUtils;
 import org.craftercms.core.exception.AuthenticationException;
 import org.craftercms.core.exception.InvalidContextException;
 import org.craftercms.core.exception.RootFolderNotFoundException;
@@ -37,9 +41,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Required;
 
+import java.beans.ConstructorProperties;
 import java.util.List;
+
+import static org.apache.commons.lang3.StringUtils.removeStart;
 
 /**
  * Implementation of {@link org.craftercms.core.store.ContentStoreAdapter} to read files from AWS S3.
@@ -51,12 +57,16 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
 
     public static final String DELIMITER = "/";
 
-    protected S3ClientBuilder clientBuilder;
+    protected final S3ClientBuilder clientBuilder;
     protected AmazonS3 client;
+    protected final int contentMaxLength;
+    protected final String[] cacheAllowedPaths;
 
-    @Required
-    public void setClientBuilder(final S3ClientBuilder clientBuilder) {
+    @ConstructorProperties({"clientBuilder", "contentMaxLength", "cacheAllowedPaths"})
+    public S3ContentStoreAdapter(final S3ClientBuilder clientBuilder, final int contentMaxLength, final String[] cacheAllowedPaths) {
         this.clientBuilder = clientBuilder;
+        this.contentMaxLength = contentMaxLength;
+        this.cacheAllowedPaths = cacheAllowedPaths;
     }
 
     @Override
@@ -107,17 +117,29 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
         logger.debug("Getting content for key {}", key);
 
         try {
-            GetObjectRequest request = new GetObjectRequest(s3Context.getBucket(), key);
-            S3Object object = client.getObject(request);
-
-            return new S3Content(object);
+            ObjectMetadata objectMetadata = client.getObjectMetadata(s3Context.getBucket(), key);
+            return new S3Content(objectMetadata, shouldCache(removeStart(key, s3Context.getKey()), objectMetadata), () -> client.getObject(s3Context.getBucket(), key));
         } catch (AmazonS3Exception e) {
-            if(e.getStatusCode() == HttpStatus.SC_NOT_FOUND) {
+            if (e.getStatusCode() == HttpStatus.SC_NOT_FOUND) {
                 throw new StoreException("No item found for key " + key);
-            } else {
-                throw new StoreException("Error getting item for key " + key, e);
             }
+            throw new StoreException("Error getting item for key " + key, e);
         }
+    }
+
+    /**
+     * Indicates if the content should be cached in memory.
+     * Content is cached if path matches the 'cacheAllowedPaths` and
+     * the content length is not greater than contentMaxLength
+     * @param key the S3 object key
+     * @param objectMetadata the S3 {@link ObjectMetadata}
+     * @return true if the content should be cached in memory, false otherwise
+     */
+    private boolean shouldCache(String key, ObjectMetadata objectMetadata) {
+        if (!RegexUtils.matchesAny(key, cacheAllowedPaths)) {
+            return false;
+        }
+        return objectMetadata.getContentLength() <= contentMaxLength;
     }
 
     /**
