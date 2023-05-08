@@ -71,7 +71,9 @@
             <bean class="org.craftercms.commons.validation.validators.impl.SecurePathValidator">
             </bean>
         </property>
-        <property name="clientBuilder" ref="crafter.s3ClientBuilder"/>
+        <constructor-arg name="clientBuilder" ref="crafter.s3ClientBuilder"/>
+        <constructor-arg name="contentMaxLength" value="${crafter.engine.store.s3.cache.contentMaxLength}"/>
+        <constructor-arg name="cacheAllowedPaths" value="${crafter.engine.store.s3.cache.allowedPaths}"/>
     </bean>
 
     <bean id="crafter.contentStoreAdapter.s3"
