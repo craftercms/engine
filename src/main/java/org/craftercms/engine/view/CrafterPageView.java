@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.craftercms.engine.util.GroovyScriptUtils.addSiteItemScriptVariables;
 
 /**
@@ -148,7 +149,7 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
     @Override
     public void afterPropertiesSet() throws Exception {
         String mimeType = getMimeType();
-        if (StringUtils.isNotEmpty(mimeType)) {
+        if (isNotEmpty(mimeType)) {
             setContentType(MediaType.parseMediaType(mimeType).toString() + ";charset=" + DEFAULT_CHARSET);
         } else {
             setContentType(DEFAULT_CONTENT_TYPE);
@@ -206,12 +207,11 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
     }
 
     protected String getPageViewName() throws RenderingException {
-        String pageViewName = page.queryValue(pageViewNameXPathQuery);
-        if (StringUtils.isNotEmpty(pageViewName)) {
+        String pageViewName = page.queryValue(pageViewNameXPathQuery).trim();
+        if (isNotEmpty(pageViewName)) {
             return pageViewName;
-        } else {
-            throw new RenderingException("No view name found for " + page);
         }
+        throw new RenderingException("No view name found for " + page);
     }
 
     protected String getMimeType() {
