@@ -294,12 +294,11 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
     }
 
     protected String getComponentTemplateName(SiteItem component, Environment env) throws TemplateException {
-        String componentTemplateName = component.queryValue(templateXPathQuery);
+        String componentTemplateName = component.queryValue(templateXPathQuery).trim();
         if (StringUtils.isNotEmpty(componentTemplateName)) {
             return templateNamePrefix + componentTemplateName + templateNameSuffix;
-        } else {
-            throw new TemplateException("No component template defined in " + component, env);
         }
+        throw new TemplateException("No component template defined in " + component, env);
     }
 
     protected SimpleHash getFullModel(SiteItem component, Map<String, Object> templateModel,
