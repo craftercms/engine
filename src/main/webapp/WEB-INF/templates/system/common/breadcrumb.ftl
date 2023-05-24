@@ -49,11 +49,16 @@
             href="${item.url}"
             $attributes=itemAttributes
           >
-            ${item.label}
+
+            <#outputFormat "HTML">
+              ${item.label}
+            </#outputFormat>
           </@a>
         <#else>
           <@span $model=siteItem $attributes=itemAttributes>
-            ${item.label}
+            <#outputFormat "HTML">
+              ${item.label}
+            </#outputFormat>
           </@span>
         </#if>
       <#if (itemWrapperElement != "")>
