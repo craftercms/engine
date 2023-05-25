@@ -15,12 +15,21 @@
  */
 package org.craftercms.engine.view.freemarker;
 
+import org.apache.commons.lang.StringUtils;
 import org.craftercms.engine.plugin.PluginService;
 import org.craftercms.engine.scripting.SiteItemScriptResolver;
 import org.craftercms.engine.service.SiteItemService;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.servlet.HandlerMapping;
+import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.view.AbstractUrlBasedView;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
+
+import java.util.Locale;
+
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 /**
  * View resolver tha resolves to {@link CrafterFreeMarkerView}s.
@@ -95,4 +104,16 @@ public class CrafterFreeMarkerViewResolver extends FreeMarkerViewResolver {
         return view;
     }
 
+    @Override
+    public View resolveViewName(String viewName, Locale locale) throws Exception {
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        if (requestAttributes != null) {
+            String pageUrl = (String) requestAttributes
+                    .getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, RequestAttributes.SCOPE_REQUEST);
+            if (isNotEmpty(pageUrl) && StringUtils.equals(pageUrl, viewName)) {
+                return null;
+            }
+        }
+        return super.resolveViewName(viewName, locale);
+    }
 }
