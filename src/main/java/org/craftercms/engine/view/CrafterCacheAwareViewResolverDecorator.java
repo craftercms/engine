@@ -15,21 +15,13 @@
  */
 package org.craftercms.engine.view;
 
-import org.apache.commons.lang.StringUtils;
 import org.craftercms.engine.service.context.SiteContext;
 import org.springframework.core.Ordered;
 import org.springframework.lang.NonNull;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
 
 import java.util.Locale;
-
-import static org.apache.commons.lang.StringUtils.isEmpty;
-import static org.springframework.web.context.request.RequestAttributes.SCOPE_REQUEST;
-import static org.springframework.web.servlet.HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE;
 
 /**
  * {@code ViewResolver} decorator that caches views on Crafter's own cache per site.
