@@ -15,6 +15,8 @@
  */
 package org.craftercms.engine.util.spring.security;
 
+import org.craftercms.engine.exception.HttpStatusCodeException;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.GenericFilterBean;
@@ -44,9 +46,9 @@ public class ForbiddenUrlsFilter extends GenericFilterBean {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         String requestUri = httpServletRequest.getRequestURI();
         if (matcher.matches(httpServletRequest)) {
-            String message = format("Access to '%s' is forbidden", requestUri);
+            String message = format("Forbidden. You don't have permission to access '%s' on this server", requestUri);
             logger.error(message);
-            throw new AccessDeniedException(message);
+            throw new HttpStatusCodeException(HttpStatus.NOT_FOUND, message);
         }
 
         chain.doFilter(request, response);

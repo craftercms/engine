@@ -66,22 +66,8 @@
 
     <!-- Entry Points -->
     <bean id="crafter.authenticationEntryPoint"
-          class="org.springframework.security.web.authentication.DelegatingAuthenticationEntryPoint">
-        <constructor-arg>
-            <map>
-                <entry>
-                    <key>
-                        <ref bean="crafter.forbiddenUrlsRequestMatcher"/>
-                    </key>
-                    <bean class="org.springframework.security.web.authentication.Http403ForbiddenEntryPoint"/>
-                </entry>
-            </map>
-        </constructor-arg>
-        <property name="defaultEntryPoint">
-            <bean class="org.craftercms.engine.util.spring.security.ConfigAwareLoginUrlAuthenticationEntryPoint">
-                <constructor-arg name="loginFormUrl" value="${crafter.security.login.form.url}"/>
-            </bean>
-        </property>
+          class="org.craftercms.engine.util.spring.security.ConfigAwareLoginUrlAuthenticationEntryPoint">
+        <constructor-arg name="loginFormUrl" value="${crafter.security.login.form.url}"/>
     </bean>
 
     <!-- User Details -->
