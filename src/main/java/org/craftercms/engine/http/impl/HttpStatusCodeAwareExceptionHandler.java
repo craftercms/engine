@@ -26,6 +26,9 @@ import org.craftercms.core.util.ExceptionUtils;
 import org.craftercms.engine.exception.HttpStatusCodeAwareException;
 import org.craftercms.engine.http.ExceptionHandler;
 
+import static org.craftercms.commons.http.HttpUtils.getFullRequestUri;
+import static org.craftercms.commons.lang.UrlUtils.cleanUrlForLog;
+
 /**
  * Handler for {@code HttpStatusCodeException}s.
  *
@@ -43,7 +46,7 @@ public class HttpStatusCodeAwareExceptionHandler implements ExceptionHandler {
         if (httpStatusCodeAwareEx != null) {
             ex = (Exception) httpStatusCodeAwareEx;
 
-            logger.error(request.getMethod() + " " + HttpUtils.getFullRequestUri(request, true) + " failed", ex);
+            logger.error(request.getMethod() + " " + cleanUrlForLog(getFullRequestUri(request, true)) + " failed", ex);
 
             response.sendError(httpStatusCodeAwareEx.getStatusCode(), ex.getMessage());
 
