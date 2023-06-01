@@ -26,7 +26,7 @@
 
     <!-- Path Matchers -->
     <bean id="crafter.forbiddenUrlsRequestMatcher" class="org.craftercms.engine.util.spring.security.matcher.OrAntPathRequestMatcher">
-        <constructor-arg value="${crafter.security.forbidden.urls}"/>
+        <constructor-arg value="#{'${crafter.security.forbidden.urls}'.split(',')}"/>
     </bean>
 
     <!-- Login Handlers -->

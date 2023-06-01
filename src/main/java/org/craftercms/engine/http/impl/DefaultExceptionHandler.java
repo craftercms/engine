@@ -15,14 +15,16 @@
  */
 package org.craftercms.engine.http.impl;
 
-import java.io.IOException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.craftercms.commons.http.HttpUtils;
 import org.craftercms.engine.http.ExceptionHandler;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+import static org.craftercms.commons.http.HttpUtils.getFullRequestUri;
+import static org.craftercms.commons.lang.UrlUtils.cleanUrlForLog;
 
 /**
  * Default {@link org.craftercms.engine.http.ExceptionHandler}, which logs all exceptions and sends a HTTP 500 status.
@@ -37,7 +39,7 @@ public class DefaultExceptionHandler implements ExceptionHandler {
 
     @Override
     public boolean handle(HttpServletRequest request, HttpServletResponse response, Exception ex) throws IOException {
-        logger.error(request.getMethod() + " " + HttpUtils.getFullRequestUri(request, true) + " failed", ex);
+        logger.error(request.getMethod() + " " + cleanUrlForLog(getFullRequestUri(request, true)) + " failed", ex);
 
         request.setAttribute(EXCEPTION_ATTRIBUTE, ex);
         response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
