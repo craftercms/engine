@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -15,6 +15,7 @@
  */
 package org.craftercms.engine.store.s3;
 
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
 import org.apache.commons.io.IOUtils;
 import org.bouncycastle.util.StoreException;
@@ -22,6 +23,9 @@ import org.craftercms.core.service.Content;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.function.Supplier;
+
+import static java.lang.String.format;
 
 /**
  * Represents the content of an S3 object.
@@ -31,6 +35,8 @@ import java.io.InputStream;
  * @since 3.1.4
  */
 public class S3Content implements Content {
+
+    private final Supplier<S3Object> objectSupplier;
 
     /**
      * When the file was last modified.
@@ -47,15 +53,28 @@ public class S3Content implements Content {
      */
     protected byte[] content;
 
-    public S3Content(final S3Object s3Object) {
-        lastModified = s3Object.getObjectMetadata().getLastModified().getTime();
-        length = s3Object.getObjectMetadata().getContentLength();
-        content = new byte[(int)length];
+    /**
+     * @param objectMetadata S3 Object metadata
+     * @param shouldCache indicates if the object content should be loaded and cached in memory.
+     * @param supplier S3Object Supplier to get the actual content
+     */
+    public S3Content(ObjectMetadata objectMetadata, boolean shouldCache, Supplier<S3Object> supplier) {
+        this.lastModified = objectMetadata.getLastModified().getTime();
+        this.length = objectMetadata.getContentLength();
+        this.objectSupplier = supplier;
+        if (shouldCache) {
+            cacheContent();
+        }
+    }
 
-        try(InputStream is = s3Object.getObjectContent()) {
+    private void cacheContent() {
+        S3Object s3Object = this.objectSupplier.get();
+        content = new byte[(int) length];
+
+        try (InputStream is = s3Object.getObjectContent()) {
             IOUtils.readFully(is, content);
         } catch (Exception e) {
-            throw new StoreException("Error reading S3 item " + s3Object, e);
+            throw new StoreException(format("Error reading S3 item %s", s3Object), e);
         }
     }
 
@@ -71,7 +90,11 @@ public class S3Content implements Content {
 
     @Override
     public InputStream getInputStream() {
-        return new ByteArrayInputStream(content);
+        if (content != null) {
+            return new ByteArrayInputStream(content);
+        }
+        S3Object s3Object = this.objectSupplier.get();
+        return s3Object.getObjectContent();
     }
 
 }

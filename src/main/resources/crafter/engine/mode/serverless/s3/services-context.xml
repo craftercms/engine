@@ -55,6 +55,10 @@
         <property name="waitForContextInit" value="${crafter.engine.site.context.waitForInit}"/>
         <property name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
         <property name="defaultSiteName" value="${crafter.engine.site.default.name}"/>
+        <property name="contextBuildRetryMaxCount" value="${crafter.engine.site.context.build.retry.maxCount}"/>
+        <property name="contextBuildRetryWaitTimeBase" value="${crafter.engine.site.context.build.retry.waitTimeBase}"/>
+        <property name="contextBuildRetryWaitTimeMultiplier" value="${crafter.engine.site.context.build.retry.waitTimeMultiplier}"/>
+        <property name="modePreview" value="${crafter.engine.preview}"/>
     </bean>
 
     <!-- AWS S3 Content Store Adapter -->
@@ -67,7 +71,9 @@
             <bean class="org.craftercms.commons.validation.validators.impl.SecurePathValidator">
             </bean>
         </property>
-        <property name="clientBuilder" ref="crafter.s3ClientBuilder"/>
+        <constructor-arg name="clientBuilder" ref="crafter.s3ClientBuilder"/>
+        <constructor-arg name="contentMaxLength" value="${crafter.engine.store.s3.cache.contentMaxLength}"/>
+        <constructor-arg name="cacheAllowedPaths" value="${crafter.engine.store.s3.cache.allowedPaths}"/>
     </bean>
 
     <bean id="crafter.contentStoreAdapter.s3"

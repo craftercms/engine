@@ -32,13 +32,12 @@ import org.springframework.context.ApplicationContextAware;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
+
+import static java.lang.String.format;
 
 /**
  * Registry and lifecycle manager of {@link SiteContext}s.
@@ -59,6 +58,26 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
     protected boolean waitForContextInit;
     protected Executor jobThreadPoolExecutor;
     protected String defaultSiteName;
+
+    /**
+     * Context build retry max count
+     */
+    protected int contextBuildRetryMaxCount;
+
+    /**
+     * Context build retry wait time base in milliseconds
+     */
+    protected long contextBuildRetryWaitTimeBase;
+
+    /**
+     * Context build retry wait time multiple
+     */
+    protected int contextBuildRetryWaitTimeMultiplier;
+
+    /**
+     * true if Engine is in preview mode, false otherwise
+     */
+    protected boolean modePreview;
 
     public SiteContextManager() {
         siteLockFactory = new WeakKeyBasedReentrantLockFactory();
@@ -105,6 +124,26 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
         this.defaultSiteName = defaultSiteName;
     }
 
+    @Required
+    public void setContextBuildRetryMaxCount(final int contextBuildRetryMaxCount) {
+        this.contextBuildRetryMaxCount = contextBuildRetryMaxCount;
+    }
+
+    @Required
+    public void setContextBuildRetryWaitTimeBase(final long contextBuildRetryWaitTimeBase) {
+        this.contextBuildRetryWaitTimeBase = contextBuildRetryWaitTimeBase;
+    }
+
+    @Required
+    public void setContextBuildRetryWaitTimeMultiplier(final int contextBuildRetryWaitTimeMultiplier) {
+        this.contextBuildRetryWaitTimeMultiplier = contextBuildRetryWaitTimeMultiplier;
+    }
+
+    @Required
+    public void setModePreview(final boolean modePreview) {
+        this.modePreview = modePreview;
+    }
+
     public void destroy() {
         destroyAllContexts();
     }
@@ -129,34 +168,26 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
             if (concurrent) {
                 CompletionService<SiteContext> cs = new ExecutorCompletionService<>(jobThreadPoolExecutor);
                 for (String siteName : siteNames) {
-                    cs.submit(() -> {
-                        try {
-                            // If the site context doesn't exist (it's new), it will be created
-                            return getContext(siteName, false);
-                        } catch (Exception e) {
-                            logger.error("Error creating site context for site '" + siteName + "'", e);
-                        }
-
-                        return null;
-                    });
+                    cs.submit(() -> getContextWithRetries(siteName));
                 }
 
                 for (int i = 0; i < siteNames.size(); i++) {
                     try {
                         cs.take();
                     } catch (InterruptedException e) {
-                        logger.error("Stopping creation of site contexts, thread interrupted");
+                        logger.error("Stopping creation of site contexts, thread interrupted", e);
                         return;
                     }
                 }
             } else {
                 for (String siteName : siteNames) {
                     try {
-                        // If the site context doesn't exist (it's new), it will be created
-                        getContext(siteName, false);
-                    } catch (Exception e) {
-                        logger.error("Error creating site context for site '" + siteName + "'", e);
+                        getContextWithRetries(siteName);
+                    } catch (InterruptedException e) {
+                        logger.error("Stopping creation of site contexts, thread interrupted", e);
+                        return;
                     }
+
                 }
             }
         }
@@ -301,6 +332,81 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
                 callback.accept(siteContext);
             }
         });
+    }
+
+    /**
+     * Get a site context and initializing if it does not exist.
+     * If in preview mode, do not retry on failure and report the exception immediately.
+     * If in live mode, retry on failure. After the max retries count, report the exception.
+     * @param siteName the site name of the context
+     * @return the site context
+     * @throws InterruptedException if the current thread is interrupted while waiting
+     */
+    protected SiteContext getContextWithRetries(String siteName) throws InterruptedException {
+        if (modePreview) {
+            try {
+                // If the site context doesn't exist (it's new), it will be created
+                return getContext(siteName, false);
+            } catch (Exception e) {
+                logger.error(format("Error creating site context for site '%s'", siteName), e);
+            }
+
+            return null;
+        }
+
+        int attempt = 0;
+        long waitTime = contextBuildRetryWaitTimeBase;
+        while (attempt < contextBuildRetryMaxCount) {
+            try {
+                // If the site context doesn't exist (it's new), it will be created
+                return getContext(siteName, false);
+            } catch (Exception e) {
+                attempt++;
+                if (attempt == contextBuildRetryMaxCount) {
+                    logger.error(format("Maximum number of retries ('%s' times) has been reached. Error creating site context for site '%s'",
+                            contextBuildRetryMaxCount, siteName), e);
+                    return null;
+                }
+
+                logger.warn(format("Error creating site context for site '%s'. Retrying in '%d' seconds", siteName, waitTime / 1000), e);
+                Thread.sleep(waitTime);
+                waitTime = waitTime * contextBuildRetryWaitTimeMultiplier;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Determine if a site has valid context
+     * @param siteId the site id
+     * @return true if site has valid context, false otherwise
+     */
+    public boolean hasValidContext(String siteId) {
+        return contextRegistry.get(siteId) != null;
+    }
+
+    /**
+     * Determine if current engine has valid site contexts
+     * Engine has valid site contexts when:
+     * 1. There are no contexts at all
+     * 2. There is one or more valid contexts
+     * @return true if engine has valid context, false otherwise
+     */
+    public boolean hasValidContexts() {
+        Collection<String> siteNames = siteListResolver.getSiteList();
+        if (siteNames.isEmpty()) {
+            return true;
+        }
+
+        for (String siteName : siteNames) {
+            SiteContext siteContext = contextRegistry.get(siteName);
+            if (siteContext != null) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

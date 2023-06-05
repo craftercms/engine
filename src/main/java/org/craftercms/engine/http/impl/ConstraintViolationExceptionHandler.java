@@ -25,10 +25,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * Handler for {@link ConstraintViolationException} exceptions
+ * Handler for {@link javax.validation.ConstraintViolationException} exceptions
  */
-public class ConstraintViolationException implements ExceptionHandler {
-    private static final Logger logger = LoggerFactory.getLogger(ConstraintViolationException.class);
+public class ConstraintViolationExceptionHandler implements ExceptionHandler {
+    private static final Logger logger = LoggerFactory.getLogger(ConstraintViolationExceptionHandler.class);
 
     @Override
     public boolean handle(HttpServletRequest request, HttpServletResponse response, Exception ex) throws IOException {
