@@ -1110,14 +1110,14 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'        
 
-  /api/1/site/elasticsearch/search:
+  /api/1/site/search/search:
     post:
       security: []
       tags:
         - search
       summary: Search
       operationId: search
-      description: Performs a search operation in the Elasticsearch index of the current site resolved for the request and optional other indexes. See <a class="reference external" href="https://docs.craftercms.org/en/4.0/developers/search-elasticsearch.html#search-elasticsearch-multi-index-query" rel="noopener noreferrer" target="_blank">Multi-index Query</a> for more information on performing a multiple index search. <br><br> <i>Note:</i> <br> <i>The request body must be a valid Elasticsearch JSON query as described in the</i> <a class="reference external" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/search-search.html" rel="noopener noreferrer" target="_blank">official docs</a>
+      description: Performs a search operation in the OpenSearch index of the current site resolved for the request and optional other indexes. See <a class="reference external" href="https://docs.craftercms.org/en/4.1/by-role/developer/common/search.html#search-multi-index-query" rel="noopener noreferrer" target="_blank">Multi-index Query</a> for more information on performing a multiple index search. <br><br> <i>Note:</i> <br> <i>The request body must be a valid OpenSearch JSON query as described in the</i> <a class="reference external" href="https://opensearch.org/docs/latest/api-reference/search/" rel="noopener noreferrer" target="_blank">official docs</a>
       parameters:
         - name: index
           in: query          
