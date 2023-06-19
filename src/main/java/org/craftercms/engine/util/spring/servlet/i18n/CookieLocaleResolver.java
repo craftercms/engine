@@ -29,12 +29,11 @@ import static org.craftercms.commons.locale.LocaleUtils.parseLocale;
 /**
  * Implementation of {@link ConfigAwareLocaleResolver} that reads the locale from a cookie.
  *
- * <p>Supported configuration properties:
+ * <p>Supported configuration properties:</p>
  *  <ul>
  *      <li><strong>cookieName</strong>: The name of the cookie to read, the site name will be appended, defaults
  *      to a global configurable value</li>
  *  </ul>
- * </p>
  *
  * @author joseross
  * @since 4.0.0

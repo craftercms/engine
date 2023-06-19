@@ -27,12 +27,11 @@ import java.util.Map;
 /**
  * Implementation of {@link ConfigAwareLocaleResolver} that executes a Groovy script to resolve the locale
  *
- * <p>Supported configuration properties:
+ * <p>Supported configuration properties:</p>
  *  <ul>
  *      <li><strong>script</strong>: The path of the Groovy script in the site, defaults to
  *      {@code /scripts/locale/resolver.groovy}</li>
  *  </ul>
- * </p>
  *
  * @author joseross
  * @since 4.0.0

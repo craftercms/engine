@@ -33,7 +33,7 @@ import java.io.IOException;
  * Request handler to render static assets that are stored externally from the content store, in remote
  * file stores.
  *
- * @author @avasquez
+ * @author avasquez
  */
 public class RemoteAssetsRequestHandler extends ResourceHttpRequestHandler {
 
