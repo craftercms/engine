@@ -30,12 +30,12 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 /**
  * Implementation of {@link ConfigAwareLocaleResolver} that reads the locale from a request header.
  *
- * <p>Supported configuration properties:
+ * <p>Supported configuration properties:</p>
  *  <ul>
  *      <li><strong>headerName</strong>: The name of the request header, defaults to
  *      {@code Accept-Language}</li>
  *  </ul>
- * </p>
+ *
  * @author joseross
  * @since 4.0.0
  */

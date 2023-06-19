@@ -31,7 +31,7 @@ import static graphql.schema.GraphQLList.list;
 import static graphql.schema.GraphQLNonNull.nonNull;
 
 /**
- * Utility objects & methods for building the GraphQL Schema
+ * Utility objects &amp; methods for building the GraphQL Schema
  *
  * @author joseross
  * @since 3.1

@@ -37,7 +37,6 @@ import org.springframework.beans.factory.InitializingBean;
  * the folder where all the sites reside and the site folder format. Then, iterates through the children of the
  * folder looking for site folders that match the format, extracting the site names from the folder name. To better
  * illustrate, here's an example:
- * <p/>
  * <p>Assume the site root folder path is file:/opt/websites/{siteName}app. The sites
  * folder, or basically the folder that contains all sites, is resolved to /opt/websites. The children of this folder
  * are brochureapp, corporateapp and plutonapp. By using the {siteName}app site name format, the site names are
