@@ -28,7 +28,7 @@ import java.util.function.Predicate;
 import static java.util.Collections.emptyList;
 
 /**
- * Extension of {@link org.craftercms.commons.locale.LocaleUtils} that automatically uses the current locale & fallback
+ * Extension of {@link org.craftercms.commons.locale.LocaleUtils} that automatically uses the current locale &amp; fallback
  * according to the site configuration
  *
  * @author joseross
