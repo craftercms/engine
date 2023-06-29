@@ -36,7 +36,7 @@
     <parent>
         <groupId>org.craftercms</groupId>
         <artifactId>craftercms</artifactId>
-        <version>4.1.0-SNAPSHOT</version><!-- craftercms version flag -->
+        <version>4.1.1-SNAPSHOT</version><!-- craftercms version flag -->
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -230,6 +230,12 @@
         </dependency>
 
         <!-- Box -->
+        <!-- Override Jose4j dependency from Box -->
+        <dependency>
+            <groupId>org.bitbucket.b_c</groupId>
+            <artifactId>jose4j</artifactId>
+            <version>${jose4j.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.box</groupId>
             <artifactId>box-java-sdk</artifactId>

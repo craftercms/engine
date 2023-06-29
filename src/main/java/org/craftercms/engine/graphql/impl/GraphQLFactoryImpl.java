@@ -63,7 +63,7 @@ public class GraphQLFactoryImpl implements GraphQLFactory, ServletContextAware {
     public static final String VARIABLE_SCHEMA = "schema";
 
     /**
-     * The path of the init script for custom fields & fetchers
+     * The path of the init script for custom fields &amp; fetchers
      */
     protected String schemaScriptPath;
 

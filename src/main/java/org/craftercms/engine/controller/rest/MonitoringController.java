@@ -39,7 +39,7 @@ import static java.lang.String.format;
 import static org.craftercms.commons.validation.annotations.param.EsapiValidationType.SITE_ID;
 
 /**
- * Rest controller to provide monitoring information & site logs
+ * Rest controller to provide monitoring information &amp; site logs
  */
 @Validated
 @RestController
