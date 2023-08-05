@@ -30,6 +30,9 @@ public class SecurityUtils {
     public static final String ANONYMOUS_PSEUDO_ROLE = "anonymous";
     public static final String ROLE_PREFIX = "ROLE_";
     public static final String AUTHENTICATED_PSEUDO_ROLE = "authenticated";
+    public static final String AUTHENTICATED_PSEUDO_ROLE_SEARCH_VALUE = AUTHENTICATED_PSEUDO_ROLE + SPACE + ROLE_PREFIX + AUTHENTICATED_PSEUDO_ROLE;
+    public static final String ANONYMOUS_PSEUDO_ROLE_SEARCH_VALUE = ANONYMOUS_PSEUDO_ROLE + SPACE + ROLE_PREFIX + ANONYMOUS_PSEUDO_ROLE;
+
 
     private SecurityUtils() {
     }

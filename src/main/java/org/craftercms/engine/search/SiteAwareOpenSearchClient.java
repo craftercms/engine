@@ -220,17 +220,17 @@ public class SiteAwareOpenSearchClient extends AbstractOpenSearchClientWrapper {
                 .match(m -> m
                     .field(roleFieldName)
                     .query(q -> q
-                        .stringValue(ANONYMOUS_PSEUDO_ROLE)
+                        .stringValue(ANONYMOUS_PSEUDO_ROLE_SEARCH_VALUE)
                     )
                 )
             );
 
-        if (auth != null && !(auth instanceof AnonymousAuthenticationToken) && isNotEmpty(auth.getAuthorities())) {
+        if (auth != null && !(auth instanceof AnonymousAuthenticationToken)) {
             logger.debug("Filtering search results for authenticated users");
             securityQuery.should(s -> s
                     .match(m -> m
                             .field(roleFieldName)
-                            .query(q -> q.stringValue(AUTHENTICATED_PSEUDO_ROLE))
+                            .query(q -> q.stringValue(AUTHENTICATED_PSEUDO_ROLE_SEARCH_VALUE))
                     ));
             if (isNotEmpty(auth.getAuthorities())) {
                 logger.debug("Filtering search results for roles: {}", auth.getAuthorities());

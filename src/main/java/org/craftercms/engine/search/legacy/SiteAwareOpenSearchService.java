@@ -213,11 +213,11 @@ public class SiteAwareOpenSearchService extends AbstractOpenSearchWrapper {
         // Include all public items
         BoolQueryBuilder securityQuery = boolQuery()
                 .should(boolQuery().mustNot(existsQuery(roleFieldName)))
-                .should(matchQuery(roleFieldName, ANONYMOUS_PSEUDO_ROLE));
+                .should(matchQuery(roleFieldName, ANONYMOUS_PSEUDO_ROLE_SEARCH_VALUE));
 
         if (auth != null && !(auth instanceof AnonymousAuthenticationToken)) {
             logger.debug("Filtering search results for authenticated users");
-            securityQuery.should(matchQuery(roleFieldName, AUTHENTICATED_PSEUDO_ROLE));
+            securityQuery.should(matchQuery(roleFieldName, AUTHENTICATED_PSEUDO_ROLE_SEARCH_VALUE));
             if (isNotEmpty(auth.getAuthorities())) {
                 logger.debug("Filtering search results for roles: {}", auth.getAuthorities());
                 securityQuery.should(matchQuery(roleFieldName, getAuthorizedRolesMatchValue(auth.getAuthorities())));
