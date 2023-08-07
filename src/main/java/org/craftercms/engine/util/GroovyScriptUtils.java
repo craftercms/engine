@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.configuration2.Configuration;
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.craftercms.commons.http.HttpUtils;
+import org.craftercms.commons.http.RequestContext;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.scripting.impl.GroovyScript;
 import org.craftercms.engine.service.context.SiteContext;
@@ -108,6 +109,14 @@ public class GroovyScriptUtils {
         addCommonVariables(variables, request, response, servletContext, true);
         addSecurityVariables(variables);
         addFilterChainVariable(variables, filterChain);
+    }
+
+    public static void addHealthCheckScriptVariables(Map<String, Object> variables,
+                                                     boolean disableVariableRestrictions) {
+        RequestContext requestContext = RequestContext.getCurrent();
+        ServletContext servletContext = disableVariableRestrictions ? requestContext.getServletContext() : null;
+        addCommonVariables(variables, requestContext.getRequest(), requestContext.getResponse(), servletContext, true);
+        addSecurityVariables(variables);
     }
 
     public static void addJobScriptVariables(Map<String, Object> variables, ServletContext servletContext) {
