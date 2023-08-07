@@ -1098,4 +1098,26 @@
     <import resource="${crafter.engine.extension.base}/services-context.xml"/>
     <import resource="classpath:crafter/entitlements/entitlements-context.xml"/>
 
+    <!-- Content Store Service -->
+    <bean id="crafter.contentStoreService"
+          class="org.craftercms.engine.security.AuthorizedRolesAwareContentStoreService">
+        <constructor-arg name="authorizedRolesXPathQuery" value="${crafter.security.authorization.page.authorizedRoles.xpathQuery}"/>
+        <constructor-arg name="cacheTemplate" ref="crafter.cacheTemplate"/>
+        <constructor-arg name="merger" ref="crafter.merger"/>
+        <constructor-arg name="processorResolver" ref="crafter.procesorResolverChain"/>
+        <constructor-arg name="mergeStrategyResolver" ref="crafter.mergeStrategyResolverChain"/>
+        <constructor-arg name="storeAdapterRegistry" ref="crafter.contentStoreAdapterRegistry"/>
+
+        <constructor-arg name="blobUrlResolver" ref="crafter.blobUrlResolver"/>
+        <constructor-arg name="blobStoreResolver" ref="crafter.blobStoreResolver"/>
+
+        <constructor-arg name="sourceAttributeName" value="${crafter.core.store.source.attribute.name}"/>
+        <constructor-arg name="sourceTypeAttributeName"
+                         value="${crafter.core.store.source.type.attribute.name}"/>
+        <constructor-arg name="sourceTypeXPath" value="${crafter.core.store.source.type.xpath}"/>
+
+        <property name="sourceAttributeEnabled" value="${crafter.core.store.source.attribute.enabled}"/>
+        <property name="flatteningProcessor" ref="crafter.includeDescriptorsProcessor"/>
+    </bean>
+
 </beans>
