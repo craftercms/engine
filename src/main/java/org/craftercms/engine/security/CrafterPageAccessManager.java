@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -15,8 +15,6 @@
  */
 package org.craftercms.engine.security;
 
-import java.util.List;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.security.annotations.RunIfSecurityEnabled;
@@ -28,7 +26,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.List;
+
 import static org.apache.commons.lang3.StringUtils.removeStart;
+import static org.craftercms.engine.util.SecurityUtils.*;
 
 /**
  * Manages access to Crafter pages, depending on the roles specified in the page and the current user's roles.
@@ -37,8 +38,6 @@ import static org.apache.commons.lang3.StringUtils.removeStart;
  * @author Alfonso Vásquez
  */
 public class CrafterPageAccessManager {
-
-    private static final String ROLE_PREFIX = "ROLE_";
 
     protected String authorizedRolesXPathQuery;
 
@@ -69,12 +68,12 @@ public class CrafterPageAccessManager {
 
         List<String> authorizedRoles = getAuthorizedRolesForPage(page);
 
-        if (CollectionUtils.isNotEmpty(authorizedRoles) && !containsRole("anonymous", authorizedRoles)) {
+        if (CollectionUtils.isNotEmpty(authorizedRoles) && !containsRole(ANONYMOUS_PSEUDO_ROLE, authorizedRoles)) {
             // If auth == null it is anonymous
             if (auth == null || auth instanceof AnonymousAuthenticationToken) {
                 throw new AccessDeniedException("User is anonymous but page '" + pageUrl + "' requires authentication");
             }
-            if (!containsRole("authenticated", authorizedRoles) && !hasAnyRole(auth, authorizedRoles)) {
+            if (!containsRole(AUTHENTICATED_PSEUDO_ROLE, authorizedRoles) && !hasAnyRole(auth, authorizedRoles)) {
                 throw new AccessDeniedException("User '" + auth.getName() + "' is not authorized " +
                                                 "to view page '" + pageUrl + "'");
             }
