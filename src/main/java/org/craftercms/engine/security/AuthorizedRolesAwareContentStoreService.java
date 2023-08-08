@@ -23,7 +23,6 @@ import org.craftercms.core.processors.ItemProcessorResolver;
 import org.craftercms.core.service.CachingOptions;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.service.Item;
-import org.craftercms.core.service.ItemFilter;
 import org.craftercms.core.service.impl.ContentStoreServiceImpl;
 import org.craftercms.core.store.ContentStoreAdapterRegistry;
 import org.craftercms.core.util.cache.CacheTemplate;
@@ -35,7 +34,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Extends {@link ContentStoreServiceImpl} to add checks for authorizedRoles property if present in content.
@@ -59,40 +57,20 @@ public class AuthorizedRolesAwareContentStoreService extends ContentStoreService
     }
 
     @Override
-    public Item getItem(Context context, CachingOptions cachingOptions, String url, ItemProcessor processor, boolean flatten) throws InvalidContextException, PathNotFoundException, XmlFileParseException, XmlMergeException, ItemProcessingException, StoreException {
-        Item item = super.getItem(context, cachingOptions, url, processor, flatten);
-        checkAccess(url, item);
+    public Item findItem(Context context, CachingOptions cachingOptions, String url, ItemProcessor processor, boolean flatten) throws InvalidContextException, XmlFileParseException, XmlMergeException, ItemProcessingException, StoreException {
+        Item item = super.findItem(context, cachingOptions, url, processor, flatten);
+        checkAccess(item);
         return item;
     }
 
-    private void checkAccess(String url, Item item) {
+    protected void checkAccess(Item item) {
         try {
             List<String> roles = item.queryDescriptorValues(authorizedRolesXPathQuery);
-            SecurityUtils.checkAccess(roles, url);
+            SecurityUtils.checkAccess(roles, item.getUrl());
         } catch (AccessDeniedException e) {
             logger.debug("Access denied for item: '{}': '{}'", item.getUrl(), e.getMessage());
             throw new StoreAccessDeniedException(e.getMessage(), e);
         }
     }
 
-    @Override
-    protected List<Item> doFilter(List<Item> items, ItemFilter filter, boolean runningBeforeProcessing) {
-        List<Item> filteredItems = super.doFilter(items, filter, runningBeforeProcessing);
-
-        if (!runningBeforeProcessing) {
-            filteredItems = filteredItems.stream()
-                    .filter(item -> {
-                        try {
-                            checkAccess(item.getUrl(), item);
-                            return true;
-                        } catch (AccessDeniedException e) {
-                            logger.warn("Access denied for item: '{}'", item.getUrl(), e);
-                            return false;
-                        }
-                    })
-                    .collect(Collectors.toList());
-        }
-
-        return filteredItems;
-    }
 }
