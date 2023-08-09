@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+  ~ Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License version 3 as published by
@@ -70,6 +70,16 @@
         <property name="contextBuildRetryWaitTimeBase" value="${crafter.engine.site.context.build.retry.waitTimeBase}"/>
         <property name="contextBuildRetryWaitTimeMultiplier" value="${crafter.engine.site.context.build.retry.waitTimeMultiplier}"/>
         <property name="modePreview" value="${crafter.engine.preview}"/>
+    </bean>
+
+    <!-- ////////////////////////////////// -->
+    <!--								 	-->
+    <!--			Health Check			-->
+    <!--									-->
+    <!-- ////////////////////////////////// -->
+    <bean id="siteHealthCheckService" class="org.craftercms.engine.service.impl.SiteHealthCheckServiceImpl">
+        <constructor-arg name="siteListResolver" ref="crafter.siteListResolver"/>
+        <constructor-arg name="healthChecks" ref="siteHealthChecks"/>
     </bean>
 
     <!-- ////////////////////////////////// -->

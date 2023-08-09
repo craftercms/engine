@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -27,7 +27,6 @@ import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
 import org.opensearch.client.opensearch.core.SearchRequest;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,14 +35,13 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.collections4.list.SetUniqueList.setUniqueList;
-import static org.apache.commons.lang3.StringUtils.*;
 import static org.craftercms.commons.locale.LocaleUtils.appendLocale;
 import static org.craftercms.commons.locale.LocaleUtils.getCompatibleLocales;
 import static org.craftercms.engine.util.LocaleUtils.*;
+import static org.craftercms.engine.util.SecurityUtils.*;
 
 /**
  * Implementation of {@link AbstractOpenSearchClientWrapper} that sets the index and security filters based on the
@@ -59,8 +57,6 @@ public class SiteAwareOpenSearchClient extends AbstractOpenSearchClientWrapper {
     private static final String DEFAULT_LOCALES_PARAM_NAME = "locales";
 
     private static final String DEFAULT_FALLBACK_PARAM_NAME = "localeFallback";
-
-    private static final String ROLE_PREFIX = "ROLE_";
 
     /**
      * Format used to build the index id
@@ -207,6 +203,8 @@ public class SiteAwareOpenSearchClient extends AbstractOpenSearchClientWrapper {
         Authentication auth = SecurityContextHolder.getContext() != null?
                                 SecurityContextHolder.getContext().getAuthentication() : null;
 
+
+
         // Include all public items
         BoolQuery.Builder securityQuery = new BoolQuery.Builder()
             .should(s -> s
@@ -222,26 +220,27 @@ public class SiteAwareOpenSearchClient extends AbstractOpenSearchClientWrapper {
                 .match(m -> m
                     .field(roleFieldName)
                     .query(q -> q
-                        .stringValue("anonymous")
+                        .stringValue(ANONYMOUS_PSEUDO_ROLE_SEARCH_VALUE)
                     )
                 )
             );
 
-        if (auth != null && !(auth instanceof AnonymousAuthenticationToken) && isNotEmpty(auth.getAuthorities())) {
-            logger.debug("Filtering search results for roles: {}", auth.getAuthorities());
+        if (auth != null && !(auth instanceof AnonymousAuthenticationToken)) {
+            logger.debug("Filtering search results for authenticated users");
             securityQuery.should(s -> s
-                .match(m -> m
-                    .field(roleFieldName)
-                    .query(q -> q
-                        .stringValue(auth.getAuthorities().stream()
-                            .map(GrantedAuthority::getAuthority)
-                            .map(role -> role +  StringUtils.SPACE +
-                                (startsWith(role, ROLE_PREFIX)? removeStart(role, ROLE_PREFIX)
-                                                                : appendIfMissing(role, ROLE_PREFIX)))
-                            .collect(joining(StringUtils.SPACE)))
-                    )
-                )
-            );
+                    .match(m -> m
+                            .field(roleFieldName)
+                            .query(q -> q.stringValue(AUTHENTICATED_PSEUDO_ROLE_SEARCH_VALUE))
+                    ));
+            if (isNotEmpty(auth.getAuthorities())) {
+                logger.debug("Filtering search results for roles: {}", auth.getAuthorities());
+                securityQuery.should(s -> s
+                        .match(m -> m
+                                .field(roleFieldName)
+                                .query(q -> q.stringValue(getAuthorizedRolesMatchValue(auth.getAuthorities()))
+                                )
+                        ));
+            }
         } else {
             logger.debug("Filtering search to show only public items");
         }
