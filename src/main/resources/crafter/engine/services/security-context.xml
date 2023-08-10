@@ -293,6 +293,16 @@
             <constructor-arg value="${crafter.security.headers.contentSecurityPolicy.value}"/>
             <property name="reportOnly" value="${crafter.security.headers.contentSecurityPolicy.reportOnly}"/>
         </bean>
+        <bean class="org.springframework.security.web.header.writers.StaticHeadersWriter">
+            <constructor-arg name="headers">
+                <list>
+                    <bean class="org.springframework.security.web.header.Header">
+                        <constructor-arg name="headerName" value="X-Permitted-Cross-Domain-Policies"/>
+                        <constructor-arg name="headerValues" value="${crafter.security.headers.permittedCrossDomainPolicies.value}"/>
+                    </bean>
+                </list>
+            </constructor-arg>
+        </bean>
     </util:list>
 
     <!-- Filter separate from the securityFilter since we want to run it in all requests -->
