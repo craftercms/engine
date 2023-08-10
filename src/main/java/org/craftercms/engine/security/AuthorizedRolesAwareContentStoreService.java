@@ -59,7 +59,9 @@ public class AuthorizedRolesAwareContentStoreService extends ContentStoreService
     @Override
     public Item findItem(Context context, CachingOptions cachingOptions, String url, ItemProcessor processor, boolean flatten) throws InvalidContextException, XmlFileParseException, XmlMergeException, ItemProcessingException, StoreException {
         Item item = super.findItem(context, cachingOptions, url, processor, flatten);
-        checkAccess(item);
+        if (item != null) {
+            checkAccess(item);
+        }
         return item;
     }
 
