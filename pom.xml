@@ -41,6 +41,15 @@
     </parent>
 
     <dependencies>
+        <!-- Overrides -->
+        <dependency>
+            <groupId>com.squareup.okio</groupId><!-- Override -->
+            <artifactId>okio-jvm</artifactId>
+            <version>${okio.version}</version>
+        </dependency>
+
+
+        <!-- Dependencies -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
