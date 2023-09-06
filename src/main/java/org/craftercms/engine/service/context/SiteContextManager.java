@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -383,30 +383,8 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
      * @return true if site has valid context, false otherwise
      */
     public boolean hasValidContext(String siteId) {
-        return contextRegistry.get(siteId) != null;
-    }
-
-    /**
-     * Determine if current engine has valid site contexts
-     * Engine has valid site contexts when:
-     * 1. There are no contexts at all
-     * 2. There is one or more valid contexts
-     * @return true if engine has valid context, false otherwise
-     */
-    public boolean hasValidContexts() {
-        Collection<String> siteNames = siteListResolver.getSiteList();
-        if (siteNames.isEmpty()) {
-            return true;
-        }
-
-        for (String siteName : siteNames) {
-            SiteContext siteContext = contextRegistry.get(siteName);
-            if (siteContext != null) {
-                return true;
-            }
-        }
-
-        return false;
+        SiteContext siteContext = contextRegistry.get(siteId);
+        return siteContext != null && siteContext.isValid();
     }
 
     /**
@@ -527,4 +505,12 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
         }
     }
 
+    /**
+     * Rebuild all site contexts currently found in the registry
+     */
+    public void startRebuildAll() {
+        this.contextRegistry.values().forEach(siteContext ->
+                startContextRebuild(siteContext.getSiteName(), siteContext.isFallback())
+        );
+    }
 }

@@ -20,14 +20,17 @@ import org.craftercms.commons.exceptions.InvalidManagementTokenException;
 import org.craftercms.commons.monitoring.StatusInfo;
 import org.craftercms.commons.monitoring.rest.MonitoringRestControllerBase;
 import org.craftercms.commons.validation.annotations.param.ValidSiteId;
-import org.craftercms.engine.service.context.SiteContextManager;
+import org.craftercms.engine.service.SiteHealthCheckService;
 import org.craftercms.engine.util.logging.CircularQueueLogAppender;
 import org.owasp.esapi.ESAPI;
 import org.owasp.esapi.Validator;
 import org.owasp.esapi.errors.ValidationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.Positive;
 import java.beans.ConstructorProperties;
@@ -39,7 +42,7 @@ import static java.lang.String.format;
 import static org.craftercms.commons.validation.annotations.param.EsapiValidationType.SITE_ID;
 
 /**
- * Rest controller to provide monitoring information & site logs
+ * Rest controller to provide monitoring information &amp; site logs
  */
 @Validated
 @RestController
@@ -49,14 +52,14 @@ public class MonitoringController extends MonitoringRestControllerBase {
     public static final String URL_ROOT = "/api/1";
     public static final String LOG_URL = "/log";
 
-    private final SiteContextManager contextManager;
+    private final SiteHealthCheckService siteHealthCheckService;
     private final Validator validator = ESAPI.validator();
     private final int MAXIMUM_SITE_ID_KEY_LENGTH = 50;
 
-    @ConstructorProperties({"contextManager", "configuredToken"})
-    public MonitoringController(final SiteContextManager contextManager, final String configuredToken) {
+    @ConstructorProperties({"siteHealthCheckService", "configuredToken"})
+    public MonitoringController(final SiteHealthCheckService siteHealthCheckService, final String configuredToken) {
         super(configuredToken);
-        this.contextManager = contextManager;
+        this.siteHealthCheckService = siteHealthCheckService;
     }
 
     @GetMapping(MonitoringRestControllerBase.ROOT_URL + LOG_URL)
@@ -87,13 +90,13 @@ public class MonitoringController extends MonitoringRestControllerBase {
                         .body(responseBody);
             }
 
-            if (!contextManager.hasValidContext(site)) {
+            if (!siteHealthCheckService.healthCheck(site)) {
                 responseBody.put("message", format("Invalid context for site '%s'.", site));
                 return ResponseEntity
                         .internalServerError()
                         .body(responseBody);
             }
-        } else if (!contextManager.hasValidContexts()) {
+        } else if (!siteHealthCheckService.healthCheck()) {
             responseBody.put("message", "Invalid contexts.");
             return ResponseEntity
                     .internalServerError()

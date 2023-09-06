@@ -48,6 +48,7 @@ public class SiteContextRestController extends RestControllerBase {
     public static final String URL_CONTEXT_ID = "/id";
     public static final String URL_DESTROY = "/destroy";
     public static final String URL_REBUILD = "/rebuild";
+    public static final String URL_REBUILD_ALL = "/rebuild_all";
     public static final String URL_GRAPHQL = "/graphql";
     public static final String URL_STATUS = "/status";
 
@@ -80,6 +81,14 @@ public class SiteContextRestController extends RestControllerBase {
 
         return createResponseMessage(format("Started destroy site context  for '%s'. " +
                 "Will be recreated on next request", siteName));
+    }
+
+    @GetMapping(URL_REBUILD_ALL)
+    public Map<String, Object> rebuildAll(@RequestParam String token) throws InvalidManagementTokenException {
+        validateToken(token);
+        contextManager.startRebuildAll();
+
+        return createResponseMessage("Started rebuild of all site contexts");
     }
 
     @GetMapping(value = URL_REBUILD)

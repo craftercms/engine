@@ -35,10 +35,12 @@ import java.util.Map;
  * @author joseross
  */
 @RestController
-@RequestMapping(RestControllerBase.REST_BASE_URI + SiteSearchController.URL_ROOT)
+@RequestMapping({RestControllerBase.REST_BASE_URI + SiteSearchController.URL_ROOT, RestControllerBase.REST_BASE_URI + SiteSearchController.URL_ES_ROOT})
 public class SiteSearchController extends RestControllerBase {
 
     public static final String URL_ROOT = "/site/search";
+    // We use this for backwards compatibility with the old search endpoint
+    public static final String URL_ES_ROOT = "/site/elasticsearch";
     public static final String URL_SEARCH = "/search";
 
     protected final SiteAwareOpenSearchService searchService;

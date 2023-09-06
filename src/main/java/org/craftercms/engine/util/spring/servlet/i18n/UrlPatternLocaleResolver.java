@@ -28,15 +28,13 @@ import static org.craftercms.commons.locale.LocaleUtils.parseLocale;
 /**
  * Implementation of {@link ConfigAwareLocaleResolver} that compares the requested URL to a map of locales
  *
- * <p>Supported configuration properties:
- *  <ul>
- *      <li><strong>mappings.mapping</strong>: A list of objects containing:</li>
- *      <ul>
- *          <li><strong>pattern</strong>: A regular expression to match against the full URL of the request</li>
- *          <li><strong>localeCode</strong>: The code of the locale to use</li>
- *      </ul>
- *  </ul>
- * </p>
+ * <p>Supported configuration properties:</p>
+ * <ul>
+ *     <li><strong>mappings.mapping</strong>: A list of objects containing:<ul>
+ *         <li><strong>pattern</strong>: A regular expression to match against the full URL of the request</li>
+ *         <li><strong>localeCode</strong>: The code of the locale to use</li>
+ *     </ul></li>
+ * </ul>
  *
  * @author joseross
  * @since 4.0.0

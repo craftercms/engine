@@ -630,6 +630,24 @@
 
     <!-- ////////////////////////////////// -->
     <!--								 	-->
+    <!--			Health Check			-->
+    <!--									-->
+    <!-- ////////////////////////////////// -->
+    <bean id="siteHealthCheckService" class="org.craftercms.engine.service.impl.SiteHealthCheckServiceImpl">
+        <constructor-arg name="siteListResolver" ref="crafter.siteResolver"/>
+        <constructor-arg name="healthChecks" ref="siteHealthChecks"/>
+    </bean>
+
+    <util:list id="siteHealthChecks">
+        <bean class="org.craftercms.engine.service.health.SiteContextHealthCheck"/>
+        <bean class="org.craftercms.engine.service.health.ScriptSiteHealthCheck">
+            <constructor-arg name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
+            <constructor-arg name="scriptPath" value="${crafter.engine.site.default.health-check.script.path}"/>
+        </bean>
+    </util:list>
+
+    <!-- ////////////////////////////////// -->
+    <!--								 	-->
     <!--			Mobile Support			-->
     <!--									-->
     <!-- ////////////////////////////////// -->

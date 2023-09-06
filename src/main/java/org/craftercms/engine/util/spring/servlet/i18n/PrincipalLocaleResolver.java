@@ -29,11 +29,10 @@ import static org.craftercms.commons.locale.LocaleUtils.parseLocale;
 /**
  * Implementation of {@link ConfigAwareLocaleResolver} that extracts the locale from the current authenticated user
  *
- * <p>Supported configuration properties:
+ * <p>Supported configuration properties:</p>
  *  <ul>
  *      <li><strong>attributeName</strong>: The name of the attribute to use, defaults to {@code preferredLanguage}</li>
  *  </ul>
- * </p>
  *
  * @author joseross
  * @since 4.0.0

@@ -22,6 +22,29 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
+    <!-- Content Store Service -->
+    <!-- We are adding this bean to the security context, so it does not conflict with Studio -->
+    <bean id="crafter.contentStoreService"
+          class="org.craftercms.engine.security.AuthorizedRolesAwareContentStoreService">
+        <constructor-arg name="authorizedRolesXPathQuery" value="${crafter.security.authorization.page.authorizedRoles.xpathQuery}"/>
+        <constructor-arg name="cacheTemplate" ref="crafter.cacheTemplate"/>
+        <constructor-arg name="merger" ref="crafter.merger"/>
+        <constructor-arg name="processorResolver" ref="crafter.procesorResolverChain"/>
+        <constructor-arg name="mergeStrategyResolver" ref="crafter.mergeStrategyResolverChain"/>
+        <constructor-arg name="storeAdapterRegistry" ref="crafter.contentStoreAdapterRegistry"/>
+
+        <constructor-arg name="blobUrlResolver" ref="crafter.blobUrlResolver"/>
+        <constructor-arg name="blobStoreResolver" ref="crafter.blobStoreResolver"/>
+
+        <constructor-arg name="sourceAttributeName" value="${crafter.core.store.source.attribute.name}"/>
+        <constructor-arg name="sourceTypeAttributeName"
+                         value="${crafter.core.store.source.type.attribute.name}"/>
+        <constructor-arg name="sourceTypeXPath" value="${crafter.core.store.source.type.xpath}"/>
+
+        <property name="sourceAttributeEnabled" value="${crafter.core.store.source.attribute.enabled}"/>
+        <property name="flatteningProcessor" ref="crafter.includeDescriptorsProcessor"/>
+    </bean>
+
     <!-- Spring Security Integration -->
 
     <!-- Path Matchers -->
@@ -263,6 +286,23 @@
             <constructor-arg index="0" value="${crafter.security.headers.xframeOptions.value}"/>
         </bean>
         <bean class="org.springframework.security.web.header.writers.XContentTypeOptionsHeaderWriter"/>
+        <bean class="org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter">
+            <constructor-arg value="#{T(org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy).get('${crafter.security.headers.referrerPolicy.value}')}"/>
+        </bean>
+        <bean class="org.springframework.security.web.header.writers.ContentSecurityPolicyHeaderWriter">
+            <constructor-arg value="${crafter.security.headers.contentSecurityPolicy.value}"/>
+            <property name="reportOnly" value="${crafter.security.headers.contentSecurityPolicy.reportOnly}"/>
+        </bean>
+        <bean class="org.springframework.security.web.header.writers.StaticHeadersWriter">
+            <constructor-arg name="headers">
+                <list>
+                    <bean class="org.springframework.security.web.header.Header">
+                        <constructor-arg name="headerName" value="X-Permitted-Cross-Domain-Policies"/>
+                        <constructor-arg name="headerValues" value="${crafter.security.headers.permittedCrossDomainPolicies.value}"/>
+                    </bean>
+                </list>
+            </constructor-arg>
+        </bean>
     </util:list>
 
     <!-- Filter separate from the securityFilter since we want to run it in all requests -->

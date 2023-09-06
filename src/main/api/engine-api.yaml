@@ -4,7 +4,7 @@ servers:
 info:
   description: |-
     Crafter Engine API
-  version: '4.0.3.0'
+  version: '4.1.1'
   title: Crafter Engine
   termsOfService: ''
   contact:
@@ -201,6 +201,41 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'          
 
+  /api/1/site/context/rebuild_all:
+    get:
+      security: []
+      tags:
+        - context
+      summary: Rebuild all site contexts
+      operationId: rebuildAllSiteContexts
+      description: Rebuild all site contexts currently found in the registry
+      parameters:
+        - name: token
+          in: query
+          description: The authorization token
+          required: true
+          schema:
+            type: string
+          example: defaultManagementToken        
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: All site contexts rebuild started
+                    example: Started rebuild of all site contexts
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'          
+                
   /api/1/site/context/graphql/rebuild:
     get:
       security: []
