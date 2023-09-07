@@ -165,22 +165,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.gmongo</groupId>
-            <artifactId>gmongo</artifactId>
-            <version>${gmongo.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId> org.codehaus.groovy</groupId>
-                    <artifactId>groovy-ant</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId> org.codehaus.groovy</groupId>
-                    <artifactId>groovy</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
             <groupId>rome</groupId>
             <artifactId>rome</artifactId>
             <version>${rome.version}</version>
