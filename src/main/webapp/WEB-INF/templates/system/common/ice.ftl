@@ -4,7 +4,7 @@
 <!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>
 CrafterCMS Authoring Scripts
 >>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
-<script defer src="/studio/static-assets/modules/editors/tinymce/v5/tinymce/tinymce.min.js"></script>
+<script defer src="/studio/static-assets/modules/editors/tinymce/v5.10.7/tinymce/tinymce.min.js"></script>
 <script defer src="/studio/static-assets/scripts/craftercms-xb.umd.js"></script>
 <script>
   document.addEventListener('craftercms.xb:loaded', () => {
