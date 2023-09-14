@@ -62,7 +62,6 @@
         <graphql.version>20.2</graphql.version>
         <graphql.extended.scalars.version>20.2</graphql.extended.scalars.version>
         <sardine.version>5.10</sardine.version>
-        <xerces.version>2.12.2</xerces.version>
         <httpproxy.version>1.12.1</httpproxy.version>
         <spatial4j.version>0.8</spatial4j.version>
         <guava.version>32.1.2-jre</guava.version>
@@ -150,11 +149,23 @@
             <groupId>org.craftercms</groupId>
             <artifactId>crafter-commons-validation</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.craftercms</groupId>
             <artifactId>crafter-search-elasticsearch</artifactId>
             <version>${crafter.search.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -262,12 +273,6 @@
             <groupId>org.tuckey</groupId>
             <artifactId>urlrewritefilter</artifactId>
             <version>${urlrewrite.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-            <version>${xerces.version}</version>
         </dependency>
 
         <!-- Logging -->
