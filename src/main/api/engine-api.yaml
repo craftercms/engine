@@ -14,7 +14,7 @@ info:
     url: 'https://www.gnu.org/licenses/gpl-3.0.en.html'
 externalDocs:
   description: CrafterCMS - Engine
-  url: 'https://docs.craftercms.org/current/developers/projects/engine/index.html'
+  url: 'https://docs.craftercms.org/current/reference/modules/engine/index.html'
 tags:
   - name: content
     description: Content retrieval operations
