@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Internal Server Error</title>
+        <title>Unable to resolve site</title>
 
         <style>
             body {
