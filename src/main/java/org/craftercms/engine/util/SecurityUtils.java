@@ -18,7 +18,9 @@ package org.craftercms.engine.util;
 import org.springframework.lang.NonNull;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -71,7 +73,7 @@ public class SecurityUtils {
      *     <li>authorizedRoles contains any of the user roles/authorities</li>
      * </ul>
      */
-    public static void checkAccess(Collection<String> authorizedRoles, String url) throws AccessDeniedException {
+    public static void checkAccess(Collection<String> authorizedRoles, String url) throws AccessDeniedException, AuthenticationException {
         Authentication authentication = null;
 
         SecurityContext context = SecurityContextHolder.getContext();
@@ -84,7 +86,7 @@ public class SecurityUtils {
         }
         // If auth == null it is anonymous
         if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
-            throw new AccessDeniedException("User is anonymous but page '" + url + "' requires authentication");
+            throw new AuthenticationCredentialsNotFoundException(format("User is anonymous but page '%s' requires authentication", url));
         }
         if (!containsRole(AUTHENTICATED_PSEUDO_ROLE, authorizedRoles) && !hasAnyRole(authentication, authorizedRoles)) {
             throw new AccessDeniedException(format("User '%s' is not authorized " +
