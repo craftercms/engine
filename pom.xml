@@ -41,6 +41,15 @@
     </parent>
 
     <dependencies>
+        <!-- Overrides -->
+        <dependency>
+            <groupId>com.squareup.okio</groupId><!-- Override -->
+            <artifactId>okio-jvm</artifactId>
+            <version>${okio.version}</version>
+        </dependency>
+
+
+        <!-- Dependencies -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
@@ -90,11 +99,23 @@
             <groupId>org.craftercms</groupId>
             <artifactId>crafter-commons-validation</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.craftercms</groupId>
             <artifactId>crafter-search-opensearch</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -123,19 +144,13 @@
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
             <version>${groovy.version}</version>
-	    <type>pom</type>
+            <type>pom</type>
         </dependency>
 
         <dependency>
             <groupId>org.apache.ivy</groupId>
             <artifactId>ivy</artifactId>
-            <version>${apache.ivy}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.codehaus.groovy</groupId>
-                    <artifactId>groovy-all</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>${ivy.version}</version>
         </dependency>
 
         <dependency>
@@ -156,22 +171,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.gmongo</groupId>
-            <artifactId>gmongo</artifactId>
-            <version>${gmongo.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId> org.codehaus.groovy</groupId>
-                    <artifactId>groovy-ant</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId> org.codehaus.groovy</groupId>
-                    <artifactId>groovy</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
             <groupId>rome</groupId>
             <artifactId>rome</artifactId>
             <version>${rome.version}</version>
@@ -181,12 +180,6 @@
             <groupId>org.tuckey</groupId>
             <artifactId>urlrewritefilter</artifactId>
             <version>${urlrewrite.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-            <version>${xerces.version}</version>
         </dependency>
 
         <!-- Logging -->
@@ -407,6 +400,12 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>${testng.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
