@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Internal Server Error</title>
+        <title>Unable to resolve project</title>
 
         <style>
             body {
@@ -10,7 +10,7 @@
         </style>
     </head>
     <body>
-        <h1>Could not resolve site for the current request.</h1>
+        <h1>Could not resolve project for the current request.</h1>
         <button type="button" onclick="location.reload()">Retry</button>
     </body>
 </html>
