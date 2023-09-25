@@ -16,8 +16,8 @@
 package org.craftercms.engine.service.context;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.craftercms.commons.concurrent.locks.KeyBasedLockFactory;
 import org.craftercms.commons.concurrent.locks.WeakKeyBasedReentrantLockFactory;
 import org.craftercms.commons.entitlements.exception.EntitlementException;
@@ -28,14 +28,16 @@ import org.springframework.beans.factory.annotation.Required;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import io.methvin.watcher.DirectoryWatcher;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
+import java.io.IOException;
+import java.nio.file.*;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -46,11 +48,12 @@ import static java.lang.String.format;
  */
 public class SiteContextManager implements ApplicationContextAware, DisposableBean {
 
-    private static final Log logger = LogFactory.getLog(SiteContextManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(SiteContextManager.class);
 
     protected ApplicationContext applicationContext;
     protected KeyBasedLockFactory<ReentrantLock> siteLockFactory;
     protected Map<String, SiteContext> contextRegistry;
+    protected Map<String, DirectoryWatcher> directoryWatcherRegistry;
     protected SiteContextFactory contextFactory;
     protected SiteContextFactory fallbackContextFactory;
     protected SiteListResolver siteListResolver;
@@ -58,6 +61,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
     protected boolean waitForContextInit;
     protected Executor jobThreadPoolExecutor;
     protected String defaultSiteName;
+    protected String[] watcherPaths = {};
 
     /**
      * Context build retry max count
@@ -82,6 +86,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
     public SiteContextManager() {
         siteLockFactory = new WeakKeyBasedReentrantLockFactory();
         contextRegistry = new ConcurrentHashMap<>();
+        directoryWatcherRegistry = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -144,6 +149,11 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
         this.modePreview = modePreview;
     }
 
+    @Required
+    public void setWatcherPaths(final String[] watcherPaths) {
+        this.watcherPaths = watcherPaths;
+    }
+
     public void destroy() {
         destroyAllContexts();
     }
@@ -197,6 +207,58 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
         logger.info("==================================================");
     }
 
+    /**
+     * Register files watcher for preview mode
+     * Any files from watcherPaths will be watched for modification
+     * @param siteName site name
+     * @param isFallback is fallback
+     */
+    protected void registerWatcherForSite(String siteName, boolean isFallback) {
+        try {
+            String resolvedRootFolderPath = contextFactory.resolvedRootFolderPath(siteName);
+            ClassLoader parentClassLoader = Thread.currentThread().getContextClassLoader();
+            List<Path> paths = Arrays.stream(watcherPaths)
+                    .map(resource -> Paths.get(resolvedRootFolderPath + resource))
+                    .collect(Collectors.toList());
+            DirectoryWatcher watcher = DirectoryWatcher.builder()
+                    .paths(paths)
+                    .listener(event -> {
+                        Thread.currentThread().setContextClassLoader(parentClassLoader);
+                        switch (event.eventType()) {
+                            case CREATE:
+                            case DELETE:
+                            case MODIFY: {
+                                logger.info("File watcher event kind: '{}'. File affected: '{}'.", event.eventType(), event.path());
+                                startContextRebuild(
+                                        siteName,
+                                        isFallback,
+                                        newContext -> logger.info("Context rebuild for site '{}' completed", siteName));
+                                break;
+                            }
+                            default:
+                                logger.info("File watcher unhandled event kind: '{}'. File affected: '{}'.", event.eventType(), event.path());
+                        }
+                    })
+                    .build();
+
+            if (directoryWatcherRegistry.get(siteName) != null) {
+                Lock lock = siteLockFactory.getLock(siteName);
+                lock.lock();
+                try {
+                    DirectoryWatcher oldWatcher = directoryWatcherRegistry.remove(siteName);
+                    oldWatcher.close();
+                } finally {
+                    lock.unlock();
+                }
+            }
+
+            directoryWatcherRegistry.put(siteName, watcher);
+            watcher.watchAsync();
+        } catch (Exception e) {
+            logger.error("Error while creating watcher for site: " + siteName, e);
+        }
+    }
+
     public void syncContexts() {
         logger.debug("Syncing the site contexts ...");
 
@@ -243,6 +305,10 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
             Lock lock = siteLockFactory.getLock(siteName);
             lock.lock();
             try {
+                if (directoryWatcherRegistry.get(siteName) != null) {
+                    DirectoryWatcher watcher = directoryWatcherRegistry.remove(siteName);
+                    watcher.close();
+                }
                 destroyContext(siteContext);
             } catch (Exception e) {
                 logger.error("Error destroying site context for site '" + siteName + "'", e);
@@ -289,6 +355,10 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
                     logger.info("==================================================");
 
                     siteContext = createContext(siteName, fallback);
+
+                    if (modePreview) {
+                        registerWatcherForSite(siteName, fallback);
+                    }
 
                     logger.info("==================================================");
                     logger.info("</Creating site context: " + siteName + ">");
@@ -406,6 +476,15 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
         Lock lock = siteLockFactory.getLock(siteName);
         lock.lock();
         try {
+            if (directoryWatcherRegistry.get(siteName) != null) {
+                try {
+                    DirectoryWatcher watcher = directoryWatcherRegistry.remove(siteName);
+                    watcher.close();
+                } catch (IOException e) {
+                    logger.warn("Error while removing directory watcher register for site '{}'", siteName, e);
+                }
+            }
+
             siteContext = contextRegistry.remove(siteName);
         } finally {
             lock.unlock();

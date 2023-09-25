@@ -60,6 +60,7 @@
         <property name="contextBuildRetryWaitTimeBase" value="${crafter.engine.site.context.build.retry.waitTimeBase}"/>
         <property name="contextBuildRetryWaitTimeMultiplier" value="${crafter.engine.site.context.build.retry.waitTimeMultiplier}"/>
         <property name="modePreview" value="${crafter.engine.preview}"/>
+        <property name="watcherPaths" value="${crafter.engine.watcher.paths}"/>
     </bean>
 
     <bean id="crafter.siteContextFactory" class="org.craftercms.engine.service.context.SiteContextFactory">

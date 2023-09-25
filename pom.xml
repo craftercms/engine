@@ -376,6 +376,12 @@
             </exclusions>
         </dependency>
 
+        <dependency>
+            <groupId>io.methvin</groupId>
+            <artifactId>directory-watcher</artifactId>
+            <version>${directoryWatcher.version}</version>
+        </dependency>
+
         <!-- Test dependencies -->
         <!-- Tomcat EL -->
         <dependency>
