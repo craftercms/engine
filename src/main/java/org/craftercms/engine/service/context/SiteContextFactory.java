@@ -459,7 +459,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
      * @param siteName site name
      * @return the root folder absolute path
      */
-    public String resolvedRootFolderPath(String siteName) throws URISyntaxException {
+    public String resolveRootFolderPath(String siteName) throws URISyntaxException {
         Map<String, String> macroValues = new HashMap<>();
         macroValues.put(siteNameMacroName, siteName);
 

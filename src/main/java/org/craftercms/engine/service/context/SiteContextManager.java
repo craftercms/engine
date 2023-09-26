@@ -15,6 +15,7 @@
  */
 package org.craftercms.engine.service.context;
 
+import io.methvin.watcher.hashing.FileHasher;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +55,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
     protected KeyBasedLockFactory<ReentrantLock> siteLockFactory;
     protected Map<String, SiteContext> contextRegistry;
     protected Map<String, DirectoryWatcher> directoryWatcherRegistry;
+    protected Map<String, String> directoryWatcherLastProcessedHash;
     protected SiteContextFactory contextFactory;
     protected SiteContextFactory fallbackContextFactory;
     protected SiteListResolver siteListResolver;
@@ -87,6 +89,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
         siteLockFactory = new WeakKeyBasedReentrantLockFactory();
         contextRegistry = new ConcurrentHashMap<>();
         directoryWatcherRegistry = new ConcurrentHashMap<>();
+        directoryWatcherLastProcessedHash = new HashMap<>();
     }
 
     @Override
@@ -215,24 +218,45 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
      */
     protected void registerWatcherForSite(String siteName, boolean isFallback) {
         try {
-            String resolvedRootFolderPath = contextFactory.resolvedRootFolderPath(siteName);
+            String siteRootPath = contextFactory.resolveRootFolderPath(siteName);
             ClassLoader parentClassLoader = Thread.currentThread().getContextClassLoader();
             List<Path> paths = Arrays.stream(watcherPaths)
-                    .map(resource -> Paths.get(resolvedRootFolderPath + resource))
+                    .map(resource -> Paths.get(siteRootPath + resource))
                     .collect(Collectors.toList());
             DirectoryWatcher watcher = DirectoryWatcher.builder()
                     .paths(paths)
+                    .fileHasher(FileHasher.LAST_MODIFIED_TIME)
                     .listener(event -> {
                         Thread.currentThread().setContextClassLoader(parentClassLoader);
                         switch (event.eventType()) {
                             case CREATE:
                             case DELETE:
                             case MODIFY: {
-                                logger.info("File watcher event kind: '{}'. File affected: '{}'.", event.eventType(), event.path());
-                                startContextRebuild(
-                                        siteName,
-                                        isFallback,
-                                        newContext -> logger.info("Context rebuild for site '{}' completed", siteName));
+                                String hashValue = event.hash() != null ? event.hash().asString() : "none";
+                                logger.info("File watcher event kind: '{}'. File affected: '{}'. Hash value: '{}'", event.eventType(), event.path(), hashValue);
+                                // Only process if the hash is different from the last processed hash value,
+                                // or the event hash is null in the case of DELETE
+                                // This means the modified time has been updated from last processed event or the file is deleted
+                                // This prevents multiple context rebuild for batch files change with same modified date such as from a git pull
+                                String lastProcessedHash = directoryWatcherLastProcessedHash.get(siteName);
+                                if (lastProcessedHash == null || event.hash() == null || !lastProcessedHash.equals(hashValue)) {
+                                    Lock lock = siteLockFactory.getLock(siteName);
+                                    lock.lock();
+                                    try {
+                                        if (event.hash() != null) {
+                                            directoryWatcherLastProcessedHash.put(siteName, hashValue);
+                                        }
+                                        startContextRebuild(
+                                                siteName,
+                                                isFallback,
+                                                newContext -> logger.info("Context rebuild for site '{}' completed. " +
+                                                        "Triggered by hash value '{}'.", siteName, hashValue));
+                                    } finally {
+                                        lock.unlock();
+                                    }
+                                } else {
+                                    logger.info("File watch for hash '{}' has already processed. No rebuild required.", hashValue);
+                                }
                                 break;
                             }
                             default:
