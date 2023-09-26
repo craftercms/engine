@@ -72,7 +72,7 @@ public class MonitoringController extends MonitoringRestControllerBase {
 
     @Override
     @GetMapping(ROOT_URL + STATUS_URL)
-    public ResponseEntity getCurrentStatus(@RequestParam(name = "site", required = false) String site,
+    public ResponseEntity getCurrentStatus(@RequestParam(name = "crafterSite", required = false) String site,
                                            @RequestParam(name = "token") String token)
             throws InvalidManagementTokenException {
         validateToken(token);
