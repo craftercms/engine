@@ -275,7 +275,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
                             case DELETE:
                             case MODIFY: {
                                 String hashValue = event.hash() != null ? event.hash().asString() : "none";
-                                logger.info("File watcher event kind: '{}'. File affected: '{}'. Hash value: '{}'", event.eventType(), event.path(), hashValue);
+                                logger.info("File watcher event type: '{}'. File affected: '{}'. Hash value: '{}'", event.eventType(), event.path(), hashValue);
                                 // Only process if the hash is different from the last processed hash value,
                                 // or the event hash is null in the case of DELETE
                                 // This means the modified time has been updated from last processed event or the file is deleted
@@ -298,12 +298,12 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
                                         siteLock.unlock();
                                     }
                                 } else {
-                                    logger.info("File watch for hash '{}' has already processed. No action required.", hashValue);
+                                    logger.debug("File watch for hash '{}' has already processed. No action required.", hashValue);
                                 }
                                 break;
                             }
                             default:
-                                logger.info("File watcher unhandled event kind: '{}'. File affected: '{}'.", event.eventType(), event.path());
+                                logger.debug("File watcher unhandled event type: '{}'. File affected: '{}'.", event.eventType(), event.path());
                         }
                     })
                     .build();
@@ -322,7 +322,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
             directoryWatcherRegistry.put(siteName, watcher);
             watcher.watchAsync();
         } catch (Exception e) {
-            logger.error("Error while creating watcher for site: " + siteName, e);
+            logger.error("Error while creating watcher for site: '{}'", siteName, e);
         }
     }
 
@@ -399,7 +399,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
                 try {
                     destroyContext(siteName);
                 } catch (Exception e) {
-                    logger.error("Error destroying site context for site '" + siteName + "'", e);
+                    logger.error("Error destroying site context for site '{}'", siteName, e);
                 }
             }
         });
@@ -409,7 +409,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
             try {
                 getContext(siteName, false);
             } catch (Exception e) {
-                logger.error("Error creating site context for site '" + siteName + "'", e);
+                logger.error("Error creating site context for site '{}'", siteName, e);
             }
         });
     }
@@ -428,7 +428,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
             String siteName = siteContext.getSiteName();
 
             logger.info("==================================================");
-            logger.info("<Destroying site context: " + siteName + ">");
+            logger.info("<Destroying site context: '{}'>", siteName);
             logger.info("==================================================");
 
             Lock siteLock = siteLockFactory.getLock(siteName);
@@ -444,13 +444,13 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
                 }
                 destroyContext(siteContext);
             } catch (Exception e) {
-                logger.error("Error destroying site context for site '" + siteName + "'", e);
+                logger.error("Error destroying site context for site '{}'", siteName, e);
             } finally {
                 siteLock.unlock();
             }
 
             logger.info("==================================================");
-            logger.info("</Destroying site context: " + siteName + ">");
+            logger.info("</Destroying site context: '{}'>", siteName);
             logger.info("==================================================");
 
             iter.remove();
@@ -484,7 +484,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
                 siteContext = contextRegistry.get(siteName);
                 if (siteContext == null) {
                     logger.info("==================================================");
-                    logger.info("<Creating site context: " + siteName + ">");
+                    logger.info("<Creating site context: '{}'>", siteName);
                     logger.info("==================================================");
 
                     siteContext = createContext(siteName, fallback);
@@ -496,14 +496,14 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
                     }
 
                     logger.info("==================================================");
-                    logger.info("</Creating site context: " + siteName + ">");
+                    logger.info("</Creating site context: '{}'>", siteName);
                     logger.info("==================================================");
                 }
             } finally {
                 siteLock.unlock();
             }
         } else if (!siteContext.isValid()) {
-            logger.error("Site context " + siteContext + " is not valid anymore");
+            logger.error("Site context '{}' is not valid anymore", siteContext);
 
             destroyContext(siteName);
 
@@ -632,7 +632,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
 
         if (siteContext != null) {
             logger.info("==================================================");
-            logger.info("<Destroying site context: " + siteName + ">");
+            logger.info("<Destroying site context: '{}'>", siteName);
             logger.info("==================================================");
 
             try {
@@ -642,7 +642,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
             }
 
             logger.info("==================================================");
-            logger.info("</Destroying site context: " + siteName + ">");
+            logger.info("</Destroying site context: '{}'>", siteName);
             logger.info("==================================================");
         }
     }
@@ -657,7 +657,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
                 try {
                     destroyContext(siteName);
                 } catch (Exception e) {
-                    logger.error("Error destroying site context for site '" + siteName + "'", e);
+                    logger.error("Error destroying site context for site '{}'", siteName, e);
                 }
             }
         }
@@ -681,7 +681,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
 
         contextRegistry.put(siteName, siteContext);
 
-        logger.info("Site context created: " + siteContext);
+        logger.info("Site context created: '{}'", siteContext);
 
         return siteContext;
     }
@@ -691,7 +691,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
         siteLock.lock();
         try {
             logger.info("==================================================");
-            logger.info("<Rebuilding site context: " + siteName + ">");
+            logger.info("<Rebuilding site context: '{}'>", siteName);
             logger.info("==================================================");
 
             SiteContext oldSiteContext = contextRegistry.get(siteName);
@@ -700,7 +700,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
             oldSiteContext.destroy();
 
             logger.info("==================================================");
-            logger.info("</Rebuilding site context: " + siteName + ">");
+            logger.info("</Rebuilding site context: '{}'>", siteName);
             logger.info("==================================================");
 
             return newContext;
@@ -712,7 +712,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
     protected void destroyContext(SiteContext siteContext) {
         siteContext.destroy();
 
-        logger.info("Site context destroyed: " + siteContext);
+        logger.info("Site context destroyed: '{}'", siteContext);
     }
 
     protected boolean validateSiteCreationEntitlement() {
