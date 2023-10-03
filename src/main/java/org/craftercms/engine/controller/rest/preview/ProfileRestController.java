@@ -16,13 +16,13 @@
 package org.craftercms.engine.controller.rest.preview;
 
 import org.apache.commons.configuration2.HierarchicalConfiguration;
+import org.apache.commons.text.StringEscapeUtils;
 import org.bouncycastle.util.Arrays;
 import org.bson.types.ObjectId;
 import org.craftercms.commons.validation.ValidationResult;
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.engine.util.ConfigUtils;
 import org.owasp.esapi.ESAPI;
-import org.owasp.esapi.Encoder;
 import org.owasp.esapi.Validator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
@@ -57,7 +57,6 @@ public class ProfileRestController {
     public static final String ERROR_MESSAGE_MODEL_ATTR_NAME = "message";
 
     private final Validator validator = ESAPI.validator();
-    private final Encoder encoder = ESAPI.encoder();
 
     @RequestMapping(value = "/get", method = RequestMethod.GET)
     @SuppressWarnings("unchecked")
@@ -72,7 +71,7 @@ public class ProfileRestController {
         return profile;
     }
 
-    @RequestMapping(value = "/set", method = RequestMethod.GET)
+    @RequestMapping(value = "/set", method = RequestMethod.POST)
     public ResponseEntity<Map<String, String>> setProfile(HttpServletRequest request, HttpSession session) {
         boolean cleanseAttributes = shouldCleanseAttributes();
 
@@ -91,7 +90,7 @@ public class ProfileRestController {
                 if (value != null) {
                     value = value.trim();
                     validateParameter(paramName, value);
-                    profile.put(paramName, cleanseAttributes ? encoder.encodeForHTML(value) : value);
+                    profile.put(paramName, cleanseAttributes ? StringEscapeUtils.escapeHtml4(value) : value);
                 }
             }
         } catch (Exception e) {
