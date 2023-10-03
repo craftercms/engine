@@ -67,9 +67,12 @@ import org.tuckey.web.filters.urlrewrite.Conf;
 import org.tuckey.web.filters.urlrewrite.UrlRewriter;
 
 import javax.servlet.ServletContext;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLClassLoader;
 import java.util.*;
 import java.util.concurrent.Executor;
@@ -449,6 +452,25 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
 
             throw e;
         }
+    }
+
+    /**
+     * Resolve root folder path
+     * @param siteName site name
+     * @return the root folder absolute path
+     */
+    public String resolveRootFolderPath(String siteName) throws URISyntaxException {
+        Map<String, String> macroValues = new HashMap<>();
+        macroValues.put(siteNameMacroName, siteName);
+
+        if (publishingTargetResolver instanceof SiteAwarePublishingTargetResolver) {
+            String target = ((SiteAwarePublishingTargetResolver) publishingTargetResolver).getPublishingTarget(siteName);
+            macroValues.put(publishingTargetMacroName, target);
+        }
+
+        String resolvedRootFolderPath = macroResolver.resolveMacros(rootFolderPath, macroValues);
+
+        return new File(new URI(resolvedRootFolderPath)).getAbsolutePath();
     }
 
     protected HierarchicalConfiguration getConfig(SiteContext siteContext, String[] configPaths,
