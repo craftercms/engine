@@ -16,17 +16,16 @@
 
 package org.craftercms.engine.graphql;
 
-import java.util.*;
-
 import graphql.schema.*;
 import org.apache.commons.collections4.ListUtils;
 
-import static graphql.Scalars.GraphQLBoolean;
-import static graphql.Scalars.GraphQLFloat;
-import static graphql.Scalars.GraphQLInt;
-import static graphql.scalars.ExtendedScalars.GraphQLLong;
-import static graphql.Scalars.GraphQLString;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import static graphql.Scalars.*;
 import static graphql.scalars.ExtendedScalars.DateTime;
+import static graphql.scalars.ExtendedScalars.GraphQLLong;
 import static graphql.schema.GraphQLList.list;
 import static graphql.schema.GraphQLNonNull.nonNull;
 
@@ -551,20 +550,32 @@ public abstract class SchemaUtils {
     public static String getGraphQLName(String name) {
         return name
             .replaceAll("-", "__")
-            .replaceAll("^/page/", "page_")
-            .replaceAll("^/component/", "component_")
             .replaceAll("^/taxonomy", "taxonomy")
+            .replaceAll("^/([^/]+)/", "$1_")
             .replaceAll("/", "___");
     }
 
     /**
+     * Returns the original name from a GraphQL-friendly content type id
+     *
+     * @param graphQLName the GraphQL-friendly content type id
+     * @return the original content type name
+     */
+    public static String getContentTypeOriginalName(String graphQLName) {
+        return graphQLName
+                .replaceAll("^taxonomy", "/taxonomy")
+                .replaceAll("^([^/_]+)_", "/$1/")
+                .replaceAll("___", "/")
+                .replaceAll("__", "-");
+    }
+
+    /**
      * Returns the original name from a GraphQL-friendly one
+     * This is a simplified version of <code>getContentTypeOriginalName</code> that
+     * works for field names like <code>title_s</code>
      */
     public static String getOriginalName(String graphQLName) {
         return graphQLName
-            .replaceAll("^page_", "/page/")
-            .replaceAll("^component_", "/component/")
-            .replaceAll("^taxonomy", "/taxonomy")
             .replaceAll("___", "/")
             .replaceAll("__", "-");
     }
