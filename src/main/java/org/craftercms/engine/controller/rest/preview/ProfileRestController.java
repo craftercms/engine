@@ -17,7 +17,6 @@ package org.craftercms.engine.controller.rest.preview;
 
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.text.StringEscapeUtils;
-import org.bouncycastle.util.Arrays;
 import org.bson.types.ObjectId;
 import org.craftercms.commons.validation.ValidationResult;
 import org.craftercms.core.controller.rest.RestControllerBase;
@@ -29,7 +28,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
