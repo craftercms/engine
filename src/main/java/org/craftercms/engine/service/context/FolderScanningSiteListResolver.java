@@ -144,5 +144,4 @@ public class FolderScanningSiteListResolver implements SiteListResolver, Resourc
             return null;
         }
     }
-
 }

@@ -71,6 +71,9 @@
         <property name="contextBuildRetryWaitTimeBase" value="${crafter.engine.site.context.build.retry.waitTimeBase}"/>
         <property name="contextBuildRetryWaitTimeMultiplier" value="${crafter.engine.site.context.build.retry.waitTimeMultiplier}"/>
         <property name="modePreview" value="${crafter.engine.preview}"/>
+        <property name="watcherPaths" value="${crafter.engine.watcher.paths}"/>
+        <property name="watcherCounterLimit" value="${crafter.engine.watcher.counter.limit}"/>
+        <property name="watcherIntervalPeriod" value="${crafter.engine.watcher.interval.period}"/>
     </bean>
 
     <!-- ////////////////////////////////// -->
