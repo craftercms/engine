@@ -1,0 +1,1838 @@
+openapi: 3.0.0
+servers:
+  - url: 'http://localhost:8080'
+info:
+  description: |-
+    Crafter Engine API
+  version: '4.0.7.0'
+  title: Crafter Engine
+  termsOfService: ''
+  contact:
+    email: info@craftercms.org
+  license:
+    name: GPL 3.0
+    url: 'https://www.gnu.org/licenses/gpl-3.0.en.html'
+externalDocs:
+  description: CrafterCMS - Engine
+  url: 'https://docs.craftercms.org/en/4.0/developers/projects/engine/index.html'
+tags:
+  - name: content
+    description: Content retrieval operations
+  - name: navigation
+    description: Navigation and structure operations
+  - name: search
+    description: Search operations
+  - name: cache
+    description: Cache operations
+  - name: context
+    description: Project/site context operations
+  - name: monitoring
+    description: Monitoring operations
+  - name: other
+    description: Other miscellaneous operations
+
+paths:
+
+  /api/1/site/context/id:
+    get:
+      security: []
+      tags:
+        - context
+      summary: Get the ID for the site context
+      operationId: getSiteContextID
+      description: Get the ID for the site context resolved for the current request, the value returned will depend on the SiteResolver implementation used.
+      parameters:
+        - name: token
+          in: query
+          description: The authorization token
+          required: true
+          schema:
+            type: string
+          example: defaultManagementToken
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"  
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The site context Id     
+                    example: 405ffc233d075b010536bd2eb786b86c 
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/1/site/context/status:
+    get:
+      security: []
+      tags:
+        - context
+      summary: Get the site context status
+      operationId: getSiteContextStatus
+      description: Get the status for the site context resolved for the current request, the value returned will depend on the SiteResolver implementation used.
+      parameters:
+        - name: token
+          in: query
+          description: The authorization token
+          required: true
+          schema:
+            type: string
+          example: defaultManagementToken
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"  
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: The site context status     
+                    example: READY
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/1/site/context/destroy:
+    get:
+      security: []
+      tags:
+        - context
+      summary: Destroy the site context
+      operationId: destroySiteContext
+      description: Destroy the site context resolved for the current request. Destroying the context involves clearing the cache, destroying any loaded configuration and Spring beans for the site, and destroying the Groovy classloader for the site.
+      parameters:
+        - name: token
+          in: query
+          description: The authorization token
+          required: true
+          schema:
+            type: string
+          example: defaultManagementToken
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"    
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Site context successfully destroyed     
+                    example: Site context for 'sample' destroyed. Will be recreated on next request
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/1/site/context/rebuild:
+    get:
+      security: []
+      tags:
+        - context
+      summary: Rebuild the site context
+      operationId: rebuildSiteContext
+      description: Rebuild the site context resolved for the current request, which means destroying and then creating the context again.
+      parameters:
+        - name: token
+          in: query
+          description: The authorization token
+          required: true
+          schema:
+            type: string
+          example: defaultManagementToken  
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"      
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Site context rebuild started
+                    example: Started rebuild for site context for 'sample'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'          
+
+  /api/1/site/context/graphql/rebuild:
+    get:
+      security: []
+      tags:
+        - context
+      summary: Rebuild GraphQL Schema 
+      operationId: rebuildGraphQLSchema
+      description: Rebuild the GraphQL schema for the site context resolved for the current request.
+      parameters:
+        - name: token
+          in: query
+          description: The authorization token
+          required: true
+          schema:
+            type: string
+          example: defaultManagementToken  
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"      
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: GraphQL schema rebuild started message
+                    example: Rebuild of GraphQL schema started for 'sample'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'          
+
+  /api/1/site/jobs/list:
+    get:
+      security: []
+      tags:
+        - other
+      summary: List jobs
+      operationId: listJobs
+      description: Get a list of all scheduled jobs for the current site.
+      parameters:
+        - name: token
+          in: query
+          description: The authorization token
+          required: true
+          schema:
+            type: string
+          example: defaultManagementToken  
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"      
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      description: Name of job                        
+                    nextFireTime:
+                      type: string
+                      description: Time when job will be executed
+                example:
+                  - name: editorial:/scripts/jobs/hourly/hourly-job.groovy
+                    nextFireTime: 2022-05-08T00:00:00Z                                
+                  - name: editorial:/scripts/jobs/custom-job.groovy
+                    nextFireTime: 2022-05-08T00:00:00Z  
+                        
+        '500':
+          $ref: '#/components/responses/InternalServerError'          
+
+  /api/1/site/mappings/reload:
+    get:
+      security: []
+      tags:
+        - context
+      summary: Reload the mappings
+      operationId: mappingsReload
+      description: Reload the mappings used to resolve sites by Crafter Engine. This endpoint is only available when Crafter Engine is in mapped multi-tenant mode.
+      parameters: 
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"      
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Successful reloading of mappings message
+                    example: Mappings reloaded
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: The current resolver is not a ReloadableMappingsSiteResolver. No mappings to reload
+  
+  /api/1/site/cache/clear:
+    get:
+      security: []
+      tags:
+        - cache
+      summary: Clear content cache
+      operationId: cacheClear
+      description: Clear the content cache scope and the Freemarker cache for the current site context.
+      parameters:
+        - name: token
+          in: query
+          description: The authorization token
+          required: true
+          schema:
+            type: string
+          example: defaultManagementToken
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"        
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string                    
+                    example: Cache clear for site 'sample' started
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'          
+
+  /api/1/site/cache/statistics:
+    get:
+      security: []
+      tags:
+        - cache
+      summary: Statistics
+      operationId: cacheStatistics
+      description: Get the statistics for all cache scopes for the current site context. <br><br> <i>Note:</i> <br> <i>The result of this call can change based on the configuration of the system, for example when Crafter Engine is configured in preview mode the cache will be disabled and the result will always be an empty object. There could be also different statistics returned depending on the cache implementation that is being used.</i>
+      parameters:
+        - name: token
+          in: query
+          description: The authorization token
+          required: true
+          schema:
+            type: string
+          example: defaultManagementToken  
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"      
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Statistics'            
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'   
+
+  /api/1/site/content_store/item:
+    get:
+      security: []
+      tags:
+        - content
+      summary: Get Item
+      operationId: getItem
+      description: Get an Item from the content store. <br> This API is used to get pages, components and folders. It returns the content and other metadata such as url, descriptorUrl, folder flag, and extra properties
+      parameters:
+        - name: url
+          in: query
+          description: The item’s url (e.g. /site/website/index.xml)
+          required: true
+          schema:
+            type: string
+        - name: flatten
+          in: query
+          description: Indicates if included descriptors should be flattened
+          required: false
+          schema:
+            type: boolean
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"        
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentStoreItems'
+              examples:
+                Folder:
+                  value:
+                    name: website
+                    url: /site/website
+                    descriptorUrl: /site/website.meta.xml
+                    descriptorDom: null
+                    properties: null
+                    folder: true
+                WithAdditionalProperties:
+                  value:
+                    name: index.xml
+                    url: /site/website/index.xml
+                    descriptorUrl: /site/website.meta.xml
+                    descriptorDom: 
+                      page: 
+                        content-type: /page/home
+                        display-template: /templates/web/pages/home.ftl
+                        merge-strategy: inherit-levels
+                        placeInNav: false
+                        file-name: index.xml
+                        objectGroupId: 8d7f
+                        objectId: 8d7f21fa-5e09-00aa-8340-853b7db302da
+                        folder-name: null
+                        header: 
+                          item: 
+                            key: /site/components/headers/header.xml
+                            value: Header
+                            include: /site/components/headers/header.xml
+                            disableFlattening: false
+                        createdDate: "1/31/2022 16:18:14"
+                        createdDate_dt: "1/31/2022 16:18:14"
+                        lastModifiedDate: "5/18/2022 15:52:21"
+                        lastModifiedDate_dt: "5/18/2022 15:52:21"
+                        left-rail:
+                          item:
+                            key: /site/components/left-rails/left-rail-with-latest-articles.xml
+                            value: "Left Rail with Latest Articles"
+                            include: /site/components/left-rails/left-rail-with-latest-articles.xml
+                            disableFlattening: false
+                        internal-name: Home
+                        orderDefault_f: -1
+                        title: Editorial
+                        hero_text: "<p>Aenean ornare velit lacus, ac varius enim ullamcorper eu. Proin aliquam facilisis ante interdum congue. Integer mollis, nisl amet convallis, porttitor magna ullamcorper, amet egestas mauris. Ut magna finibus nisi nec lacinia. Nam maximus erat id euismod egestas. Pellentesque sapien ac quam. Lorem ipsum dolor sit nullam.</p>"
+                        hero_title: "<h1><span>Hi, I&rsquo;m Editorial</span></h1>\n<h3><span style=\"font-size: 1.5em;\">by HTML5 UP</span></h3>"
+                        features: 
+                          item: 
+                            -
+                              value: "Quam lorem ipsum"
+                              key: /site/components/features/quam-lorem-ipsum.xml
+                              include: /site/components/features/quam-lorem-ipsum.xml
+                              disableFlattening: false
+                            -
+                              key: /site/components/features/sapien-veroeros.xml
+                              value: "Sapien Veroeros"
+                              include: /site/components/features/sapien-veroeros.xml
+                              disableFlattening": false
+                        hero_image: /static-assets/images/strawberries.jpg
+                        features_title: "Erat lacinia"         
+                    properties: 
+                      "//page/merge-strategy: inherit-levels
+                      //page/content-type: /page/home"
+                    folder: false      
+                WithoutAdditionalProperties:
+                  value:
+                    name: index.xml
+                    url: /site/website/index.xml
+                    descriptorUrl: /site/website.meta.xml
+                    descriptorDom: 
+                      page:
+                        content-type: /page/home
+                        display-template: /templates/web/pages/home.ftl
+                        merge-strategy: inherit-levels
+                        placeInNav: false
+                        file-name: index.xml
+                        objectGroupId: 8d7f
+                        objectId: 8d7f21fa-5e09-00aa-8340-853b7db302da
+                        folder-name: null
+                        header: 
+                          item: 
+                            key: /site/components/headers/header.xml
+                            value: Header
+                            include: /site/components/headers/header.xml
+                            disableFlattening: false
+                        createdDate: 1/31/2022 16:18:14
+                        createdDate_dt: 1/31/2022 16:18:14
+                        lastModifiedDate: 5/18/2022 15:52:21
+                        lastModifiedDate_dt: 5/18/2022 15:52:21
+                        left-rail: 
+                          item: 
+                            key: /site/components/left-rails/left-rail-with-latest-articles.xml
+                            value: Left Rail with Latest Articles
+                            include: /site/components/left-rails/left-rail-with-latest-articles.xml
+                            disableFlattening: false
+                        internal-name: Home
+                        orderDefault_f: -1
+                        title: Editorial
+                        hero_text: "<p>Aenean ornare velit lacus, ac varius enim ullamcorper eu. Proin aliquam facilisis ante interdum congue. Integer mollis, nisl amet convallis, porttitor magna ullamcorper, amet egestas mauris. Ut magna finibus nisi nec lacinia. Nam maximus erat id euismod egestas. Pellentesque sapien ac quam. Lorem ipsum dolor sit nullam.</p>"
+                        hero_title: "<h1><span>Hi, I&rsquo;m Editorial</span></h1>\n<h3><span style=\"font-size: 1.5em;\">by HTML5 UP</span></h3>"
+                        features: 
+                          item: 
+                            -
+                              key: "/site/components/features/quam-lorem-ipsum.xml"
+                              value: "Quam lorem ipsum"
+                              include: /site/components/features/quam-lorem-ipsum.xml
+                              disableFlattening: false},
+                            -
+                              key: /site/components/features/sapien-veroeros.xml
+                              value: "Sapien Veroeros"
+                              include: "/site/components/features/sapien-veroeros.xml"
+                              disableFlattening: false}                         
+                        hero_image: "/static-assets/images/strawberries.jpg"
+                        features_title: "Erat lacinia"  
+                    properties: "null"
+                    folder: false                  
+        '404':
+          $ref: '#/components/responses/NotFound'
+          example: No item found at /site/website/index.xml
+        '500':
+          $ref: '#/components/responses/InternalServerError'                      
+
+  /api/1/site/content_store/children:
+    get:
+      security: []
+      tags:
+        - content
+      summary: Get Children
+      operationId: getChildren
+      description: Get the list of Items directly under a folder in the content store.
+      parameters:
+        - name: url
+          in: query
+          description: The folder’s url (e.g. /site/website/index.xml)
+          required: true
+          schema:
+            type: string
+        - name: flatten
+          in: query
+          description: Indicates if included descriptors should be flattened
+          required: false
+          schema:
+            type: boolean
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"        
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ContentStoreItems'
+              example: 
+                [
+                  {
+                    "name": "articles",
+                    "url": "/site/website/articles",
+                    "descriptorUrl": "/site/website/articles.meta.xml",
+                    "descriptorDom": null,
+                    "properties": null,
+                    "folder": true
+                  },
+                  {
+                    "name": "crafter-level-descriptor.level.xml",
+                    "url": "/site/website/crafter-level-descriptor.level.xml",
+                    "descriptorUrl": "/site/website/crafter-level-descriptor.level.xml",
+                    "descriptorDom": {
+                        "component": {
+                          "content-type": "/component/level-descriptor",
+                          "display-template": {
+                             "crafter-source": "/site/website/crafter-level-descriptor.level.xml",
+                             "crafter-source-content-type-id": "/component/level-descriptor"
+                          },
+                          "merge-strategy": "inherit-levels",
+                          "file-name": "crafter-level-descriptor.level.xml",
+                          "objectGroupId": "0a68",
+                          "objectId": "0a68e8ad-77d8-0a58-e7bf-09a71fb3077b",
+                          "folder-name": {
+                            "crafter-source": "/site/website/crafter-level-descriptor.level.xml",
+                            "crafter-source-content-type-id": "/component/level-descriptor"
+                          },
+                          "header_o": {
+                            "item": {
+                              "key": "/site/components/headers/header.xml",
+                              "value": "Header",
+                              "include": "/site/components/headers/header.xml",
+                              "disableFlattening": "false"
+                          }
+                        },
+                        "createdDate": "2017-03-13T20:26:50.000Z",
+                        "createdDate_dt": "2017-03-13T20:26:50.000Z",
+                        "lastModifiedDate": "2017-05-18T15:38:58.000Z",
+                        "lastModifiedDate_dt": "2017-05-18T15:38:58.000Z",
+                        "left_rail_o": {
+                          "item": {
+                            "key": "/site/components/left-rails/left-rail-with-no-articles.xml",
+                            "value": "Left Rail with No Articles",
+                            "include": "/site/components/left-rails/left-rail-with-no-articles.xml",
+                            "disableFlattening": "false"
+                          }
+                        }
+                      }
+                    },
+                    "properties": null,
+                    "folder": false
+                  },
+                  {
+                    "name": "entertainment",
+                    "url": "/site/website/entertainment",
+                    "descriptorUrl": "/site/website/entertainment.meta.xml",
+                    "descriptorDom": null,
+                    "properties": null,
+                    "folder": true
+                  },
+                  {
+                    "name": "health",
+                    "url": "/site/website/health",
+                    "descriptorUrl": "/site/website/health.meta.xml",
+                    "descriptorDom": null,
+                    "properties": null,
+                    "folder": true
+                  },
+                  {
+                    "name": "index.xml",
+                    "url": "/site/website/index.xml",
+                    "descriptorUrl": "/site/website/index.xml",
+                    "descriptorDom": {
+                      "page": {
+                        "content-type": "/page/home",
+                        "display-template": "/templates/web/pages/home.ftl",
+                        "merge-strategy": "inherit-levels",
+                        "file-name": "index.xml",
+                        "objectGroupId": "8d7f",
+                        "objectId": "8d7f21fa-5e09-00aa-8340-853b7db302da",
+                        "folder-name": {
+                          "crafter-source": "/site/website/crafter-level-descriptor.level.xml",
+                          "crafter-source-content-type-id": "/component/level-descriptor"
+                        },
+                        "header_o": {
+                          "crafter-source": "/site/website/crafter-level-descriptor.level.xml",
+                          "crafter-source-content-type-id": "/component/level-descriptor",
+                          "item": {
+                            "key": "/site/components/headers/header.xml",
+                            "value": "Header",
+                            "include": "/site/components/headers/header.xml",
+                            "disableFlattening": "false"
+                          }
+                        },
+                        "createdDate": "2017-01-31T16:18:14.000Z",
+                        "createdDate_dt": "2017-01-31T16:18:14.000Z",
+                        "lastModifiedDate": "2021-03-31T18:08:03.196Z",
+                        "lastModifiedDate_dt": "2021-03-31T18:20:09.599Z",
+                        "left_rail_o": {
+                          "item": [
+                            {
+                              "key": "/site/components/left-rails/left-rail-with-latest-articles.xml",
+                              "value": "Left Rail with Latest Articles",
+                              "include": "/site/components/left-rails/left-rail-with-latest-articles.xml",
+                              "disableFlattening": "false"
+                            }
+                          ]
+                        },
+                        "no-template-required": null,
+                        "internal-name": "Home",
+                        "orderDefault_f": "-1",
+                        "title_t": "Editorial",
+                        "hero_text_html": "<p>Aenean ornare velit lacus, ac varius enim ullamcorper eu. Proin aliquam facilisis ante interdum congue. Integer mollis, nisl amet convallis, porttitor magna ullamcorper, amet egestas mauris. Ut magna finibus nisi nec lacinia. Nam maximus erat id euismod egestas. Pellentesque sapien ac quam. Lorem ipsum dolor sit nullam.</p>",
+                        "hero_title_html": "<h1>Hi, I&rsquo;m Editorial</h1>\n    <h3><span style=\"font-size: 1.5em;\">by HTML5 UP</span></h3>",
+                        "features_o": {
+                          "item": [
+                            {
+                              "datasource": "features",
+                              "key": "/site/components/features/4be0a368-783c-8f73-7469-63a62636bd4c.xml",
+                              "value": "Smile",
+                              "include": "/site/components/features/4be0a368-783c-8f73-7469-63a62636bd4c.xml",
+                              "disableFlattening": "false"
+                            },
+                            {
+                              "datasource": "features",
+                              "inline": "true",
+                              "key": "310b0c87-c3ca-4da0-4aa2-7002a318d7ce",
+                              "value": "Download",
+                              "disableFlattening": "false",
+                              "component": {
+                                "id": "310b0c87-c3ca-4da0-4aa2-7002a318d7ce",
+                                "content-type": "/component/feature",
+                                "display-template": "/templates/web/components/feature.ftl",
+                                "no-template-required": null,
+                                "merge-strategy": "inherit-levels",
+                                "objectGroupId": "310b",
+                                "objectId": "310b0c87-c3ca-4da0-4aa2-7002a318d7ce",
+                                "file-name": "310b0c87-c3ca-4da0-4aa2-7002a318d7ce.xml",
+                                "internal-name": "Download",
+                                "title_t": "Download",
+                                "disabled": "false",
+                                "icon_s": "fa-arrow-alt-circle-down far",
+                                "body_html": "<p>Download ornare velit lacus, ac varius enim lorem ullamcorper dolore.\n          Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>\n        ",
+                                "createdDate": "2019-10-11T19:20:07.555Z",
+                                "createdDate_dt": "2019-10-11T19:20:07.555Z",
+                                "lastModifiedDate": "2019-12-22T11:56:51.172Z",
+                                "lastModifiedDate_dt": "2019-12-22T11:56:51.172Z"
+                              }
+                            },
+                            {
+                              "datasource": "features",
+                              "inline": "true",
+                              "key": "a89386c4-a205-2681-2db1-c3606f714411",
+                              "value": "Build",
+                              "disableFlattening": "false",
+                              "component": {
+                                "id": "a89386c4-a205-2681-2db1-c3606f714411",
+                                "content-type": "/component/feature",
+                                "display-template": "/templates/web/components/feature.ftl",
+                                "no-template-required": null,
+                                "merge-strategy": "inherit-levels",
+                                "objectGroupId": "a893",
+                                "objectId": "a89386c4-a205-2681-2db1-c3606f714411",
+                                "file-name": "a89386c4-a205-2681-2db1-c3606f714411.xml",
+                                "internal-name": "Build",
+                                "title_t": "Build",
+                                "disabled": "false",
+                                "icon_s": "fa-building far",
+                                "body_html": "<p>Build enean ornare velit lacus, ac varius enim lorem ullamcorper dolore.\n          Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>\n        ",
+                                "createdDate": "2019-10-11T19:19:53.590Z",
+                                "createdDate_dt": "2019-10-11T19:19:53.590Z",
+                                "lastModifiedDate": "2019-12-22T11:56:34.603Z",
+                                "lastModifiedDate_dt": "2019-12-22T11:56:34.603Z"
+                              }
+                            },
+                            {
+                              "datasource": "features",
+                              "key": "/site/components/features/72ef047f-02b7-89e2-bbd5-4763ac7dbca8.xml",
+                              "value": "Closed captioning",
+                              "include": "/site/components/features/72ef047f-02b7-89e2-bbd5-4763ac7dbca8.xml",
+                              "disableFlattening": "false"
+                            }
+                          ]
+                        },
+                        "hero_image_s": "/static-assets/images/strawberries.jpg",
+                        "features_title_t": "Erat lacinia",
+                        "disabled": "false"
+                      }
+                    },
+                    "properties": null,
+                    "folder": false
+                  },
+                  {
+                    "name": "search-results",
+                    "url": "/site/website/search-results",
+                    "descriptorUrl": "/site/website/search-results.meta.xml",
+                    "descriptorDom": null,
+                    "properties": null,
+                    "folder": true
+                  },
+                  {
+                    "name": "style",
+                    "url": "/site/website/style",
+                    "descriptorUrl": "/site/website/style.meta.xml",
+                    "descriptorDom": null,
+                    "properties": null,
+                    "folder": true
+                  },
+                  {
+                    "name": "technology",
+                    "url": "/site/website/technology",
+                    "descriptorUrl": "/site/website/technology.meta.xml",
+                    "descriptorDom": null,
+                    "properties": null,
+                    "folder": true
+                  }
+                ]
+        '404':
+          $ref: '#/components/responses/NotFound'
+          example: No item found at /site/website/index.xml
+        '500':
+          $ref: '#/components/responses/InternalServerError'        
+
+  /api/1/site/content_store/tree:
+    get:
+      security: []
+      tags:
+        - content
+      summary: Get Tree
+      operationId: getTree
+      description: Get the complete Item hierarchy under the specified folder in the content store.
+      parameters:
+        - name: url
+          in: query
+          description: The folder’s url (e.g. /site/website/index.xml)
+          required: true
+          schema:
+            type: string
+        - name: depth
+          in: query
+          description: Amount of levels to include (unlimited by default)
+          required: false
+          schema:
+            type: integer    
+        - name: flatten
+          in: query
+          description: Indicates if included descriptors should be flattened
+          required: false
+          schema:
+            type: boolean
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"        
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentStoreItems'
+        '404':
+          $ref: '#/components/responses/NotFound'
+          example: No folder found at /site/website/index.xml
+        '500':
+          $ref: '#/components/responses/InternalServerError'     
+
+  /api/1/profile/get:
+    get:
+      security: []
+      tags:
+        - other
+      summary: Get Profile
+      operationId: getProfile
+      description: Get the current user’s profile from the session, if no profile is set an empty one will be created. Only use it in conjunction with Studio’s Personas.
+      parameters:
+        - name: url
+          in: query
+          description: The folder’s url (e.g. /site/website/index.xml)
+          required: true
+          schema:
+            type: string
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"        
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'  
+              examples:
+                userProfileExample:
+                  $ref: '#/components/examples/userProfileExample'         
+        '500':
+          $ref: '#/components/responses/InternalServerError'        
+  
+  /api/1/profile/set:
+    get:
+      security: []
+      tags:
+        - other
+      summary: Set Profile
+      operationId: setProfile
+      description: Set the current user’s profile, all parameters are added to the profile and stored in the session. Only use it in conjunction with Studio’s Personas. <br><br> <i>Note:</i> <br> <i>Any parameter included in the request will be added as a property for the user profile, if the request is made without any parameter then profile will be cleared.</i>
+      parameters:
+        - name: age
+          in: query
+          description: The user age
+          schema:
+            type: integer
+        - name: username
+          in: query
+          description: The user name
+          schema:
+            type: string
+        - name: lastname
+          in: query
+          description: The user last name
+          schema:
+            type: string        
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"        
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string                    
+                    example: john       
+        '500':
+          $ref: '#/components/responses/InternalServerError'        
+
+  /api/1/site/navigation/breadcrumb:
+    get:
+      security: []
+      tags:
+        - navigation
+      summary: Breadcrumb
+      operationId: breadcrumb
+      description: Returns the navigation items that form the breadcrumb for the specified store URL.
+      parameters:
+        - name: url
+          in: query
+          required: true
+          description: The URL used to build the breadcrumb
+          schema:
+            type: string
+        - name: root
+          in: query
+          description: The starting point of the breadcrumb
+          schema:
+            type: string
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"        
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  $ref: '#/components/schemas/NavigationTreeNode'  
+              example:
+                - label: Home
+                  url: /
+                  active: false
+                  subItem: null
+                - label: Style
+                  url: /style
+                  active: false
+                  subItem: null
+        '500':
+          $ref: '#/components/responses/InternalServerError'        
+
+  /api/1/site/navigation/tree:
+    get:
+      security: []
+      tags:
+        - navigation
+      summary: Tree
+      operationId: tree
+      description: Returns the navigation tree with the specified depth for the specified store URL.
+      parameters:
+        - name: url
+          in: query
+          required: true
+          description: The root folder of the tree
+          schema:
+            type: string
+          example: /site/website  
+        - name: depth
+          in: query
+          description: The depth of the tree (defaults to 1)
+          schema:
+            type: integer    
+          example: 2  
+        - name: currentPageUrl
+          in: query
+          description: The URL of the current page
+          schema:
+            type: string
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"        
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/NavigationTreeNode'  
+              example:
+                label: Home
+                url: /
+                active: false
+                subItem: 
+                  - label: Style
+                    url: /style
+                    active: false
+                    subItem: []
+                  - label: Health
+                    url: /health
+                    active: false
+                    subItem: []  
+                  - label: Entertainment
+                    url: /entertainment
+                    active: false
+                    subItem: []
+                  - label: Technology
+                    url: /technology
+                    active: false
+                    subItem: []        
+        '500':
+          $ref: '#/components/responses/InternalServerError'        
+
+  /api/1/site/url/transform:
+    get:
+      security: []
+      tags:
+        - navigation
+      summary: Transform
+      operationId: transform
+      description: Transforms a URL, based on the current site’s configuration.
+      parameters:
+        - name: url
+          in: query
+          required: true
+          description: The URL to be transformed
+          schema:
+            type: string
+          example: /site/website/style/index.xml
+        - name: transformerName
+          in: query
+          required: true
+          description: The name of the transformer to apply
+          schema:
+            type: string
+          example: storeUrlToRenderUrl  
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"      
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string    
+              example: /style
+                
+        '500':
+          $ref: '#/components/responses/InternalServerError'        
+
+  /api/1/site/elasticsearch/search:
+    post:
+      security: []
+      tags:
+        - search
+      summary: Search
+      operationId: search
+      description: Performs a search operation in the Elasticsearch index of the current site resolved for the request and optional other indexes. See <a class="reference external" href="https://docs.craftercms.org/en/4.0/developers/search-elasticsearch.html#search-elasticsearch-multi-index-query" rel="noopener noreferrer" target="_blank">Multi-index Query</a> for more information on performing a multiple index search. <br><br> <i>Note:</i> <br> <i>The request body must be a valid Elasticsearch JSON query as described in the</i> <a class="reference external" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/search-search.html" rel="noopener noreferrer" target="_blank">official docs</a>
+      parameters:
+        - name: index
+          in: query          
+          description: Comma separated list of index names to be searched in addition to the current site
+          schema:
+            type: string          
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"        
+      requestBody:    
+        description: User entity to create
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                _source:
+                  type: string
+                  example: "localId"
+                size:
+                  type: integer
+                  example: 1
+                query:
+                  type:  string
+                  example: '"match_all" : {}'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object    
+              example:
+                { 
+                  "took": 41,
+                  "timed_out": false,
+                  "_shards": {
+                    "total": 5,
+                    "successful": 5,
+                    "skipped": 0,
+                    "failed": 0
+                  },
+                  "hits": {
+                    "total": 28,
+                    "max_score": 1.0,
+                    "hits": [
+                      {
+                        "_index": "editorial-preview_v1",
+                        "_type": "_doc",
+                        "_id": "f4a1af43fed0b4e246abb3a8c7d7323d",
+                        "_score": 1.0,
+                        "_source": {
+                          "localId": "/site/components/articles-widget/latest-articles-widget.xml"
+                        }
+                      }
+                    ]
+                  }
+                }        
+        '500':
+          $ref: '#/components/responses/InternalServerError'        
+
+  /api/1/site/graphql:
+    get:
+      security: []
+      tags:
+        - content
+      summary: Query (GET)
+      operationId: query
+      description: Performs a query in the GraphQL instance of the current site resolved for the request. <br><br> <i>Note:</i> <br> <i>The query string must be a valid GraphQL query as described in the</i> <a class="reference external" href="https://graphql.org/learn/queries/" rel="noopener noreferrer" target="_blank">official docs</a>      
+      parameters:
+        - name: query
+          in: query 
+          required: true         
+          description: The GraphQL query
+          schema:
+            type: string
+          example: "{page_article{items{title_t}}}"
+        - name: operationName
+          in: query                   
+          description: The GraphQL operation name
+          schema:
+            type: string              
+        - name: variables
+          in: query                   
+          description: A JSON object containing variables for the query
+          schema:
+            type: string                    
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"        
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object   
+              example: 
+                {
+                  "data": {
+                    "page_article": {
+                      "items": [
+                        {
+                          "title_t": "New ACME Phone Released Today"
+                        },
+                        {
+                           "title_t": "Top Clubs In Virginia"
+                        },
+                        {
+                           "title_t": "Coffee is Good for Your Health"
+                        },
+                        {
+                          "title_t": "5 Popular Diets for Women"
+                        },
+                        {
+                          "title_t": "Top Romantic Valentine Movies"
+                        },
+                        {
+                          "title_t": "10 Tips to Get a Six Pack"
+                        },
+                        {
+                          "title_t": "Women Styles for Winter"
+                        },
+                        {
+                          "title_t": "Men Styles For Winter"
+                        },
+                        {
+                          "title_t": "Top Books For Young Women"
+                        }
+                      ]
+                    }
+                  }
+                }                                
+        '500':
+          $ref: '#/components/responses/InternalServerError'     
+    post:
+      security: []
+      tags:
+        - content
+      summary: Query (POST)
+      operationId: queryPost
+      description: Performs a query in the GraphQL instance of the current site resolved for the request. <br><br> <i>Note:</i> <br> <i>The query string must be a valid GraphQL query as described in the</i> <a class="reference external" href="https://graphql.org/learn/queries/" rel="noopener noreferrer" target="_blank">official docs</a>       
+      parameters:
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"        
+      requestBody:
+        description: Search Parameters
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  description: "The GraphQL query"                  
+                  type: string                  
+                  example: 
+                    "query ArticlesByAuthor($author:String) {
+                      page_article {
+                        total
+                        items {
+                          title_t
+                          author_s(filter:{equals:$author})
+                          date_dt
+                        }
+                      }
+                    }"
+                variables:
+                  description: "A JSON object containing variables for the query"
+                  type: object
+                  example: 
+                    { "author": "Jane Doe" }
+                operationName:
+                  description: "Name you give to your query <br><br> <i>Required when there are multiple operations in the document (query)</i>"
+                  type: string 
+                  example: ArticlesByAuthor   
+              required: 
+                -  query      
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+              example: 
+                {
+                  "data": {
+                    "page_article": {
+                      "total": 4,
+                      "items": [
+                        {
+                          "title_t": "Women Styles for Winter",
+                          "author_s": "Jane Doe",
+                          "date_dt": "2021-01-03T05:00:00Z"
+                        },
+                        {
+                          "title_t": "Top Books For Young Women",
+                          "author_s": "Jane Doe",
+                          "date_dt": "2020-12-28T05:00:00Z"
+                        },
+                        {
+                          "title_t": "5 Popular Diets for Women",
+                          "author_s": "Jane Doe",
+                          "date_dt": "2021-03-14T04:00:00Z"
+                        },
+                        {
+                          "title_t": "Top Romantic Valentine Movies",
+                          "author_s": "Jane Doe",
+                          "date_dt": "2021-02-14T05:00:00Z"
+                        }
+                      ]
+                    }
+                  }
+                }                                 
+        '500':
+          $ref: '#/components/responses/InternalServerError'   
+
+  /api/1/config/preview:
+    get:
+      security: []
+      tags:
+        - other
+      summary: Preview
+      operationId: preview
+      description: Indicates if Engine is configured in preview mode.
+      parameters:
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"    
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  preview:
+                    type: boolean                    
+                    example: true
+
+  /api/1/monitoring/memory:
+    get:
+      security: []
+      tags:
+        - monitoring
+      summary: Get Memory Stats
+      operationId: memory
+      description: Returns the Crafter Engine JVM memory details.
+      parameters:
+        - name: token
+          in: query
+          description: The authorization token
+          required: true
+          schema:
+            type: string
+          example: defaultManagementToken
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"      
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalJvmMemory:
+                    type: integer                    
+                    example: 2017984512
+                  freeJvmMemory:
+                    type: integer                    
+                    example: 1113921056
+                  maxJvmMemory:
+                    type: integer                    
+                    example: 3817865216
+                  totalOsMemory:
+                    type: integer                    
+                    example: 17179869184          
+                  freeOsMemory:
+                    type: integer                    
+                    example: 2669301760            
+                  totalSwapMemory:
+                    type: integer                    
+                    example: 2147483648              
+                  freeSwapMemory:
+                    type: integer                    
+                    example: 1026555904                
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'                      
+                                    
+  /api/1/monitoring/status:
+    get:
+      security: []
+      tags:
+        - monitoring
+      summary: Get Status
+      operationId: status
+      description: Returns the Crafter Engine JVM status details.
+      parameters:
+        - name: token
+          in: query
+          description: The authorization token
+          required: true
+          schema:
+            type: string
+          example: defaultManagementToken
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"      
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  uptime:
+                    type: integer                    
+                    example: 2017984512
+                  startup:
+                    type: string                    
+                    example: "2019-03-07T21:29:11.049Z"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/1/monitoring/version:
+    get:
+      security: []
+      tags:
+        - monitoring
+      summary: Get Version
+      operationId: version
+      description: Returns the Crafter Engine JVM status details.
+      parameters:
+        - name: token
+          in: query
+          description: The authorization token
+          required: true
+          schema:
+            type: string
+          example: defaultManagementToken
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"      
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  packageName:
+                    type: string                    
+                    example: "Crafter Engine"
+                  packageVersion:
+                    type: string                    
+                    example: "4.0.3-SNAPSHOT"
+                  packageBuild:
+                    type: string                    
+                    example: "48d29a56c6011f2908fb160f7648f66785d44b81"  
+                  packageBuildDate:
+                    type: string                    
+                    example: "2023-03-08T21:53:22.558Z"      
+                  osName:
+                    type: string                    
+                    example: "Mac OS X"        
+                  osVersion:
+                    type: string                    
+                    example: "11.2"          
+                  osArch:
+                    type: string                    
+                    example: "x86_64"            
+                  javaVersion:
+                    type: string                    
+                    example: "11"
+                  javaVendor:
+                    type: string                    
+                    example: "Oracle Corporation"
+                  javaVm:
+                    type: string                    
+                    example: "OpenJDK 64-Bit Server VM"                  
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  
+  /api/1/monitoring/log:
+    get:
+      security: []
+      tags:
+        - monitoring
+      summary: Get Log Events
+      operationId: log
+      description: Returns all events recorded in the Crafter Engine log for a given site in a specific time period.
+      parameters:
+        - name: site
+          in: query
+          description: The name of the site
+          required: true
+          schema:
+            type: string
+          example: my-editorial
+        - name: since
+          in: query
+          description: The time in milliseconds from which events should be fetched
+          required: true
+          schema:
+            type: integer
+          example: 1396772083660  
+        - name: token
+          in: query
+          description: The authorization token
+          required: true
+          schema:
+            type: string
+          example: defaultManagementToken
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"      
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    exception:
+                      type: string                        
+                    site:
+                      type: string
+                    level:
+                      type: string
+                    thread:
+                      type: string
+                    message:
+                      type: string
+                    timestampm:
+                      type: integer 
+                    timestaamp:
+                      type: string
+                example: 
+                  - exception: ""
+                    site: "editorial"
+                    level: "INFO"                  
+                    thread: "pool-16-thread-1"
+                    message: "--------------------------------------------------"
+                    timestampm: 1678683085456
+                    timestamp: "2023-03-13T04:51:25.456+0000"
+                  - exception: ""
+                    site: "editorial"
+                    level: "INFO"                  
+                    thread: "pool-16-thread-1"
+                    message: "<Initializing context site: editorial>"
+                    timestampm: 1678683085477
+                    timestamp: "2023-03-13T04:51:25.477+0000"
+                  - exception: ""
+                    site: "editorial"
+                    level: "INFO"                  
+                    thread: "pool-16-thread-1"
+                    message: "--------------------------------------------------"
+                    timestampm: 1678683085498
+                    timestamp: "2023-03-13T04:51:25.498+0000"
+                  - exception: ""
+                    site: "editorial"
+                    level: "INFO"                  
+                    thread: "pool-16-thread-1"
+                    message: "Starting GraphQL schema build for site 'editorial'"
+                    timestampm: 1678683085499
+                    timestamp: "2023-03-13T04:51:25.499+0000"                                 
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+          
+  /crafter-controller/component:
+    get:
+      security: []
+      tags:
+        - other
+      summary: Get Component
+      operationId: getComponent
+      description: Get a component.
+      parameters:
+        - name: path
+          in: query
+          description: Path to the component <br> (e.g. /site/components/headers/header.xml)
+          required: true
+          schema:
+            type: string
+          example: /site/components/features/4be0a368-783c-8f73-7469-63a62636bd4c.xml
+        - name: crafterSite
+          in: query 
+          required: true         
+          description: Used to set the project/site value
+          schema:
+            type: string
+          example: "my-editorial"      
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string   
+              example: 
+                  <!-- Feature Component -->\n
+                    <article
+                      class="feature"
+                      data-craftercms-model-path="/site/components/features/4be0a368-783c-8f73-7469-63a62636bd4c.xml"
+                      data-craftercms-model-id="4be0a368-783c-8f73-7469-63a62636bd4c"
+                    >  <span
+                       class="icon fa-smile far"
+                       data-craftercms-model-path="/site/components/features/4be0a368-783c-8f73-7469-63a62636bd4c.xml"
+                       data-craftercms-model-id="4be0a368-783c-8f73-7469-63a62636bd4c"
+                       data-craftercms-field-id="icon_s"
+                    ></span>
+                    <div class="content">
+                      <h3
+                        data-craftercms-model-path="/site/components/features/4be0a368-783c-8f73-7469-63a62636bd4c.xml"
+                        data-craftercms-model-id="4be0a368-783c-8f73-7469-63a62636bd4c"
+                        data-craftercms-field-id="title_t"
+                        >      Smile
+                      </h3>
+                      <div
+                        data-craftercms-model-path="/site/components/features/4be0a368-783c-8f73-7469-63a62636bd4c.xml"
+                        data-craftercms-model-id="4be0a368-783c-8f73-7469-63a62636bd4c"
+                        data-craftercms-field-id="body_html"
+                        >      <p>Smile, aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
+                      </div>
+                    </div>
+                  </article>
+                  <!-- /Feature Component -->
+
+components:
+  schemas:
+    Statistics:
+      type: object
+      properties:
+        size:
+          type: integer                                          
+        localHeapSize:
+          type: integer                                          
+        localOffHeapSize:
+          type: integer                                        
+        localDiskSize:
+          type: integer                                          
+        cacheHitRatio:
+          type: integer                                         
+        cacheHitCount:
+          type: integer                                         
+        cacheMissCount:
+          type: integer                                          
+        cacheMissExpiredCount:
+          type: integer                                          
+        cacheMissNotFoundCount:
+          type: integer
+      example:
+        size: 17
+        localHeapSize: 17
+        localOffHeapSize: 0
+        localDiskSize: 0
+        cacheHitRatio: 1
+        cacheHitCount: 4
+        cacheMissCount: 25
+        cacheMissExpiredCount: 0
+        cacheMissNotFoundCount: 25
+
+    ContentStoreItems:
+      type: object
+      properties:
+        name:
+          description: Name of item being retrieved (e.g. index.xml) 
+          type: string                                          
+        url:
+          description: The item’s URL (e.g. /site/website/index.xml)
+          type: string                                          
+        descriptorUrl:
+          description: "The item’s descriptor URL (e.g. for a folder: /site/website.meta.xml, for a page: /site/website/index.xml)"
+          type: string                                        
+        descriptorDom:
+          description: Contains the content of item being retrieved (DOM of xml)
+          type: object
+          nullable: true
+        properties:
+          description: Contains additional properties that are generated by an ItemProcessor
+          type: string
+          nullable: true
+        folder:
+          description: Indicates whether the item is a folder (true or false)
+          type: boolean 
+
+    UserProfile:
+      type: object
+      properties:
+        age:           
+          type: integer
+        username:
+          type: string
+        lastname:           
+          type: string
+
+    NavigationTreeNode:
+      type: object
+      properties:
+        label:
+          type: string                    
+        url: 
+          type: string 
+        active:
+          type: boolean
+        subItems:
+          type: object             
+   
+          
+  responses:
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: No item found at /site/website/index.xml
+
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Required String parameter 'token' is not present
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Management authorization failed, invalid token.
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Internal Server Error
+
+  examples:
+    userProfileExample:
+      value:
+        age: 30
+        username: john
+        lastname: doe
+    
