@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import freemarker.template.Configuration;
 import freemarker.template.SimpleHash;
 import freemarker.template.Template;
+import org.craftercms.core.exception.RootFolderNotFoundException;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.service.context.SiteContextResolver;
 import org.slf4j.Logger;
@@ -75,13 +76,11 @@ public class SiteContextResolvingFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response,
                          FilterChain chain) throws IOException, ServletException {
-        SiteContext siteContext = getContext((HttpServletRequest) request);
-        if (siteContext != null) {
-            SiteContext.setCurrent(siteContext);
-        } else {
-            renderError((HttpServletResponse) response);
+        SiteContext siteContext = getContext((HttpServletRequest) request, (HttpServletResponse) response);
+        if (siteContext == null) {
             return;
         }
+        SiteContext.setCurrent(siteContext);
         try {
             chain.doFilter(request, response);
         } finally {
@@ -89,17 +88,21 @@ public class SiteContextResolvingFilter implements Filter {
         }
     }
 
-    protected SiteContext getContext(HttpServletRequest request) {
+    protected SiteContext getContext(HttpServletRequest request, HttpServletResponse response) {
         try {
             return contextResolver.getContext(request);
+        } catch (RootFolderNotFoundException e) {
+            logger.error("Error while resolving site context for current request", e);
+            renderError(response, HttpServletResponse.SC_NOT_FOUND);
         } catch (Exception e) {
             logger.error("Error while resolving site context for current request", e);
-            return null;
+            renderError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
+        return null;
     }
 
-    protected void renderError(HttpServletResponse response) {
-        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    protected void renderError(HttpServletResponse response, int responseCode) {
+        response.setStatus(responseCode);
         try {
             Configuration configuration = freeMarkerConfigFactory.getObject().getConfiguration();
             Template template = configuration.getTemplate(errorTemplate);

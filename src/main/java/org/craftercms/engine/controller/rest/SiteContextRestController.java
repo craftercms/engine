@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -23,15 +23,17 @@ import org.craftercms.engine.event.SiteContextCreatedEvent;
 import org.craftercms.engine.event.SiteEvent;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.service.context.SiteContextManager;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.beans.ConstructorProperties;
 import java.util.Collections;
 import java.util.Map;
+
+import static java.lang.String.format;
 
 /**
  * REST controller for operations related for the {@link org.craftercms.engine.service.context.SiteContext}
@@ -46,24 +48,20 @@ public class SiteContextRestController extends RestControllerBase {
     public static final String URL_CONTEXT_ID = "/id";
     public static final String URL_DESTROY = "/destroy";
     public static final String URL_REBUILD = "/rebuild";
+    public static final String URL_REBUILD_ALL = "/rebuild_all";
     public static final String URL_GRAPHQL = "/graphql";
     public static final String URL_STATUS = "/status";
 
-    public static final String MODEL_ATTR_ID =  "id";
+    public static final String MODEL_ATTR_ID = "id";
     public static final String MODEL_ATTR_STATUS = "status";
 
-    private SiteContextManager contextManager;
-    private String configuredToken;
+    private final SiteContextManager contextManager;
+    private final String configuredToken;
 
-    @Required
-    public void setContextManager(SiteContextManager contextManager) {
+    @ConstructorProperties({"contextManager", "configuredToken"})
+    public SiteContextRestController(final SiteContextManager contextManager, final String configuredToken) {
+        this.configuredToken = configuredToken;
         this.contextManager = contextManager;
-    }
-
-    protected void validateToken(String token) throws InvalidManagementTokenException {
-        if(!StringUtils.equals(token, getConfiguredToken())) {
-            throw new InvalidManagementTokenException("Management authorization failed, invalid token.");
-        }
     }
 
     @GetMapping(value = URL_CONTEXT_ID)
@@ -81,8 +79,16 @@ public class SiteContextRestController extends RestControllerBase {
 
         contextManager.startDestroyContext(siteName);
 
-        return createResponseMessage("Started destroy site context  for '" + siteName + "'. Will be recreated on " +
-                                     "next request");
+        return createResponseMessage(format("Started destroy site context  for '%s'. " +
+                "Will be recreated on next request", siteName));
+    }
+
+    @GetMapping(URL_REBUILD_ALL)
+    public Map<String, Object> rebuildAll(@RequestParam String token) throws InvalidManagementTokenException {
+        validateToken(token);
+        contextManager.startRebuildAll();
+
+        return createResponseMessage("Started rebuild of all site contexts");
     }
 
     @GetMapping(value = URL_REBUILD)
@@ -95,12 +101,12 @@ public class SiteContextRestController extends RestControllerBase {
 
         // Don't rebuild context if the context was just created in this request
         if (SiteEvent.getLatestRequestEvent(SiteContextCreatedEvent.class, request) != null) {
-            return createResponseMessage("Site context for '" + siteName + "' created during the request. " +
-                    "Context rebuild not necessary");
+            return createResponseMessage(format("Site context for '%s' created during the request. " +
+                    "Context rebuild not necessary", siteName));
         } else {
             contextManager.startContextRebuild(siteName, siteContext.isFallback());
 
-            return createResponseMessage("Started rebuild for Site context for '" + siteName + "'");
+            return createResponseMessage(format("Started rebuild for Site context for '%s'", siteName));
         }
     }
 
@@ -114,12 +120,12 @@ public class SiteContextRestController extends RestControllerBase {
 
         // Don't rebuild GraphQL schema if the context was just created in this request
         if (SiteEvent.getLatestRequestEvent(SiteContextCreatedEvent.class, request) != null) {
-            return createResponseMessage("Site context for '" + siteName + "' created during the request. " +
-                    "GraphQL schema rebuild not necessary");
+            return createResponseMessage(format("Site context for '%s' created during the request. " +
+                    "GraphQL schema rebuild not necessary", siteName));
         } else {
             siteContext.startGraphQLSchemaBuild();
 
-            return createResponseMessage("Rebuild of GraphQL schema started for '" + siteName + "'");
+            return createResponseMessage(format("Rebuild of GraphQL schema started for '%s'", siteName));
         }
     }
 
@@ -130,12 +136,9 @@ public class SiteContextRestController extends RestControllerBase {
         return createSingletonModifiableMap(MODEL_ATTR_STATUS, SiteContext.getCurrent().getState());
     }
 
-    public String getConfiguredToken() {
-        return configuredToken;
-    }
-
-    @Required
-    public void setConfiguredToken(String configuredToken) {
-        this.configuredToken = configuredToken;
+    protected final void validateToken(final String requestToken) throws InvalidManagementTokenException {
+        if (!StringUtils.equals(requestToken, configuredToken)) {
+            throw new InvalidManagementTokenException("Management authorization failed, invalid token.");
+        }
     }
 }

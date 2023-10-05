@@ -72,7 +72,7 @@ public class BreadcrumbBuilder {
 
         return cacheTemplate.getObject(context, (Callback<List<BreadcrumbItem>>) () -> {
             String indexFileName = SiteProperties.getIndexFileName();
-            CachingAwareList<BreadcrumbItem> breadcrumb = new CachingAwareList<BreadcrumbItem>();
+            CachingAwareList<BreadcrumbItem> breadcrumb = new CachingAwareList<>();
             String breadcrumbUrl = StringUtils.substringBeforeLast(StringUtils.substringAfter(url, homePath), indexFileName);
             String[] breadcrumbUrlComponents = breadcrumbUrl.split("/");
             String currentUrl = homePath;

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+  ~ Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License version 3 as published by
@@ -32,6 +32,7 @@
     <import resource="classpath:crafter/engine/services/url-transformation-context.xml"/>
     <import resource="classpath:crafter/engine/services/targeting-context.xml"/>
     <import resource="classpath:crafter/engine/services/locale-context.xml"/>
+    <import resource="classpath:crafter/engine/services/search-legacy-context.xml"/>
 
     <!-- ////////////////////////////////// -->
     <!--								 	-->
@@ -192,6 +193,7 @@
             <list>
                 <bean class="org.craftercms.engine.http.impl.ViewNotResolvedExceptionHandler"/>
                 <bean class="org.craftercms.engine.http.impl.HttpStatusCodeAwareExceptionHandler"/>
+                <bean class="org.craftercms.engine.http.impl.ConstraintViolationExceptionHandler"/>
                 <bean class="org.craftercms.engine.http.impl.DefaultExceptionHandler"/>
             </list>
         </property>
@@ -250,6 +252,10 @@
     <bean id="crafter.etagFilter" class="org.craftercms.engine.servlet.filter.ConfigAwareEtagFilter">
         <constructor-arg name="enabled" value="${crafter.engine.header.etag.enable}"/>
         <constructor-arg name="includedUrls" value="${crafter.engine.header.etag.include.urls}"/>
+    </bean>
+
+    <bean id="crafter.httpHeadersRewriteFilter" class="org.craftercms.engine.servlet.filter.HttpHeadersRewriteFilter">
+        <constructor-arg name="cacheTemplate" ref="crafter.cacheTemplate"/>
     </bean>
 
     <!-- ////////////////////////////////// -->
@@ -496,7 +502,6 @@
         <property name="descriptorFileExtension" value="${crafter.core.store.descriptorFile.extension}"/>
         <property name="pathValidator">
             <bean class="org.craftercms.commons.validation.validators.impl.SecurePathValidator">
-                <constructor-arg name="targetKey" value="path"/>
             </bean>
         </property>
     </bean>
@@ -536,6 +541,13 @@
         <property name="waitForContextInit" value="${crafter.engine.site.context.waitForInit}"/>
         <property name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
         <property name="defaultSiteName" value="${crafter.engine.site.default.name}"/>
+        <property name="contextBuildRetryMaxCount" value="${crafter.engine.site.context.build.retry.maxCount}"/>
+        <property name="contextBuildRetryWaitTimeBase" value="${crafter.engine.site.context.build.retry.waitTimeBase}"/>
+        <property name="contextBuildRetryWaitTimeMultiplier" value="${crafter.engine.site.context.build.retry.waitTimeMultiplier}"/>
+        <property name="modePreview" value="${crafter.engine.preview}"/>
+        <property name="watcherPaths" value="${crafter.engine.watcher.paths}"/>
+        <property name="watcherCounterLimit" value="${crafter.engine.watcher.counter.limit}"/>
+        <property name="watcherIntervalPeriod" value="${crafter.engine.watcher.interval.period}"/>
     </bean>
 
     <bean id="crafter.siteContextsBootstrap" class="org.craftercms.engine.service.context.SiteContextsBootstrap">
@@ -621,6 +633,24 @@
 
     <!-- ////////////////////////////////// -->
     <!--								 	-->
+    <!--			Health Check			-->
+    <!--									-->
+    <!-- ////////////////////////////////// -->
+    <bean id="siteHealthCheckService" class="org.craftercms.engine.service.impl.SiteHealthCheckServiceImpl">
+        <constructor-arg name="siteListResolver" ref="crafter.siteResolver"/>
+        <constructor-arg name="healthChecks" ref="siteHealthChecks"/>
+    </bean>
+
+    <util:list id="siteHealthChecks">
+        <bean class="org.craftercms.engine.service.health.SiteContextHealthCheck"/>
+        <bean class="org.craftercms.engine.service.health.ScriptSiteHealthCheck">
+            <constructor-arg name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
+            <constructor-arg name="scriptPath" value="${crafter.engine.site.default.health-check.script.path}"/>
+        </bean>
+    </util:list>
+
+    <!-- ////////////////////////////////// -->
+    <!--								 	-->
     <!--			Mobile Support			-->
     <!--									-->
     <!-- ////////////////////////////////// -->
@@ -655,38 +685,38 @@
     <!-- ////////////////////////////////// -->
 
     <!-- Deprecated, in process to be removed -->
-    <bean id="crafter.elasticsearchService" class="org.craftercms.engine.search.legacy.SiteAwareElasticsearchService">
+    <bean id="crafter.searchService" class="org.craftercms.engine.search.legacy.SiteAwareOpenSearchService">
         <constructor-arg name="client">
-            <bean class="org.craftercms.search.elasticsearch.spring.RestHighLevelClientFactory">
-                <constructor-arg name="serverUrls" value="${crafter.engine.elasticsearch.urls}"/>
-                <property name="username" value="${crafter.engine.elasticsearch.username}"/>
-                <property name="password" value="${crafter.engine.elasticsearch.password}"/>
-                <property name="connectTimeout" value="${crafter.engine.elasticsearch.timeout.connect}"/>
-                <property name="socketTimeout" value="${crafter.engine.elasticsearch.timeout.socket}"/>
-                <property name="threadCount" value="${crafter.engine.elasticsearch.threads}"/>
-                <property name="socketKeepAlive" value="${crafter.engine.elasticsearch.keepAlive}"/>
+            <bean class="org.craftercms.search.opensearch.spring.RestHighLevelClientFactory">
+                <constructor-arg name="serverUrls" ref="crafter.searchUrls"/>
+                <property name="username" ref="crafter.searchUsername"/>
+                <property name="password" ref="crafter.searchPassword"/>
+                <property name="connectTimeout" ref="crafter.searchConnectTimeout"/>
+                <property name="socketTimeout" ref="crafter.searchSocketTimeout"/>
+                <property name="threadCount" ref="crafter.searchThreadCount"/>
+                <property name="socketKeepAlive" ref="crafter.searchSocketKeepAlive"/>
             </bean>
         </constructor-arg>
         <constructor-arg name="indexIdFormat" value="${crafter.engine.search.index.format}"/>
         <constructor-arg name="enableTranslation" value="${crafter.engine.translation.enable}"/>
-        <property name="filterQueries" value="${crafter.engine.elasticsearch.filters}"/>
+        <property name="filterQueries" value="${crafter.engine.search.filters}"/>
     </bean>
 
-    <bean id="crafter.elasticsearchClient" class="org.craftercms.engine.search.SiteAwareElasticsearchClient">
+    <bean id="crafter.searchClient" class="org.craftercms.engine.search.SiteAwareOpenSearchClient">
         <constructor-arg name="client">
-            <bean class="org.craftercms.search.elasticsearch.spring.ElasticsearchClientFactory">
-                <constructor-arg name="serverUrls" value="${crafter.engine.elasticsearch.urls}"/>
-                <property name="username" value="${crafter.engine.elasticsearch.username}"/>
-                <property name="password" value="${crafter.engine.elasticsearch.password}"/>
-                <property name="connectTimeout" value="${crafter.engine.elasticsearch.timeout.connect}"/>
-                <property name="socketTimeout" value="${crafter.engine.elasticsearch.timeout.socket}"/>
-                <property name="threadCount" value="${crafter.engine.elasticsearch.threads}"/>
-                <property name="socketKeepAlive" value="${crafter.engine.elasticsearch.keepAlive}"/>
+            <bean class="org.craftercms.search.opensearch.spring.OpenSearchClientFactory">
+                <constructor-arg name="serverUrls" ref="crafter.searchUrls"/>
+                <property name="username" ref="crafter.searchUsername"/>
+                <property name="password" ref="crafter.searchPassword"/>
+                <property name="connectTimeout" ref="crafter.searchConnectTimeout"/>
+                <property name="socketTimeout" ref="crafter.searchSocketTimeout"/>
+                <property name="threadCount" ref="crafter.searchThreadCount"/>
+                <property name="socketKeepAlive" ref="crafter.searchSocketKeepAlive"/>
             </bean>
         </constructor-arg>
         <constructor-arg name="indexIdFormat" value="${crafter.engine.search.index.format}"/>
         <constructor-arg name="enableTranslation" value="${crafter.engine.translation.enable}"/>
-        <property name="filterQueries" value="${crafter.engine.elasticsearch.filters}"/>
+        <property name="filterQueries" value="${crafter.engine.search.filters}"/>
     </bean>
 
     <!-- ////////////////////////////////// -->
@@ -733,8 +763,8 @@
         <entry key="urlTransformationService" value-ref="crafter.urlTransformationService"/>
         <entry key="navTreeBuilder" value-ref="crafter.navTreeBuilder"/>
         <entry key="navBreadcrumbBuilder" value-ref="crafter.navBreadcrumbBuilder"/>
-        <entry key="elasticsearch" value-ref="crafter.elasticsearchService"/>
-        <entry key="elasticsearchClient" value-ref="crafter.elasticsearchClient"/>
+        <entry key="search" value-ref="crafter.searchService"/>
+        <entry key="searchClient" value-ref="crafter.searchClient"/>
         <entry key="breadcrumbBuilder" value-ref="crafter.breadcrumbBuilder"/>
         <entry key="globalProperties" value-ref="crafter.propertyResolver"/>
         <entry key="modePreview" value="#{T(java.lang.Boolean).valueOf(${crafter.engine.preview})}"/>
@@ -971,7 +1001,7 @@
         <property name="defaultLimit" value="${crafter.engine.graphql.query.limit}"/>
         <property name="defaultSortField" value="${crafter.engine.graphql.query.sort.field}"/>
         <property name="defaultSortOrder" value="${crafter.engine.graphql.query.sort.order}"/>
-        <property name="elasticsearchClient" ref="crafter.elasticsearchClient"/>
+        <property name="searchClient" ref="crafter.searchClient"/>
     </bean>
 
     <bean id="crafter.urlTransformDataFetcher" class="org.craftercms.engine.graphql.impl.fetchers.UrlTransformDataFetcher">

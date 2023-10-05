@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -15,17 +15,22 @@
  */
 package org.craftercms.engine.controller;
 
-import org.springframework.beans.factory.annotation.Required;
+import org.craftercms.commons.validation.annotations.param.ValidExistingContentPath;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.beans.ConstructorProperties;
+
+
 /**
  * @author Alfonso Vásquez
  */
 @Controller
+@Validated
 @RequestMapping(ComponentRenderController.URL_ROOT)
 public class ComponentRenderController {
 
@@ -33,15 +38,16 @@ public class ComponentRenderController {
 
     public final String COMPONENT_PATH_MODEL_NAME = "componentPath";
 
-    private String renderComponentViewName;
+    private final String renderComponentViewName;
 
-    @Required
-    public void setRenderComponentViewName(String renderComponentViewName) {
+    @ConstructorProperties({"renderComponentViewName"})
+    public ComponentRenderController(String renderComponentViewName) {
         this.renderComponentViewName = renderComponentViewName;
     }
 
     @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST})
-    protected ModelAndView render(@RequestParam("path") String path) throws Exception {
+    protected ModelAndView render(@ValidExistingContentPath
+                                  @RequestParam("path") String path) throws Exception {
         return new ModelAndView(renderComponentViewName, COMPONENT_PATH_MODEL_NAME, path);
     }
 

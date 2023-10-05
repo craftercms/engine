@@ -19,14 +19,18 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:util="http://www.springframework.org/schema/util"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
-       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
 
     <import resource="classpath:crafter/core/rest-context.xml"/>
     <import resource="classpath:crafter/engine/rendering/controller-context.xml" />
     <import resource="classpath:crafter/engine/rendering/view-context.xml" />
+
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
 
     <!-- ////////////////////////////////// -->
     <!--								 	-->
@@ -91,7 +95,7 @@
     <!-- ////////////////////////////////// -->
 
 
-    <bean id="crafter.jsonMsgConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+    <bean id="crafter.jsonMsgConverter" class="org.craftercms.engine.util.spring.converter.MappingJackson2HttpMessageConverterFactoryBean">
         <property name="objectMapper" ref="crafter.coreObjectMapper"/>
     </bean>
 

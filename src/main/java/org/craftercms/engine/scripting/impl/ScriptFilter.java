@@ -141,7 +141,7 @@ public class ScriptFilter implements Filter {
     protected List<FilterMapping> getFilterMappings() {
         final SiteContext siteContext = SiteContext.getCurrent();
         if (siteContext != null) {
-            Callback<List<FilterMapping>> callback = new Callback<List<FilterMapping>>() {
+            Callback<List<FilterMapping>> callback = new Callback<>() {
 
                 @Override
                 public List<FilterMapping> execute() {

@@ -15,7 +15,7 @@
  */
 package org.craftercms.engine.properties;
 
-import org.apache.commons.lang3.StringUtils;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 /**
  * Global properties of the Engine instance, in other words, properties that are common to all sites.
@@ -29,16 +29,16 @@ public class SystemProperties {
 
     public static boolean isModePreview() {
         String value = System.getProperty(MODE_PREVIEW_PROPERTY_NAME);
-        if (StringUtils.isNotEmpty(value)) {
-            return Boolean.valueOf(value);
-        } else {
-            return false;
+        if (isNotEmpty(value)) {
+            return Boolean.parseBoolean(value);
         }
+
+        return false;
     }
 
     public static String getEnvironment() {
         String value = System.getProperty(ENVIRONMENT_PROPERTY_NAME);
-        if (StringUtils.isNotEmpty(value)) {
+        if (isNotEmpty(value)) {
             return value;
         } else {
             return null;

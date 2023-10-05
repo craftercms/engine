@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 import static graphql.schema.FieldCoordinates.coordinates;
 
 /**
- * Utility class used from Groovy to hold custom fields, fetchers & resolvers
+ * Utility class used from Groovy to hold custom fields, fetchers &amp; resolvers
  *
  * @author joseross
  * @since 3.1.4
@@ -134,7 +134,7 @@ public class SchemaCustomizer {
     }
 
     /**
-     * Updates the root type & code registry with the custom fields & fetchers
+     * Updates the root type &amp; code registry with the custom fields &amp; fetchers
      * @param rootTypeName the name of the root type
      * @param rootTypeBuilder the root type
      * @param codeRegistry the code registry

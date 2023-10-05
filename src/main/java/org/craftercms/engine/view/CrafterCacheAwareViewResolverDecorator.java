@@ -16,8 +16,8 @@
 package org.craftercms.engine.view;
 
 import org.craftercms.engine.service.context.SiteContext;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.Ordered;
+import org.springframework.lang.NonNull;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
 
@@ -50,13 +50,12 @@ public class CrafterCacheAwareViewResolverDecorator implements ViewResolver, Ord
         this.order = order;
     }
 
-    @Required
     public void setActualViewResolver(ViewResolver actualViewResolver) {
         this.actualViewResolver = actualViewResolver;
     }
 
     @Override
-    public View resolveViewName(String viewName, Locale locale) throws Exception {
+    public View resolveViewName(@NonNull String viewName, @NonNull Locale locale) throws Exception {
         SiteContext siteContext = SiteContext.getCurrent();
         if (siteContext != null) {
             try {

@@ -302,7 +302,7 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
                     logger.debug("Scripts associated to page " + page.getStoreUrl() + ": " + scriptUrls);
                 }
 
-                List<Script> scripts = new ArrayList<Script>(scriptUrls.size());
+                List<Script> scripts = new ArrayList<>(scriptUrls.size());
 
                 for (String scriptUrl : scriptUrls) {
                     Script script = scriptFactory.getScript(scriptUrl);

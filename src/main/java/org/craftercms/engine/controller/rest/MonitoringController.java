@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -16,46 +16,94 @@
 
 package org.craftercms.engine.controller.rest;
 
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
 import org.craftercms.commons.exceptions.InvalidManagementTokenException;
+import org.craftercms.commons.monitoring.StatusInfo;
 import org.craftercms.commons.monitoring.rest.MonitoringRestControllerBase;
+import org.craftercms.commons.validation.annotations.param.ValidSiteId;
+import org.craftercms.engine.service.SiteHealthCheckService;
 import org.craftercms.engine.util.logging.CircularQueueLogAppender;
+import org.owasp.esapi.ESAPI;
+import org.owasp.esapi.Validator;
+import org.owasp.esapi.errors.ValidationException;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.constraints.Positive;
+import java.beans.ConstructorProperties;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static java.lang.String.format;
+import static org.craftercms.commons.validation.annotations.param.EsapiValidationType.SITE_ID;
+
 /**
- * Rest controller to provide monitoring information & site logs
+ * Rest controller to provide monitoring information &amp; site logs
  */
+@Validated
 @RestController
 @RequestMapping(MonitoringController.URL_ROOT)
 public class MonitoringController extends MonitoringRestControllerBase {
 
-    public final static String URL_ROOT = "/api/1";
-    public final static String LOG_URL = "/log";
+    public static final String URL_ROOT = "/api/1";
+    public static final String LOG_URL = "/log";
 
-    private String configuredToken;
+    private final SiteHealthCheckService siteHealthCheckService;
+    private final Validator validator = ESAPI.validator();
+    private final int MAXIMUM_SITE_ID_KEY_LENGTH = 50;
+
+    @ConstructorProperties({"siteHealthCheckService", "configuredToken"})
+    public MonitoringController(final SiteHealthCheckService siteHealthCheckService, final String configuredToken) {
+        super(configuredToken);
+        this.siteHealthCheckService = siteHealthCheckService;
+    }
 
     @GetMapping(MonitoringRestControllerBase.ROOT_URL + LOG_URL)
-    public List<Map<String,Object>> getLoggedEvents(@RequestParam String site, @RequestParam long since,
-                                                    @RequestParam String token) throws InvalidManagementTokenException {
-        if (StringUtils.isNotEmpty(token) && StringUtils.equals(token, getConfiguredToken())) {
-            return CircularQueueLogAppender.getLoggedEvents(site, since);
-        } else {
-            throw new InvalidManagementTokenException("Management authorization failed, invalid token.");
-        }
+    public List<Map<String, Object>> getLoggedEvents(@RequestParam @ValidSiteId String site,
+                                                     @Positive @RequestParam long since,
+                                                     @RequestParam String token) throws InvalidManagementTokenException {
+        validateToken(token);
+        return CircularQueueLogAppender.getLoggedEvents(site, since);
     }
 
     @Override
-    protected String getConfiguredToken() {
-        return configuredToken;
+    @GetMapping(ROOT_URL + STATUS_URL)
+    public ResponseEntity getCurrentStatus(@RequestParam(name = "crafterSite", required = false) String site,
+                                           @RequestParam(name = "token") String token)
+            throws InvalidManagementTokenException {
+        validateToken(token);
+
+        Map<String, String> responseBody = new HashMap<>();
+
+        if (site != null) {
+            String paramNameValidationKey = SITE_ID.typeKey;
+            try {
+                validator.getValidInput(paramNameValidationKey, site, paramNameValidationKey, MAXIMUM_SITE_ID_KEY_LENGTH, false);
+            } catch (ValidationException e) {
+                responseBody.put("message", format("Invalid site Id: '%s'.", site));
+                return ResponseEntity
+                        .badRequest()
+                        .body(responseBody);
+            }
+
+            if (!siteHealthCheckService.healthCheck(site)) {
+                responseBody.put("message", format("Invalid context for site '%s'.", site));
+                return ResponseEntity
+                        .internalServerError()
+                        .body(responseBody);
+            }
+        } else if (!siteHealthCheckService.healthCheck()) {
+            responseBody.put("message", "Invalid contexts.");
+            return ResponseEntity
+                    .internalServerError()
+                    .body(responseBody);
+        }
+
+        return ResponseEntity.ok().body(StatusInfo.getCurrentStatus());
     }
 
-    public void setConfiguredToken(String configuredToken) {
-        this.configuredToken = configuredToken;
-    }
 }

@@ -118,7 +118,9 @@
       href="${navItem.url}"
       $attributes=(addSubItemData)?then(hasSubItemItemAttributes, itemAttributes)
     >
+    <#outputFormat "HTML">
       ${navItem.label}
+    </#outputFormat>
     </@a>
   </#if>
 

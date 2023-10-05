@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -21,16 +21,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.LocaleUtils;
-import org.craftercms.search.elasticsearch.impl.AbstractElasticsearchWrapper;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchType;
-import org.elasticsearch.action.support.IndicesOptions;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.craftercms.search.opensearch.impl.AbstractOpenSearchWrapper;
+import org.opensearch.action.search.SearchRequest;
+import org.opensearch.action.search.SearchType;
+import org.opensearch.action.support.IndicesOptions;
+import org.opensearch.client.RestHighLevelClient;
+import org.opensearch.index.query.BoolQueryBuilder;
+import org.opensearch.search.builder.SearchSourceBuilder;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -42,36 +41,27 @@ import java.util.Locale;
 import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.joining;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.collections4.list.SetUniqueList.setUniqueList;
-import static org.apache.commons.lang3.StringUtils.appendIfMissing;
-import static org.apache.commons.lang3.StringUtils.removeStart;
-import static org.apache.commons.lang3.StringUtils.startsWith;
 import static org.craftercms.commons.locale.LocaleUtils.appendLocale;
 import static org.craftercms.commons.locale.LocaleUtils.getCompatibleLocales;
-import static org.craftercms.engine.util.LocaleUtils.getCurrentLocale;
-import static org.craftercms.engine.util.LocaleUtils.getDefaultLocale;
-import static org.craftercms.engine.util.LocaleUtils.isTranslationEnabled;
-import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
-import static org.elasticsearch.index.query.QueryBuilders.existsQuery;
-import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
+import static org.craftercms.engine.util.LocaleUtils.*;
+import static org.craftercms.engine.util.SecurityUtils.*;
+import static org.opensearch.index.query.QueryBuilders.*;
 
 /**
- * Implementation of {@link org.craftercms.search.elasticsearch.ElasticsearchWrapper}
+ * Implementation of {@link org.craftercms.search.opensearch.OpenSearchWrapper}
  * that sets the index based on the current site context for all search requests.
  * @author joseross
  * @since 3.1
  */
-public class SiteAwareElasticsearchService extends AbstractElasticsearchWrapper {
+public class SiteAwareOpenSearchService extends AbstractOpenSearchWrapper {
 
     private static final String DEFAULT_ROLE_FIELD_NAME = "authorizedRoles.item.role";
 
     private static final String DEFAULT_LOCALES_PARAM_NAME = "locales";
 
     private static final String DEFAULT_FALLBACK_PARAM_NAME = "localeFallback";
-
-    private static final String ROLE_PREFIX = "ROLE_";
 
 
     /**
@@ -88,7 +78,7 @@ public class SiteAwareElasticsearchService extends AbstractElasticsearchWrapper 
     protected final boolean enableTranslation;
 
     @ConstructorProperties({"client", "indexIdFormat", "enableTranslation"})
-    public SiteAwareElasticsearchService(RestHighLevelClient client, String indexIdFormat, boolean enableTranslation) {
+    public SiteAwareOpenSearchService(RestHighLevelClient client, String indexIdFormat, boolean enableTranslation) {
         super(client);
         this.indexIdFormat = indexIdFormat;
         this.enableTranslation = enableTranslation;
@@ -223,16 +213,15 @@ public class SiteAwareElasticsearchService extends AbstractElasticsearchWrapper 
         // Include all public items
         BoolQueryBuilder securityQuery = boolQuery()
                 .should(boolQuery().mustNot(existsQuery(roleFieldName)))
-                .should(matchQuery(roleFieldName, "anonymous"));
+                .should(matchQuery(roleFieldName, ANONYMOUS_PSEUDO_ROLE_SEARCH_VALUE));
 
-        if (auth != null && !(auth instanceof AnonymousAuthenticationToken) && isNotEmpty(auth.getAuthorities())) {
-            logger.debug("Filtering search results for roles: {}", auth.getAuthorities());
-            securityQuery.should(matchQuery(roleFieldName, auth.getAuthorities().stream()
-                            .map(GrantedAuthority::getAuthority)
-                            .map(role -> role +  " " +
-                                    (startsWith(role, ROLE_PREFIX)? removeStart(role, ROLE_PREFIX)
-                                            : appendIfMissing(role, ROLE_PREFIX)))
-                            .collect(joining(" "))));
+        if (auth != null && !(auth instanceof AnonymousAuthenticationToken)) {
+            logger.debug("Filtering search results for authenticated users");
+            securityQuery.should(matchQuery(roleFieldName, AUTHENTICATED_PSEUDO_ROLE_SEARCH_VALUE));
+            if (isNotEmpty(auth.getAuthorities())) {
+                logger.debug("Filtering search results for roles: {}", auth.getAuthorities());
+                securityQuery.should(matchQuery(roleFieldName, getAuthorizedRolesMatchValue(auth.getAuthorities())));
+            }
         } else {
             logger.debug("Filtering search to show only public items");
         }

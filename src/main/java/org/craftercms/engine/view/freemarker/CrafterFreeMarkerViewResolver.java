@@ -18,7 +18,7 @@ package org.craftercms.engine.view.freemarker;
 import org.craftercms.engine.plugin.PluginService;
 import org.craftercms.engine.scripting.SiteItemScriptResolver;
 import org.craftercms.engine.service.SiteItemService;
-import org.springframework.beans.factory.annotation.Required;
+import org.springframework.lang.NonNull;
 import org.springframework.web.servlet.view.AbstractUrlBasedView;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 
@@ -41,27 +41,22 @@ public class CrafterFreeMarkerViewResolver extends FreeMarkerViewResolver {
      */
     protected boolean enableStatics;
 
-    @Required
     public void setSiteItemService(SiteItemService siteItemService) {
         this.siteItemService = siteItemService;
     }
 
-    @Required
     public void setComponentTemplateXPathQuery(String componentTemplateXPathQuery) {
         this.componentTemplateXPathQuery = componentTemplateXPathQuery;
     }
 
-    @Required
     public void setComponentIncludeElementName(String componentIncludeElementName) {
         this.componentIncludeElementName = componentIncludeElementName;
     }
 
-    @Required
     public void setComponentEmbeddedElementName(final String componentEmbeddedElementName) {
         this.componentEmbeddedElementName = componentEmbeddedElementName;
     }
 
-    @Required
     public void setComponentScriptResolver(SiteItemScriptResolver componentScriptResolver) {
         this.componentScriptResolver = componentScriptResolver;
     }
@@ -75,12 +70,14 @@ public class CrafterFreeMarkerViewResolver extends FreeMarkerViewResolver {
     }
 
     @Override
-    protected Class requiredViewClass() {
+    @NonNull
+    protected Class<?> requiredViewClass() {
         return CrafterFreeMarkerView.class;
     }
 
     @Override
-    protected AbstractUrlBasedView buildView(String viewName) throws Exception {
+    @NonNull
+    protected AbstractUrlBasedView buildView(@NonNull String viewName) throws Exception {
         CrafterFreeMarkerView view = (CrafterFreeMarkerView) super.buildView(viewName);
         view.setSiteItemService(siteItemService);
         view.setComponentTemplateXPathQuery(componentTemplateXPathQuery);
@@ -94,5 +91,4 @@ public class CrafterFreeMarkerViewResolver extends FreeMarkerViewResolver {
 
         return view;
     }
-
 }

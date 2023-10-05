@@ -36,11 +36,20 @@
     <parent>
         <groupId>org.craftercms</groupId>
         <artifactId>craftercms</artifactId>
-        <version>4.0.2-SNAPSHOT</version><!-- craftercms version flag -->
+        <version>4.1.2-SNAPSHOT</version><!-- craftercms version flag -->
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
     <dependencies>
+        <!-- Overrides -->
+        <dependency>
+            <groupId>com.squareup.okio</groupId><!-- Override -->
+            <artifactId>okio-jvm</artifactId>
+            <version>${okio.version}</version>
+        </dependency>
+
+
+        <!-- Dependencies -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
@@ -88,8 +97,25 @@
         </dependency>
         <dependency>
             <groupId>org.craftercms</groupId>
-            <artifactId>crafter-search-elasticsearch</artifactId>
+            <artifactId>crafter-commons-validation</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.craftercms</groupId>
+            <artifactId>crafter-search-opensearch</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -118,19 +144,13 @@
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
             <version>${groovy.version}</version>
-	    <type>pom</type>
+            <type>pom</type>
         </dependency>
 
         <dependency>
             <groupId>org.apache.ivy</groupId>
             <artifactId>ivy</artifactId>
-            <version>${apache.ivy}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.codehaus.groovy</groupId>
-                    <artifactId>groovy-all</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>${ivy.version}</version>
         </dependency>
 
         <dependency>
@@ -149,27 +169,6 @@
             <artifactId>commons-collections4</artifactId>
             <version>${commons.collections4.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-text</artifactId>
-            <version>${commons.text.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.gmongo</groupId>
-            <artifactId>gmongo</artifactId>
-            <version>${gmongo.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId> org.codehaus.groovy</groupId>
-                    <artifactId>groovy-ant</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId> org.codehaus.groovy</groupId>
-                    <artifactId>groovy</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
 
         <dependency>
             <groupId>rome</groupId>
@@ -181,12 +180,6 @@
             <groupId>org.tuckey</groupId>
             <artifactId>urlrewritefilter</artifactId>
             <version>${urlrewrite.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-            <version>${xerces.version}</version>
         </dependency>
 
         <!-- Logging -->
@@ -207,7 +200,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
+            <artifactId>log4j-slf4j2-impl</artifactId>
             <version>${log4j.version}</version>
         </dependency>
 
@@ -230,6 +223,12 @@
         </dependency>
 
         <!-- Box -->
+        <!-- Override Jose4j dependency from Box -->
+        <dependency>
+            <groupId>org.bitbucket.b_c</groupId>
+            <artifactId>jose4j</artifactId>
+            <version>${jose4j.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.box</groupId>
             <artifactId>box-java-sdk</artifactId>
@@ -264,32 +263,32 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>${jackson.databind.version}</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-cbor</artifactId>
-            <version>${jackson.dataformat.version}</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-smile</artifactId>
-            <version>${jackson.dataformat.version}</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-xml</artifactId>
-            <version>${jackson.dataformat.version}</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-yaml</artifactId>
-            <version>${jackson.dataformat.version}</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>${jackson.dataformat.version}</version>
+            <version>${jackson.version}</version>
         </dependency>
 
         <!-- GraphQL -->
@@ -377,7 +376,20 @@
             </exclusions>
         </dependency>
 
+        <dependency>
+            <groupId>io.methvin</groupId>
+            <artifactId>directory-watcher</artifactId>
+            <version>${directory-watcher.version}</version>
+        </dependency>
+
         <!-- Test dependencies -->
+        <!-- Tomcat EL -->
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-jasper-el</artifactId>
+            <version>${tomcat.version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
@@ -394,6 +406,12 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>${testng.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

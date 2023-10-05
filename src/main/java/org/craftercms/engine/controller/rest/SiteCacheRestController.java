@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -25,14 +25,16 @@ import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.engine.event.SiteContextCreatedEvent;
 import org.craftercms.engine.event.SiteEvent;
 import org.craftercms.engine.service.context.SiteContext;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.beans.ConstructorProperties;
 import java.util.Map;
+
+import static java.lang.String.format;
 
 /**
  * REST controller for operations related to a site's cache.
@@ -49,50 +51,44 @@ public class SiteCacheRestController extends RestControllerBase {
     public static final String URL_CLEAR = "/clear";
     public static final String URL_STATS = "/statistics";
 
-    private String configuredToken;
+    private final String configuredToken;
+
+    @ConstructorProperties({"configuredToken"})
+    public SiteCacheRestController(final String configuredToken) {
+        this.configuredToken = configuredToken;
+    }
 
     @RequestMapping(value = URL_CLEAR, method = RequestMethod.GET)
     public Map<String, Object> clear(HttpServletRequest request, @RequestParam String token) throws InvalidManagementTokenException {
-        if (StringUtils.equals(token, getConfiguredToken())) {
-            SiteContext siteContext = SiteContext.getCurrent();
-            String siteName = siteContext.getSiteName();
-            String msg;
+        validateToken(token);
+        SiteContext siteContext = SiteContext.getCurrent();
+        String siteName = siteContext.getSiteName();
+        String msg;
 
-            // Don't clear cache if the context was just created in this request
-            if (SiteEvent.getLatestRequestEvent(SiteContextCreatedEvent.class, request) != null) {
-                return createResponseMessage("Site context for '" + siteName + "' created during the request. " +
-                                             "Cache clear not necessary");
-            } else {
-                siteContext.startCacheClear();
-
-                msg = "Cache clear for site '" + siteName + "' started";
-            }
-
-            logger.debug(msg);
-
-            return createResponseMessage(msg);
+        // Don't clear cache if the context was just created in this request
+        if (SiteEvent.getLatestRequestEvent(SiteContextCreatedEvent.class, request) != null) {
+            return createResponseMessage(format("Site context for '%s' created during the request. Cache clear not necessary", siteName));
         } else {
-            throw new InvalidManagementTokenException("Management authorization failed, invalid token.");
+            siteContext.startCacheClear();
+            msg = format("Cache clear for site '%s' started", siteName);
         }
+
+        logger.debug(msg);
+
+        return createResponseMessage(msg);
     }
 
     @RequestMapping(value = URL_STATS, method = RequestMethod.GET)
     public CacheStatistics getStatistics(@RequestParam String token) throws InvalidManagementTokenException {
-        if (StringUtils.isNotEmpty(token) && StringUtils.equals(token, getConfiguredToken())) {
-            SiteContext siteContext = SiteContext.getCurrent();
+        validateToken(token);
 
-            return siteContext.getCacheTemplate().getCacheService().getStatistics(siteContext.getContext());
-        } else {
+        SiteContext siteContext = SiteContext.getCurrent();
+        return siteContext.getCacheTemplate().getCacheService().getStatistics(siteContext.getContext());
+    }
+
+    protected final void validateToken(final String requestToken) throws InvalidManagementTokenException {
+        if (!StringUtils.equals(requestToken, configuredToken)) {
             throw new InvalidManagementTokenException("Management authorization failed, invalid token.");
         }
-    }
-
-    public String getConfiguredToken() {
-        return configuredToken;
-    }
-
-    @Required
-    public void setConfiguredToken(String configuredToken) {
-        this.configuredToken = configuredToken;
     }
 }

@@ -193,7 +193,7 @@ public class PageRenderController extends AbstractController {
 
     protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response,
                                                         Map<String, Object> model) {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         addControllerScriptVariables(variables, request, response,
                 disableVariableRestrictions? getServletContext() : null, model);
 

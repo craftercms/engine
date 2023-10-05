@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+  ~ Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License version 3 as published by
@@ -17,7 +17,10 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
     <import resource="classpath:crafter/engine/mode/serverless/deployment-events-context.xml" />
 
@@ -55,6 +58,13 @@
         <property name="waitForContextInit" value="${crafter.engine.site.context.waitForInit}"/>
         <property name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
         <property name="defaultSiteName" value="${crafter.engine.site.default.name}"/>
+        <property name="contextBuildRetryMaxCount" value="${crafter.engine.site.context.build.retry.maxCount}"/>
+        <property name="contextBuildRetryWaitTimeBase" value="${crafter.engine.site.context.build.retry.waitTimeBase}"/>
+        <property name="contextBuildRetryWaitTimeMultiplier" value="${crafter.engine.site.context.build.retry.waitTimeMultiplier}"/>
+        <property name="modePreview" value="${crafter.engine.preview}"/>
+        <property name="watcherPaths" value="${crafter.engine.watcher.paths}"/>
+        <property name="watcherCounterLimit" value="${crafter.engine.watcher.counter.limit}"/>
+        <property name="watcherIntervalPeriod" value="${crafter.engine.watcher.interval.period}"/>
     </bean>
 
     <!-- AWS S3 Content Store Adapter -->
@@ -65,10 +75,11 @@
         <property name="descriptorFileExtension" value="${crafter.core.store.descriptorFile.extension}"/>
         <property name="pathValidator">
             <bean class="org.craftercms.commons.validation.validators.impl.SecurePathValidator">
-                <constructor-arg name="targetKey" value="path"/>
             </bean>
         </property>
-        <property name="clientBuilder" ref="crafter.s3ClientBuilder"/>
+        <constructor-arg name="clientBuilder" ref="crafter.s3ClientBuilder"/>
+        <constructor-arg name="contentMaxLength" value="${crafter.engine.store.s3.cache.contentMaxLength}"/>
+        <constructor-arg name="cacheAllowedPaths" value="${crafter.engine.store.s3.cache.allowedPaths}"/>
     </bean>
 
     <bean id="crafter.contentStoreAdapter.s3"
@@ -91,4 +102,13 @@
         </property>
     </bean>
 
+    <!-- ////////////////////////////////// -->
+    <!--								 	-->
+    <!--			Health Check			-->
+    <!--									-->
+    <!-- ////////////////////////////////// -->
+    <bean id="siteHealthCheckService" class="org.craftercms.engine.service.impl.SiteHealthCheckServiceImpl">
+        <constructor-arg name="siteListResolver" ref="crafter.siteListResolver"/>
+        <constructor-arg name="healthChecks" ref="siteHealthChecks"/>
+    </bean>
 </beans>
