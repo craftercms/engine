@@ -156,7 +156,7 @@ public class ContentTypeBasedDataFetcher extends RequestAwareDataFetcher<Object>
                     .term(t -> t
                         .field(QUERY_FIELD_NAME_CONTENT_TYPE)
                         .value(v -> v
-                            .stringValue(getOriginalName(fieldName))
+                            .stringValue(getContentTypeOriginalName(fieldName))
                         )
                     )
                 );
