@@ -99,11 +99,23 @@
             <groupId>org.craftercms</groupId>
             <artifactId>crafter-commons-validation</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.craftercms</groupId>
             <artifactId>crafter-search-opensearch</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -132,19 +144,13 @@
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
             <version>${groovy.version}</version>
-	    <type>pom</type>
+            <type>pom</type>
         </dependency>
 
         <dependency>
             <groupId>org.apache.ivy</groupId>
             <artifactId>ivy</artifactId>
-            <version>${apache.ivy}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.codehaus.groovy</groupId>
-                    <artifactId>groovy-all</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>${ivy.version}</version>
         </dependency>
 
         <dependency>
@@ -174,12 +180,6 @@
             <groupId>org.tuckey</groupId>
             <artifactId>urlrewritefilter</artifactId>
             <version>${urlrewrite.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-            <version>${xerces.version}</version>
         </dependency>
 
         <!-- Logging -->
@@ -376,6 +376,12 @@
             </exclusions>
         </dependency>
 
+        <dependency>
+            <groupId>io.methvin</groupId>
+            <artifactId>directory-watcher</artifactId>
+            <version>${directory-watcher.version}</version>
+        </dependency>
+
         <!-- Test dependencies -->
         <!-- Tomcat EL -->
         <dependency>
@@ -400,6 +406,12 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>${testng.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
