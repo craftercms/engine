@@ -25,6 +25,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolationException;
 
 import freemarker.template.Configuration;
 import freemarker.template.SimpleHash;
@@ -92,13 +93,18 @@ public class SiteContextResolvingFilter implements Filter {
         try {
             return contextResolver.getContext(request);
         } catch (RootFolderNotFoundException e) {
-            logger.error("Error while resolving site context for current request", e);
-            renderError(response, HttpServletResponse.SC_NOT_FOUND);
+            handleException(response, HttpServletResponse.SC_NOT_FOUND, e);
+        } catch (ConstraintViolationException e) {
+            handleException(response, HttpServletResponse.SC_BAD_REQUEST, e);
         } catch (Exception e) {
-            logger.error("Error while resolving site context for current request", e);
-            renderError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            handleException(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
         }
         return null;
+    }
+
+    private void handleException(HttpServletResponse response, int statusCode, Exception e) {
+        logger.error("Error while resolving site context for current request", e);
+        renderError(response, statusCode);
     }
 
     protected void renderError(HttpServletResponse response, int responseCode) {
