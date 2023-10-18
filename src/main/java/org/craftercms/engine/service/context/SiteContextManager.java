@@ -23,6 +23,8 @@ import org.craftercms.commons.concurrent.locks.WeakKeyBasedReentrantLockFactory;
 import org.craftercms.commons.entitlements.exception.EntitlementException;
 import org.craftercms.commons.entitlements.model.EntitlementType;
 import org.craftercms.commons.entitlements.validator.EntitlementValidator;
+import org.craftercms.commons.validation.annotations.param.EsapiValidatedParam;
+import org.craftercms.commons.validation.annotations.param.ValidateParams;
 import org.craftercms.engine.event.SiteContextPurgedEvent;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationContext;
@@ -39,6 +41,8 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
+
+import static org.craftercms.commons.validation.annotations.param.EsapiValidationType.SITE_ID;
 
 /**
  * Registry and lifecycle manager of {@link SiteContext}s.
@@ -241,7 +245,8 @@ public class SiteContextManager implements ApplicationContextAware {
      *
      * @return the context
      */
-    public SiteContext getContext(String siteName, boolean fallback) {
+    @ValidateParams
+    public SiteContext getContext(@EsapiValidatedParam(maxLength = 50, type = SITE_ID) String siteName, boolean fallback) {
         SiteContext siteContext = contextRegistry.get(siteName);
         if (siteContext == null) {
             if (!fallback && !siteName.equals(defaultSiteName) && !validateSiteCreationEntitlement()) {
