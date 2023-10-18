@@ -15,24 +15,27 @@
  */
 package org.craftercms.engine.service.context;
 
+import io.methvin.watcher.DirectoryWatcher;
 import io.methvin.watcher.hashing.FileHasher;
 import org.apache.commons.collections4.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.craftercms.commons.concurrent.locks.KeyBasedLockFactory;
 import org.craftercms.commons.concurrent.locks.WeakKeyBasedReentrantLockFactory;
 import org.craftercms.commons.entitlements.exception.EntitlementException;
 import org.craftercms.commons.entitlements.model.EntitlementType;
 import org.craftercms.commons.entitlements.validator.EntitlementValidator;
+import org.craftercms.commons.validation.annotations.param.ValidSiteId;
 import org.craftercms.engine.event.SiteContextPurgedEvent;
-import org.springframework.beans.factory.annotation.Required;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import io.methvin.watcher.DirectoryWatcher;
+import org.springframework.validation.annotation.Validated;
 
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -48,6 +51,7 @@ import static java.lang.String.format;
  *
  * @author Alfonso Vásquez
  */
+@Validated
 public class SiteContextManager implements ApplicationContextAware, DisposableBean {
 
     private static final Logger logger = LoggerFactory.getLogger(SiteContextManager.class);
@@ -488,7 +492,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
      *
      * @return the context
      */
-    public SiteContext getContext(String siteName, boolean fallback) {
+    public SiteContext getContext(@ValidSiteId String siteName, boolean fallback) {
         SiteContext siteContext = contextRegistry.get(siteName);
         if (siteContext == null) {
             if (!fallback && !siteName.equals(defaultSiteName) && !validateSiteCreationEntitlement()) {
