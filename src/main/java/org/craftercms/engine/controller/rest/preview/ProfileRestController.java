@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -16,21 +16,18 @@
 package org.craftercms.engine.controller.rest.preview;
 
 import org.apache.commons.configuration2.HierarchicalConfiguration;
-import org.bouncycastle.util.Arrays;
+import org.apache.commons.text.StringEscapeUtils;
 import org.bson.types.ObjectId;
 import org.craftercms.commons.validation.ValidationResult;
 import org.craftercms.core.controller.rest.RestControllerBase;
+import org.craftercms.engine.rest.SetProfileRequest;
 import org.craftercms.engine.util.ConfigUtils;
 import org.owasp.esapi.ESAPI;
-import org.owasp.esapi.Encoder;
 import org.owasp.esapi.Validator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
@@ -57,7 +54,6 @@ public class ProfileRestController {
     public static final String ERROR_MESSAGE_MODEL_ATTR_NAME = "message";
 
     private final Validator validator = ESAPI.validator();
-    private final Encoder encoder = ESAPI.encoder();
 
     @RequestMapping(value = "/get", method = RequestMethod.GET)
     @SuppressWarnings("unchecked")
@@ -72,11 +68,11 @@ public class ProfileRestController {
         return profile;
     }
 
-    @RequestMapping(value = "/set", method = RequestMethod.GET)
-    public ResponseEntity<Map<String, String>> setProfile(HttpServletRequest request, HttpSession session) {
+    @PostMapping("/set")
+    public ResponseEntity<Map<String, String>> setProfile(@RequestBody SetProfileRequest profileRequest, HttpSession session) {
         boolean cleanseAttributes = shouldCleanseAttributes();
 
-        Map<String, String[]> parameterMap = request.getParameterMap();
+        Map<String, String> parameterMap = profileRequest.getParameters();
         if (parameterMap.size() > MAXIMUM_PROPERTY_COUNT) {
             String message = format("Parameter count should not exceed %d. %d parameters were found.",
                     MAXIMUM_PROPERTY_COUNT, parameterMap.size());
@@ -86,12 +82,11 @@ public class ProfileRestController {
         Map<String, String> profile = new HashMap<>(parameterMap.size());
         try {
             for (String paramName : parameterMap.keySet()) {
-                String[] paramValueArray = parameterMap.get(paramName);
-                String value = Arrays.isNullOrEmpty(paramValueArray) ? null : paramValueArray[0];
+                String value = parameterMap.get(paramName);
                 if (value != null) {
                     value = value.trim();
                     validateParameter(paramName, value);
-                    profile.put(paramName, cleanseAttributes ? encoder.encodeForHTML(value) : value);
+                    profile.put(paramName, cleanseAttributes ? StringEscapeUtils.escapeHtml4(value) : value);
                 }
             }
         } catch (Exception e) {

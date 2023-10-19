@@ -20,12 +20,14 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpStatus;
 import org.craftercms.commons.lang.UrlUtils;
 import org.craftercms.commons.validation.ValidationException;
 import org.craftercms.commons.validation.ValidationRuntimeException;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.util.ExceptionUtils;
 import org.craftercms.engine.exception.HttpStatusCodeAwareException;
+import org.craftercms.engine.exception.HttpStatusCodeException;
 import org.craftercms.engine.exception.ScriptNotFoundException;
 import org.craftercms.engine.plugin.PluginService;
 import org.craftercms.engine.scripting.ScriptFactory;
@@ -183,10 +185,7 @@ public class RestScriptsController implements ServletContextAware {
             return scriptFactory.getScript(scriptUrl).execute(scriptVariables);
         } catch (ScriptNotFoundException e) {
             logger.error(format("Script not found at '%s'", scriptUrl));
-
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-
-            return singletonMap(errorMessageModelAttributeName, "REST script not found");
+            throw new HttpStatusCodeException(HttpStatus.SC_NOT_FOUND, e);
         } catch (Exception e) {
             logger.error(format("Error executing REST script at '%s'", scriptUrl), e);
 
