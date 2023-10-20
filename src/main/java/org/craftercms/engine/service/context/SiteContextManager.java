@@ -28,9 +28,11 @@ import org.craftercms.engine.event.SiteContextPurgedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.validation.annotation.Validated;
 
 import java.io.IOException;
@@ -156,8 +158,8 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
         this.siteListResolver = siteListResolver;
     }
 
-    @Required
-    public void setEntitlementValidator(final EntitlementValidator entitlementValidator) {
+    @Autowired
+    public void setEntitlementValidator(@Lazy final EntitlementValidator entitlementValidator) {
         this.entitlementValidator = entitlementValidator;
     }
 
