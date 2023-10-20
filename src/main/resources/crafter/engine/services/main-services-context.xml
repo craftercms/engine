@@ -544,7 +544,6 @@
 
     <bean id="crafter.siteContextResolver" class="org.craftercms.engine.service.context.SiteContextResolverImpl">
         <property name="siteResolver" ref="crafter.siteResolver"/>
-        <property name="siteContextManager" ref="crafter.siteContextManager"/>
         <property name="fallbackSiteName" value="default"/>
     </bean>
 
@@ -1008,7 +1007,6 @@
     <!-- ////////////////////////////////// -->
 
     <bean id="crafter.entitlementsProvider" class="org.craftercms.engine.entitlement.EngineEntitlementUsageProvider">
-        <property name="siteContextManager" ref="crafter.siteContextManager"/>
     </bean>
 
     <!-- ////////////////////////////////// -->
