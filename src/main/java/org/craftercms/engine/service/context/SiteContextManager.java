@@ -93,6 +93,11 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
     protected String[] watcherPaths = {};
 
     /**
+     * Directory watcher ignore paths
+     */
+    protected String[] watcherIgnorePaths = {};
+
+    /**
      * Directory watcher counter limit to run rebuild
      */
     protected int watcherCounterLimit;
@@ -197,6 +202,11 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
     }
 
     @Required
+    public void setWatcherIgnorePaths(final String[] watcherIgnorePaths) {
+        this.watcherIgnorePaths = watcherIgnorePaths;
+    }
+
+    @Required
     public void setWatcherCounterLimit(final int watcherCounterLimit) {
         this.watcherCounterLimit = watcherCounterLimit;
     }
@@ -270,6 +280,9 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
             List<Path> paths = Arrays.stream(watcherPaths)
                     .map(resource -> Paths.get(siteRootPath + resource))
                     .collect(Collectors.toList());
+            List<Path> ignorePaths = Arrays.stream(watcherIgnorePaths)
+                    .map(resource -> Paths.get(siteRootPath + resource))
+                    .collect(Collectors.toList());
             DirectoryWatcher watcher = DirectoryWatcher.builder()
                     .paths(paths)
                     .fileHasher(FileHasher.LAST_MODIFIED_TIME)
@@ -278,6 +291,11 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
                             case CREATE:
                             case DELETE:
                             case MODIFY: {
+                                boolean pathIgnored = ignorePaths.stream().anyMatch(ignorePath -> event.path().startsWith(ignorePath));
+                                if (pathIgnored) {
+                                    return;
+                                }
+
                                 String hashValue = event.hash() != null ? event.hash().asString() : "none";
                                 logger.info("File watcher event type: '{}'. File affected: '{}'. Hash value: '{}'", event.eventType(), event.path(), hashValue);
                                 // Only process if the hash is different from the last processed hash value,
