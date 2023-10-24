@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.validation.constraints.NotEmpty;
 import java.beans.ConstructorProperties;
 
 
@@ -46,7 +47,7 @@ public class ComponentRenderController {
     }
 
     @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST})
-    protected ModelAndView render(@ValidExistingContentPath
+    protected ModelAndView render(@NotEmpty @ValidExistingContentPath
                                   @RequestParam("path") String path) throws Exception {
         return new ModelAndView(renderComponentViewName, COMPONENT_PATH_MODEL_NAME, path);
     }
