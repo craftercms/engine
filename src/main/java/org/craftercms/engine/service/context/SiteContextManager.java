@@ -15,24 +15,29 @@
  */
 package org.craftercms.engine.service.context;
 
+import io.methvin.watcher.DirectoryWatcher;
 import io.methvin.watcher.hashing.FileHasher;
 import org.apache.commons.collections4.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.craftercms.commons.concurrent.locks.KeyBasedLockFactory;
 import org.craftercms.commons.concurrent.locks.WeakKeyBasedReentrantLockFactory;
 import org.craftercms.commons.entitlements.exception.EntitlementException;
 import org.craftercms.commons.entitlements.model.EntitlementType;
 import org.craftercms.commons.entitlements.validator.EntitlementValidator;
+import org.craftercms.commons.validation.annotations.param.ValidSiteId;
 import org.craftercms.engine.event.SiteContextPurgedEvent;
-import org.springframework.beans.factory.annotation.Required;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import io.methvin.watcher.DirectoryWatcher;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.validation.annotation.Validated;
 
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -48,6 +53,7 @@ import static java.lang.String.format;
  *
  * @author Alfonso Vásquez
  */
+@Validated
 public class SiteContextManager implements ApplicationContextAware, DisposableBean {
 
     private static final Logger logger = LoggerFactory.getLogger(SiteContextManager.class);
@@ -87,6 +93,11 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
      * Directory watcher watch paths
      */
     protected String[] watcherPaths = {};
+
+    /**
+     * Directory watcher ignore paths
+     */
+    protected String[] watcherIgnorePaths = {};
 
     /**
      * Directory watcher counter limit to run rebuild
@@ -147,8 +158,8 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
         this.siteListResolver = siteListResolver;
     }
 
-    @Required
-    public void setEntitlementValidator(final EntitlementValidator entitlementValidator) {
+    @Autowired
+    public void setEntitlementValidator(@Lazy final EntitlementValidator entitlementValidator) {
         this.entitlementValidator = entitlementValidator;
     }
 
@@ -190,6 +201,11 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
     @Required
     public void setWatcherPaths(final String[] watcherPaths) {
         this.watcherPaths = watcherPaths;
+    }
+
+    @Required
+    public void setWatcherIgnorePaths(final String[] watcherIgnorePaths) {
+        this.watcherIgnorePaths = watcherIgnorePaths;
     }
 
     @Required
@@ -266,6 +282,9 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
             List<Path> paths = Arrays.stream(watcherPaths)
                     .map(resource -> Paths.get(siteRootPath + resource))
                     .collect(Collectors.toList());
+            List<Path> ignorePaths = Arrays.stream(watcherIgnorePaths)
+                    .map(resource -> Paths.get(siteRootPath + resource))
+                    .collect(Collectors.toList());
             DirectoryWatcher watcher = DirectoryWatcher.builder()
                     .paths(paths)
                     .fileHasher(FileHasher.LAST_MODIFIED_TIME)
@@ -274,6 +293,11 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
                             case CREATE:
                             case DELETE:
                             case MODIFY: {
+                                boolean pathIgnored = ignorePaths.stream().anyMatch(ignorePath -> event.path().startsWith(ignorePath));
+                                if (pathIgnored) {
+                                    return;
+                                }
+
                                 String hashValue = event.hash() != null ? event.hash().asString() : "none";
                                 logger.info("File watcher event type: '{}'. File affected: '{}'. Hash value: '{}'", event.eventType(), event.path(), hashValue);
                                 // Only process if the hash is different from the last processed hash value,
@@ -470,7 +494,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
      *
      * @return the context
      */
-    public SiteContext getContext(String siteName, boolean fallback) {
+    public SiteContext getContext(@ValidSiteId String siteName, boolean fallback) {
         SiteContext siteContext = contextRegistry.get(siteName);
         if (siteContext == null) {
             if (!fallback && !siteName.equals(defaultSiteName) && !validateSiteCreationEntitlement()) {

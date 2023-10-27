@@ -19,10 +19,12 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
-       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+       http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
     <import resource="classpath:crafter/core/core-context.xml"/>
     <import resource="classpath:crafter/engine/services/profile-context.xml"/>
@@ -50,6 +52,23 @@
             </list>
         </property>
         <property name="ignoreUnresolvablePlaceholders" value="true"/>
+    </bean>
+
+    <!-- ////////////////////////////////// -->
+    <!--								 	-->
+    <!--			Validations				-->
+    <!--									-->
+    <!-- ////////////////////////////////// -->
+    <mvc:annotation-driven validator="commonValidator">
+        <mvc:path-matching registered-suffixes-only="true" />
+    </mvc:annotation-driven>
+
+    <!--
+    This allows to validate params for "in-line annotated methods"
+    e.g.: public ResponseBody clearCache(@EsapiValidatedParam(type = SITE_ID) @RequestParam String siteId)
+     -->
+    <bean id="methodValidationPostProcessor" class="org.springframework.validation.beanvalidation.MethodValidationPostProcessor">
+        <property name="validator" ref="commonValidator"/>
     </bean>
 
     <!-- Runs after the mode post processors -->
@@ -525,7 +544,6 @@
 
     <bean id="crafter.siteContextResolver" class="org.craftercms.engine.service.context.SiteContextResolverImpl">
         <property name="siteResolver" ref="crafter.siteResolver"/>
-        <property name="siteContextManager" ref="crafter.siteContextManager"/>
         <property name="fallbackSiteName" value="default"/>
     </bean>
 
@@ -546,6 +564,7 @@
         <property name="contextBuildRetryWaitTimeMultiplier" value="${crafter.engine.site.context.build.retry.waitTimeMultiplier}"/>
         <property name="modePreview" value="${crafter.engine.preview}"/>
         <property name="watcherPaths" value="${crafter.engine.watcher.paths}"/>
+        <property name="watcherIgnorePaths" value="${crafter.engine.watcher.ignorePaths}"/>
         <property name="watcherCounterLimit" value="${crafter.engine.watcher.counter.limit}"/>
         <property name="watcherIntervalPeriod" value="${crafter.engine.watcher.interval.period}"/>
     </bean>
@@ -988,7 +1007,6 @@
     <!-- ////////////////////////////////// -->
 
     <bean id="crafter.entitlementsProvider" class="org.craftercms.engine.entitlement.EngineEntitlementUsageProvider">
-        <property name="siteContextManager" ref="crafter.siteContextManager"/>
     </bean>
 
     <!-- ////////////////////////////////// -->

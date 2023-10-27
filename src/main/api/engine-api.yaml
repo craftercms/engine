@@ -4,7 +4,7 @@ servers:
 info:
   description: |-
     Crafter Engine API
-  version: '4.1.1'
+  version: '4.1.2'
   title: Crafter Engine
   termsOfService: ''
   contact:
@@ -33,7 +33,7 @@ tags:
 
 paths:
 
-  /api/1/site/context/id:
+  /api/1/site/context/id.json:
     get:
       security: []
       tags:
@@ -75,7 +75,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
-  /api/1/site/context/status:
+  /api/1/site/context/status.json:
     get:
       security: []
       tags:
@@ -117,7 +117,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
-  /api/1/site/context/destroy:
+  /api/1/site/context/destroy.json:
     get:
       security: []
       tags:
@@ -159,7 +159,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
-  /api/1/site/context/rebuild:
+  /api/1/site/context/rebuild.json:
     get:
       security: []
       tags:
@@ -201,7 +201,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'          
 
-  /api/1/site/context/rebuild_all:
+  /api/1/site/context/rebuild_all.json:
     get:
       security: []
       tags:
@@ -236,7 +236,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'          
                 
-  /api/1/site/context/graphql/rebuild:
+  /api/1/site/context/graphql/rebuild.json:
     get:
       security: []
       tags:
@@ -278,7 +278,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'          
 
-  /api/1/site/jobs/list:
+  /api/1/site/jobs/list.json:
     get:
       security: []
       tags:
@@ -326,7 +326,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'          
 
-  /api/1/site/mappings/reload:
+  /api/1/site/mappings/reload.json:
     get:
       security: []
       tags:
@@ -365,7 +365,7 @@ paths:
                     type: string
                     example: The current resolver is not a ReloadableMappingsSiteResolver. No mappings to reload
   
-  /api/1/site/cache/clear:
+  /api/1/site/cache/clear.json:
     get:
       security: []
       tags:
@@ -406,7 +406,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'          
 
-  /api/1/site/cache/statistics:
+  /api/1/site/cache/statistics.json:
     get:
       security: []
       tags:
@@ -443,7 +443,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'   
 
-  /api/1/site/content_store/item:
+  /api/1/site/content_store/item.json:
     get:
       security: []
       tags:
@@ -599,7 +599,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'                      
 
-  /api/1/site/content_store/children:
+  /api/1/site/content_store/children.json:
     get:
       security: []
       tags:
@@ -861,7 +861,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'        
 
-  /api/1/site/content_store/tree:
+  /api/1/site/content_store/tree.json:
     get:
       security: []
       tags:
@@ -908,7 +908,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'     
 
-  /api/1/profile/get:
+  /api/1/profile/get.json:
     get:
       security: []
       tags:
@@ -943,7 +943,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'        
   
-  /api/1/profile/set:
+  /api/1/profile/set.json:
     get:
       security: []
       tags:
@@ -988,7 +988,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'        
 
-  /api/1/site/navigation/breadcrumb:
+  /api/1/site/navigation/breadcrumb.json:
     get:
       security: []
       tags:
@@ -1037,7 +1037,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'        
 
-  /api/1/site/navigation/tree:
+  /api/1/site/navigation/tree.json:
     get:
       security: []
       tags:
@@ -1103,7 +1103,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'        
 
-  /api/1/site/url/transform:
+  /api/1/site/url/transform.json:
     get:
       security: []
       tags:
@@ -1145,7 +1145,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'        
 
-  /api/1/site/search/search:
+  /api/1/site/search/search.json:
     post:
       security: []
       tags:
@@ -1219,7 +1219,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'        
 
-  /api/1/site/graphql:
+  /api/1/site/graphql.json:
     get:
       security: []
       tags:
@@ -1385,7 +1385,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'   
 
-  /api/1/config/preview:
+  /api/1/config/preview.json:
     get:
       security: []
       tags:
@@ -1413,7 +1413,7 @@ paths:
                     type: boolean                    
                     example: true
 
-  /api/1/monitoring/memory:
+  /api/1/monitoring/memory.json:
     get:
       security: []
       tags:
@@ -1472,7 +1472,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'                      
                                     
-  /api/1/monitoring/status:
+  /api/1/monitoring/status.json:
     get:
       security: []
       tags:
@@ -1516,7 +1516,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
-  /api/1/monitoring/version:
+  /api/1/monitoring/version.json:
     get:
       security: []
       tags:
@@ -1584,7 +1584,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
   
-  /api/1/monitoring/log:
+  /api/1/monitoring/log.json:
     get:
       security: []
       tags:
@@ -1681,7 +1681,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
           
-  /crafter-controller/component:
+  /crafter-controller/component.json:
     get:
       security: []
       tags:
