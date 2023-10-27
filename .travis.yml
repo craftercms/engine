@@ -23,6 +23,7 @@ notifications:
 before_install:
   - mkdir -p $HOME/.m2
   - cp .travis-settings.xml $HOME/.m2/settings.xml
+install: skip
 script:
   - if [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; then bash -c  "mvn deploy --settings .travis-settings.xml";  fi
   - if [[ "$TRAVIS_PULL_REQUEST" != "false" ]]; then bash -c "mvn clean install" ;fi
