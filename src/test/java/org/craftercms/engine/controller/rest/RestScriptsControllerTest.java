@@ -20,6 +20,7 @@ import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.util.cache.CacheTemplate;
+import org.craftercms.engine.exception.HttpStatusCodeException;
 import org.craftercms.engine.plugin.PluginService;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.scripting.impl.GroovyScriptFactory;
@@ -128,15 +129,18 @@ public class RestScriptsControllerTest {
         setCurrentRequest(request);
         setCurrentSiteContext(storeService);
 
-        ResponseEntity responseEntity = controller.handleRequest(request, response);
+        try {
+            ResponseEntity responseEntity = controller.handleRequest(request, response);
+            assertEquals(statusCode, response.getStatus());
 
-        assertEquals(statusCode, response.getStatus());
-
-        Map<String, Object> responseBody = (Map<String, Object>) responseEntity.getBody();
-        assertEquals(message, responseBody.get(RestScriptsController.DEFAULT_ERROR_MESSAGE_MODEL_ATTR_NAME));
-
-        removeCurrentRequest();
-        removeCurrentSiteContext();
+            Map<String, Object> responseBody = (Map<String, Object>) responseEntity.getBody();
+            assertEquals(message, responseBody.get(RestScriptsController.DEFAULT_ERROR_MESSAGE_MODEL_ATTR_NAME));
+        } catch (HttpStatusCodeException e) {
+            assertEquals(statusCode, e.getStatusCode());
+        } finally {
+            removeCurrentRequest();
+            removeCurrentSiteContext();
+        }
     }
 
     private ServletContext createServletContext() {

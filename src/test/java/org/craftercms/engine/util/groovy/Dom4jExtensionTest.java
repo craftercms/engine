@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import groovy.util.GroovyScriptEngine;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.engine.scripting.ScriptFactory;
@@ -29,6 +28,7 @@ import org.craftercms.engine.scripting.impl.GroovyScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.test.utils.CacheTemplateMockUtils;
 import org.craftercms.engine.test.utils.ContentStoreServiceMockUtils;
+import org.craftercms.engine.test.utils.ContextMockUtils;
 import org.dom4j.io.SAXReader;
 import org.junit.Before;
 import org.junit.Test;
@@ -84,6 +84,7 @@ public class Dom4jExtensionTest {
         CacheTemplate cacheTemplate = CacheTemplateMockUtils.createCacheTemplate();
 
         SiteContext siteContext = spy( new SiteContext());
+        when(siteContext.getContext()).thenReturn(ContextMockUtils.createContext());
         when(siteContext.getSiteName()).thenReturn("default");
         when(siteContext.getStoreService()).thenReturn(storeService);
         when(siteContext.getCacheTemplate()).thenReturn(cacheTemplate);
