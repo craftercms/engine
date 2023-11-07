@@ -19,9 +19,11 @@ package org.craftercms.engine.test.utils;
 import org.apache.commons.configuration2.XMLConfiguration;
 import org.craftercms.commons.config.ConfigUtils;
 import org.craftercms.commons.http.RequestContext;
+import org.craftercms.core.service.Context;
 import org.craftercms.engine.service.context.SiteContext;
 import org.junit.After;
 import org.junit.Before;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.springframework.core.io.ClassPathResource;
@@ -46,7 +48,7 @@ public class ConfigAwareTestBase {
         MockitoAnnotations.initMocks(this);
 
         when(siteContext.getSiteName()).thenReturn("test");
-        when(siteContext.getContext()).thenReturn(ContextMockUtils.createContext());
+        when(siteContext.getContext()).thenReturn(Mockito.mock(Context.class));
 
         setCurrentRequestContext();
         setCurrentSiteContext();
