@@ -32,7 +32,6 @@ import org.craftercms.engine.test.utils.ContentStoreServiceMockUtils;
 import org.dom4j.io.SAXReader;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
