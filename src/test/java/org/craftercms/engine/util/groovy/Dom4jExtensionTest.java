@@ -85,7 +85,7 @@ public class Dom4jExtensionTest {
         CacheTemplate cacheTemplate = CacheTemplateMockUtils.createCacheTemplate();
 
         SiteContext siteContext = spy( new SiteContext());
-        when(siteContext.getContext()).thenReturn(Mockito.mock(Context.class));
+        when(siteContext.getContext()).thenReturn(mock(Context.class));
         when(siteContext.getSiteName()).thenReturn("default");
         when(siteContext.getStoreService()).thenReturn(storeService);
         when(siteContext.getCacheTemplate()).thenReturn(cacheTemplate);
