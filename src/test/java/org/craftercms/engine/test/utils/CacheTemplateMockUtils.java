@@ -34,13 +34,13 @@ public class CacheTemplateMockUtils {
 
     @SuppressWarnings("unchecked")
     public static void setUpWithNoCaching(CacheTemplate mock) {
-        when(mock.getObject(any(Context.class), any(Callback.class), any())).then(invocation -> {
+        when(mock.getObject(any(Context.class), any(Callback.class), any(Object[].class))).then(invocation -> {
             Object[] args = invocation.getArguments();
             Callback<?> callback = (Callback<?>) args[1];
 
             return callback.execute();
         });
-        when(mock.getObject(any(Context.class), any(CachingOptions.class), any(Callback.class), any())).then(
+        when(mock.getObject(any(Context.class), any(CachingOptions.class), any(Callback.class), any(Object[].class))).then(
                 invocation -> {
                     Object[] args = invocation.getArguments();
                     Callback<?> callback = (Callback<?>) args[2];
