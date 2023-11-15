@@ -276,6 +276,10 @@
         <constructor-arg index="0" ref="crafter.securityFilterChain"/>
     </bean>
 
+    <!--    This is meant to be in preview mode context with a PreviewAccessTokenFilter -->
+    <bean id="crafter.previewSecurityFilter" class="org.craftercms.engine.util.spring.security.NoopFilter">
+    </bean>
+
     <!-- Secure Headers -->
 
     <util:list id="crafter.secureHeaderWriters">
