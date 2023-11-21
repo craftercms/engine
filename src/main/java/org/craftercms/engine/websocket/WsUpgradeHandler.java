@@ -47,6 +47,10 @@ public class WsUpgradeHandler implements HttpUpgradeHandler {
         this.sock = sock;
     }
 
+    /**
+     * Forward back and forth the websocket stream between websocket server and web client via engine as the proxy
+     * @param wc the WebConnection object associated to this upgrade request
+     */
     @Override
     public void init(WebConnection wc) {
         logger.debug("* Websocket| Upgrade begin");
@@ -54,10 +58,11 @@ public class WsUpgradeHandler implements HttpUpgradeHandler {
             var servletIn = wc.getInputStream();
             var servletOut = wc.getOutputStream();
             future = exec.submit(() -> {
-                logger.debug("> Websocket| Backend -> Client");
+                logger.debug("> Websocket| Websocket server -> Engine");
                 int i = 0;
                 try {
                     int bs;
+                    // Read data from Websocket server -> Engine and write to Client
                     while ((bs = sockIn.read()) != -1) {
                         servletOut.write(bs);
                         servletOut.flush();
@@ -72,10 +77,11 @@ public class WsUpgradeHandler implements HttpUpgradeHandler {
                 return null;
             });
 
-            logger.debug("> Websocket| Client -> Backend");
+            logger.debug("> Websocket| Client -> Engine");
             int i = 0;
             int bs;
             try {
+                // Read data from Client -> Engine and write to Websocket server
                 while ((bs = servletIn.read()) != -1) {
                     sockOut.write(bs);
                     i++;
