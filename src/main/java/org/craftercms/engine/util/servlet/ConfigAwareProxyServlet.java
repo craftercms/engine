@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.Socket;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -122,9 +123,12 @@ public class ConfigAwareProxyServlet extends ProxyServlet {
     }
 
     /**
-     * Handle a websocket request by upgrading requests with 101 responses
-     * @param servletRequest request
-     * @param servletResponse response
+     * Handle the initial handshake request for websocket connection and establish the websocket.
+     * A WebSocket interaction begins with an HTTP request that uses the HTTP Upgrade header to upgrade to the WebSocket protocol.
+     * This method first forward the handshake request to the websocket server and read the response.
+     * If the response is 101, use {@link WsUpgradeHandler} to establish the websocket proxy among client <==> engine <==> websocket server.
+     * @param servletRequest servlet request from client
+     * @param servletResponse servlet response to client
      */
     private void websocketHandlerService(HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws IOException, ServletException {
         //initialize request attributes from caches if unset by a subclass by this point
@@ -137,77 +141,124 @@ public class ConfigAwareProxyServlet extends ProxyServlet {
         String proxyRequestUri = rewriteUrlFromRequest(servletRequest);
         URL url = new URL(proxyRequestUri);
 
-        Socket sock = new Socket(url.getHost(), url.getPort());
+        // Create a new socket connection to the websocket server
+        Socket socketProxyClient = new Socket(url.getHost(), url.getPort());
         boolean closeSocket = false;
         try {
-            var sockIn = sock.getInputStream();
-            var sockOut = sock.getOutputStream();
+            var socketIn = socketProxyClient.getInputStream();
+            var sockOut = socketProxyClient.getOutputStream();
 
-            StringBuilder req = new StringBuilder(512);
-            req.append("GET " + url.getFile()).append(" HTTP/1.1");
-            logger.debug("> Websocket|", req);
-            req.append("\r\n");
-            var headerNames = servletRequest.getHeaderNames();
-            while (headerNames.hasMoreElements()) {
-                var name = headerNames.nextElement();
-                String header = servletRequest.getHeader(name);
-                logger.debug("> Websocket| {}:{}", name, header);
-                req.append(name + ": " + header + "\r\n");
-            }
-            req.append("\r\n");
-
-            sockOut.write(req.toString().getBytes(StandardCharsets.UTF_8));
+            // Send the handshake request from engine to the websocket server
+            String handshakeRequest = getProxyHandshakeRequest(servletRequest, url);
+            sockOut.write(handshakeRequest.getBytes(StandardCharsets.UTF_8));
             sockOut.flush();
 
-            StringBuilder responseBytes = new StringBuilder(512);
-            int b = 0;
-            while (b != -1) {
-                b = sockIn.read();
-                if (b != -1) {
-                    responseBytes.append((char) b);
-                    var len = responseBytes.length();
-                    if (len >= 4
-                            && responseBytes.charAt(len - 4) == '\r'
-                            && responseBytes.charAt(len - 3) == '\n'
-                            && responseBytes.charAt(len - 2) == '\r'
-                            && responseBytes.charAt(len - 1) == '\n'
-                    ) {
-                        break;
-                    }
-                }
-            }
-
-            String[] rows = responseBytes.toString().split("\r\n");
-
-            String response = rows[0];
-            logger.debug("< Websocket| '{}'", response);
-
-            int idx1 = response.indexOf(' ');
-            int idx2 = response.indexOf(' ', idx1 + 1);
-
-            for (int i = 1; i < rows.length; i++) {
-                String line = rows[i];
-                int idx3 = line.indexOf(":");
-                String k = line.substring(0, idx3);
-                String headerField = line.substring(idx3 + 2);
-                logger.debug("< Websocket| {}:{}", k, headerField);
-                servletResponse.setHeader(k, headerField);
-            }
-
-            int respCode = Integer.parseInt(response.substring(idx1 + 1, idx2));
-            if (respCode != HttpServletResponse.SC_SWITCHING_PROTOCOLS) {
+            // Get handshake response from websocket server to engine
+            String[] responseLines = getProxyHandshakeResponse(socketIn);
+            addProxyResponseHeaders(responseLines, servletResponse);
+            int respCode = proxyHandshakeResponseCode(responseLines);
+            if (respCode != HttpServletResponse.SC_SWITCHING_PROTOCOLS) {   // The websocket handshake failed, close the connection
                 servletResponse.setStatus(respCode);
                 servletResponse.flushBuffer();
                 logger.debug("< Websocket| Flush");
                 closeSocket = true;
-            } else {
+            } else { // The websocket handshake succeeded, establish the websocket connection
                 var upgradeHandler = servletRequest.upgrade(WsUpgradeHandler.class);
-                upgradeHandler.preInit(exec, sockIn, sockOut, sock);
+                upgradeHandler.preInit(exec, socketIn, sockOut, socketProxyClient);
             }
         } finally {
             if (closeSocket) {
-                sock.close();
+                socketProxyClient.close();
             }
+        }
+    }
+
+    /**
+     * Get the handshake request to websocket server
+     * @param servletRequest original servlet request from client
+     * @param serverUrl websocket server url
+     * @return GET request for handshaking websocket connection
+     */
+    private String getProxyHandshakeRequest(HttpServletRequest servletRequest, URL serverUrl) {
+        StringBuilder req = new StringBuilder(512);
+        req.append("GET " + serverUrl.getFile()).append(" HTTP/1.1");
+        logger.debug("> Websocket|", req);
+        req.append("\r\n");
+        var headerNames = servletRequest.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
+            var name = headerNames.nextElement();
+            String header = servletRequest.getHeader(name);
+            logger.debug("> Websocket| {}:{}", name, header);
+            req.append(name + ": " + header + "\r\n");
+        }
+        req.append("\r\n");
+
+        return req.toString();
+    }
+
+    /**
+     * Get the websocket handshake responses lines
+     * Sample of response:
+     *  HTTP/1.1 101 Switching Protocols
+     *  Upgrade: websocket
+     *  Connection: Upgrade
+     *  Sec-WebSocket-Accept: xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+     * @param socketIn input stream to websocket client (engine)
+     * @return responses lines
+     * @throws IOException
+     */
+    private String[] getProxyHandshakeResponse(InputStream socketIn) throws IOException {
+        StringBuilder responseBytes = new StringBuilder(512);
+        int b = 0;
+        while (b != -1) {
+            b = socketIn.read();
+            if (b != -1) {
+                responseBytes.append((char) b);
+                var len = responseBytes.length();
+                if (len >= 4
+                        && responseBytes.charAt(len - 4) == '\r'
+                        && responseBytes.charAt(len - 3) == '\n'
+                        && responseBytes.charAt(len - 2) == '\r'
+                        && responseBytes.charAt(len - 1) == '\n'
+                ) {
+                    break;
+                }
+            }
+        }
+
+        String[] lines = responseBytes.toString().split("\r\n");
+        logger.debug("< Websocket| '{}'", lines[0]);
+
+        return lines;
+    }
+
+    /**
+     * Get the handshake response code from the response lines
+     * Sample of first response line: `HTTP/1.1 101 Switching Protocols`
+     * This method will get the index of first and second space character and then split the status code
+     * @param lines response lines
+     * @return the status code (101 in case of success)
+     */
+    private int proxyHandshakeResponseCode(String[] lines) {
+        int idx1 = lines[0].indexOf(' ');
+        int idx2 = lines[0].indexOf(' ', idx1 + 1);
+        int respCode = Integer.parseInt(lines[0].substring(idx1 + 1, idx2));
+        return respCode;
+    }
+
+    /**
+     * Add the handshake response headers to clients response headers
+     * @param lines response lines
+     * @param servletResponse original servlet response to client
+     */
+    private void addProxyResponseHeaders(String[] lines, HttpServletResponse servletResponse) {
+        for (int i = 1; i < lines.length; i++) {
+            String line = lines[i];
+            int index = line.indexOf(":");
+            String k = line.substring(0, index);
+            String headerField = line.substring(index + 2);
+            logger.debug("< Websocket| {}:{}", k, headerField);
+            servletResponse.setHeader(k, headerField);
         }
     }
 
