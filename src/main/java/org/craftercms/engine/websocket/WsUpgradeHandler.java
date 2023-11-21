@@ -35,16 +35,16 @@ public class WsUpgradeHandler implements HttpUpgradeHandler {
     private static final Logger logger = LoggerFactory.getLogger(WsUpgradeHandler.class);
 
     ExecutorService exec;
-    InputStream sockIn;
-    OutputStream sockOut;
-    Socket sock;
+    InputStream socketIn;
+    OutputStream socketOut;
+    Socket socket;
     Future<?> future;
 
-    public void preInit(ExecutorService exec, InputStream sockIn, OutputStream sockOut, Socket sock) {
+    public void preInit(ExecutorService exec, InputStream socketIn, OutputStream socketOut, Socket socket) {
         this.exec = exec;
-        this.sockIn = sockIn;
-        this.sockOut = sockOut;
-        this.sock = sock;
+        this.socketIn = socketIn;
+        this.socketOut = socketOut;
+        this.socket = socket;
     }
 
     /**
@@ -63,7 +63,7 @@ public class WsUpgradeHandler implements HttpUpgradeHandler {
                 try {
                     int bs;
                     // Read data from Websocket server -> Engine and write to Client
-                    while ((bs = sockIn.read()) != -1) {
+                    while ((bs = socketIn.read()) != -1) {
                         servletOut.write(bs);
                         servletOut.flush();
                         i++;
@@ -83,13 +83,13 @@ public class WsUpgradeHandler implements HttpUpgradeHandler {
             try {
                 // Read data from Client -> Engine and write to Websocket server
                 while ((bs = servletIn.read()) != -1) {
-                    sockOut.write(bs);
+                    socketOut.write(bs);
                     i++;
                 }
             } catch (Exception exc) {
                 logger.debug("> Websocket| Connection interrupted", exc);
             } finally {
-                sockOut.close();
+                socketOut.close();
             }
             logger.debug("> Websocket| Done: {}", i);
 
@@ -110,7 +110,7 @@ public class WsUpgradeHandler implements HttpUpgradeHandler {
             future.cancel(true);
         }
         try {
-            sock.close();
+            socket.close();
         } catch (IOException ex) {
             logger.debug("Exception while closing socket", ex);
         }

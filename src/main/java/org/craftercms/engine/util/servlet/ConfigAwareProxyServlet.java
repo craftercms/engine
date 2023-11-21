@@ -146,12 +146,12 @@ public class ConfigAwareProxyServlet extends ProxyServlet {
         boolean closeSocket = false;
         try {
             var socketIn = socketProxyClient.getInputStream();
-            var sockOut = socketProxyClient.getOutputStream();
+            var socketOut = socketProxyClient.getOutputStream();
 
             // Send the handshake request from engine to the websocket server
             String handshakeRequest = getProxyHandshakeRequest(servletRequest, url);
-            sockOut.write(handshakeRequest.getBytes(StandardCharsets.UTF_8));
-            sockOut.flush();
+            socketOut.write(handshakeRequest.getBytes(StandardCharsets.UTF_8));
+            socketOut.flush();
 
             // Get handshake response from websocket server to engine
             String[] responseLines = getProxyHandshakeResponse(socketIn);
@@ -164,7 +164,7 @@ public class ConfigAwareProxyServlet extends ProxyServlet {
                 closeSocket = true;
             } else { // The websocket handshake succeeded, establish the websocket connection
                 var upgradeHandler = servletRequest.upgrade(WsUpgradeHandler.class);
-                upgradeHandler.preInit(exec, socketIn, sockOut, socketProxyClient);
+                upgradeHandler.preInit(exec, socketIn, socketOut, socketProxyClient);
             }
         } finally {
             if (closeSocket) {
