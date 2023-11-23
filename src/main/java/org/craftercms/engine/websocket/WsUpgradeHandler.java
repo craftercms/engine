@@ -59,43 +59,21 @@ public class WsUpgradeHandler implements HttpUpgradeHandler {
             var servletOut = wc.getOutputStream();
             future = exec.submit(() -> {
                 logger.debug("> Websocket| Websocket server -> Engine");
-                int i = 0;
                 try {
-                    int bs;
-                    // Read data from Websocket server -> Engine and write to Client
-                    while ((bs = socketIn.read()) != -1) {
-                        servletOut.write(bs);
-                        servletOut.flush();
-                        i++;
-                    }
-                } catch (Exception exc) {
-                    logger.debug("> Websocket| Connection interrupted", exc);
-                } finally {
-                    servletOut.close();
+                    forwardStreamData(socketIn, servletOut, true);
+                } catch (IOException e) {
+                    logger.error("Error while forwarding websocket stream", e);
                 }
-                logger.debug("< Websocket| Done: '{}'", i);
+
                 return null;
             });
 
             logger.debug("> Websocket| Client -> Engine");
-            int i = 0;
-            int bs;
-            try {
-                // Read data from Client -> Engine and write to Websocket server
-                while ((bs = servletIn.read()) != -1) {
-                    socketOut.write(bs);
-                    i++;
-                }
-            } catch (Exception exc) {
-                logger.debug("> Websocket| Connection interrupted", exc);
-            } finally {
-                socketOut.close();
-            }
-            logger.debug("> Websocket| Done: {}", i);
+            forwardStreamData(servletIn, socketOut, false);
 
             future.get();
-        } catch (Exception ex) {
-            logger.error("Error while initializing websocket connection", ex);
+        } catch (Exception e) {
+            logger.error("Error while forwarding websocket stream", e);
         } finally {
             if (future != null) {
                 future.cancel(true);
@@ -115,5 +93,31 @@ public class WsUpgradeHandler implements HttpUpgradeHandler {
             logger.debug("Exception while closing socket", ex);
         }
         logger.debug("* Websocket| Upgrade close");
+    }
+
+    /**
+     * Forward the whole bytes from an input stream to an output stream
+     * @param inputStream the input stream to read bytes from
+     * @param outputStream the output stream to write bytes into
+     * @param flushOutput true to flush output stream right after reading each block
+     * @throws IOException if there is an error close the output stream
+     */
+    private void forwardStreamData(InputStream inputStream, OutputStream outputStream, boolean flushOutput) throws IOException {
+        int i = 0;
+        int bs;
+        try {
+            while ((bs = inputStream.read()) != -1) {
+                outputStream.write(bs);
+                if (flushOutput) {
+                    outputStream.flush();
+                }
+                i++;
+            }
+        } catch (Exception exc) {
+            logger.debug("> Websocket| Read/Write streams interrupted", exc);
+        } finally {
+            socketOut.close();
+        }
+        logger.debug("> Websocket| Done: {}", i);
     }
 }
