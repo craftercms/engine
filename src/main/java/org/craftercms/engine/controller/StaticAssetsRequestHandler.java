@@ -18,9 +18,7 @@ package org.craftercms.engine.controller;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -81,17 +79,18 @@ public class StaticAssetsRequestHandler extends ResourceHttpRequestHandler {
     }
 
     @Override
-    public void handleRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        Resource resource = getResource(request);
-        if (resource != null) {
-            MediaType mediaType = getMediaType(request, resource);
-            if (mediaType.equals(MediaType.TEXT_HTML)) {
-                response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-            }
+    protected MediaType getMediaType(HttpServletRequest request, Resource resource) {
+        MediaType mediaType = super.getMediaType(request, resource);
+        MediaType textType = MediaType.parseMediaType("text/*");
+        if (textType.includes(mediaType)) {
+            return MediaType.parseMediaType(new StringBuilder()
+                    .append(mediaType)
+                    .append("; charset=")
+                    .append(StandardCharsets.UTF_8.name())
+                    .toString());
         }
 
-        super.handleRequest(request, response);
+        return mediaType;
     }
 
     @Override
