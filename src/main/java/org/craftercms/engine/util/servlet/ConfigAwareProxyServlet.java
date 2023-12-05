@@ -189,7 +189,10 @@ public class ConfigAwareProxyServlet extends ProxyServlet {
             var name = headerNames.nextElement();
             String header = servletRequest.getHeader(name);
             logger.debug("> Websocket| {}:{}", name, header);
-            req.append(name + ": " + header + "\r\n");
+            req.append(name)
+                .append(": ")
+                .append(header)
+                .append("\r\n");
         }
         req.append("\r\n");
 
