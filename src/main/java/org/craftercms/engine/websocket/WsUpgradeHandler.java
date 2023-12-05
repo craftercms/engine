@@ -33,6 +33,7 @@ import java.util.concurrent.Future;
 public class WsUpgradeHandler implements HttpUpgradeHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(WsUpgradeHandler.class);
+    private static final int WEBSOCKET_READ_BUFFER = 1024 * 4; // 4KB
 
     ExecutorService exec;
     InputStream socketIn;
@@ -104,10 +105,11 @@ public class WsUpgradeHandler implements HttpUpgradeHandler {
      */
     private void forwardStreamData(InputStream inputStream, OutputStream outputStream, boolean flushOutput) throws IOException {
         int i = 0;
-        int bs;
+        int count;
         try {
-            while ((bs = inputStream.read()) != -1) {
-                outputStream.write(bs);
+            byte[] buffer = new byte[WEBSOCKET_READ_BUFFER];
+            while ((count = inputStream.read(buffer)) > 0) {
+                outputStream.write(buffer, 0, count);
                 if (flushOutput) {
                     outputStream.flush();
                 }
