@@ -154,9 +154,9 @@ public class ConfigAwareProxyServlet extends ProxyServlet {
             socketOut.flush();
 
             // Get handshake response from websocket server to engine
-            String[] responseLines = getProxyHandshakeResponse(socketIn);
-            addProxyResponseHeaders(responseLines, servletResponse);
-            int respCode = proxyHandshakeResponseCode(responseLines);
+            String[] headers = getProxyHandshakeResponseHeaders(socketIn);
+            addProxyResponseHeaders(headers, servletResponse);
+            int respCode = getProxyHandshakeStatusCode(headers);
             if (respCode != HttpServletResponse.SC_SWITCHING_PROTOCOLS) {   // The websocket handshake failed, close the connection
                 servletResponse.setStatus(respCode);
                 servletResponse.flushBuffer();
@@ -210,7 +210,7 @@ public class ConfigAwareProxyServlet extends ProxyServlet {
      * @return responses lines
      * @throws IOException
      */
-    private String[] getProxyHandshakeResponse(InputStream socketIn) throws IOException {
+    private String[] getProxyHandshakeResponseHeaders(InputStream socketIn) throws IOException {
         StringBuilder responseBytes = new StringBuilder(512);
         int b = 0;
         while (b != -1) {
@@ -239,29 +239,29 @@ public class ConfigAwareProxyServlet extends ProxyServlet {
      * Get the handshake response code from the response lines
      * Sample of first response line: `HTTP/1.1 101 Switching Protocols`
      * This method will get the index of first and second space character and then split the status code
-     * @param lines response lines
+     * @param headers response headers
      * @return the status code (101 in case of success)
      */
-    private int proxyHandshakeResponseCode(String[] lines) {
-        int idx1 = lines[0].indexOf(' ');
-        int idx2 = lines[0].indexOf(' ', idx1 + 1);
-        int respCode = Integer.parseInt(lines[0].substring(idx1 + 1, idx2));
+    private int getProxyHandshakeStatusCode(String[] headers) {
+        int idx1 = headers[0].indexOf(' ');
+        int idx2 = headers[0].indexOf(' ', idx1 + 1);
+        int respCode = Integer.parseInt(headers[0].substring(idx1 + 1, idx2));
         return respCode;
     }
 
     /**
      * Add the handshake response headers to clients response headers
-     * @param lines response lines
+     * @param headers response headers
      * @param servletResponse original servlet response to client
      */
-    private void addProxyResponseHeaders(String[] lines, HttpServletResponse servletResponse) {
-        for (int i = 1; i < lines.length; i++) {
-            String line = lines[i];
-            int index = line.indexOf(":");
-            String k = line.substring(0, index);
-            String headerField = line.substring(index + 2);
-            logger.debug("< Websocket| {}:{}", k, headerField);
-            servletResponse.setHeader(k, headerField);
+    private void addProxyResponseHeaders(String[] headers, HttpServletResponse servletResponse) {
+        for (int i = 1; i < headers.length; i++) {
+            String header = headers[i];
+            int index = header.indexOf(":");
+            String key = header.substring(0, index);
+            String headerField = header.substring(index + 2);
+            logger.debug("< Websocket| {}:{}", key, headerField);
+            servletResponse.setHeader(key, headerField);
         }
     }
 
