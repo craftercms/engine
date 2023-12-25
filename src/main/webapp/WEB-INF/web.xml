@@ -57,6 +57,11 @@
     </listener>
 
     <filter>
+        <filter-name>crafter.secureHeaderWriterFilter</filter-name>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+    </filter>
+
+    <filter>
         <filter-name>log4jServletFilter</filter-name>
         <filter-class>org.apache.logging.log4j.web.Log4jServletFilter</filter-class>
     </filter>
@@ -116,11 +121,6 @@
     </filter>
 
     <filter>
-        <filter-name>crafter.secureHeaderWriterFilter</filter-name>
-        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
-    </filter>
-
-    <filter>
         <filter-name>crafter.securityFilter</filter-name>
         <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
     </filter>
@@ -144,6 +144,12 @@
         <filter-name>crafter.httpHeadersRewriteFilter</filter-name>
         <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
     </filter>
+
+    <filter-mapping>
+        <filter-name>crafter.secureHeaderWriterFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+    </filter-mapping>
 
     <filter-mapping>
         <filter-name>log4jServletFilter</filter-name>
@@ -217,12 +223,6 @@
         <dispatcher>REQUEST</dispatcher>
         <dispatcher>FORWARD</dispatcher>
         <dispatcher>INCLUDE</dispatcher>
-    </filter-mapping>
-
-    <filter-mapping>
-        <filter-name>crafter.secureHeaderWriterFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-        <dispatcher>REQUEST</dispatcher>
     </filter-mapping>
 
     <filter-mapping>
