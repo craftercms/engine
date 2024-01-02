@@ -23,6 +23,8 @@ import org.craftercms.core.exception.CrafterException;
  */
 public class ScriptException extends CrafterException {
 
+    public static final String MODIFY_PROPERTY_EXCEPTION_FORMAT = "Property '%s' is not modifiable.";
+
     public ScriptException(String message, Throwable cause) {
         super(message, cause);
     }

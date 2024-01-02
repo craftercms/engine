@@ -25,8 +25,12 @@ import org.apache.commons.collections.CollectionUtils;
 import org.craftercms.commons.converters.Converter;
 import org.craftercms.core.service.Item;
 import org.craftercms.core.service.Tree;
+import org.craftercms.engine.exception.ScriptException;
 import org.dom4j.Document;
 import org.dom4j.Element;
+
+import static java.lang.String.format;
+import static org.craftercms.engine.exception.ScriptException.MODIFY_PROPERTY_EXCEPTION_FORMAT;
 
 /**
  * Basic adapter to a {@link Item}, enhanced with methods that can be easily invoked in template engines like Freemarker.
@@ -36,14 +40,14 @@ import org.dom4j.Element;
  */
 public class DefaultSiteItem extends AbstractXmlSiteItem {
 
-    protected Item item;
-    protected List<SiteItem> childItems;
-    protected Comparator<SiteItem> sortComparator;
+    private final ImmutableItem item;
+    private List<SiteItem> childItems;
+    private final Comparator<SiteItem> sortComparator;
 
     public DefaultSiteItem(Item item, Converter<Element, Object> modelFieldConverter,
                         Comparator<SiteItem> sortComparator) {
         super(modelFieldConverter);
-        this.item = item;
+        this.item = ImmutableItem.copyOf(item);
         this.sortComparator = sortComparator;
     }
 
@@ -89,8 +93,8 @@ public class DefaultSiteItem extends AbstractXmlSiteItem {
     @Override
     public List<SiteItem> getChildItems() {
         if (childItems == null) {
-            if (item instanceof Tree) {
-                List<Item> treeChildren = ((Tree) item).getChildren();
+            if ((Item) item instanceof Tree) {
+                List<Item> treeChildren = ((Tree) (Item) item).getChildren();
                 if (CollectionUtils.isNotEmpty(treeChildren)) {
                     childItems = new ArrayList<>(treeChildren.size());
                     for (Item treeChild : treeChildren) {
@@ -109,6 +113,10 @@ public class DefaultSiteItem extends AbstractXmlSiteItem {
         }
 
         return childItems;
+    }
+
+    public void setChildItems(List<SiteItem> childItems) {
+        throw new ScriptException(format(MODIFY_PROPERTY_EXCEPTION_FORMAT, "childItems"));
     }
 
     @Override
