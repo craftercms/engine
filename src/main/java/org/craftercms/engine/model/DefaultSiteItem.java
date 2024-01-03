@@ -40,9 +40,9 @@ import static org.craftercms.engine.exception.ScriptException.MODIFY_PROPERTY_EX
  */
 public class DefaultSiteItem extends AbstractXmlSiteItem {
 
-    private final ImmutableItem item;
-    private List<SiteItem> childItems;
-    private final Comparator<SiteItem> sortComparator;
+    protected ImmutableItem item;
+    protected List<SiteItem> childItems;
+    protected Comparator<SiteItem> sortComparator;
 
     public DefaultSiteItem(Item item, Converter<Element, Object> modelFieldConverter,
                         Comparator<SiteItem> sortComparator) {
@@ -54,6 +54,14 @@ public class DefaultSiteItem extends AbstractXmlSiteItem {
     @Override
     public Item getItem() {
         return item;
+    }
+
+    public void setItem(Item item) {
+        throw new ScriptException(format(MODIFY_PROPERTY_EXCEPTION_FORMAT, "item"));
+    }
+
+    public void setSortComparator(Comparator<SiteItem> sortComparator) {
+        throw new ScriptException(format(MODIFY_PROPERTY_EXCEPTION_FORMAT, "sortComparator"));
     }
 
     @Override
