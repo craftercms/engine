@@ -54,6 +54,23 @@
         <ref bean="crafter.forbiddenUrlsFilter"/>
     </util:list>
 
+    <bean id="crafter.previewSecurityFilterChain"
+          class="org.craftercms.engine.util.spring.security.DefaultSecurityFilterChain">
+        <constructor-arg name="securityEnabled" value="${crafter.security.preview.enabled}"/>
+        <constructor-arg name="urlsToExclude" value="${crafter.security.preview.urlsToExclude}"/>
+        <constructor-arg name="filters">
+            <util:list>
+                <bean class="org.craftercms.engine.util.spring.security.preview.PreviewAccessTokenFilter">
+                    <constructor-arg name="encryptor" ref="crafter.textEncryptor"/>
+                </bean>
+            </util:list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="crafter.previewSecurityFilter" class="org.springframework.security.web.FilterChainProxy">
+        <constructor-arg index="0" ref="crafter.previewSecurityFilterChain"/>
+    </bean>
+
     <util:list id="crafter.authenticationProviders">
         <!-- Add Targeting support -->
         <ref bean="crafter.targetingAuthenticationProvider"/>

@@ -17,6 +17,7 @@ package org.craftercms.engine.controller;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FilenameUtils;
@@ -31,6 +32,7 @@ import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.CacheControl;
+import org.springframework.http.MediaType;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 
@@ -74,6 +76,21 @@ public class StaticAssetsRequestHandler extends ResourceHttpRequestHandler {
 
     public void setDisableCaching(final boolean disableCaching) {
         this.disableCaching = disableCaching;
+    }
+
+    @Override
+    protected MediaType getMediaType(HttpServletRequest request, Resource resource) {
+        MediaType mediaType = super.getMediaType(request, resource);
+        MediaType textType = MediaType.parseMediaType("text/*");
+        if (textType.includes(mediaType)) {
+            return MediaType.parseMediaType(new StringBuilder()
+                    .append(mediaType)
+                    .append("; charset=")
+                    .append(StandardCharsets.UTF_8.name())
+                    .toString());
+        }
+
+        return mediaType;
     }
 
     @Override

@@ -105,7 +105,6 @@ public class SiteHealthCheckServiceImplTest {
     public void firstCheckFailsTest() {
         // If a check fails, there is no need to execute the others
         when(healthChecks.get(0).checkHealth(SITE1)).thenReturn(false);
-        when(healthChecks.get(1).checkHealth(SITE1)).thenReturn(true);
         when(siteListResolver.getSiteList()).thenReturn(List.of(SITE1));
 
         assertFalse("Health check should return false if there are no sites passing the checks", siteHealthCheckService.healthCheck());

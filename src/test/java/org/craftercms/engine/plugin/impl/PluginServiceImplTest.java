@@ -69,6 +69,8 @@ public class PluginServiceImplTest {
     public void setUp() throws IOException {
         SiteContext.setCurrent(siteContext);
 
+        pluginService.configurationPathPattern = "/config/plugins/${pluginId}/config.xml";
+
         when(contentStoreService.exists(any(), eq(PLUGIN_CONFIG_PATH))).thenReturn(true);
         when(contentStoreService.getContent(any(), eq(PLUGIN_CONFIG_PATH))).thenReturn(content);
     }

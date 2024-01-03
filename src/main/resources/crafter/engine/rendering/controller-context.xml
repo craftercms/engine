@@ -22,10 +22,15 @@
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
-       http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+    http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
+    <!-- ////////////////////////////////// -->
+    <!--								 	-->
+    <!--			Validations				-->
+    <!--									-->
+    <!-- ////////////////////////////////// -->
     <mvc:annotation-driven validator="commonValidator">
-        <mvc:path-matching registered-suffixes-only="true" />
+        <mvc:path-matching registered-suffixes-only="true"/>
     </mvc:annotation-driven>
 
     <!--
