@@ -720,6 +720,8 @@
         <constructor-arg name="enableTranslation" value="${crafter.engine.translation.enable}"/>
         <property name="filterQueries" value="${crafter.engine.search.filters}"/>
     </bean>
+    <alias name="crafter.searchService" alias="crafter.elasticsearchService"/>
+    <alias name="crafter.searchClient" alias="crafter.elasticsearchClient"/>
 
     <bean id="crafter.searchClient" class="org.craftercms.engine.search.SiteAwareOpenSearchClient">
         <constructor-arg name="client">
