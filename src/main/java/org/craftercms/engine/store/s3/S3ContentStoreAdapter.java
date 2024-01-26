@@ -152,7 +152,13 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
         }
 
         S3Context s3Context = (S3Context) context;
-        String key = StringUtils.appendIfMissing(s3Context.getKey(), path);
+        String key = s3Context.getKey();
+
+        if (StringUtils.isNotEmpty(key)) {
+            key = StringUtils.appendIfMissing(key, path);
+        } else {
+            key = StringUtils.stripStart(path, DELIMITER);
+        }
 
         logger.debug("Getting file for key {}", key);
 
