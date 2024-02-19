@@ -43,7 +43,7 @@ public class DefaultSiteItem extends AbstractXmlSiteItem {
     public DefaultSiteItem(Item item, Converter<Element, Object> modelFieldConverter,
                         Comparator<SiteItem> sortComparator) {
         super(modelFieldConverter);
-        this.item = new Item(item);
+        this.item = item;
         this.sortComparator = sortComparator;
     }
 

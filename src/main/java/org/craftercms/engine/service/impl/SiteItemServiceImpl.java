@@ -139,7 +139,7 @@ public class SiteItemServiceImpl implements SiteItemService {
 
         Item item = storeService.findItem(context.getContext(), null, url, processor);
         if (item != null && (predicate == null || predicate.evaluate(item))) {
-            return createItemWrapper(item);
+            return createItemWrapper(new Item(item));
         } else {
             return null;
         }
@@ -174,7 +174,7 @@ public class SiteItemServiceImpl implements SiteItemService {
 
         Tree tree = storeService.findTree(getSiteContext().getContext(), null, url, depth, filter, processor);
         if (tree != null) {
-            return createItemWrapper(tree);
+            return createItemWrapper(new Tree(tree));
         } else {
             return null;
         }
@@ -233,7 +233,7 @@ public class SiteItemServiceImpl implements SiteItemService {
 
         Tree tree = storeService.findTree(getSiteContext().getContext(), null, url, depth, compositeFilter, null);
         if (tree != null) {
-            return createItemWrapper(tree);
+            return createItemWrapper(new Tree(tree));
         } else {
             return null;
         }
