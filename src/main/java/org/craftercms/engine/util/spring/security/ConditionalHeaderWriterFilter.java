@@ -37,6 +37,7 @@ public class ConditionalHeaderWriterFilter extends HeaderWriterFilter {
     @ConstructorProperties({"enabled", "headerWriters"})
     public ConditionalHeaderWriterFilter(boolean enabled, List<HeaderWriter> headerWriters) {
         super(headerWriters);
+        super.setShouldWriteHeadersEagerly(true);
         this.enabled = enabled;
     }
 
