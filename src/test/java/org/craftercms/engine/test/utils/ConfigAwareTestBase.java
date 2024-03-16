@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2024 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -22,7 +22,6 @@ import org.craftercms.commons.http.RequestContext;
 import org.craftercms.engine.service.context.SiteContext;
 import org.junit.After;
 import org.junit.Before;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.springframework.core.io.ClassPathResource;
@@ -51,7 +50,7 @@ public class ConfigAwareTestBase {
         setCurrentRequestContext();
         setCurrentSiteContext();
 
-        config = ConfigUtils.readXmlConfiguration(new ClassPathResource("config/site-config.xml"), ',', null);
+        config = ConfigUtils.readXmlConfiguration(new ClassPathResource("config/site-config.xml"), ',', null, null);
 
         when(siteContext.getConfig()).thenReturn(config);
     }

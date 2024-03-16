@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2024 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -16,9 +16,11 @@
 
 package org.craftercms.engine.store.s3;
 
+import com.amazonaws.services.s3.AmazonS3URI;
 import org.craftercms.core.service.ContextImpl;
 import org.craftercms.core.store.ContentStoreAdapter;
-import com.amazonaws.services.s3.AmazonS3URI;
+
+import java.util.Map;
 
 /**
  * Implementation of {@link org.craftercms.core.service.Context} for AWS S3.
@@ -34,8 +36,9 @@ public class S3Context extends ContextImpl {
 
     public S3Context(final String id, final ContentStoreAdapter storeAdapter, final String rootFolderPath,
                      final boolean mergingOn, final boolean cacheOn, final int maxAllowedItemsInCache,
-                     final boolean ignoreHiddenFiles, final AmazonS3URI rootFolderUri) {
-        super(id, storeAdapter, rootFolderPath, mergingOn, cacheOn, maxAllowedItemsInCache, ignoreHiddenFiles);
+                     final boolean ignoreHiddenFiles, final AmazonS3URI rootFolderUri,
+                     final Map<String, String> configurationVariables) {
+        super(id, storeAdapter, rootFolderPath, mergingOn, cacheOn, maxAllowedItemsInCache, ignoreHiddenFiles, configurationVariables);
         this.rootFolderUri = rootFolderUri;
     }
 
