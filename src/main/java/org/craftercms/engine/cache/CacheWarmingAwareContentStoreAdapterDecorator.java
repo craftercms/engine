@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2024 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 /**
@@ -59,10 +60,10 @@ public class CacheWarmingAwareContentStoreAdapterDecorator implements ContentSto
 
     @Override
     public Context createContext(String id, String rootFolderPath, boolean mergingOn, boolean cacheOn,
-                                 int maxAllowedItemsInCache, boolean ignoreHiddenFiles)
+                                 int maxAllowedItemsInCache, boolean ignoreHiddenFiles, Map<String, String> configurationVariables)
             throws RootFolderNotFoundException, StoreException, AuthenticationException {
         Context context = actualStoreAdapter.createContext(id, rootFolderPath, mergingOn, cacheOn,
-                                                           maxAllowedItemsInCache, ignoreHiddenFiles);
+                                                           maxAllowedItemsInCache, ignoreHiddenFiles, configurationVariables);
         if (warmUpEnabled) {
             return new PreloadedFoldersAwareContext(context, actualStoreAdapter, cacheService);
         } else {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2024 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -94,6 +94,9 @@ import static org.craftercms.engine.util.GroovyScriptUtils.getCompilerConfigurat
 public class SiteContextFactory implements ApplicationContextAware, ServletContextAware {
 
     public static final String DEFAULT_SITE_NAME_MACRO_NAME = "siteName";
+    public static final String SITE_NAME_CONFIG_VARIABLE = "siteName";
+    public static final String SITE_ID_CONFIG_VARIABLE = "siteId";
+
     public static final long DEFAULT_INIT_TIMEOUT = 300000L;
     public static final String CONFIG_BEAN_NAME = "siteConfig";
     public static final long DEFAULT_SHUTDOWN_TIMEOUT = 5;
@@ -362,9 +365,11 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         }
 
         String resolvedRootFolderPath = macroResolver.resolveMacros(rootFolderPath, macroValues);
-
+        Map<String, String> configVariables = new HashMap<>();
+        configVariables.put(SITE_NAME_CONFIG_VARIABLE, siteName);
+        configVariables.put(SITE_ID_CONFIG_VARIABLE, siteName);
         Context context = storeService.getContext(UUID.randomUUID().toString(), storeType, resolvedRootFolderPath,
-                                                  mergingOn, cacheOn, maxAllowedItemsInCache, ignoreHiddenFiles);
+                                                  mergingOn, cacheOn, maxAllowedItemsInCache, ignoreHiddenFiles, configVariables);
 
         try {
             SiteContext siteContext = new SiteContext();
@@ -485,7 +490,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             for (int i = configPaths.length - 1; i >= 0; i--) {
                 Resource config = resourceLoader.getResource(configPaths[i]);
                 if (config.exists()) {
-                    return configurationReader.readXmlConfiguration(config);
+                    return configurationReader.readXmlConfiguration(config, siteContext.getContext().getConfigLookupVariables());
                 }
             }
             return null;
@@ -656,7 +661,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             while(iterator.hasPrevious()) {
                 Resource resource = resourceLoader.getResource(iterator.previous());
                 if (resource.exists()) {
-                    return configurationReader.readXmlConfiguration(resource);
+                    return configurationReader.readXmlConfiguration(resource, siteContext.getContext().getConfigLookupVariables());
                 }
             }
             return null;
@@ -682,7 +687,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             while(iterator.hasPrevious()) {
                 Resource resource = resourceLoader.getResource(iterator.previous());
                 if (resource.exists()) {
-                    return configurationReader.readXmlConfiguration(resource);
+                    return configurationReader.readXmlConfiguration(resource, siteContext.getContext().getConfigLookupVariables());
                 }
             }
             return null;
