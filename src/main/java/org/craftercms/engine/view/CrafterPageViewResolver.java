@@ -33,7 +33,6 @@ import org.craftercms.engine.security.CrafterPageAccessManager;
 import org.craftercms.engine.service.SiteItemService;
 import org.craftercms.engine.service.UrlTransformationService;
 import org.craftercms.engine.service.context.SiteContext;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.Ordered;
 import org.springframework.web.context.support.WebApplicationObjectSupport;
 import org.springframework.web.servlet.View;
@@ -81,9 +80,33 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
     protected CrafterPageAccessManager accessManager;
     protected boolean disableVariableRestrictions;
 
-    public CrafterPageViewResolver() {
+    public CrafterPageViewResolver(String renderUrlToStoreUrlTransformerName, String storeUrlToRenderUrlTransformerName,
+                                   String toFullHttpsUrlTransformerName, UrlTransformationService urlTransformationService,
+                                   CacheTemplate cacheTemplate, SiteItemService siteItemService, String pageViewNameXPathQuery,
+                                   String redirectUrlXPathQuery, String contentTypeXPathQuery, String redirectContentType,
+                                   String disabledXPathQuery, String mimeTypeXPathQuery, String forceHttpsXPathQuery,
+                                   SiteItemScriptResolver scriptResolver, ViewResolver delegatedViewResolver,
+                                   UserAgentTemplateDetector userAgentTemplateDetector, CrafterPageAccessManager accessManager) {
         order = 10;
         cachingOptions = CachingOptions.DEFAULT_CACHING_OPTIONS;
+
+        this.renderUrlToStoreUrlTransformerName = renderUrlToStoreUrlTransformerName;
+        this.storeUrlToRenderUrlTransformerName = storeUrlToRenderUrlTransformerName;
+        this.toFullHttpsUrlTransformerName = toFullHttpsUrlTransformerName;
+        this.urlTransformationService = urlTransformationService;
+        this.cacheTemplate = cacheTemplate;
+        this.siteItemService = siteItemService;
+        this.pageViewNameXPathQuery = pageViewNameXPathQuery;
+        this.redirectUrlXPathQuery = redirectUrlXPathQuery;
+        this.contentTypeXPathQuery = contentTypeXPathQuery;
+        this.redirectContentType = redirectContentType;
+        this.disabledXPathQuery = disabledXPathQuery;
+        this.mimeTypeXPathQuery = mimeTypeXPathQuery;
+        this.scriptResolver = scriptResolver;
+        this.forceHttpsXPathQuery = forceHttpsXPathQuery;
+        this.delegatedViewResolver = delegatedViewResolver;
+        this.userAgentTemplateDetector = userAgentTemplateDetector;
+        this.accessManager = accessManager;
     }
 
     @Override
@@ -99,93 +122,8 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
         this.cacheUrlTransformations = cacheUrlTransformations;
     }
 
-    @Required
-    public void setRenderUrlToStoreUrlTransformerName(String renderUrlToStoreUrlTransformerName) {
-        this.renderUrlToStoreUrlTransformerName = renderUrlToStoreUrlTransformerName;
-    }
-
-    @Required
-    public void setStoreUrlToRenderUrlTransformerName(String storeUrlToRenderUrlTransformerName) {
-        this.storeUrlToRenderUrlTransformerName = storeUrlToRenderUrlTransformerName;
-    }
-
-    @Required
-    public void setToFullHttpsUrlTransformerName(String toFullHttpsUrlTransformerName) {
-        this.toFullHttpsUrlTransformerName = toFullHttpsUrlTransformerName;
-    }
-
-    @Required
-    public void setUrlTransformationService(UrlTransformationService urlTransformationService) {
-        this.urlTransformationService = urlTransformationService;
-    }
-
-    @Required
-    public void setCacheTemplate(CacheTemplate cacheTemplate) {
-        this.cacheTemplate = cacheTemplate;
-    }
-
     public void setCachingOptions(CachingOptions cachingOptions) {
         this.cachingOptions = cachingOptions;
-    }
-
-    @Required
-    public void setSiteItemService(SiteItemService siteItemService) {
-        this.siteItemService = siteItemService;
-    }
-
-    @Required
-    public void setPageViewNameXPathQuery(String pageViewNameXPathQuery) {
-        this.pageViewNameXPathQuery = pageViewNameXPathQuery;
-    }
-
-    @Required
-    public void setRedirectUrlXPathQuery(String redirectUrlXPathQuery) {
-        this.redirectUrlXPathQuery = redirectUrlXPathQuery;
-    }
-
-    @Required
-    public void setContentTypeXPathQuery(String contentTypeXPathQuery) {
-        this.contentTypeXPathQuery = contentTypeXPathQuery;
-    }
-
-    @Required
-    public void setRedirectContentType(String redirectContentType) {
-        this.redirectContentType = redirectContentType;
-    }
-
-    @Required
-    public void setDisabledXPathQuery(String disabledXPathQuery) {
-        this.disabledXPathQuery = disabledXPathQuery;
-    }
-
-    @Required
-    public void setMimeTypeXPathQuery(String mimeTypeXPathQuery) {
-        this.mimeTypeXPathQuery = mimeTypeXPathQuery;
-    }
-
-    @Required
-    public void setScriptResolver(SiteItemScriptResolver scriptResolver) {
-        this.scriptResolver = scriptResolver;
-    }
-
-    @Required
-    public void setForceHttpsXPathQuery(String forceHttpsXPathQuery) {
-        this.forceHttpsXPathQuery = forceHttpsXPathQuery;
-    }
-
-    @Required
-    public void setDelegatedViewResolver(ViewResolver delegatedViewResolver) {
-        this.delegatedViewResolver = delegatedViewResolver;
-    }
-
-    @Required
-    public void setUserAgentTemplateDetector(UserAgentTemplateDetector userAgentTemplateDetector) {
-        this.userAgentTemplateDetector = userAgentTemplateDetector;
-    }
-
-    @Required
-    public void setAccessManager(CrafterPageAccessManager accessManager) {
-        this.accessManager = accessManager;
     }
 
     public void setDisableVariableRestrictions(boolean disableVariableRestrictions) {
@@ -270,17 +208,11 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
 
                         return getCurrentPageHttpsRedirectView();
                     } else {
-                        UserAgentAwareCrafterPageView view = new UserAgentAwareCrafterPageView();
+                        UserAgentAwareCrafterPageView view = new UserAgentAwareCrafterPageView(
+                                page, locale, pageViewNameXPathQuery, mimeTypeXPathQuery,
+                                loadScripts(siteContext.getScriptFactory(), page),
+                                delegatedViewResolver, userAgentTemplateDetector);
                         view.setServletContext(getServletContext());
-                        view.setPage(page);
-                        view.setLocale(locale);
-                        view.setPageViewNameXPathQuery(pageViewNameXPathQuery);
-                        view.setMimeTypeXPathQuery(mimeTypeXPathQuery);
-                        view.setDelegatedViewResolver(delegatedViewResolver);
-                        view.setUserAgentTemplateDetector(userAgentTemplateDetector);
-
-                        loadScripts(siteContext.getScriptFactory(), page, view);
-
                         return applyLifecycleMethods(page.getStoreUrl(), view);
                     }
                 } else {
@@ -294,24 +226,27 @@ public class CrafterPageViewResolver extends WebApplicationObjectSupport impleme
         }
     }
 
-    protected void loadScripts(ScriptFactory scriptFactory, SiteItem page, CrafterPageView view) {
-        if (scriptFactory != null) {
-            List<String> scriptUrls = scriptResolver.getScriptUrls(page);
-            if (CollectionUtils.isNotEmpty(scriptUrls)) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Scripts associated to page " + page.getStoreUrl() + ": " + scriptUrls);
-                }
-
-                List<Script> scripts = new ArrayList<>(scriptUrls.size());
-
-                for (String scriptUrl : scriptUrls) {
-                    Script script = scriptFactory.getScript(scriptUrl);
-                    scripts.add(script);
-                }
-
-                view.setScripts(scripts);
-            }
+    protected  List<Script> loadScripts(ScriptFactory scriptFactory, SiteItem page) {
+        if (scriptFactory == null) {
+            return new ArrayList<>();
         }
+
+        List<String> scriptUrls = scriptResolver.getScriptUrls(page);
+        if (CollectionUtils.isEmpty(scriptUrls)) {
+            return new ArrayList<>();
+        }
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Scripts associated to page " + page.getStoreUrl() + ": " + scriptUrls);
+        }
+
+        List<Script> scripts = new ArrayList<>(scriptUrls.size());
+
+        for (String scriptUrl : scriptUrls) {
+            Script script = scriptFactory.getScript(scriptUrl);
+            scripts.add(script);
+        }
+        return scripts;
     }
 
     protected View applyLifecycleMethods(String viewName, View view) {

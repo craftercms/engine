@@ -49,7 +49,7 @@
 
     <bean id="crafter.internalAssetsRequestHandler" class="org.craftercms.engine.controller.StaticAssetsRequestHandler"
           init-method="init">
-        <property name="contentStoreService" ref="crafter.contentStoreService"/>
+        <constructor-arg name="contentStoreService" ref="crafter.contentStoreService"/>
         <property name="disableCaching" value="${crafter.engine.staticAssets.disableCaching}"/>
         <property name="staticAssetsPath" value="${crafter.engine.internalAssets.path}"/>
     </bean>

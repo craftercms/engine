@@ -20,7 +20,6 @@ import java.util.Map;
 
 import graphql.schema.DataFetchingEnvironment;
 import org.craftercms.engine.service.UrlTransformationService;
-import org.springframework.beans.factory.annotation.Required;
 
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
@@ -39,8 +38,7 @@ public class UrlTransformDataFetcher extends RequestAwareDataFetcher {
      */
     protected UrlTransformationService urlTransformationService;
 
-    @Required
-    public void setUrlTransformationService(final UrlTransformationService urlTransformationService) {
+    public UrlTransformDataFetcher(final UrlTransformationService urlTransformationService) {
         this.urlTransformationService = urlTransformationService;
     }
 

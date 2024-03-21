@@ -25,18 +25,18 @@
     <import resource="classpath:crafter/profile/client-context.xml"/>
 
     <bean id="crafter.defaultTenantResolver" class="org.craftercms.security.utils.tenant.DefaultTenantsResolver">
-        <property name="defaultTenantNames" value="${crafter.security.tenant.default.names}"/>
+        <constructor-arg name="defaultTenantNames" value="${crafter.security.tenant.default.names}"/>
     </bean>
 
     <bean id="crafter.paramTenantResolver" class="org.craftercms.security.utils.tenant.ParamTenantsResolver"/>
 
     <bean id="crafter.tenantsResolver" class="org.craftercms.security.utils.tenant.TenantsResolverChain">
-        <property name="resolvers">
+        <constructor-arg name="resolvers">
             <list>
                 <ref bean="crafter.paramTenantResolver"/>
                 <ref bean="crafter.defaultTenantResolver"/>
             </list>
-        </property>
+        </constructor-arg>
     </bean>
 
     <bean id="crafter.guavaCacheAuthenticationCache" class="org.craftercms.commons.cache.GuavaCacheFactoryBean">
@@ -51,9 +51,9 @@
 
     <bean id="crafter.profileAuthenticationManager"
           class="org.craftercms.security.authentication.impl.AuthenticationManagerImpl">
-        <property name="authenticationService" ref="crafter.authenticationServiceRestClient"/>
-        <property name="authenticationCache" ref="crafter.authenticationCache"/>
-        <property name="profileService" ref="crafter.profileServiceRestClient"/>
+        <constructor-arg name="authenticationService" ref="crafter.authenticationServiceRestClient"/>
+        <constructor-arg name="profileService" ref="crafter.profileServiceRestClient"/>
+        <constructor-arg name="authenticationCache" ref="crafter.authenticationCache"/>
     </bean>
 
     <bean id="crafter.profileAuthenticationProvider"

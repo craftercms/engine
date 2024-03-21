@@ -22,7 +22,6 @@ import org.craftercms.core.service.Context;
 import org.craftercms.engine.service.context.SiteContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Required;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -40,19 +39,8 @@ public class SiteCacheWarmerImpl implements SiteCacheWarmer {
     protected CacheService cacheService;
     protected List<ContextCacheWarmer> contextCacheWarmers;
 
-    /**
-     * Sets the {@link CacheService}
-     */
-    @Required
-    public void setCacheService(CacheService cacheService) {
+    public SiteCacheWarmerImpl(CacheService cacheService, List<ContextCacheWarmer> contextCacheWarmers) {
         this.cacheService = cacheService;
-    }
-
-    /**
-     * Sets the list of {@link ContextCacheWarmer} used to perfotm the warm up
-     */
-    @Required
-    public void setContextCacheWarmers(List<ContextCacheWarmer> contextCacheWarmers) {
         this.contextCacheWarmers = contextCacheWarmers;
     }
 

@@ -18,17 +18,16 @@ package org.craftercms.engine.servlet.filter;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.craftercms.engine.http.ExceptionHandler;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Top level filter used for handling uncaught and unhandled exceptions within the code.
@@ -39,8 +38,7 @@ public class ExceptionHandlingFilter implements Filter {
 
     private List<ExceptionHandler> exceptionHandlers;
 
-    @Required
-    public void setExceptionHandlers(List<ExceptionHandler> exceptionHandlers) {
+    public ExceptionHandlingFilter(List<ExceptionHandler> exceptionHandlers) {
         this.exceptionHandlers = exceptionHandlers;
     }
 

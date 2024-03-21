@@ -59,8 +59,7 @@ public class ConfigurationScriptJobResolverTest {
         setUpStoreService(storeService);
         setUpSiteContext(siteContext, storeService);
 
-        resolver = new ConfigurationScriptJobResolver();
-        resolver.setScriptSuffix(".groovy");
+        resolver = new ConfigurationScriptJobResolver(".groovy");
     }
 
     @Test

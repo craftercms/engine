@@ -18,7 +18,7 @@ package org.craftercms.engine.controller;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -28,7 +28,6 @@ import org.craftercms.commons.lang.UrlUtils;
 import org.craftercms.core.service.Content;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.engine.service.context.SiteContext;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.CacheControl;
@@ -65,8 +64,7 @@ public class StaticAssetsRequestHandler extends ResourceHttpRequestHandler {
         }
     }
 
-    @Required
-    public void setContentStoreService(ContentStoreService contentStoreService) {
+    public StaticAssetsRequestHandler(ContentStoreService contentStoreService) {
         this.contentStoreService = contentStoreService;
     }
 

@@ -29,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Lazy;
@@ -129,13 +128,33 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
      */
     protected boolean modePreview;
 
-    public SiteContextManager() {
+    public SiteContextManager(SiteContextFactory contextFactory, SiteContextFactory fallbackContextFactory,
+                              final SiteListResolver siteListResolver, boolean waitForContextInit,
+                              Executor jobThreadPoolExecutor, final String defaultSiteName, final int contextBuildRetryMaxCount,
+                              final long contextBuildRetryWaitTimeBase, final int contextBuildRetryWaitTimeMultiplier,
+                              final boolean modePreview, final String[] watcherPaths, final String[] watcherIgnorePaths,
+                              final int watcherCounterLimit, final int watcherIntervalPeriod) {
         siteLockFactory = new WeakKeyBasedReentrantLockFactory();
         contextRegistry = new ConcurrentHashMap<>();
         directoryWatcherRegistry = new ConcurrentHashMap<>();
         directoryWatcherLastProcessedHash = new HashMap<>();
         directoryWatcherCounter = new ConcurrentHashMap<>();
         directoryWatcherExecutor = new ConcurrentHashMap<>();
+
+        this.contextFactory = contextFactory;
+        this.fallbackContextFactory = fallbackContextFactory;
+        this.siteListResolver = siteListResolver;
+        this.waitForContextInit = waitForContextInit;
+        this.jobThreadPoolExecutor = jobThreadPoolExecutor;
+        this.defaultSiteName = defaultSiteName;
+        this.contextBuildRetryMaxCount = contextBuildRetryMaxCount;
+        this.contextBuildRetryWaitTimeBase = contextBuildRetryWaitTimeBase;
+        this.contextBuildRetryWaitTimeMultiplier = contextBuildRetryWaitTimeMultiplier;
+        this.modePreview = modePreview;
+        this.watcherPaths = watcherPaths;
+        this.watcherIgnorePaths = watcherIgnorePaths;
+        this.watcherCounterLimit = watcherCounterLimit;
+        this.watcherIntervalPeriod = watcherIntervalPeriod;
     }
 
     @Override
@@ -143,79 +162,9 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
         this.applicationContext = applicationContext;
     }
 
-    @Required
-    public void setContextFactory(SiteContextFactory contextFactory) {
-        this.contextFactory = contextFactory;
-    }
-
-    @Required
-    public void setFallbackContextFactory(SiteContextFactory fallbackContextFactory) {
-        this.fallbackContextFactory = fallbackContextFactory;
-    }
-
-    @Required
-    public void setSiteListResolver(final SiteListResolver siteListResolver) {
-        this.siteListResolver = siteListResolver;
-    }
-
     @Autowired
     public void setEntitlementValidator(@Lazy final EntitlementValidator entitlementValidator) {
         this.entitlementValidator = entitlementValidator;
-    }
-
-    @Required
-    public void setWaitForContextInit(boolean waitForContextInit) {
-        this.waitForContextInit = waitForContextInit;
-    }
-
-    @Required
-    public void setJobThreadPoolExecutor(Executor jobThreadPoolExecutor) {
-        this.jobThreadPoolExecutor = jobThreadPoolExecutor;
-    }
-
-    @Required
-    public void setDefaultSiteName(final String defaultSiteName) {
-        this.defaultSiteName = defaultSiteName;
-    }
-
-    @Required
-    public void setContextBuildRetryMaxCount(final int contextBuildRetryMaxCount) {
-        this.contextBuildRetryMaxCount = contextBuildRetryMaxCount;
-    }
-
-    @Required
-    public void setContextBuildRetryWaitTimeBase(final long contextBuildRetryWaitTimeBase) {
-        this.contextBuildRetryWaitTimeBase = contextBuildRetryWaitTimeBase;
-    }
-
-    @Required
-    public void setContextBuildRetryWaitTimeMultiplier(final int contextBuildRetryWaitTimeMultiplier) {
-        this.contextBuildRetryWaitTimeMultiplier = contextBuildRetryWaitTimeMultiplier;
-    }
-
-    @Required
-    public void setModePreview(final boolean modePreview) {
-        this.modePreview = modePreview;
-    }
-
-    @Required
-    public void setWatcherPaths(final String[] watcherPaths) {
-        this.watcherPaths = watcherPaths;
-    }
-
-    @Required
-    public void setWatcherIgnorePaths(final String[] watcherIgnorePaths) {
-        this.watcherIgnorePaths = watcherIgnorePaths;
-    }
-
-    @Required
-    public void setWatcherCounterLimit(final int watcherCounterLimit) {
-        this.watcherCounterLimit = watcherCounterLimit;
-    }
-
-    @Required
-    public void setWatcherIntervalPeriod(final int watcherIntervalPeriod) {
-        this.watcherIntervalPeriod = watcherIntervalPeriod;
     }
 
     public void destroy() {

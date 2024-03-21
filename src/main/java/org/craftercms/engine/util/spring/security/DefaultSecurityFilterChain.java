@@ -19,8 +19,8 @@ package org.craftercms.engine.util.spring.security;
 import java.beans.ConstructorProperties;
 import java.util.List;
 import java.util.stream.Stream;
-import javax.servlet.Filter;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.Filter;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;

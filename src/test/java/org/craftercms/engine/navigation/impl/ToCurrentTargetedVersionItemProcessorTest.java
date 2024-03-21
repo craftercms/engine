@@ -21,6 +21,7 @@ import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Item;
 import org.craftercms.core.url.UrlTransformationEngine;
 import org.craftercms.engine.service.context.SiteContext;
+import org.craftercms.engine.targeting.impl.LocaleTargetIdManager;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -42,11 +43,8 @@ public class ToCurrentTargetedVersionItemProcessorTest {
 
     @Before
     public void setUp() throws Exception {
-        processor = new ToCurrentTargetedVersionItemProcessor();
-        processor.setToCurrentTargetedUrlTransformerName(TRANSFORMER_NAME);
-        processor.setUrlTransformationEngine(createUrlTransformationEngine());
-        processor.setStoreService(createContentStoreService());
-
+        processor = new ToCurrentTargetedVersionItemProcessor(TRANSFORMER_NAME, createUrlTransformationEngine(),
+                createContentStoreService(), new LocaleTargetIdManager());
         setUpCurrentConfig();
     }
 

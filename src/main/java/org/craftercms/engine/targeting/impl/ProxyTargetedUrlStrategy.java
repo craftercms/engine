@@ -18,6 +18,7 @@ package org.craftercms.engine.targeting.impl;
 import org.craftercms.engine.targeting.TargetedUrlComponents;
 import org.craftercms.engine.targeting.TargetedUrlStrategy;
 import org.craftercms.engine.util.spring.AbstractProxyBean;
+import org.craftercms.engine.util.spring.ApplicationContextAccessor;
 
 /**
  * {@link TargetedUrlStrategy} that proxies to the strategy defined in the site application context, or if not
@@ -26,6 +27,10 @@ import org.craftercms.engine.util.spring.AbstractProxyBean;
  * @author avasquez
  */
 public class ProxyTargetedUrlStrategy extends AbstractProxyBean<TargetedUrlStrategy> implements TargetedUrlStrategy {
+
+    public ProxyTargetedUrlStrategy(ApplicationContextAccessor applicationContext, String beanName) {
+        super(applicationContext, beanName);
+    }
 
     @Override
     public boolean isFileNameBasedStrategy() {

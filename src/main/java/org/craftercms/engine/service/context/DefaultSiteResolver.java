@@ -18,9 +18,7 @@ package org.craftercms.engine.service.context;
 
 import java.util.Collection;
 import java.util.Collections;
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.beans.factory.annotation.Required;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * {@link org.craftercms.engine.service.context.SiteResolver} that resolves always the current site name to a default
@@ -32,8 +30,7 @@ public class DefaultSiteResolver implements SiteListResolver, SiteResolver {
 
     private String defaultSiteName;
 
-    @Required
-    public void setDefaultSiteName(String defaultSiteName) {
+    public DefaultSiteResolver(String defaultSiteName) {
         this.defaultSiteName = defaultSiteName;
     }
 

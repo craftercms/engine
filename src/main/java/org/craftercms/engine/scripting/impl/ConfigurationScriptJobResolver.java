@@ -19,7 +19,7 @@ package org.craftercms.engine.scripting.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
@@ -32,7 +32,6 @@ import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.ContentStoreUtils;
 import org.craftercms.engine.util.SchedulingUtils;
 import org.craftercms.engine.util.quartz.JobContext;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.context.ServletContextAware;
 
 /**
@@ -62,8 +61,7 @@ public class ConfigurationScriptJobResolver implements ScriptJobResolver, Servle
     protected ServletContext servletContext;
     protected boolean disableVariableRestrictions;
 
-    @Required
-    public void setScriptSuffix(String scriptSuffix) {
+    public ConfigurationScriptJobResolver(String scriptSuffix) {
         this.scriptSuffix = scriptSuffix;
     }
 

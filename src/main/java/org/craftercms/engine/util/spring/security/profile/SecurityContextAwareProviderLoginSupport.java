@@ -18,15 +18,19 @@ package org.craftercms.engine.util.spring.security.profile;
 
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
+import org.craftercms.commons.crypto.TextEncryptor;
+import org.craftercms.profile.api.services.ProfileService;
 import org.craftercms.security.authentication.Authentication;
+import org.craftercms.security.authentication.AuthenticationManager;
 import org.craftercms.security.exception.AuthenticationException;
 import org.craftercms.security.social.impl.ProviderLoginSupportImpl;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
+import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.social.connect.web.ConnectSupport;
 
 /**
@@ -36,6 +40,12 @@ import org.springframework.social.connect.web.ConnectSupport;
  * @since 3.1.5
  */
 public class SecurityContextAwareProviderLoginSupport extends ProviderLoginSupportImpl {
+
+    public SecurityContextAwareProviderLoginSupport(ConnectionFactoryLocator connectionFactoryLocator,
+                                                    ProfileService profileService, AuthenticationManager authenticationManager,
+                                                    TextEncryptor textEncryptor) {
+        super(connectionFactoryLocator, profileService, authenticationManager, textEncryptor);
+    }
 
     @Override
     public Authentication complete(final String tenant, final String providerId, final HttpServletRequest request,

@@ -16,10 +16,10 @@
 package org.craftercms.engine.util;
 
 import java.util.Map;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.configuration2.Configuration;
 import org.codehaus.groovy.control.CompilerConfiguration;

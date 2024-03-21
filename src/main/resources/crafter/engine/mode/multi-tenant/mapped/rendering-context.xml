@@ -38,7 +38,7 @@
 
     <bean id="crafter.siteMappingsRestController"
           class="org.craftercms.engine.controller.rest.multitenant.SiteMappingsRestController">
-        <property name="siteResolver" ref="crafter.mappingsSiteResolver"/>
+        <constructor-arg name="siteResolver" ref="crafter.mappingsSiteResolver"/>
     </bean>
 
 </beans>

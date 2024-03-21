@@ -30,8 +30,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.Size;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.Size;
 import java.beans.ConstructorProperties;
 import java.util.List;
 

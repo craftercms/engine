@@ -19,9 +19,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,7 +29,7 @@ import org.craftercms.engine.http.ExceptionHandler;
 import org.springframework.web.util.UriUtils;
 
 /**
- * Handles {@link javax.servlet.ServletException}s that are thrown when a view can't be resolved.
+ * Handles {@link jakarta.servlet.ServletException}s that are thrown when a view can't be resolved.
  *
  * @author Alfonso Vásquez
  */

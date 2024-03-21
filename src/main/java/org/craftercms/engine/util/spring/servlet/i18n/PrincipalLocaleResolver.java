@@ -21,7 +21,7 @@ import org.craftercms.engine.util.spring.security.CustomUser;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Locale;
 
 import static org.craftercms.commons.locale.LocaleUtils.parseLocale;

@@ -16,7 +16,6 @@
 package org.craftercms.engine.view;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.core.util.ExceptionUtils;
@@ -26,14 +25,13 @@ import org.craftercms.engine.exception.RenderingException;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.scripting.Script;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.view.AbstractView;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -70,38 +68,18 @@ public class CrafterPageView extends AbstractView implements CachingAwareObject,
     protected ViewResolver delegatedViewResolver;
     protected boolean disableVariableRestrictions;
 
+    public CrafterPageView(SiteItem page, Locale locale, String pageViewNameXPathQuery, String mimeTypeXPathQuery,
+                           List<Script> scripts, ViewResolver delegatedViewResolver) {
+        this.page = page;
+        this.locale = locale;
+        this.pageViewNameXPathQuery = pageViewNameXPathQuery;
+        this.mimeTypeXPathQuery = mimeTypeXPathQuery;
+        this.scripts = scripts;
+        this.delegatedViewResolver = delegatedViewResolver;
+    }
+
     public SiteItem getPage() {
         return page;
-    }
-
-    @Required
-    public void setPage(SiteItem page) {
-        this.page = page;
-    }
-
-    @Required
-    public void setLocale(Locale locale) {
-        this.locale = locale;
-    }
-
-    @Required
-    public void setPageViewNameXPathQuery(String pageViewNameXPathQuery) {
-        this.pageViewNameXPathQuery = pageViewNameXPathQuery;
-    }
-
-    @Required
-    public void setMimeTypeXPathQuery(String mimeTypeXPathQuery) {
-        this.mimeTypeXPathQuery = mimeTypeXPathQuery;
-    }
-
-    @Required
-    public void setScripts(List<Script> scripts) {
-        this.scripts = scripts;
-    }
-
-    @Required
-    public void setDelegatedViewResolver(ViewResolver delegatedViewResolver) {
-        this.delegatedViewResolver = delegatedViewResolver;
     }
 
     @Override

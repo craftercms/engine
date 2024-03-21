@@ -24,7 +24,6 @@ import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.service.context.SiteContextManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 
@@ -63,20 +62,17 @@ public class DeploymentEventsWatcher implements ApplicationListener<ApplicationE
     private Map<String, Properties> latestDeploymentEvents;
     private Map<String, SiteEvent> latestSiteContextEvents;
 
-    public DeploymentEventsWatcher() {
+    public DeploymentEventsWatcher(SiteContextManager siteContextManager) {
         this.deploymentEventsFileUrl = DEFAULT_DEPLOYMENT_EVENTS_FILE_URL;
         this.startupCompleted = false;
         this.latestDeploymentEvents = new ConcurrentHashMap<>();
         this.latestSiteContextEvents = new ConcurrentHashMap<>();
+
+        this.siteContextManager = siteContextManager;
     }
 
     public void setDeploymentEventsFileUrl(String deploymentEventsFileUrl) {
         this.deploymentEventsFileUrl = deploymentEventsFileUrl;
-    }
-
-    @Required
-    public void setSiteContextManager(SiteContextManager siteContextManager) {
-        this.siteContextManager = siteContextManager;
     }
 
     public void checkForEvents() {

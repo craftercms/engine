@@ -20,6 +20,7 @@ import java.util.Collections;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Item;
 import org.craftercms.core.url.UrlTransformationEngine;
+import org.craftercms.engine.targeting.impl.LocaleTargetIdManager;
 import org.dom4j.Document;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,10 +43,8 @@ public class FolderToIndexItemProcessorTest {
 
     @Before
     public void setUp() throws Exception {
-        processor = new FolderToIndexItemProcessor();
-        processor.setFolderToIndexUrlTransformerName(TRANSFORMER_NAME);
-        processor.setUrlTransformationEngine(createUrlTransformationEngine());
-        processor.setStoreService(createContentStoreService());
+        processor = new FolderToIndexItemProcessor(TRANSFORMER_NAME, createUrlTransformationEngine(),
+                createContentStoreService(), new LocaleTargetIdManager());
     }
 
     @Test

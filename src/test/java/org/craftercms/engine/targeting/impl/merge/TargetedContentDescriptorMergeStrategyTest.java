@@ -68,8 +68,7 @@ public class TargetedContentDescriptorMergeStrategyTest {
 
     @Before
     public void setUp() throws Exception {
-        mergeStrategy = new TargetedContentDescriptorMergeStrategy();
-        mergeStrategy.setLevelDescriptorFileName(LEVEL_DESCRIPTOR_FILENAME);
+        mergeStrategy = new TargetedContentDescriptorMergeStrategy(LEVEL_DESCRIPTOR_FILENAME);
         mergeStrategy.setMergeStrategyResolver(createStrategyResolver(mergeStrategy));
         mergeStrategy.setCandidateTargetedUrlsResolver(createCandidateUrlsResolver());
 
@@ -115,15 +114,13 @@ public class TargetedContentDescriptorMergeStrategyTest {
     }
 
     private DescriptorMergeStrategyResolver createStrategyResolver(DescriptorMergeStrategy defaultMergeStrategy) {
-        InheritLevelsMergeStrategy inheritLevelsMergeStrategy = new InheritLevelsMergeStrategy();
-        inheritLevelsMergeStrategy.setLevelDescriptorFileName(LEVEL_DESCRIPTOR_FILENAME);
+        InheritLevelsMergeStrategy inheritLevelsMergeStrategy = new InheritLevelsMergeStrategy(LEVEL_DESCRIPTOR_FILENAME);
 
         Map<String, DescriptorMergeStrategy> mappings = new LinkedHashMap<>(2);
         mappings.put("/site/website/products/index.xml", inheritLevelsMergeStrategy);
         mappings.put(".*", defaultMergeStrategy);
 
-        UrlPatternMergeStrategyResolver strategyResolver = new UrlPatternMergeStrategyResolver();
-        strategyResolver.setUrlPatternToStrategyMappings(mappings);
+        UrlPatternMergeStrategyResolver strategyResolver = new UrlPatternMergeStrategyResolver(mappings);
 
         return strategyResolver;
     }
@@ -131,15 +128,12 @@ public class TargetedContentDescriptorMergeStrategyTest {
     private CandidateTargetedUrlsResolver createCandidateUrlsResolver() {
         LocaleTargetIdManager targetIdManager = new LocaleTargetIdManager();
 
-        TargetedUrlByFolderStrategy targetUrlStrategy = new TargetedUrlByFolderStrategy();
-        targetUrlStrategy.setTargetIdManager(targetIdManager);
+        TargetedUrlByFolderStrategy targetUrlStrategy = new TargetedUrlByFolderStrategy(targetIdManager);
 
         CandidateTargetIdsResolverImpl candidateTargetIdsResolver = new CandidateTargetIdsResolverImpl();
 
-        CandidateTargetedUrlsResolverImpl candidateUrlsResolver = new CandidateTargetedUrlsResolverImpl();
-        candidateUrlsResolver.setTargetIdManager(targetIdManager);
-        candidateUrlsResolver.setTargetedUrlStrategy(targetUrlStrategy);
-        candidateUrlsResolver.setCandidateTargetIdsResolver(candidateTargetIdsResolver);
+        CandidateTargetedUrlsResolverImpl candidateUrlsResolver = new CandidateTargetedUrlsResolverImpl(targetIdManager,
+                targetUrlStrategy, candidateTargetIdsResolver);
 
         return candidateUrlsResolver;
     }

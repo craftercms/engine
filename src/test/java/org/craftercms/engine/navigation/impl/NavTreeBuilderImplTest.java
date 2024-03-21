@@ -46,9 +46,7 @@ public class NavTreeBuilderImplTest {
 
     @Before
     public void setUp() throws Exception {
-        navTreeBuilder = new NavTreeBuilderImpl();
-        navTreeBuilder.setSiteItemService(getSiteItemService());
-        navTreeBuilder.setDefaultItemConverter(getItemConverter());
+        navTreeBuilder = new NavTreeBuilderImpl(getSiteItemService(), getItemConverter());
     }
 
     @Test

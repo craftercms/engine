@@ -30,7 +30,6 @@ import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.scripting.SiteItemScriptResolver;
 import org.craftercms.engine.service.context.SiteContext;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Default implementation of {@link SiteItemScriptResolver}.
@@ -47,28 +46,12 @@ public class SiteItemScriptResolverImpl implements SiteItemScriptResolver {
     protected String scriptUrlFormat;
     protected String scriptsXPathQuery;
 
-    @Required
-    public void setStoreService(ContentStoreService storeService) {
+    public SiteItemScriptResolverImpl(ContentStoreService storeService, String contentTypeXPathQuery, String contentTypePattern,
+                                      String scriptUrlFormat, String scriptsXPathQuery) {
         this.storeService = storeService;
-    }
-
-    @Required
-    public void setContentTypeXPathQuery(String contentTypeXPathQuery) {
         this.contentTypeXPathQuery = contentTypeXPathQuery;
-    }
-
-    @Required
-    public void setContentTypePattern(String contentTypePattern) {
         this.contentTypePattern = Pattern.compile(contentTypePattern);
-    }
-
-    @Required
-    public void setScriptUrlFormat(String scriptUrlFormat) {
         this.scriptUrlFormat = scriptUrlFormat;
-    }
-
-    @Required
-    public void setScriptsXPathQuery(String scriptsXPathQuery) {
         this.scriptsXPathQuery = scriptsXPathQuery;
     }
 

@@ -18,11 +18,6 @@ package org.craftercms.engine.security;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.util.SecurityUtils;
 import org.craftercms.security.annotations.RunIfSecurityEnabled;
-import org.springframework.beans.factory.annotation.Required;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-
 import java.util.List;
 
 /**
@@ -35,8 +30,7 @@ public class CrafterPageAccessManager {
 
     protected String authorizedRolesXPathQuery;
 
-    @Required
-    public void setAuthorizedRolesXPathQuery(String authorizedRolesXPathQuery) {
+    public CrafterPageAccessManager(String authorizedRolesXPathQuery) {
         this.authorizedRolesXPathQuery = authorizedRolesXPathQuery;
     }
 

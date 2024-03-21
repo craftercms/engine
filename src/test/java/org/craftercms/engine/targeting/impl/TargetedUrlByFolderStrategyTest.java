@@ -55,8 +55,7 @@ public class TargetedUrlByFolderStrategyTest {
         when(targetIdManager.getCurrentTargetId()).thenReturn(CURRENT_TARGET_ID);
         when(targetIdManager.getAvailableTargetIds()).thenReturn(AVAILABLE_TARGET_IDS);
 
-        targetedUrlStrategy = new TargetedUrlByFolderStrategy();
-        targetedUrlStrategy.setTargetIdManager(targetIdManager);
+        targetedUrlStrategy = new TargetedUrlByFolderStrategy(targetIdManager);
     }
 
     @Test

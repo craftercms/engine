@@ -24,7 +24,6 @@ import org.craftercms.core.url.UrlTransformer;
 import org.craftercms.engine.targeting.TargetedUrlStrategy;
 import org.craftercms.engine.util.TargetingUtils;
 import org.craftercms.engine.properties.SiteProperties;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Transforms the URL into a targeted URL (if it's not a targeted URL yet).
@@ -36,8 +35,7 @@ public class ToTargetedUrlTransformer implements UrlTransformer {
     protected TargetedUrlStrategy targetedUrlStrategy;
     protected boolean forceCurrentTargetId;
 
-    @Required
-    public void setTargetedUrlStrategy(TargetedUrlStrategy targetedUrlStrategy) {
+    public ToTargetedUrlTransformer(TargetedUrlStrategy targetedUrlStrategy) {
         this.targetedUrlStrategy = targetedUrlStrategy;
     }
 

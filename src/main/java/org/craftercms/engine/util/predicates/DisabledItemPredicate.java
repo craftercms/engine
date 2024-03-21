@@ -20,7 +20,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.core.service.Item;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Predicate used to check if an item is disabled.
@@ -33,8 +32,7 @@ public class DisabledItemPredicate implements Predicate<Item> {
 
     protected String disabledXPathQuery;
 
-    @Required
-    public void setDisabledXPathQuery(String disabledXPathQuery) {
+    public DisabledItemPredicate(String disabledXPathQuery) {
         this.disabledXPathQuery = disabledXPathQuery;
     }
 

@@ -55,8 +55,7 @@ public class TargetedUrlByFileStrategyTest {
         when(targetIdManager.getCurrentTargetId()).thenReturn(CURRENT_TARGET_ID);
         when(targetIdManager.getAvailableTargetIds()).thenReturn(AVAILABLE_TARGET_IDS);
 
-        targetedUrlStrategy = new TargetedUrlByFileStrategy();
-        targetedUrlStrategy.setTargetIdManager(targetIdManager);
+        targetedUrlStrategy = new TargetedUrlByFileStrategy(targetIdManager);
     }
 
     @Test

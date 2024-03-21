@@ -31,7 +31,8 @@ import org.craftercms.core.xml.mergers.MergeableDescriptor;
 import org.craftercms.core.xml.mergers.impl.strategies.InheritLevelsMergeStrategy;
 import org.craftercms.engine.targeting.CandidateTargetedUrlsResolver;
 import org.dom4j.Document;
-import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * {@link DescriptorMergeStrategy} used for merging descriptors of a targeted content hierarchy. The exact descriptors
@@ -64,13 +65,16 @@ public class TargetedContentDescriptorMergeStrategy extends InheritLevelsMergeSt
     protected DescriptorMergeStrategyResolver mergeStrategyResolver;
     protected CandidateTargetedUrlsResolver candidateTargetedUrlsResolver;
 
-    @Required
-    public void setMergeStrategyResolver(DescriptorMergeStrategyResolver mergeStrategyResolver) {
+    public TargetedContentDescriptorMergeStrategy(String levelDescriptorFileName) {
+        super(levelDescriptorFileName);
+    }
+
+    @Autowired
+    public void setMergeStrategyResolver(@Lazy DescriptorMergeStrategyResolver mergeStrategyResolver) {
         this.mergeStrategyResolver = mergeStrategyResolver;
     }
 
-    @Required
-    public void setCandidateTargetedUrlsResolver(CandidateTargetedUrlsResolver candidateTargetedUrlsResolver) {
+    public void setCandidateTargetedUrlsResolver(@Lazy CandidateTargetedUrlsResolver candidateTargetedUrlsResolver) {
         this.candidateTargetedUrlsResolver = candidateTargetedUrlsResolver;
     }
 

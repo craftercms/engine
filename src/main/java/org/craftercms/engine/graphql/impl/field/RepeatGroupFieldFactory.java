@@ -27,7 +27,8 @@ import org.craftercms.engine.graphql.GraphQLFieldFactory;
 import org.craftercms.engine.graphql.GraphQLTypeFactory;
 import org.dom4j.Document;
 import org.dom4j.Node;
-import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 import static graphql.schema.GraphQLList.list;
 import static org.craftercms.engine.graphql.SchemaUtils.FIELD_NAME_ITEM;
@@ -46,13 +47,12 @@ public class RepeatGroupFieldFactory implements GraphQLFieldFactory {
 
     protected GraphQLTypeFactory typeFactory;
 
-    @Required
-    public void setFieldsXPath(final String fieldsXPath) {
+    public RepeatGroupFieldFactory(final String fieldsXPath) {
         this.fieldsXPath = fieldsXPath;
     }
 
-    @Required
-    public void setTypeFactory(final GraphQLTypeFactory typeFactory) {
+    @Autowired
+    public void setTypeFactory(@Lazy final GraphQLTypeFactory typeFactory) {
         this.typeFactory = typeFactory;
     }
 

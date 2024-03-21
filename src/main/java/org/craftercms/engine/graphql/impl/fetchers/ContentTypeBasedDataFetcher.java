@@ -30,7 +30,6 @@ import org.opensearch.client.opensearch.core.SearchResponse;
 import org.opensearch.client.opensearch.core.search.Hit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.util.StopWatch;
 
 import java.io.IOException;
@@ -76,23 +75,11 @@ public class ContentTypeBasedDataFetcher extends RequestAwareDataFetcher<Object>
      */
     protected OpenSearchClientWrapper searchClient;
 
-    @Required
-    public void setDefaultLimit(final int defaultLimit) {
+    public ContentTypeBasedDataFetcher(final int defaultLimit, final String defaultSortField, final String defaultSortOrder,
+                                       final OpenSearchClientWrapper searchClient) {
         this.defaultLimit = defaultLimit;
-    }
-
-    @Required
-    public void setDefaultSortField(final String defaultSortField) {
         this.defaultSortField = defaultSortField;
-    }
-
-    @Required
-    public void setDefaultSortOrder(final String defaultSortOrder) {
         this.defaultSortOrder = defaultSortOrder;
-    }
-
-    @Required
-    public void setSearchClient(final OpenSearchClientWrapper searchClient) {
         this.searchClient = searchClient;
     }
 

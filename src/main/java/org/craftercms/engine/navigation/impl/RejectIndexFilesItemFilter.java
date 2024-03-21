@@ -23,7 +23,6 @@ import org.craftercms.core.service.ItemFilter;
 import org.craftercms.engine.targeting.TargetedUrlComponents;
 import org.craftercms.engine.targeting.TargetedUrlStrategy;
 import org.craftercms.engine.properties.SiteProperties;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * {@link ItemFilter} that rejects all indexes, including targeted ones (e.g index_en.xml, index_es_CR.xml).
@@ -34,8 +33,7 @@ public class RejectIndexFilesItemFilter implements ItemFilter {
 
     protected TargetedUrlStrategy targetedUrlStrategy;
 
-    @Required
-    public void setTargetedUrlStrategy(TargetedUrlStrategy targetedUrlStrategy) {
+    public RejectIndexFilesItemFilter(TargetedUrlStrategy targetedUrlStrategy) {
         this.targetedUrlStrategy = targetedUrlStrategy;
     }
 

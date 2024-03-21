@@ -19,13 +19,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import freemarker.core.Environment;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import org.craftercms.commons.http.RequestContext;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * {@link TemplateExceptionHandler} that instead of printing the errors directly in the HTML and stopping template processing, stores
@@ -62,8 +61,7 @@ public class CrafterTemplateExceptionHandler implements TemplateExceptionHandler
 
     private boolean displayTemplateExceptionsInView;
 
-    @Required
-    public void setDisplayTemplateExceptionsInView(boolean displayTemplateExceptionsInView) {
+    public CrafterTemplateExceptionHandler(boolean displayTemplateExceptionsInView) {
         this.displayTemplateExceptionsInView = displayTemplateExceptionsInView;
     }
 

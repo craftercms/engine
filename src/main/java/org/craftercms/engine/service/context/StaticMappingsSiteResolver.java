@@ -19,11 +19,10 @@ package org.craftercms.engine.service.context;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * {@link org.craftercms.engine.service.context.SiteResolver} that resolves the current site name from a set of
@@ -37,8 +36,7 @@ public class StaticMappingsSiteResolver implements SiteListResolver, SiteResolve
 
     private Map<String, String> mappings;
 
-    @Required
-    public void setMappings(Map<String, String> mappings) {
+    public StaticMappingsSiteResolver(Map<String, String> mappings) {
         this.mappings = mappings;
     }
 

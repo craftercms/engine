@@ -19,7 +19,7 @@ package org.craftercms.engine.scripting.impl;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import groovy.lang.GroovyClassLoader;
 import org.craftercms.commons.http.RequestContext;
@@ -156,7 +156,7 @@ public class GroovyScriptFactoryTest {
     }
 
     private void destroyApplicationContext() {
-        ((GenericApplicationContext)globalVars.get("applicationContext")).destroy();
+        ((GenericApplicationContext)globalVars.get("applicationContext")).close();
     }
 
 }

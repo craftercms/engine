@@ -21,7 +21,6 @@ import java.util.Map;
 import org.apache.commons.collections4.MapUtils;
 import org.craftercms.engine.macro.Macro;
 import org.craftercms.engine.macro.MacroResolver;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Default implementation of {@link org.craftercms.engine.macro.MacroResolver}. Uses a chain of {@link Macro}s to
@@ -33,11 +32,9 @@ public class MacroResolverImpl implements MacroResolver {
 
     private List<Macro> macros;
 
-    @Required
-    public void setMacros(List<Macro> macros) {
+    public MacroResolverImpl(List<Macro> macros) {
         this.macros = macros;
     }
-
 
     @Override
     public String resolveMacros(String str) {

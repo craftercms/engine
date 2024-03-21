@@ -22,7 +22,6 @@ import org.craftercms.core.util.XmlUtils;
 import org.craftercms.engine.graphql.GraphQLFieldFactory;
 import org.dom4j.Document;
 import org.dom4j.Node;
-import org.springframework.beans.factory.annotation.Required;
 
 import static graphql.Scalars.GraphQLString;
 import static org.craftercms.engine.graphql.SchemaUtils.FIELD_SUFFIX_RAW;
@@ -39,8 +38,7 @@ public class RTEFieldFactory implements GraphQLFieldFactory {
 
     protected String titleXPath;
 
-    @Required
-    public void setTitleXPath(final String titleXPath) {
+    public RTEFieldFactory(final String titleXPath) {
         this.titleXPath = titleXPath;
     }
 

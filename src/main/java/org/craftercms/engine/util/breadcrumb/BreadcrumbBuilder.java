@@ -27,7 +27,6 @@ import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.properties.SiteProperties;
 import org.craftercms.engine.service.SiteItemService;
 import org.craftercms.engine.service.context.SiteContext;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Helper class to create navigation breadcrumbs.
@@ -47,23 +46,11 @@ public class BreadcrumbBuilder {
     protected String homePath;
     protected String breadcrumbNameXPathQuery;
 
-    @Required
-    public void setCacheTemplate(CacheTemplate cacheTemplate) {
+    public BreadcrumbBuilder(CacheTemplate cacheTemplate, final SiteItemService siteItemService, String homePath,
+                             String breadcrumbNameXPathQuery) {
         this.cacheTemplate = cacheTemplate;
-    }
-
-    @Required
-    public void setSiteItemService(final SiteItemService siteItemService) {
         this.siteItemService = siteItemService;
-    }
-
-    @Required
-    public void setHomePath(String homePath) {
         this.homePath = homePath;
-    }
-
-    @Required
-    public void setBreadcrumbNameXPathQuery(String breadcrumbNameXPathQuery) {
         this.breadcrumbNameXPathQuery = breadcrumbNameXPathQuery;
     }
 

@@ -19,12 +19,11 @@ package org.craftercms.engine.controller.rest.multitenant;
 import java.util.Collections;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.engine.service.context.ReloadableMappingsSiteResolver;
 import org.craftercms.engine.service.context.SiteResolver;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,8 +42,7 @@ public class SiteMappingsRestController {
 
     private SiteResolver siteResolver;
 
-    @Required
-    public void setSiteResolver(SiteResolver siteResolver) {
+    public SiteMappingsRestController(SiteResolver siteResolver) {
         this.siteResolver = siteResolver;
     }
 

@@ -18,7 +18,7 @@ package org.craftercms.engine.scripting.impl;
 
 import java.util.Arrays;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.exception.CrafterException;
@@ -110,12 +110,8 @@ public class SiteItemScriptResolverImplTest {
     }
 
     private SiteItemScriptResolver createScriptResolver(ContentStoreService storeService) {
-        SiteItemScriptResolverImpl scriptResolver = new SiteItemScriptResolverImpl();
-        scriptResolver.setContentTypePattern("^/page/(.+)$");
-        scriptResolver.setContentTypeXPathQuery("content-type");
-        scriptResolver.setScriptUrlFormat("/scripts/pages/%s.groovy");
-        scriptResolver.setScriptsXPathQuery("scripts/item/key");
-        scriptResolver.setStoreService(storeService);
+        SiteItemScriptResolverImpl scriptResolver = new SiteItemScriptResolverImpl(storeService, "content-type",
+                "^/page/(.+)$", "/scripts/pages/%s.groovy", "scripts/item/key");
 
         return scriptResolver;
     }

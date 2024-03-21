@@ -19,11 +19,10 @@ package org.craftercms.engine.service.context;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.core.exception.CrafterException;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.io.Resource;
 import org.springframework.beans.factory.InitializingBean;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.*;
 
@@ -44,13 +43,8 @@ public class ReloadableMappingsSiteResolver implements SiteListResolver, SiteRes
 
     protected volatile Properties mappings;
 
-    @Required
-    public void setMappingsFile(Resource mappingsFile) {
+    public ReloadableMappingsSiteResolver(Resource mappingsFile, SiteContextManager siteContextManager) {
         this.mappingsFile = mappingsFile;
-    }
-
-    @Required
-    public void setSiteContextManager(SiteContextManager siteContextManager) {
         this.siteContextManager = siteContextManager;
     }
 

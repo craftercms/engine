@@ -25,7 +25,6 @@ import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.navigation.NavItem;
 import org.craftercms.engine.properties.SiteProperties;
 import org.craftercms.engine.service.UrlTransformationService;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Default converter from {@link SiteItem} to {@link NavItem}. To generate the URL, it uses a URL transformer, and to generate the
@@ -41,23 +40,11 @@ public class DefaultItemConverter implements Converter<SiteItem, NavItem> {
     protected String storeUrlToRenderUrlTransformerName;
     protected UrlTransformationService urlTransformationService;
 
-    @Required
-    public void setNavLabelXPath(String navLabelXPath) {
+    public DefaultItemConverter(String navLabelXPath, String internalNameXPath, String storeUrlToRenderUrlTransformerName,
+                                UrlTransformationService urlTransformationService) {
         this.navLabelXPath = navLabelXPath;
-    }
-
-    @Required
-    public void setInternalNameXPath(String internalNameXPath) {
         this.internalNameXPath = internalNameXPath;
-    }
-
-    @Required
-    public void setStoreUrlToRenderUrlTransformerName(String storeUrlToRenderUrlTransformerName) {
         this.storeUrlToRenderUrlTransformerName = storeUrlToRenderUrlTransformerName;
-    }
-
-    @Required
-    public void setUrlTransformationService(UrlTransformationService urlTransformationService) {
         this.urlTransformationService = urlTransformationService;
     }
 

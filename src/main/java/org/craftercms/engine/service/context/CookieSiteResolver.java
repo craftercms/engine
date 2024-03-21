@@ -16,13 +16,12 @@
 
 package org.craftercms.engine.service.context;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.http.HttpUtils;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * {@link org.craftercms.engine.service.context.SiteResolver} that resolves the current site name from a cookie or
@@ -36,8 +35,7 @@ public class CookieSiteResolver implements SiteResolver {
 
     protected String paramOrCookieName;
 
-    @Required
-    public void setParamOrCookieName(String paramOrCookieName) {
+    public CookieSiteResolver(String paramOrCookieName) {
         this.paramOrCookieName = paramOrCookieName;
     }
 

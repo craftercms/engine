@@ -16,7 +16,7 @@
 
 package org.craftercms.engine.service.context;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Resolves the {@link org.craftercms.engine.service.context.SiteContext} to be used for the specified request.
