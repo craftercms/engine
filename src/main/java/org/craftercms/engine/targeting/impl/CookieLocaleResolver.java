@@ -47,6 +47,8 @@ import org.springframework.web.util.WebUtils;
  * request. As a more convenient alternative, consider using
  * {@link org.springframework.web.servlet.support.RequestContext#changeLocale}.
  *
+ * Source: https://github.com/spring-projects/spring-framework/blob/v5.3.33/spring-webmvc/src/main/java/org/springframework/web/servlet/i18n/CookieLocaleResolver.java
+ *
  * @author Juergen Hoeller
  * @author Jean-Pierre Pawlak
  * @since 27.02.2003

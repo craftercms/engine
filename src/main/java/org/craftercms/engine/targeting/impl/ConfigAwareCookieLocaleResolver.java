@@ -27,6 +27,9 @@ import org.craftercms.engine.util.ConfigUtils;
  * {@link CookieLocaleResolver} extension that uses the default locale specified in the site configuration if
  * the user has not current locale associated.
  *
+ * TODO: This class extends `CookieLocaleResolver` version 5.3.33 to keep the override `getCookieName()`. Review this to use the latest
+ *
+ *
  * @author avasquez
  */
 public class ConfigAwareCookieLocaleResolver extends CookieLocaleResolver {
