@@ -22,7 +22,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.craftercms.engine.targeting.TargetIdManager;
 import org.craftercms.engine.targeting.TargetedUrlComponents;
 import org.craftercms.engine.targeting.TargetedUrlStrategy;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * {@link TargetedUrlStrategy} base class, that provides basic implementations of {@link #parseTargetedUrl(String)}
@@ -34,8 +33,7 @@ public abstract class AbstractTargetedUrlStrategy implements TargetedUrlStrategy
 
     protected TargetIdManager targetIdManager;
 
-    @Required
-    public void setTargetIdManager(TargetIdManager targetIdManager) {
+    public AbstractTargetedUrlStrategy(TargetIdManager targetIdManager) {
         this.targetIdManager = targetIdManager;
     }
 

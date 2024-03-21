@@ -15,13 +15,12 @@
  */
 package org.craftercms.engine.macro.impl;
 
-import javax.servlet.http.Cookie;
+import jakarta.servlet.http.Cookie;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.http.HttpUtils;
 import org.craftercms.commons.http.RequestContext;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Represents a macro that can be a cookie value.
@@ -34,8 +33,7 @@ public class CookieMacro extends AbstractMacro {
 
     private String cookieName;
 
-    @Required
-    public void setCookieName(String cookieName) {
+    public CookieMacro(String cookieName) {
         this.cookieName = cookieName;
     }
 

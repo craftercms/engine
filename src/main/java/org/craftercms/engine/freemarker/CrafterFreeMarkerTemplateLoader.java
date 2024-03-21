@@ -28,7 +28,6 @@ import org.craftercms.core.service.Content;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.engine.service.context.SiteContext;
-import org.springframework.beans.factory.annotation.Required;
 
 import static org.craftercms.commons.lang.RegexUtils.matchesAny;
 
@@ -46,13 +45,8 @@ public class CrafterFreeMarkerTemplateLoader implements TemplateLoader {
 
     private String[] globalAllowedPaths;
 
-    @Required
-    public void setContentStoreService(ContentStoreService contentStoreService) {
+    public CrafterFreeMarkerTemplateLoader(ContentStoreService contentStoreService, String[] globalAllowedPaths) {
         this.contentStoreService = contentStoreService;
-    }
-
-    @Required
-    public void setGlobalAllowedPaths(String[] globalAllowedPaths) {
         this.globalAllowedPaths = globalAllowedPaths;
     }
 

@@ -18,8 +18,8 @@ package org.craftercms.engine.util.spring.security;
 import org.springframework.security.web.header.HeaderWriter;
 import org.springframework.security.web.header.HeaderWriterFilter;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
 import java.beans.ConstructorProperties;
 import java.util.List;
 

@@ -15,9 +15,9 @@
  */
 package org.craftercms.engine.view.freemarker;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 import freemarker.template.ObjectWrapper;
 import freemarker.template.SimpleHash;

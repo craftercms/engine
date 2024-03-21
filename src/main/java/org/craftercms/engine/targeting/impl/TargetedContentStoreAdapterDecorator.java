@@ -34,7 +34,6 @@ import org.craftercms.engine.targeting.CandidateTargetedUrlsResolver;
 import org.craftercms.engine.util.TargetingUtils;
 import org.craftercms.engine.util.store.decorators.ContentStoreAdapterDecorator;
 import org.craftercms.engine.util.store.decorators.DecoratedStoreAdapterContext;
-import org.springframework.beans.factory.annotation.Required;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,14 +57,13 @@ public class TargetedContentStoreAdapterDecorator implements ContentStoreAdapter
     protected ContentStoreAdapter actualStoreAdapter;
     protected CandidateTargetedUrlsResolver candidateTargetedUrlsResolver;
 
+    public TargetedContentStoreAdapterDecorator(CandidateTargetedUrlsResolver candidateTargetedUrlsResolver) {
+        this.candidateTargetedUrlsResolver = candidateTargetedUrlsResolver;
+    }
+
     @Override
     public void setActualStoreAdapter(ContentStoreAdapter actualStoreAdapter) {
         this.actualStoreAdapter = actualStoreAdapter;
-    }
-
-    @Required
-    public void setCandidateTargetedUrlsResolver(CandidateTargetedUrlsResolver candidateTargetedUrlsResolver) {
-        this.candidateTargetedUrlsResolver = candidateTargetedUrlsResolver;
     }
 
     @Override

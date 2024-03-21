@@ -26,7 +26,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.craftercms.engine.service.context.SiteContextFactory;
 import org.craftercms.engine.service.context.SiteListResolver;
 import org.craftercms.engine.store.s3.util.S3ClientBuilder;
-import org.springframework.beans.factory.annotation.Required;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,22 +45,15 @@ public class S3SiteListResolver implements SiteListResolver {
     protected AmazonS3URI s3Uri;
     protected S3ClientBuilder clientBuilder;
 
-    public S3SiteListResolver() {
+    public S3SiteListResolver(String s3Uri, final S3ClientBuilder clientBuilder) {
         setSiteNameMacroName(SiteContextFactory.DEFAULT_SITE_NAME_MACRO_NAME);
+
+        this.s3Uri = new AmazonS3URI(s3Uri);
+        this.clientBuilder = clientBuilder;
     }
 
     public void setSiteNameMacroName(String siteNameMacroName) {
         this.siteNameMacroPlaceholder = "{" + siteNameMacroName + "}";
-    }
-
-    @Required
-    public void setS3Uri(String s3Uri) {
-        this.s3Uri = new AmazonS3URI(s3Uri);
-    }
-
-    @Required
-    public void setClientBuilder(final S3ClientBuilder clientBuilder) {
-        this.clientBuilder = clientBuilder;
     }
 
     @Override

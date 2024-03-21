@@ -28,7 +28,8 @@ import org.dom4j.Document;
 import org.dom4j.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 import java.util.Collections;
 import java.util.List;
@@ -77,52 +78,24 @@ public class GraphQLTypeFactoryImpl implements GraphQLTypeFactory {
      */
     protected Map<String, DataFetcher> customFetchers;
 
-    @Required
-    public void setCustomFetchers(final Map<String, DataFetcher> customFetchers) {
+    public GraphQLTypeFactoryImpl(final Map<String, DataFetcher> customFetchers, final String rootQueryTypeName,
+                                  final String[] ignoredFields, final String contentTypeNameXPath,
+                                  final String contentTypeTitleXPath, final String contentTypeFieldsXPath,
+                                  final String contentTypeFieldIdXPath, final String contentTypeFieldTypeXPath,
+                                  final String contentTypeFieldTitleXPath) {
         this.customFetchers = customFetchers;
-    }
-
-    @Required
-    public void setRootQueryTypeName(final String rootQueryTypeName) {
         this.rootQueryTypeName = rootQueryTypeName;
-    }
-
-    public void setIgnoredFields(final String[] ignoredFields) {
         this.ignoredFields = ignoredFields;
-    }
-
-    @Required
-    public void setContentTypeNameXPath(final String contentTypeNameXPath) {
         this.contentTypeNameXPath = contentTypeNameXPath;
-    }
-
-    @Required
-    public void setContentTypeTitleXPath(final String contentTypeTitleXPath) {
         this.contentTypeTitleXPath = contentTypeTitleXPath;
-    }
-
-    @Required
-    public void setContentTypeFieldsXPath(final String contentTypeFieldsXPath) {
         this.contentTypeFieldsXPath = contentTypeFieldsXPath;
-    }
-
-    @Required
-    public void setContentTypeFieldIdXPath(final String contentTypeFieldIdXPath) {
         this.contentTypeFieldIdXPath = contentTypeFieldIdXPath;
-    }
-
-    @Required
-    public void setContentTypeFieldTypeXPath(final String contentTypeFieldTypeXPath) {
         this.contentTypeFieldTypeXPath = contentTypeFieldTypeXPath;
-    }
-
-    @Required
-    public void setContentTypeFieldTitleXPath(final String contentTypeFieldTitleXPath) {
         this.contentTypeFieldTitleXPath = contentTypeFieldTitleXPath;
     }
 
-    @Required
-    public void setFieldFactories(final Map<String, GraphQLFieldFactory> fieldFactories) {
+    @Autowired
+    public void setFieldFactories(@Lazy final Map<String, GraphQLFieldFactory> fieldFactories) {
         this.fieldFactories = fieldFactories;
     }
 

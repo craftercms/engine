@@ -25,7 +25,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executor;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 import graphql.GraphQL;
 import graphql.schema.*;
@@ -41,7 +41,6 @@ import org.craftercms.engine.util.GroovyScriptUtils;
 import org.craftercms.engine.util.concurrent.SiteAwareThreadPoolExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.util.StopWatch;
 import org.springframework.web.context.ServletContextAware;
 
@@ -104,38 +103,15 @@ public class GraphQLFactoryImpl implements GraphQLFactory, ServletContextAware {
 
     protected boolean disableVariableRestrictions;
 
-    @Required
-    public void setSchemaScriptPath(final String schemaScriptPath) {
+    public GraphQLFactoryImpl(final String schemaScriptPath, final String repoConfigFolder, final String contentTypeDefinitionName,
+                              final String rootQueryTypeName, final GraphQLTypeFactory typeFactory, DataFetcher<?> dataFetcher,
+                              final Executor jobThreadPoolExecutor) {
         this.schemaScriptPath = schemaScriptPath;
-    }
-
-    @Required
-    public void setRepoConfigFolder(final String repoConfigFolder) {
         this.repoConfigFolder = repoConfigFolder;
-    }
-
-    @Required
-    public void setContentTypeDefinitionName(final String contentTypeDefinitionName) {
         this.contentTypeDefinitionName = contentTypeDefinitionName;
-    }
-
-    @Required
-    public void setRootQueryTypeName(final String rootQueryTypeName) {
         this.rootQueryTypeName = rootQueryTypeName;
-    }
-
-    @Required
-    public void setTypeFactory(final GraphQLTypeFactory typeFactory) {
         this.typeFactory = typeFactory;
-    }
-
-    @Required
-    public void setDataFetcher(DataFetcher<?> dataFetcher) {
         this.dataFetcher = dataFetcher;
-    }
-
-    @Required
-    public void setJobThreadPoolExecutor(final Executor jobThreadPoolExecutor) {
         this.jobThreadPoolExecutor = jobThreadPoolExecutor;
     }
 

@@ -16,7 +16,7 @@
 
 package org.craftercms.engine.service.context;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Resolves the site for a given request

@@ -25,7 +25,6 @@ import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.navigation.NavItem;
 import org.craftercms.engine.navigation.NavTreeBuilder;
 import org.craftercms.engine.service.SiteItemService;
-import org.springframework.beans.factory.annotation.Required;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,9 +42,9 @@ public class NavTreeBuilderImpl implements NavTreeBuilder {
     protected ItemProcessor processor;
     protected Converter<SiteItem, NavItem> defaultItemConverter;
 
-    @Required
-    public void setSiteItemService(SiteItemService siteItemService) {
+    public NavTreeBuilderImpl(SiteItemService siteItemService, Converter<SiteItem, NavItem> defaultItemConverter) {
         this.siteItemService = siteItemService;
+        this.defaultItemConverter = defaultItemConverter;
     }
 
     public void setFilter(ItemFilter filter) {
@@ -62,11 +61,6 @@ public class NavTreeBuilderImpl implements NavTreeBuilder {
 
     public void setProcessors(List<ItemProcessor> processors) {
         processor = new ItemProcessorPipeline(processors);
-    }
-
-    @Required
-    public void setDefaultItemConverter(Converter<SiteItem, NavItem> defaultItemConverter) {
-        this.defaultItemConverter = defaultItemConverter;
     }
 
     @Override

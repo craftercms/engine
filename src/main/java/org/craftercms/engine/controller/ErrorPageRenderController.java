@@ -17,11 +17,10 @@ package org.craftercms.engine.controller;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.IOUtils;
 import org.craftercms.engine.http.impl.DefaultExceptionHandler;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,8 +42,7 @@ public class ErrorPageRenderController {
 
     private String errorViewNamePrefix;
 
-    @Required
-    public void setErrorViewNamePrefix(String errorViewNamePrefix) {
+    public ErrorPageRenderController(String errorViewNamePrefix) {
         this.errorViewNamePrefix = errorViewNamePrefix;
     }
 

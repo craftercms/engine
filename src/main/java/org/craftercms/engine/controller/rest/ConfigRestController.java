@@ -19,7 +19,6 @@ package org.craftercms.engine.controller.rest;
 import java.util.Map;
 
 import org.craftercms.core.controller.rest.RestControllerBase;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,8 +41,7 @@ public class ConfigRestController {
 
     protected boolean modePreview;
 
-    @Required
-    public void setModePreview(final boolean modePreview) {
+    public ConfigRestController(final boolean modePreview) {
         this.modePreview = modePreview;
     }
 

@@ -20,7 +20,6 @@ import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.engine.event.SiteContextInitializedEvent;
 import org.craftercms.engine.scripting.ScriptUrlTemplateScanner;
 import org.craftercms.engine.service.context.SiteContext;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationListener;
 import org.springframework.web.util.UriTemplate;
 
@@ -40,13 +39,8 @@ public class CachedScriptUrlTemplateScanner implements ScriptUrlTemplateScanner,
     protected CacheTemplate cacheTemplate;
     protected ScriptUrlTemplateScanner actualScanner;
 
-    @Required
-    public void setCacheTemplate(CacheTemplate cacheTemplate) {
+    public CachedScriptUrlTemplateScanner(CacheTemplate cacheTemplate, ScriptUrlTemplateScanner actualScanner) {
         this.cacheTemplate = cacheTemplate;
-    }
-
-    @Required
-    public void setActualScanner(ScriptUrlTemplateScanner actualScanner) {
         this.actualScanner = actualScanner;
     }
 

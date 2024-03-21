@@ -30,14 +30,13 @@ import org.craftercms.engine.properties.SiteProperties;
 import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -67,18 +66,13 @@ public class PageRenderController extends AbstractController {
 
     protected PluginService pluginService;
 
-    @Required
-    public void setFallbackPageUrl(String fallbackPageUrl) {
+    public PageRenderController(String fallbackPageUrl, final ContentStoreService storeService) {
         this.fallbackPageUrl = fallbackPageUrl;
+        this.storeService = storeService;
     }
 
     public void setFallbackMessage(String fallbackMessage) {
         this.fallbackMessage = fallbackMessage;
-    }
-
-    @Required
-    public void setStoreService(final ContentStoreService storeService) {
-        this.storeService = storeService;
     }
 
     public void setDisableVariableRestrictions(boolean disableVariableRestrictions) {

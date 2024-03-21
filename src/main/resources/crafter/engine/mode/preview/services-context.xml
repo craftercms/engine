@@ -40,60 +40,58 @@
     <!-- ////////////////////////////////// -->
 
     <bean id="crafter.siteResolver" class="org.craftercms.engine.service.context.CookieSiteResolver">
-        <property name="paramOrCookieName" value="${crafter.engine.request.param.siteName}"/>
+        <constructor-arg name="paramOrCookieName" value="${crafter.engine.request.param.siteName}"/>
     </bean>
 
     <bean id="crafter.siteListResolver" class="org.craftercms.engine.service.context.FolderScanningSiteListResolver">
-        <property name="siteRootFolderPath" value="${crafter.engine.site.default.rootFolder.path}"/>
-        <property name="macroResolver" ref="crafter.macroResolver"/>
+        <constructor-arg name="siteRootFolderPath" value="${crafter.engine.site.default.rootFolder.path}"/>
+        <constructor-arg name="macroResolver" ref="crafter.macroResolver"/>
     </bean>
 
     <bean id="crafter.siteContextManager" class="org.craftercms.engine.service.context.SiteContextManager">
-        <property name="fallbackContextFactory" ref="crafter.fallbackSiteContextFactory"/>
-        <property name="contextFactory" ref="crafter.siteContextFactory"/>
-        <property name="siteListResolver" ref="crafter.siteListResolver"/>
+        <constructor-arg name="contextFactory" ref="crafter.siteContextFactory"/>
+        <constructor-arg name="fallbackContextFactory" ref="crafter.fallbackSiteContextFactory"/>
+        <constructor-arg name="siteListResolver" ref="crafter.siteListResolver"/>
+        <constructor-arg name="waitForContextInit" value="${crafter.engine.site.context.waitForInit}"/>
+        <constructor-arg name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
+        <constructor-arg name="defaultSiteName" value="${crafter.engine.site.default.name}"/>
+        <constructor-arg name="contextBuildRetryMaxCount" value="${crafter.engine.site.context.build.retry.maxCount}"/>
+        <constructor-arg name="contextBuildRetryWaitTimeBase" value="${crafter.engine.site.context.build.retry.waitTimeBase}"/>
+        <constructor-arg name="contextBuildRetryWaitTimeMultiplier" value="${crafter.engine.site.context.build.retry.waitTimeMultiplier}"/>
+        <constructor-arg name="modePreview" value="${crafter.engine.preview}"/>
+        <constructor-arg name="watcherPaths" value="${crafter.engine.watcher.paths}"/>
+        <constructor-arg name="watcherIgnorePaths" value="${crafter.engine.watcher.ignorePaths}"/>
+        <constructor-arg name="watcherCounterLimit" value="${crafter.engine.watcher.counter.limit}"/>
+        <constructor-arg name="watcherIntervalPeriod" value="${crafter.engine.watcher.interval.period}"/>
         <property name="entitlementValidator" ref="crafter.entitlementValidator"/>
-        <property name="waitForContextInit" value="${crafter.engine.site.context.waitForInit}"/>
-        <property name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
-        <property name="defaultSiteName" value="${crafter.engine.site.default.name}"/>
-        <property name="contextBuildRetryMaxCount" value="${crafter.engine.site.context.build.retry.maxCount}"/>
-        <property name="contextBuildRetryWaitTimeBase" value="${crafter.engine.site.context.build.retry.waitTimeBase}"/>
-        <property name="contextBuildRetryWaitTimeMultiplier" value="${crafter.engine.site.context.build.retry.waitTimeMultiplier}"/>
-        <property name="modePreview" value="${crafter.engine.preview}"/>
-        <property name="watcherPaths" value="${crafter.engine.watcher.paths}"/>
-        <property name="watcherIgnorePaths" value="${crafter.engine.watcher.ignorePaths}"/>
-        <property name="watcherCounterLimit" value="${crafter.engine.watcher.counter.limit}"/>
-        <property name="watcherIntervalPeriod" value="${crafter.engine.watcher.interval.period}"/>
     </bean>
 
     <bean id="crafter.siteContextFactory" class="org.craftercms.engine.service.context.SiteContextFactory">
-        <property name="rootFolderPath" value="${crafter.engine.site.default.rootFolder.path}"/>
-        <property name="staticAssetsPath" value="${crafter.engine.site.default.staticAssets.path}"/>
-        <property name="templatesPath" value="${crafter.engine.site.default.templates.path}"/>
-        <property name="freeMarkerConfigFactory" ref="crafter.freeMarkerConfigFactory"/>
-        <property name="initScriptPath" value="${crafter.engine.site.default.init.script.path}"/>
-        <property name="restScriptsPath" value="${crafter.engine.site.default.rest.scripts.path}"/>
-        <property name="controllerScriptsPath" value="${crafter.engine.site.default.controller.scripts.path}"/>
-        <property name="configPaths" value="${crafter.engine.site.default.config.paths}"/>
-        <property name="applicationContextPaths" value="${crafter.engine.site.default.config.appContext.paths}"/>
-        <property name="urlRewriteConfPaths" value="${crafter.engine.site.default.urlrewrite.config.paths}"/>
-        <property name="proxyConfigPaths" value="${crafter.engine.site.default.proxy.config.paths}"/>
-        <property name="translationConfigPaths" value="${crafter.engine.site.default.translation.config.paths}"/>
-        <property name="groovyClassesPath" value="${crafter.engine.site.default.classes.groovy.path}"/>
-        <property name="cacheOn" value="false"/>
-        <property name="urlTransformationEngine" ref="crafter.urlTransformationEngine"/>
-        <property name="storeService" ref="crafter.contentStoreService"/>
-        <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
-        <property name="macroResolver" ref="crafter.macroResolver"/>
-        <property name="groovyGlobalVars" ref="crafter.restScriptsVariables"/>
-        <property name="jobResolvers" ref="crafter.scriptJobResolvers"/>
-        <property name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
-        <property name="storeType" value="${crafter.engine.store.type}"/>
-        <property name="graphQLFactory" ref="crafter.graphQLFactory"/>
-        <property name="cacheWarmUpEnabled" value="false"/>
-        <property name="cacheWarmer" ref="crafter.siteCacheWarmer"/>
+        <constructor-arg name="storeType" value="${crafter.engine.store.type}"/>
+        <constructor-arg name="rootFolderPath" value="${crafter.engine.site.default.rootFolder.path}"/>
+        <constructor-arg name="staticAssetsPath" value="${crafter.engine.site.default.staticAssets.path}"/>
+        <constructor-arg name="templatesPath" value="${crafter.engine.site.default.templates.path}"/>
+        <constructor-arg name="initScriptPath" value="${crafter.engine.site.default.init.script.path}"/>
+        <constructor-arg name="restScriptsPath" value="${crafter.engine.site.default.rest.scripts.path}"/>
+        <constructor-arg name="controllerScriptsPath" value="${crafter.engine.site.default.controller.scripts.path}"/>
+        <constructor-arg name="configPaths" value="${crafter.engine.site.default.config.paths}"/>
+        <constructor-arg name="applicationContextPaths" value="${crafter.engine.site.default.config.appContext.paths}"/>
+        <constructor-arg name="urlRewriteConfPaths" value="${crafter.engine.site.default.urlrewrite.config.paths}"/>
+        <constructor-arg name="proxyConfigPaths" value="${crafter.engine.site.default.proxy.config.paths}"/>
+        <constructor-arg name="groovyClassesPath" value="${crafter.engine.site.default.classes.groovy.path}"/>
+        <constructor-arg name="groovyGlobalVars" ref="crafter.restScriptsVariables"/>
+        <constructor-arg name="freeMarkerConfigFactory" ref="crafter.freeMarkerConfigFactory"/>
+        <constructor-arg name="urlTransformationEngine" ref="crafter.urlTransformationEngine"/>
+        <constructor-arg name="storeService" ref="crafter.contentStoreService"/>
+        <constructor-arg name="cacheTemplate" ref="crafter.cacheTemplate"/>
+        <constructor-arg name="macroResolver" ref="crafter.macroResolver"/>
+        <constructor-arg name="jobResolvers" ref="crafter.scriptJobResolvers"/>
+        <constructor-arg name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
+        <constructor-arg name="graphQLFactory" ref="crafter.graphQLFactory"/>
+        <constructor-arg name="cacheWarmUpEnabled" value="false"/>
+        <constructor-arg name="cacheWarmer" ref="crafter.siteCacheWarmer"/>
+        <constructor-arg name="configurationReader" ref="crafter.configurationReader"/>
         <property name="initTimeout" value="${crafter.engine.site.context.initTimeout}"/>
-        <property name="configurationReader" ref="crafter.configurationReader"/>
         <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
         <property name="defaultPublicBeans" value="${crafter.engine.defaultPublicBeans}"/>
         <property name="publishingTargetResolver" ref="crafter.publishingTargetResolver"/>
@@ -102,6 +100,8 @@
         <property name="sandboxBlacklist" value="${crafter.engine.groovy.sandbox.blacklist.path}"/>
         <property name="enableExpressions" value="${crafter.engine.context.expressions.enable}"/>
         <property name="enableTranslation" value="${crafter.engine.translation.enable}"/>
+        <property name="translationConfigPaths" value="${crafter.engine.site.default.translation.config.paths}"/>
+        <property name="cacheOn" value="false"/>
     </bean>
 
     <!-- ////////////////////////////////// -->
