@@ -74,6 +74,7 @@ public class TargetedContentDescriptorMergeStrategy extends InheritLevelsMergeSt
         this.mergeStrategyResolver = mergeStrategyResolver;
     }
 
+    @Autowired
     public void setCandidateTargetedUrlsResolver(@Lazy CandidateTargetedUrlsResolver candidateTargetedUrlsResolver) {
         this.candidateTargetedUrlsResolver = candidateTargetedUrlsResolver;
     }

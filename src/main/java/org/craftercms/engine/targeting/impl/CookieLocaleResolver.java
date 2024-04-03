@@ -34,6 +34,14 @@ import org.springframework.web.util.CookieGenerator;
 import org.springframework.web.util.WebUtils;
 
 /**
+ * TODO: review this to remove this class
+ * This class is a copied version of `CookieLocaleResolver` 5.3.33
+ * to keep using method {@link ConfigAwareCookieLocaleResolver#getCookieName()}.
+ * Source: https://github.com/spring-projects/spring-framework/blob/v5.3.33/spring-webmvc/src/main/java/org/springframework/web/servlet/i18n/CookieLocaleResolver.java
+ *
+ */
+
+/**
  * {@link LocaleResolver} implementation that uses a cookie sent back to the user
  * in case of a custom setting, with a fallback to the configured default locale,
  * the request's {@code Accept-Language} header, or the default locale for the server.
@@ -46,8 +54,6 @@ import org.springframework.web.util.WebUtils;
  * {@code #setLocale(Context)} on the resolver, e.g. responding to a locale change
  * request. As a more convenient alternative, consider using
  * {@link org.springframework.web.servlet.support.RequestContext#changeLocale}.
- *
- * Source: https://github.com/spring-projects/spring-framework/blob/v5.3.33/spring-webmvc/src/main/java/org/springframework/web/servlet/i18n/CookieLocaleResolver.java
  *
  * @author Juergen Hoeller
  * @author Jean-Pierre Pawlak

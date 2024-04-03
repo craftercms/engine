@@ -64,16 +64,14 @@
         <property name="pluginService" ref="crafter.pluginService"/>
     </bean>
 
-    <bean id="crafter.staticAssetsRequestHandler" class="org.craftercms.engine.controller.StaticAssetsRequestHandler"
-            init-method="init">
+    <bean id="crafter.staticAssetsRequestHandler" class="org.craftercms.engine.controller.StaticAssetsRequestHandler">
         <constructor-arg name="contentStoreService" ref="crafter.contentStoreService"/>
-        <property name="disableCaching" value="${crafter.engine.staticAssets.disableCaching}"/>
+        <constructor-arg name="disableCaching" value="${crafter.engine.staticAssets.disableCaching}"/>
     </bean>
 
-    <bean id="crafter.remoteAssetsRequestHandler" class="org.craftercms.engine.controller.RemoteAssetsRequestHandler"
-          init-method="init">
+    <bean id="crafter.remoteAssetsRequestHandler" class="org.craftercms.engine.controller.RemoteAssetsRequestHandler">
         <constructor-arg name="remoteFileResolver" ref="crafter.remoteFileResolver"/>
-        <property name="disableCaching" value="${crafter.engine.remoteAssets.disableCaching}"/>
+        <constructor-arg name="disableCaching" value="${crafter.engine.remoteAssets.disableCaching}"/>
     </bean>
 
     <bean id="crafter.pageRenderController" class="org.craftercms.engine.controller.PageRenderController">

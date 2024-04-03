@@ -37,20 +37,15 @@ import java.io.IOException;
 public class RemoteAssetsRequestHandler extends ResourceHttpRequestHandler {
 
     private RemoteFileResolver remoteFileResolver;
-    private boolean disableCaching;
 
-    protected void init(RemoteFileResolver remoteFileResolver) {
+    public RemoteAssetsRequestHandler(RemoteFileResolver remoteFileResolver, final boolean disableCaching) {
         this.remoteFileResolver = remoteFileResolver;
 
-        if(disableCaching) {
+        if (disableCaching) {
             setCacheControl(CacheControl.noCache());
         }
         setRequireSession(false);
         setResourceRegionHttpMessageConverter(new RangeAwareResourceRegionHttpMessageConverter());
-    }
-
-    public void setDisableCaching(final boolean disableCaching) {
-        this.disableCaching = disableCaching;
     }
 
     @Override

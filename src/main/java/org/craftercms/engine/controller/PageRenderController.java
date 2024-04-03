@@ -31,6 +31,7 @@ import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
@@ -99,10 +100,15 @@ public class PageRenderController extends AbstractController {
                                         HttpStatus.NOT_FOUND);
             } else {
                 pageUrl = (String)request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-                if (StringUtils.isEmpty(pageUrl)) {
+                // Spring 6 set this attribute as an empty string in the case of root directory
+                // it could be a bug while using PathPattern by default:
+                // https://github.com/spring-projects/spring-framework/blob/main/spring-webmvc/src/main/java/org/springframework/web/servlet/handler/AbstractHandlerMapping.java#L583
+                if (pageUrl.isEmpty()) {
+                    pageUrl = "/";
+                } else if (pageUrl == null) {
                     throw new IllegalStateException(
-                        "Required request attribute '" + HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE +
-                        "' is not set");
+                            "Required request attribute '" + HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE +
+                                    "' is not set");
                 }
 
                 Script controllerScript = getControllerScript(siteContext, request, pageUrl);

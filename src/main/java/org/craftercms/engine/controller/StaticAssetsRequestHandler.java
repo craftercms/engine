@@ -47,9 +47,10 @@ public class StaticAssetsRequestHandler extends ResourceHttpRequestHandler {
 
     private ContentStoreService contentStoreService;
     private String staticAssetsPath;
-    private boolean disableCaching;
 
-    protected void init() {
+    public StaticAssetsRequestHandler(ContentStoreService contentStoreService, final boolean disableCaching) {
+        this.contentStoreService = contentStoreService;
+
         // Don't require a session for static-assets
         setRequireSession(false);
 
@@ -64,16 +65,8 @@ public class StaticAssetsRequestHandler extends ResourceHttpRequestHandler {
         }
     }
 
-    public StaticAssetsRequestHandler(ContentStoreService contentStoreService) {
-        this.contentStoreService = contentStoreService;
-    }
-
     public void setStaticAssetsPath(String staticAssetsPath) {
         this.staticAssetsPath = staticAssetsPath;
-    }
-
-    public void setDisableCaching(final boolean disableCaching) {
-        this.disableCaching = disableCaching;
     }
 
     @Override
