@@ -28,6 +28,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
+import java.util.Map;
+
 import static org.mockito.Mockito.when;
 
 /**
@@ -36,6 +38,8 @@ import static org.mockito.Mockito.when;
  * @author avasquez
  */
 public class ConfigAwareTestBase {
+    private static final String CONTEXT_NAME = "contextName";
+    private static final String CONTEXT_NAME_VALUE = "crafter-test";
 
     @Spy
     protected SiteContext siteContext;
@@ -49,8 +53,8 @@ public class ConfigAwareTestBase {
 
         setCurrentRequestContext();
         setCurrentSiteContext();
-
-        config = ConfigUtils.readXmlConfiguration(new ClassPathResource("config/site-config.xml"), ',', null, null);
+        Map<String, String> contextConfigVariables = Map.of(CONTEXT_NAME, CONTEXT_NAME_VALUE);
+        config = ConfigUtils.readXmlConfiguration(new ClassPathResource("config/site-config.xml"), ',', null, contextConfigVariables);
 
         when(siteContext.getConfig()).thenReturn(config);
     }
