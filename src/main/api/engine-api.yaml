@@ -4,7 +4,7 @@ servers:
 info:
   description: |-
     Crafter Engine API
-  version: '4.1.2'
+  version: '4.2.0'
   title: Crafter Engine
   termsOfService: ''
   contact:
@@ -1181,8 +1181,9 @@ paths:
                   type: integer
                   example: 1
                 query:
-                  type:  string
-                  example: '"match_all" : {}'
+                  type:  object
+                  example: 
+                    match_all: {}
       responses:
         '200':
           description: OK
