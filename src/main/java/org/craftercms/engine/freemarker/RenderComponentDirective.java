@@ -21,7 +21,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 import freemarker.core.Environment;
 import freemarker.template.SimpleHash;
@@ -48,7 +48,6 @@ import org.craftercms.engine.util.GroovyScriptUtils;
 import org.craftercms.engine.view.CrafterPageView;
 import org.dom4j.Element;
 import org.springframework.beans.factory.ObjectFactory;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Custom directive to render a component by processing the template defined in the component element's template name
@@ -79,48 +78,19 @@ public class RenderComponentDirective implements TemplateDirectiveModel {
     protected String componentElementName;
     protected SiteItemScriptResolver scriptResolver;
 
-    @Required
-    public void setServletContext(ServletContext servletContext) {
+    public RenderComponentDirective(ServletContext servletContext, SiteItemService siteItemService,
+                                    ObjectFactory<SimpleHash> modelFactory, String templateXPathQuery,
+                                    String templateNamePrefix, String templateNameSuffix,
+                                    String includeElementName, final String componentElementName,
+                                    SiteItemScriptResolver scriptResolver) {
         this.servletContext = servletContext;
-    }
-
-    @Required
-    public void setSiteItemService(SiteItemService siteItemService) {
         this.siteItemService = siteItemService;
-    }
-
-    @Required
-    public void setModelFactory(ObjectFactory<SimpleHash> modelFactory) {
         this.modelFactory = modelFactory;
-    }
-
-    @Required
-    public void setTemplateXPathQuery(String templateXPathQuery) {
         this.templateXPathQuery = templateXPathQuery;
-    }
-
-    @Required
-    public void setTemplateNamePrefix(String templateNamePrefix) {
         this.templateNamePrefix = templateNamePrefix;
-    }
-
-    @Required
-    public void setTemplateNameSuffix(String templateNameSuffix) {
         this.templateNameSuffix = templateNameSuffix;
-    }
-
-    @Required
-    public void setIncludeElementName(String includeElementName) {
         this.includeElementName = includeElementName;
-    }
-
-    @Required
-    public void setComponentElementName(final String componentElementName) {
         this.componentElementName = componentElementName;
-    }
-
-    @Required
-    public void setScriptResolver(SiteItemScriptResolver scriptResolver) {
         this.scriptResolver = scriptResolver;
     }
 

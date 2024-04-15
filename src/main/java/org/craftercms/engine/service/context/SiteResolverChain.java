@@ -16,10 +16,9 @@
 package org.craftercms.engine.service.context;
 
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * {@link org.craftercms.engine.service.context.SiteResolver} that goes through a chain of resolvers until one of
@@ -31,8 +30,7 @@ public class SiteResolverChain implements SiteResolver {
 
     protected List<SiteResolver> chain;
 
-    @Required
-    public void setChain(List<SiteResolver> chain) {
+    public SiteResolverChain(List<SiteResolver> chain) {
         this.chain = chain;
     }
 

@@ -61,10 +61,8 @@ public class CandidateTargetedUrlsResolverImplTest {
 
     @Before
     public void setUp() throws Exception {
-        candidateUrlsResolver = new CandidateTargetedUrlsResolverImpl();
-        candidateUrlsResolver.setTargetIdManager(createTargetIdManager());
-        candidateUrlsResolver.setTargetedUrlStrategy(createTargetedUrlStrategy());
-        candidateUrlsResolver.setCandidateTargetIdsResolver(createCandidateTargetIdsResolver());
+        candidateUrlsResolver = new CandidateTargetedUrlsResolverImpl(createTargetIdManager(), createTargetedUrlStrategy(),
+                createCandidateTargetIdsResolver());
 
         setUpCurrentSiteContext();
     }

@@ -20,12 +20,12 @@ import org.craftercms.engine.http.ExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * Handler for {@link javax.validation.ConstraintViolationException} exceptions
+ * Handler for {@link jakarta.validation.ConstraintViolationException} exceptions
  */
 public class ConstraintViolationExceptionHandler implements ExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(ConstraintViolationExceptionHandler.class);
@@ -33,7 +33,7 @@ public class ConstraintViolationExceptionHandler implements ExceptionHandler {
     @Override
     public boolean handle(HttpServletRequest request, HttpServletResponse response, Exception ex) throws IOException {
         Exception constraintViolationException =
-                ExceptionUtils.getThrowableOfType(ex, javax.validation.ConstraintViolationException.class);
+                ExceptionUtils.getThrowableOfType(ex, jakarta.validation.ConstraintViolationException.class);
 
         if (constraintViolationException != null) {
             logger.warn("Failed to validate request parameters: {}", constraintViolationException.getMessage());

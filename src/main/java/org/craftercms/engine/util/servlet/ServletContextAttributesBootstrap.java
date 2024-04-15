@@ -17,9 +17,8 @@
 package org.craftercms.engine.util.servlet;
 
 import java.util.Map;
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.context.ServletContextAware;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -33,14 +32,13 @@ public class ServletContextAttributesBootstrap implements ServletContextAware, I
     private ServletContext servletContext;
     private Map<String, Object> attributes;
 
+    public ServletContextAttributesBootstrap(Map<String, Object> attributes) {
+        this.attributes = attributes;
+    }
+
     @Override
     public void setServletContext(ServletContext servletContext) {
         this.servletContext = servletContext;
-    }
-
-    @Required
-    public void setAttributes(Map<String, Object> attributes) {
-        this.attributes = attributes;
     }
 
     public void afterPropertiesSet() {

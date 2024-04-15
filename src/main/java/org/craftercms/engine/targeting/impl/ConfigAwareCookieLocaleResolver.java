@@ -16,17 +16,19 @@
 package org.craftercms.engine.targeting.impl;
 
 import java.util.Locale;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.lang3.LocaleUtils;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.ConfigUtils;
-import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 
 /**
  * {@link CookieLocaleResolver} extension that uses the default locale specified in the site configuration if
  * the user has not current locale associated.
+ *
+ * TODO: This class extends `CookieLocaleResolver` version 5.3.33 to keep the override `getCookieName()`. Review this to use the latest
+ *
  *
  * @author avasquez
  */

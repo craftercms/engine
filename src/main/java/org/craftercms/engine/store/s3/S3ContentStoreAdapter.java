@@ -34,6 +34,7 @@ import org.craftercms.core.service.CachingOptions;
 import org.craftercms.core.service.Content;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.store.impl.File;
+import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.core.util.cache.impl.CachingAwareList;
 import org.craftercms.engine.store.AbstractCachedFileBasedContentStoreAdapter;
 import org.craftercms.engine.store.s3.util.S3ClientBuilder;
@@ -41,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.validation.Validator;
 
 import java.beans.ConstructorProperties;
 import java.util.List;
@@ -63,7 +65,10 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
     protected final String[] cacheAllowedPaths;
 
     @ConstructorProperties({"clientBuilder", "contentMaxLength", "cacheAllowedPaths"})
-    public S3ContentStoreAdapter(final S3ClientBuilder clientBuilder, final int contentMaxLength, final String[] cacheAllowedPaths) {
+    public S3ContentStoreAdapter(Validator pathValidator, String descriptorFileExtension,
+                                 String metadataFileExtension, CacheTemplate cacheTemplate,
+                                 final S3ClientBuilder clientBuilder, final int contentMaxLength, final String[] cacheAllowedPaths) {
+        super(pathValidator, descriptorFileExtension, metadataFileExtension, cacheTemplate);
         this.clientBuilder = clientBuilder;
         this.contentMaxLength = contentMaxLength;
         this.cacheAllowedPaths = cacheAllowedPaths;

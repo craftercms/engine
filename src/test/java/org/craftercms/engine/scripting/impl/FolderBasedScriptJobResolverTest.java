@@ -57,10 +57,7 @@ public class FolderBasedScriptJobResolverTest {
         setUpStoreService(storeService);
         setUpSiteContext(siteContext, storeService);
 
-        resolver = new FolderBasedScriptJobResolver();
-        resolver.setFolderUrl("/scripts/jobs");
-        resolver.setCronExpression(HOURLY_CRON_EXPRESSION);
-        resolver.setScriptSuffix(".groovy");
+        resolver = new FolderBasedScriptJobResolver(".groovy", "/scripts/jobs", HOURLY_CRON_EXPRESSION);
     }
 
     @Test

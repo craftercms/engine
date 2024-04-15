@@ -22,7 +22,9 @@ import org.craftercms.core.service.CachingOptions;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.store.impl.AbstractFileBasedContentStoreAdapter;
 import org.craftercms.core.store.impl.File;
+import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.core.util.cache.impl.CachingAwareList;
+import org.springframework.validation.Validator;
 
 import java.util.List;
 
@@ -36,6 +38,11 @@ public abstract class AbstractCachedFileBasedContentStoreAdapter extends Abstrac
 
     public static final String CONST_KEY_ELEM_FILE= "fileBasedContentStoreAdapter.file";
     public static final String CONST_KEY_ELEM_CHILDREN = "fileBasedContentStoreAdapter.children";
+
+    public AbstractCachedFileBasedContentStoreAdapter(Validator pathValidator, String descriptorFileExtension,
+                                                      String metadataFileExtension, CacheTemplate cacheTemplate) {
+        super(pathValidator, descriptorFileExtension, metadataFileExtension, cacheTemplate);
+    }
 
     @Override
     protected File findFile(Context context, CachingOptions cachingOptions,

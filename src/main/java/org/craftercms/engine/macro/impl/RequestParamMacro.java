@@ -18,7 +18,6 @@ package org.craftercms.engine.macro.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.http.RequestContext;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Represents a macro that can be a request parameter.
@@ -27,12 +26,11 @@ import org.springframework.beans.factory.annotation.Required;
  */
 public class RequestParamMacro extends AbstractMacro {
 
-    private static final Log logger = LogFactory.getLog(CookieMacro.class);
+    private static final Log logger = LogFactory.getLog(RequestParamMacro.class);
 
     private String requestParamName;
 
-    @Required
-    public void setRequestParamName(String requestParamName) {
+    public RequestParamMacro(String requestParamName) {
         this.requestParamName = requestParamName;
     }
 

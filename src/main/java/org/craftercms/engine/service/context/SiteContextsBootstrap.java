@@ -17,7 +17,6 @@
 package org.craftercms.engine.service.context;
 
 import org.craftercms.engine.event.SiteContextsBootstrappedEvent;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
@@ -37,8 +36,10 @@ public class SiteContextsBootstrap implements ApplicationListener<ContextRefresh
 
     protected boolean triggered;
 
-    public SiteContextsBootstrap() {
+    public SiteContextsBootstrap(boolean createContextsOnStartup, SiteContextManager siteContextManager) {
         createConcurrently = false;
+        this.createContextsOnStartup = createContextsOnStartup;
+        this.siteContextManager = siteContextManager;
     }
 
     @Override
@@ -46,18 +47,8 @@ public class SiteContextsBootstrap implements ApplicationListener<ContextRefresh
         this.applicationContext = applicationContext;
     }
 
-    @Required
-    public void setCreateContextsOnStartup(boolean createContextsOnStartup) {
-        this.createContextsOnStartup = createContextsOnStartup;
-    }
-
     public void setCreateConcurrently(boolean createConcurrently) {
         this.createConcurrently = createConcurrently;
-    }
-
-    @Required
-    public void setSiteContextManager(SiteContextManager siteContextManager) {
-        this.siteContextManager = siteContextManager;
     }
 
     @Override

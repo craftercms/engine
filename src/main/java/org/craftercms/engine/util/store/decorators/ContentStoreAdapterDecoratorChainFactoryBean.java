@@ -16,7 +16,6 @@
 package org.craftercms.engine.util.store.decorators;
 
 import org.craftercms.core.store.ContentStoreAdapter;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 
 import java.util.List;
@@ -32,13 +31,8 @@ public class ContentStoreAdapterDecoratorChainFactoryBean extends AbstractFactor
     private ContentStoreAdapter storeAdapter;
     private List<ContentStoreAdapterDecorator> decorators;
 
-    @Required
-    public void setStoreAdapter(ContentStoreAdapter storeAdapter) {
+    public ContentStoreAdapterDecoratorChainFactoryBean(ContentStoreAdapter storeAdapter, List<ContentStoreAdapterDecorator> decorators) {
         this.storeAdapter = storeAdapter;
-    }
-
-    @Required
-    public void setDecorators(List<ContentStoreAdapterDecorator> decorators) {
         this.decorators = decorators;
     }
 

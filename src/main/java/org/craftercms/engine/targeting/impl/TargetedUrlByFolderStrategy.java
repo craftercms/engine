@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.craftercms.commons.lang.UrlUtils;
+import org.craftercms.engine.targeting.TargetIdManager;
 
 /**
  * {@link org.craftercms.engine.targeting.TargetedUrlStrategy} implementation that recognizes the target ID in
@@ -34,6 +35,10 @@ public class TargetedUrlByFolderStrategy extends AbstractTargetedUrlStrategy {
 
     public static final int TARGET_ID_GROUP = 1;
     public static final int SUFFIX_GROUP = 2;
+
+    public TargetedUrlByFolderStrategy(TargetIdManager targetIdManager) {
+        super(targetIdManager);
+    }
 
     @Override
     public boolean isFileNameBasedStrategy() {

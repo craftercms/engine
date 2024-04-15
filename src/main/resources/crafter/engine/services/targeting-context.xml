@@ -22,7 +22,7 @@
     <bean id="crafter.targetedUrlStrategyBase"
           class="org.craftercms.engine.targeting.impl.AbstractTargetedUrlStrategy"
           abstract="true">
-        <property name="targetIdManager" ref="crafter.proxyTargetIdManager"/>
+        <constructor-arg name="targetIdManager" ref="crafter.proxyTargetIdManager"/>
     </bean>
 
     <bean id="crafter.targetedUrlStrategy"
@@ -31,15 +31,15 @@
 
     <bean id="crafter.proxyTargetedUrlStrategy"
           class="org.craftercms.engine.targeting.impl.ProxyTargetedUrlStrategy">
-        <property name="applicationContext" ref="crafter.applicationContextAccessor"/>
-        <property name="beanName" value="crafter.targetedUrlStrategy"/>
+        <constructor-arg name="applicationContext" ref="crafter.applicationContextAccessor"/>
+        <constructor-arg name="beanName" value="crafter.targetedUrlStrategy"/>
     </bean>
 
     <bean id="crafter.targetIdManager" class="org.craftercms.engine.targeting.impl.LocaleTargetIdManager"/>
 
     <bean id="crafter.proxyTargetIdManager" class="org.craftercms.engine.targeting.impl.ProxyTargetIdManager">
-        <property name="applicationContext" ref="crafter.applicationContextAccessor"/>
-        <property name="beanName" value="crafter.targetIdManager"/>
+        <constructor-arg name="applicationContext" ref="crafter.applicationContextAccessor"/>
+        <constructor-arg name="beanName" value="crafter.targetIdManager"/>
     </bean>
 
     <bean id="crafter.candidateTargetIdsResolver"
@@ -47,14 +47,14 @@
 
     <bean id="crafter.candidateTargetedUrlsResolver"
           class="org.craftercms.engine.targeting.impl.CandidateTargetedUrlsResolverImpl">
-        <property name="targetIdManager" ref="crafter.proxyTargetIdManager"/>
-        <property name="targetedUrlStrategy" ref="crafter.proxyTargetedUrlStrategy"/>
-        <property name="candidateTargetIdsResolver" ref="crafter.candidateTargetIdsResolver"/>
+        <constructor-arg name="targetIdManager" ref="crafter.proxyTargetIdManager"/>
+        <constructor-arg name="targetedUrlStrategy" ref="crafter.proxyTargetedUrlStrategy"/>
+        <constructor-arg name="candidateTargetIdsResolver" ref="crafter.candidateTargetIdsResolver"/>
     </bean>
 
     <bean id="crafter.targetedContentStoreAdapterDecorator"
           class="org.craftercms.engine.targeting.impl.TargetedContentStoreAdapterDecorator" scope="prototype">
-        <property name="candidateTargetedUrlsResolver" ref="crafter.candidateTargetedUrlsResolver"/>
+        <constructor-arg name="candidateTargetedUrlsResolver" ref="crafter.candidateTargetedUrlsResolver"/>
     </bean>
 
 </beans>
