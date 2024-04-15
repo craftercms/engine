@@ -4,7 +4,7 @@ git:
   quiet: true
 language: java
 jdk:
-  - openjdk17
+  - openjdk21
 branches:
   only:
   - develop
