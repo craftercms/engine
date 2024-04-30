@@ -27,7 +27,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.engine.macro.MacroResolver;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.beans.factory.InitializingBean;
@@ -60,22 +59,14 @@ public class FolderScanningSiteListResolver implements SiteListResolver, Resourc
     protected String sitesFolderPath;
     protected Pattern siteFolderNamePattern;
 
-    public FolderScanningSiteListResolver() {
+    public FolderScanningSiteListResolver(String siteRootFolderPath, MacroResolver macroResolver) {
         this.siteNameMacroName = SiteContextFactory.DEFAULT_SITE_NAME_MACRO_NAME;
-    }
-
-    @Required
-    public void setSiteRootFolderPath(String siteRootFolderPath) {
         this.siteRootFolderPath = siteRootFolderPath;
+        this.macroResolver = macroResolver;
     }
 
     public void setSiteNameMacroName(String siteNameMacroName) {
         this.siteNameMacroName = siteNameMacroName;
-    }
-
-    @Required
-    public void setMacroResolver(MacroResolver macroResolver) {
-        this.macroResolver = macroResolver;
     }
 
     @Override

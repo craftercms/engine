@@ -27,7 +27,6 @@ import org.craftercms.engine.targeting.TargetIdManager;
 import org.craftercms.engine.targeting.TargetedUrlComponents;
 import org.craftercms.engine.targeting.TargetedUrlStrategy;
 import org.craftercms.engine.util.TargetingUtils;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Default implementation of {@link CandidateTargetedUrlsResolverImpl}, that works by first extracting the root folder
@@ -43,18 +42,10 @@ public class CandidateTargetedUrlsResolverImpl implements CandidateTargetedUrlsR
     protected TargetedUrlStrategy targetedUrlStrategy;
     protected CandidateTargetIdsResolver candidateTargetIdsResolver;
 
-    @Required
-    public void setTargetIdManager(TargetIdManager targetIdManager) {
+    public CandidateTargetedUrlsResolverImpl(TargetIdManager targetIdManager, TargetedUrlStrategy targetedUrlStrategy,
+                                             CandidateTargetIdsResolver candidateTargetIdsResolver) {
         this.targetIdManager = targetIdManager;
-    }
-
-    @Required
-    public void setTargetedUrlStrategy(TargetedUrlStrategy targetedUrlStrategy) {
         this.targetedUrlStrategy = targetedUrlStrategy;
-    }
-
-    @Required
-    public void setCandidateTargetIdsResolver(CandidateTargetIdsResolver candidateTargetIdsResolver) {
         this.candidateTargetIdsResolver = candidateTargetIdsResolver;
     }
 

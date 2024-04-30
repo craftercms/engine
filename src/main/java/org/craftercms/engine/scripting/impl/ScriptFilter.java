@@ -31,13 +31,12 @@ import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.ConfigUtils;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.security.web.util.matcher.*;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
 
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.*;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,13 +66,9 @@ public class ScriptFilter implements Filter {
 
     protected RequestMatcher excludedUrlsMatcher;
 
-    public ScriptFilter() {
+    public ScriptFilter(CacheTemplate cacheTemplate) {
         pathMatcher = new AntPathMatcher();
         excludedUrlsMatcher = new NegatedRequestMatcher(AnyRequestMatcher.INSTANCE);
-    }
-
-    @Required
-    public void setCacheTemplate(CacheTemplate cacheTemplate) {
         this.cacheTemplate = cacheTemplate;
     }
 

@@ -18,7 +18,7 @@ package org.craftercms.engine.freemarker;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 import freemarker.core.Environment;
 import freemarker.template.TemplateDirectiveBody;
@@ -36,7 +36,6 @@ import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.GroovyScriptUtils;
 import org.craftercms.engine.view.CrafterPageView;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Freemarker directive that allows to execute scripts/controllers from inside Freemarker templates. The directive receives a single
@@ -52,8 +51,7 @@ public class ExecuteControllerDirective implements TemplateDirectiveModel {
 
     protected ServletContext servletContext;
 
-    @Required
-    public void setServletContext(ServletContext servletContext) {
+    public ExecuteControllerDirective(ServletContext servletContext) {
         this.servletContext = servletContext;
     }
 

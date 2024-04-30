@@ -52,9 +52,8 @@ public class TargetedContentStoreAdapterDecoratorTest extends ConfigAwareTestBas
     public void setUp() throws Exception {
         super.setUp();
 
-        storeAdapter = new TargetedContentStoreAdapterDecorator();
+        storeAdapter = new TargetedContentStoreAdapterDecorator(createCandidateTargetedUrlsResolver());
         storeAdapter.setActualStoreAdapter(createActualStoreAdapter());
-        storeAdapter.setCandidateTargetedUrlsResolver(createCandidateTargetedUrlsResolver());
 
         LocaleContextHolder.setLocale(LocaleUtils.toLocale("en"));
     }
@@ -267,15 +266,12 @@ public class TargetedContentStoreAdapterDecoratorTest extends ConfigAwareTestBas
     private CandidateTargetedUrlsResolver createCandidateTargetedUrlsResolver() {
         LocaleTargetIdManager targetIdManager = new LocaleTargetIdManager();
 
-        TargetedUrlByFolderStrategy targetUrlStrategy = new TargetedUrlByFolderStrategy();
-        targetUrlStrategy.setTargetIdManager(targetIdManager);
+        TargetedUrlByFolderStrategy targetUrlStrategy = new TargetedUrlByFolderStrategy(targetIdManager);
 
         CandidateTargetIdsResolverImpl candidateTargetIdsResolver = new CandidateTargetIdsResolverImpl();
 
-        CandidateTargetedUrlsResolverImpl candidateUrlsResolver = new CandidateTargetedUrlsResolverImpl();
-        candidateUrlsResolver.setTargetIdManager(targetIdManager);
-        candidateUrlsResolver.setTargetedUrlStrategy(targetUrlStrategy);
-        candidateUrlsResolver.setCandidateTargetIdsResolver(candidateTargetIdsResolver);
+        CandidateTargetedUrlsResolverImpl candidateUrlsResolver = new CandidateTargetedUrlsResolverImpl(targetIdManager,
+                targetUrlStrategy, candidateTargetIdsResolver);
 
         return candidateUrlsResolver;
     }

@@ -19,8 +19,8 @@ import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.craftercms.engine.service.context.SiteContext;
 import org.springframework.web.util.WebUtils;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import java.beans.ConstructorProperties;
 import java.util.Locale;
 

@@ -17,7 +17,7 @@ package org.craftercms.engine.util;
 
 import java.util.concurrent.Executor;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 import org.craftercms.engine.scripting.impl.ScriptJob;
 import org.craftercms.engine.service.context.SiteContext;

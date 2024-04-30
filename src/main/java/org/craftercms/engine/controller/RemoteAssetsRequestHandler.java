@@ -19,13 +19,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.craftercms.commons.file.stores.RemoteFile;
 import org.craftercms.commons.file.stores.RemoteFileResolver;
 import org.craftercms.engine.util.spring.resources.RangeAwareResourceRegionHttpMessageConverter;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.io.Resource;
 import org.springframework.http.CacheControl;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -38,23 +37,15 @@ import java.io.IOException;
 public class RemoteAssetsRequestHandler extends ResourceHttpRequestHandler {
 
     private RemoteFileResolver remoteFileResolver;
-    private boolean disableCaching;
 
-    protected void init() {
-        if(disableCaching) {
+    public RemoteAssetsRequestHandler(RemoteFileResolver remoteFileResolver, final boolean disableCaching) {
+        this.remoteFileResolver = remoteFileResolver;
+
+        if (disableCaching) {
             setCacheControl(CacheControl.noCache());
         }
         setRequireSession(false);
         setResourceRegionHttpMessageConverter(new RangeAwareResourceRegionHttpMessageConverter());
-    }
-
-    @Required
-    public void setRemoteFileResolver(RemoteFileResolver remoteFileResolver) {
-        this.remoteFileResolver = remoteFileResolver;
-    }
-
-    public void setDisableCaching(final boolean disableCaching) {
-        this.disableCaching = disableCaching;
     }
 
     @Override

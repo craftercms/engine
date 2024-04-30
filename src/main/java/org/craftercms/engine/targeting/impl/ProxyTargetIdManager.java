@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.craftercms.engine.targeting.TargetIdManager;
 import org.craftercms.engine.util.spring.AbstractProxyBean;
+import org.craftercms.engine.util.spring.ApplicationContextAccessor;
 
 /**
  * {@link ProxyTargetIdManager} that proxies to the manager defined in the site application context, or if not
@@ -27,6 +28,10 @@ import org.craftercms.engine.util.spring.AbstractProxyBean;
  * @author avasquez
  */
 public class ProxyTargetIdManager extends AbstractProxyBean<TargetIdManager> implements TargetIdManager {
+
+    public ProxyTargetIdManager(ApplicationContextAccessor applicationContext, String beanName) {
+        super(applicationContext, beanName);
+    }
 
     @Override
     public String getCurrentTargetId() throws IllegalStateException {

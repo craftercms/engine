@@ -18,9 +18,8 @@ package org.craftercms.engine.service.context;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Required;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * {@link org.craftercms.engine.service.context.SiteResolver} that resolves the current site name from a custom HTTP
@@ -32,12 +31,11 @@ public class HeaderSiteResolver implements SiteResolver {
 
     private static final Logger logger = LoggerFactory.getLogger(HeaderSiteResolver.class);
 
-    protected String headerName;
-
-    @Required
-    public void setHeaderName(String headerName) {
+    public HeaderSiteResolver(String headerName) {
         this.headerName = headerName;
     }
+
+    protected String headerName;
 
     @Override
     public String getSiteName(HttpServletRequest request) {

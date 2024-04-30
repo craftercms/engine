@@ -15,11 +15,10 @@
  */
 package org.craftercms.engine.macro.impl;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpSession;
 
 import org.craftercms.commons.http.RequestContext;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.context.ServletContextAware;
 
 /**
@@ -39,12 +38,8 @@ public class ScopeAttributeMacro extends AbstractMacro implements ServletContext
     private Scope scope;
     private ServletContext servletContext;
 
-    public ScopeAttributeMacro() {
+    public ScopeAttributeMacro(String attributeName) {
         scope = Scope.REQUEST;
-    }
-
-    @Required
-    public void setAttributeName(String attributeName) {
         this.attributeName = attributeName;
     }
 

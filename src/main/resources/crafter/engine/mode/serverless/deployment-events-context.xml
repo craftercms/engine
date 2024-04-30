@@ -23,7 +23,7 @@
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
     <bean id="crafter.deploymentEventsWatcher" class="org.craftercms.engine.util.deployment.DeploymentEventsWatcher">
-        <property name="siteContextManager" ref="crafter.siteContextManager"/>
+        <constructor-arg name="siteContextManager" ref="crafter.siteContextManager"/>
     </bean>
 
     <bean id="crafter.deploymentEventsWatcherJob"
