@@ -46,8 +46,7 @@ public class ToTargetedUrlTransformerTest {
 
     @Before
     public void setUp() throws Exception {
-        urlTransformer = new ToTargetedUrlTransformer();
-        urlTransformer.setTargetedUrlStrategy(createTargetedUrlStrategy());
+        urlTransformer = new ToTargetedUrlTransformer(createTargetedUrlStrategy());
 
         setUpCurrentSiteContext();
     }

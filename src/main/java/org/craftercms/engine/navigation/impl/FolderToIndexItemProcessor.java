@@ -23,7 +23,6 @@ import org.craftercms.core.service.Context;
 import org.craftercms.core.service.Item;
 import org.craftercms.core.url.UrlTransformationEngine;
 import org.craftercms.engine.targeting.TargetIdManager;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * {@link ItemProcessor} that modifies the a folder item to include the descriptor DOM of it's index file.
@@ -37,23 +36,11 @@ public class FolderToIndexItemProcessor implements ItemProcessor {
     protected ContentStoreService storeService;
     protected TargetIdManager targetIdManager;
 
-    @Required
-    public void setFolderToIndexUrlTransformerName(String folderToIndexUrlTransformerName) {
+    public FolderToIndexItemProcessor(String folderToIndexUrlTransformerName, UrlTransformationEngine urlTransformationEngine,
+                                      ContentStoreService storeService, TargetIdManager targetIdManager) {
         this.folderToIndexUrlTransformerName = folderToIndexUrlTransformerName;
-    }
-
-    @Required
-    public void setUrlTransformationEngine(UrlTransformationEngine urlTransformationEngine) {
         this.urlTransformationEngine = urlTransformationEngine;
-    }
-
-    @Required
-    public void setStoreService(ContentStoreService storeService) {
         this.storeService = storeService;
-    }
-
-    @Required
-    public void setTargetIdManager(TargetIdManager targetIdManager) {
         this.targetIdManager = targetIdManager;
     }
 

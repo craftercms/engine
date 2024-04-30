@@ -25,7 +25,6 @@ import org.craftercms.core.service.Item;
 import org.craftercms.core.url.UrlTransformationEngine;
 import org.craftercms.engine.targeting.TargetIdManager;
 import org.craftercms.engine.properties.SiteProperties;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * {@link ItemProcessor} that converts the item to the current targeted item (e.g. if the current target ID is en_US, then index.xml
@@ -41,23 +40,12 @@ public class ToCurrentTargetedVersionItemProcessor implements ItemProcessor {
     protected ContentStoreService storeService;
     protected TargetIdManager targetIdManager;
 
-    @Required
-    public void setToCurrentTargetedUrlTransformerName(String toCurrentTargetedUrlTransformerName) {
+    public ToCurrentTargetedVersionItemProcessor(String toCurrentTargetedUrlTransformerName,
+                                                 UrlTransformationEngine urlTransformationEngine,
+                                                 ContentStoreService storeService, TargetIdManager targetIdManager) {
         this.toCurrentTargetedUrlTransformerName = toCurrentTargetedUrlTransformerName;
-    }
-
-    @Required
-    public void setUrlTransformationEngine(UrlTransformationEngine urlTransformationEngine) {
         this.urlTransformationEngine = urlTransformationEngine;
-    }
-
-    @Required
-    public void setStoreService(ContentStoreService storeService) {
         this.storeService = storeService;
-    }
-
-    @Required
-    public void setTargetIdManager(TargetIdManager targetIdManager) {
         this.targetIdManager = targetIdManager;
     }
 

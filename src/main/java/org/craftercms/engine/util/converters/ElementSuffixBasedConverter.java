@@ -23,7 +23,6 @@ import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.converters.Converter;
 import org.craftercms.engine.properties.SiteProperties;
 import org.dom4j.Element;
-import org.springframework.beans.factory.annotation.Required;
 
 public class ElementSuffixBasedConverter implements Converter<Element, Object> {
 
@@ -34,12 +33,9 @@ public class ElementSuffixBasedConverter implements Converter<Element, Object> {
     protected Map<String, Converter<String, ?>> suffixMappedConverters;
     protected String[] supportedSuffixesOnDisabledFullModelTypeConversion;
 
-    public ElementSuffixBasedConverter() {
+    public ElementSuffixBasedConverter(Map<String, Converter<String, ?>> suffixMappedConverters) {
         supportedSuffixesOnDisabledFullModelTypeConversion = DEFAULT_SUPPORTED_SUFFIXES_ON_DISABLED_FULL_MODEL_CONVERSION;
-    }
 
-    @Required
-    public void setSuffixMappedConverters(Map<String, Converter<String, ?>> suffixMappedConverters) {
         this.suffixMappedConverters = suffixMappedConverters;
     }
 

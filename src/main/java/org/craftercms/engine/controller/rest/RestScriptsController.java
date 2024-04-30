@@ -38,13 +38,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.UriTemplate;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +61,7 @@ import static org.craftercms.engine.util.GroovyScriptUtils.addRestScriptVariable
  *
  * @author Alfonso Vásquez
  */
+@RestController
 @RequestMapping(path = {API_ROOT, API_1_SERVICES_ROOT})
 public class RestScriptsController implements ServletContextAware {
 

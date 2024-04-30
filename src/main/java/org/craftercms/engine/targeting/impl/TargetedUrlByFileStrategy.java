@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.craftercms.engine.targeting.TargetIdManager;
 
 /**
  * {@link org.craftercms.engine.targeting.TargetedUrlStrategy} implementation that recognizes the target ID in
@@ -38,7 +39,8 @@ public class TargetedUrlByFileStrategy extends AbstractTargetedUrlStrategy {
 
     protected String targetIdSeparator;
 
-    public TargetedUrlByFileStrategy() {
+    public TargetedUrlByFileStrategy(TargetIdManager targetIdManager) {
+        super(targetIdManager);
         targetIdSeparator = DEFAULT_TARGET_ID_SEPARATOR;
     }
 

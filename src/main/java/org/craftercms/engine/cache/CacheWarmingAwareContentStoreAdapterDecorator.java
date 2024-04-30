@@ -22,7 +22,6 @@ import org.craftercms.core.util.ContentStoreUtils;
 import org.craftercms.engine.util.store.decorators.ContentStoreAdapterDecorator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Required;
 
 import java.util.List;
 import java.util.Map;
@@ -43,19 +42,14 @@ public class CacheWarmingAwareContentStoreAdapterDecorator implements ContentSto
     protected ContentStoreAdapter actualStoreAdapter;
     protected CacheService cacheService;
 
-    @Required
-    public void setWarmUpEnabled(boolean warmUpEnabled) {
+    public CacheWarmingAwareContentStoreAdapterDecorator(boolean warmUpEnabled, CacheService cacheService) {
         this.warmUpEnabled = warmUpEnabled;
+        this.cacheService = cacheService;
     }
 
     @Override
     public void setActualStoreAdapter(ContentStoreAdapter actualStoreAdapter) {
         this.actualStoreAdapter = actualStoreAdapter;
-    }
-
-    @Required
-    public void setCacheService(CacheService cacheService) {
-        this.cacheService = cacheService;
     }
 
     @Override

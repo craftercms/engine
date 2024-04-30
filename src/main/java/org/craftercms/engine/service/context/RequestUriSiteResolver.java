@@ -18,11 +18,10 @@ package org.craftercms.engine.service.context;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * {@link org.craftercms.engine.service.context.SiteResolver} that resolves the current site name from an extract of
@@ -37,13 +36,8 @@ public class RequestUriSiteResolver implements SiteResolver {
     protected String siteNameRegex;
     protected int siteNameRegexGroup;
 
-    @Required
-    public void setSiteNameRegex(String siteNameRegex) {
+    public RequestUriSiteResolver(String siteNameRegex, int siteNameRegexGroup) {
         this.siteNameRegex = siteNameRegex;
-    }
-
-    @Required
-    public void setSiteNameRegexGroup(int siteNameRegexGroup) {
         this.siteNameRegexGroup = siteNameRegexGroup;
     }
 

@@ -76,8 +76,7 @@ public class RejectIndexFilesItemFilterTest {
     }
 
     private RejectIndexFilesItemFilter createFilter(TargetedUrlStrategy strategy) {
-        RejectIndexFilesItemFilter filter = new RejectIndexFilesItemFilter();
-        filter.setTargetedUrlStrategy(strategy);
+        RejectIndexFilesItemFilter filter = new RejectIndexFilesItemFilter(strategy);
 
         return filter;
     }
@@ -86,8 +85,7 @@ public class RejectIndexFilesItemFilterTest {
         TargetIdManager targetIdManager = mock(TargetIdManager.class);
         when(targetIdManager.getAvailableTargetIds()).thenReturn(Arrays.asList("en", "en_US"));
 
-        TargetedUrlByFileStrategy strategy = new TargetedUrlByFileStrategy();
-        strategy.setTargetIdManager(targetIdManager);
+        TargetedUrlByFileStrategy strategy = new TargetedUrlByFileStrategy(targetIdManager);
 
         return strategy;
     }

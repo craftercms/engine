@@ -27,7 +27,6 @@ import org.craftercms.core.service.Item;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.scripting.ScriptUrlTemplateScanner;
 import org.craftercms.engine.service.context.SiteContext;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.util.UriTemplate;
 
 /**
@@ -43,17 +42,13 @@ public class ScriptUrlTemplateScannerImpl implements ScriptUrlTemplateScanner {
     protected Pattern urlVariablePlaceholderPattern;
     protected String scriptsFolder;
 
-    public ScriptUrlTemplateScannerImpl() {
+    public ScriptUrlTemplateScannerImpl(String scriptsFolder) {
         urlVariablePlaceholderPattern = Pattern.compile(DEFAULT_URL_VARIABLE_PLACEHOLDER_PATTERN);
+        this.scriptsFolder = scriptsFolder;
     }
 
     public void setUrlVariablePlaceholderPattern(String urlVariablePlaceholderPattern) {
         this.urlVariablePlaceholderPattern = Pattern.compile(urlVariablePlaceholderPattern);
-    }
-
-    @Required
-    public void setScriptsFolder(String scriptsFolder) {
-        this.scriptsFolder = scriptsFolder;
     }
 
     @Override

@@ -16,16 +16,16 @@
 
 package org.craftercms.engine.servlet.interceptor;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.http.HttpUtils;
 import org.craftercms.engine.service.context.SiteContext;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.beans.ConstructorProperties;
 
@@ -38,7 +38,7 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
  *
  * @author avasquez
  */
-public class SiteCookieChangeInterceptor extends HandlerInterceptorAdapter {
+public class SiteCookieChangeInterceptor implements HandlerInterceptor {
 
     private static final Log logger = LogFactory.getLog(SiteCookieChangeInterceptor.class);
 
