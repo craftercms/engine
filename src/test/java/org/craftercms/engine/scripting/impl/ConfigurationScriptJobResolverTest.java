@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2024 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -16,8 +16,7 @@
 
 package org.craftercms.engine.scripting.impl;
 
-import java.util.List;
-
+import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
 import org.craftercms.commons.config.ConfigUtils;
@@ -34,6 +33,9 @@ import org.quartz.CronTrigger;
 import org.quartz.impl.JobDetailImpl;
 import org.springframework.core.io.ClassPathResource;
 
+import java.util.List;
+import java.util.Map;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
@@ -45,7 +47,10 @@ import static org.mockito.Mockito.when;
  * @author avasquez
  */
 public class ConfigurationScriptJobResolverTest {
-
+    private static final String CONFIG_MACRO_TEST_PROPERTY = "test-property";
+    private static final String CONFIG_TEST_PROPERTY_VALUE = "This one supports macro for site crafter-test";
+    private static final String CONTEXT_NAME = "contextName";
+    private static final String CONTEXT_NAME_VALUE = "crafter-test";
     @Mock
     private ContentStoreService storeService;
     @Mock
@@ -87,13 +92,20 @@ public class ConfigurationScriptJobResolverTest {
         assertEquals("0 0/15 * * * ?", trigger.getCronExpression());
     }
 
+    @Test
+    public void testMacrosInConfig () {
+        HierarchicalConfiguration config = siteContext.getConfig();
+        assertEquals(CONFIG_TEST_PROPERTY_VALUE, config.getString(CONFIG_MACRO_TEST_PROPERTY));
+    }
+
     private void setUpStoreService(ContentStoreService storeService) {
         ContentStoreServiceMockUtils.setUpGetContentFromClassPath(storeService);
     }
 
     private void setUpSiteContext(SiteContext siteContext, ContentStoreService storeService) throws Exception {
+        Map<String, String> contextConfigVariables = Map.of(CONTEXT_NAME, CONTEXT_NAME_VALUE);
         XMLConfiguration config =
-            ConfigUtils.readXmlConfiguration(new ClassPathResource("config/site-config.xml"), ',', null);
+            ConfigUtils.readXmlConfiguration(new ClassPathResource("config/site-config.xml"), ',', null, contextConfigVariables);
         config.setListDelimiterHandler(new DefaultListDelimiterHandler(','));
 
         when(siteContext.getSiteName()).thenReturn("default");

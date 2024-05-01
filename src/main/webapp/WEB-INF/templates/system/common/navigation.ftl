@@ -87,9 +87,9 @@
 >
   <#-- itemWrapperElement will be rendered if itemWrapperElement has no empty value and rootItem is set to true -->
   <#-- if no rootItem is rendered, then the itemWrapper is not rendered (it would be empty) -->
+  <#assign hasSubItems = ((navItem.subItems)?size > 0) />
+  <#assign addSubItemData = hasSubItems && currentDepth < depth && !inlineRootWithImmediateChildren/>
   <#if itemWrapperElement != "" && includeRoot>
-    <#assign hasSubItems = ((navItem.subItems)?size > 0) />
-    <#assign addSubItemData = hasSubItems && currentDepth < depth && !inlineRootWithImmediateChildren/>
     <#assign itemWrapperDepthClass = (currentDepth == 0)?then(
       itemWrapperClass,
       '${subItemWrapperClass} ${(subItemWrapperClassPrefix != "")?then("${subItemClassPrefix}-${currentDepth}", "")}'
@@ -112,11 +112,17 @@
       '${subItemClass} ${(subItemClassPrefix != "")?then("${subItemClassPrefix}-${currentDepth}", "")}'
     )/>
 
+    <#local classes = "${navItem.active?then(itemActiveClass, '')} ${(addSubItemData)?then(hasSubItemItemClass, itemDepthClass)}">
+    <#local attributesToApply = (addSubItemData)?then(hasSubItemItemAttributes, itemAttributes)>
+    <#if attributesToApply["class"]??>
+      <#local classes = "${classes} ${attributesToApply['class']}">
+      <#local attributesToApply = attributesToApply + { "class": classes }>
+    </#if>
     <@a
-      class="${navItem.active?then(itemActiveClass, '')} ${(addSubItemData)?then(hasSubItemItemClass, itemDepthClass)}"
+      class=classes
       $model=item
       href="${navItem.url}"
-      $attributes=(addSubItemData)?then(hasSubItemItemAttributes, itemAttributes)
+      $attributes=attributesToApply
     >
     <#outputFormat "HTML">
       ${navItem.label}

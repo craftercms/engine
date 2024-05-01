@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2024 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -44,6 +44,7 @@ import org.springframework.beans.factory.InitializingBean;
 
 import java.beans.ConstructorProperties;
 import java.util.List;
+import java.util.Map;
 
 import static org.apache.commons.lang3.StringUtils.removeStart;
 
@@ -89,7 +90,7 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
     @Override
     public Context createContext(final String id, final String rootFolderPath, final boolean mergingOn,
                                  final boolean cacheOn, final int maxAllowedItemsInCache,
-                                 final boolean ignoreHiddenFiles)
+                                 final boolean ignoreHiddenFiles, Map<String, String> configurationVariables)
         throws RootFolderNotFoundException, StoreException, AuthenticationException {
 
         AmazonS3URI uri = new AmazonS3URI(StringUtils.removeEnd(rootFolderPath, DELIMITER));
@@ -105,7 +106,7 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
         }
 
         return new S3Context(id, this, rootFolderPath, mergingOn, cacheOn, maxAllowedItemsInCache,
-                             ignoreHiddenFiles, uri);
+                             ignoreHiddenFiles, uri, configurationVariables);
     }
 
     @Override
