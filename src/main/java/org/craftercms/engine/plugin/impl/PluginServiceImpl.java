@@ -34,6 +34,7 @@ import java.beans.ConstructorProperties;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -86,7 +87,12 @@ public class PluginServiceImpl implements PluginService {
     protected HierarchicalConfiguration<?> loadPluginConfiguration(Context context, String pluginPath) {
         try (InputStream is =
                      contentStoreService.getContent(context, pluginPath).getInputStream()) {
-            return configurationReader.readXmlConfiguration(is, SiteContext.getCurrent().getContext().getConfigLookupVariables());
+            Map<String, String> lookupVariables = new HashMap<>();
+            Context currentContext = SiteContext.getCurrent().getContext();
+            if (currentContext != null) {
+                lookupVariables = currentContext.getConfigLookupVariables();
+            }
+            return configurationReader.readXmlConfiguration(is, lookupVariables);
         } catch (ConfigurationException | IOException e) {
             logger.error("Error loading plugin configuration", e);
             return new XMLConfiguration();
