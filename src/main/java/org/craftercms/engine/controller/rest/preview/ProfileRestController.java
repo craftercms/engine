@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2024 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -15,7 +15,9 @@
  */
 package org.craftercms.engine.controller.rest.preview;
 
+import jakarta.servlet.http.HttpSession;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.bson.types.ObjectId;
 import org.craftercms.commons.validation.ValidationResult;
@@ -28,11 +30,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.servlet.http.HttpSession;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toList;
 import static org.craftercms.commons.validation.annotations.param.EsapiValidationType.HTTPParameterName;
 
 /**
@@ -57,9 +61,9 @@ public class ProfileRestController {
 
     @RequestMapping(value = "/get", method = RequestMethod.GET)
     @SuppressWarnings("unchecked")
-    public Map<String, String> getProfile(HttpSession session) {
+    public Map<String, Object> getProfile(HttpSession session) {
 
-        Map<String, String> profile = (Map<String, String>) session.getAttribute(PROFILE_SESSION_ATTRIBUTE);
+        Map<String, Object> profile = (Map<String, Object>) session.getAttribute(PROFILE_SESSION_ATTRIBUTE);
         if (profile == null) {
             profile = new HashMap<>();
             session.setAttribute(PROFILE_SESSION_ATTRIBUTE, profile);
@@ -69,24 +73,28 @@ public class ProfileRestController {
     }
 
     @PostMapping("/set")
-    public ResponseEntity<Map<String, String>> setProfile(@RequestBody SetProfileRequest profileRequest, HttpSession session) {
-        boolean cleanseAttributes = shouldCleanseAttributes();
-
-        Map<String, String> parameterMap = profileRequest.getParameters();
+    public ResponseEntity<Object> setProfile(@RequestBody SetProfileRequest profileRequest, HttpSession session) {
+        Map<String, Object> parameterMap = profileRequest.getParameters();
         if (parameterMap.size() > MAXIMUM_PROPERTY_COUNT) {
             String message = format("Parameter count should not exceed %d. %d parameters were found.",
                     MAXIMUM_PROPERTY_COUNT, parameterMap.size());
             return ResponseEntity.badRequest().body(Map.of(ERROR_MESSAGE_MODEL_ATTR_NAME, message));
         }
 
-        Map<String, String> profile = new HashMap<>(parameterMap.size());
+        Map<String, Object> profile = new HashMap<>();
         try {
             for (String paramName : parameterMap.keySet()) {
-                String value = parameterMap.get(paramName);
-                if (value != null) {
-                    value = value.trim();
-                    validateParameter(paramName, value);
-                    profile.put(paramName, cleanseAttributes ? StringEscapeUtils.escapeHtml4(value) : value);
+                Object param = parameterMap.get(paramName);
+                if (param instanceof String) {
+                    validateParameter(paramName, (String) param);
+                    String value = cleanProfileParam((String) param);
+                    profile.put(paramName, value);
+                } else if (param instanceof List) {
+                    List<String> paramValue = (List<String>) param;
+                    for (String s : paramValue) {
+                        validateParameter(paramName, s);
+                    }
+                    profile.put(paramName, paramValue.stream().map(this::cleanProfileParam).collect(toList()));
                 }
             }
         } catch (Exception e) {
@@ -97,6 +105,14 @@ public class ProfileRestController {
         profile.put("id", new ObjectId().toHexString());
         session.setAttribute(PROFILE_SESSION_ATTRIBUTE, profile);
         return ResponseEntity.ok(profile);
+    }
+
+    private String cleanProfileParam(String value) {
+        if (StringUtils.isEmpty(value)) {
+            return value;
+        }
+        return value.transform(String::trim)
+                .transform(shouldCleanseAttributes() ? StringEscapeUtils::escapeHtml4 : identity());
     }
 
     private void validateParameter(final String paramName, final @NonNull String value) throws Exception {
