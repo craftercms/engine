@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2024 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -24,18 +24,18 @@ import java.util.Map;
  * Holds the necessary parameters for a set profile request.
  */
 public class SetProfileRequest {
-    private final Map<String, String> parameters;
+    private final Map<String, Object> parameters;
 
     public SetProfileRequest() {
         parameters = new HashMap<>();
     }
 
     @JsonAnySetter
-    public void addParameter(final String key, final String value) {
+    public void addParameter(final String key, final Object value) {
         parameters.put(key, value);
     }
 
-    public Map<String, String> getParameters() {
+    public Map<String, Object> getParameters() {
         return parameters;
     }
 }
