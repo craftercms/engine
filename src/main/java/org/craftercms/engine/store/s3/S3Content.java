@@ -15,8 +15,6 @@
  */
 package org.craftercms.engine.store.s3;
 
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.S3Object;
 import org.apache.commons.io.IOUtils;
 import org.bouncycastle.util.StoreException;
 import org.craftercms.core.service.Content;
@@ -36,7 +34,17 @@ import static java.lang.String.format;
  */
 public class S3Content implements Content {
 
-    private final Supplier<S3Object> objectSupplier;
+    private final Supplier<InputStream> objectSupplier;
+
+    /**
+     * Name of the bucket
+     */
+    protected String bucketName;
+
+    /**
+     * The S3 object key
+     */
+    protected String keyName;
 
     /**
      * When the file was last modified.
@@ -56,11 +64,13 @@ public class S3Content implements Content {
     /**
      * @param objectMetadata S3 Object metadata
      * @param shouldCache indicates if the object content should be loaded and cached in memory.
-     * @param supplier S3Object Supplier to get the actual content
+     * @param supplier InputStream Supplier to get the actual content
      */
-    public S3Content(ObjectMetadata objectMetadata, boolean shouldCache, Supplier<S3Object> supplier) {
-        this.lastModified = objectMetadata.getLastModified().getTime();
+    public S3Content(S3ObjectMetadata objectMetadata, boolean shouldCache, Supplier<InputStream> supplier) {
+        this.lastModified = objectMetadata.getLastModified();
         this.length = objectMetadata.getContentLength();
+        this.bucketName = objectMetadata.getBucketName();
+        this.keyName = objectMetadata.getKeyName();
         this.objectSupplier = supplier;
         if (shouldCache) {
             cacheContent();
@@ -68,13 +78,12 @@ public class S3Content implements Content {
     }
 
     private void cacheContent() {
-        S3Object s3Object = this.objectSupplier.get();
         content = new byte[(int) length];
 
-        try (InputStream is = s3Object.getObjectContent()) {
+        try (InputStream is = this.objectSupplier.get()) {
             IOUtils.readFully(is, content);
         } catch (Exception e) {
-            throw new StoreException(format("Error reading S3 item %s", s3Object), e);
+            throw new StoreException(format("Error reading S3 item %s:%s", bucketName, keyName), e);
         }
     }
 
@@ -93,8 +102,7 @@ public class S3Content implements Content {
         if (content != null) {
             return new ByteArrayInputStream(content);
         }
-        S3Object s3Object = this.objectSupplier.get();
-        return s3Object.getObjectContent();
+        return this.objectSupplier.get();
     }
 
 }
