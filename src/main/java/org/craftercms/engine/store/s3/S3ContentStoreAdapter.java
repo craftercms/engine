@@ -99,8 +99,7 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
                                  final boolean ignoreHiddenFiles, Map<String, String> configurationVariables)
         throws RootFolderNotFoundException, StoreException, AuthenticationException {
 
-        S3Uri uri = S3Uri.builder().uri(URI.create(StringUtils.removeEnd(rootFolderPath, DELIMITER))).build();
-
+        S3Uri uri = client.utilities().parseUri(URI.create(StringUtils.removeEnd(rootFolderPath, DELIMITER)));
         ListObjectsV2Request request = ListObjectsV2Request.builder()
                 .bucket(uri.bucket().orElse(""))
                 .prefix(uri.key().orElse(""))

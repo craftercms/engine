@@ -28,7 +28,6 @@ import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -50,8 +49,8 @@ public class S3SiteListResolver implements SiteListResolver {
     public S3SiteListResolver(String s3Uri, final S3ClientBuilder clientBuilder) {
         setSiteNameMacroName(SiteContextFactory.DEFAULT_SITE_NAME_MACRO_NAME);
 
-        this.s3Uri = S3Uri.builder().uri(URI.create(s3Uri)).build();
         this.clientBuilder = clientBuilder;
+        this.s3Uri = clientBuilder.getClient().utilities().parseUri(URI.create(encodeMacro(s3Uri)));
     }
 
     public void setSiteNameMacroName(String siteNameMacroName) {
@@ -70,6 +69,11 @@ public class S3SiteListResolver implements SiteListResolver {
         }
     }
 
+    /**
+     * Get site list of site from buckets match a regex
+     * @param bucketNameRegex the regex to match sites
+     * @return list of sites
+     */
     protected Collection<String> getSiteListFromBucketNames(String bucketNameRegex) {
         List<String> siteNames = new ArrayList<>();
         S3Client client = clientBuilder.getClient();
@@ -86,7 +90,13 @@ public class S3SiteListResolver implements SiteListResolver {
 
         return siteNames;
     }
-    
+
+    /**
+     * Get sites list from a bucket with a root prefix
+     * @param bucketName the bucket name
+     * @param rootPrefix the root prefix
+     * @return list of sites
+     */
     protected Collection<String> getSiteListFromBucketKeys(String bucketName, String rootPrefix) {
         List<String> siteNames = new ArrayList<>();
         S3Client client = clientBuilder.getClient();
@@ -98,14 +108,23 @@ public class S3SiteListResolver implements SiteListResolver {
                 .build();
 
         ListObjectsV2Response result = client.listObjectsV2(request);
-        if(CollectionUtils.isNotEmpty(result.commonPrefixes())) {
+        if (CollectionUtils.isNotEmpty(result.commonPrefixes())) {
             result.commonPrefixes()
                   .stream()
-                  .map(prefix -> StringUtils.stripEnd(StringUtils.removeStart(String.valueOf(prefix), rootPrefix), DELIMITER))
+                  .map(p -> StringUtils.stripEnd(StringUtils.removeStart(p.prefix(), rootPrefix), DELIMITER))
                   .forEach(siteNames::add);
         }
 
         return siteNames;
+    }
+
+    /**
+     * Encode an URL to valid the macro characters
+     * @param uri URL string
+     * @return encoded version of the URL
+     */
+    private String encodeMacro(String uri) {
+        return uri.replace("{", "%7B").replace("}", "%7D");
     }
 
 }
