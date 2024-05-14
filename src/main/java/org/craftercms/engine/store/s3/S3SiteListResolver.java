@@ -18,6 +18,7 @@ package org.craftercms.engine.store.s3;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.craftercms.commons.http.HttpUtils;
 import org.craftercms.engine.service.context.SiteContextFactory;
 import org.craftercms.engine.service.context.SiteListResolver;
 import org.craftercms.engine.store.s3.util.S3ClientBuilder;
@@ -50,7 +51,7 @@ public class S3SiteListResolver implements SiteListResolver {
         setSiteNameMacroName(SiteContextFactory.DEFAULT_SITE_NAME_MACRO_NAME);
 
         this.clientBuilder = clientBuilder;
-        this.s3Uri = clientBuilder.getClient().utilities().parseUri(URI.create(encodeMacro(s3Uri)));
+        this.s3Uri = clientBuilder.getClient().utilities().parseUri(URI.create(HttpUtils.encodeUrlMacro(s3Uri)));
     }
 
     public void setSiteNameMacroName(String siteNameMacroName) {
@@ -116,15 +117,6 @@ public class S3SiteListResolver implements SiteListResolver {
         }
 
         return siteNames;
-    }
-
-    /**
-     * Encode an URL to valid the macro characters
-     * @param uri URL string
-     * @return encoded version of the URL
-     */
-    private String encodeMacro(String uri) {
-        return uri.replace("{", "%7B").replace("}", "%7D");
     }
 
 }
