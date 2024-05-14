@@ -44,7 +44,6 @@ import software.amazon.awssdk.services.s3.paginators.ListObjectsV2Iterable;
 
 import java.beans.ConstructorProperties;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 
@@ -66,7 +65,8 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
     protected final int contentMaxLength;
     protected final String[] cacheAllowedPaths;
 
-    @ConstructorProperties({"clientBuilder", "contentMaxLength", "cacheAllowedPaths"})
+    @ConstructorProperties({"pathValidator", "descriptorFileExtension", "metadataFileExtension", "cacheTemplate",
+            "clientBuilder", "contentMaxLength", "cacheAllowedPaths"})
     public S3ContentStoreAdapter(Validator pathValidator, String descriptorFileExtension,
                                  String metadataFileExtension, CacheTemplate cacheTemplate,
                                  final S3ClientBuilder clientBuilder, final int contentMaxLength, final String[] cacheAllowedPaths) {
