@@ -85,6 +85,11 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
         client.close();
     }
 
+    /**
+     * Check if the result of listing S3 object response is empty
+     * @param result instance of {@link ListObjectsV2Response}
+     * @return true if the result is empty, false otherwise
+     */
     protected boolean isResultEmpty(ListObjectsV2Response result) {
         return (!result.hasCommonPrefixes() || result.commonPrefixes().isEmpty())
             && (!result.hasContents() || result.contents().isEmpty());
@@ -107,7 +112,7 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
         ListObjectsV2Response result = client.listObjectsV2(request);
 
         if (isResultEmpty(result)) {
-            throw new RootFolderNotFoundException("Root folder " + rootFolderPath + " not found");
+            throw new RootFolderNotFoundException(format("Root folder '%s' not found", rootFolderPath));
         }
 
         return new S3Context(id, this, rootFolderPath, mergingOn, cacheOn, maxAllowedItemsInCache,
@@ -128,7 +133,7 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
                     () -> {
                         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                                 .bucket(s3Context.getBucket())
-                                .key(s3Context.getKey())
+                                .key(key)
                                 .build();
                         return client.getObject(getObjectRequest);
                     });
@@ -164,7 +169,7 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
         }
 
         S3Context s3Context = (S3Context) context;
-        String key = StringUtils.appendIfMissing(s3Context.getKey(), path);
+        String key = StringUtils.stripStart(StringUtils.appendIfMissing(s3Context.getKey(), path), DELIMITER);
 
         logger.debug("Getting file for key {}", key);
 
@@ -173,7 +178,7 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
             try {
                 ListObjectsV2Request request = ListObjectsV2Request.builder()
                         .bucket(s3Context.getBucket())
-                        .prefix(key)
+                        .prefix(StringUtils.appendIfMissing(key, DELIMITER))
                         .delimiter(DELIMITER)
                         .build();
                 ListObjectsV2Response result = client.listObjectsV2(request);
@@ -181,10 +186,10 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
                     return new S3Prefix(key);
                 }
             } catch (S3Exception e) {
-                if(e.statusCode() == HttpStatus.SC_NOT_FOUND) {
+                if (e.statusCode() == HttpStatus.SC_NOT_FOUND) {
                     logger.debug("No object found for key {}", key);
                 } else {
-                    throw new StoreException("Error listing objects for key " + key, e);
+                    throw new StoreException(format("Error listing objects for key '%s'", key), e);
                 }
             }
         } else {
@@ -196,7 +201,7 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
                     logger.debug("No object found for key {}", key);
                 }
             } catch (S3Exception e) {
-                throw new StoreException("Error checking if object for key " + key + " exists", e);
+                throw new StoreException(format("Error checking if object for key '%s' exists", key), e);
             }
         }
         return null;
@@ -210,7 +215,7 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
         throws InvalidContextException, StoreException {
 
         if (!(dir instanceof S3Prefix)) {
-            throw new StoreException("Can't get children for file " + dir);
+            throw new StoreException(format("Can't get children for file '%s'", dir));
         }
 
         S3Context s3Context = (S3Context) context;
