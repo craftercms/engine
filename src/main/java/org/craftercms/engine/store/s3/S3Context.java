@@ -46,7 +46,7 @@ public class S3Context extends ContextImpl {
      * Returns the name of the bucket.
      */
     public String getBucket() {
-        return rootFolderUri.bucket().orElse("");
+        return rootFolderUri.bucket().orElseThrow();
     }
 
     /**

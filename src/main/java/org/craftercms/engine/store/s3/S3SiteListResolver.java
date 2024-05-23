@@ -60,7 +60,7 @@ public class S3SiteListResolver implements SiteListResolver {
 
     @Override
     public Collection<String> getSiteList() {
-        String bucketName = s3Uri.bucket().orElse("");
+        String bucketName = s3Uri.bucket().orElseThrow();
         if (bucketName.contains(siteNameMacroPlaceholder)) {
             String bucketNameRegex = bucketName.replace(siteNameMacroPlaceholder, "(.+)");
             return getSiteListFromBucketNames(bucketNameRegex);

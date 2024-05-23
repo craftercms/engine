@@ -106,7 +106,7 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
 
         S3Uri uri = client.utilities().parseUri(URI.create(StringUtils.removeEnd(rootFolderPath, DELIMITER)));
         ListObjectsV2Request request = ListObjectsV2Request.builder()
-                .bucket(uri.bucket().orElse(""))
+                .bucket(uri.bucket().orElseThrow())
                 .prefix(uri.key().orElse(""))
                 .delimiter(DELIMITER).build();
         ListObjectsV2Response result = client.listObjectsV2(request);
