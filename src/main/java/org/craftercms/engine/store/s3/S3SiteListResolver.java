@@ -18,7 +18,9 @@ package org.craftercms.engine.store.s3;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.bouncycastle.util.StoreException;
 import org.craftercms.commons.http.HttpUtils;
+import org.craftercms.engine.exception.s3.S3BucketNotFoundException;
 import org.craftercms.engine.service.context.SiteContextFactory;
 import org.craftercms.engine.service.context.SiteListResolver;
 import org.craftercms.engine.store.s3.util.S3ClientBuilder;
@@ -60,7 +62,7 @@ public class S3SiteListResolver implements SiteListResolver {
 
     @Override
     public Collection<String> getSiteList() {
-        String bucketName = s3Uri.bucket().orElseThrow();
+        String bucketName = s3Uri.bucket().orElseThrow(() -> new S3BucketNotFoundException());
         if (bucketName.contains(siteNameMacroPlaceholder)) {
             String bucketNameRegex = bucketName.replace(siteNameMacroPlaceholder, "(.+)");
             return getSiteListFromBucketNames(bucketNameRegex);

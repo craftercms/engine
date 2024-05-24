@@ -18,6 +18,7 @@ package org.craftercms.engine.store.s3;
 
 import org.craftercms.core.service.ContextImpl;
 import org.craftercms.core.store.ContentStoreAdapter;
+import org.craftercms.engine.exception.s3.S3BucketNotFoundException;
 import software.amazon.awssdk.services.s3.S3Uri;
 
 import java.util.Map;
@@ -46,7 +47,7 @@ public class S3Context extends ContextImpl {
      * Returns the name of the bucket.
      */
     public String getBucket() {
-        return rootFolderUri.bucket().orElseThrow();
+        return rootFolderUri.bucket().orElseThrow(() -> new S3BucketNotFoundException());
     }
 
     /**

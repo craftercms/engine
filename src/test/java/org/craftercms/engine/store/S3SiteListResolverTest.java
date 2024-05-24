@@ -16,6 +16,7 @@
 
 package org.craftercms.engine.store;
 
+import org.craftercms.engine.exception.s3.S3BucketNotFoundException;
 import org.craftercms.engine.store.s3.S3SiteListResolver;
 import org.craftercms.engine.store.s3.util.S3ClientBuilder;
 import org.junit.Before;
@@ -28,14 +29,17 @@ import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3Uri;
 import software.amazon.awssdk.services.s3.S3Utilities;
 import software.amazon.awssdk.services.s3.model.*;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -54,6 +58,9 @@ public class S3SiteListResolverTest {
     private static S3Client defaultClient;
 
     private static S3Utilities defaultUtilities;
+
+    @Mock
+    private static S3Utilities mockUtilities;
 
     private S3SiteListResolver resolver;
 
@@ -99,6 +106,18 @@ public class S3SiteListResolverTest {
 
         assertEquals(2, siteList.size());
         assertEquals(List.of("site1", "site2"), siteList);
+    }
+
+    @Test
+    public void testNoBucketException() {
+        when(s3ClientMock.utilities()).thenReturn(mockUtilities);
+        when(mockUtilities.parseUri(any())).thenReturn(S3Uri.builder()
+                .uri(URI.create("s3://sample-bucket/folder"))
+                .build()); // empty bucket name
+        resolver = new S3SiteListResolver(TEST_URI_SUB_FOLDER, clientBuilderMock);
+        assertThrows(S3BucketNotFoundException.class, () -> {
+            resolver.getSiteList();
+        });
     }
 
     private static AwsCredentialsProvider dummyCreds() {
