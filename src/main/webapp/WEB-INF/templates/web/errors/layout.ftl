@@ -61,6 +61,13 @@
             });
           }
       </script>
+
+      <script defer src="/studio/static-assets/scripts/craftercms-xb.umd.js"></script>
+      <script>
+        document.addEventListener('craftercms.xb:loaded', () => {
+          window.craftercms.xb.post('ERROR_PAGE_CHECK_IN', { code: ${errorCode}, message: "${errorMessage}"});
+        });
+      </script>
     </body>
   </html>
 </#macro>
