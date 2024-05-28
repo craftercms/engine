@@ -71,7 +71,7 @@ public class SiteContextFactoryTest {
                 "", "", "", new String[]{}, new String[]{}, new String[]{}, new String[]{},
                 "", new HashMap<>(), freeMarkerConfigurationFactory, urlTransformationEngine, contentStoreService, cacheTemplate,
                 macroResolver, new ArrayList<>(), jobThreadPoolExecutor, graphQLFactory, false,
-                cacheWarmer, configurationReader);
+                cacheWarmer, configurationReader, new String[0]);
         siteContextFactory.setTranslationConfigPaths(new String[]{});
         when(macroResolver.resolveMacros(any(), any())).thenReturn("");
     }
