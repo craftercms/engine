@@ -102,6 +102,7 @@
         <property name="sandboxBlacklist" value="${crafter.engine.groovy.sandbox.blacklist.path}"/>
         <property name="enableExpressions" value="${crafter.engine.context.expressions.enable}"/>
         <property name="enableTranslation" value="${crafter.engine.translation.enable}"/>
+        <property name="whitelistGetEnvRegex" value="${crafter.engine.groovy.sandbox.whitelist.getenvRegex}"/>
     </bean>
 
     <!-- ////////////////////////////////// -->

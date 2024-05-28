@@ -148,6 +148,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected String sandboxBlacklist;
     protected boolean enableExpressions;
     protected boolean enableTranslation;
+    protected List<String> whitelistGetEnvRegex;
 
     public SiteContextFactory() {
         siteNameMacroName = DEFAULT_SITE_NAME_MACRO_NAME;
@@ -350,6 +351,10 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         this.enableTranslation = enableTranslation;
     }
 
+    public void setWhitelistGetEnvRegex(String[] whitelistGetEnvRegex) {
+        this.whitelistGetEnvRegex = Arrays.stream(whitelistGetEnvRegex).toList();
+    }
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.globalApplicationContext = applicationContext;
@@ -510,11 +515,13 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
                 Resource sandboxBlacklist = resourceLoader.getResource(this.sandboxBlacklist);
                 try (InputStream is = sandboxBlacklist.getInputStream()) {
                     Blacklist blacklist = new Blacklist(new InputStreamReader(is));
+                    blacklist.setGetEnvWhitelistRegex(whitelistGetEnvRegex);
                     siteContext.scriptSandbox = new SandboxInterceptor(blacklist, singletonList(Dom4jExtension.class));
                 }
             // Enable only the hardcoded blacklist
             } else if (enableScriptSandbox) {
                 Whitelist whitelist = new PermitAllWhitelist();
+                whitelist.setGetEnvWhitelistRegex(whitelistGetEnvRegex);
                 siteContext.scriptSandbox = new SandboxInterceptor(whitelist, singletonList(Dom4jExtension.class));
             }
         } catch (IOException e) {
