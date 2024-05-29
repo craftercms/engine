@@ -95,12 +95,12 @@
     </bean>
 
     <bean id="crafter.contentStoreAdapterRegistry" class="org.craftercms.core.store.impl.ContentStoreAdapterRegistryImpl" >
-        <property name="adapters">
+        <constructor-arg name="adapters">
             <map>
                 <entry key="filesystem" value-ref="crafter.contentStoreAdapter.filesystem"/>
                 <entry key="s3" value-ref="crafter.contentStoreAdapter.s3"/>
             </map>
-        </property>
+        </constructor-arg>
     </bean>
 
     <!-- ////////////////////////////////// -->

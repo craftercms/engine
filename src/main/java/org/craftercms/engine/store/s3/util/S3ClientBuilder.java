@@ -18,7 +18,7 @@ package org.craftercms.engine.store.s3.util;
 
 import org.craftercms.commons.config.profiles.aws.S3Profile;
 import org.craftercms.commons.file.stores.S3Utils;
-import com.amazonaws.services.s3.AmazonS3;
+import software.amazon.awssdk.services.s3.S3Client;
 
 import java.beans.ConstructorProperties;
 
@@ -44,7 +44,7 @@ public class S3ClientBuilder {
      * Builds an AWS S3 client, if no values are provided the default client will be used.
      * @return AWS S3 client
      */
-    public AmazonS3 getClient() {
+    public S3Client getClient() {
         return S3Utils.createClient(profile);
     }
 

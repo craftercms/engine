@@ -16,9 +16,10 @@
 
 package org.craftercms.engine.store.s3;
 
-import com.amazonaws.services.s3.AmazonS3URI;
 import org.craftercms.core.service.ContextImpl;
 import org.craftercms.core.store.ContentStoreAdapter;
+import org.craftercms.engine.exception.s3.S3BucketNotConfiguredException;
+import software.amazon.awssdk.services.s3.S3Uri;
 
 import java.util.Map;
 
@@ -32,11 +33,11 @@ public class S3Context extends ContextImpl {
     /**
      * AWS S3 bucket uri to use as root folder for the site.
      */
-    protected AmazonS3URI rootFolderUri;
+    protected S3Uri rootFolderUri;
 
     public S3Context(final String id, final ContentStoreAdapter storeAdapter, final String rootFolderPath,
                      final boolean mergingOn, final boolean cacheOn, final int maxAllowedItemsInCache,
-                     final boolean ignoreHiddenFiles, final AmazonS3URI rootFolderUri,
+                     final boolean ignoreHiddenFiles, final S3Uri rootFolderUri,
                      final Map<String, String> configurationVariables) {
         super(id, storeAdapter, rootFolderPath, mergingOn, cacheOn, maxAllowedItemsInCache, ignoreHiddenFiles, configurationVariables);
         this.rootFolderUri = rootFolderUri;
@@ -46,14 +47,14 @@ public class S3Context extends ContextImpl {
      * Returns the name of the bucket.
      */
     public String getBucket() {
-        return rootFolderUri.getBucket();
+        return rootFolderUri.bucket().orElseThrow(() -> new S3BucketNotConfiguredException());
     }
 
     /**
      * Returns the key of the folder.
      */
     public String getKey() {
-        return rootFolderUri.getKey();
+        return rootFolderUri.key().orElse("");
     }
 
 }
