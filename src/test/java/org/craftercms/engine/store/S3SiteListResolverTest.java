@@ -16,7 +16,7 @@
 
 package org.craftercms.engine.store;
 
-import org.craftercms.engine.exception.s3.S3BucketNotFoundException;
+import org.craftercms.engine.exception.s3.S3BucketNotConfiguredException;
 import org.craftercms.engine.store.s3.S3SiteListResolver;
 import org.craftercms.engine.store.s3.util.S3ClientBuilder;
 import org.junit.Before;
@@ -115,7 +115,7 @@ public class S3SiteListResolverTest {
                 .uri(URI.create("s3://sample-bucket/folder"))
                 .build()); // empty bucket name
         resolver = new S3SiteListResolver(TEST_URI_SUB_FOLDER, clientBuilderMock);
-        assertThrows(S3BucketNotFoundException.class, () -> {
+        assertThrows(S3BucketNotConfiguredException.class, () -> {
             resolver.getSiteList();
         });
     }

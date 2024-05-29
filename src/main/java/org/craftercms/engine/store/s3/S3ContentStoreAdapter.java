@@ -30,7 +30,7 @@ import org.craftercms.core.service.Context;
 import org.craftercms.core.store.impl.File;
 import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.core.util.cache.impl.CachingAwareList;
-import org.craftercms.engine.exception.s3.S3BucketNotFoundException;
+import org.craftercms.engine.exception.s3.S3BucketNotConfiguredException;
 import org.craftercms.engine.store.AbstractCachedFileBasedContentStoreAdapter;
 import org.craftercms.engine.store.s3.util.S3ClientBuilder;
 import org.slf4j.Logger;
@@ -107,7 +107,7 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
 
         S3Uri uri = client.utilities().parseUri(URI.create(StringUtils.removeEnd(rootFolderPath, DELIMITER)));
         ListObjectsV2Request request = ListObjectsV2Request.builder()
-                .bucket(uri.bucket().orElseThrow(() -> new S3BucketNotFoundException()))
+                .bucket(uri.bucket().orElseThrow(() -> new S3BucketNotConfiguredException()))
                 .prefix(uri.key().orElse(""))
                 .delimiter(DELIMITER).build();
         ListObjectsV2Response result = client.listObjectsV2(request);

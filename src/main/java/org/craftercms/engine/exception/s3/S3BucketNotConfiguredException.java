@@ -19,13 +19,13 @@ package org.craftercms.engine.exception.s3;
 import org.craftercms.core.exception.CrafterException;
 
 /**
- * Throw when bucket not found
+ * Throw when bucket not configured
  */
-public class S3BucketNotFoundException extends CrafterException {
+public class S3BucketNotConfiguredException extends CrafterException {
 
     public static final String DEFAULT_EXCEPTION_MESSAGE = "S3 bucket not found";
 
-    public S3BucketNotFoundException() {
+    public S3BucketNotConfiguredException() {
         super(DEFAULT_EXCEPTION_MESSAGE);
     }
 }
