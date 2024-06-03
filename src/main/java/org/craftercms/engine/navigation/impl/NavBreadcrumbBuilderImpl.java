@@ -29,7 +29,6 @@ import org.craftercms.engine.navigation.NavBreadcrumbBuilder;
 import org.craftercms.engine.navigation.NavItem;
 import org.craftercms.engine.properties.SiteProperties;
 import org.craftercms.engine.service.SiteItemService;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Default implementation of {@link NavBreadcrumbBuilderImpl}.
@@ -44,8 +43,7 @@ public class NavBreadcrumbBuilderImpl implements NavBreadcrumbBuilder {
     protected ItemProcessor processor;
     protected Converter<SiteItem, NavItem> defaultItemConverter;
 
-    @Required
-    public void setSiteItemService(SiteItemService siteItemService) {
+    public NavBreadcrumbBuilderImpl(SiteItemService siteItemService) {
         this.siteItemService = siteItemService;
     }
 

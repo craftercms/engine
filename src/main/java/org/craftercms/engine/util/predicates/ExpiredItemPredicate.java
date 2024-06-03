@@ -23,7 +23,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.converters.Converter;
 import org.craftercms.core.service.Item;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Predicate used to check if an item is expired.
@@ -37,13 +36,8 @@ public class ExpiredItemPredicate implements Predicate<Item> {
     protected String expiredXPathQuery;
     protected Converter<String, Date> dateConverter;
 
-    @Required
-    public void setExpiredXPathQuery(String expiredXPathQuery) {
+    public ExpiredItemPredicate(String expiredXPathQuery, Converter<String, Date> dateConverter) {
         this.expiredXPathQuery = expiredXPathQuery;
-    }
-
-    @Required
-    public void setDateConverter(Converter<String, Date> dateConverter) {
         this.dateConverter = dateConverter;
     }
 

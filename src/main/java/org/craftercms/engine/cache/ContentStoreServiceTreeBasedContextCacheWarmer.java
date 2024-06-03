@@ -23,7 +23,6 @@ import org.craftercms.engine.properties.SiteProperties;
 import org.craftercms.engine.util.CacheUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Required;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -43,28 +42,13 @@ public class ContentStoreServiceTreeBasedContextCacheWarmer implements ContextCa
     protected ContentStoreService contentStoreService;
     protected Map<String, Integer> descriptorPreloadFolders;
 
-    /**
-     * Sets if warm up is enabled
-     */
-    @Required
-    public void setWarmUpEnabled(boolean warmUpEnabled) {
+    public ContentStoreServiceTreeBasedContextCacheWarmer(boolean warmUpEnabled, ContentStoreService contentStoreService,
+                                                          String[] descriptorPreloadFolders) {
         this.warmUpEnabled = warmUpEnabled;
-    }
-
-    /**
-     * Sets the content store service
-     */
-    @Required
-    public void setContentStoreService(ContentStoreService contentStoreService) {
         this.contentStoreService = contentStoreService;
-    }
 
-    /**
-     * Sets the list of descriptor folder trees to preload in the cache. Each folder can have it's depth specified
-     * after a colon, like {@code PATH:DEPTH}
-     */
-    @Required
-    public void setDescriptorPreloadFolders(String[] descriptorPreloadFolders) {
+        // Sets the list of descriptor folder trees to preload in the cache. Each folder can have it's depth specified
+        // after a colon, like {@code PATH:DEPTH}
         this.descriptorPreloadFolders = CacheUtils.parsePreloadFoldersList(descriptorPreloadFolders);
     }
 

@@ -16,13 +16,12 @@
 
 package org.craftercms.engine.service.context;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.annotation.Lazy;
 
 /**
@@ -43,19 +42,14 @@ public class SiteContextResolverImpl implements SiteContextResolver {
     protected SiteContextManager siteContextManager;
     protected String fallbackSiteName;
 
-    @Required
-    public void setSiteResolver(SiteResolver siteResolver) {
+    public SiteContextResolverImpl(SiteResolver siteResolver, String fallbackSiteName) {
         this.siteResolver = siteResolver;
+        this.fallbackSiteName = fallbackSiteName;
     }
 
     @Autowired
     public void setSiteContextManager(@Lazy SiteContextManager siteContextManager) {
         this.siteContextManager = siteContextManager;
-    }
-
-    @Required
-    public void setFallbackSiteName(String fallbackSiteName) {
-        this.fallbackSiteName = fallbackSiteName;
     }
 
     @Override

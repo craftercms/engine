@@ -16,8 +16,8 @@
 
 package org.craftercms.engine.util.spring.security.profile;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.craftercms.security.authentication.AuthenticationManager;
 import org.craftercms.security.exception.AuthenticationSystemException;

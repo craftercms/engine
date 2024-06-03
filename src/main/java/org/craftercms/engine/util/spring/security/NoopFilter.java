@@ -15,7 +15,7 @@
  */
 package org.craftercms.engine.util.spring.security;
 
-import javax.servlet.*;
+import jakarta.servlet.*;
 import java.io.IOException;
 
 /**

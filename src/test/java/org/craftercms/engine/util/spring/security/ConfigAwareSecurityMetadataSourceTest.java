@@ -17,7 +17,7 @@
 package org.craftercms.engine.util.spring.security;
 
 import java.util.Collection;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.util.cache.CacheTemplate;

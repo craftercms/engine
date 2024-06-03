@@ -65,9 +65,7 @@ public class ConfigAwareConnectionFactoryLocatorTest extends ConfigAwareTestBase
 
         };
 
-        locator = new ConfigAwareConnectionFactoryLocator();
-        locator.setCacheTemplate(cacheTemplate);
-        locator.setDefaultLocator(new ConnectionFactoryRegistry());
+        locator = new ConfigAwareConnectionFactoryLocator(new ConnectionFactoryRegistry(), cacheTemplate);
         locator.setConfigParsers(Arrays.<ConfigurationParser<?>>asList(configParserStub));
     }
 

@@ -39,7 +39,6 @@ import org.craftercms.engine.service.filter.ExcludeByNameItemFilter;
 import org.craftercms.engine.service.filter.ExpectedNodeValueItemFilter;
 import org.craftercms.engine.service.filter.IncludeByNameItemFilter;
 import org.dom4j.Element;
-import org.springframework.beans.factory.annotation.Required;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -63,9 +62,9 @@ public class SiteItemServiceImpl implements SiteItemService {
     protected Converter<Element, Object> modelFieldConverter;
     protected Comparator<SiteItem> sortComparator;
 
-    @Required
-    public void setStoreService(ContentStoreService storeService) {
+    public SiteItemServiceImpl(ContentStoreService storeService, Converter<Element, Object> modelFieldConverter) {
         this.storeService = storeService;
+        this.modelFieldConverter = modelFieldConverter;
     }
 
     public void setDefaultPredicates(List<Predicate<Item>> defaultPredicates) {
@@ -78,11 +77,6 @@ public class SiteItemServiceImpl implements SiteItemService {
 
     public void setDefaultProcessors(List<ItemProcessor> defaultProcessors) {
         this.defaultProcessors = defaultProcessors;
-    }
-
-    @Required
-    public void setModelFieldConverter(Converter<Element, Object> modelFieldConverter) {
-        this.modelFieldConverter = modelFieldConverter;
     }
 
     public void setSortComparator(Comparator<SiteItem> sortComparator) {

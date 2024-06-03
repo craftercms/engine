@@ -16,8 +16,8 @@
 package org.craftercms.engine.view.freemarker;
 
 import freemarker.ext.beans.BeansWrapper;
-import freemarker.ext.servlet.HttpRequestParametersHashModel;
-import freemarker.ext.servlet.HttpSessionHashModel;
+import freemarker.ext.jakarta.servlet.HttpRequestParametersHashModel;
+import freemarker.ext.jakarta.servlet.HttpSessionHashModel;
 import freemarker.template.SimpleHash;
 import freemarker.template.TemplateHashModel;
 import org.apache.commons.configuration2.Configuration;
@@ -35,7 +35,8 @@ import org.craftercms.engine.util.spring.ApplicationContextAccessor;
 import org.craftercms.engine.util.spring.security.profile.ProfileUser;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectFactory;
-import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -43,11 +44,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerView;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -129,38 +130,38 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
         this.enableStatics = enableStatics;
     }
 
-    @Required
-    public void setSiteItemService(SiteItemService siteItemService) {
+    @Autowired
+    public void setSiteItemService(@Lazy SiteItemService siteItemService) {
         this.siteItemService = siteItemService;
     }
 
-    @Required
-    public void setComponentTemplateXPathQuery(String componentTemplateXPathQuery) {
+    @Autowired
+    public void setComponentTemplateXPathQuery(@Lazy String componentTemplateXPathQuery) {
         this.componentTemplateXPathQuery = componentTemplateXPathQuery;
     }
 
-    @Required
-    public void setComponentTemplateNamePrefix(String componentTemplateNamePrefix) {
+    @Autowired
+    public void setComponentTemplateNamePrefix(@Lazy String componentTemplateNamePrefix) {
         this.componentTemplateNamePrefix = componentTemplateNamePrefix;
     }
 
-    @Required
-    public void setComponentTemplateNameSuffix(String componentTemplateNameSuffix) {
+    @Autowired
+    public void setComponentTemplateNameSuffix(@Lazy String componentTemplateNameSuffix) {
         this.componentTemplateNameSuffix = componentTemplateNameSuffix;
     }
 
-    @Required
-    public void setComponentIncludeElementName(String componentIncludeElementName) {
+    @Autowired
+    public void setComponentIncludeElementName(@Lazy String componentIncludeElementName) {
         this.componentIncludeElementName = componentIncludeElementName;
     }
 
-    @Required
-    public void setComponentEmbeddedElementName(final String componentEmbeddedElementName) {
+    @Autowired
+    public void setComponentEmbeddedElementName(@Lazy final String componentEmbeddedElementName) {
         this.componentEmbeddedElementName = componentEmbeddedElementName;
     }
 
-    @Required
-    public void setComponentScriptResolver(SiteItemScriptResolver componentScriptResolver) {
+    @Autowired
+    public void setComponentScriptResolver(@Lazy SiteItemScriptResolver componentScriptResolver) {
         this.componentScriptResolver = componentScriptResolver;
     }
 
@@ -257,19 +258,11 @@ public class CrafterFreeMarkerView extends FreeMarkerView {
 
         ObjectFactory<SimpleHash> componentModelFactory = () -> buildTemplateModel(model, request, response);
 
-        RenderComponentDirective renderComponentDirective = new RenderComponentDirective();
-        renderComponentDirective.setSiteItemService(siteItemService);
-        renderComponentDirective.setModelFactory(componentModelFactory);
-        renderComponentDirective.setTemplateXPathQuery(componentTemplateXPathQuery);
-        renderComponentDirective.setTemplateNamePrefix(componentTemplateNamePrefix);
-        renderComponentDirective.setTemplateNameSuffix(componentTemplateNameSuffix);
-        renderComponentDirective.setIncludeElementName(componentIncludeElementName);
-        renderComponentDirective.setComponentElementName(componentEmbeddedElementName);
-        renderComponentDirective.setScriptResolver(componentScriptResolver);
-        renderComponentDirective.setServletContext(getServletContext());
+        RenderComponentDirective renderComponentDirective = new RenderComponentDirective(getServletContext(),
+                siteItemService, componentModelFactory, componentTemplateXPathQuery, componentTemplateNamePrefix,
+                componentTemplateNameSuffix, componentIncludeElementName, componentEmbeddedElementName, componentScriptResolver);
 
-        ExecuteControllerDirective executeControllerDirective = new ExecuteControllerDirective();
-        executeControllerDirective.setServletContext(getServletContext());
+        ExecuteControllerDirective executeControllerDirective = new ExecuteControllerDirective(getServletContext());
 
         templateModel.put(RENDER_COMPONENT_DIRECTIVE_NAME, renderComponentDirective);
         templateModel.put(EXECUTE_CONTROLLER_DIRECTIVE_NAME, executeControllerDirective);

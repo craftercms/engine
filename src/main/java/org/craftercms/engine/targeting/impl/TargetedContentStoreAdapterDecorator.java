@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2024 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -34,10 +34,10 @@ import org.craftercms.engine.targeting.CandidateTargetedUrlsResolver;
 import org.craftercms.engine.util.TargetingUtils;
 import org.craftercms.engine.util.store.decorators.ContentStoreAdapterDecorator;
 import org.craftercms.engine.util.store.decorators.DecoratedStoreAdapterContext;
-import org.springframework.beans.factory.annotation.Required;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * {@link ContentStoreAdapterDecorator} that uses a {@link CandidateTargetedUrlsResolver} to generate candidate
@@ -58,22 +58,23 @@ public class TargetedContentStoreAdapterDecorator implements ContentStoreAdapter
     protected ContentStoreAdapter actualStoreAdapter;
     protected CandidateTargetedUrlsResolver candidateTargetedUrlsResolver;
 
+    public TargetedContentStoreAdapterDecorator(CandidateTargetedUrlsResolver candidateTargetedUrlsResolver) {
+        this.candidateTargetedUrlsResolver = candidateTargetedUrlsResolver;
+    }
+
     @Override
     public void setActualStoreAdapter(ContentStoreAdapter actualStoreAdapter) {
         this.actualStoreAdapter = actualStoreAdapter;
     }
 
-    @Required
-    public void setCandidateTargetedUrlsResolver(CandidateTargetedUrlsResolver candidateTargetedUrlsResolver) {
-        this.candidateTargetedUrlsResolver = candidateTargetedUrlsResolver;
-    }
-
     @Override
     public Context createContext(String id, String rootFolderPath, boolean mergingOn, boolean cacheOn,
-                                 int maxAllowedItemsInCache, boolean ignoreHiddenFiles)
+                                 int maxAllowedItemsInCache, boolean ignoreHiddenFiles,
+                                 Map<String, String> configurationVariables)
             throws StoreException, AuthenticationException {
         Context context = actualStoreAdapter.createContext(id, rootFolderPath, mergingOn, cacheOn,
-                                                           maxAllowedItemsInCache, ignoreHiddenFiles);
+                maxAllowedItemsInCache, ignoreHiddenFiles,
+                configurationVariables);
 
         return new DecoratedStoreAdapterContext(context, this);
     }
