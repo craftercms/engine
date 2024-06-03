@@ -450,7 +450,7 @@ paths:
         - content
       summary: Get Item
       operationId: getItem
-      description: Get an Item from the content store. <br> This API is used to get pages, components and folders. It returns the content and other metadata such as url, descriptorUrl, folder flag, and extra properties
+      description: "Get an Item from the content store. <br> This API is used to get pages, components and folders. It returns the content and other metadata such as url, descriptorUrl, folder flag, and extra properties <br><br><i> Note: This API also returns 'disabled' items when Crafter Engine is in preview mode to support authoring use cases.</i>"
       parameters:
         - name: url
           in: query
