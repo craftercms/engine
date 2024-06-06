@@ -600,6 +600,7 @@
         <constructor-arg name="cacheWarmUpEnabled" value="${crafter.engine.site.cache.warmUp.enabled}"/>
         <constructor-arg name="cacheWarmer" ref="crafter.siteCacheWarmer"/>
         <constructor-arg name="configurationReader" ref="crafter.configurationReader"/>
+        <constructor-arg name="whitelistGetEnvRegex" value="${crafter.engine.groovy.sandbox.whitelist.getenvRegex}"/>
         <property name="initTimeout" value="${crafter.engine.site.context.initTimeout}"/>
         <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
         <property name="defaultPublicBeans" value="${crafter.engine.defaultPublicBeans}"/>
@@ -639,6 +640,7 @@
         <constructor-arg name="cacheWarmUpEnabled" value="false"/>
         <constructor-arg name="cacheWarmer" ref="crafter.siteCacheWarmer"/>
         <constructor-arg name="configurationReader" ref="crafter.configurationReader"/>
+        <constructor-arg name="whitelistGetEnvRegex" value="${crafter.engine.groovy.sandbox.whitelist.getenvRegex}"/>
         <property name="initTimeout" value="${crafter.engine.site.context.initTimeout}"/>
         <property name="publishingTargetResolver" ref="crafter.publishingTargetResolver"/>
         <property name="enableScriptSandbox" value="${crafter.engine.groovy.sandbox.enable}"/>

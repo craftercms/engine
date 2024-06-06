@@ -147,6 +147,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected String sandboxBlacklist;
     protected boolean enableExpressions;
     protected boolean enableTranslation;
+    protected List<String> whitelistGetEnvRegex;
 
     public SiteContextFactory(String storeType, String rootFolderPath, String staticAssetsPath, String templatesPath,
                               String initScriptPath, String restScriptsPath, final String controllerScriptsPath,
@@ -155,7 +156,8 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
                               ObjectFactory<FreeMarkerConfig> freeMarkerConfigFactory, UrlTransformationEngine urlTransformationEngine,
                               ContentStoreService storeService, CacheTemplate cacheTemplate, MacroResolver macroResolver,
                               List<ScriptJobResolver> jobResolvers, Executor jobThreadPoolExecutor, GraphQLFactory graphQLFactory,
-                              boolean cacheWarmUpEnabled, SiteCacheWarmer cacheWarmer, EncryptionAwareConfigurationReader configurationReader) {
+                              boolean cacheWarmUpEnabled, SiteCacheWarmer cacheWarmer, EncryptionAwareConfigurationReader configurationReader,
+                              String[] whitelistGetEnvRegex) {
         siteNameMacroName = DEFAULT_SITE_NAME_MACRO_NAME;
         mergingOn = Context.DEFAULT_MERGING_ON;
         cacheOn = Context.DEFAULT_CACHE_ON;
@@ -190,6 +192,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         this.cacheWarmUpEnabled = cacheWarmUpEnabled;
         this.cacheWarmer = cacheWarmer;
         this.configurationReader = configurationReader;
+        this.whitelistGetEnvRegex = Arrays.stream(whitelistGetEnvRegex).toList();
     }
 
     @Override
@@ -421,11 +424,13 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
                 Resource sandboxBlacklist = resourceLoader.getResource(this.sandboxBlacklist);
                 try (InputStream is = sandboxBlacklist.getInputStream()) {
                     Blacklist blacklist = new Blacklist(new InputStreamReader(is));
+                    blacklist.setGetEnvWhitelistRegex(whitelistGetEnvRegex);
                     siteContext.scriptSandbox = new SandboxInterceptor(blacklist, singletonList(Dom4jExtension.class));
                 }
             // Enable only the hardcoded blacklist
             } else if (enableScriptSandbox) {
                 Whitelist whitelist = new PermitAllWhitelist();
+                whitelist.setGetEnvWhitelistRegex(whitelistGetEnvRegex);
                 siteContext.scriptSandbox = new SandboxInterceptor(whitelist, singletonList(Dom4jExtension.class));
             }
         } catch (IOException e) {
