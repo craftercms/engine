@@ -137,7 +137,7 @@ public class HttpHeadersRewriteFilter extends OncePerRequestFilter {
             }
         };
 
-        return cacheTemplate.getObject(siteContext.getContext(), callback, HEADER_MAPPINGS_CACHE_KEY);
+        return cacheTemplate.getObject(siteContext.getContext(), callback, requestUri, HEADER_MAPPINGS_CACHE_KEY);
     }
 
     protected static class HeaderMapping {
