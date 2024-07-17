@@ -18,6 +18,7 @@ package org.craftercms.engine.util.spring.security.targeting;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import org.apache.commons.lang.StringUtils;
 import org.bson.types.ObjectId;
 import org.craftercms.engine.controller.rest.preview.ProfileRestController;
 import org.craftercms.engine.util.spring.security.ConfigAwarePreAuthenticationFilter;
@@ -76,7 +77,7 @@ public class TargetingPreAuthenticatedFilter extends ConfigAwarePreAuthenticatio
                     roles = ((String) rolesAttr).split(",");
                 }
                 if (roles != null) {
-                    profile.getRoles().addAll(Arrays.asList(roles));
+                    profile.getRoles().addAll(Arrays.stream(roles).filter(StringUtils::isNotBlank).toList());
                 }
 
                 Map<String, Object> customAttributes = new HashMap<>(attributes);
