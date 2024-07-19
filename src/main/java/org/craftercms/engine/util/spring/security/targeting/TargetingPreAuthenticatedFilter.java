@@ -24,10 +24,7 @@ import org.craftercms.engine.controller.rest.preview.ProfileRestController;
 import org.craftercms.engine.util.spring.security.ConfigAwarePreAuthenticationFilter;
 import org.craftercms.profile.api.Profile;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static org.apache.commons.collections4.MapUtils.isNotEmpty;
 
@@ -73,6 +70,8 @@ public class TargetingPreAuthenticatedFilter extends ConfigAwarePreAuthenticatio
                 String[] roles = null;
                 if (rolesAttr instanceof String[]) {
                     roles = (String[]) rolesAttr;
+                } else if (rolesAttr instanceof ArrayList<?>) {
+                    roles = ((ArrayList<?>) rolesAttr).toArray(new String[0]);
                 } else if (rolesAttr instanceof String) {
                     roles = ((String) rolesAttr).split(",");
                 }
