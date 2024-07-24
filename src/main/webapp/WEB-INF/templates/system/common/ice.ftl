@@ -49,7 +49,7 @@ CrafterCMS Authoring Scripts
   <#local renderTo = "">
   <#if notEmptyString(nested)>
     <#local renderTo = "innerHTML">
-  <#elseif $field?has_content && $field?matches('^([a-zA-Z_-]+)(:{1}.*)$')>
+  <#elseif $field?has_content && $field?matches('^([a-zA-Z0-9_-]+)(:{1}.*)$')>
     <#local fieldExpressionParts = $field?split(":")>
     <#local $field = fieldExpressionParts[0]>
     <#local renderTo = fieldExpressionParts[1]?has_content?then(fieldExpressionParts[1], "innerHTML")>
