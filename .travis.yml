@@ -13,7 +13,7 @@ branches:
     - master
 cache:
   directories:
-  - "$HOME/.m2"
+    - "$HOME/.m2"
 notifications:
   slack: craftersoftware:7YiSb41ZG5rfMgiAY7Qgprc7
 before_install:
