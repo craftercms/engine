@@ -55,7 +55,6 @@ staticMethod java.lang.System getProperties
 staticMethod java.lang.System getProperty java.lang.String
 staticMethod java.lang.System getProperty java.lang.String java.lang.String
 staticMethod java.lang.System getenv
-staticMethod java.lang.System getenv java.lang.String
 
 # SECURITY-683 speculative approach to Spectre/Meltdown
 staticMethod java.lang.System nanoTime
@@ -129,3 +128,6 @@ method javax.script.ScriptEngineManager getEngineByName java.lang.String
 
 new javax.script.ScriptEngineManager
 new javax.script.ScriptEngineManager java.lang.ClassLoader
+
+# Spring methods
+method org.springframework.core.env.ConfigurableEnvironment getSystemEnvironment

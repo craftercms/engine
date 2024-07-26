@@ -18,7 +18,7 @@ package org.craftercms.engine.event;
 import org.craftercms.engine.service.context.SiteContext;
 import org.springframework.context.ApplicationEvent;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Application event that is related to a site.

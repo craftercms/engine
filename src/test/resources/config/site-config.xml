@@ -20,6 +20,8 @@
     <indexFileName>index.xml</indexFileName>
     <defaultLocale>en</defaultLocale>
 
+    <test-property>This one supports macro for site ${contextName}</test-property>
+
     <!-- Compatibility properties -->
     <compatibility>
         <!--

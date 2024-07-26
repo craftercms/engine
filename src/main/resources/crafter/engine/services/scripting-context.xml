@@ -23,29 +23,29 @@
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
     <bean id="crafter.pageScriptResolver" class="org.craftercms.engine.scripting.impl.SiteItemScriptResolverImpl">
-        <property name="storeService" ref="crafter.contentStoreService"/>
-        <property name="contentTypeXPathQuery" value="${crafter.engine.page.contentType.xpathQuery}"/>
-        <property name="contentTypePattern" value="${crafter.engine.page.contentType.pattern}"/>
-        <property name="scriptUrlFormat" value="${crafter.engine.page.contentType.script.url.format}"/>
-        <property name="scriptsXPathQuery" value="${crafter.engine.scripts.xpathQuery}"/>
+        <constructor-arg name="storeService" ref="crafter.contentStoreService"/>
+        <constructor-arg name="contentTypeXPathQuery" value="${crafter.engine.page.contentType.xpathQuery}"/>
+        <constructor-arg name="contentTypePattern" value="${crafter.engine.page.contentType.pattern}"/>
+        <constructor-arg name="scriptUrlFormat" value="${crafter.engine.page.contentType.script.url.format}"/>
+        <constructor-arg name="scriptsXPathQuery" value="${crafter.engine.scripts.xpathQuery}"/>
     </bean>
 
     <bean id="crafter.componentScriptResolver" class="org.craftercms.engine.scripting.impl.SiteItemScriptResolverImpl">
-        <property name="storeService" ref="crafter.contentStoreService"/>
-        <property name="contentTypeXPathQuery" value="${crafter.engine.component.contentType.xpathQuery}"/>
-        <property name="contentTypePattern" value="${crafter.engine.component.contentType.pattern}"/>
-        <property name="scriptUrlFormat" value="${crafter.engine.component.contentType.script.url.format}"/>
-        <property name="scriptsXPathQuery" value="${crafter.engine.scripts.xpathQuery}"/>
+        <constructor-arg name="storeService" ref="crafter.contentStoreService"/>
+        <constructor-arg name="contentTypeXPathQuery" value="${crafter.engine.component.contentType.xpathQuery}"/>
+        <constructor-arg name="contentTypePattern" value="${crafter.engine.component.contentType.pattern}"/>
+        <constructor-arg name="scriptUrlFormat" value="${crafter.engine.component.contentType.script.url.format}"/>
+        <constructor-arg name="scriptsXPathQuery" value="${crafter.engine.scripts.xpathQuery}"/>
     </bean>
-    
+
     <bean id="crafter.scriptUrlTemplateScanner"
           class="org.craftercms.engine.scripting.impl.CachedScriptUrlTemplateScanner">
-        <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
-        <property name="actualScanner">
+        <constructor-arg name="cacheTemplate" ref="crafter.cacheTemplate"/>
+        <constructor-arg name="actualScanner">
             <bean class="org.craftercms.engine.scripting.impl.ScriptUrlTemplateScannerImpl">
-                <property name="scriptsFolder" value="${crafter.engine.site.default.rest.scripts.path}"/>
+                <constructor-arg name="scriptsFolder" value="${crafter.engine.site.default.rest.scripts.path}"/>
             </bean>
-        </property>
+        </constructor-arg>
     </bean>
 
     <util:map id="crafter.restScriptsVariables">
@@ -53,7 +53,6 @@
         <entry key="urlTransformationService" value-ref="crafter.urlTransformationService"/>
         <entry key="navTreeBuilder" value-ref="crafter.navTreeBuilder"/>
         <entry key="navBreadcrumbBuilder" value-ref="crafter.navBreadcrumbBuilder"/>
-        <entry key="search" value-ref="crafter.searchService"/>
         <entry key="searchClient" value-ref="crafter.searchClient"/>
         <entry key="applicationContext" value-ref="crafter.applicationContextAccessor"/>
         <entry key="globalProperties" value-ref="crafter.propertyResolver"/>
@@ -71,7 +70,6 @@
         <entry key="connectionFactoryLocator" value-ref="crafter.connectionFactoryLocator"/>
         <entry key="providerLoginSupport" value-ref="crafter.providerLoginSupport"/>
 
-        <entry key="elasticsearch" value-ref="crafter.searchService"/>
         <entry key="elasticsearchClient" value-ref="crafter.searchClient"/>
     </util:map>
 

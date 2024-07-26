@@ -27,7 +27,6 @@ import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.ConfigUtils;
 import org.craftercms.engine.util.config.ConfigurationParser;
 import org.craftercms.engine.util.config.impl.FacebookConnectionFactoryConfigParser;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.social.connect.ConnectionFactory;
 import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.social.connect.support.ConnectionFactoryRegistry;
@@ -51,18 +50,11 @@ public class ConfigAwareConnectionFactoryLocator implements ConnectionFactoryLoc
     protected CacheTemplate cacheTemplate;
     protected List<ConfigurationParser<?>> configParsers;
 
-    public ConfigAwareConnectionFactoryLocator() {
+    public ConfigAwareConnectionFactoryLocator(ConnectionFactoryLocator defaultLocator, CacheTemplate cacheTemplate) {
         configParsers = new ArrayList<>(1);
         configParsers.add(new FacebookConnectionFactoryConfigParser());
-    }
 
-    @Required
-    public void setDefaultLocator(ConnectionFactoryLocator defaultLocator) {
         this.defaultLocator = defaultLocator;
-    }
-
-    @Required
-    public void setCacheTemplate(CacheTemplate cacheTemplate) {
         this.cacheTemplate = cacheTemplate;
     }
 

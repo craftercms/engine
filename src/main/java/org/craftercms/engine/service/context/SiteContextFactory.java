@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2024 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -51,7 +51,6 @@ import org.jenkinsci.plugins.scriptsecurity.sandbox.whitelists.PermitAllWhitelis
 import org.quartz.Scheduler;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectFactory;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -66,7 +65,7 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
 import org.tuckey.web.filters.urlrewrite.Conf;
 import org.tuckey.web.filters.urlrewrite.UrlRewriter;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -94,6 +93,9 @@ import static org.craftercms.engine.util.GroovyScriptUtils.getCompilerConfigurat
 public class SiteContextFactory implements ApplicationContextAware, ServletContextAware {
 
     public static final String DEFAULT_SITE_NAME_MACRO_NAME = "siteName";
+    public static final String SITE_NAME_CONFIG_VARIABLE = "siteName";
+    public static final String SITE_ID_CONFIG_VARIABLE = "siteId";
+
     public static final long DEFAULT_INIT_TIMEOUT = 300000L;
     public static final String CONFIG_BEAN_NAME = "siteConfig";
     public static final long DEFAULT_SHUTDOWN_TIMEOUT = 5;
@@ -145,8 +147,17 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected String sandboxBlacklist;
     protected boolean enableExpressions;
     protected boolean enableTranslation;
+    protected List<String> whitelistGetEnvRegex;
 
-    public SiteContextFactory() {
+    public SiteContextFactory(String storeType, String rootFolderPath, String staticAssetsPath, String templatesPath,
+                              String initScriptPath, String restScriptsPath, final String controllerScriptsPath,
+                              String[] configPaths, String[] applicationContextPaths, String[] urlRewriteConfPaths,
+                              String[] proxyConfigPaths, String groovyClassesPath, Map<String, Object> groovyGlobalVars,
+                              ObjectFactory<FreeMarkerConfig> freeMarkerConfigFactory, UrlTransformationEngine urlTransformationEngine,
+                              ContentStoreService storeService, CacheTemplate cacheTemplate, MacroResolver macroResolver,
+                              List<ScriptJobResolver> jobResolvers, Executor jobThreadPoolExecutor, GraphQLFactory graphQLFactory,
+                              boolean cacheWarmUpEnabled, SiteCacheWarmer cacheWarmer, EncryptionAwareConfigurationReader configurationReader,
+                              String[] whitelistGetEnvRegex) {
         siteNameMacroName = DEFAULT_SITE_NAME_MACRO_NAME;
         mergingOn = Context.DEFAULT_MERGING_ON;
         cacheOn = Context.DEFAULT_CACHE_ON;
@@ -156,6 +167,32 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         defaultPublicBeans = new String[0];
         shutdownTimeout = DEFAULT_SHUTDOWN_TIMEOUT;
         publishingTargetMacroName = DEFAULT_PUBLISHING_TARGET_MACRO_NAME;
+
+        this.storeType = storeType;
+        this.rootFolderPath = rootFolderPath;
+        this.staticAssetsPath = staticAssetsPath;
+        this.templatesPath = templatesPath;
+        this.initScriptPath = initScriptPath;
+        this.restScriptsPath = restScriptsPath;
+        this.controllerScriptsPath = controllerScriptsPath;
+        this.configPaths = configPaths;
+        this.applicationContextPaths = applicationContextPaths;
+        this.urlRewriteConfPaths = urlRewriteConfPaths;
+        this.proxyConfigPaths = proxyConfigPaths;
+        this.groovyClassesPath = groovyClassesPath;
+        this.groovyGlobalVars = groovyGlobalVars;
+        this.freeMarkerConfigFactory = freeMarkerConfigFactory;
+        this.urlTransformationEngine = urlTransformationEngine;
+        this.storeService = storeService;
+        this.cacheTemplate = cacheTemplate;
+        this.macroResolver = macroResolver;
+        this.jobResolvers = jobResolvers;
+        this.jobThreadPoolExecutor = jobThreadPoolExecutor;
+        this.graphQLFactory = graphQLFactory;
+        this.cacheWarmUpEnabled = cacheWarmUpEnabled;
+        this.cacheWarmer = cacheWarmer;
+        this.configurationReader = configurationReader;
+        this.whitelistGetEnvRegex = Arrays.stream(whitelistGetEnvRegex).toList();
     }
 
     @Override
@@ -167,73 +204,8 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         this.siteNameMacroName = siteNameMacroName;
     }
 
-    @Required
-    public void setStoreType(String storeType) {
-        this.storeType = storeType;
-    }
-
-    @Required
-    public void setRootFolderPath(String rootFolderPath) {
-        this.rootFolderPath = rootFolderPath;
-    }
-
-    @Required
-    public void setStaticAssetsPath(String staticAssetsPath) {
-        this.staticAssetsPath = staticAssetsPath;
-    }
-
-    @Required
-    public void setTemplatesPath(String templatesPath) {
-        this.templatesPath = templatesPath;
-    }
-
-    @Required
-    public void setInitScriptPath(String initScriptPath) {
-        this.initScriptPath = initScriptPath;
-    }
-
-    @Required
-    public void setRestScriptsPath(String restScriptsPath) {
-        this.restScriptsPath = restScriptsPath;
-    }
-
-    @Required
-    public void setControllerScriptsPath(final String controllerScriptsPath) {
-        this.controllerScriptsPath = controllerScriptsPath;
-    }
-
-    @Required
-    public void setConfigPaths(String[] configPaths) {
-        this.configPaths = configPaths;
-    }
-
-    @Required
-    public void setApplicationContextPaths(String[] applicationContextPaths) {
-        this.applicationContextPaths = applicationContextPaths;
-    }
-
-    @Required
-    public void setUrlRewriteConfPaths(String[] urlRewriteConfPaths) {
-        this.urlRewriteConfPaths = urlRewriteConfPaths;
-    }
-
-    @Required
-    public void setProxyConfigPaths(String[] proxyConfigPaths) {
-        this.proxyConfigPaths = proxyConfigPaths;
-    }
-
     public void setTranslationConfigPaths(String[] translationConfigPaths) {
         this.translationConfigPaths = translationConfigPaths;
-    }
-
-    @Required
-    public void setGroovyClassesPath(String groovyClassesPath) {
-        this.groovyClassesPath = groovyClassesPath;
-    }
-
-    @Required
-    public void setGroovyGlobalVars(Map<String, Object> groovyGlobalVars) {
-        this.groovyGlobalVars = groovyGlobalVars;
     }
 
     public void setMergingOn(boolean mergingOn) {
@@ -252,63 +224,8 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         this.ignoreHiddenFiles = ignoreHiddenFiles;
     }
 
-    @Required
-    public void setFreeMarkerConfigFactory(ObjectFactory<FreeMarkerConfig> freeMarkerConfigFactory) {
-        this.freeMarkerConfigFactory = freeMarkerConfigFactory;
-    }
-
-    @Required
-    public void setUrlTransformationEngine(UrlTransformationEngine urlTransformationEngine) {
-        this.urlTransformationEngine = urlTransformationEngine;
-    }
-
-    @Required
-    public void setStoreService(ContentStoreService storeService) {
-        this.storeService = storeService;
-    }
-
-    @Required
-    public void setCacheTemplate(CacheTemplate cacheTemplate) {
-        this.cacheTemplate = cacheTemplate;
-    }
-
-    @Required
-    public void setMacroResolver(MacroResolver macroResolver) {
-        this.macroResolver = macroResolver;
-    }
-
-    @Required
-    public void setJobResolvers(List<ScriptJobResolver> jobResolvers) {
-        this.jobResolvers = jobResolvers;
-    }
-
-    @Required
-    public void setJobThreadPoolExecutor(Executor jobThreadPoolExecutor) {
-        this.jobThreadPoolExecutor = jobThreadPoolExecutor;
-    }
-
-    @Required
-    public void setGraphQLFactory(GraphQLFactory graphQLFactory) {
-        this.graphQLFactory = graphQLFactory;
-    }
-
-    @Required
-    public void setCacheWarmUpEnabled(boolean cacheWarmUpEnabled) {
-        this.cacheWarmUpEnabled = cacheWarmUpEnabled;
-    }
-
-    @Required
-    public void setCacheWarmer(SiteCacheWarmer cacheWarmer) {
-        this.cacheWarmer = cacheWarmer;
-    }
-
     public void setInitTimeout(final long initTimeout) {
         this.initTimeout = initTimeout;
-    }
-
-    @Required
-    public void setConfigurationReader(EncryptionAwareConfigurationReader configurationReader) {
-        this.configurationReader = configurationReader;
     }
 
     public void setDisableVariableRestrictions(boolean disableVariableRestrictions) {
@@ -362,9 +279,11 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         }
 
         String resolvedRootFolderPath = macroResolver.resolveMacros(rootFolderPath, macroValues);
-
+        Map<String, String> configVariables = new HashMap<>();
+        configVariables.put(SITE_NAME_CONFIG_VARIABLE, siteName);
+        configVariables.put(SITE_ID_CONFIG_VARIABLE, siteName);
         Context context = storeService.getContext(UUID.randomUUID().toString(), storeType, resolvedRootFolderPath,
-                                                  mergingOn, cacheOn, maxAllowedItemsInCache, ignoreHiddenFiles);
+                                                  mergingOn, cacheOn, maxAllowedItemsInCache, ignoreHiddenFiles, configVariables);
 
         try {
             SiteContext siteContext = new SiteContext();
@@ -485,7 +404,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             for (int i = configPaths.length - 1; i >= 0; i--) {
                 Resource config = resourceLoader.getResource(configPaths[i]);
                 if (config.exists()) {
-                    return configurationReader.readXmlConfiguration(config);
+                    return configurationReader.readXmlConfiguration(config, siteContext.getContext().getConfigLookupVariables());
                 }
             }
             return null;
@@ -505,11 +424,13 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
                 Resource sandboxBlacklist = resourceLoader.getResource(this.sandboxBlacklist);
                 try (InputStream is = sandboxBlacklist.getInputStream()) {
                     Blacklist blacklist = new Blacklist(new InputStreamReader(is));
+                    blacklist.setGetEnvWhitelistRegex(whitelistGetEnvRegex);
                     siteContext.scriptSandbox = new SandboxInterceptor(blacklist, singletonList(Dom4jExtension.class));
                 }
             // Enable only the hardcoded blacklist
             } else if (enableScriptSandbox) {
                 Whitelist whitelist = new PermitAllWhitelist();
+                whitelist.setGetEnvWhitelistRegex(whitelistGetEnvRegex);
                 siteContext.scriptSandbox = new SandboxInterceptor(whitelist, singletonList(Dom4jExtension.class));
             }
         } catch (IOException e) {
@@ -656,7 +577,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             while(iterator.hasPrevious()) {
                 Resource resource = resourceLoader.getResource(iterator.previous());
                 if (resource.exists()) {
-                    return configurationReader.readXmlConfiguration(resource);
+                    return configurationReader.readXmlConfiguration(resource, siteContext.getContext().getConfigLookupVariables());
                 }
             }
             return null;
@@ -682,7 +603,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
             while(iterator.hasPrevious()) {
                 Resource resource = resourceLoader.getResource(iterator.previous());
                 if (resource.exists()) {
-                    return configurationReader.readXmlConfiguration(resource);
+                    return configurationReader.readXmlConfiguration(resource, siteContext.getContext().getConfigLookupVariables());
                 }
             }
             return null;

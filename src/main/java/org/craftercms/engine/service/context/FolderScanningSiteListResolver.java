@@ -24,10 +24,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.craftercms.engine.macro.MacroResolver;
-import org.springframework.beans.factory.annotation.Required;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.beans.factory.InitializingBean;
@@ -46,7 +45,7 @@ import org.springframework.beans.factory.InitializingBean;
  */
 public class FolderScanningSiteListResolver implements SiteListResolver, ResourceLoaderAware, InitializingBean {
 
-    private static final Log logger = LogFactory.getLog(FolderScanningSiteListResolver.class);
+    private static final Logger logger = LoggerFactory.getLogger(FolderScanningSiteListResolver.class);
 
     public static final String SITE_ROOT_FOLDER_PATH_REGEX = "^(([^:]+:)?(.+?/))([^/]*\\{%s\\}[^/]*)(/.*)?$";
     public static final int SITES_FOLDER_PATH_GROUP = 1;
@@ -60,22 +59,14 @@ public class FolderScanningSiteListResolver implements SiteListResolver, Resourc
     protected String sitesFolderPath;
     protected Pattern siteFolderNamePattern;
 
-    public FolderScanningSiteListResolver() {
+    public FolderScanningSiteListResolver(String siteRootFolderPath, MacroResolver macroResolver) {
         this.siteNameMacroName = SiteContextFactory.DEFAULT_SITE_NAME_MACRO_NAME;
-    }
-
-    @Required
-    public void setSiteRootFolderPath(String siteRootFolderPath) {
         this.siteRootFolderPath = siteRootFolderPath;
+        this.macroResolver = macroResolver;
     }
 
     public void setSiteNameMacroName(String siteNameMacroName) {
         this.siteNameMacroName = siteNameMacroName;
-    }
-
-    @Required
-    public void setMacroResolver(MacroResolver macroResolver) {
-        this.macroResolver = macroResolver;
     }
 
     @Override
@@ -129,16 +120,16 @@ public class FolderScanningSiteListResolver implements SiteListResolver, Resourc
         try {
             File sitesFolder = resourceLoader.getResource(sitesFolderPath).getFile();
             if (sitesFolder.exists()) {
-                logger.info("Sites folder resolved to " + sitesFolder.getAbsolutePath());
+                logger.debug("Sites folder resolved to '{}'", sitesFolder.getAbsolutePath());
 
                 return sitesFolder;
             } else {
-                logger.error("Sites folder " + sitesFolderPath + " doesn't exist");
+                logger.error("Sites folder '{}' doesn't exist", sitesFolderPath);
 
                 return null;
             }
         } catch (IOException e) {
-            logger.error("Unable to retrieve sites folder " + sitesFolderPath, e);
+            logger.error("Unable to retrieve sites folder '{}'", sitesFolderPath, e);
 
             return null;
         }

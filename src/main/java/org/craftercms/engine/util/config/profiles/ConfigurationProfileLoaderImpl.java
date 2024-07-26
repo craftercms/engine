@@ -21,7 +21,6 @@ import org.craftercms.commons.config.ConfigurationProvider;
 import org.craftercms.commons.config.profiles.ConfigurationProfile;
 import org.craftercms.commons.config.profiles.ConfigurationProfileLoader;
 import org.craftercms.engine.service.context.SiteContext;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Implementation of {@link ConfigurationProfile} that loads profiles from a specific file in the current site.
@@ -35,23 +34,11 @@ public class ConfigurationProfileLoaderImpl<T extends ConfigurationProfile> impl
     private ConfigurationMapper<T> profileMapper;
     private ConfigurationProvider configurationProvider;
 
-    @Required
-    public void setProfilesModule(String profilesModule) {
+    public ConfigurationProfileLoaderImpl(String profilesModule, String profilesUrl, ConfigurationMapper<T> profileMapper,
+                                          ConfigurationProvider configurationProvider) {
         this.profilesModule = profilesModule;
-    }
-
-    @Required
-    public void setProfilesUrl(String profilesUrl) {
         this.profilesUrl = profilesUrl;
-    }
-
-    @Required
-    public void setProfileMapper(ConfigurationMapper<T> profileMapper) {
         this.profileMapper = profileMapper;
-    }
-
-    @Required
-    public void setConfigurationProvider(ConfigurationProvider configurationProvider) {
         this.configurationProvider = configurationProvider;
     }
 

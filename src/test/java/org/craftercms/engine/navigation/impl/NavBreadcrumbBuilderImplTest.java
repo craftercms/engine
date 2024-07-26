@@ -43,8 +43,7 @@ public class NavBreadcrumbBuilderImplTest {
 
     @Before
     public void setUp() throws Exception {
-        navBreadcrumbBuilder = new NavBreadcrumbBuilderImpl();
-        navBreadcrumbBuilder.setSiteItemService(getSiteItemService());
+        navBreadcrumbBuilder = new NavBreadcrumbBuilderImpl(getSiteItemService());
         navBreadcrumbBuilder.setDefaultItemConverter(getItemConverter());
 
         setUpCurrentSiteContext();

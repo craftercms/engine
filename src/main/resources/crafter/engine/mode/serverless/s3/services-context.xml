@@ -46,38 +46,38 @@
 
     <!-- AWS S3 Site List Resolver -->
     <bean id="crafter.siteListResolver" class="org.craftercms.engine.store.s3.S3SiteListResolver">
-        <property name="s3Uri" value="${crafter.engine.site.default.rootFolder.path}"/>
-        <property name="clientBuilder" ref="crafter.s3ClientBuilder"/>
+        <constructor-arg name="s3Uri" value="${crafter.engine.site.default.rootFolder.path}"/>
+        <constructor-arg name="clientBuilder" ref="crafter.s3ClientBuilder"/>
     </bean>
 
     <bean id="crafter.siteContextManager" class="org.craftercms.engine.service.context.SiteContextManager">
-        <property name="fallbackContextFactory" ref="crafter.fallbackSiteContextFactory"/>
-        <property name="contextFactory" ref="crafter.siteContextFactory"/>
-        <property name="siteListResolver" ref="crafter.siteListResolver"/>
+        <constructor-arg name="contextFactory" ref="crafter.siteContextFactory"/>
+        <constructor-arg name="fallbackContextFactory" ref="crafter.fallbackSiteContextFactory"/>
+        <constructor-arg name="siteListResolver" ref="crafter.siteListResolver"/>
+        <constructor-arg name="waitForContextInit" value="${crafter.engine.site.context.waitForInit}"/>
+        <constructor-arg name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
+        <constructor-arg name="defaultSiteName" value="${crafter.engine.site.default.name}"/>
+        <constructor-arg name="contextBuildRetryMaxCount" value="${crafter.engine.site.context.build.retry.maxCount}"/>
+        <constructor-arg name="contextBuildRetryWaitTimeBase" value="${crafter.engine.site.context.build.retry.waitTimeBase}"/>
+        <constructor-arg name="contextBuildRetryWaitTimeMultiplier" value="${crafter.engine.site.context.build.retry.waitTimeMultiplier}"/>
+        <constructor-arg name="modePreview" value="${crafter.engine.preview}"/>
+        <constructor-arg name="watcherPaths" value="${crafter.engine.watcher.paths}"/>
+        <constructor-arg name="watcherIgnorePaths" value="${crafter.engine.watcher.ignorePaths}"/>
+        <constructor-arg name="watcherCounterLimit" value="${crafter.engine.watcher.counter.limit}"/>
+        <constructor-arg name="watcherIntervalPeriod" value="${crafter.engine.watcher.interval.period}"/>
         <property name="entitlementValidator" ref="crafter.entitlementValidator"/>
-        <property name="waitForContextInit" value="${crafter.engine.site.context.waitForInit}"/>
-        <property name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
-        <property name="defaultSiteName" value="${crafter.engine.site.default.name}"/>
-        <property name="contextBuildRetryMaxCount" value="${crafter.engine.site.context.build.retry.maxCount}"/>
-        <property name="contextBuildRetryWaitTimeBase" value="${crafter.engine.site.context.build.retry.waitTimeBase}"/>
-        <property name="contextBuildRetryWaitTimeMultiplier" value="${crafter.engine.site.context.build.retry.waitTimeMultiplier}"/>
-        <property name="modePreview" value="${crafter.engine.preview}"/>
-        <property name="watcherPaths" value="${crafter.engine.watcher.paths}"/>
-        <property name="watcherIgnorePaths" value="${crafter.engine.watcher.ignorePaths}"/>
-        <property name="watcherCounterLimit" value="${crafter.engine.watcher.counter.limit}"/>
-        <property name="watcherIntervalPeriod" value="${crafter.engine.watcher.interval.period}"/>
     </bean>
 
     <!-- AWS S3 Content Store Adapter -->
 
     <bean id="crafter.s3ContentStoreAdapter" class="org.craftercms.engine.store.s3.S3ContentStoreAdapter">
-        <property name="cacheTemplate" ref="crafter.cacheTemplate"/>
-        <property name="metadataFileExtension" value="${crafter.core.store.metadataFile.extension}"/>
-        <property name="descriptorFileExtension" value="${crafter.core.store.descriptorFile.extension}"/>
-        <property name="pathValidator">
+        <constructor-arg name="pathValidator">
             <bean class="org.craftercms.commons.validation.validators.impl.SecurePathValidator">
             </bean>
-        </property>
+        </constructor-arg>
+        <constructor-arg name="descriptorFileExtension" value="${crafter.core.store.descriptorFile.extension}"/>
+        <constructor-arg name="metadataFileExtension" value="${crafter.core.store.metadataFile.extension}"/>
+        <constructor-arg name="cacheTemplate" ref="crafter.cacheTemplate"/>
         <constructor-arg name="clientBuilder" ref="crafter.s3ClientBuilder"/>
         <constructor-arg name="contentMaxLength" value="${crafter.engine.store.s3.cache.contentMaxLength}"/>
         <constructor-arg name="cacheAllowedPaths" value="${crafter.engine.store.s3.cache.allowedPaths}"/>
@@ -85,22 +85,22 @@
 
     <bean id="crafter.contentStoreAdapter.s3"
           class="org.craftercms.engine.util.store.decorators.ContentStoreAdapterDecoratorChainFactoryBean">
-        <property name="storeAdapter" ref="crafter.s3ContentStoreAdapter"/>
-        <property name="decorators">
+        <constructor-arg name="storeAdapter" ref="crafter.s3ContentStoreAdapter"/>
+        <constructor-arg name="decorators">
             <list>
                 <ref bean="crafter.cacheWarmingContentStoreAdapterDecorator"/>
                 <ref bean="crafter.targetedContentStoreAdapterDecorator"/>
             </list>
-        </property>
+        </constructor-arg>
     </bean>
 
     <bean id="crafter.contentStoreAdapterRegistry" class="org.craftercms.core.store.impl.ContentStoreAdapterRegistryImpl" >
-        <property name="adapters">
+        <constructor-arg name="adapters">
             <map>
                 <entry key="filesystem" value-ref="crafter.contentStoreAdapter.filesystem"/>
                 <entry key="s3" value-ref="crafter.contentStoreAdapter.s3"/>
             </map>
-        </property>
+        </constructor-arg>
     </bean>
 
     <!-- ////////////////////////////////// -->

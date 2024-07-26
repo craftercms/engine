@@ -15,8 +15,6 @@
  */
 package org.craftercms.engine.macro.impl;
 
-import org.springframework.beans.factory.annotation.Required;
-
 /**
  * Created by alfonsovasquez on 14/10/16.
  */
@@ -25,13 +23,8 @@ public class FixedValueMacro extends AbstractMacro {
     private String macroName;
     private String macroValue;
 
-    @Required
-    public void setMacroName(String macroName) {
+    public FixedValueMacro(String macroName, String macroValue) {
         this.macroName = macroName;
-    }
-
-    @Required
-    public void setMacroValue(String macroValue) {
         this.macroValue = macroValue;
     }
 

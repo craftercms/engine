@@ -56,6 +56,13 @@
         <property name="urlMap" ref="crafter.urlMappings"/>
         <!-- This property became false by default in Spring 5.3 -->
         <property name="useTrailingSlashMatch" value="true"/>
+
+        <!-- https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/servlet/handler/AbstractHandlerMapping.html#setPatternParser(org.springframework.web.util.pattern.PathPatternParser)
+        Since Spring 6.0, this is populated to a PathPatternParser by default. Setting to null to keep current behavior.
+        -->
+        <property name="patternParser">
+            <null/>
+        </property>
     </bean>
 
     <bean id="crafter.restScriptsController" class="org.craftercms.engine.controller.rest.RestScriptsController">
@@ -64,28 +71,26 @@
         <property name="pluginService" ref="crafter.pluginService"/>
     </bean>
 
-    <bean id="crafter.staticAssetsRequestHandler" class="org.craftercms.engine.controller.StaticAssetsRequestHandler"
-            init-method="init">
-        <property name="contentStoreService" ref="crafter.contentStoreService"/>
-        <property name="disableCaching" value="${crafter.engine.staticAssets.disableCaching}"/>
+    <bean id="crafter.staticAssetsRequestHandler" class="org.craftercms.engine.controller.StaticAssetsRequestHandler">
+        <constructor-arg name="contentStoreService" ref="crafter.contentStoreService"/>
+        <constructor-arg name="disableCaching" value="${crafter.engine.staticAssets.disableCaching}"/>
     </bean>
 
-    <bean id="crafter.remoteAssetsRequestHandler" class="org.craftercms.engine.controller.RemoteAssetsRequestHandler"
-          init-method="init">
-        <property name="remoteFileResolver" ref="crafter.remoteFileResolver"/>
-        <property name="disableCaching" value="${crafter.engine.remoteAssets.disableCaching}"/>
+    <bean id="crafter.remoteAssetsRequestHandler" class="org.craftercms.engine.controller.RemoteAssetsRequestHandler">
+        <constructor-arg name="remoteFileResolver" ref="crafter.remoteFileResolver"/>
+        <constructor-arg name="disableCaching" value="${crafter.engine.remoteAssets.disableCaching}"/>
     </bean>
 
     <bean id="crafter.pageRenderController" class="org.craftercms.engine.controller.PageRenderController">
-        <property name="fallbackPageUrl" value="/no-site.html"/>
+        <constructor-arg name="fallbackPageUrl" value="/no-site.html"/>
+        <constructor-arg name="storeService" ref="crafter.contentStoreService"/>
         <property name="fallbackMessage" value="${crafter.engine.site.fallback.message}"/>
-        <property name="storeService" ref="crafter.contentStoreService"/>
         <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
         <property name="pluginService" ref="crafter.pluginService"/>
     </bean>
 
     <bean id="crafter.errorPageRenderController" class="org.craftercms.engine.controller.ErrorPageRenderController">
-        <property name="errorViewNamePrefix" value="${crafter.engine.error.viewName.prefix}"/>
+        <constructor-arg name="errorViewNamePrefix" value="${crafter.engine.error.viewName.prefix}"/>
     </bean>
 
     <bean id="crafter.monitoringRenderController" class="org.craftercms.engine.controller.rest.MonitoringController">
@@ -129,7 +134,7 @@
     <bean id="crafter.siteGraphQLController" class="org.craftercms.engine.controller.rest.SiteGraphQLController"/>
 
     <bean id="crafter.siteConfigController" class="org.craftercms.engine.controller.rest.ConfigRestController">
-        <property name="modePreview" value="${crafter.engine.preview}"/>
+        <constructor-arg name="modePreview" value="${crafter.engine.preview}"/>
     </bean>
 
     <util:map id="crafter.urlMappings">

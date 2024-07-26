@@ -68,11 +68,9 @@ public class FolderScanningSiteListResolverTest {
         sitesFolder.newFolder(CORPORATE_SITE_FOLDER_NAME);
         sitesFolder.newFolder(PLUTON_SITE_FOLDER_NAME);
 
-        siteListResolver = new FolderScanningSiteListResolver();
-        siteListResolver.setMacroResolver(createMacroResolver());
+        siteListResolver = new FolderScanningSiteListResolver(siteRootFolderPath, createMacroResolver());
         siteListResolver.setResourceLoader(createResourceLoader());
         siteListResolver.setSiteNameMacroName(SITE_NAME_MACRO_NAME);
-        siteListResolver.setSiteRootFolderPath(siteRootFolderPath);
 
         siteListResolver.afterPropertiesSet();
     }

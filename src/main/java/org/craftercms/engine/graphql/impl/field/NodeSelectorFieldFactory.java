@@ -27,7 +27,6 @@ import org.dom4j.Document;
 import org.dom4j.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Required;
 
 import static graphql.Scalars.GraphQLString;
 import static graphql.schema.GraphQLList.list;
@@ -55,18 +54,9 @@ public class NodeSelectorFieldFactory implements GraphQLFieldFactory {
     protected String datasourceNameXPath;
     protected String datasourceItemTypeXPathFormat;
 
-    @Required
-    public void setDisableFlatteningXPath(String disableFlatteningXPath) {
+    public NodeSelectorFieldFactory(String disableFlatteningXPath, final String datasourceNameXPath, String datasourceItemTypeXPathFormat) {
         this.disableFlatteningXPath = disableFlatteningXPath;
-    }
-
-    @Required
-    public void setDatasourceNameXPath(final String datasourceNameXPath) {
         this.datasourceNameXPath = datasourceNameXPath;
-    }
-
-    @Required
-    public void setDatasourceItemTypeXPathFormat(String datasourceItemTypeXPathFormat) {
         this.datasourceItemTypeXPathFormat = datasourceItemTypeXPathFormat;
     }
 

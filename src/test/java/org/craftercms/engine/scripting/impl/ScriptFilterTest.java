@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2024 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -18,12 +18,12 @@ package org.craftercms.engine.scripting.impl;
 
 import java.io.IOException;
 import java.util.Collections;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
@@ -77,9 +77,8 @@ public class ScriptFilterTest {
         siteContext = createSiteContext(storeService);
         servletContext = new MockServletContext();
 
-        filter = new ScriptFilter();
+        filter = new ScriptFilter(cacheTemplate);
         filter.setPluginService(mock(PluginService.class));
-        filter.setCacheTemplate(cacheTemplate);
         filter.setExcludedUrls(new String[]{
                 "/api/1/monitoring/**",
                 "/api/1/site/context/**",
@@ -182,7 +181,7 @@ public class ScriptFilterTest {
         ScriptFactory scriptFactory = createScriptFactory(siteContext);
 
         XMLConfiguration config =
-            ConfigUtils.readXmlConfiguration(new ClassPathResource("config/site-config.xml"), ',', null);
+            ConfigUtils.readXmlConfiguration(new ClassPathResource("config/site-config.xml"), ',', null, null);
         config.setListDelimiterHandler(new DefaultListDelimiterHandler(','));
 
         when(siteContext.getSiteName()).thenReturn("default");

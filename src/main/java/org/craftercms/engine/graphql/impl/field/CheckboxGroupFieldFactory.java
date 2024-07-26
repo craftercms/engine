@@ -30,7 +30,6 @@ import org.dom4j.Document;
 import org.dom4j.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Required;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -61,13 +60,8 @@ public class CheckboxGroupFieldFactory implements GraphQLFieldFactory {
 
     protected ObjectMapper objectMapper = new ObjectMapper();
 
-    @Required
-    public void setDatasourceNameXPath(final String datasourceNameXPath) {
+    public CheckboxGroupFieldFactory(final String datasourceNameXPath, String datasourceSettingsXPathFormat) {
         this.datasourceNameXPath = datasourceNameXPath;
-    }
-
-    @Required
-    public void setDatasourceSettingsXPathFormat(String datasourceSettingsXPathFormat) {
         this.datasourceSettingsXPathFormat = datasourceSettingsXPathFormat;
     }
 

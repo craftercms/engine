@@ -1,15 +1,7 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html>
-<head>
-    <title>Bad Request</title>
+<#include "./layout.ftl">
 
-    <style>
-        body {
-            font-family: sans-serif; color: #222;
-        }
-    </style>
-</head>
-<body>
-    <h2>The request is invalid.</h2>
-</body>
-</html>
+<@layout
+  pageTitle="Bad Request"
+  errorCode="400"
+  errorMessage="The request is invalid."
+/>

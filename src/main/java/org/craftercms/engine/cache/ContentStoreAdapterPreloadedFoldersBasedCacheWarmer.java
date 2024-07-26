@@ -27,7 +27,6 @@ import org.craftercms.engine.util.CacheUtils;
 import org.craftercms.engine.util.store.decorators.DecoratedStoreAdapterContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Required;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -47,29 +46,16 @@ public class ContentStoreAdapterPreloadedFoldersBasedCacheWarmer implements Cont
     protected Map<String, Integer> descriptorPreloadFolders;
     protected Map<String, Integer> contentPreloadFolders;
 
-    /**
-     * Sets if warm up is enabled
-     */
-    @Required
-    public void setWarmUpEnabled(boolean warmUpEnabled) {
+    public ContentStoreAdapterPreloadedFoldersBasedCacheWarmer(boolean warmUpEnabled, String[] descriptorPreloadFolders,
+                                                               String[] contentPreloadFolders) {
         this.warmUpEnabled = warmUpEnabled;
-    }
 
-    /**
-     * Sets the list of descriptor folders to preload in the cache. Each folder can have it's depth specified
-     * after a colon, like {@code PATH:DEPTH}
-     */
-    @Required
-    public void setDescriptorPreloadFolders(String[] descriptorPreloadFolders) {
+        // Sets the list of descriptor folders to preload in the cache. Each folder can have it's depth specified
+        // after a colon, like {@code PATH:DEPTH}
         this.descriptorPreloadFolders = CacheUtils.parsePreloadFoldersList(descriptorPreloadFolders);
-    }
 
-    /**
-     * Sets the list of content folders to preload in the cache. Each folder can have it's depth specified
-     * after a colon, like {@code PATH:DEPTH}
-     */
-    @Required
-    public void setContentPreloadFolders(String[] contentPreloadFolders) {
+        // Sets the list of content folders to preload in the cache. Each folder can have it's depth specified
+        // after a colon, like {@code PATH:DEPTH}
         this.contentPreloadFolders = CacheUtils.parsePreloadFoldersList(contentPreloadFolders);
     }
 

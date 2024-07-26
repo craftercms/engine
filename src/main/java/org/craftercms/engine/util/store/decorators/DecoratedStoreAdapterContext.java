@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2024 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -17,6 +17,8 @@ package org.craftercms.engine.util.store.decorators;
 
 import org.craftercms.core.service.Context;
 import org.craftercms.core.store.ContentStoreAdapter;
+
+import java.util.Map;
 
 /**
  * {@link Context} wrapper used by {@link ContentStoreAdapterDecorator}.
@@ -81,6 +83,11 @@ public class DecoratedStoreAdapterContext implements Context {
     @Override
     public boolean ignoreHiddenFiles() {
         return actualContext.ignoreHiddenFiles();
+    }
+
+    @Override
+    public Map<String, String> getConfigLookupVariables() {
+        return actualContext.getConfigLookupVariables();
     }
 
     @Override
