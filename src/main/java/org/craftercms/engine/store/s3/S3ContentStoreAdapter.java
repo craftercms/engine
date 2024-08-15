@@ -128,9 +128,9 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
     @Override
     protected Content getContent(Context context, CachingOptions cachingOptions,
                                  File file) throws InvalidContextException, StoreException {
-        S3Object s3Object = (S3Object) file;
-
-        logger.debug("Getting content for {}", s3Object);
+        if (!(file instanceof S3Object s3Object)) {
+            throw new StoreException(format("'%s' is not an S3 object", file));
+        }
 
         return s3Object;
     }
@@ -148,11 +148,11 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
         String bucketName = s3Context.getBucket();
         String key = stripStart(appendIfMissing(s3Context.getKey(), path), DELIMITER);
 
-        logger.debug("Getting file for 's3://{}/{}'", bucketName, key);
-
         if (isEmpty(FilenameUtils.getExtension(key))) {
             // If it is a folder, check if there are objects with the prefix
             try {
+                logger.debug("Checking if S3 prefix 's3://{}/{}' exists", bucketName, key);
+
                 ListObjectsV2Request request = ListObjectsV2Request.builder()
                         .bucket(bucketName)
                         .prefix(appendIfMissing(key, DELIMITER))
@@ -164,18 +164,14 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
                 }
             } catch (S3Exception e) {
                 if (e.statusCode() == HttpStatus.SC_NOT_FOUND) {
-                    logger.debug("No object found for 's3://{}/{}'", bucketName, key);
+                    logger.debug("S3 prefix 's3://{}/{}' not found", bucketName, key);
                 } else {
-                    throw new StoreException(format("Error listing objects for 's3://%s/%s'", bucketName, key), e);
+                    throw new StoreException(format("Error listing objects for S3 prefix 's3://%s/%s'", bucketName, key), e);
                 }
             }
         } else {
             // If it is a file, get metadata and content for the file
-            try {
-                return getObject(s3Context, client, bucketName, key);
-            } catch (S3Exception e) {
-                throw new StoreException(format("Error checking if object for 's3://%s/%s'", bucketName, key), e);
-            }
+           return getObject(s3Context, client, bucketName, key);
         }
         return null;
     }
@@ -187,19 +183,19 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
     protected List<File> doGetChildren(Context context, File dir)
         throws InvalidContextException, StoreException {
 
-        if (!(dir instanceof S3Prefix prefix)) {
-            throw new StoreException(format("Can't get children for file '%s'", dir));
+        if (!(dir instanceof S3Prefix s3Prefix)) {
+            throw new StoreException(format("'%s' is not an S3 prefix", dir));
         }
 
         S3Context s3Context = (S3Context) context;
         String bucketName = s3Context.getBucket();
 
-        logger.debug("Getting children for 's3://{}/{}'", bucketName, prefix);
+        logger.debug("Listing objects for S3 prefix 's3://{}/{}'", bucketName, s3Prefix);
 
         List<File> children = new CachingAwareList<>();
         ListObjectsV2Request request = ListObjectsV2Request.builder()
                 .bucket(bucketName)
-                .prefix(prefix.getPrefix())
+                .prefix(s3Prefix.getPrefix())
                 .delimiter(DELIMITER)
                 .build();
         ListObjectsV2Iterable result = client.listObjectsV2Paginator(request);
@@ -222,9 +218,14 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
     @Override
     public boolean validate(final Context context) throws StoreException, AuthenticationException {
         S3Context s3Context = (S3Context) context;
+        String bucketName = s3Context.getBucket();
+        String rootPrefix = s3Context.getKey();
+
+        logger.debug("Listing objects for S3 context root prefix 's3://{}/{}'", bucketName, rootPrefix);
+
         ListObjectsV2Request request = ListObjectsV2Request.builder()
-                .bucket(s3Context.getBucket())
-                .prefix(s3Context.getKey())
+                .bucket(bucketName)
+                .prefix(rootPrefix)
                 .delimiter(DELIMITER)
                 .build();
         ListObjectsV2Response result = client.listObjectsV2(request);
@@ -259,6 +260,8 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
                 .key(key)
                 .build();
 
+        logger.debug("Getting S3 object 's3://{}/{}'", bucket, key);
+
         try (ResponseInputStream<GetObjectResponse> objectIS = client.getObject(getObjectRequest)) {
             GetObjectResponse objectResp = objectIS.response();
             long lastModified = objectResp.lastModified().toEpochMilli();
@@ -275,7 +278,7 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
 
             return new S3Object(bucket, key, lastModified, contentLength, contentSupplier);
         } catch (NoSuchKeyException e) {
-            logger.debug("No object found for 's3://{}/{}'", bucket, key);
+            logger.debug("No S3 object found at 's3://{}/{}'", bucket, key);
 
             return null;
         } catch (Exception e) {
