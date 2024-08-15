@@ -148,7 +148,7 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
         String bucketName = s3Context.getBucket();
         String key = stripStart(appendIfMissing(s3Context.getKey(), path), DELIMITER);
 
-        logger.debug("Getting file for s3://{}/{}", bucketName, key);
+        logger.debug("Getting file for 's3://{}/{}'", bucketName, key);
 
         if (isEmpty(FilenameUtils.getExtension(key))) {
             // If it is a folder, check if there are objects with the prefix
@@ -164,9 +164,9 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
                 }
             } catch (S3Exception e) {
                 if (e.statusCode() == HttpStatus.SC_NOT_FOUND) {
-                    logger.debug("No object found for s3://{}/{}", bucketName, key);
+                    logger.debug("No object found for 's3://{}/{}'", bucketName, key);
                 } else {
-                    throw new StoreException(format("Error listing objects for s3://%s/%s", bucketName, key), e);
+                    throw new StoreException(format("Error listing objects for 's3://%s/%s'", bucketName, key), e);
                 }
             }
         } else {
@@ -174,7 +174,7 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
             try {
                 return getObject(s3Context, client, bucketName, key);
             } catch (S3Exception e) {
-                throw new StoreException(format("Error checking if object for s3://%s/%s", bucketName, key), e);
+                throw new StoreException(format("Error checking if object for 's3://%s/%s'", bucketName, key), e);
             }
         }
         return null;
@@ -194,7 +194,7 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
         S3Context s3Context = (S3Context) context;
         String bucketName = s3Context.getBucket();
 
-        logger.debug("Getting children for s3://{}/{}", bucketName, prefix);
+        logger.debug("Getting children for 's3://{}/{}'", bucketName, prefix);
 
         List<File> children = new CachingAwareList<>();
         ListObjectsV2Request request = ListObjectsV2Request.builder()
@@ -275,11 +275,11 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
 
             return new S3Object(bucket, key, lastModified, contentLength, contentSupplier);
         } catch (NoSuchKeyException e) {
-            logger.debug("No object found for s3://{}/{}", bucket, key);
+            logger.debug("No object found for 's3://{}/{}'", bucket, key);
 
             return null;
         } catch (Exception e) {
-            throw new StoreException(format("Error getting S3 object s3://%s/%s", bucket, key), e);
+            throw new StoreException(format("Error getting S3 object 's3://%s/%s'", bucket, key), e);
         }
     }
 
