@@ -130,7 +130,7 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
                                  File file) throws InvalidContextException, StoreException {
         S3Object s3Object = (S3Object) file;
 
-        logger.debug("Getting content for {}", s3Object);
+        logger.debug("Getting content for '{}'", s3Object);
 
         return s3Object;
     }
