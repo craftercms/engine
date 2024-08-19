@@ -30,17 +30,26 @@ import static org.craftercms.engine.store.s3.S3ContentStoreAdapter.DELIMITER;
 public class S3Prefix extends AbstractCachingAwareObject implements File {
 
     /**
+     * The bucket name.
+     */
+    protected String bucketName;
+    /**
      * The full prefix.
      */
     protected String prefix;
 
-    public S3Prefix(String prefix) {
+    public S3Prefix(String bucketName, String prefix) {
+        this.bucketName = bucketName;
         if (!prefix.equals(DELIMITER)) {
             prefix = StringUtils.stripStart(prefix, DELIMITER);
             prefix = StringUtils.appendIfMissing(prefix, DELIMITER);
         }
 
         this.prefix = prefix;
+    }
+
+    public String getBucketName() {
+        return bucketName;
     }
 
     public String getPrefix() {
@@ -69,7 +78,10 @@ public class S3Prefix extends AbstractCachingAwareObject implements File {
 
     @Override
     public String toString() {
-        return "S3Prefix{" + "prefix='" + prefix + '\'' + '}';
+        return "S3Prefix{" +
+                "bucketName='" + bucketName + '\'' +
+                ", prefix='" + prefix + '\'' +
+                '}';
     }
 
 }

@@ -27,12 +27,21 @@ import org.craftercms.core.util.cache.impl.AbstractCachingAwareObject;
 public class S3File extends AbstractCachingAwareObject implements File {
 
     /**
+     * The S3 bucket name.
+     */
+    protected String bucketName;
+    /**
      * The S3 key.
      */
     protected String key;
 
-    public S3File(final String key) {
+    public S3File(final String bucketName, final String key) {
+        this.bucketName = bucketName;
         this.key = key;
+    }
+
+    public String getBucketName() {
+        return bucketName;
     }
 
     public String getKey() {
@@ -62,8 +71,9 @@ public class S3File extends AbstractCachingAwareObject implements File {
     @Override
     public String toString() {
         return "S3File{" +
-               "key='" + key + '\'' +
-               '}';
+                "bucketName='" + bucketName + '\'' +
+                ", key='" + key + '\'' +
+                '}';
     }
 
 }
