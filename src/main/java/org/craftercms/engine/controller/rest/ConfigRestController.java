@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2024 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -16,12 +16,12 @@
 
 package org.craftercms.engine.controller.rest;
 
-import java.util.Map;
-
+import org.craftercms.core.controller.rest.CrafterRestController;
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 import static java.util.Collections.singletonMap;
 
@@ -32,7 +32,7 @@ import static java.util.Collections.singletonMap;
  * @author joseross
  * @since 3.1.1
  */
-@RestController
+@CrafterRestController
 @RequestMapping(RestControllerBase.REST_BASE_URI + ConfigRestController.URL_ROOT)
 public class ConfigRestController {
 
