@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2024 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -16,10 +16,12 @@
 
 package org.craftercms.engine.controller.rest;
 
+import jakarta.validation.constraints.Positive;
 import org.craftercms.commons.exceptions.InvalidManagementTokenException;
 import org.craftercms.commons.monitoring.StatusInfo;
 import org.craftercms.commons.monitoring.rest.MonitoringRestControllerBase;
 import org.craftercms.commons.validation.annotations.param.ValidSiteId;
+import org.craftercms.core.controller.rest.CrafterRestController;
 import org.craftercms.engine.service.SiteHealthCheckService;
 import org.craftercms.engine.util.logging.CircularQueueLogAppender;
 import org.owasp.esapi.ESAPI;
@@ -30,9 +32,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.validation.constraints.Positive;
 import java.beans.ConstructorProperties;
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +45,7 @@ import static org.craftercms.commons.validation.annotations.param.EsapiValidatio
  * Rest controller to provide monitoring information &amp; site logs
  */
 @Validated
-@RestController
+@CrafterRestController
 @RequestMapping(MonitoringController.URL_ROOT)
 public class MonitoringController extends MonitoringRestControllerBase {
 
