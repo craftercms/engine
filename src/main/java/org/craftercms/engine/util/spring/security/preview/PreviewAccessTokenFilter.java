@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2024 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -30,6 +30,8 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import java.beans.ConstructorProperties;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
@@ -38,7 +40,8 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
  * Filter that checks if the user is authorized to preview the site.
  */
 public class PreviewAccessTokenFilter extends GenericFilterBean {
-    private final static String PREVIEW_SITE_COOKIE_NAME = "crafterPreview";
+    private final static String PREVIEW_SITE_TOKEN_NAME = "crafterPreview";
+    private final static String PREVIEW_SITE_TOKEN_HEADER_NAME = "X-Crafter-Preview";
 
     private final TextEncryptor textEncryptor;
 
@@ -56,16 +59,25 @@ public class PreviewAccessTokenFilter extends GenericFilterBean {
             return;
         }
 
-        String previewCookie = HttpUtils.getCookieValue(PREVIEW_SITE_COOKIE_NAME, httpServletRequest);
-        if (isEmpty(previewCookie)) {
-            String message = format("User is not authorized to preview site. '%s' cookie not found", PREVIEW_SITE_COOKIE_NAME);
+        String previewToken = httpServletRequest.getHeader(PREVIEW_SITE_TOKEN_HEADER_NAME);
+        if (isEmpty(previewToken)) {
+            previewToken = HttpUtils.getCookieValue(PREVIEW_SITE_TOKEN_NAME, httpServletRequest);
+        }
+        if (isEmpty(previewToken)) {
+            previewToken = httpServletRequest.getParameter(PREVIEW_SITE_TOKEN_NAME);
+        }
+
+        if (isEmpty(previewToken)) {
+            String message = format("User is not authorized to preview site. '%s' header or '%s' token not found",
+                    PREVIEW_SITE_TOKEN_HEADER_NAME, PREVIEW_SITE_TOKEN_NAME);
             logger.error(message);
             throw new HttpStatusCodeException(HttpStatus.UNAUTHORIZED, message);
         }
 
-        String[] tokens = decryptCookie(previewCookie);
+        String[] tokens = decryptPreviewToken(previewToken);
         if (tokens.length != 2) {
-            String message = format("Failed to validate preview site token. Found '%s' elements but expecting 2", PREVIEW_SITE_COOKIE_NAME);
+            String message = format("Failed to validate preview site token. Found '%s' header or '%s' token elements but expecting 2",
+                    PREVIEW_SITE_TOKEN_HEADER_NAME, PREVIEW_SITE_TOKEN_NAME);
             logger.error(message);
             throw new HttpStatusCodeException(HttpStatus.UNAUTHORIZED, message);
         }
@@ -73,14 +85,17 @@ public class PreviewAccessTokenFilter extends GenericFilterBean {
         long tokenTimestamp = Long.parseLong(tokens[1]);
         boolean isExpired = tokenTimestamp < System.currentTimeMillis();
         if (isExpired) {
-            String message = format("User is not authorized to preview site '%s', '%s' cookie has expired", site, PREVIEW_SITE_COOKIE_NAME);
+            String message = format("User is not authorized to preview site '%s', '%s' header or '%s' token has expired",
+                    site, PREVIEW_SITE_TOKEN_HEADER_NAME, PREVIEW_SITE_TOKEN_NAME);
             logger.error(message);
             throw new HttpStatusCodeException(HttpStatus.FORBIDDEN, message);
         }
 
-        String previewSiteFromCookie = tokens[0];
-        if (!site.equals(previewSiteFromCookie)) {
-            String message = format("User is not authorized to preview site '%s', '%s' cookie does not match", site, PREVIEW_SITE_COOKIE_NAME);
+        String previewSitesFromToken = tokens[0];
+        List<String> allowedSites = Arrays.asList(previewSitesFromToken.split(","));
+        if (!allowedSites.contains(site)) {
+            String message = format("User is not authorized to preview site '%s', '%s' header or '%s' token does not match",
+                    site, PREVIEW_SITE_TOKEN_HEADER_NAME, PREVIEW_SITE_TOKEN_NAME);
             logger.error(message);
             throw new HttpStatusCodeException(HttpStatus.FORBIDDEN, message);
         }
@@ -89,14 +104,14 @@ public class PreviewAccessTokenFilter extends GenericFilterBean {
     }
 
     /**
-     * Decrypts the preview site cookie.
+     * Decrypts the preview site token.
      *
-     * @param encryptedCookie the encrypted cookie
-     * @return the decrypted cookie as an array of tokens (siteName, expirationTimestamp)
+     * @param encryptedToken the encrypted token
+     * @return the decrypted token as an array of tokens (siteNames, expirationTimestamp)
      */
-    private String[] decryptCookie(final String encryptedCookie) {
+    private String[] decryptPreviewToken(final String encryptedToken) {
         try {
-            return textEncryptor.decrypt(encryptedCookie)
+            return textEncryptor.decrypt(encryptedToken)
                     .split("\\|");
         } catch (CryptoException e) {
             String message = "Failed to decrypt preview site token";
