@@ -61,10 +61,10 @@ public class PreviewAccessTokenFilter extends GenericFilterBean {
 
         String previewToken = httpServletRequest.getHeader(PREVIEW_SITE_TOKEN_HEADER_NAME);
         if (isEmpty(previewToken)) {
-            previewToken = HttpUtils.getCookieValue(PREVIEW_SITE_TOKEN_NAME, httpServletRequest);
+            previewToken = httpServletRequest.getParameter(PREVIEW_SITE_TOKEN_NAME);
         }
         if (isEmpty(previewToken)) {
-            previewToken = httpServletRequest.getParameter(PREVIEW_SITE_TOKEN_NAME);
+            previewToken = HttpUtils.getCookieValue(PREVIEW_SITE_TOKEN_NAME, httpServletRequest);
         }
 
         if (isEmpty(previewToken)) {
