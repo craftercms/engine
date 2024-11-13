@@ -15,16 +15,16 @@
  */
 package org.craftercms.engine.http.impl;
 
-import java.io.IOException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.craftercms.commons.http.HttpUtils;
 import org.craftercms.core.util.ExceptionUtils;
 import org.craftercms.engine.exception.HttpStatusCodeAwareException;
+import org.craftercms.engine.exception.PreviewAccessException;
 import org.craftercms.engine.http.ExceptionHandler;
+
+import java.io.IOException;
 
 import static org.craftercms.commons.http.HttpUtils.getFullRequestUri;
 import static org.craftercms.commons.lang.UrlUtils.cleanUrlForLog;
@@ -41,19 +41,22 @@ public class HttpStatusCodeAwareExceptionHandler implements ExceptionHandler {
     @Override
     public boolean handle(HttpServletRequest request, HttpServletResponse response, Exception ex) throws IOException {
         HttpStatusCodeAwareException httpStatusCodeAwareEx =
-            ExceptionUtils.getThrowableOfType(ex, HttpStatusCodeAwareException.class);
+                ExceptionUtils.getThrowableOfType(ex, HttpStatusCodeAwareException.class);
 
-        if (httpStatusCodeAwareEx != null) {
-            ex = (Exception) httpStatusCodeAwareEx;
-
-            logger.error(request.getMethod() + " " + cleanUrlForLog(getFullRequestUri(request, true)) + " failed", ex);
-
-            response.sendError(httpStatusCodeAwareEx.getStatusCode(), ex.getMessage());
-
-            return true;
+        if (httpStatusCodeAwareEx == null) {
+            return false;
         }
 
-        return false;
+        String message = String.format("%s %s failed", request.getMethod(), cleanUrlForLog(getFullRequestUri(request, true)));
+        if (httpStatusCodeAwareEx instanceof PreviewAccessException previewException) {
+            logger.debug(message, previewException);
+        } else {
+            ex = (Exception) httpStatusCodeAwareEx;
+            logger.error(message, ex);
+        }
+
+        response.sendError(httpStatusCodeAwareEx.getStatusCode(), ex.getMessage());
+        return true;
     }
 
 }

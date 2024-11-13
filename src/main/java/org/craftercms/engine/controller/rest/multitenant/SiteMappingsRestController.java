@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2024 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -16,24 +16,23 @@
 
 package org.craftercms.engine.controller.rest.multitenant;
 
-import java.util.Collections;
-import java.util.Map;
-
 import jakarta.servlet.http.HttpServletResponse;
-
+import org.craftercms.core.controller.rest.CrafterRestController;
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.engine.service.context.ReloadableMappingsSiteResolver;
 import org.craftercms.engine.service.context.SiteResolver;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * REST controller for operations related to site mappings.
  *
  * @author avasquez
  */
-@RestController
+@CrafterRestController
 @RequestMapping(RestControllerBase.REST_BASE_URI + SiteMappingsRestController.URL_ROOT)
 public class SiteMappingsRestController {
 

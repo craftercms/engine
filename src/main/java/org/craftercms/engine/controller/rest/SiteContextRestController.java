@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2024 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -16,8 +16,10 @@
 
 package org.craftercms.engine.controller.rest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.craftercms.commons.exceptions.InvalidManagementTokenException;
+import org.craftercms.core.controller.rest.CrafterRestController;
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.engine.event.SiteContextCreatedEvent;
 import org.craftercms.engine.event.SiteEvent;
@@ -26,9 +28,7 @@ import org.craftercms.engine.service.context.SiteContextManager;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.beans.ConstructorProperties;
 import java.util.Collections;
 import java.util.Map;
@@ -40,7 +40,7 @@ import static java.lang.String.format;
  *
  * @author Alfonso Vásquez
  */
-@RestController
+@CrafterRestController
 @RequestMapping(RestControllerBase.REST_BASE_URI + SiteContextRestController.URL_ROOT)
 public class SiteContextRestController extends RestControllerBase {
 

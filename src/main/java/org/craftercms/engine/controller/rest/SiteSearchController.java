@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2024 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -16,14 +16,18 @@
 
 package org.craftercms.engine.controller.rest;
 
+import jakarta.servlet.http.HttpServletResponse;
+import org.craftercms.core.controller.rest.CrafterRestController;
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.engine.search.legacy.SiteAwareOpenSearchService;
 import org.opensearch.action.search.SearchResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import jakarta.servlet.http.HttpServletResponse;
 import java.beans.ConstructorProperties;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -34,7 +38,7 @@ import java.util.Map;
  *
  * @author joseross
  */
-@RestController
+@CrafterRestController
 @RequestMapping({RestControllerBase.REST_BASE_URI + SiteSearchController.URL_ROOT, RestControllerBase.REST_BASE_URI + SiteSearchController.URL_ES_ROOT})
 public class SiteSearchController extends RestControllerBase {
 

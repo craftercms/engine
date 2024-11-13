@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2024 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -17,6 +17,7 @@
 package org.craftercms.engine.controller.rest;
 
 import org.craftercms.commons.validation.annotations.param.ValidExistingContentPath;
+import org.craftercms.core.controller.rest.CrafterRestController;
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.engine.navigation.NavBreadcrumbBuilder;
 import org.craftercms.engine.navigation.NavItem;
@@ -25,7 +26,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.beans.ConstructorProperties;
 import java.util.List;
@@ -36,7 +36,7 @@ import java.util.List;
  * @author joseross
  */
 @Validated
-@RestController
+@CrafterRestController
 @RequestMapping(RestControllerBase.REST_BASE_URI + SiteNavigationController.URL_ROOT)
 public class SiteNavigationController extends RestControllerBase {
 

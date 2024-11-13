@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.bson.types.ObjectId;
 import org.craftercms.commons.validation.ValidationResult;
+import org.craftercms.core.controller.rest.CrafterRestController;
 import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.engine.rest.SetProfileRequest;
 import org.craftercms.engine.util.ConfigUtils;
@@ -28,7 +29,10 @@ import org.owasp.esapi.ESAPI;
 import org.owasp.esapi.Validator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +49,7 @@ import static org.craftercms.commons.validation.annotations.param.EsapiValidatio
  * @author Russ Danner
  * @author Alfonso Vásquez
  */
-@RestController
+@CrafterRestController
 @RequestMapping(RestControllerBase.REST_BASE_URI + ProfileRestController.URL_ROOT)
 public class ProfileRestController {
 
