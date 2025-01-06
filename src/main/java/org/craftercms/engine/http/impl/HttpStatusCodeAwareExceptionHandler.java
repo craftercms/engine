@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2025 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -55,8 +55,21 @@ public class HttpStatusCodeAwareExceptionHandler implements ExceptionHandler {
             logger.error(message, ex);
         }
 
-        response.sendError(httpStatusCodeAwareEx.getStatusCode(), ex.getMessage());
+        response.sendError(httpStatusCodeAwareEx.getStatusCode(), getResponseMessage(ex));
         return true;
+    }
+
+    /**
+     * Get a response message key depends on the exception to resolve by the template
+     * @param ex the exception
+     * @return response message
+     */
+    private static String getResponseMessage(Exception ex) {
+        if (ex instanceof PreviewAccessException) {
+            return PreviewAccessException.class.getSimpleName();
+        }
+
+        return ex.getMessage();
     }
 
 }

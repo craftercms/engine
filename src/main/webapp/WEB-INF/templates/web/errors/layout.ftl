@@ -4,6 +4,7 @@
   errorTitle=pageTitle
   errorMessage=""
   stackTrace=""
+  paddedErrorMessage=false
 >
   <!DOCTYPE html>
   <html class="h-full bg-gray-100 dark:bg-neutral-900">
@@ -22,6 +23,11 @@
               max-height: 1000em;
               transition: max-height .5s ease-in-out;
           }
+          .padded-message {
+            text-align: left;
+            padding-left: 25%;
+            padding-right: 15%;
+          }
       </style>
     </head>
     <body>
@@ -29,7 +35,7 @@
         <div class="text-center">
           <p class="text-base font-semibold text-gray-500 dark:text-gray-400">${errorCode}</p>
           <h1 class="mt-4 text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl">${errorTitle!pageTitle}</h1>
-          <p class="mt-6 text-base leading-7 text-gray-600 dark:text-gray-300">${errorMessage}</p>
+          <p class="mt-6 text-base leading-7 text-gray-600 dark:text-gray-300 <#if paddedErrorMessage>padded-message</#if>">${errorMessage}</p>
           <div class="mt-10 flex items-center justify-center gap-x-6">
             <a href="/" class="rounded-md bg-gray-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-gray-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600">Go back home</a>
             <a href="mailto:" class="text-sm font-semibold text-gray-900 dark:text-white">Contact support <span aria-hidden="true">&rarr;</span></a>
