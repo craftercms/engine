@@ -1,6 +1,6 @@
 <#macro initExperienceBuilder isAuthoring=(modePreview) props="{}" other...>
 <#assign noXb = ((requestParameters["xb"]!'') == 'off')>
-<#if isAuthoring && model?? && !noXb>
+<#if isAuthoring && contentModel?? && !noXb>
 <!-- >>>>>>>>>>>>>>>>>>>>>>>>>>>>
 CrafterCMS Authoring Scripts
 >>>>>>>>>>>>>>>>>>>>>>>>>>>> -->
@@ -9,7 +9,7 @@ CrafterCMS Authoring Scripts
 <script>
   document.addEventListener('craftercms.xb:loaded', () => {
     window.craftercms.xb.initExperienceBuilder({
-      path: '${model.getItem().descriptorUrl!''}',
+      path: '${contentModel.getItem().descriptorUrl!''}',
       ...${props}
     });
   });

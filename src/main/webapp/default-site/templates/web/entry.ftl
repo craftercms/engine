@@ -89,7 +89,7 @@
 
 <main id="main">
 
-	<a href="https://craftercms.org">
+	<a href="https://craftercms.com">
 		<img src="${urlTransformationService.transform('toWebAppRelativeUrl', '/static-assets/img/logo.svg')}" alt="CrafterCMS"/>
 	</a>
 
@@ -103,7 +103,7 @@
 	<nav class="navigation">
 		<h2 class="navigation--title">Helpful links:</h2>
 		<a class="navigation--link" href="/studio">Authoring environment</a>
-		<a class="navigation--link" href="http://docs.craftercms.org">Docs Homepage</a>
+		<a class="navigation--link" href="http://craftercms.com/docs">Docs Homepage</a>
 		<a class="navigation--link" href="http://www.craftercms.com/resources">Tutorials &amp; Screencasts</a>
 		<a class="navigation--link" href="http://www.craftercms.com/about/partners">Professional Services</a>
 	</nav>

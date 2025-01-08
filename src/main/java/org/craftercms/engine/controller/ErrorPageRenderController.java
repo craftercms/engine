@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2025 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -39,6 +39,8 @@ public class ErrorPageRenderController {
     public static final String ERROR_CODE_PATH_VAR = "code";
 
     public static final String STACK_TRACE_ATTRIBUTE = "stackTrace";
+    public static final String ERROR_MESSAGE_ATTRIBUTE = "errorMessage";
+    public static final String SERVLET_REQUEST_ERROR_MESSAGE_ATTRIBUTE = "jakarta.servlet.error.message";
 
     private String errorViewNamePrefix;
 
@@ -62,6 +64,11 @@ public class ErrorPageRenderController {
             }
 
             mv.addObject(STACK_TRACE_ATTRIBUTE, errorWriter.toString());
+        }
+
+        String errorMessage = (String) request.getAttribute(SERVLET_REQUEST_ERROR_MESSAGE_ATTRIBUTE);
+        if (errorMessage != null) {
+            mv.addObject(ERROR_MESSAGE_ATTRIBUTE, errorMessage);
         }
 
         return mv;

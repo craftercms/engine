@@ -1,7 +1,7 @@
 Crafter Engine
 ==============
 
-Crafter Engine is the content rendering engine for CrafterCMS. For more information, please visit: http://docs.craftercms.org.
+Crafter Engine is the content rendering engine for CrafterCMS. For more information, please visit: http://craftercms.com/docs.
 
 # Community
 ## Contributors
