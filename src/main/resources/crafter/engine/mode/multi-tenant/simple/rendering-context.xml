@@ -16,37 +16,37 @@
   -->
 
 <beans xmlns="http://www.springframework.org/schema/beans"
-	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	   xmlns:util="http://www.springframework.org/schema/util"
-	   xsi:schemaLocation="
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-		<bean class="org.craftercms.commons.spring.ListMergingPostProcessor">
-				<property name="order" value="0"/>
-				<property name="beanName" value="crafter.properties"/>
-				<property name="propertyName" value="locations"/>
-				<property name="additionalElements">
-						<list>
-								<value>classpath:crafter/engine/mode/multi-tenant/simple/server-config.properties</value>
-						</list>
-				</property>
-		</bean>
+	<bean class="org.craftercms.commons.spring.ListMergingPostProcessor">
+		<property name="order" value="0"/>
+		<property name="beanName" value="crafter.properties"/>
+		<property name="propertyName" value="locations"/>
+		<property name="additionalElements">
+			<list>
+				<value>classpath:crafter/engine/mode/multi-tenant/simple/server-config.properties</value>
+			</list>
+		</property>
+	</bean>
 
-		<bean id="crafter.siteCookieChangeInterceptor"
-			  class="org.craftercms.engine.servlet.interceptor.SiteCookieChangeInterceptor">
-				<constructor-arg name="enabled" value="${crafter.engine.response.cookie.enable}"/>
-				<constructor-arg name="cookieName" value="${crafter.engine.request.param.siteName}"/>
-				<constructor-arg name="cookieDomain" value="${crafter.engine.response.cookie.domain}"/>
-				<constructor-arg name="cookiePath" value="${crafter.engine.response.cookie.path}"/>
-				<constructor-arg name="cookieMaxAge" value="${crafter.engine.response.cookie.maxAge}"/>
-				<constructor-arg name="httpOnly" value="${crafter.engine.response.cookie.httpOnly}"/>
-				<constructor-arg name="secure" value="${crafter.engine.response.cookie.secure}"/>
-		</bean>
+	<bean id="crafter.siteCookieChangeInterceptor"
+	      class="org.craftercms.engine.servlet.interceptor.SiteCookieChangeInterceptor">
+		<constructor-arg name="enabled" value="${crafter.engine.response.cookie.enable}"/>
+		<constructor-arg name="cookieName" value="${crafter.engine.request.param.siteName}"/>
+		<constructor-arg name="cookieDomain" value="${crafter.engine.response.cookie.domain}"/>
+		<constructor-arg name="cookiePath" value="${crafter.engine.response.cookie.path}"/>
+		<constructor-arg name="cookieMaxAge" value="${crafter.engine.response.cookie.maxAge}"/>
+		<constructor-arg name="httpOnly" value="${crafter.engine.response.cookie.httpOnly}"/>
+		<constructor-arg name="secure" value="${crafter.engine.response.cookie.secure}"/>
+	</bean>
 
-		<util:list id="crafter.interceptors">
-				<ref bean="crafter.siteCookieChangeInterceptor"/>
-				<ref bean="crafter.localeChangeInterceptor"/>
-		</util:list>
+	<util:list id="crafter.interceptors">
+		<ref bean="crafter.siteCookieChangeInterceptor"/>
+		<ref bean="crafter.localeChangeInterceptor"/>
+	</util:list>
 
 </beans>

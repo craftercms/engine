@@ -16,24 +16,24 @@
   -->
 
 <beans xmlns="http://www.springframework.org/schema/beans"
-	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-		<bean id="crafter.groovyLocaleResolver" scope="prototype"
-			  class="org.craftercms.engine.util.spring.servlet.i18n.GroovyLocaleResolver"/>
+	<bean id="crafter.groovyLocaleResolver" scope="prototype"
+	      class="org.craftercms.engine.util.spring.servlet.i18n.GroovyLocaleResolver"/>
 
-		<bean id="crafter.urlPatternLocaleResolver" scope="prototype"
-			  class="org.craftercms.engine.util.spring.servlet.i18n.UrlPatternLocaleResolver"/>
+	<bean id="crafter.urlPatternLocaleResolver" scope="prototype"
+	      class="org.craftercms.engine.util.spring.servlet.i18n.UrlPatternLocaleResolver"/>
 
-		<bean id="crafter.headerLocaleResolver" scope="prototype"
-			  class="org.craftercms.engine.util.spring.servlet.i18n.HeaderLocaleResolver"/>
+	<bean id="crafter.headerLocaleResolver" scope="prototype"
+	      class="org.craftercms.engine.util.spring.servlet.i18n.HeaderLocaleResolver"/>
 
-		<bean id="crafter.cookieLocaleResolver" scope="prototype"
-			  class="org.craftercms.engine.util.spring.servlet.i18n.CookieLocaleResolver">
-				<constructor-arg name="defaultCookieName" value="${crafter.engine.locale.cookie.name}"/>
-		</bean>
+	<bean id="crafter.cookieLocaleResolver" scope="prototype"
+	      class="org.craftercms.engine.util.spring.servlet.i18n.CookieLocaleResolver">
+		<constructor-arg name="defaultCookieName" value="${crafter.engine.locale.cookie.name}"/>
+	</bean>
 
-		<bean id="crafter.principalLocaleResolver" scope="prototype"
-			  class="org.craftercms.engine.util.spring.servlet.i18n.PrincipalLocaleResolver"/>
+	<bean id="crafter.principalLocaleResolver" scope="prototype"
+	      class="org.craftercms.engine.util.spring.servlet.i18n.PrincipalLocaleResolver"/>
 
 </beans>

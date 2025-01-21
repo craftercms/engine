@@ -16,307 +16,307 @@
   -->
 
 <web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
-		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 
-		<env-entry>
-				<env-entry-name>crafter.engine.extension.base</env-entry-name>
-				<env-entry-type>java.lang.String</env-entry-type>
-				<env-entry-value>classpath*:crafter/engine/extension</env-entry-value>
-		</env-entry>
+	<env-entry>
+		<env-entry-name>crafter.engine.extension.base</env-entry-name>
+		<env-entry-type>java.lang.String</env-entry-type>
+		<env-entry-value>classpath*:crafter/engine/extension</env-entry-value>
+	</env-entry>
 
-		<context-param>
-				<param-name>contextConfigLocation</param-name>
-				<param-value>classpath:crafter/engine/services/main-services-context.xml</param-value>
-		</context-param>
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath:crafter/engine/services/main-services-context.xml</param-value>
+	</context-param>
 
-		<context-param>
-				<param-name>log4jConfiguration</param-name>
-				<param-value>classpath:crafter/engine/extension/logging.xml</param-value>
-		</context-param>
+	<context-param>
+		<param-name>log4jConfiguration</param-name>
+		<param-value>classpath:crafter/engine/extension/logging.xml</param-value>
+	</context-param>
 
-		<context-param>
-				<param-name>webAppRootKey</param-name>
-				<param-value>crafter-engine</param-value>
-		</context-param>
+	<context-param>
+		<param-name>webAppRootKey</param-name>
+		<param-value>crafter-engine</param-value>
+	</context-param>
 
-		<listener>
-				<listener-class>org.apache.logging.log4j.web.Log4jServletContextListener</listener-class>
-		</listener>
+	<listener>
+		<listener-class>org.apache.logging.log4j.web.Log4jServletContextListener</listener-class>
+	</listener>
 
-		<listener>
-				<listener-class>org.springframework.web.util.WebAppRootListener</listener-class>
-		</listener>
+	<listener>
+		<listener-class>org.springframework.web.util.WebAppRootListener</listener-class>
+	</listener>
 
-		<listener>
-				<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-		</listener>
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
 
-		<listener>
-				<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
-		</listener>
+	<listener>
+		<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+	</listener>
 
-		<filter>
-				<filter-name>crafter.cloudfrontForwardedHeaderFilter</filter-name>
-				<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
-		</filter>
+	<filter>
+		<filter-name>crafter.cloudfrontForwardedHeaderFilter</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
 
-		<filter>
-				<filter-name>crafter.forwardedHeaderFilter</filter-name>
-				<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
-		</filter>
+	<filter>
+		<filter-name>crafter.forwardedHeaderFilter</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
 
-		<filter>
-				<filter-name>crafter.secureHeaderWriterFilter</filter-name>
-				<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
-		</filter>
+	<filter>
+		<filter-name>crafter.secureHeaderWriterFilter</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
 
-		<filter>
-				<filter-name>log4jServletFilter</filter-name>
-				<filter-class>org.apache.logging.log4j.web.Log4jServletFilter</filter-class>
-		</filter>
+	<filter>
+		<filter-name>log4jServletFilter</filter-name>
+		<filter-class>org.apache.logging.log4j.web.Log4jServletFilter</filter-class>
+	</filter>
 
-		<filter>
-				<filter-name>characterEncodingFilter</filter-name>
-				<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
-				<init-param>
-						<param-name>encoding</param-name>
-						<param-value>UTF-8</param-value>
-				</init-param>
-		</filter>
+	<filter>
+		<filter-name>characterEncodingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+	</filter>
 
-		<filter>
-				<filter-name>crafter.requestContextBindingFilter</filter-name>
-				<filter-class>org.craftercms.commons.http.RequestContextBindingFilter</filter-class>
-		</filter>
+	<filter>
+		<filter-name>crafter.requestContextBindingFilter</filter-name>
+		<filter-class>org.craftercms.commons.http.RequestContextBindingFilter</filter-class>
+	</filter>
 
-		<filter>
-				<filter-name>crafter.contentCachingFilter</filter-name>
-				<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
-		</filter>
+	<filter>
+		<filter-name>crafter.contentCachingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
 
-		<filter>
-				<filter-name>crafter.siteContextResolvingFilter</filter-name>
-				<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
-		</filter>
+	<filter>
+		<filter-name>crafter.siteContextResolvingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
 
-		<filter>
-				<filter-name>crafter.exceptionHandlingFilter</filter-name>
-				<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
-		</filter>
+	<filter>
+		<filter-name>crafter.exceptionHandlingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
 
-		<filter>
-				<filter-name>crafter.previewSecurityFilter</filter-name>
-				<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
-		</filter>
+	<filter>
+		<filter-name>crafter.previewSecurityFilter</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
 
-		<filter>
-				<filter-name>crafter.proxyFilter</filter-name>
-				<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
-		</filter>
+	<filter>
+		<filter-name>crafter.proxyFilter</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
 
-		<filter>
-				<filter-name>crafter.corsFilter</filter-name>
-				<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
-		</filter>
+	<filter>
+		<filter-name>crafter.corsFilter</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
 
-		<filter>
-				<filter-name>crafter.urlRewriteFilter</filter-name>
-				<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
-		</filter>
+	<filter>
+		<filter-name>crafter.urlRewriteFilter</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
 
-		<filter>
-				<filter-name>crafter.securityFilter</filter-name>
-				<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
-		</filter>
+	<filter>
+		<filter-name>crafter.securityFilter</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
 
-		<filter>
-				<filter-name>crafter.scriptFilter</filter-name>
-				<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
-		</filter>
+	<filter>
+		<filter-name>crafter.scriptFilter</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
 
-		<filter>
-				<filter-name>crafter.poweredByFilter</filter-name>
-				<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
-		</filter>
+	<filter>
+		<filter-name>crafter.poweredByFilter</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
 
-		<filter>
-				<filter-name>crafter.etagFilter</filter-name>
-				<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
-		</filter>
+	<filter>
+		<filter-name>crafter.etagFilter</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
 
-		<filter>
-				<filter-name>crafter.httpHeadersRewriteFilter</filter-name>
-				<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
-		</filter>
+	<filter>
+		<filter-name>crafter.httpHeadersRewriteFilter</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
 
-		<filter-mapping>
-				<filter-name>crafter.cloudfrontForwardedHeaderFilter</filter-name>
-				<url-pattern>/*</url-pattern>
-		</filter-mapping>
+	<filter-mapping>
+		<filter-name>crafter.cloudfrontForwardedHeaderFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
 
-		<filter-mapping>
-				<filter-name>crafter.forwardedHeaderFilter</filter-name>
-				<url-pattern>/*</url-pattern>
-		</filter-mapping>
+	<filter-mapping>
+		<filter-name>crafter.forwardedHeaderFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
 
-		<filter-mapping>
-				<filter-name>crafter.secureHeaderWriterFilter</filter-name>
-				<url-pattern>/*</url-pattern>
-				<dispatcher>REQUEST</dispatcher>
-		</filter-mapping>
+	<filter-mapping>
+		<filter-name>crafter.secureHeaderWriterFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+	</filter-mapping>
 
-		<filter-mapping>
-				<filter-name>log4jServletFilter</filter-name>
-				<url-pattern>/*</url-pattern>
-				<dispatcher>REQUEST</dispatcher>
-				<dispatcher>FORWARD</dispatcher>
-				<dispatcher>INCLUDE</dispatcher>
-				<dispatcher>ERROR</dispatcher>
-		</filter-mapping>
+	<filter-mapping>
+		<filter-name>log4jServletFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+		<dispatcher>FORWARD</dispatcher>
+		<dispatcher>INCLUDE</dispatcher>
+		<dispatcher>ERROR</dispatcher>
+	</filter-mapping>
 
-		<filter-mapping>
-				<filter-name>characterEncodingFilter</filter-name>
-				<url-pattern>/*</url-pattern>
-		</filter-mapping>
+	<filter-mapping>
+		<filter-name>characterEncodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
 
-		<filter-mapping>
-				<filter-name>crafter.requestContextBindingFilter</filter-name>
-				<url-pattern>/*</url-pattern>
-				<dispatcher>REQUEST</dispatcher>
-				<dispatcher>FORWARD</dispatcher>
-				<dispatcher>INCLUDE</dispatcher>
-				<dispatcher>ERROR</dispatcher>
-		</filter-mapping>
+	<filter-mapping>
+		<filter-name>crafter.requestContextBindingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+		<dispatcher>FORWARD</dispatcher>
+		<dispatcher>INCLUDE</dispatcher>
+		<dispatcher>ERROR</dispatcher>
+	</filter-mapping>
 
-		<filter-mapping>
-				<filter-name>crafter.contentCachingFilter</filter-name>
-				<url-pattern>/*</url-pattern>
-		</filter-mapping>
+	<filter-mapping>
+		<filter-name>crafter.contentCachingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
 
-		<filter-mapping>
-				<filter-name>crafter.siteContextResolvingFilter</filter-name>
-				<url-pattern>/*</url-pattern>
-				<dispatcher>REQUEST</dispatcher>
-				<dispatcher>FORWARD</dispatcher>
-				<dispatcher>INCLUDE</dispatcher>
-				<dispatcher>ERROR</dispatcher>
-		</filter-mapping>
+	<filter-mapping>
+		<filter-name>crafter.siteContextResolvingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+		<dispatcher>FORWARD</dispatcher>
+		<dispatcher>INCLUDE</dispatcher>
+		<dispatcher>ERROR</dispatcher>
+	</filter-mapping>
 
-		<filter-mapping>
-				<filter-name>crafter.exceptionHandlingFilter</filter-name>
-				<url-pattern>/*</url-pattern>
-				<dispatcher>REQUEST</dispatcher>
-		</filter-mapping>
+	<filter-mapping>
+		<filter-name>crafter.exceptionHandlingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+	</filter-mapping>
 
-		<filter-mapping>
-				<filter-name>crafter.previewSecurityFilter</filter-name>
-				<url-pattern>/*</url-pattern>
-				<dispatcher>REQUEST</dispatcher>
-		</filter-mapping>
+	<filter-mapping>
+		<filter-name>crafter.previewSecurityFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+	</filter-mapping>
 
-		<filter-mapping>
-				<filter-name>crafter.proxyFilter</filter-name>
-				<url-pattern>/*</url-pattern>
-				<dispatcher>REQUEST</dispatcher>
-		</filter-mapping>
+	<filter-mapping>
+		<filter-name>crafter.proxyFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+	</filter-mapping>
 
-		<filter-mapping>
-				<filter-name>crafter.corsFilter</filter-name>
-				<url-pattern>/*</url-pattern>
-				<dispatcher>REQUEST</dispatcher>
-				<dispatcher>FORWARD</dispatcher>
-				<dispatcher>INCLUDE</dispatcher>
-		</filter-mapping>
+	<filter-mapping>
+		<filter-name>crafter.corsFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+		<dispatcher>FORWARD</dispatcher>
+		<dispatcher>INCLUDE</dispatcher>
+	</filter-mapping>
 
-		<filter-mapping>
-				<filter-name>crafter.urlRewriteFilter</filter-name>
-				<url-pattern>/*</url-pattern>
-				<dispatcher>REQUEST</dispatcher>
-				<dispatcher>FORWARD</dispatcher>
-		</filter-mapping>
+	<filter-mapping>
+		<filter-name>crafter.urlRewriteFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+		<dispatcher>FORWARD</dispatcher>
+	</filter-mapping>
 
-		<filter-mapping>
-				<filter-name>crafter.securityFilter</filter-name>
-				<url-pattern>/*</url-pattern>
-				<dispatcher>REQUEST</dispatcher>
-				<dispatcher>FORWARD</dispatcher>
-		</filter-mapping>
+	<filter-mapping>
+		<filter-name>crafter.securityFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+		<dispatcher>FORWARD</dispatcher>
+	</filter-mapping>
 
-		<filter-mapping>
-				<filter-name>crafter.scriptFilter</filter-name>
-				<url-pattern>/*</url-pattern>
-				<dispatcher>REQUEST</dispatcher>
-				<dispatcher>FORWARD</dispatcher>
-				<dispatcher>INCLUDE</dispatcher>
-				<dispatcher>ERROR</dispatcher>
-		</filter-mapping>
+	<filter-mapping>
+		<filter-name>crafter.scriptFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+		<dispatcher>FORWARD</dispatcher>
+		<dispatcher>INCLUDE</dispatcher>
+		<dispatcher>ERROR</dispatcher>
+	</filter-mapping>
 
-		<filter-mapping>
-				<filter-name>crafter.poweredByFilter</filter-name>
-				<url-pattern>/*</url-pattern>
-				<dispatcher>REQUEST</dispatcher>
-				<dispatcher>FORWARD</dispatcher>
-				<dispatcher>INCLUDE</dispatcher>
-		</filter-mapping>
+	<filter-mapping>
+		<filter-name>crafter.poweredByFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+		<dispatcher>FORWARD</dispatcher>
+		<dispatcher>INCLUDE</dispatcher>
+	</filter-mapping>
 
-		<filter-mapping>
-				<filter-name>crafter.etagFilter</filter-name>
-				<url-pattern>/*</url-pattern>
-		</filter-mapping>
+	<filter-mapping>
+		<filter-name>crafter.etagFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
 
-		<filter-mapping>
-				<filter-name>crafter.httpHeadersRewriteFilter</filter-name>
-				<url-pattern>/*</url-pattern>
-				<dispatcher>REQUEST</dispatcher>
-		</filter-mapping>
+	<filter-mapping>
+		<filter-name>crafter.httpHeadersRewriteFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+	</filter-mapping>
 
-		<servlet>
-				<servlet-name>Spring MVC Dispatcher Servlet</servlet-name>
-				<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-				<init-param>
-						<param-name>contextConfigLocation</param-name>
-						<param-value>classpath:crafter/engine/rendering/main-rendering-context.xml</param-value>
-				</init-param>
-				<init-param>
-						<param-name>threadContextInheritable</param-name>
-						<param-value>true</param-value>
-				</init-param>
-				<load-on-startup>1</load-on-startup>
-		</servlet>
+	<servlet>
+		<servlet-name>Spring MVC Dispatcher Servlet</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>classpath:crafter/engine/rendering/main-rendering-context.xml</param-value>
+		</init-param>
+		<init-param>
+			<param-name>threadContextInheritable</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
 
-		<servlet-mapping>
-				<servlet-name>Spring MVC Dispatcher Servlet</servlet-name>
-				<url-pattern>/*</url-pattern>
-		</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>Spring MVC Dispatcher Servlet</servlet-name>
+		<url-pattern>/*</url-pattern>
+	</servlet-mapping>
 
-		<session-config>
-				<session-timeout>15</session-timeout>
-		</session-config>
+	<session-config>
+		<session-timeout>15</session-timeout>
+	</session-config>
 
-		<error-page>
-				<error-code>400</error-code>
-				<location>/crafter-controller/error/400</location>
-		</error-page>
+	<error-page>
+		<error-code>400</error-code>
+		<location>/crafter-controller/error/400</location>
+	</error-page>
 
-		<error-page>
-				<error-code>401</error-code>
-				<location>/crafter-controller/error/401</location>
-		</error-page>
+	<error-page>
+		<error-code>401</error-code>
+		<location>/crafter-controller/error/401</location>
+	</error-page>
 
-		<error-page>
-				<error-code>403</error-code>
-				<location>/crafter-controller/error/403</location>
-		</error-page>
+	<error-page>
+		<error-code>403</error-code>
+		<location>/crafter-controller/error/403</location>
+	</error-page>
 
-		<error-page>
-				<error-code>404</error-code>
-				<location>/crafter-controller/error/404</location>
-		</error-page>
+	<error-page>
+		<error-code>404</error-code>
+		<location>/crafter-controller/error/404</location>
+	</error-page>
 
-		<error-page>
-				<error-code>500</error-code>
-				<location>/crafter-controller/error/500</location>
-		</error-page>
+	<error-page>
+		<error-code>500</error-code>
+		<location>/crafter-controller/error/500</location>
+	</error-page>
 
 </web-app>

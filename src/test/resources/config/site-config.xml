@@ -16,109 +16,109 @@
   -->
 
 <site>
-		<!-- General properties -->
-		<indexFileName>index.xml</indexFileName>
-		<defaultLocale>en</defaultLocale>
+	<!-- General properties -->
+	<indexFileName>index.xml</indexFileName>
+	<defaultLocale>en</defaultLocale>
 
-		<test-property>This one supports macro for site ${contextName}</test-property>
+	<test-property>This one supports macro for site ${contextName}</test-property>
 
-		<!-- Compatibility properties -->
-		<compatibility>
-				<!--
-				Disables full content model type conversion (false by default in all sites).
+	<!-- Compatibility properties -->
+	<compatibility>
+		<!--
+		Disables full content model type conversion (false by default in all sites).
 
-				Up to and including version 2:
-				Crafter Engine, in the FreeMarker host only, converts model elements based on a suffix type hint, but only for the first level in
-				the model, and not for _dt. For example, for contentModel.myvalue_i Integer is returned, but for contentModel.repeater.myvalue_i
-				and contentModel.date_dt a String is returned. In the Groovy host no type of conversion was performed.
+		Up to and including version 2:
+		Crafter Engine, in the FreeMarker host only, converts model elements based on a suffix type hint, but only for the first level in
+		the model, and not for _dt. For example, for contentModel.myvalue_i Integer is returned, but for contentModel.repeater.myvalue_i
+		and contentModel.date_dt a String is returned. In the Groovy host no type of conversion was performed.
 
-				In version 3 onwards, Crafter Engine converts elements with any suffix type hints (including _dt) at at any level in the content
-				model and for both Freemarker and Groovy hosts.
-				-->
-				<disableFullModelTypeConversion>false</disableFullModelTypeConversion>
-		</compatibility>
+		In version 3 onwards, Crafter Engine converts elements with any suffix type hints (including _dt) at at any level in the content
+		model and for both Freemarker and Groovy hosts.
+		-->
+		<disableFullModelTypeConversion>false</disableFullModelTypeConversion>
+	</compatibility>
 
 
-		<!-- Filter properties -->
-		<filters>
-				<filter>
-						<script>/scripts/filters/testFilter1.groovy</script>
-						<mapping>
-								<include>/**</include>
-						</mapping>
-				</filter>
-				<filter>
-						<script>/scripts/filters/testFilter2.groovy</script>
-						<mapping>
-								<include>/**</include>
-						</mapping>
-				</filter>
-				<filter>
-						<script>/scripts/filters/testFilter3.groovy</script>
-						<mapping>
-								<include>/**</include>
-								<exclude>/static-assets/**</exclude>
-						</mapping>
-				</filter>
-		</filters>
+	<!-- Filter properties -->
+	<filters>
+		<filter>
+			<script>/scripts/filters/testFilter1.groovy</script>
+			<mapping>
+				<include>/**</include>
+			</mapping>
+		</filter>
+		<filter>
+			<script>/scripts/filters/testFilter2.groovy</script>
+			<mapping>
+				<include>/**</include>
+			</mapping>
+		</filter>
+		<filter>
+			<script>/scripts/filters/testFilter3.groovy</script>
+			<mapping>
+				<include>/**</include>
+				<exclude>/static-assets/**</exclude>
+			</mapping>
+		</filter>
+	</filters>
 
-		<!-- Content targeting properties -->
-		<targeting>
-				<enabled>true</enabled>
-				<rootFolders>/site/website</rootFolders>
-				<excludePatterns>/site/website/index\.xml</excludePatterns>
-				<availableTargetIds>en,ja,ja_jp,ja_jp_jp</availableTargetIds>
-				<fallbackTargetId>en</fallbackTargetId>
-				<mergeFolders>true</mergeFolders>
-				<redirectToTargetedUrl>false</redirectToTargetedUrl>
-		</targeting>
+	<!-- Content targeting properties -->
+	<targeting>
+		<enabled>true</enabled>
+		<rootFolders>/site/website</rootFolders>
+		<excludePatterns>/site/website/index\.xml</excludePatterns>
+		<availableTargetIds>en,ja,ja_jp,ja_jp_jp</availableTargetIds>
+		<fallbackTargetId>en</fallbackTargetId>
+		<mergeFolders>true</mergeFolders>
+		<redirectToTargetedUrl>false</redirectToTargetedUrl>
+	</targeting>
 
-		<!-- Profile properties -->
-		<profile>
-				<api>
-						<accessTokenId>cd287b58-ab9c-457f-a4f0-39ef49f04c69</accessTokenId>
-				</api>
-		</profile>
+	<!-- Profile properties -->
+	<profile>
+		<api>
+			<accessTokenId>cd287b58-ab9c-457f-a4f0-39ef49f04c69</accessTokenId>
+		</api>
+	</profile>
 
-		<!-- Security properties -->
-		<security>
-				<login>
-						<formUrl>/signin</formUrl>
-						<defaultSuccessUrl>/home</defaultSuccessUrl>
-						<alwaysUseDefaultSuccessUrl>true</alwaysUseDefaultSuccessUrl>
-						<failureUrl>/signin?error=loginFailure</failureUrl>
-				</login>
-				<logout>
-						<successUrl>/home</successUrl>
-				</logout>
-				<accessDenied>
-						<errorPageUrl>/signin?error=accessDenied</errorPageUrl>
-				</accessDenied>
-				<urlRestrictions>
-						<restriction>
-								<url>/*</url>
-								<expression>hasRole('USER')</expression>
-						</restriction>
-				</urlRestrictions>
-		</security>
+	<!-- Security properties -->
+	<security>
+		<login>
+			<formUrl>/signin</formUrl>
+			<defaultSuccessUrl>/home</defaultSuccessUrl>
+			<alwaysUseDefaultSuccessUrl>true</alwaysUseDefaultSuccessUrl>
+			<failureUrl>/signin?error=loginFailure</failureUrl>
+		</login>
+		<logout>
+			<successUrl>/home</successUrl>
+		</logout>
+		<accessDenied>
+			<errorPageUrl>/signin?error=accessDenied</errorPageUrl>
+		</accessDenied>
+		<urlRestrictions>
+			<restriction>
+				<url>/*</url>
+				<expression>hasRole('USER')</expression>
+			</restriction>
+		</urlRestrictions>
+	</security>
 
-		<!-- Social properties -->
-		<socialConnections>
-				<facebookConnectionFactory>
-						<appId>000000000000000</appId>
-						<appSecret>c852cb30cda311e488300800200c9a66</appSecret>
-				</facebookConnectionFactory>
-		</socialConnections>
+	<!-- Social properties -->
+	<socialConnections>
+		<facebookConnectionFactory>
+			<appId>000000000000000</appId>
+			<appSecret>c852cb30cda311e488300800200c9a66</appSecret>
+		</facebookConnectionFactory>
+	</socialConnections>
 
-		<!-- Job properties -->
-		<jobs>
-				<jobFolder>
-						<path>/scripts/jobs/morejobs</path>
-						<cronExpression>0 0/15 * * * ?</cronExpression>
-				</jobFolder>
-				<job>
-						<path>/scripts/jobs/testJob.groovy</path>
-						<cronExpression>0 0/15 * * * ?</cronExpression>
-				</job>
-		</jobs>
+	<!-- Job properties -->
+	<jobs>
+		<jobFolder>
+			<path>/scripts/jobs/morejobs</path>
+			<cronExpression>0 0/15 * * * ?</cronExpression>
+		</jobFolder>
+		<job>
+			<path>/scripts/jobs/testJob.groovy</path>
+			<cronExpression>0 0/15 * * * ?</cronExpression>
+		</job>
+	</jobs>
 </site>
