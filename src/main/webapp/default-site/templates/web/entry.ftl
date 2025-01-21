@@ -22,67 +22,67 @@
 	<!-- start CSS -->
 	<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600" rel="stylesheet">
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap-reboot.min.css"
-				rel="stylesheet">
+	      rel="stylesheet">
 	<style>
-		html, body {
-			height: 100%;
-		}
+            html, body {
+                height: 100%;
+            }
 
-		body {
-			font-family: 'Open Sans', sans-serif;
-			background-position: center center;
-			background-image: url('${urlTransformationService.transform('toWebAppRelativeUrl', '/static-assets/img/gears.jpg')}');
-			background-repeat: no-repeat;
-			background-size: cover;
-			align-items: center;
-			justify-content: center;
-			display: flex;
-		}
+            body {
+                font-family: 'Open Sans', sans-serif;
+                background-position: center center;
+                background-image: url('${urlTransformationService.transform('toWebAppRelativeUrl', '/static-assets/img/gears.jpg')}');
+                background-repeat: no-repeat;
+                background-size: cover;
+                align-items: center;
+                justify-content: center;
+                display: flex;
+            }
 
-		#main {
-			margin: 20px;
-			padding: 20px;
-			max-width: 400px;
-			border-radius: 20px;
-			background-color: #fff;
-			background-color: rgba(255,255,255,.9);
-			position: relative;
-		}
+            #main {
+                margin: 20px;
+                padding: 20px;
+                max-width: 400px;
+                border-radius: 20px;
+                background-color: #fff;
+                background-color: rgba(255, 255, 255, .9);
+                position: relative;
+            }
 
-		.footer {
-			font-size: 65%;
-			color: #999;
-		}
+            .footer {
+                font-size: 65%;
+                color: #999;
+            }
 
-		.logo {
-			width: 200px;
-			margin: 20px auto;
-			display: block;
-		}
+            .logo {
+                width: 200px;
+                margin: 20px auto;
+                display: block;
+            }
 
-		.navigation {
-			margin: 0 0 20px;
-		}
+            .navigation {
+                margin: 0 0 20px;
+            }
 
-		.navigation--title {
-			font-size: 80%;
-		}
+            .navigation--title {
+                font-size: 80%;
+            }
 
-		.navigation--link {
-			font-size: 80%;
-			display: block;
-		}
+            .navigation--link {
+                font-size: 80%;
+                display: block;
+            }
 
-		.footer,
-		.no-site-message {
-			text-align: center;
-		}
+            .footer,
+            .no-site-message {
+                text-align: center;
+            }
 	</style>
 	<!-- end CSS-->
 
 	<!-- Favicon Setting -->
 	<link rel="icon" type="image/x-icon"
-				href='${urlTransformationService.transform('toWebAppRelativeUrl', '/static-assets/img/favicon.ico')}'/>
+	      href='${urlTransformationService.transform('toWebAppRelativeUrl', '/static-assets/img/favicon.ico')}'/>
 </head>
 
 <body>

@@ -30,23 +30,23 @@ import static org.junit.Assert.*;
  */
 public class CandidateTargetIdsResolverImplTest {
 
-    private CandidateTargetIdsResolverImpl candidateTargetIdsResolver;
+	private CandidateTargetIdsResolverImpl candidateTargetIdsResolver;
 
-    @Before
-    public void setUp() throws Exception {
-        candidateTargetIdsResolver = new CandidateTargetIdsResolverImpl();
-    }
+	@Before
+	public void setUp() throws Exception {
+		candidateTargetIdsResolver = new CandidateTargetIdsResolverImpl();
+	}
 
-    @Test
-    public void testGetTargetIds() throws Exception {
-        List<String> targetIds = candidateTargetIdsResolver.getTargetIds("ja_jp_jp", "en");
+	@Test
+	public void testGetTargetIds() throws Exception {
+		List<String> targetIds = candidateTargetIdsResolver.getTargetIds("ja_jp_jp", "en");
 
-        assertNotNull(targetIds);
-        assertEquals(4, targetIds.size());
-        assertEquals("ja_jp_jp", targetIds.get(0));
-        assertEquals("ja_jp", targetIds.get(1));
-        assertEquals("ja", targetIds.get(2));
-        assertEquals("en", targetIds.get(3));
-    }
+		assertNotNull(targetIds);
+		assertEquals(4, targetIds.size());
+		assertEquals("ja_jp_jp", targetIds.get(0));
+		assertEquals("ja_jp", targetIds.get(1));
+		assertEquals("ja", targetIds.get(2));
+		assertEquals("en", targetIds.get(3));
+	}
 
 }

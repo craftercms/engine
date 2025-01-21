@@ -36,49 +36,49 @@ import java.beans.ConstructorProperties;
  */
 public class ProfileAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
 
-    protected TenantsResolver tenantsResolver;
+	protected TenantsResolver tenantsResolver;
 
-    protected AuthenticationManager authenticationManager;
+	protected AuthenticationManager authenticationManager;
 
-    @ConstructorProperties({"tenantsResolver", "authenticationManager"})
-    public ProfileAuthenticationProvider(final TenantsResolver tenantsResolver,
-                                         final AuthenticationManager authenticationManager) {
-        this.tenantsResolver = tenantsResolver;
-        this.authenticationManager = authenticationManager;
-    }
+	@ConstructorProperties({"tenantsResolver", "authenticationManager"})
+	public ProfileAuthenticationProvider(final TenantsResolver tenantsResolver,
+					     final AuthenticationManager authenticationManager) {
+		this.tenantsResolver = tenantsResolver;
+		this.authenticationManager = authenticationManager;
+	}
 
-    @Override
-    protected void additionalAuthenticationChecks(final UserDetails userDetails,
-                                                  final UsernamePasswordAuthenticationToken authentication)
-        throws AuthenticationException {
-        // do nothing
-    }
+	@Override
+	protected void additionalAuthenticationChecks(final UserDetails userDetails,
+						      final UsernamePasswordAuthenticationToken authentication)
+		throws AuthenticationException {
+		// do nothing
+	}
 
-    @Override
-    protected UserDetails retrieveUser(final String username,
-                                       final UsernamePasswordAuthenticationToken authentication)
-        throws AuthenticationException {
-        String[] tenants = getTenants();
-        try {
-            Authentication profileAuth =
-                authenticationManager.authenticateUser(tenants, username, authentication.getCredentials().toString());
+	@Override
+	protected UserDetails retrieveUser(final String username,
+					   final UsernamePasswordAuthenticationToken authentication)
+		throws AuthenticationException {
+		String[] tenants = getTenants();
+		try {
+			Authentication profileAuth =
+				authenticationManager.authenticateUser(tenants, username, authentication.getCredentials().toString());
 
-            return createPrincipal(profileAuth);
-        } catch (Exception e) {
-            throw new AuthenticationServiceException("Error authenticating user " + username, e);
-        }
-    }
+			return createPrincipal(profileAuth);
+		} catch (Exception e) {
+			throw new AuthenticationServiceException("Error authenticating user " + username, e);
+		}
+	}
 
-    protected String[] getTenants() {
-        String[] tenants = tenantsResolver.getTenants();
-        if (ArrayUtils.isEmpty(tenants)) {
-            throw new AuthenticationServiceException("No tenants resolved for authentication");
-        }
-        return tenants;
-    }
+	protected String[] getTenants() {
+		String[] tenants = tenantsResolver.getTenants();
+		if (ArrayUtils.isEmpty(tenants)) {
+			throw new AuthenticationServiceException("No tenants resolved for authentication");
+		}
+		return tenants;
+	}
 
-    protected ProfileUser createPrincipal(Authentication auth) {
-        return new ProfileUser(auth);
-    }
+	protected ProfileUser createPrincipal(Authentication auth) {
+		return new ProfileUser(auth);
+	}
 
 }

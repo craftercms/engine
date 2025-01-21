@@ -24,25 +24,25 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
  */
 public class SystemProperties {
 
-    public static final String MODE_PREVIEW_PROPERTY_NAME = "crafter.modePreview";
-    public static final String ENVIRONMENT_PROPERTY_NAME = "crafter.environment";
+	public static final String MODE_PREVIEW_PROPERTY_NAME = "crafter.modePreview";
+	public static final String ENVIRONMENT_PROPERTY_NAME = "crafter.environment";
 
-    public static boolean isModePreview() {
-        String value = System.getProperty(MODE_PREVIEW_PROPERTY_NAME);
-        if (isNotEmpty(value)) {
-            return Boolean.parseBoolean(value);
-        }
+	public static boolean isModePreview() {
+		String value = System.getProperty(MODE_PREVIEW_PROPERTY_NAME);
+		if (isNotEmpty(value)) {
+			return Boolean.parseBoolean(value);
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    public static String getEnvironment() {
-        String value = System.getProperty(ENVIRONMENT_PROPERTY_NAME);
-        if (isNotEmpty(value)) {
-            return value;
-        } else {
-            return null;
-        }
-    }
+	public static String getEnvironment() {
+		String value = System.getProperty(ENVIRONMENT_PROPERTY_NAME);
+		if (isNotEmpty(value)) {
+			return value;
+		} else {
+			return null;
+		}
+	}
 
 }

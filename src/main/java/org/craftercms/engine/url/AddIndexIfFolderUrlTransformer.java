@@ -31,15 +31,15 @@ import org.craftercms.engine.properties.SiteProperties;
  */
 public class AddIndexIfFolderUrlTransformer implements UrlTransformer {
 
-    @Override
-    public String transformUrl(Context context, CachingOptions cachingOptions,
-                               String url) throws UrlTransformationException {
-        String extension = FilenameUtils.getExtension(url);
-        if (StringUtils.isEmpty(extension)) {
-            url = UrlUtils.concat(url, SiteProperties.getIndexFileName());
-        }
+	@Override
+	public String transformUrl(Context context, CachingOptions cachingOptions,
+				   String url) throws UrlTransformationException {
+		String extension = FilenameUtils.getExtension(url);
+		if (StringUtils.isEmpty(extension)) {
+			url = UrlUtils.concat(url, SiteProperties.getIndexFileName());
+		}
 
-        return url;
-    }
+		return url;
+	}
 
 }

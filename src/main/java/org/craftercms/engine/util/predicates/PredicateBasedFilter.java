@@ -30,26 +30,26 @@ import org.craftercms.core.service.ItemFilter;
  */
 public class PredicateBasedFilter implements ItemFilter {
 
-    protected Predicate<Item> predicate;
+	protected Predicate<Item> predicate;
 
-    @ConstructorProperties({"predicate"})
-    public PredicateBasedFilter(Predicate<Item> predicate) {
-        this.predicate = predicate;
-    }
+	@ConstructorProperties({"predicate"})
+	public PredicateBasedFilter(Predicate<Item> predicate) {
+		this.predicate = predicate;
+	}
 
-    @Override
-    public boolean runBeforeProcessing() {
-        return false;
-    }
+	@Override
+	public boolean runBeforeProcessing() {
+		return false;
+	}
 
-    @Override
-    public boolean runAfterProcessing() {
-        return true;
-    }
+	@Override
+	public boolean runAfterProcessing() {
+		return true;
+	}
 
-    @Override
-    public boolean accepts(Item item, List<Item> acceptedItems, List<Item> rejectedItems, boolean runningBeforeProcessing) {
-        return predicate.evaluate(item);
-    }
+	@Override
+	public boolean accepts(Item item, List<Item> acceptedItems, List<Item> rejectedItems, boolean runningBeforeProcessing) {
+		return predicate.evaluate(item);
+	}
 
 }

@@ -31,50 +31,50 @@ import org.craftercms.engine.targeting.TargetIdManager;
  */
 public class FolderToIndexItemProcessor implements ItemProcessor {
 
-    protected String folderToIndexUrlTransformerName;
-    protected UrlTransformationEngine urlTransformationEngine;
-    protected ContentStoreService storeService;
-    protected TargetIdManager targetIdManager;
+	protected String folderToIndexUrlTransformerName;
+	protected UrlTransformationEngine urlTransformationEngine;
+	protected ContentStoreService storeService;
+	protected TargetIdManager targetIdManager;
 
-    public FolderToIndexItemProcessor(String folderToIndexUrlTransformerName, UrlTransformationEngine urlTransformationEngine,
-                                      ContentStoreService storeService, TargetIdManager targetIdManager) {
-        this.folderToIndexUrlTransformerName = folderToIndexUrlTransformerName;
-        this.urlTransformationEngine = urlTransformationEngine;
-        this.storeService = storeService;
-        this.targetIdManager = targetIdManager;
-    }
+	public FolderToIndexItemProcessor(String folderToIndexUrlTransformerName, UrlTransformationEngine urlTransformationEngine,
+					  ContentStoreService storeService, TargetIdManager targetIdManager) {
+		this.folderToIndexUrlTransformerName = folderToIndexUrlTransformerName;
+		this.urlTransformationEngine = urlTransformationEngine;
+		this.storeService = storeService;
+		this.targetIdManager = targetIdManager;
+	}
 
-    @Override
-    public Item process(Context context, CachingOptions cachingOptions, Item item) throws ItemProcessingException {
-        if (item.isFolder()) {
-            String folderUrl = item.getUrl();
-            String indexUrl = urlTransformationEngine.transformUrl(context, cachingOptions,
-                                                                   folderToIndexUrlTransformerName, folderUrl);
-            Item indexItem = storeService.findItem(context, cachingOptions, indexUrl, null);
+	@Override
+	public Item process(Context context, CachingOptions cachingOptions, Item item) throws ItemProcessingException {
+		if (item.isFolder()) {
+			String folderUrl = item.getUrl();
+			String indexUrl = urlTransformationEngine.transformUrl(context, cachingOptions,
+				folderToIndexUrlTransformerName, folderUrl);
+			Item indexItem = storeService.findItem(context, cachingOptions, indexUrl, null);
 
-            if (indexItem != null) {
-                Item newFolderItem = new Item(item);
+			if (indexItem != null) {
+				Item newFolderItem = new Item(item);
 
-                newFolderItem.setDescriptorUrl(indexItem.getDescriptorUrl());
-                newFolderItem.setDescriptorDom(indexItem.getDescriptorDom());
+				newFolderItem.setDescriptorUrl(indexItem.getDescriptorUrl());
+				newFolderItem.setDescriptorDom(indexItem.getDescriptorDom());
 
-                return newFolderItem;
-            }
-        }
+				return newFolderItem;
+			}
+		}
 
-        return item;
-    }
+		return item;
+	}
 
-    @Override
-    public String toString() {
-        // The current target ID is added because the toString() method is used for item caching, and the result of the
-        // folderToIndexFileTransformer varies by target ID
-        return "FolderToIndexItemProcessor{" +
-               "currentTargetId='" + targetIdManager.getCurrentTargetId() + '\'' +
-               ", folderToIndexUrlTransformerName='" + folderToIndexUrlTransformerName + '\'' +
-               ", urlTransformationEngine=" + urlTransformationEngine +
-               ", storeService=" + storeService +
-               '}';
-    }
+	@Override
+	public String toString() {
+		// The current target ID is added because the toString() method is used for item caching, and the result of the
+		// folderToIndexFileTransformer varies by target ID
+		return "FolderToIndexItemProcessor{" +
+			"currentTargetId='" + targetIdManager.getCurrentTargetId() + '\'' +
+			", folderToIndexUrlTransformerName='" + folderToIndexUrlTransformerName + '\'' +
+			", urlTransformationEngine=" + urlTransformationEngine +
+			", storeService=" + storeService +
+			'}';
+	}
 
 }

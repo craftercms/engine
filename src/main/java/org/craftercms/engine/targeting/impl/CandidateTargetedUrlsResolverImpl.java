@@ -38,48 +38,48 @@ import org.craftercms.engine.util.TargetingUtils;
  */
 public class CandidateTargetedUrlsResolverImpl implements CandidateTargetedUrlsResolver {
 
-    protected TargetIdManager targetIdManager;
-    protected TargetedUrlStrategy targetedUrlStrategy;
-    protected CandidateTargetIdsResolver candidateTargetIdsResolver;
+	protected TargetIdManager targetIdManager;
+	protected TargetedUrlStrategy targetedUrlStrategy;
+	protected CandidateTargetIdsResolver candidateTargetIdsResolver;
 
-    public CandidateTargetedUrlsResolverImpl(TargetIdManager targetIdManager, TargetedUrlStrategy targetedUrlStrategy,
-                                             CandidateTargetIdsResolver candidateTargetIdsResolver) {
-        this.targetIdManager = targetIdManager;
-        this.targetedUrlStrategy = targetedUrlStrategy;
-        this.candidateTargetIdsResolver = candidateTargetIdsResolver;
-    }
+	public CandidateTargetedUrlsResolverImpl(TargetIdManager targetIdManager, TargetedUrlStrategy targetedUrlStrategy,
+						 CandidateTargetIdsResolver candidateTargetIdsResolver) {
+		this.targetIdManager = targetIdManager;
+		this.targetedUrlStrategy = targetedUrlStrategy;
+		this.candidateTargetIdsResolver = candidateTargetIdsResolver;
+	}
 
-    @Override
-    public List<String> getUrls(String targetedUrl) {
-        List<String> candidateUrls = new ArrayList<>();
-        String rootFolder = TargetingUtils.getMatchingRootFolder(targetedUrl);
+	@Override
+	public List<String> getUrls(String targetedUrl) {
+		List<String> candidateUrls = new ArrayList<>();
+		String rootFolder = TargetingUtils.getMatchingRootFolder(targetedUrl);
 
-        if (StringUtils.isNotEmpty(rootFolder)) {
-            String relativeTargetedUrl = StringUtils.substringAfter(targetedUrl, rootFolder);
-            TargetedUrlComponents urlComp = targetedUrlStrategy.parseTargetedUrl(relativeTargetedUrl);
+		if (StringUtils.isNotEmpty(rootFolder)) {
+			String relativeTargetedUrl = StringUtils.substringAfter(targetedUrl, rootFolder);
+			TargetedUrlComponents urlComp = targetedUrlStrategy.parseTargetedUrl(relativeTargetedUrl);
 
-            if (urlComp != null) {
-                String prefix = UrlUtils.concat(rootFolder, urlComp.getPrefix());
-                String suffix = urlComp.getSuffix();
-                String targetId = urlComp.getTargetId();
-                String fallbackTargetId = targetIdManager.getFallbackTargetId();
-                List<String> candidateTargetIds = candidateTargetIdsResolver.getTargetIds(targetId, fallbackTargetId);
+			if (urlComp != null) {
+				String prefix = UrlUtils.concat(rootFolder, urlComp.getPrefix());
+				String suffix = urlComp.getSuffix();
+				String targetId = urlComp.getTargetId();
+				String fallbackTargetId = targetIdManager.getFallbackTargetId();
+				List<String> candidateTargetIds = candidateTargetIdsResolver.getTargetIds(targetId, fallbackTargetId);
 
-                if (CollectionUtils.isNotEmpty(candidateTargetIds)) {
-                    for (String candidateTargetId : candidateTargetIds) {
-                        candidateUrls.add(targetedUrlStrategy.buildTargetedUrl(prefix, candidateTargetId, suffix));
-                    }
-                } else {
-                    candidateUrls.add(targetedUrl);
-                }
-            } else {
-                candidateUrls.add(targetedUrl);
-            }
-        } else {
-            candidateUrls.add(targetedUrl);
-        }
+				if (CollectionUtils.isNotEmpty(candidateTargetIds)) {
+					for (String candidateTargetId : candidateTargetIds) {
+						candidateUrls.add(targetedUrlStrategy.buildTargetedUrl(prefix, candidateTargetId, suffix));
+					}
+				} else {
+					candidateUrls.add(targetedUrl);
+				}
+			} else {
+				candidateUrls.add(targetedUrl);
+			}
+		} else {
+			candidateUrls.add(targetedUrl);
+		}
 
-        return candidateUrls;
-    }
+		return candidateUrls;
+	}
 
 }

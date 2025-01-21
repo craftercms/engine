@@ -21,6 +21,7 @@ import org.craftercms.engine.http.ExceptionHandler;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 
 import static org.craftercms.commons.http.HttpUtils.getFullRequestUri;
@@ -33,18 +34,18 @@ import static org.craftercms.commons.lang.UrlUtils.cleanUrlForLog;
  */
 public class DefaultExceptionHandler implements ExceptionHandler {
 
-    private static final Log logger = LogFactory.getLog(DefaultExceptionHandler.class);
+	private static final Log logger = LogFactory.getLog(DefaultExceptionHandler.class);
 
-    public static final String EXCEPTION_ATTRIBUTE = "exception";
+	public static final String EXCEPTION_ATTRIBUTE = "exception";
 
-    @Override
-    public boolean handle(HttpServletRequest request, HttpServletResponse response, Exception ex) throws IOException {
-        logger.error(request.getMethod() + " " + cleanUrlForLog(getFullRequestUri(request, true)) + " failed", ex);
+	@Override
+	public boolean handle(HttpServletRequest request, HttpServletResponse response, Exception ex) throws IOException {
+		logger.error(request.getMethod() + " " + cleanUrlForLog(getFullRequestUri(request, true)) + " failed", ex);
 
-        request.setAttribute(EXCEPTION_ATTRIBUTE, ex);
-        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		request.setAttribute(EXCEPTION_ATTRIBUTE, ex);
+		response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
-        return true;
-    }
+		return true;
+	}
 
 }

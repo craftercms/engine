@@ -31,25 +31,25 @@ import org.springframework.security.web.authentication.SavedRequestAwareAuthenti
  */
 public class ConfigAwareAuthenticationSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
-    public static final String LOGIN_DEFAULT_SUCCESS_URL_KEY = "security.login.defaultSuccessUrl";
-    public static final String LOGIN_ALWAYS_USE_DEFAULT_SUCCESS_URL_KEY = "security.login.alwaysUseDefaultSuccessUrl";
+	public static final String LOGIN_DEFAULT_SUCCESS_URL_KEY = "security.login.defaultSuccessUrl";
+	public static final String LOGIN_ALWAYS_USE_DEFAULT_SUCCESS_URL_KEY = "security.login.alwaysUseDefaultSuccessUrl";
 
-    @Override
-    protected String determineTargetUrl(final HttpServletRequest request, final HttpServletResponse response) {
-        HierarchicalConfiguration config = ConfigUtils.getCurrentConfig();
-        if (config != null) {
-            return config.getString(LOGIN_DEFAULT_SUCCESS_URL_KEY, super.determineTargetUrl(request, response));
-        }
-        return super.determineTargetUrl(request, response);
-    }
+	@Override
+	protected String determineTargetUrl(final HttpServletRequest request, final HttpServletResponse response) {
+		HierarchicalConfiguration config = ConfigUtils.getCurrentConfig();
+		if (config != null) {
+			return config.getString(LOGIN_DEFAULT_SUCCESS_URL_KEY, super.determineTargetUrl(request, response));
+		}
+		return super.determineTargetUrl(request, response);
+	}
 
-    @Override
-    protected boolean isAlwaysUseDefaultTargetUrl() {
-        HierarchicalConfiguration config = ConfigUtils.getCurrentConfig();
-        if (config != null) {
-            return config.getBoolean(LOGIN_ALWAYS_USE_DEFAULT_SUCCESS_URL_KEY, super.isAlwaysUseDefaultTargetUrl());
-        }
-        return super.isAlwaysUseDefaultTargetUrl();
-    }
+	@Override
+	protected boolean isAlwaysUseDefaultTargetUrl() {
+		HierarchicalConfiguration config = ConfigUtils.getCurrentConfig();
+		if (config != null) {
+			return config.getBoolean(LOGIN_ALWAYS_USE_DEFAULT_SUCCESS_URL_KEY, super.isAlwaysUseDefaultTargetUrl());
+		}
+		return super.isAlwaysUseDefaultTargetUrl();
+	}
 
 }

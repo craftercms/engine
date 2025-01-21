@@ -29,47 +29,47 @@ import org.craftercms.core.service.ItemFilter;
  */
 public class ExpectedNodeValueItemFilter implements ItemFilter {
 
-    private String nodeXPathQuery;
-    private String expectedValueRegex;
+	private String nodeXPathQuery;
+	private String expectedValueRegex;
 
-    @ConstructorProperties({"nodeXPathQuery", "expectedValueRegex"})
-    public ExpectedNodeValueItemFilter(String nodeXPathQuery, String expectedValueRegex) {
-        this.nodeXPathQuery = nodeXPathQuery;
-        this.expectedValueRegex = expectedValueRegex;
-    }
+	@ConstructorProperties({"nodeXPathQuery", "expectedValueRegex"})
+	public ExpectedNodeValueItemFilter(String nodeXPathQuery, String expectedValueRegex) {
+		this.nodeXPathQuery = nodeXPathQuery;
+		this.expectedValueRegex = expectedValueRegex;
+	}
 
-    @Override
-    public boolean runBeforeProcessing() {
-        return false;
-    }
+	@Override
+	public boolean runBeforeProcessing() {
+		return false;
+	}
 
-    @Override
-    public boolean runAfterProcessing() {
-        return true;
-    }
+	@Override
+	public boolean runAfterProcessing() {
+		return true;
+	}
 
-    @Override
-    public boolean accepts(Item item, List<Item> acceptedItems, List<Item> rejectedItems,
-                           boolean runningBeforeProcessing) {
-        // If the item doesn't have a descriptor, don't run the filter.
-        if (item.getDescriptorDom() != null) {
-            String result = item.queryDescriptorValue(nodeXPathQuery);
-            if (StringUtils.isNotEmpty(result)) {
-                return result.matches(expectedValueRegex);
-            } else {
-                return false;
-            }
-        } else {
-            return true;
-        }
-    }
+	@Override
+	public boolean accepts(Item item, List<Item> acceptedItems, List<Item> rejectedItems,
+			       boolean runningBeforeProcessing) {
+		// If the item doesn't have a descriptor, don't run the filter.
+		if (item.getDescriptorDom() != null) {
+			String result = item.queryDescriptorValue(nodeXPathQuery);
+			if (StringUtils.isNotEmpty(result)) {
+				return result.matches(expectedValueRegex);
+			} else {
+				return false;
+			}
+		} else {
+			return true;
+		}
+	}
 
-    @Override
-    public String toString() {
-        return "ExpectedNodeValueItemFilter[" +
-                "nodeXPathQuery='" + nodeXPathQuery + '\'' +
-                ", expectedValueRegex='" + expectedValueRegex + '\'' +
-                ']';
-    }
+	@Override
+	public String toString() {
+		return "ExpectedNodeValueItemFilter[" +
+			"nodeXPathQuery='" + nodeXPathQuery + '\'' +
+			", expectedValueRegex='" + expectedValueRegex + '\'' +
+			']';
+	}
 
 }

@@ -18,6 +18,7 @@ package org.craftercms.engine.service.context;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
@@ -31,29 +32,29 @@ import org.apache.commons.logging.LogFactory;
  */
 public class RequestUriSiteResolver implements SiteResolver {
 
-    private static final Log logger = LogFactory.getLog(RequestUriSiteResolver.class);
+	private static final Log logger = LogFactory.getLog(RequestUriSiteResolver.class);
 
-    protected String siteNameRegex;
-    protected int siteNameRegexGroup;
+	protected String siteNameRegex;
+	protected int siteNameRegexGroup;
 
-    public RequestUriSiteResolver(String siteNameRegex, int siteNameRegexGroup) {
-        this.siteNameRegex = siteNameRegex;
-        this.siteNameRegexGroup = siteNameRegexGroup;
-    }
+	public RequestUriSiteResolver(String siteNameRegex, int siteNameRegexGroup) {
+		this.siteNameRegex = siteNameRegex;
+		this.siteNameRegexGroup = siteNameRegexGroup;
+	}
 
-    @Override
-    public String getSiteName(HttpServletRequest request) {
-        String requestUri = request.getRequestURI();
-        Matcher matcher = Pattern.compile(siteNameRegex).matcher(requestUri);
-        String siteName = null;
+	@Override
+	public String getSiteName(HttpServletRequest request) {
+		String requestUri = request.getRequestURI();
+		Matcher matcher = Pattern.compile(siteNameRegex).matcher(requestUri);
+		String siteName = null;
 
-        if (matcher.matches()) {
-            siteName = matcher.group(siteNameRegexGroup);
-        } else if (logger.isDebugEnabled()) {
-            logger.debug("Unable to match request URI " + requestUri + " to regex " + siteNameRegex);
-        }
+		if (matcher.matches()) {
+			siteName = matcher.group(siteNameRegexGroup);
+		} else if (logger.isDebugEnabled()) {
+			logger.debug("Unable to match request URI " + requestUri + " to regex " + siteNameRegex);
+		}
 
-        return siteName;
-    }
+		return siteName;
+	}
 
 }

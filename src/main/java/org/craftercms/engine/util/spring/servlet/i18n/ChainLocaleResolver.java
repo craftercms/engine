@@ -27,6 +27,7 @@ import org.springframework.web.servlet.i18n.AbstractLocaleResolver;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -51,84 +52,84 @@ import static org.craftercms.engine.util.LocaleUtils.getCompatibleLocales;
  */
 public class ChainLocaleResolver extends AbstractLocaleResolver {
 
-    private static final Logger logger = LoggerFactory.getLogger(ChainLocaleResolver.class);
+	private static final Logger logger = LoggerFactory.getLogger(ChainLocaleResolver.class);
 
-    public static final String ATTR_NAME_LOCALE = ChainLocaleResolver.class.getSimpleName() + ".LOCALE";
+	public static final String ATTR_NAME_LOCALE = ChainLocaleResolver.class.getSimpleName() + ".LOCALE";
 
-    public static final String BEAN_NAME_PATTERN = "crafter.${type}LocaleResolver";
+	public static final String BEAN_NAME_PATTERN = "crafter.${type}LocaleResolver";
 
-    public static final String CONFIG_KEY_LOCALE_RESOLVER = "localeResolvers.localeResolver";
+	public static final String CONFIG_KEY_LOCALE_RESOLVER = "localeResolvers.localeResolver";
 
-    public static final String CONFIG_KEY_TYPE = "type";
+	public static final String CONFIG_KEY_TYPE = "type";
 
-    /**
-     * The list of supported locales
-     */
-    protected List<Locale> supportedLocales;
+	/**
+	 * The list of supported locales
+	 */
+	protected List<Locale> supportedLocales;
 
-    /**
-     * The list of {@link LocaleResolver}s
-     */
-    protected List<LocaleResolver> resolvers;
+	/**
+	 * The list of {@link LocaleResolver}s
+	 */
+	protected List<LocaleResolver> resolvers;
 
-    public ChainLocaleResolver(ApplicationContext appContext, HierarchicalConfiguration<?> config) {
-        setDefaultLocale(LocaleUtils.getDefaultLocale(config));
+	public ChainLocaleResolver(ApplicationContext appContext, HierarchicalConfiguration<?> config) {
+		setDefaultLocale(LocaleUtils.getDefaultLocale(config));
 
-        supportedLocales = parseLocales(config.getList(String.class, CONFIG_KEY_SUPPORTED_LOCALES));
+		supportedLocales = parseLocales(config.getList(String.class, CONFIG_KEY_SUPPORTED_LOCALES));
 
-        resolvers = new LinkedList<>();
-        config.configurationsAt(CONFIG_KEY_LOCALE_RESOLVER).forEach(resolverConf -> {
-            String type = resolverConf.getString(CONFIG_KEY_TYPE);
-            String beanName = StrSubstitutor.replace(BEAN_NAME_PATTERN, singletonMap(CONFIG_KEY_TYPE, type));
-            try {
-                ConfigAwareLocaleResolver resolver = (ConfigAwareLocaleResolver) appContext.getBean(beanName);
-                resolver.init(resolverConf);
-                resolver.setSupportedLocales(supportedLocales);
-                resolvers.add(resolver);
-            } catch (BeansException e) {
-                logger.error("Error creating instance of bean '{}'", beanName, e);
-            }
-        });
-    }
+		resolvers = new LinkedList<>();
+		config.configurationsAt(CONFIG_KEY_LOCALE_RESOLVER).forEach(resolverConf -> {
+			String type = resolverConf.getString(CONFIG_KEY_TYPE);
+			String beanName = StrSubstitutor.replace(BEAN_NAME_PATTERN, singletonMap(CONFIG_KEY_TYPE, type));
+			try {
+				ConfigAwareLocaleResolver resolver = (ConfigAwareLocaleResolver) appContext.getBean(beanName);
+				resolver.init(resolverConf);
+				resolver.setSupportedLocales(supportedLocales);
+				resolvers.add(resolver);
+			} catch (BeansException e) {
+				logger.error("Error creating instance of bean '{}'", beanName, e);
+			}
+		});
+	}
 
-    protected boolean isSupported(Locale locale) {
-        var compatibleLocales = getCompatibleLocales(locale);
-        return supportedLocales.stream().anyMatch(compatibleLocales::contains);
-    }
+	protected boolean isSupported(Locale locale) {
+		var compatibleLocales = getCompatibleLocales(locale);
+		return supportedLocales.stream().anyMatch(compatibleLocales::contains);
+	}
 
-    @Override
-    public Locale resolveLocale(HttpServletRequest request) {
-        Locale locale = (Locale) request.getAttribute(ATTR_NAME_LOCALE);
-        if (locale != null) {
-            logger.debug("Using previously resolved locale {}", locale);
-            return locale;
-        }
+	@Override
+	public Locale resolveLocale(HttpServletRequest request) {
+		Locale locale = (Locale) request.getAttribute(ATTR_NAME_LOCALE);
+		if (locale != null) {
+			logger.debug("Using previously resolved locale {}", locale);
+			return locale;
+		}
 
-        logger.debug("No locale has been resolved for this request, trying to find one");
-        for(LocaleResolver resolver : resolvers) {
-            try {
-                logger.debug("Executing locale resolver {}", resolver);
-                locale = resolver.resolveLocale(request);
-                if (locale != null && isSupported(locale)) {
-                    logger.debug("Using new locale {}", locale);
-                    return locale;
-                }
-            } catch (Exception e) {
-                logger.error("Error during execution of locale resolver {}", resolver, e);
-            }
-        }
+		logger.debug("No locale has been resolved for this request, trying to find one");
+		for (LocaleResolver resolver : resolvers) {
+			try {
+				logger.debug("Executing locale resolver {}", resolver);
+				locale = resolver.resolveLocale(request);
+				if (locale != null && isSupported(locale)) {
+					logger.debug("Using new locale {}", locale);
+					return locale;
+				}
+			} catch (Exception e) {
+				logger.error("Error during execution of locale resolver {}", resolver, e);
+			}
+		}
 
-        logger.debug("No locale could be resolved, used the default locale");
-        locale = getDefaultLocale();
+		logger.debug("No locale could be resolved, used the default locale");
+		locale = getDefaultLocale();
 
-        setLocale(request, null, locale);
+		setLocale(request, null, locale);
 
-        return locale;
-    }
+		return locale;
+	}
 
-    @Override
-    public void setLocale(HttpServletRequest request, HttpServletResponse response, Locale locale) {
-        request.setAttribute(ATTR_NAME_LOCALE, locale);
-    }
+	@Override
+	public void setLocale(HttpServletRequest request, HttpServletResponse response, Locale locale) {
+		request.setAttribute(ATTR_NAME_LOCALE, locale);
+	}
 
 }

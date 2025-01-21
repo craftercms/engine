@@ -20,6 +20,7 @@ import org.springframework.web.servlet.LocaleResolver;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.beans.ConstructorProperties;
 import java.util.Locale;
 
@@ -32,29 +33,29 @@ import java.util.Locale;
  */
 public class DelegatingLocaleResolver implements LocaleResolver {
 
-    /**
-     * The default {@link LocaleResolver}
-     */
-    protected LocaleResolver defaultLocaleResolver;
+	/**
+	 * The default {@link LocaleResolver}
+	 */
+	protected LocaleResolver defaultLocaleResolver;
 
-    @ConstructorProperties({"defaultLocaleResolver"})
-    public DelegatingLocaleResolver(LocaleResolver defaultLocaleResolver) {
-        this.defaultLocaleResolver = defaultLocaleResolver;
-    }
+	@ConstructorProperties({"defaultLocaleResolver"})
+	public DelegatingLocaleResolver(LocaleResolver defaultLocaleResolver) {
+		this.defaultLocaleResolver = defaultLocaleResolver;
+	}
 
-    protected LocaleResolver getDelegate() {
-        LocaleResolver resolver = SiteContext.getCurrent().getLocaleResolver();
-        return resolver != null? resolver : defaultLocaleResolver;
-    }
+	protected LocaleResolver getDelegate() {
+		LocaleResolver resolver = SiteContext.getCurrent().getLocaleResolver();
+		return resolver != null ? resolver : defaultLocaleResolver;
+	}
 
-    @Override
-    public Locale resolveLocale(HttpServletRequest request) {
-        return getDelegate().resolveLocale(request);
-    }
+	@Override
+	public Locale resolveLocale(HttpServletRequest request) {
+		return getDelegate().resolveLocale(request);
+	}
 
-    @Override
-    public void setLocale(HttpServletRequest request, HttpServletResponse response, Locale locale) {
-        getDelegate().setLocale(request, response, locale);
-    }
+	@Override
+	public void setLocale(HttpServletRequest request, HttpServletResponse response, Locale locale) {
+		getDelegate().setLocale(request, response, locale);
+	}
 
 }

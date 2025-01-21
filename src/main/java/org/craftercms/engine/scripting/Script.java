@@ -28,8 +28,8 @@ import org.craftercms.engine.exception.ScriptException;
  */
 public interface Script extends CachingAwareObject {
 
-    String getUrl();
+	String getUrl();
 
-    Object execute(Map<String, Object> variables) throws ScriptException;
+	Object execute(Map<String, Object> variables) throws ScriptException;
 
 }

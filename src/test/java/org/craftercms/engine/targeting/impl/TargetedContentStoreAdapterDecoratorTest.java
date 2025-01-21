@@ -45,235 +45,235 @@ import static org.mockito.Mockito.*;
  */
 public class TargetedContentStoreAdapterDecoratorTest extends ConfigAwareTestBase {
 
-    private TargetedContentStoreAdapterDecorator storeAdapter;
+	private TargetedContentStoreAdapterDecorator storeAdapter;
 
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
+	@Override
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
 
-        storeAdapter = new TargetedContentStoreAdapterDecorator(createCandidateTargetedUrlsResolver());
-        storeAdapter.setActualStoreAdapter(createActualStoreAdapter());
+		storeAdapter = new TargetedContentStoreAdapterDecorator(createCandidateTargetedUrlsResolver());
+		storeAdapter.setActualStoreAdapter(createActualStoreAdapter());
 
-        LocaleContextHolder.setLocale(LocaleUtils.toLocale("en"));
-    }
+		LocaleContextHolder.setLocale(LocaleUtils.toLocale("en"));
+	}
 
-    @Override
-    @After
-    public void tearDown() throws Exception {
-        LocaleContextHolder.resetLocaleContext();
+	@Override
+	@After
+	public void tearDown() throws Exception {
+		LocaleContextHolder.resetLocaleContext();
 
-        super.tearDown();
-    }
+		super.tearDown();
+	}
 
-    @Test
-    public void testExists() throws Exception {
-        Context context = new DecoratedStoreAdapterContext(mock(Context.class), storeAdapter);
-        CachingOptions cachingOptions = CachingOptions.DEFAULT_CACHING_OPTIONS;
+	@Test
+	public void testExists() throws Exception {
+		Context context = new DecoratedStoreAdapterContext(mock(Context.class), storeAdapter);
+		CachingOptions cachingOptions = CachingOptions.DEFAULT_CACHING_OPTIONS;
 
-        boolean exists = storeAdapter.exists(context, cachingOptions,"/site/website/en");
+		boolean exists = storeAdapter.exists(context, cachingOptions, "/site/website/en");
 
-        assertTrue(exists);
+		assertTrue(exists);
 
-        exists = storeAdapter.exists(context, cachingOptions, "/site/website/ja_jp_jp");
+		exists = storeAdapter.exists(context, cachingOptions, "/site/website/ja_jp_jp");
 
-        assertTrue(exists);
+		assertTrue(exists);
 
-        exists = storeAdapter.exists(context, cachingOptions, "/site/website/ja_jp_jp/index.xml");
+		exists = storeAdapter.exists(context, cachingOptions, "/site/website/ja_jp_jp/index.xml");
 
-        assertTrue(exists);
+		assertTrue(exists);
 
-        exists = storeAdapter.exists(context, cachingOptions, "/site/website/index.xml");
+		exists = storeAdapter.exists(context, cachingOptions, "/site/website/index.xml");
 
-        assertTrue(exists);
+		assertTrue(exists);
 
-        exists = storeAdapter.exists(context, cachingOptions, "/static-assets/css/main.css");
+		exists = storeAdapter.exists(context, cachingOptions, "/static-assets/css/main.css");
 
-        assertTrue(exists);
-    }
+		assertTrue(exists);
+	}
 
-    @Test
-    public void testFindContent() throws Exception {
-        Context context = new DecoratedStoreAdapterContext(mock(Context.class), storeAdapter);
-        CachingOptions cachingOptions = CachingOptions.DEFAULT_CACHING_OPTIONS;
+	@Test
+	public void testFindContent() throws Exception {
+		Context context = new DecoratedStoreAdapterContext(mock(Context.class), storeAdapter);
+		CachingOptions cachingOptions = CachingOptions.DEFAULT_CACHING_OPTIONS;
 
-        Content content = storeAdapter.findContent(context, cachingOptions, "/site/website/en/index.xml");
+		Content content = storeAdapter.findContent(context, cachingOptions, "/site/website/en/index.xml");
 
-        assertNotNull(content);
+		assertNotNull(content);
 
-        content = storeAdapter.findContent(context, cachingOptions, "/site/website/ja_jp_jp/index.xml");
+		content = storeAdapter.findContent(context, cachingOptions, "/site/website/ja_jp_jp/index.xml");
 
-        assertNotNull(content);
+		assertNotNull(content);
 
-        content = storeAdapter.findContent(context, cachingOptions, "/site/website/index.xml");
+		content = storeAdapter.findContent(context, cachingOptions, "/site/website/index.xml");
 
-        assertNotNull(content);
+		assertNotNull(content);
 
-        content = storeAdapter.findContent(context, cachingOptions, "/static-assets/css/main.css");
+		content = storeAdapter.findContent(context, cachingOptions, "/static-assets/css/main.css");
 
-        assertNotNull(content);
-    }
+		assertNotNull(content);
+	}
 
-    @Test
-    public void testFindItem() throws Exception {
-        Context context = new DecoratedStoreAdapterContext(mock(Context.class), storeAdapter);
-        CachingOptions cachingOptions = CachingOptions.DEFAULT_CACHING_OPTIONS;
+	@Test
+	public void testFindItem() throws Exception {
+		Context context = new DecoratedStoreAdapterContext(mock(Context.class), storeAdapter);
+		CachingOptions cachingOptions = CachingOptions.DEFAULT_CACHING_OPTIONS;
 
-        Item item = storeAdapter.findItem(context, cachingOptions, "/site/website/en", true);
+		Item item = storeAdapter.findItem(context, cachingOptions, "/site/website/en", true);
 
-        assertNotNull(item);
-        assertEquals("en", item.getName());
-        assertEquals("/site/website/en", item.getUrl());
+		assertNotNull(item);
+		assertEquals("en", item.getName());
+		assertEquals("/site/website/en", item.getUrl());
 
-        item = storeAdapter.findItem(context, cachingOptions, "/site/website/ja_jp_jp", true);
+		item = storeAdapter.findItem(context, cachingOptions, "/site/website/ja_jp_jp", true);
 
-        assertNotNull(item);
-        assertEquals("en", item.getName());
-        assertEquals("/site/website/en", item.getUrl());
+		assertNotNull(item);
+		assertEquals("en", item.getName());
+		assertEquals("/site/website/en", item.getUrl());
 
-        item = storeAdapter.findItem(context, cachingOptions, "/site/website/ja_jp_jp/index.xml", true);
+		item = storeAdapter.findItem(context, cachingOptions, "/site/website/ja_jp_jp/index.xml", true);
 
-        assertNotNull(item);
-        assertEquals("index.xml", item.getName());
-        assertEquals("/site/website/en/index.xml", item.getUrl());
+		assertNotNull(item);
+		assertEquals("index.xml", item.getName());
+		assertEquals("/site/website/en/index.xml", item.getUrl());
 
-        item = storeAdapter.findItem(context, cachingOptions, "/site/website/index.xml", true);
+		item = storeAdapter.findItem(context, cachingOptions, "/site/website/index.xml", true);
 
-        assertNotNull(item);
-        assertEquals("index.xml", item.getName());
-        assertEquals("/site/website/index.xml", item.getUrl());
+		assertNotNull(item);
+		assertEquals("index.xml", item.getName());
+		assertEquals("/site/website/index.xml", item.getUrl());
 
-        item = storeAdapter.findItem(context, cachingOptions, "/static-assets/css/main.css", true);
+		item = storeAdapter.findItem(context, cachingOptions, "/static-assets/css/main.css", true);
 
-        assertNotNull(item);
-        assertEquals("main.css", item.getName());
-        assertEquals("/static-assets/css/main.css", item.getUrl());
-    }
+		assertNotNull(item);
+		assertEquals("main.css", item.getName());
+		assertEquals("/static-assets/css/main.css", item.getUrl());
+	}
 
-    @Test
-    public void testFindItems() throws Exception {
-        Context context = new DecoratedStoreAdapterContext(mock(Context.class), storeAdapter);
-        CachingOptions cachingOptions = CachingOptions.DEFAULT_CACHING_OPTIONS;
-
-        List<Item> items = storeAdapter.findItems(context, cachingOptions, "/site/website/en");
+	@Test
+	public void testFindItems() throws Exception {
+		Context context = new DecoratedStoreAdapterContext(mock(Context.class), storeAdapter);
+		CachingOptions cachingOptions = CachingOptions.DEFAULT_CACHING_OPTIONS;
+
+		List<Item> items = storeAdapter.findItems(context, cachingOptions, "/site/website/en");
 
-        assertNotNull(items);
-        assertEquals(2, items.size());
-        assertEquals("index.xml", items.get(0).getName());
-        assertEquals("/site/website/en/index.xml", items.get(0).getUrl());
-        assertEquals("about-us", items.get(1).getName());
-        assertEquals("/site/website/en/about-us", items.get(1).getUrl());
+		assertNotNull(items);
+		assertEquals(2, items.size());
+		assertEquals("index.xml", items.get(0).getName());
+		assertEquals("/site/website/en/index.xml", items.get(0).getUrl());
+		assertEquals("about-us", items.get(1).getName());
+		assertEquals("/site/website/en/about-us", items.get(1).getUrl());
 
-        items = storeAdapter.findItems(context, cachingOptions, "/site/website/ja_jp_jp");
+		items = storeAdapter.findItems(context, cachingOptions, "/site/website/ja_jp_jp");
 
-        assertNotNull(items);
-        assertEquals(2, items.size());
-        assertEquals("index.xml", items.get(0).getName());
-        assertEquals("/site/website/ja/index.xml", items.get(0).getUrl());
-        assertEquals("about-us", items.get(1).getName());
-        assertEquals("/site/website/en/about-us", items.get(1).getUrl());
+		assertNotNull(items);
+		assertEquals(2, items.size());
+		assertEquals("index.xml", items.get(0).getName());
+		assertEquals("/site/website/ja/index.xml", items.get(0).getUrl());
+		assertEquals("about-us", items.get(1).getName());
+		assertEquals("/site/website/en/about-us", items.get(1).getUrl());
 
-        config.setProperty(SiteProperties.MERGE_FOLDERS_CONFIG_KEY, false);
+		config.setProperty(SiteProperties.MERGE_FOLDERS_CONFIG_KEY, false);
 
-        items = storeAdapter.findItems(context, cachingOptions, "/site/website/ja_jp_jp");
+		items = storeAdapter.findItems(context, cachingOptions, "/site/website/ja_jp_jp");
 
-        assertNotNull(items);
-        assertEquals(1, items.size());
-        assertEquals("index.xml", items.get(0).getName());
-        assertEquals("/site/website/ja/index.xml", items.get(0).getUrl());
-    }
+		assertNotNull(items);
+		assertEquals(1, items.size());
+		assertEquals("index.xml", items.get(0).getName());
+		assertEquals("/site/website/ja/index.xml", items.get(0).getUrl());
+	}
 
-    private ContentStoreAdapter createActualStoreAdapter() {
-        ContentStoreAdapter adapter = mock(ContentStoreAdapter.class);
+	private ContentStoreAdapter createActualStoreAdapter() {
+		ContentStoreAdapter adapter = mock(ContentStoreAdapter.class);
 
-        Item idx = new Item();
-        idx.setName("index.xml");
-        idx.setUrl("/site/website/index.xml");
+		Item idx = new Item();
+		idx.setName("index.xml");
+		idx.setUrl("/site/website/index.xml");
 
-        Item en = new Item();
-        en.setName("en");
-        en.setUrl("/site/website/en");
+		Item en = new Item();
+		en.setName("en");
+		en.setUrl("/site/website/en");
 
-        Item enIdx = new Item();
-        enIdx.setName("index.xml");
-        enIdx.setUrl("/site/website/en/index.xml");
+		Item enIdx = new Item();
+		enIdx.setName("index.xml");
+		enIdx.setUrl("/site/website/en/index.xml");
 
-        Item enAboutUs = new Item();
-        enAboutUs.setName("about-us");
-        enAboutUs.setUrl("/site/website/en/about-us");
+		Item enAboutUs = new Item();
+		enAboutUs.setName("about-us");
+		enAboutUs.setUrl("/site/website/en/about-us");
 
-        Item mainCss = new Item();
-        mainCss.setName("main.css");
-        mainCss.setUrl("/static-assets/css/main.css");
+		Item mainCss = new Item();
+		mainCss.setName("main.css");
+		mainCss.setUrl("/static-assets/css/main.css");
 
-        Item frIdx = new Item();
-        frIdx.setName("index.xml");
-        frIdx.setUrl("/site/website/ja/index.xml");
+		Item frIdx = new Item();
+		frIdx.setName("index.xml");
+		frIdx.setUrl("/site/website/ja/index.xml");
 
-        when(adapter.exists(any(Context.class), any(CachingOptions.class),
-                            eq("/site/website/index.xml"))).thenReturn(true);
+		when(adapter.exists(any(Context.class), any(CachingOptions.class),
+			eq("/site/website/index.xml"))).thenReturn(true);
 
-        when(adapter.exists(any(Context.class), any(CachingOptions.class),
-                            eq("/site/website/en"))).thenReturn(true);
+		when(adapter.exists(any(Context.class), any(CachingOptions.class),
+			eq("/site/website/en"))).thenReturn(true);
 
-        when(adapter.exists(any(Context.class), any(CachingOptions.class),
-                            eq("/site/website/en/index.xml"))).thenReturn(true);
+		when(adapter.exists(any(Context.class), any(CachingOptions.class),
+			eq("/site/website/en/index.xml"))).thenReturn(true);
 
-        when(adapter.exists(any(Context.class), any(CachingOptions.class),
-                            eq("/static-assets/css/main.css"))).thenReturn(true);
+		when(adapter.exists(any(Context.class), any(CachingOptions.class),
+			eq("/static-assets/css/main.css"))).thenReturn(true);
 
-        when(adapter.findContent(any(Context.class),
-                                 any(CachingOptions.class),
-                                 eq("/site/website/index.xml"))).thenReturn(mock(Content.class));
+		when(adapter.findContent(any(Context.class),
+			any(CachingOptions.class),
+			eq("/site/website/index.xml"))).thenReturn(mock(Content.class));
 
-        when(adapter.findContent(any(Context.class),
-                                 any(CachingOptions.class),
-                                 eq("/site/website/en/index.xml"))).thenReturn(mock(Content.class));
+		when(adapter.findContent(any(Context.class),
+			any(CachingOptions.class),
+			eq("/site/website/en/index.xml"))).thenReturn(mock(Content.class));
 
-        when(adapter.findContent(any(Context.class),
-                                 any(CachingOptions.class),
-                                 eq("/static-assets/css/main.css"))).thenReturn(mock(Content.class));
+		when(adapter.findContent(any(Context.class),
+			any(CachingOptions.class),
+			eq("/static-assets/css/main.css"))).thenReturn(mock(Content.class));
 
-        when(adapter.findItem(any(Context.class), any(CachingOptions.class), eq("/site/website/index.xml"),
-                              anyBoolean())).thenReturn(idx);
+		when(adapter.findItem(any(Context.class), any(CachingOptions.class), eq("/site/website/index.xml"),
+			anyBoolean())).thenReturn(idx);
 
-        when(adapter.findItem(any(Context.class),
-                              any(CachingOptions.class),
-                              eq("/site/website/en"),
-                              anyBoolean())).thenReturn(en);
+		when(adapter.findItem(any(Context.class),
+			any(CachingOptions.class),
+			eq("/site/website/en"),
+			anyBoolean())).thenReturn(en);
 
-        when(adapter.findItem(any(Context.class),
-                              any(CachingOptions.class),
-                              eq("/site/website/en/index.xml"),
-                              anyBoolean())).thenReturn(enIdx);
+		when(adapter.findItem(any(Context.class),
+			any(CachingOptions.class),
+			eq("/site/website/en/index.xml"),
+			anyBoolean())).thenReturn(enIdx);
 
-        when(adapter.findItem(any(Context.class),
-                              any(CachingOptions.class),
-                              eq("/static-assets/css/main.css"),
-                              anyBoolean())).thenReturn(mainCss);
+		when(adapter.findItem(any(Context.class),
+			any(CachingOptions.class),
+			eq("/static-assets/css/main.css"),
+			anyBoolean())).thenReturn(mainCss);
 
-        when(adapter.findItems(any(Context.class),
-                               any(CachingOptions.class),
-                               eq("/site/website/en"))).thenReturn(Arrays.asList(enIdx, enAboutUs));
+		when(adapter.findItems(any(Context.class),
+			any(CachingOptions.class),
+			eq("/site/website/en"))).thenReturn(Arrays.asList(enIdx, enAboutUs));
 
-        when(adapter.findItems(any(Context.class),
-                               any(CachingOptions.class),
-                               eq("/site/website/ja"))).thenReturn(Collections.singletonList(frIdx));
+		when(adapter.findItems(any(Context.class),
+			any(CachingOptions.class),
+			eq("/site/website/ja"))).thenReturn(Collections.singletonList(frIdx));
 
-        return adapter;
-    }
+		return adapter;
+	}
 
-    private CandidateTargetedUrlsResolver createCandidateTargetedUrlsResolver() {
-        LocaleTargetIdManager targetIdManager = new LocaleTargetIdManager();
+	private CandidateTargetedUrlsResolver createCandidateTargetedUrlsResolver() {
+		LocaleTargetIdManager targetIdManager = new LocaleTargetIdManager();
 
-        TargetedUrlByFolderStrategy targetUrlStrategy = new TargetedUrlByFolderStrategy(targetIdManager);
+		TargetedUrlByFolderStrategy targetUrlStrategy = new TargetedUrlByFolderStrategy(targetIdManager);
 
-        CandidateTargetIdsResolverImpl candidateTargetIdsResolver = new CandidateTargetIdsResolverImpl();
+		CandidateTargetIdsResolverImpl candidateTargetIdsResolver = new CandidateTargetIdsResolverImpl();
 
-        CandidateTargetedUrlsResolverImpl candidateUrlsResolver = new CandidateTargetedUrlsResolverImpl(targetIdManager,
-                targetUrlStrategy, candidateTargetIdsResolver);
+		CandidateTargetedUrlsResolverImpl candidateUrlsResolver = new CandidateTargetedUrlsResolverImpl(targetIdManager,
+			targetUrlStrategy, candidateTargetIdsResolver);
 
-        return candidateUrlsResolver;
-    }
+		return candidateUrlsResolver;
+	}
 
 }

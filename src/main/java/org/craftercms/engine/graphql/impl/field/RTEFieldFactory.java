@@ -31,34 +31,35 @@ import static org.craftercms.engine.graphql.SchemaUtils.getGraphQLName;
 /**
  * Implementation of {@link GraphQLFieldFactory} that handles RTE fields. It adds the copy field with the original
  * HTML markup without any filter to prevent queries to it
+ *
  * @author joseross
  * @since 3.1
  */
 public class RTEFieldFactory implements GraphQLFieldFactory {
 
-    protected String titleXPath;
+	protected String titleXPath;
 
-    public RTEFieldFactory(final String titleXPath) {
-        this.titleXPath = titleXPath;
-    }
+	public RTEFieldFactory(final String titleXPath) {
+		this.titleXPath = titleXPath;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void createField(final Document contentTypeDefinition, final Node contentTypeField,
-                            final String contentTypeFieldId, final String parentGraphQLTypeName,
-                            final GraphQLObjectType.Builder parentGraphQLType, final String graphQLFieldName,
-                            final GraphQLFieldDefinition.Builder graphQLField) {
-        // Add the copy field as string without filters
-        parentGraphQLType.field(GraphQLFieldDefinition.newFieldDefinition()
-            .name(getGraphQLName(graphQLFieldName) + FIELD_SUFFIX_RAW)
-            .description(XmlUtils.selectSingleNodeValue(contentTypeField, titleXPath))
-            .type(GraphQLString));
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void createField(final Document contentTypeDefinition, final Node contentTypeField,
+				final String contentTypeFieldId, final String parentGraphQLTypeName,
+				final GraphQLObjectType.Builder parentGraphQLType, final String graphQLFieldName,
+				final GraphQLFieldDefinition.Builder graphQLField) {
+		// Add the copy field as string without filters
+		parentGraphQLType.field(GraphQLFieldDefinition.newFieldDefinition()
+			.name(getGraphQLName(graphQLFieldName) + FIELD_SUFFIX_RAW)
+			.description(XmlUtils.selectSingleNodeValue(contentTypeField, titleXPath))
+			.type(GraphQLString));
 
-        // Add the original as string with text filters
-        graphQLField.type(GraphQLString);
-        graphQLField.argument(TEXT_FILTER);
-    }
+		// Add the original as string with text filters
+		graphQLField.type(GraphQLString);
+		graphQLField.argument(TEXT_FILTER);
+	}
 
 }

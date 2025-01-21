@@ -34,22 +34,22 @@ import java.beans.ConstructorProperties;
  */
 public class ConfigAwareLoginUrlAuthenticationEntryPoint extends LoginUrlAuthenticationEntryPoint {
 
-    public static final String LOGIN_FORM_URL_KEY = "security.login.formUrl";
+	public static final String LOGIN_FORM_URL_KEY = "security.login.formUrl";
 
-    @ConstructorProperties({"loginFormUrl"})
-    public ConfigAwareLoginUrlAuthenticationEntryPoint(final String loginFormUrl) {
-        super(loginFormUrl);
-    }
+	@ConstructorProperties({"loginFormUrl"})
+	public ConfigAwareLoginUrlAuthenticationEntryPoint(final String loginFormUrl) {
+		super(loginFormUrl);
+	}
 
-    @Override
-    protected String determineUrlToUseForThisRequest(final HttpServletRequest request,
-                                                     final HttpServletResponse response,
-                                                     final AuthenticationException exception) {
-        HierarchicalConfiguration<?> siteConfig = ConfigUtils.getCurrentConfig();
-        if (siteConfig != null && siteConfig.containsKey(LOGIN_FORM_URL_KEY)) {
-            return siteConfig.getString(LOGIN_FORM_URL_KEY);
-        }
-        return super.getLoginFormUrl();
-    }
+	@Override
+	protected String determineUrlToUseForThisRequest(final HttpServletRequest request,
+							 final HttpServletResponse response,
+							 final AuthenticationException exception) {
+		HierarchicalConfiguration<?> siteConfig = ConfigUtils.getCurrentConfig();
+		if (siteConfig != null && siteConfig.containsKey(LOGIN_FORM_URL_KEY)) {
+			return siteConfig.getString(LOGIN_FORM_URL_KEY);
+		}
+		return super.getLoginFormUrl();
+	}
 
 }

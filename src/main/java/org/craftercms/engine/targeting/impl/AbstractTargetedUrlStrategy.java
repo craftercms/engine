@@ -31,86 +31,86 @@ import org.craftercms.engine.targeting.TargetedUrlStrategy;
  */
 public abstract class AbstractTargetedUrlStrategy implements TargetedUrlStrategy {
 
-    protected TargetIdManager targetIdManager;
+	protected TargetIdManager targetIdManager;
 
-    public AbstractTargetedUrlStrategy(TargetIdManager targetIdManager) {
-        this.targetIdManager = targetIdManager;
-    }
+	public AbstractTargetedUrlStrategy(TargetIdManager targetIdManager) {
+		this.targetIdManager = targetIdManager;
+	}
 
-    @Override
-    public String toTargetedUrl(String url, boolean forceCurrentTargetId) {
-        Matcher matcher = matchUrl(url);
-        if (matcher == null) {
-            String currentTargetId = targetIdManager.getCurrentTargetId();
+	@Override
+	public String toTargetedUrl(String url, boolean forceCurrentTargetId) {
+		Matcher matcher = matchUrl(url);
+		if (matcher == null) {
+			String currentTargetId = targetIdManager.getCurrentTargetId();
 
-            return doToTargetedUrl(url, currentTargetId);
-        } else if (forceCurrentTargetId) {
-            String currentTargetId = targetIdManager.getCurrentTargetId();
-            TargetedUrlComponents urlComponents = getTargetedUrlComponents(matcher);
+			return doToTargetedUrl(url, currentTargetId);
+		} else if (forceCurrentTargetId) {
+			String currentTargetId = targetIdManager.getCurrentTargetId();
+			TargetedUrlComponents urlComponents = getTargetedUrlComponents(matcher);
 
-            if (!currentTargetId.equals(urlComponents.getTargetId())) {
-                return buildTargetedUrl(urlComponents.getPrefix(), currentTargetId, urlComponents.getSuffix());
-            }
-        }
+			if (!currentTargetId.equals(urlComponents.getTargetId())) {
+				return buildTargetedUrl(urlComponents.getPrefix(), currentTargetId, urlComponents.getSuffix());
+			}
+		}
 
-        return url;
-    }
+		return url;
+	}
 
-    @Override
-    public TargetedUrlComponents parseTargetedUrl(String targetedUrl) {
-        Matcher matcher = matchUrl(targetedUrl);
-        if (matcher != null) {
-            return getTargetedUrlComponents(matcher);
-        } else {
-            return null;
-        }
-    }
+	@Override
+	public TargetedUrlComponents parseTargetedUrl(String targetedUrl) {
+		Matcher matcher = matchUrl(targetedUrl);
+		if (matcher != null) {
+			return getTargetedUrlComponents(matcher);
+		} else {
+			return null;
+		}
+	}
 
-    @Override
-    public String buildTargetedUrl(String prefix, String targetId, String suffix) {
-        String targetedUrl = "";
+	@Override
+	public String buildTargetedUrl(String prefix, String targetId, String suffix) {
+		String targetedUrl = "";
 
-        if (StringUtils.isNotEmpty(prefix)) {
-            targetedUrl += prefix;
-        }
-        if (StringUtils.isNotEmpty(targetId)) {
-            targetedUrl += targetId;
-        }
-        if (StringUtils.isNotEmpty(suffix)) {
-            targetedUrl += suffix;
-        }
+		if (StringUtils.isNotEmpty(prefix)) {
+			targetedUrl += prefix;
+		}
+		if (StringUtils.isNotEmpty(targetId)) {
+			targetedUrl += targetId;
+		}
+		if (StringUtils.isNotEmpty(suffix)) {
+			targetedUrl += suffix;
+		}
 
-        return targetedUrl;
-    }
+		return targetedUrl;
+	}
 
-    protected Matcher matchUrl(String url) {
-        Pattern pattern = getTargetedUrlPattern();
-        Matcher matcher = pattern.matcher(url);
+	protected Matcher matchUrl(String url) {
+		Pattern pattern = getTargetedUrlPattern();
+		Matcher matcher = pattern.matcher(url);
 
-        if (matcher.matches()) {
-            return matcher;
-        } else {
-            return null;
-        }
-    }
+		if (matcher.matches()) {
+			return matcher;
+		} else {
+			return null;
+		}
+	}
 
-    protected TargetedUrlComponents getTargetedUrlComponents(Matcher matcher) {
-        TargetedUrlComponents urlComp = new TargetedUrlComponents();
-        urlComp.setPrefix(getPrefix(matcher));
-        urlComp.setTargetId(getTargetId(matcher));
-        urlComp.setSuffix(getSuffix(matcher));
+	protected TargetedUrlComponents getTargetedUrlComponents(Matcher matcher) {
+		TargetedUrlComponents urlComp = new TargetedUrlComponents();
+		urlComp.setPrefix(getPrefix(matcher));
+		urlComp.setTargetId(getTargetId(matcher));
+		urlComp.setSuffix(getSuffix(matcher));
 
-        return urlComp;
-    }
+		return urlComp;
+	}
 
-    protected abstract String getPrefix(Matcher matcher);
+	protected abstract String getPrefix(Matcher matcher);
 
-    protected abstract String getTargetId(Matcher matcher);
+	protected abstract String getTargetId(Matcher matcher);
 
-    protected abstract String getSuffix(Matcher matcher);
+	protected abstract String getSuffix(Matcher matcher);
 
-    protected abstract Pattern getTargetedUrlPattern();
+	protected abstract Pattern getTargetedUrlPattern();
 
-    protected abstract String doToTargetedUrl(String url, String currentTargetId);
+	protected abstract String doToTargetedUrl(String url, String currentTargetId);
 
 }

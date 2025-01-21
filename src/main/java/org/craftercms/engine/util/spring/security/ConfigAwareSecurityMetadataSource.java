@@ -52,61 +52,61 @@ import static java.util.Collections.singleton;
  */
 public class ConfigAwareSecurityMetadataSource implements FilterInvocationSecurityMetadataSource {
 
-    public static final String URL_RESTRICTION_KEY = "security.urlRestrictions.restriction";
-    public static final String URL_RESTRICTION_URL_KEY = "url";
-    public static final String URL_RESTRICTION_EXPRESSION_KEY = "expression";
+	public static final String URL_RESTRICTION_KEY = "security.urlRestrictions.restriction";
+	public static final String URL_RESTRICTION_URL_KEY = "url";
+	public static final String URL_RESTRICTION_EXPRESSION_KEY = "expression";
 
-    public static final String URL_RESTRICTIONS_CACHE_KEY = "urlRestrictions";
+	public static final String URL_RESTRICTIONS_CACHE_KEY = "urlRestrictions";
 
-    protected CacheTemplate cacheTemplate;
+	protected CacheTemplate cacheTemplate;
 
-    @ConstructorProperties({"cacheTemplate"})
-    public ConfigAwareSecurityMetadataSource(final CacheTemplate cacheTemplate) {
-        this.cacheTemplate = cacheTemplate;
-    }
+	@ConstructorProperties({"cacheTemplate"})
+	public ConfigAwareSecurityMetadataSource(final CacheTemplate cacheTemplate) {
+		this.cacheTemplate = cacheTemplate;
+	}
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public Collection<ConfigAttribute> getAttributes(final Object object) throws IllegalArgumentException {
-        Callback<SecurityMetadataSource> callback = () -> {
-            HierarchicalConfiguration siteConfig = ConfigUtils.getCurrentConfig();
-            if (siteConfig != null) {
-                List<HierarchicalConfiguration> restrictionsConfig = siteConfig.configurationsAt(URL_RESTRICTION_KEY);
-                if (CollectionUtils.isNotEmpty(restrictionsConfig)) {
-                    LinkedHashMap<RequestMatcher, Collection<ConfigAttribute>> map = new LinkedHashMap<>();
-                    for (HierarchicalConfiguration restrictionConfig : restrictionsConfig) {
-                        String url = restrictionConfig.getString(URL_RESTRICTION_URL_KEY);
-                        String expression = restrictionConfig.getString(URL_RESTRICTION_EXPRESSION_KEY);
-                        if (StringUtils.isNotEmpty(url) && StringUtils.isNotEmpty(expression)) {
-                            AntPathRequestMatcher matcher = new AntPathRequestMatcher(url);
-                            map.put(matcher, singleton(new SecurityConfig(expression)));
-                        }
-                    }
-                    return new ExpressionBasedFilterInvocationSecurityMetadataSource(map,
-                        new DefaultWebSecurityExpressionHandler());
-                }
-            }
-            return new DefaultFilterInvocationSecurityMetadataSource(new LinkedHashMap<>());
-        };
+	@Override
+	@SuppressWarnings("unchecked")
+	public Collection<ConfigAttribute> getAttributes(final Object object) throws IllegalArgumentException {
+		Callback<SecurityMetadataSource> callback = () -> {
+			HierarchicalConfiguration siteConfig = ConfigUtils.getCurrentConfig();
+			if (siteConfig != null) {
+				List<HierarchicalConfiguration> restrictionsConfig = siteConfig.configurationsAt(URL_RESTRICTION_KEY);
+				if (CollectionUtils.isNotEmpty(restrictionsConfig)) {
+					LinkedHashMap<RequestMatcher, Collection<ConfigAttribute>> map = new LinkedHashMap<>();
+					for (HierarchicalConfiguration restrictionConfig : restrictionsConfig) {
+						String url = restrictionConfig.getString(URL_RESTRICTION_URL_KEY);
+						String expression = restrictionConfig.getString(URL_RESTRICTION_EXPRESSION_KEY);
+						if (StringUtils.isNotEmpty(url) && StringUtils.isNotEmpty(expression)) {
+							AntPathRequestMatcher matcher = new AntPathRequestMatcher(url);
+							map.put(matcher, singleton(new SecurityConfig(expression)));
+						}
+					}
+					return new ExpressionBasedFilterInvocationSecurityMetadataSource(map,
+						new DefaultWebSecurityExpressionHandler());
+				}
+			}
+			return new DefaultFilterInvocationSecurityMetadataSource(new LinkedHashMap<>());
+		};
 
-        SiteContext siteContext = SiteContext.getCurrent();
-        if (siteContext != null) {
-            SecurityMetadataSource metadataSource =
-                cacheTemplate.getObject(siteContext.getContext(), callback, URL_RESTRICTIONS_CACHE_KEY);
+		SiteContext siteContext = SiteContext.getCurrent();
+		if (siteContext != null) {
+			SecurityMetadataSource metadataSource =
+				cacheTemplate.getObject(siteContext.getContext(), callback, URL_RESTRICTIONS_CACHE_KEY);
 
-            return metadataSource.getAttributes(object);
-        }
-        return null;
-    }
+			return metadataSource.getAttributes(object);
+		}
+		return null;
+	}
 
-    @Override
-    public Collection<ConfigAttribute> getAllConfigAttributes() {
-        return null;
-    }
+	@Override
+	public Collection<ConfigAttribute> getAllConfigAttributes() {
+		return null;
+	}
 
-    @Override
-    public boolean supports(final Class<?> clazz) {
-        return FilterInvocation.class.isAssignableFrom(clazz);
-    }
+	@Override
+	public boolean supports(final Class<?> clazz) {
+		return FilterInvocation.class.isAssignableFrom(clazz);
+	}
 
 }

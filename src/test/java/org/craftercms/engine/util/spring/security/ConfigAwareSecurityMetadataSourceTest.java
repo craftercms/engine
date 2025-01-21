@@ -17,6 +17,7 @@
 package org.craftercms.engine.util.spring.security;
 
 import java.util.Collection;
+
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.craftercms.commons.http.RequestContext;
@@ -42,31 +43,31 @@ import static org.mockito.Mockito.when;
  */
 public class ConfigAwareSecurityMetadataSourceTest extends ConfigAwareTestBase {
 
-    private ConfigAwareSecurityMetadataSource metadataSource;
-    @Mock
-    private CacheTemplate cacheTemplate;
+	private ConfigAwareSecurityMetadataSource metadataSource;
+	@Mock
+	private CacheTemplate cacheTemplate;
 
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
+	@Override
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
 
-        CacheTemplateMockUtils.setUpWithNoCaching(cacheTemplate);
+		CacheTemplateMockUtils.setUpWithNoCaching(cacheTemplate);
 
-        metadataSource = new ConfigAwareSecurityMetadataSource(cacheTemplate);
-    }
+		metadataSource = new ConfigAwareSecurityMetadataSource(cacheTemplate);
+	}
 
-    @Test
-    public void testProcessRequest() {
-        HttpServletRequest request = RequestContext.getCurrent().getRequest();
+	@Test
+	public void testProcessRequest() {
+		HttpServletRequest request = RequestContext.getCurrent().getRequest();
 
-        FilterInvocation invocation = mock(FilterInvocation.class);
-        when(invocation.getRequest()).thenReturn(request);
+		FilterInvocation invocation = mock(FilterInvocation.class);
+		when(invocation.getRequest()).thenReturn(request);
 
-        Collection<ConfigAttribute> attributes = metadataSource.getAttributes(invocation);
+		Collection<ConfigAttribute> attributes = metadataSource.getAttributes(invocation);
 
-        assertThat(attributes, notNullValue());
-        assertThat(attributes.size(), is(1));
-    }
+		assertThat(attributes, notNullValue());
+		assertThat(attributes.size(), is(1));
+	}
 
 }

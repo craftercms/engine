@@ -29,32 +29,32 @@ import org.craftercms.engine.service.context.SiteContext;
  */
 public class ConfigurationProfileLoaderImpl<T extends ConfigurationProfile> implements ConfigurationProfileLoader<T> {
 
-    private String profilesModule;
-    private String profilesUrl;
-    private ConfigurationMapper<T> profileMapper;
-    private ConfigurationProvider configurationProvider;
+	private String profilesModule;
+	private String profilesUrl;
+	private ConfigurationMapper<T> profileMapper;
+	private ConfigurationProvider configurationProvider;
 
-    public ConfigurationProfileLoaderImpl(String profilesModule, String profilesUrl, ConfigurationMapper<T> profileMapper,
-                                          ConfigurationProvider configurationProvider) {
-        this.profilesModule = profilesModule;
-        this.profilesUrl = profilesUrl;
-        this.profileMapper = profileMapper;
-        this.configurationProvider = configurationProvider;
-    }
+	public ConfigurationProfileLoaderImpl(String profilesModule, String profilesUrl, ConfigurationMapper<T> profileMapper,
+					      ConfigurationProvider configurationProvider) {
+		this.profilesModule = profilesModule;
+		this.profilesUrl = profilesUrl;
+		this.profileMapper = profileMapper;
+		this.configurationProvider = configurationProvider;
+	}
 
-    @Override
-    public T loadProfile(String id) throws ConfigurationException {
-        SiteContext siteContext = SiteContext.getCurrent();
-        if (siteContext != null) {
-            try {
-                return profileMapper.readConfig(configurationProvider, profilesModule, profilesUrl, null, id);
-            } catch (Exception e) {
-                throw new ConfigurationException("Error while loading profile " +  id + " from configuration at " +
-                                                 profilesUrl, e);
-            }
-        } else {
-            throw new IllegalStateException("No current site context found");
-        }
-    }
+	@Override
+	public T loadProfile(String id) throws ConfigurationException {
+		SiteContext siteContext = SiteContext.getCurrent();
+		if (siteContext != null) {
+			try {
+				return profileMapper.readConfig(configurationProvider, profilesModule, profilesUrl, null, id);
+			} catch (Exception e) {
+				throw new ConfigurationException("Error while loading profile " + id + " from configuration at " +
+					profilesUrl, e);
+			}
+		} else {
+			throw new IllegalStateException("No current site context found");
+		}
+	}
 
 }

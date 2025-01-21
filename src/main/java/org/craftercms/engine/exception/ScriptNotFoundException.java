@@ -23,8 +23,8 @@ package org.craftercms.engine.exception;
  */
 public class ScriptNotFoundException extends ScriptException {
 
-    public ScriptNotFoundException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	public ScriptNotFoundException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
 }

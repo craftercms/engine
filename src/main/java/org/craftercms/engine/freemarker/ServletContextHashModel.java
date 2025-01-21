@@ -29,22 +29,22 @@ import jakarta.servlet.ServletContext;
  */
 public class ServletContextHashModel implements TemplateHashModel {
 
-    private ServletContext servletContext;
-    private ObjectWrapper objectWrapper;
+	private ServletContext servletContext;
+	private ObjectWrapper objectWrapper;
 
-    public ServletContextHashModel(ServletContext servletContext, ObjectWrapper objectWrapper) {
-        this.servletContext = servletContext;
-        this.objectWrapper = objectWrapper;
-    }
+	public ServletContextHashModel(ServletContext servletContext, ObjectWrapper objectWrapper) {
+		this.servletContext = servletContext;
+		this.objectWrapper = objectWrapper;
+	}
 
-    @Override
-    public TemplateModel get(String key) throws TemplateModelException {
-        return objectWrapper.wrap(servletContext.getAttribute(key));
-    }
+	@Override
+	public TemplateModel get(String key) throws TemplateModelException {
+		return objectWrapper.wrap(servletContext.getAttribute(key));
+	}
 
-    @Override
-    public boolean isEmpty() throws TemplateModelException {
-        return !servletContext.getAttributeNames().hasMoreElements();
-    }
+	@Override
+	public boolean isEmpty() throws TemplateModelException {
+		return !servletContext.getAttributeNames().hasMoreElements();
+	}
 
 }

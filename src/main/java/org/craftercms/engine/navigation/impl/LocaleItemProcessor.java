@@ -34,22 +34,22 @@ import static org.craftercms.engine.util.LocaleUtils.resolveLocalePath;
  */
 public class LocaleItemProcessor implements ItemProcessor {
 
-    protected ContentStoreService storeService;
+	protected ContentStoreService storeService;
 
-    @ConstructorProperties({"storeService"})
-    public LocaleItemProcessor(ContentStoreService storeService) {
-        this.storeService = storeService;
-    }
+	@ConstructorProperties({"storeService"})
+	public LocaleItemProcessor(ContentStoreService storeService) {
+		this.storeService = storeService;
+	}
 
-    @Override
-    public Item process(Context context, CachingOptions cachingOptions, Item item) throws ItemProcessingException {
+	@Override
+	public Item process(Context context, CachingOptions cachingOptions, Item item) throws ItemProcessingException {
 
-        if (item != null && item.getDescriptorDom() != null) {
-            return storeService.getItem(context,
-                    resolveLocalePath(item.getDescriptorUrl(), url -> storeService.exists(context, url)));
-        }
+		if (item != null && item.getDescriptorDom() != null) {
+			return storeService.getItem(context,
+				resolveLocalePath(item.getDescriptorUrl(), url -> storeService.exists(context, url)));
+		}
 
-        return item;
-    }
+		return item;
+	}
 
 }

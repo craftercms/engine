@@ -16,100 +16,100 @@
   -->
 
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:util="http://www.springframework.org/schema/util"
-       xsi:schemaLocation="
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:util="http://www.springframework.org/schema/util"
+	   xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-    <import resource="classpath:crafter/engine/mode/serverless/deployment-events-context.xml" />
+		<import resource="classpath:crafter/engine/mode/serverless/deployment-events-context.xml"/>
 
-    <bean class="org.craftercms.commons.spring.ListMergingPostProcessor">
-        <property name="order" value="0" />
-        <property name="beanName" value="crafter.properties" />
-        <property name="propertyName" value="locations" />
-        <property name="additionalElements">
-            <list>
-                <value>classpath:crafter/engine/mode/serverless/s3/server-config.properties</value>
-            </list>
-        </property>
-    </bean>
+		<bean class="org.craftercms.commons.spring.ListMergingPostProcessor">
+				<property name="order" value="0"/>
+				<property name="beanName" value="crafter.properties"/>
+				<property name="propertyName" value="locations"/>
+				<property name="additionalElements">
+						<list>
+								<value>classpath:crafter/engine/mode/serverless/s3/server-config.properties</value>
+						</list>
+				</property>
+		</bean>
 
-    <!-- AWS S3 client builder -->
-    <bean id="crafter.s3ClientBuilder" class="org.craftercms.engine.store.s3.util.S3ClientBuilder">
-        <constructor-arg name="endpoint" value="${crafter.engine.s3.endpoint:}"/>
-        <constructor-arg name="region" value="${crafter.engine.s3.region:}"/>
-        <constructor-arg name="accessKey" value="${crafter.engine.s3.accessKey:}"/>
-        <constructor-arg name="secretKey" value="${crafter.engine.s3.secretKey:}"/>
-        <constructor-arg name="pathStyle" value="${crafter.engine.s3.pathStyle:false}"/>
-    </bean>
+		<!-- AWS S3 client builder -->
+		<bean id="crafter.s3ClientBuilder" class="org.craftercms.engine.store.s3.util.S3ClientBuilder">
+				<constructor-arg name="endpoint" value="${crafter.engine.s3.endpoint:}"/>
+				<constructor-arg name="region" value="${crafter.engine.s3.region:}"/>
+				<constructor-arg name="accessKey" value="${crafter.engine.s3.accessKey:}"/>
+				<constructor-arg name="secretKey" value="${crafter.engine.s3.secretKey:}"/>
+				<constructor-arg name="pathStyle" value="${crafter.engine.s3.pathStyle:false}"/>
+		</bean>
 
-    <!-- AWS S3 Site List Resolver -->
-    <bean id="crafter.siteListResolver" class="org.craftercms.engine.store.s3.S3SiteListResolver">
-        <constructor-arg name="s3Uri" value="${crafter.engine.site.default.rootFolder.path}"/>
-        <constructor-arg name="clientBuilder" ref="crafter.s3ClientBuilder"/>
-    </bean>
+		<!-- AWS S3 Site List Resolver -->
+		<bean id="crafter.siteListResolver" class="org.craftercms.engine.store.s3.S3SiteListResolver">
+				<constructor-arg name="s3Uri" value="${crafter.engine.site.default.rootFolder.path}"/>
+				<constructor-arg name="clientBuilder" ref="crafter.s3ClientBuilder"/>
+		</bean>
 
-    <bean id="crafter.siteContextManager" class="org.craftercms.engine.service.context.SiteContextManager">
-        <constructor-arg name="contextFactory" ref="crafter.siteContextFactory"/>
-        <constructor-arg name="fallbackContextFactory" ref="crafter.fallbackSiteContextFactory"/>
-        <constructor-arg name="siteListResolver" ref="crafter.siteListResolver"/>
-        <constructor-arg name="waitForContextInit" value="${crafter.engine.site.context.waitForInit}"/>
-        <constructor-arg name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
-        <constructor-arg name="defaultSiteName" value="${crafter.engine.site.default.name}"/>
-        <constructor-arg name="contextBuildRetryMaxCount" value="${crafter.engine.site.context.build.retry.maxCount}"/>
-        <constructor-arg name="contextBuildRetryWaitTimeBase" value="${crafter.engine.site.context.build.retry.waitTimeBase}"/>
-        <constructor-arg name="contextBuildRetryWaitTimeMultiplier" value="${crafter.engine.site.context.build.retry.waitTimeMultiplier}"/>
-        <constructor-arg name="modePreview" value="${crafter.engine.preview}"/>
-        <constructor-arg name="watcherPaths" value="${crafter.engine.watcher.paths}"/>
-        <constructor-arg name="watcherIgnorePaths" value="${crafter.engine.watcher.ignorePaths}"/>
-        <constructor-arg name="watcherCounterLimit" value="${crafter.engine.watcher.counter.limit}"/>
-        <constructor-arg name="watcherIntervalPeriod" value="${crafter.engine.watcher.interval.period}"/>
-        <property name="entitlementValidator" ref="crafter.entitlementValidator"/>
-    </bean>
+		<bean id="crafter.siteContextManager" class="org.craftercms.engine.service.context.SiteContextManager">
+				<constructor-arg name="contextFactory" ref="crafter.siteContextFactory"/>
+				<constructor-arg name="fallbackContextFactory" ref="crafter.fallbackSiteContextFactory"/>
+				<constructor-arg name="siteListResolver" ref="crafter.siteListResolver"/>
+				<constructor-arg name="waitForContextInit" value="${crafter.engine.site.context.waitForInit}"/>
+				<constructor-arg name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
+				<constructor-arg name="defaultSiteName" value="${crafter.engine.site.default.name}"/>
+				<constructor-arg name="contextBuildRetryMaxCount" value="${crafter.engine.site.context.build.retry.maxCount}"/>
+				<constructor-arg name="contextBuildRetryWaitTimeBase" value="${crafter.engine.site.context.build.retry.waitTimeBase}"/>
+				<constructor-arg name="contextBuildRetryWaitTimeMultiplier" value="${crafter.engine.site.context.build.retry.waitTimeMultiplier}"/>
+				<constructor-arg name="modePreview" value="${crafter.engine.preview}"/>
+				<constructor-arg name="watcherPaths" value="${crafter.engine.watcher.paths}"/>
+				<constructor-arg name="watcherIgnorePaths" value="${crafter.engine.watcher.ignorePaths}"/>
+				<constructor-arg name="watcherCounterLimit" value="${crafter.engine.watcher.counter.limit}"/>
+				<constructor-arg name="watcherIntervalPeriod" value="${crafter.engine.watcher.interval.period}"/>
+				<property name="entitlementValidator" ref="crafter.entitlementValidator"/>
+		</bean>
 
-    <!-- AWS S3 Content Store Adapter -->
+		<!-- AWS S3 Content Store Adapter -->
 
-    <bean id="crafter.s3ContentStoreAdapter" class="org.craftercms.engine.store.s3.S3ContentStoreAdapter">
-        <constructor-arg name="pathValidator">
-            <bean class="org.craftercms.commons.validation.validators.impl.SecurePathValidator">
-            </bean>
-        </constructor-arg>
-        <constructor-arg name="descriptorFileExtension" value="${crafter.core.store.descriptorFile.extension}"/>
-        <constructor-arg name="metadataFileExtension" value="${crafter.core.store.metadataFile.extension}"/>
-        <constructor-arg name="cacheTemplate" ref="crafter.cacheTemplate"/>
-        <constructor-arg name="clientBuilder" ref="crafter.s3ClientBuilder"/>
-        <constructor-arg name="contentMaxLength" value="${crafter.engine.store.s3.cache.contentMaxLength}"/>
-        <constructor-arg name="cacheAllowedPaths" value="${crafter.engine.store.s3.cache.allowedPaths}"/>
-    </bean>
+		<bean id="crafter.s3ContentStoreAdapter" class="org.craftercms.engine.store.s3.S3ContentStoreAdapter">
+				<constructor-arg name="pathValidator">
+						<bean class="org.craftercms.commons.validation.validators.impl.SecurePathValidator">
+						</bean>
+				</constructor-arg>
+				<constructor-arg name="descriptorFileExtension" value="${crafter.core.store.descriptorFile.extension}"/>
+				<constructor-arg name="metadataFileExtension" value="${crafter.core.store.metadataFile.extension}"/>
+				<constructor-arg name="cacheTemplate" ref="crafter.cacheTemplate"/>
+				<constructor-arg name="clientBuilder" ref="crafter.s3ClientBuilder"/>
+				<constructor-arg name="contentMaxLength" value="${crafter.engine.store.s3.cache.contentMaxLength}"/>
+				<constructor-arg name="cacheAllowedPaths" value="${crafter.engine.store.s3.cache.allowedPaths}"/>
+		</bean>
 
-    <bean id="crafter.contentStoreAdapter.s3"
-          class="org.craftercms.engine.util.store.decorators.ContentStoreAdapterDecoratorChainFactoryBean">
-        <constructor-arg name="storeAdapter" ref="crafter.s3ContentStoreAdapter"/>
-        <constructor-arg name="decorators">
-            <list>
-                <ref bean="crafter.cacheWarmingContentStoreAdapterDecorator"/>
-                <ref bean="crafter.targetedContentStoreAdapterDecorator"/>
-            </list>
-        </constructor-arg>
-    </bean>
+		<bean id="crafter.contentStoreAdapter.s3"
+			  class="org.craftercms.engine.util.store.decorators.ContentStoreAdapterDecoratorChainFactoryBean">
+				<constructor-arg name="storeAdapter" ref="crafter.s3ContentStoreAdapter"/>
+				<constructor-arg name="decorators">
+						<list>
+								<ref bean="crafter.cacheWarmingContentStoreAdapterDecorator"/>
+								<ref bean="crafter.targetedContentStoreAdapterDecorator"/>
+						</list>
+				</constructor-arg>
+		</bean>
 
-    <bean id="crafter.contentStoreAdapterRegistry" class="org.craftercms.core.store.impl.ContentStoreAdapterRegistryImpl" >
-        <constructor-arg name="adapters">
-            <map>
-                <entry key="filesystem" value-ref="crafter.contentStoreAdapter.filesystem"/>
-                <entry key="s3" value-ref="crafter.contentStoreAdapter.s3"/>
-            </map>
-        </constructor-arg>
-    </bean>
+		<bean id="crafter.contentStoreAdapterRegistry" class="org.craftercms.core.store.impl.ContentStoreAdapterRegistryImpl">
+				<constructor-arg name="adapters">
+						<map>
+								<entry key="filesystem" value-ref="crafter.contentStoreAdapter.filesystem"/>
+								<entry key="s3" value-ref="crafter.contentStoreAdapter.s3"/>
+						</map>
+				</constructor-arg>
+		</bean>
 
-    <!-- ////////////////////////////////// -->
-    <!--								 	-->
-    <!--			Health Check			-->
-    <!--									-->
-    <!-- ////////////////////////////////// -->
-    <bean id="siteHealthCheckService" class="org.craftercms.engine.service.impl.SiteHealthCheckServiceImpl">
-        <constructor-arg name="siteListResolver" ref="crafter.siteListResolver"/>
-        <constructor-arg name="healthChecks" ref="siteHealthChecks"/>
-    </bean>
+		<!-- ////////////////////////////////// -->
+		<!--								 	-->
+		<!--			Health Check			-->
+		<!--									-->
+		<!-- ////////////////////////////////// -->
+		<bean id="siteHealthCheckService" class="org.craftercms.engine.service.impl.SiteHealthCheckServiceImpl">
+				<constructor-arg name="siteListResolver" ref="crafter.siteListResolver"/>
+				<constructor-arg name="healthChecks" ref="siteHealthChecks"/>
+		</bean>
 </beans>

@@ -40,21 +40,21 @@ import static org.craftercms.commons.validation.annotations.param.EsapiValidatio
 @RequestMapping(RestControllerBase.REST_BASE_URI + SiteUrlController.URL_ROOT)
 public class SiteUrlController extends RestControllerBase {
 
-    public static final String URL_ROOT = "/site/url";
-    public static final String URL_TRANSFORM = "/transform";
+	public static final String URL_ROOT = "/site/url";
+	public static final String URL_TRANSFORM = "/transform";
 
-    protected final UrlTransformationService urlTransformationService;
+	protected final UrlTransformationService urlTransformationService;
 
-    @ConstructorProperties({"urlTransformationService"})
-    public SiteUrlController(final UrlTransformationService urlTransformationService) {
-        this.urlTransformationService = urlTransformationService;
-    }
+	@ConstructorProperties({"urlTransformationService"})
+	public SiteUrlController(final UrlTransformationService urlTransformationService) {
+		this.urlTransformationService = urlTransformationService;
+	}
 
-    @GetMapping(URL_TRANSFORM)
-    public String transformUrl(@EsapiValidatedParam(type = ALPHANUMERIC) @RequestParam String transformerName,
-                               @ValidExistingContentPath
-                               @RequestParam String url) {
-        return urlTransformationService.transform(transformerName, url);
-    }
+	@GetMapping(URL_TRANSFORM)
+	public String transformUrl(@EsapiValidatedParam(type = ALPHANUMERIC) @RequestParam String transformerName,
+				   @ValidExistingContentPath
+				   @RequestParam String url) {
+		return urlTransformationService.transform(transformerName, url);
+	}
 
 }

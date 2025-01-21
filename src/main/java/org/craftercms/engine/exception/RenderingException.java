@@ -24,8 +24,8 @@ import org.craftercms.core.exception.CrafterException;
  */
 public class RenderingException extends CrafterException {
 
-    public RenderingException(String message) {
-        super(message);
-    }
+	public RenderingException(String message) {
+		super(message);
+	}
 
 }

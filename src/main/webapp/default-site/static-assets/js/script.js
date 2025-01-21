@@ -19,16 +19,14 @@
 */
 
 $('#main').bgStretcher({
-	images: ['/static-assets/img/gears.jpg'], 
+	images: ['/static-assets/img/gears.jpg'],
 	imageWidth: 1533,
 	imageHeight: 1148,
-    anchoringImg: 'center top'
+	anchoringImg: 'center top'
 });
 
-$('.bgOpaque').each(function(i) {
-    $(this).
-    	children().wrapAll('<div class="opaque-container" />').end().
-		append('<div class="opaque-background" />'); 
+$('.bgOpaque').each(function (i) {
+	$(this).children().wrapAll('<div class="opaque-container" />').end().append('<div class="opaque-background" />');
 });
 
 

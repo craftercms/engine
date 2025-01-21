@@ -24,28 +24,30 @@ import java.beans.ConstructorProperties;
 
 /**
  * Utility class to build the AWS S3 client instances.
+ *
  * @author joseross
  */
 public class S3ClientBuilder {
 
-    protected S3Profile profile;
+	protected S3Profile profile;
 
-    @ConstructorProperties({"endpoint", "region", "accessKey", "secretKey", "pathStyle"})
-    public S3ClientBuilder(String endpoint, String region, String accessKey, String secretKey, boolean pathStyle) {
-        profile = new S3Profile();
-        profile.setEndpoint(endpoint);
-        profile.setRegion(region);
-        profile.setAccessKey(accessKey);
-        profile.setSecretKey(secretKey);
-        profile.setPathStyleAccessEnabled(pathStyle);
-    }
+	@ConstructorProperties({"endpoint", "region", "accessKey", "secretKey", "pathStyle"})
+	public S3ClientBuilder(String endpoint, String region, String accessKey, String secretKey, boolean pathStyle) {
+		profile = new S3Profile();
+		profile.setEndpoint(endpoint);
+		profile.setRegion(region);
+		profile.setAccessKey(accessKey);
+		profile.setSecretKey(secretKey);
+		profile.setPathStyleAccessEnabled(pathStyle);
+	}
 
-    /**
-     * Builds an AWS S3 client, if no values are provided the default client will be used.
-     * @return AWS S3 client
-     */
-    public S3Client getClient() {
-        return S3Utils.createClient(profile);
-    }
+	/**
+	 * Builds an AWS S3 client, if no values are provided the default client will be used.
+	 *
+	 * @return AWS S3 client
+	 */
+	public S3Client getClient() {
+		return S3Utils.createClient(profile);
+	}
 
 }

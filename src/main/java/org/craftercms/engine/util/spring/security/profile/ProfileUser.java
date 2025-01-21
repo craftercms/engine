@@ -34,67 +34,67 @@ import static java.util.stream.Collectors.toSet;
  */
 public class ProfileUser extends CustomUser {
 
-    protected Authentication authentication;
+	protected Authentication authentication;
 
-    protected Profile profile;
+	protected Profile profile;
 
-    public ProfileUser(final Authentication auth) {
-        this(auth.getProfile());
-        this.authentication = auth;
-    }
+	public ProfileUser(final Authentication auth) {
+		this(auth.getProfile());
+		this.authentication = auth;
+	}
 
-    public ProfileUser(final Profile profile) {
-        super(profile.getUsername(), "N/A", profile.isEnabled(), true, true, true,
-            profile.getRoles().stream().map(SimpleGrantedAuthority::new).collect(toSet()));
-        this.profile = profile;
-    }
+	public ProfileUser(final Profile profile) {
+		super(profile.getUsername(), "N/A", profile.isEnabled(), true, true, true,
+			profile.getRoles().stream().map(SimpleGrantedAuthority::new).collect(toSet()));
+		this.profile = profile;
+	}
 
-    public Authentication getAuthentication() {
-        return authentication;
-    }
+	public Authentication getAuthentication() {
+		return authentication;
+	}
 
-    public Profile getProfile() {
-        return profile;
-    }
+	public Profile getProfile() {
+		return profile;
+	}
 
-    @Override
-    public <T> T getAttribute(final String name) {
-        return profile.getAttribute(name);
-    }
+	@Override
+	public <T> T getAttribute(final String name) {
+		return profile.getAttribute(name);
+	}
 
-    @Override
-    public void setAttributes(final Map<String, Object> attributes) {
-        profile.setAttributes(attributes);
-    }
+	@Override
+	public void setAttributes(final Map<String, Object> attributes) {
+		profile.setAttributes(attributes);
+	}
 
-    @Override
-    public void setAttribute(final String name, final Object value) {
-        profile.setAttribute(name, value);
-    }
+	@Override
+	public void setAttribute(final String name, final Object value) {
+		profile.setAttribute(name, value);
+	}
 
-    @Override
-    public Map<String, Object> getAttributes() {
-        return profile.getAttributes();
-    }
+	@Override
+	public Map<String, Object> getAttributes() {
+		return profile.getAttributes();
+	}
 
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof ProfileUser)) {
-            return false;
-        }
-        if (!super.equals(o)) {
-            return false;
-        }
-        final ProfileUser details = (ProfileUser)o;
-        return Objects.equals(profile, details.profile);
-    }
+	@Override
+	public boolean equals(final Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof ProfileUser)) {
+			return false;
+		}
+		if (!super.equals(o)) {
+			return false;
+		}
+		final ProfileUser details = (ProfileUser) o;
+		return Objects.equals(profile, details.profile);
+	}
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), profile);
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hash(super.hashCode(), profile);
+	}
 
 }

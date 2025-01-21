@@ -40,83 +40,83 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
  * Filter that checks if the user is authorized to preview the site.
  */
 public class PreviewAccessTokenFilter extends GenericFilterBean {
-    private final static String PREVIEW_SITE_TOKEN_NAME = "crafterPreview";
-    private final static String PREVIEW_SITE_TOKEN_HEADER_NAME = "X-Crafter-Preview";
+	private final static String PREVIEW_SITE_TOKEN_NAME = "crafterPreview";
+	private final static String PREVIEW_SITE_TOKEN_HEADER_NAME = "X-Crafter-Preview";
 
-    private final TextEncryptor textEncryptor;
+	private final TextEncryptor textEncryptor;
 
-    @ConstructorProperties({"textEncryptor"})
-    public PreviewAccessTokenFilter(final TextEncryptor textEncryptor) {
-        this.textEncryptor = textEncryptor;
-    }
+	@ConstructorProperties({"textEncryptor"})
+	public PreviewAccessTokenFilter(final TextEncryptor textEncryptor) {
+		this.textEncryptor = textEncryptor;
+	}
 
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        HttpServletRequest httpServletRequest = (HttpServletRequest) request;
-        String site = SiteContext.getCurrent().getSiteName();
-        if (isEmpty(site)) {
-            chain.doFilter(request, response);
-            return;
-        }
+	@Override
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+		HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+		String site = SiteContext.getCurrent().getSiteName();
+		if (isEmpty(site)) {
+			chain.doFilter(request, response);
+			return;
+		}
 
-        String previewToken = httpServletRequest.getHeader(PREVIEW_SITE_TOKEN_HEADER_NAME);
-        if (isEmpty(previewToken)) {
-            previewToken = httpServletRequest.getParameter(PREVIEW_SITE_TOKEN_NAME);
-        }
-        if (isEmpty(previewToken)) {
-            previewToken = HttpUtils.getCookieValue(PREVIEW_SITE_TOKEN_NAME, httpServletRequest);
-        }
+		String previewToken = httpServletRequest.getHeader(PREVIEW_SITE_TOKEN_HEADER_NAME);
+		if (isEmpty(previewToken)) {
+			previewToken = httpServletRequest.getParameter(PREVIEW_SITE_TOKEN_NAME);
+		}
+		if (isEmpty(previewToken)) {
+			previewToken = HttpUtils.getCookieValue(PREVIEW_SITE_TOKEN_NAME, httpServletRequest);
+		}
 
-        if (isEmpty(previewToken)) {
-            String message = format("User is not authorized to preview site. '%s' header or '%s' token not found",
-                    PREVIEW_SITE_TOKEN_HEADER_NAME, PREVIEW_SITE_TOKEN_NAME);
-            logger.debug(message);
-            throw new PreviewAccessException(HttpStatus.UNAUTHORIZED, message);
-        }
+		if (isEmpty(previewToken)) {
+			String message = format("User is not authorized to preview site. '%s' header or '%s' token not found",
+				PREVIEW_SITE_TOKEN_HEADER_NAME, PREVIEW_SITE_TOKEN_NAME);
+			logger.debug(message);
+			throw new PreviewAccessException(HttpStatus.UNAUTHORIZED, message);
+		}
 
-        String[] tokens = decryptPreviewToken(previewToken);
-        if (tokens.length != 2) {
-            String message = format("Failed to validate preview site token. Found '%s' header or '%s' token elements but expecting 2",
-                    PREVIEW_SITE_TOKEN_HEADER_NAME, PREVIEW_SITE_TOKEN_NAME);
-            logger.debug(message);
-            throw new PreviewAccessException(HttpStatus.UNAUTHORIZED, message);
-        }
+		String[] tokens = decryptPreviewToken(previewToken);
+		if (tokens.length != 2) {
+			String message = format("Failed to validate preview site token. Found '%s' header or '%s' token elements but expecting 2",
+				PREVIEW_SITE_TOKEN_HEADER_NAME, PREVIEW_SITE_TOKEN_NAME);
+			logger.debug(message);
+			throw new PreviewAccessException(HttpStatus.UNAUTHORIZED, message);
+		}
 
-        long tokenTimestamp = Long.parseLong(tokens[1]);
-        boolean isExpired = tokenTimestamp < System.currentTimeMillis();
-        if (isExpired) {
-            String message = format("User is not authorized to preview site '%s', '%s' header or '%s' token has expired",
-                    site, PREVIEW_SITE_TOKEN_HEADER_NAME, PREVIEW_SITE_TOKEN_NAME);
-            logger.debug(message);
-            throw new PreviewAccessException(HttpStatus.FORBIDDEN, message);
-        }
+		long tokenTimestamp = Long.parseLong(tokens[1]);
+		boolean isExpired = tokenTimestamp < System.currentTimeMillis();
+		if (isExpired) {
+			String message = format("User is not authorized to preview site '%s', '%s' header or '%s' token has expired",
+				site, PREVIEW_SITE_TOKEN_HEADER_NAME, PREVIEW_SITE_TOKEN_NAME);
+			logger.debug(message);
+			throw new PreviewAccessException(HttpStatus.FORBIDDEN, message);
+		}
 
-        String previewSitesFromToken = tokens[0];
-        List<String> allowedSites = Arrays.asList(previewSitesFromToken.split(","));
-        if (!allowedSites.contains(site)) {
-            String message = format("User is not authorized to preview site '%s', '%s' header or '%s' token does not match",
-                    site, PREVIEW_SITE_TOKEN_HEADER_NAME, PREVIEW_SITE_TOKEN_NAME);
-            logger.debug(message);
-            throw new PreviewAccessException(HttpStatus.FORBIDDEN, message);
-        }
+		String previewSitesFromToken = tokens[0];
+		List<String> allowedSites = Arrays.asList(previewSitesFromToken.split(","));
+		if (!allowedSites.contains(site)) {
+			String message = format("User is not authorized to preview site '%s', '%s' header or '%s' token does not match",
+				site, PREVIEW_SITE_TOKEN_HEADER_NAME, PREVIEW_SITE_TOKEN_NAME);
+			logger.debug(message);
+			throw new PreviewAccessException(HttpStatus.FORBIDDEN, message);
+		}
 
-        chain.doFilter(request, response);
-    }
+		chain.doFilter(request, response);
+	}
 
-    /**
-     * Decrypts the preview site token.
-     *
-     * @param encryptedToken the encrypted token
-     * @return the decrypted token as an array of tokens (siteNames, expirationTimestamp)
-     */
-    private String[] decryptPreviewToken(final String encryptedToken) {
-        try {
-            return textEncryptor.decrypt(encryptedToken)
-                    .split("\\|");
-        } catch (CryptoException e) {
-            String message = "Failed to decrypt preview site token";
-            logger.debug(message, e);
-            throw new PreviewAccessException(HttpStatus.UNAUTHORIZED, message);
-        }
-    }
+	/**
+	 * Decrypts the preview site token.
+	 *
+	 * @param encryptedToken the encrypted token
+	 * @return the decrypted token as an array of tokens (siteNames, expirationTimestamp)
+	 */
+	private String[] decryptPreviewToken(final String encryptedToken) {
+		try {
+			return textEncryptor.decrypt(encryptedToken)
+				.split("\\|");
+		} catch (CryptoException e) {
+			String message = "Failed to decrypt preview site token";
+			logger.debug(message, e);
+			throw new PreviewAccessException(HttpStatus.UNAUTHORIZED, message);
+		}
+	}
 }

@@ -40,158 +40,159 @@ import java.util.concurrent.TimeUnit;
  */
 public class ContentStoreAdapterPreloadedFoldersBasedCacheWarmer implements ContextCacheWarmer {
 
-    private static final Logger logger = LoggerFactory.getLogger(ContentStoreAdapterPreloadedFoldersBasedCacheWarmer.class);
+	private static final Logger logger = LoggerFactory.getLogger(ContentStoreAdapterPreloadedFoldersBasedCacheWarmer.class);
 
-    protected boolean warmUpEnabled;
-    protected Map<String, Integer> descriptorPreloadFolders;
-    protected Map<String, Integer> contentPreloadFolders;
+	protected boolean warmUpEnabled;
+	protected Map<String, Integer> descriptorPreloadFolders;
+	protected Map<String, Integer> contentPreloadFolders;
 
-    public ContentStoreAdapterPreloadedFoldersBasedCacheWarmer(boolean warmUpEnabled, String[] descriptorPreloadFolders,
-                                                               String[] contentPreloadFolders) {
-        this.warmUpEnabled = warmUpEnabled;
+	public ContentStoreAdapterPreloadedFoldersBasedCacheWarmer(boolean warmUpEnabled, String[] descriptorPreloadFolders,
+								   String[] contentPreloadFolders) {
+		this.warmUpEnabled = warmUpEnabled;
 
-        // Sets the list of descriptor folders to preload in the cache. Each folder can have it's depth specified
-        // after a colon, like {@code PATH:DEPTH}
-        this.descriptorPreloadFolders = CacheUtils.parsePreloadFoldersList(descriptorPreloadFolders);
+		// Sets the list of descriptor folders to preload in the cache. Each folder can have it's depth specified
+		// after a colon, like {@code PATH:DEPTH}
+		this.descriptorPreloadFolders = CacheUtils.parsePreloadFoldersList(descriptorPreloadFolders);
 
-        // Sets the list of content folders to preload in the cache. Each folder can have it's depth specified
-        // after a colon, like {@code PATH:DEPTH}
-        this.contentPreloadFolders = CacheUtils.parsePreloadFoldersList(contentPreloadFolders);
-    }
+		// Sets the list of content folders to preload in the cache. Each folder can have it's depth specified
+		// after a colon, like {@code PATH:DEPTH}
+		this.contentPreloadFolders = CacheUtils.parsePreloadFoldersList(contentPreloadFolders);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void warmUpCache(Context context) {
-        List<PreloadedFolder> preloadedFolders = new ArrayList<>();
-        PreloadedFoldersAwareContext contextWrapper = findPreloadedFoldersAwareContext(context);
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void warmUpCache(Context context) {
+		List<PreloadedFolder> preloadedFolders = new ArrayList<>();
+		PreloadedFoldersAwareContext contextWrapper = findPreloadedFoldersAwareContext(context);
 
-        if (contextWrapper == null) {
-            throw new IllegalStateException("PreloadedFoldersAwareContext expected but not found");
-        }
+		if (contextWrapper == null) {
+			throw new IllegalStateException("PreloadedFoldersAwareContext expected but not found");
+		}
 
-        for (Map.Entry<String, Integer> entry : getContentPreloadFolders().entrySet()) {
-            preloadFolder(contextWrapper, entry.getKey(), entry.getValue(), true, preloadedFolders);
-        }
+		for (Map.Entry<String, Integer> entry : getContentPreloadFolders().entrySet()) {
+			preloadFolder(contextWrapper, entry.getKey(), entry.getValue(), true, preloadedFolders);
+		}
 
-        for (Map.Entry<String, Integer> entry : getDescriptorPreloadFolders().entrySet()) {
-            preloadFolder(contextWrapper, entry.getKey(), entry.getValue(), false, preloadedFolders);
-        }
+		for (Map.Entry<String, Integer> entry : getDescriptorPreloadFolders().entrySet()) {
+			preloadFolder(contextWrapper, entry.getKey(), entry.getValue(), false, preloadedFolders);
+		}
 
-        contextWrapper.setPreloadedFolders(preloadedFolders);
-    }
+		contextWrapper.setPreloadedFolders(preloadedFolders);
+	}
 
-    protected PreloadedFoldersAwareContext findPreloadedFoldersAwareContext(Context context) {
-        if (context instanceof PreloadedFoldersAwareContext) {
-            return (PreloadedFoldersAwareContext) context;
-        } else if (context instanceof DecoratedStoreAdapterContext) {
-            return findPreloadedFoldersAwareContext(((DecoratedStoreAdapterContext)context).getActualContext());
-        } else {
-            return null;
-        }
-    }
+	protected PreloadedFoldersAwareContext findPreloadedFoldersAwareContext(Context context) {
+		if (context instanceof PreloadedFoldersAwareContext) {
+			return (PreloadedFoldersAwareContext) context;
+		} else if (context instanceof DecoratedStoreAdapterContext) {
+			return findPreloadedFoldersAwareContext(((DecoratedStoreAdapterContext) context).getActualContext());
+		} else {
+			return null;
+		}
+	}
 
-    protected void preloadFolder(PreloadedFoldersAwareContext contextWrapper, String path, int depth,
-                                 boolean contentOnly, List<PreloadedFolder> preloadedFolders) {
-        path = ContentStoreUtils.normalizePath(path);
+	protected void preloadFolder(PreloadedFoldersAwareContext contextWrapper, String path, int depth,
+				     boolean contentOnly, List<PreloadedFolder> preloadedFolders) {
+		path = ContentStoreUtils.normalizePath(path);
 
-        Context actualContext = contextWrapper.getActualContext();
-        StopWatch stopWatch = new StopWatch();
+		Context actualContext = contextWrapper.getActualContext();
+		StopWatch stopWatch = new StopWatch();
 
-        logger.info("Starting preload of folder [{}] with depth {}", path, depth);
+		logger.info("Starting preload of folder [{}] with depth {}", path, depth);
 
-        stopWatch.start();
+		stopWatch.start();
 
-        Item rootFolder = actualContext.getStoreAdapter().findItem(actualContext, null, path, true);
-        if (rootFolder == null || !rootFolder.isFolder()) {
-            throw new IllegalStateException("Can't preload folder " + path + ": it doesn't exist or is not a folder");
-        }
+		Item rootFolder = actualContext.getStoreAdapter().findItem(actualContext, null, path, true);
+		if (rootFolder == null || !rootFolder.isFolder()) {
+			throw new IllegalStateException("Can't preload folder " + path + ": it doesn't exist or is not a folder");
+		}
 
-        Set<String> preloadedDescendants = new TreeSet<>();
+		Set<String> preloadedDescendants = new TreeSet<>();
 
-        try {
-            preloadFolderChildren(actualContext, path, depth, contentOnly, preloadedDescendants);
-            preloadedFolders.add(new PreloadedFolder(path, depth, preloadedDescendants));
-        } catch (Exception e) {
-            logger.error("Error while preloading folder [{}]", path, e);
-        }
+		try {
+			preloadFolderChildren(actualContext, path, depth, contentOnly, preloadedDescendants);
+			preloadedFolders.add(new PreloadedFolder(path, depth, preloadedDescendants));
+		} catch (Exception e) {
+			logger.error("Error while preloading folder [{}]", path, e);
+		}
 
-        stopWatch.stop();
+		stopWatch.stop();
 
-        logger.info("Preload of folder [{}] with depth {} completed in {} secs", path, depth,
-                    stopWatch.getTime(TimeUnit.SECONDS));
-    }
+		logger.info("Preload of folder [{}] with depth {} completed in {} secs", path, depth,
+			stopWatch.getTime(TimeUnit.SECONDS));
+	}
 
-    protected void preloadFolderChildren(Context context, String path, int depth, boolean contentOnly,
-                                         Set<String> preloadedPaths) {
-        if (depth == ContentStoreService.UNLIMITED_TREE_DEPTH || depth >= 1) {
-            if (depth >= 1) {
-                depth--;
-            }
+	protected void preloadFolderChildren(Context context, String path, int depth, boolean contentOnly,
+					     Set<String> preloadedPaths) {
+		if (depth == ContentStoreService.UNLIMITED_TREE_DEPTH || depth >= 1) {
+			if (depth >= 1) {
+				depth--;
+			}
 
-            List<Item> children = context.getStoreAdapter().findItems(context, null, path);
-            if (CollectionUtils.isNotEmpty(children)) {
-                for (Item item : children) {
-                    preloadFolderChild(item, context, depth, contentOnly, preloadedPaths);
-                }
-            }
-        }
-    }
+			List<Item> children = context.getStoreAdapter().findItems(context, null, path);
+			if (CollectionUtils.isNotEmpty(children)) {
+				for (Item item : children) {
+					preloadFolderChild(item, context, depth, contentOnly, preloadedPaths);
+				}
+			}
+		}
+	}
 
-    /**
-     * Preload a child of folder.
-     * Catch any exception while perform preload in order to not interrupt the whole process
-     * @param child item to perform preload
-     * @param context the context
-     * @param depth perform preload a folder with depth
-     * @param contentOnly true if only content, false otherwise
-     * @param preloadedPaths collection of preloaded paths
-     */
-    private void preloadFolderChild(Item child, Context context, int depth, boolean contentOnly, Set<String> preloadedPaths) {
-        String childPath = child.getUrl();
-        try {
-            if (child.isFolder()) {
-                logger.debug("Preloading folder [{}]", childPath);
-                if (!contentOnly) {
-                    context.getStoreAdapter().findItem(context, null, childPath, true);
-                }
+	/**
+	 * Preload a child of folder.
+	 * Catch any exception while perform preload in order to not interrupt the whole process
+	 *
+	 * @param child          item to perform preload
+	 * @param context        the context
+	 * @param depth          perform preload a folder with depth
+	 * @param contentOnly    true if only content, false otherwise
+	 * @param preloadedPaths collection of preloaded paths
+	 */
+	private void preloadFolderChild(Item child, Context context, int depth, boolean contentOnly, Set<String> preloadedPaths) {
+		String childPath = child.getUrl();
+		try {
+			if (child.isFolder()) {
+				logger.debug("Preloading folder [{}]", childPath);
+				if (!contentOnly) {
+					context.getStoreAdapter().findItem(context, null, childPath, true);
+				}
 
-                preloadedPaths.add(childPath);
+				preloadedPaths.add(childPath);
 
-                preloadFolderChildren(context, childPath, depth, contentOnly, preloadedPaths);
-            } else if (contentOnly) {
-                logger.debug("Preloading content [{}]", childPath);
-                context.getStoreAdapter().findContent(context, null, childPath);
+				preloadFolderChildren(context, childPath, depth, contentOnly, preloadedPaths);
+			} else if (contentOnly) {
+				logger.debug("Preloading content [{}]", childPath);
+				context.getStoreAdapter().findContent(context, null, childPath);
 
-                preloadedPaths.add(childPath);
-            } else {
-                logger.debug("Preloading item [{}]", childPath);
-                context.getStoreAdapter().findItem(context, null, childPath, true);
+				preloadedPaths.add(childPath);
+			} else {
+				logger.debug("Preloading item [{}]", childPath);
+				context.getStoreAdapter().findItem(context, null, childPath, true);
 
-                preloadedPaths.add(childPath);
-            }
-        } catch (Exception e) {
-            logger.error("Error while preload path '{}'", childPath, e);
-        }
-    }
+				preloadedPaths.add(childPath);
+			}
+		} catch (Exception e) {
+			logger.error("Error while preload path '{}'", childPath, e);
+		}
+	}
 
-    protected Map<String, Integer> getDescriptorPreloadFolders() {
-        Map<String, Integer> preloadFolders = SiteProperties.getDescriptorPreloadFolders();
-        if (MapUtils.isNotEmpty(preloadFolders)) {
-            return preloadFolders;
-        } else {
-            return descriptorPreloadFolders;
-        }
-    }
+	protected Map<String, Integer> getDescriptorPreloadFolders() {
+		Map<String, Integer> preloadFolders = SiteProperties.getDescriptorPreloadFolders();
+		if (MapUtils.isNotEmpty(preloadFolders)) {
+			return preloadFolders;
+		} else {
+			return descriptorPreloadFolders;
+		}
+	}
 
-    protected Map<String, Integer> getContentPreloadFolders() {
-        Map<String, Integer> preloadFolders = SiteProperties.getContentPreloadFolders();
-        if (MapUtils.isNotEmpty(preloadFolders)) {
-            return preloadFolders;
-        } else {
-            return contentPreloadFolders;
-        }
-    }
+	protected Map<String, Integer> getContentPreloadFolders() {
+		Map<String, Integer> preloadFolders = SiteProperties.getContentPreloadFolders();
+		if (MapUtils.isNotEmpty(preloadFolders)) {
+			return preloadFolders;
+		} else {
+			return contentPreloadFolders;
+		}
+	}
 
 }

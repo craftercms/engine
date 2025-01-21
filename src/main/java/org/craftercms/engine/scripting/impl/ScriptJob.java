@@ -36,34 +36,34 @@ import org.quartz.JobExecutionException;
  */
 public class ScriptJob implements Job {
 
-    public static final String SITE_CONTEXT_DATA_KEY = "siteContext";
-    public static final String SCRIPT_URL_DATA_KEY = "scriptUrl";
-    public static final String SERVLET_CONTEXT_DATA_KEY = "servletContext";
+	public static final String SITE_CONTEXT_DATA_KEY = "siteContext";
+	public static final String SCRIPT_URL_DATA_KEY = "scriptUrl";
+	public static final String SERVLET_CONTEXT_DATA_KEY = "servletContext";
 
-    @Override
-    public void execute(JobExecutionContext context) throws JobExecutionException {
-        JobDataMap dataMap = context.getJobDetail().getJobDataMap();
-        String scriptUrl = dataMap.getString(SCRIPT_URL_DATA_KEY);
-        SiteContext siteContext = (SiteContext)dataMap.get(SITE_CONTEXT_DATA_KEY);
-        ServletContext servletContext = (ServletContext)dataMap.get(SERVLET_CONTEXT_DATA_KEY);
-        ScriptFactory scriptFactory = siteContext.getScriptFactory();
+	@Override
+	public void execute(JobExecutionContext context) throws JobExecutionException {
+		JobDataMap dataMap = context.getJobDetail().getJobDataMap();
+		String scriptUrl = dataMap.getString(SCRIPT_URL_DATA_KEY);
+		SiteContext siteContext = (SiteContext) dataMap.get(SITE_CONTEXT_DATA_KEY);
+		ServletContext servletContext = (ServletContext) dataMap.get(SERVLET_CONTEXT_DATA_KEY);
+		ScriptFactory scriptFactory = siteContext.getScriptFactory();
 
-        if (scriptFactory == null) {
-            throw new JobExecutionException(
-                "No script factory associate to site context '" + siteContext.getSiteName() + "'");
-        }
+		if (scriptFactory == null) {
+			throw new JobExecutionException(
+				"No script factory associate to site context '" + siteContext.getSiteName() + "'");
+		}
 
-        SiteContext.setCurrent(siteContext);
-        try {
-            Map<String, Object> variables = new HashMap<>();
-            GroovyScriptUtils.addJobScriptVariables(variables, servletContext);
+		SiteContext.setCurrent(siteContext);
+		try {
+			Map<String, Object> variables = new HashMap<>();
+			GroovyScriptUtils.addJobScriptVariables(variables, servletContext);
 
-            scriptFactory.getScript(scriptUrl).execute(variables);
-        } catch (Exception e) {
-            throw new JobExecutionException("Error executing script job at " + scriptUrl, e);
-        } finally {
-            SiteContext.clear();
-        }
-    }
+			scriptFactory.getScript(scriptUrl).execute(variables);
+		} catch (Exception e) {
+			throw new JobExecutionException("Error executing script job at " + scriptUrl, e);
+		} finally {
+			SiteContext.clear();
+		}
+	}
 
 }

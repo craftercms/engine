@@ -32,31 +32,31 @@ import org.craftercms.engine.properties.SiteProperties;
  */
 public class ToTargetedUrlTransformer implements UrlTransformer {
 
-    protected TargetedUrlStrategy targetedUrlStrategy;
-    protected boolean forceCurrentTargetId;
+	protected TargetedUrlStrategy targetedUrlStrategy;
+	protected boolean forceCurrentTargetId;
 
-    public ToTargetedUrlTransformer(TargetedUrlStrategy targetedUrlStrategy) {
-        this.targetedUrlStrategy = targetedUrlStrategy;
-    }
+	public ToTargetedUrlTransformer(TargetedUrlStrategy targetedUrlStrategy) {
+		this.targetedUrlStrategy = targetedUrlStrategy;
+	}
 
-    public void setForceCurrentTargetId(boolean forceCurrentTargetId) {
-        this.forceCurrentTargetId = forceCurrentTargetId;
-    }
+	public void setForceCurrentTargetId(boolean forceCurrentTargetId) {
+		this.forceCurrentTargetId = forceCurrentTargetId;
+	}
 
-    @Override
-    public String transformUrl(Context context, CachingOptions cachingOptions,
-                               String url) throws UrlTransformationException {
-        if (SiteProperties.isTargetingEnabled() && !TargetingUtils.excludePath(url)) {
-            String rootFolder = TargetingUtils.getMatchingRootFolder(url);
-            if (StringUtils.isNotEmpty(rootFolder)) {
-                String relativeUrl = StringUtils.substringAfter(url, rootFolder);
-                String targetedUrl = targetedUrlStrategy.toTargetedUrl(relativeUrl, forceCurrentTargetId);
+	@Override
+	public String transformUrl(Context context, CachingOptions cachingOptions,
+				   String url) throws UrlTransformationException {
+		if (SiteProperties.isTargetingEnabled() && !TargetingUtils.excludePath(url)) {
+			String rootFolder = TargetingUtils.getMatchingRootFolder(url);
+			if (StringUtils.isNotEmpty(rootFolder)) {
+				String relativeUrl = StringUtils.substringAfter(url, rootFolder);
+				String targetedUrl = targetedUrlStrategy.toTargetedUrl(relativeUrl, forceCurrentTargetId);
 
-                return UrlUtils.concat(rootFolder, targetedUrl);
-            }
-        }
+				return UrlUtils.concat(rootFolder, targetedUrl);
+			}
+		}
 
-        return url;
-    }
+		return url;
+	}
 
 }

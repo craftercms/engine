@@ -28,29 +28,29 @@ import java.util.List;
  */
 public class ContentStoreAdapterDecoratorChainFactoryBean extends AbstractFactoryBean<ContentStoreAdapter> {
 
-    private ContentStoreAdapter storeAdapter;
-    private List<ContentStoreAdapterDecorator> decorators;
+	private ContentStoreAdapter storeAdapter;
+	private List<ContentStoreAdapterDecorator> decorators;
 
-    public ContentStoreAdapterDecoratorChainFactoryBean(ContentStoreAdapter storeAdapter, List<ContentStoreAdapterDecorator> decorators) {
-        this.storeAdapter = storeAdapter;
-        this.decorators = decorators;
-    }
+	public ContentStoreAdapterDecoratorChainFactoryBean(ContentStoreAdapter storeAdapter, List<ContentStoreAdapterDecorator> decorators) {
+		this.storeAdapter = storeAdapter;
+		this.decorators = decorators;
+	}
 
-    @Override
-    public Class<?> getObjectType() {
-        return ContentStoreAdapter.class;
-    }
+	@Override
+	public Class<?> getObjectType() {
+		return ContentStoreAdapter.class;
+	}
 
-    @Override
-    protected ContentStoreAdapter createInstance() {
-        ContentStoreAdapter currentAdapter = storeAdapter;
+	@Override
+	protected ContentStoreAdapter createInstance() {
+		ContentStoreAdapter currentAdapter = storeAdapter;
 
-        for (ContentStoreAdapterDecorator decorator : decorators) {
-            decorator.setActualStoreAdapter(currentAdapter);
-            currentAdapter = decorator;
-        }
+		for (ContentStoreAdapterDecorator decorator : decorators) {
+			decorator.setActualStoreAdapter(currentAdapter);
+			currentAdapter = decorator;
+		}
 
-        return currentAdapter;
-    }
+		return currentAdapter;
+	}
 
 }

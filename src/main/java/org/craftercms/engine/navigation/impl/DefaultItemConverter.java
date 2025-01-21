@@ -34,82 +34,82 @@ import org.craftercms.engine.service.UrlTransformationService;
  * @author avasquez
  */
 public class DefaultItemConverter implements Converter<SiteItem, NavItem> {
-    
-    protected String navLabelXPath;
-    protected String internalNameXPath;
-    protected String storeUrlToRenderUrlTransformerName;
-    protected UrlTransformationService urlTransformationService;
 
-    public DefaultItemConverter(String navLabelXPath, String internalNameXPath, String storeUrlToRenderUrlTransformerName,
-                                UrlTransformationService urlTransformationService) {
-        this.navLabelXPath = navLabelXPath;
-        this.internalNameXPath = internalNameXPath;
-        this.storeUrlToRenderUrlTransformerName = storeUrlToRenderUrlTransformerName;
-        this.urlTransformationService = urlTransformationService;
-    }
+	protected String navLabelXPath;
+	protected String internalNameXPath;
+	protected String storeUrlToRenderUrlTransformerName;
+	protected UrlTransformationService urlTransformationService;
 
-    @Override
-    public Class<?> getSourceClass() {
-        return SiteItem.class;
-    }
+	public DefaultItemConverter(String navLabelXPath, String internalNameXPath, String storeUrlToRenderUrlTransformerName,
+				    UrlTransformationService urlTransformationService) {
+		this.navLabelXPath = navLabelXPath;
+		this.internalNameXPath = internalNameXPath;
+		this.storeUrlToRenderUrlTransformerName = storeUrlToRenderUrlTransformerName;
+		this.urlTransformationService = urlTransformationService;
+	}
 
-    @Override
-    public Class<?> getTargetClass() {
-        return NavItem.class;
-    }
+	@Override
+	public Class<?> getSourceClass() {
+		return SiteItem.class;
+	}
 
-    @Override
-    public NavItem convert(SiteItem siteItem) {
-        NavItem navItem = null;
+	@Override
+	public Class<?> getTargetClass() {
+		return NavItem.class;
+	}
 
-        if (siteItem.getDom() != null) {
-            navItem = new NavItem();
-            navItem.setLabel(getNavigationLabel(siteItem));
-            navItem.setUrl(getNavigationUrl(siteItem));
-            navItem.setAttributes(getAdditionalAttributes(siteItem));
-        }
+	@Override
+	public NavItem convert(SiteItem siteItem) {
+		NavItem navItem = null;
 
-        return navItem;
-    }
+		if (siteItem.getDom() != null) {
+			navItem = new NavItem();
+			navItem.setLabel(getNavigationLabel(siteItem));
+			navItem.setUrl(getNavigationUrl(siteItem));
+			navItem.setAttributes(getAdditionalAttributes(siteItem));
+		}
 
-    protected String getNavigationLabel(SiteItem siteItem) {
-        String navLabel = siteItem.queryValue(navLabelXPath);
-        if (StringUtils.isEmpty(navLabel)) {
-            navLabel = siteItem.queryValue(internalNameXPath);
-            if (StringUtils.isEmpty(navLabel)) {
-                navLabel = FilenameUtils.removeExtension(siteItem.getStoreName());
-                navLabel = StringUtils.replace(navLabel, "-", " ");
-                navLabel = StringUtils.capitalize(navLabel);
-            }
-        }
+		return navItem;
+	}
 
-        return navLabel;
-    }
+	protected String getNavigationLabel(SiteItem siteItem) {
+		String navLabel = siteItem.queryValue(navLabelXPath);
+		if (StringUtils.isEmpty(navLabel)) {
+			navLabel = siteItem.queryValue(internalNameXPath);
+			if (StringUtils.isEmpty(navLabel)) {
+				navLabel = FilenameUtils.removeExtension(siteItem.getStoreName());
+				navLabel = StringUtils.replace(navLabel, "-", " ");
+				navLabel = StringUtils.capitalize(navLabel);
+			}
+		}
 
-    protected String getNavigationUrl(SiteItem siteItem) {
-        return urlTransformationService.transform(storeUrlToRenderUrlTransformerName, siteItem.getStoreUrl());
-    }
+		return navLabel;
+	}
 
-    protected Map<String, String> getAdditionalAttributes(SiteItem siteItem) {
-        Map<String, String> attrs = new HashMap<>();
-        String[] fields = SiteProperties.getNavigationAdditionalFields();
-        for (String field : fields) {
-            String value = siteItem.queryValue(field);
-            if(value != null) {
-                attrs.put(field, value);
-            }
-        }
-        return attrs;
-    }
+	protected String getNavigationUrl(SiteItem siteItem) {
+		return urlTransformationService.transform(storeUrlToRenderUrlTransformerName, siteItem.getStoreUrl());
+	}
 
-    @Override
-    public String toString() {
-        return "DefaultItemConverter{" +
-               "navLabelXPath='" + navLabelXPath + '\'' +
-               ", internalNameXPath='" + internalNameXPath + '\'' +
-               ", storeUrlToRenderUrlTransformerName='" + storeUrlToRenderUrlTransformerName + '\'' +
-               ", urlTransformationService=" + urlTransformationService +
-               '}';
-    }
+	protected Map<String, String> getAdditionalAttributes(SiteItem siteItem) {
+		Map<String, String> attrs = new HashMap<>();
+		String[] fields = SiteProperties.getNavigationAdditionalFields();
+		for (String field : fields) {
+			String value = siteItem.queryValue(field);
+			if (value != null) {
+				attrs.put(field, value);
+			}
+		}
+		return attrs;
+	}
+
+	@Override
+	public String toString() {
+		return "DefaultItemConverter{" +
+			"navLabelXPath='" + navLabelXPath + '\'' +
+			", internalNameXPath='" + internalNameXPath + '\'' +
+			", storeUrlToRenderUrlTransformerName='" + storeUrlToRenderUrlTransformerName + '\'' +
+			", urlTransformationService=" + urlTransformationService +
+			'}';
+	}
 
 }

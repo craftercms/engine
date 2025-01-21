@@ -22,6 +22,6 @@ package org.craftercms.engine.exception;
  */
 public interface HttpStatusCodeAwareException {
 
-    int getStatusCode();
+	int getStatusCode();
 
 }

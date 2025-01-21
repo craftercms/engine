@@ -29,73 +29,73 @@ import java.util.Set;
  */
 public class PreloadedFolder {
 
-    private String path;
-    private int depth;
-    private Set<String> descendants;
+	private String path;
+	private int depth;
+	private Set<String> descendants;
 
-    public PreloadedFolder(String path, int depth, Set<String> descendants) {
-        this.path = StringUtils.appendIfMissing(path, "/");
-        this.depth = depth;
-        this.descendants = descendants;
-    }
+	public PreloadedFolder(String path, int depth, Set<String> descendants) {
+		this.path = StringUtils.appendIfMissing(path, "/");
+		this.depth = depth;
+		this.descendants = descendants;
+	}
 
-    /**
-     * Returns the path of the folder.
-     */
-    public String getPath() {
-        return path;
-    }
+	/**
+	 * Returns the path of the folder.
+	 */
+	public String getPath() {
+		return path;
+	}
 
-    /**
-     * Returns:
-     *
-     * <ul>
-     *     <li>Null if the descendant's depth is greater than the preload depth for this folder.</li>
-     *     <li>True if the descendant is in the list of preloaded descendants</li>
-     *     <li>False if the descendant is not in the list of preloaded descendants</li>
-     * </ul>
-     */
-    public Boolean exists(String descendant) {
-        if (depth == ContentStoreService.UNLIMITED_TREE_DEPTH) {
-            return descendants.contains(descendant);
-        } else {
-            int childDepth = getDepth(descendant);
-            if (childDepth > depth) {
-                return null;
-            } else {
-                return descendants.contains(descendant);
-            }
-        }
-    }
+	/**
+	 * Returns:
+	 *
+	 * <ul>
+	 *     <li>Null if the descendant's depth is greater than the preload depth for this folder.</li>
+	 *     <li>True if the descendant is in the list of preloaded descendants</li>
+	 *     <li>False if the descendant is not in the list of preloaded descendants</li>
+	 * </ul>
+	 */
+	public Boolean exists(String descendant) {
+		if (depth == ContentStoreService.UNLIMITED_TREE_DEPTH) {
+			return descendants.contains(descendant);
+		} else {
+			int childDepth = getDepth(descendant);
+			if (childDepth > depth) {
+				return null;
+			} else {
+				return descendants.contains(descendant);
+			}
+		}
+	}
 
-    private int getDepth(String child) {
-        String afterParentPath = StringUtils.substringAfter(child, path);
-        String[] pathComponents = afterParentPath.split("/");
+	private int getDepth(String child) {
+		String afterParentPath = StringUtils.substringAfter(child, path);
+		String[] pathComponents = afterParentPath.split("/");
 
-        return pathComponents.length;
-    }
+		return pathComponents.length;
+	}
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
 
-        PreloadedFolder that = (PreloadedFolder) o;
+		PreloadedFolder that = (PreloadedFolder) o;
 
-        return depth == that.depth && path.equals(that.path);
-    }
+		return depth == that.depth && path.equals(that.path);
+	}
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(path, depth);
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hash(path, depth);
+	}
 
-    @Override
-    public String toString() {
-        return "PreloadedFolder{" +
-               "path='" + path + '\'' +
-               ", depth=" + depth +
-               '}';
-    }
+	@Override
+	public String toString() {
+		return "PreloadedFolder{" +
+			"path='" + path + '\'' +
+			", depth=" + depth +
+			'}';
+	}
 
 }

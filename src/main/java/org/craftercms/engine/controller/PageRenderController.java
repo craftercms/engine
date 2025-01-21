@@ -38,6 +38,7 @@ import org.springframework.web.servlet.mvc.AbstractController;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,176 +56,176 @@ import static org.craftercms.engine.util.GroovyScriptUtils.addControllerScriptVa
  * @author Dejan Brkic
  */
 public class PageRenderController extends AbstractController {
-	
+
 	private static final Log logger = LogFactory.getLog(PageRenderController.class);
 
-    private static final String SCRIPT_URL_FORMAT = "%s.%s.%s"; // {url}.{method}.{scriptExt}
+	private static final String SCRIPT_URL_FORMAT = "%s.%s.%s"; // {url}.{method}.{scriptExt}
 
-    protected String fallbackPageUrl;
-    protected String fallbackMessage;
-    protected ContentStoreService storeService;
-    protected boolean disableVariableRestrictions;
+	protected String fallbackPageUrl;
+	protected String fallbackMessage;
+	protected ContentStoreService storeService;
+	protected boolean disableVariableRestrictions;
 
-    protected PluginService pluginService;
+	protected PluginService pluginService;
 
-    public PageRenderController(String fallbackPageUrl, final ContentStoreService storeService) {
-        this.fallbackPageUrl = fallbackPageUrl;
-        this.storeService = storeService;
-    }
+	public PageRenderController(String fallbackPageUrl, final ContentStoreService storeService) {
+		this.fallbackPageUrl = fallbackPageUrl;
+		this.storeService = storeService;
+	}
 
-    public void setFallbackMessage(String fallbackMessage) {
-        this.fallbackMessage = fallbackMessage;
-    }
+	public void setFallbackMessage(String fallbackMessage) {
+		this.fallbackMessage = fallbackMessage;
+	}
 
-    public void setDisableVariableRestrictions(boolean disableVariableRestrictions) {
-        this.disableVariableRestrictions = disableVariableRestrictions;
-    }
+	public void setDisableVariableRestrictions(boolean disableVariableRestrictions) {
+		this.disableVariableRestrictions = disableVariableRestrictions;
+	}
 
-    public void setPluginService(PluginService pluginService) {
-        this.pluginService = pluginService;
-    }
+	public void setPluginService(PluginService pluginService) {
+		this.pluginService = pluginService;
+	}
 
-    @Override
-    protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
-        throws Exception {
-        String pageUrl;
-        SiteContext siteContext = SiteContext.getCurrent();
+	@Override
+	protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
+		throws Exception {
+		String pageUrl;
+		SiteContext siteContext = SiteContext.getCurrent();
 
-        if (siteContext != null) {
-            if (siteContext.isFallback()) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Rendering fallback page [" + fallbackPageUrl + "]");
-                }
+		if (siteContext != null) {
+			if (siteContext.isFallback()) {
+				if (logger.isDebugEnabled()) {
+					logger.debug("Rendering fallback page [" + fallbackPageUrl + "]");
+				}
 
-                return new ModelAndView(fallbackPageUrl, singletonMap(EMPTY, createResponseMessage(fallbackMessage)),
-                                        HttpStatus.NOT_FOUND);
-            } else {
-                pageUrl = (String)request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-                // Spring 6 set this attribute as an empty string in the case of root directory
-                // it could be a bug while using PathPattern by default:
-                // https://github.com/spring-projects/spring-framework/blob/main/spring-webmvc/src/main/java/org/springframework/web/servlet/handler/AbstractHandlerMapping.java#L583
-                if (pageUrl.isEmpty()) {
-                    pageUrl = "/";
-                } else if (pageUrl == null) {
-                    throw new IllegalStateException(
-                            "Required request attribute '" + HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE +
-                                    "' is not set");
-                }
+				return new ModelAndView(fallbackPageUrl, singletonMap(EMPTY, createResponseMessage(fallbackMessage)),
+					HttpStatus.NOT_FOUND);
+			} else {
+				pageUrl = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+				// Spring 6 set this attribute as an empty string in the case of root directory
+				// it could be a bug while using PathPattern by default:
+				// https://github.com/spring-projects/spring-framework/blob/main/spring-webmvc/src/main/java/org/springframework/web/servlet/handler/AbstractHandlerMapping.java#L583
+				if (pageUrl.isEmpty()) {
+					pageUrl = "/";
+				} else if (pageUrl == null) {
+					throw new IllegalStateException(
+						"Required request attribute '" + HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE +
+							"' is not set");
+				}
 
-                Script controllerScript = getControllerScript(siteContext, request, pageUrl);
-                if (controllerScript != null) {
-                    Map<String, Object> model = new HashMap<>();
-                    Map<String, Object> variables = createScriptVariables(request, response, model);
+				Script controllerScript = getControllerScript(siteContext, request, pageUrl);
+				if (controllerScript != null) {
+					Map<String, Object> model = new HashMap<>();
+					Map<String, Object> variables = createScriptVariables(request, response, model);
 
-                    pluginService.addPluginVariables(controllerScript.getUrl(), variables::put);
+					pluginService.addPluginVariables(controllerScript.getUrl(), variables::put);
 
-                    String viewName = executeScript(controllerScript, variables);
+					String viewName = executeScript(controllerScript, variables);
 
-                    if (StringUtils.isNotEmpty(viewName)) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("Rendering view " + viewName + " returned by script " + controllerScript);
-                        }
+					if (StringUtils.isNotEmpty(viewName)) {
+						if (logger.isDebugEnabled()) {
+							logger.debug("Rendering view " + viewName + " returned by script " + controllerScript);
+						}
 
-                        return new ModelAndView(viewName, model);
-                    } else {
-                        return null;
-                    }
-                }
+						return new ModelAndView(viewName, model);
+					} else {
+						return null;
+					}
+				}
 
-                if (SiteProperties.isSpaEnabled()) {
-                    String viewName = SiteProperties.getSpaViewName();
+				if (SiteProperties.isSpaEnabled()) {
+					String viewName = SiteProperties.getSpaViewName();
 
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("SPA mode enabled. Returning default view: " + viewName);
-                    }
+					if (logger.isDebugEnabled()) {
+						logger.debug("SPA mode enabled. Returning default view: " + viewName);
+					}
 
-                    return new ModelAndView(viewName);
-                }
+					return new ModelAndView(viewName);
+				}
 
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Rendering page [" + pageUrl + "]");
-                }
-            }
-        } else {
-            throw new IllegalStateException("No current site context found");
-        }
+				if (logger.isDebugEnabled()) {
+					logger.debug("Rendering page [" + pageUrl + "]");
+				}
+			}
+		} else {
+			throw new IllegalStateException("No current site context found");
+		}
 
-        return new ModelAndView(pageUrl);
-    }
+		return new ModelAndView(pageUrl);
+	}
 
-    protected Script getControllerScript(SiteContext siteContext, HttpServletRequest request, String pageUrl) {
-        ScriptFactory scriptFactory = siteContext.getScriptFactory();
+	protected Script getControllerScript(SiteContext siteContext, HttpServletRequest request, String pageUrl) {
+		ScriptFactory scriptFactory = siteContext.getScriptFactory();
 
-        if (scriptFactory == null) {
-            throw new IllegalStateException("No script factory associated to current site context '" +
-                                            siteContext.getSiteName() + "'");
-        }
+		if (scriptFactory == null) {
+			throw new IllegalStateException("No script factory associated to current site context '" +
+				siteContext.getSiteName() + "'");
+		}
 
-        String scriptUrl = getScriptUrl(siteContext, scriptFactory, request, pageUrl);
+		String scriptUrl = getScriptUrl(siteContext, scriptFactory, request, pageUrl);
 
-        try {
-            // Check controller script exists
-            if (storeService.exists(siteContext.getContext(), scriptUrl)) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Controller script found for page " + pageUrl + " at " + scriptUrl);
-                }
+		try {
+			// Check controller script exists
+			if (storeService.exists(siteContext.getContext(), scriptUrl)) {
+				if (logger.isDebugEnabled()) {
+					logger.debug("Controller script found for page " + pageUrl + " at " + scriptUrl);
+				}
 
-                return scriptFactory.getScript(scriptUrl);
-            } else if (logger.isDebugEnabled()) {
-                logger.debug("No controller script for page " + pageUrl + " at " + scriptUrl);
-            }
-        } catch (CrafterException e) {
-            logger.error("Error while trying to retrieve controller script at " + scriptUrl, e);
-        }
+				return scriptFactory.getScript(scriptUrl);
+			} else if (logger.isDebugEnabled()) {
+				logger.debug("No controller script for page " + pageUrl + " at " + scriptUrl);
+			}
+		} catch (CrafterException e) {
+			logger.error("Error while trying to retrieve controller script at " + scriptUrl, e);
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    protected String getScriptUrl(SiteContext siteContext, ScriptFactory scriptFactory, HttpServletRequest request,
-                                  String pageUrl) {
-        String method = request.getMethod().toLowerCase();
-        String pageUrlNoExt = FilenameUtils.removeExtension(pageUrl);
-        String controllerScriptsPath = siteContext.getControllerScriptsPath();
+	protected String getScriptUrl(SiteContext siteContext, ScriptFactory scriptFactory, HttpServletRequest request,
+				      String pageUrl) {
+		String method = request.getMethod().toLowerCase();
+		String pageUrlNoExt = FilenameUtils.removeExtension(pageUrl);
+		String controllerScriptsPath = siteContext.getControllerScriptsPath();
 
-        String baseUrl = UrlUtils.concat(controllerScriptsPath, pageUrlNoExt);
+		String baseUrl = UrlUtils.concat(controllerScriptsPath, pageUrlNoExt);
 
-        return String.format(SCRIPT_URL_FORMAT, baseUrl, method, scriptFactory.getScriptFileExtension());
-    }
+		return String.format(SCRIPT_URL_FORMAT, baseUrl, method, scriptFactory.getScriptFileExtension());
+	}
 
-    protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response,
-                                                        Map<String, Object> model) {
-        Map<String, Object> variables = new HashMap<>();
-        addControllerScriptVariables(variables, request, response,
-                disableVariableRestrictions? getServletContext() : null, model);
+	protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response,
+							    Map<String, Object> model) {
+		Map<String, Object> variables = new HashMap<>();
+		addControllerScriptVariables(variables, request, response,
+			disableVariableRestrictions ? getServletContext() : null, model);
 
-        return variables;
-    }
+		return variables;
+	}
 
-    protected String executeScript(Script script, Map<String, Object> scriptVariables)
-        throws Exception {
-        try {
-            Object result = script.execute(scriptVariables);
-            if (result != null) {
-                if (result instanceof String) {
-                    return (String) result;
-                } else {
-                    throw new ScriptException("Expected String view name as return value of controller script " +
-                                              script + ". Actual type of returns value: " +
-                                              result.getClass().getName());
-                }
-            } else {
-                return null;
-            }
-        } catch (Exception e) {
-            logger.error("Error executing controller script at " + script.getUrl(), e);
+	protected String executeScript(Script script, Map<String, Object> scriptVariables)
+		throws Exception {
+		try {
+			Object result = script.execute(scriptVariables);
+			if (result != null) {
+				if (result instanceof String) {
+					return (String) result;
+				} else {
+					throw new ScriptException("Expected String view name as return value of controller script " +
+						script + ". Actual type of returns value: " +
+						result.getClass().getName());
+				}
+			} else {
+				return null;
+			}
+		} catch (Exception e) {
+			logger.error("Error executing controller script at " + script.getUrl(), e);
 
-            Exception cause = (Exception) ExceptionUtils.getThrowableOfType(e, HttpStatusCodeAwareException.class);
-            if (cause != null) {
-                throw cause;
-            } else {
-                throw e;
-            }
-        }
-    }
+			Exception cause = (Exception) ExceptionUtils.getThrowableOfType(e, HttpStatusCodeAwareException.class);
+			if (cause != null) {
+				throw cause;
+			} else {
+				throw e;
+			}
+		}
+	}
 
 }

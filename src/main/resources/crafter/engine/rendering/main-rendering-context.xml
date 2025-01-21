@@ -16,125 +16,125 @@
   -->
 
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:util="http://www.springframework.org/schema/util"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:aop="http://www.springframework.org/schema/aop"
-       xsi:schemaLocation="
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:util="http://www.springframework.org/schema/util"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
 
-    <import resource="classpath:crafter/core/rest-context.xml"/>
-    <import resource="classpath:crafter/engine/rendering/controller-context.xml" />
-    <import resource="classpath:crafter/engine/rendering/view-context.xml" />
+		<import resource="classpath:crafter/core/rest-context.xml"/>
+		<import resource="classpath:crafter/engine/rendering/controller-context.xml"/>
+		<import resource="classpath:crafter/engine/rendering/view-context.xml"/>
 
-    <aop:aspectj-autoproxy proxy-target-class="true"/>
+		<aop:aspectj-autoproxy proxy-target-class="true"/>
 
-    <!-- ////////////////////////////////// -->
-    <!--								 	-->
-    <!--			Properties				-->
-    <!--									-->
-    <!-- ////////////////////////////////// -->
+		<!-- ////////////////////////////////// -->
+		<!--								 	-->
+		<!--			Properties				-->
+		<!--									-->
+		<!-- ////////////////////////////////// -->
 
-    <bean name="crafter.properties" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
-        <property name="order" value="0"/>
-        <property name="locations">
-            <list>
-                <value>classpath:crafter/core/core.properties</value>
-                <value>classpath:crafter/security/security.properties</value>
-                <value>classpath:crafter/engine/server-config.properties</value>
-            </list>
-        </property>
-        <property name="ignoreUnresolvablePlaceholders" value="true"/>
-    </bean>
+		<bean name="crafter.properties" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+				<property name="order" value="0"/>
+				<property name="locations">
+						<list>
+								<value>classpath:crafter/core/core.properties</value>
+								<value>classpath:crafter/security/security.properties</value>
+								<value>classpath:crafter/engine/server-config.properties</value>
+						</list>
+				</property>
+				<property name="ignoreUnresolvablePlaceholders" value="true"/>
+		</bean>
 
-    <!-- Runs after the mode post processors -->
-    <bean class="org.craftercms.commons.spring.ListMergingPostProcessor">
-        <property name="order" value="1000" />
-        <property name="beanName" value="crafter.properties" />
-        <property name="propertyName" value="locations" />
-        <property name="additionalElements">
-            <list>
-                <value>${crafter.engine.extension.base}/overlay-config.properties</value>
-                <value>${crafter.engine.extension.base}/server-config.properties</value>
-            </list>
-        </property>
-    </bean>
+		<!-- Runs after the mode post processors -->
+		<bean class="org.craftercms.commons.spring.ListMergingPostProcessor">
+				<property name="order" value="1000"/>
+				<property name="beanName" value="crafter.properties"/>
+				<property name="propertyName" value="locations"/>
+				<property name="additionalElements">
+						<list>
+								<value>${crafter.engine.extension.base}/overlay-config.properties</value>
+								<value>${crafter.engine.extension.base}/server-config.properties</value>
+						</list>
+				</property>
+		</bean>
 
-    <!--
-    Activates various annotations to be detected in bean classes: Spring's @Required and @Autowired, as well as JSR
-    250's @Resource (if available), JAX-WS's @WebServiceRef (if available), EJB3's @EJB
-    (if available), and JPA's @PersistenceContext and @PersistenceUnit (if available).
-    -->
-    <context:annotation-config/>
+		<!--
+		Activates various annotations to be detected in bean classes: Spring's @Required and @Autowired, as well as JSR
+		250's @Resource (if available), JAX-WS's @WebServiceRef (if available), EJB3's @EJB
+		(if available), and JPA's @PersistenceContext and @PersistenceUnit (if available).
+		-->
+		<context:annotation-config/>
 
-    <!-- Used to overwrite certain <mvc:annotation-driven> configuration -->
-    <bean id="crafter.annotationDrivenConfigCustomizer" class="org.craftercms.engine.util.spring.mvc.AnnotationDrivenConfigCustomizer">
-        <property name="contentNegotiationManager" ref="crafter.contentNegotiationManager"/>
-        <property name="messageConverters" ref="crafter.messageConverters"/>
-        <property name="interceptors" ref="crafter.interceptors"/>
-    </bean>
+		<!-- Used to overwrite certain <mvc:annotation-driven> configuration -->
+		<bean id="crafter.annotationDrivenConfigCustomizer" class="org.craftercms.engine.util.spring.mvc.AnnotationDrivenConfigCustomizer">
+				<property name="contentNegotiationManager" ref="crafter.contentNegotiationManager"/>
+				<property name="messageConverters" ref="crafter.messageConverters"/>
+				<property name="interceptors" ref="crafter.interceptors"/>
+		</bean>
 
-    <bean id="crafter.contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
-        <property name="favorPathExtension" value="true"/>
-        <property name="defaultContentType" value="application/json"/>
-        <property name="mediaTypes">
-            <map>
-                <entry key="xml" value="application/xml"/>
-                <entry key="json" value="application/json"/>
-            </map>
-        </property>
-    </bean>
+		<bean id="crafter.contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+				<property name="favorPathExtension" value="true"/>
+				<property name="defaultContentType" value="application/json"/>
+				<property name="mediaTypes">
+						<map>
+								<entry key="xml" value="application/xml"/>
+								<entry key="json" value="application/json"/>
+						</map>
+				</property>
+		</bean>
 
-    <!-- ////////////////////////////////// -->
-    <!--								 	-->
-    <!--		Message Converters 			-->
-    <!--									-->
-    <!-- ////////////////////////////////// -->
-
-
-    <bean id="crafter.jsonMsgConverter" class="org.craftercms.engine.util.spring.converter.MappingJackson2HttpMessageConverterFactoryBean">
-        <property name="objectMapper" ref="crafter.coreObjectMapper"/>
-    </bean>
-
-    <bean id="crafter.xmlMsgConverter" class="org.springframework.http.converter.xml.MarshallingHttpMessageConverter">
-        <constructor-arg index="0" ref="crafter.xmlMarshaller"/>
-    </bean>
-
-    <!-- Use the default message converters, overwrite if need to specify new message converters -->
-    <util:list id="crafter.messageConverters">
-        <ref bean="crafter.jsonMsgConverter"/>
-        <ref bean="crafter.xmlMsgConverter"/>
-    </util:list>
-
-    <!-- ////////////////////////////////// -->
-    <!--								 	-->
-    <!--			 Locale 				-->
-    <!--									-->
-    <!-- ////////////////////////////////// -->
+		<!-- ////////////////////////////////// -->
+		<!--								 	-->
+		<!--		Message Converters 			-->
+		<!--									-->
+		<!-- ////////////////////////////////// -->
 
 
-    <bean id="crafter.localeChangeInterceptor" class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
-        <property name="paramName" value="locale"/>
-    </bean>
+		<bean id="crafter.jsonMsgConverter" class="org.craftercms.engine.util.spring.converter.MappingJackson2HttpMessageConverterFactoryBean">
+				<property name="objectMapper" ref="crafter.coreObjectMapper"/>
+		</bean>
 
-    <util:list id="crafter.interceptors">
-        <ref bean="crafter.localeChangeInterceptor"/>
-    </util:list>
+		<bean id="crafter.xmlMsgConverter" class="org.springframework.http.converter.xml.MarshallingHttpMessageConverter">
+				<constructor-arg index="0" ref="crafter.xmlMarshaller"/>
+		</bean>
 
-    <!-- This needs to be named localeResolver so that the DispatcherServlet can find it -->
-    <bean id="localeResolver" class="org.craftercms.engine.util.spring.servlet.i18n.DelegatingLocaleResolver">
-        <constructor-arg name="defaultLocaleResolver">
-            <!-- The standalone resolver used when there is no translation config -->
-            <bean class="org.craftercms.engine.targeting.impl.ConfigAwareCookieLocaleResolver">
-                <property name="cookieName" value="${crafter.engine.locale.cookie.name}"/>
-            </bean>
-        </constructor-arg>
-    </bean>
+		<!-- Use the default message converters, overwrite if need to specify new message converters -->
+		<util:list id="crafter.messageConverters">
+				<ref bean="crafter.jsonMsgConverter"/>
+				<ref bean="crafter.xmlMsgConverter"/>
+		</util:list>
 
-    <import resource="${crafter.engine.extension.base}/rendering-overlay-context.xml"/>
-    <import resource="${crafter.engine.extension.base}/rendering-context.xml"/>
+		<!-- ////////////////////////////////// -->
+		<!--								 	-->
+		<!--			 Locale 				-->
+		<!--									-->
+		<!-- ////////////////////////////////// -->
+
+
+		<bean id="crafter.localeChangeInterceptor" class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
+				<property name="paramName" value="locale"/>
+		</bean>
+
+		<util:list id="crafter.interceptors">
+				<ref bean="crafter.localeChangeInterceptor"/>
+		</util:list>
+
+		<!-- This needs to be named localeResolver so that the DispatcherServlet can find it -->
+		<bean id="localeResolver" class="org.craftercms.engine.util.spring.servlet.i18n.DelegatingLocaleResolver">
+				<constructor-arg name="defaultLocaleResolver">
+						<!-- The standalone resolver used when there is no translation config -->
+						<bean class="org.craftercms.engine.targeting.impl.ConfigAwareCookieLocaleResolver">
+								<property name="cookieName" value="${crafter.engine.locale.cookie.name}"/>
+						</bean>
+				</constructor-arg>
+		</bean>
+
+		<import resource="${crafter.engine.extension.base}/rendering-overlay-context.xml"/>
+		<import resource="${crafter.engine.extension.base}/rendering-context.xml"/>
 
 </beans>

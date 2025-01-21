@@ -28,40 +28,40 @@ import static freemarker.template.utility.Collections12.singletonList;
  */
 public class SiteContextHashModel implements TemplateHashModelEx {
 
-    public static final String SITE_NAME_KEY = "siteName";
+	public static final String SITE_NAME_KEY = "siteName";
 
-    protected ObjectWrapper objectWrapper;
+	protected ObjectWrapper objectWrapper;
 
-    public SiteContextHashModel(ObjectWrapper objectWrapper) {
-        this.objectWrapper = objectWrapper;
-    }
+	public SiteContextHashModel(ObjectWrapper objectWrapper) {
+		this.objectWrapper = objectWrapper;
+	}
 
-    @Override
-    public int size() throws TemplateModelException {
-        return 1;
-    }
+	@Override
+	public int size() throws TemplateModelException {
+		return 1;
+	}
 
-    @Override
-    public TemplateCollectionModel keys() throws TemplateModelException {
-        return new SimpleCollection(singletonList(SITE_NAME_KEY), objectWrapper);
-    }
+	@Override
+	public TemplateCollectionModel keys() throws TemplateModelException {
+		return new SimpleCollection(singletonList(SITE_NAME_KEY), objectWrapper);
+	}
 
-    @Override
-    public TemplateCollectionModel values() throws TemplateModelException {
-        return new SimpleCollection(singletonList(SiteContext.getCurrent().getSiteName()), objectWrapper);
-    }
+	@Override
+	public TemplateCollectionModel values() throws TemplateModelException {
+		return new SimpleCollection(singletonList(SiteContext.getCurrent().getSiteName()), objectWrapper);
+	}
 
-    @Override
-    public TemplateModel get(String key) throws TemplateModelException {
-        if (SITE_NAME_KEY.equals(key)) {
-            return objectWrapper.wrap(SiteContext.getCurrent().getSiteName());
-        }
-        return objectWrapper.wrap(null);
-    }
+	@Override
+	public TemplateModel get(String key) throws TemplateModelException {
+		if (SITE_NAME_KEY.equals(key)) {
+			return objectWrapper.wrap(SiteContext.getCurrent().getSiteName());
+		}
+		return objectWrapper.wrap(null);
+	}
 
-    @Override
-    public boolean isEmpty() {
-        return false;
-    }
+	@Override
+	public boolean isEmpty() {
+		return false;
+	}
 
 }

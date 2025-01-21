@@ -30,6 +30,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import jakarta.servlet.http.HttpServletRequest;
+
 import java.beans.ConstructorProperties;
 import java.util.*;
 import java.util.stream.Stream;
@@ -52,204 +53,203 @@ import static org.craftercms.engine.util.SecurityUtils.*;
  */
 public class SiteAwareOpenSearchClient extends AbstractOpenSearchClientWrapper {
 
-    private static final String DEFAULT_ROLE_FIELD_NAME = "authorizedRoles.item.role";
+	private static final String DEFAULT_ROLE_FIELD_NAME = "authorizedRoles.item.role";
 
-    private static final String DEFAULT_LOCALES_PARAM_NAME = "locales";
+	private static final String DEFAULT_LOCALES_PARAM_NAME = "locales";
 
-    private static final String DEFAULT_FALLBACK_PARAM_NAME = "localeFallback";
+	private static final String DEFAULT_FALLBACK_PARAM_NAME = "localeFallback";
 
-    /**
-     * Format used to build the index id
-     */
-    protected String indexIdFormat;
+	/**
+	 * Format used to build the index id
+	 */
+	protected String indexIdFormat;
 
-    protected String roleFieldName = DEFAULT_ROLE_FIELD_NAME;
+	protected String roleFieldName = DEFAULT_ROLE_FIELD_NAME;
 
-    protected String localesParameterName = DEFAULT_LOCALES_PARAM_NAME;
+	protected String localesParameterName = DEFAULT_LOCALES_PARAM_NAME;
 
-    protected String fallbackParameterName = DEFAULT_FALLBACK_PARAM_NAME;
+	protected String fallbackParameterName = DEFAULT_FALLBACK_PARAM_NAME;
 
-    protected final boolean enableTranslation;
+	protected final boolean enableTranslation;
 
-    @ConstructorProperties({"client", "indexIdFormat", "enableTranslation"})
-    public SiteAwareOpenSearchClient(OpenSearchClient client, String indexIdFormat, boolean enableTranslation) {
-        super(client);
-        this.indexIdFormat = indexIdFormat;
-        this.enableTranslation = enableTranslation;
-    }
+	@ConstructorProperties({"client", "indexIdFormat", "enableTranslation"})
+	public SiteAwareOpenSearchClient(OpenSearchClient client, String indexIdFormat, boolean enableTranslation) {
+		super(client);
+		this.indexIdFormat = indexIdFormat;
+		this.enableTranslation = enableTranslation;
+	}
 
-    public void setRoleFieldName(final String roleFieldName) {
-        this.roleFieldName = roleFieldName;
-    }
+	public void setRoleFieldName(final String roleFieldName) {
+		this.roleFieldName = roleFieldName;
+	}
 
-    public void setLocalesParameterName(String localesParameterName) {
-        this.localesParameterName = localesParameterName;
-    }
+	public void setLocalesParameterName(String localesParameterName) {
+		this.localesParameterName = localesParameterName;
+	}
 
-    public void setFallbackParameterName(String fallbackParameterName) {
-        this.fallbackParameterName = fallbackParameterName;
-    }
+	public void setFallbackParameterName(String fallbackParameterName) {
+		this.fallbackParameterName = fallbackParameterName;
+	}
 
-    protected List<Locale> getLocales() {
-        if (!(enableTranslation && isTranslationEnabled())) {
-            return emptyList();
-        }
-        SetUniqueList<Locale> locales = setUniqueList(new LinkedList<>());
-        RequestContext requestContext = RequestContext.getCurrent();
-        String useFallback = null;
-        if (requestContext != null) {
-            HttpServletRequest httpRequest = requestContext.getRequest();
-            String requestedLocales = httpRequest.getParameter(localesParameterName);
-            useFallback = httpRequest.getParameter(fallbackParameterName);
-            if (StringUtils.isNotEmpty(requestedLocales)) {
-                // split the locales and add all compatible versions to the list
-                Stream.of(requestedLocales.split(","))
-                        .map(LocaleUtils::parseLocale)
-                        .map(LocaleUtils::getCompatibleLocales)
-                        .forEach(locales::addAll);
-            }
-        }
-        // if no locales are requested then use the current
-        if (locales.isEmpty()) {
-            locales.addAll(getCompatibleLocales(getCurrentLocale()));
-        }
-        // if fallback is requested then include the default locale too
-        if (StringUtils.isNotEmpty(useFallback) && Boolean.parseBoolean(useFallback)) {
-            locales.addAll(getCompatibleLocales(getDefaultLocale()));
-        }
-        return locales;
-    }
+	protected List<Locale> getLocales() {
+		if (!(enableTranslation && isTranslationEnabled())) {
+			return emptyList();
+		}
+		SetUniqueList<Locale> locales = setUniqueList(new LinkedList<>());
+		RequestContext requestContext = RequestContext.getCurrent();
+		String useFallback = null;
+		if (requestContext != null) {
+			HttpServletRequest httpRequest = requestContext.getRequest();
+			String requestedLocales = httpRequest.getParameter(localesParameterName);
+			useFallback = httpRequest.getParameter(fallbackParameterName);
+			if (StringUtils.isNotEmpty(requestedLocales)) {
+				// split the locales and add all compatible versions to the list
+				Stream.of(requestedLocales.split(","))
+					.map(LocaleUtils::parseLocale)
+					.map(LocaleUtils::getCompatibleLocales)
+					.forEach(locales::addAll);
+			}
+		}
+		// if no locales are requested then use the current
+		if (locales.isEmpty()) {
+			locales.addAll(getCompatibleLocales(getCurrentLocale()));
+		}
+		// if fallback is requested then include the default locale too
+		if (StringUtils.isNotEmpty(useFallback) && Boolean.parseBoolean(useFallback)) {
+			locales.addAll(getCompatibleLocales(getDefaultLocale()));
+		}
+		return locales;
+	}
 
-    protected String addPrefix(SiteContext siteContext, String name) {
-        return String.format("%s_%s", siteContext.getSiteName(), name);
-    }
+	protected String addPrefix(SiteContext siteContext, String name) {
+		return String.format("%s_%s", siteContext.getSiteName(), name);
+	}
 
-    @Override
-    protected void updateIndex(SearchRequest request, Map<String, Object> parameters, RequestUpdates updates) {
-        // Call the parent to support custom index search
-        super.updateIndex(request, parameters, updates);
+	@Override
+	protected void updateIndex(SearchRequest request, Map<String, Object> parameters, RequestUpdates updates) {
+		// Call the parent to support custom index search
+		super.updateIndex(request, parameters, updates);
 
-        SiteContext siteContext = SiteContext.getCurrent();
-        if (siteContext == null) {
-            throw new IllegalStateException("Current site context not found");
-        }
+		SiteContext siteContext = SiteContext.getCurrent();
+		if (siteContext == null) {
+			throw new IllegalStateException("Current site context not found");
+		}
 
-        // Generate the default alias for the current site
-        String aliasName = String.format(indexIdFormat, siteContext.getSiteName());
-        // Get the requested indices
-        List<String> currentIndices = updates.getIndex();
+		// Generate the default alias for the current site
+		String aliasName = String.format(indexIdFormat, siteContext.getSiteName());
+		// Get the requested indices
+		List<String> currentIndices = updates.getIndex();
 
-        // list of aliases to query
-        var aliases = new LinkedList<String>();
-        var locales = getLocales();
+		// list of aliases to query
+		var aliases = new LinkedList<String>();
+		var locales = getLocales();
 
-        if (!locales.isEmpty()) {
-            locales.stream()
-                    .map(locale -> appendLocale(aliasName, locale))
-                    .forEach(aliases::add);
-        }
+		if (!locales.isEmpty()) {
+			locales.stream()
+				.map(locale -> appendLocale(aliasName, locale))
+				.forEach(aliases::add);
+		}
 
-        // the original alias will always be included for backward compatibility
-        aliases.add(aliasName);
+		// the original alias will always be included for backward compatibility
+		aliases.add(aliasName);
 
-        List<Map<String, Double>> boosting = new LinkedList<>();
+		List<Map<String, Double>> boosting = new LinkedList<>();
 
-        if (isNotEmpty(currentIndices)) {
-            // Add the site name prefix for all indices
-            currentIndices.stream().map(index -> addPrefix(siteContext, index)).forEach(aliases::add);
+		if (isNotEmpty(currentIndices)) {
+			// Add the site name prefix for all indices
+			currentIndices.stream().map(index -> addPrefix(siteContext, index)).forEach(aliases::add);
 
-            // Add the site name prefix for the boosting if needed
-            List<Map<String, Double>> existingBoosting = request.indicesBoost();
-            if (isNotEmpty(existingBoosting)) {
-                existingBoosting.stream()
-                                .map(boost -> boost.entrySet().stream()
-                                        .collect(toMap(entry -> addPrefix(siteContext, entry.getKey()),
-                                                       Map.Entry::getValue)))
-                                .forEach(boosting::add);
-            }
-        }
+			// Add the site name prefix for the boosting if needed
+			List<Map<String, Double>> existingBoosting = request.indicesBoost();
+			if (isNotEmpty(existingBoosting)) {
+				existingBoosting.stream()
+					.map(boost -> boost.entrySet().stream()
+						.collect(toMap(entry -> addPrefix(siteContext, entry.getKey()),
+							Map.Entry::getValue)))
+					.forEach(boosting::add);
+			}
+		}
 
-        logger.debug("Executing query for aliases: {}", aliases);
+		logger.debug("Executing query for aliases: {}", aliases);
 
-        // Override the indices field in the request
-        updates.setIndex(aliases);
+		// Override the indices field in the request
+		updates.setIndex(aliases);
 
-        if (aliases.size() > 1) {
-            // Boost the results based on the index
-            var boost = 1d;
-            var iterator = aliases.listIterator(aliases.size());
-            while (iterator.hasPrevious()) {
-                boosting.add(Map.of(iterator.previous(), boost));
-                // TODO: Make this value configurable per site
-                boost += 0.05;
-            }
-            updates.setIndicesBoost(boosting);
+		if (aliases.size() > 1) {
+			// Boost the results based on the index
+			var boost = 1d;
+			var iterator = aliases.listIterator(aliases.size());
+			while (iterator.hasPrevious()) {
+				boosting.add(Map.of(iterator.previous(), boost));
+				// TODO: Make this value configurable per site
+				boost += 0.05;
+			}
+			updates.setIndicesBoost(boosting);
 
-            // Don't fail if one of the indices doesn't exist
-            updates.setIgnoreUnavailable(true);
+			// Don't fail if one of the indices doesn't exist
+			updates.setIgnoreUnavailable(true);
 
-            // Fix scores across multiple indices
-            updates.setSearchType(SearchType.DfsQueryThenFetch);
-        }
-    }
+			// Fix scores across multiple indices
+			updates.setSearchType(SearchType.DfsQueryThenFetch);
+		}
+	}
 
-    @Override
-    protected void updateQuery(SearchRequest request, Map<String, Object> parameters, RequestUpdates updates) {
-        super.updateQuery(request, parameters, updates);
+	@Override
+	protected void updateQuery(SearchRequest request, Map<String, Object> parameters, RequestUpdates updates) {
+		super.updateQuery(request, parameters, updates);
 
-        // Use the updated if it exists
-        BoolQuery mainQuery = Optional.ofNullable(updates.getQuery()).orElse(request.query()).bool();
+		// Use the updated if it exists
+		BoolQuery mainQuery = Optional.ofNullable(updates.getQuery()).orElse(request.query()).bool();
 
-        Authentication auth = SecurityContextHolder.getContext() != null?
-                                SecurityContextHolder.getContext().getAuthentication() : null;
+		Authentication auth = SecurityContextHolder.getContext() != null ?
+			SecurityContextHolder.getContext().getAuthentication() : null;
 
 
+		// Include all public items
+		BoolQuery.Builder securityQuery = new BoolQuery.Builder()
+			.should(s -> s
+				.bool(b -> b
+					.mustNot(n -> n
+						.exists(e -> e
+							.field(roleFieldName)
+						)
+					)
+				)
+			)
+			.should(s -> s
+				.match(m -> m
+					.field(roleFieldName)
+					.query(q -> q
+						.stringValue(ANONYMOUS_PSEUDO_ROLE_SEARCH_VALUE)
+					)
+				)
+			);
 
-        // Include all public items
-        BoolQuery.Builder securityQuery = new BoolQuery.Builder()
-            .should(s -> s
-                .bool(b -> b
-                    .mustNot(n -> n
-                        .exists(e -> e
-                            .field(roleFieldName)
-                        )
-                    )
-                )
-            )
-            .should(s -> s
-                .match(m -> m
-                    .field(roleFieldName)
-                    .query(q -> q
-                        .stringValue(ANONYMOUS_PSEUDO_ROLE_SEARCH_VALUE)
-                    )
-                )
-            );
-
-        if (auth != null && !(auth instanceof AnonymousAuthenticationToken)) {
-            logger.debug("Filtering search results for authenticated users");
-            securityQuery.should(s -> s
-                    .match(m -> m
-                            .field(roleFieldName)
-                            .query(q -> q.stringValue(AUTHENTICATED_PSEUDO_ROLE_SEARCH_VALUE))
-                    ));
-            if (isNotEmpty(auth.getAuthorities())) {
-                logger.debug("Filtering search results for roles: {}", auth.getAuthorities());
-                securityQuery.should(s -> s
-                        .match(m -> m
-                                .field(roleFieldName)
-                                .query(q -> q.stringValue(getAuthorizedRolesMatchValue(auth.getAuthorities()))
-                                )
-                        ));
-            }
-        } else {
-            logger.debug("Filtering search to show only public items");
-        }
-        updates.setQuery(q -> q
-            .bool(b -> b
-                .must(mainQuery._toQuery())
-                .filter(securityQuery.build()._toQuery())
-            )
-        );
-    }
+		if (auth != null && !(auth instanceof AnonymousAuthenticationToken)) {
+			logger.debug("Filtering search results for authenticated users");
+			securityQuery.should(s -> s
+				.match(m -> m
+					.field(roleFieldName)
+					.query(q -> q.stringValue(AUTHENTICATED_PSEUDO_ROLE_SEARCH_VALUE))
+				));
+			if (isNotEmpty(auth.getAuthorities())) {
+				logger.debug("Filtering search results for roles: {}", auth.getAuthorities());
+				securityQuery.should(s -> s
+					.match(m -> m
+						.field(roleFieldName)
+						.query(q -> q.stringValue(getAuthorizedRolesMatchValue(auth.getAuthorities()))
+						)
+					));
+			}
+		} else {
+			logger.debug("Filtering search to show only public items");
+		}
+		updates.setQuery(q -> q
+			.bool(b -> b
+				.must(mainQuery._toQuery())
+				.filter(securityQuery.build()._toQuery())
+			)
+		);
+	}
 
 }

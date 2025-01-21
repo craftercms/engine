@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+
 import jakarta.servlet.http.HttpServletRequest;
 
 import freemarker.core.Environment;
@@ -34,74 +35,74 @@ import org.craftercms.commons.http.RequestContext;
  */
 public class CrafterTemplateExceptionHandler implements TemplateExceptionHandler {
 
-    public static final String FREEMARKER_CURRENT_ERROR_ID_ATTRIBUTE = "freemarkerCurrentErrorId";
+	public static final String FREEMARKER_CURRENT_ERROR_ID_ATTRIBUTE = "freemarkerCurrentErrorId";
 
-    public static final String ERROR_FORMAT =
-        "<script type='text/javascript'>" +
-            "function showError{errorId}() {" +
-                "document.getElementById('error{errorId}').style.display = 'block';" +
-                "document.getElementById('toggleError{errorId}Btn').innerHTML = 'Hide error';" +
-            "}" +
-            "function hideError{errorId}() {" +
-                "document.getElementById('error{errorId}').style.display = 'none';" +
-                "document.getElementById('toggleError{errorId}Btn').innerHTML = 'Show error';" +
-            "}" +
-            "function toggleError{errorId}() {" +
-                "if (document.getElementById('error{errorId}').style.display == 'none') {" +
-                    "showError{errorId}();" +
-                "} else {" +
-                    "hideError{errorId}();" +
-                "}" +
-            "}" +
-        "</script>" +
-        "<a id='toggleError{errorId}Btn' onclick='toggleError{errorId}()' style='color: red; font-size: 14px; " +
-                "font-family: Arial, Helvetica, sans-serif; font-style: normal; font-variant: normal; font-weight: normal; " +
-                "text-decoration: underline; text-transform: none; cursor: pointer'>Show error</a>" +
-        "<div id='error{errorId}' style='display: none;'><pre>${error}</pre></div>";
+	public static final String ERROR_FORMAT =
+		"<script type='text/javascript'>" +
+			"function showError{errorId}() {" +
+			"document.getElementById('error{errorId}').style.display = 'block';" +
+			"document.getElementById('toggleError{errorId}Btn').innerHTML = 'Hide error';" +
+			"}" +
+			"function hideError{errorId}() {" +
+			"document.getElementById('error{errorId}').style.display = 'none';" +
+			"document.getElementById('toggleError{errorId}Btn').innerHTML = 'Show error';" +
+			"}" +
+			"function toggleError{errorId}() {" +
+			"if (document.getElementById('error{errorId}').style.display == 'none') {" +
+			"showError{errorId}();" +
+			"} else {" +
+			"hideError{errorId}();" +
+			"}" +
+			"}" +
+			"</script>" +
+			"<a id='toggleError{errorId}Btn' onclick='toggleError{errorId}()' style='color: red; font-size: 14px; " +
+			"font-family: Arial, Helvetica, sans-serif; font-style: normal; font-variant: normal; font-weight: normal; " +
+			"text-decoration: underline; text-transform: none; cursor: pointer'>Show error</a>" +
+			"<div id='error{errorId}' style='display: none;'><pre>${error}</pre></div>";
 
-    private boolean displayTemplateExceptionsInView;
+	private boolean displayTemplateExceptionsInView;
 
-    public CrafterTemplateExceptionHandler(boolean displayTemplateExceptionsInView) {
-        this.displayTemplateExceptionsInView = displayTemplateExceptionsInView;
-    }
+	public CrafterTemplateExceptionHandler(boolean displayTemplateExceptionsInView) {
+		this.displayTemplateExceptionsInView = displayTemplateExceptionsInView;
+	}
 
-    @Override
-    public void handleTemplateException(TemplateException te, Environment env, Writer out) throws TemplateException {
-        if (displayTemplateExceptionsInView) {
-            String error = ERROR_FORMAT.replace("{errorId}", createErrorId());
-            error = error.replace("{error}", getExceptionStackTrace(te));
+	@Override
+	public void handleTemplateException(TemplateException te, Environment env, Writer out) throws TemplateException {
+		if (displayTemplateExceptionsInView) {
+			String error = ERROR_FORMAT.replace("{errorId}", createErrorId());
+			error = error.replace("{error}", getExceptionStackTrace(te));
 
-            try {
-                out.write(error);
-            } catch (IOException e) {
-                throw new TemplateException("Failed to print error. Cause: " + e, env);
-            }
-        }
-    }
+			try {
+				out.write(error);
+			} catch (IOException e) {
+				throw new TemplateException("Failed to print error. Cause: " + e, env);
+			}
+		}
+	}
 
-    protected String getExceptionStackTrace(TemplateException te) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
+	protected String getExceptionStackTrace(TemplateException te) {
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
 
-        te.printStackTrace(pw);
-        pw.flush();
+		te.printStackTrace(pw);
+		pw.flush();
 
-        return sw.toString();
-    }
+		return sw.toString();
+	}
 
-    protected String createErrorId() {
-        HttpServletRequest request = RequestContext.getCurrent().getRequest();
-        Integer currentErrorId = (Integer)request.getAttribute(FREEMARKER_CURRENT_ERROR_ID_ATTRIBUTE);
+	protected String createErrorId() {
+		HttpServletRequest request = RequestContext.getCurrent().getRequest();
+		Integer currentErrorId = (Integer) request.getAttribute(FREEMARKER_CURRENT_ERROR_ID_ATTRIBUTE);
 
-        if (currentErrorId == null) {
-            currentErrorId = 1;
-        } else {
-            currentErrorId++;
-        }
+		if (currentErrorId == null) {
+			currentErrorId = 1;
+		} else {
+			currentErrorId++;
+		}
 
-        request.setAttribute(FREEMARKER_CURRENT_ERROR_ID_ATTRIBUTE, currentErrorId);
+		request.setAttribute(FREEMARKER_CURRENT_ERROR_ID_ATTRIBUTE, currentErrorId);
 
-        return currentErrorId.toString();
-    }
+		return currentErrorId.toString();
+	}
 
 }

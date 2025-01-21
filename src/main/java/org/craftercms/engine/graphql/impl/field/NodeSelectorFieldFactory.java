@@ -43,83 +43,84 @@ import static org.craftercms.engine.graphql.SchemaUtils.getGraphQLName;
 
 /**
  * Implementation of {@link GraphQLFieldFactory} that handles node-selector fields
+ *
  * @author joseross
  * @since 3.1
  */
 public class NodeSelectorFieldFactory implements GraphQLFieldFactory {
 
-    private static final Logger logger = LoggerFactory.getLogger(NodeSelectorFieldFactory.class);
+	private static final Logger logger = LoggerFactory.getLogger(NodeSelectorFieldFactory.class);
 
-    protected String disableFlatteningXPath;
-    protected String datasourceNameXPath;
-    protected String datasourceItemTypeXPathFormat;
+	protected String disableFlatteningXPath;
+	protected String datasourceNameXPath;
+	protected String datasourceItemTypeXPathFormat;
 
-    public NodeSelectorFieldFactory(String disableFlatteningXPath, final String datasourceNameXPath, String datasourceItemTypeXPathFormat) {
-        this.disableFlatteningXPath = disableFlatteningXPath;
-        this.datasourceNameXPath = datasourceNameXPath;
-        this.datasourceItemTypeXPathFormat = datasourceItemTypeXPathFormat;
-    }
+	public NodeSelectorFieldFactory(String disableFlatteningXPath, final String datasourceNameXPath, String datasourceItemTypeXPathFormat) {
+		this.disableFlatteningXPath = disableFlatteningXPath;
+		this.datasourceNameXPath = datasourceNameXPath;
+		this.datasourceItemTypeXPathFormat = datasourceItemTypeXPathFormat;
+	}
 
-    @Override
-    public void createField(final Document contentTypeDefinition, final Node contentTypeField,
-                            final String contentTypeFieldId, final String parentGraphQLTypeName,
-                            final GraphQLObjectType.Builder parentGraphQLType, final String graphQLFieldName,
-                            final GraphQLFieldDefinition.Builder graphQLField) {
-        boolean disableFlattening = BooleanUtils.toBoolean(
-                XmlUtils.selectSingleNodeValue(contentTypeField, disableFlatteningXPath));
+	@Override
+	public void createField(final Document contentTypeDefinition, final Node contentTypeField,
+				final String contentTypeFieldId, final String parentGraphQLTypeName,
+				final GraphQLObjectType.Builder parentGraphQLType, final String graphQLFieldName,
+				final GraphQLFieldDefinition.Builder graphQLField) {
+		boolean disableFlattening = BooleanUtils.toBoolean(
+			XmlUtils.selectSingleNodeValue(contentTypeField, disableFlatteningXPath));
 
-        if (disableFlattening) {
-            // Flattening is disabled, so use the generic item include type
-            logger.debug("Flattening is disabled for node selector '{}'. Won't generate additional schema " +
-                "types and fields for its items", graphQLFieldName);
+		if (disableFlattening) {
+			// Flattening is disabled, so use the generic item include type
+			logger.debug("Flattening is disabled for node selector '{}'. Won't generate additional schema " +
+				"types and fields for its items", graphQLFieldName);
 
-            graphQLField.type(ITEM_INCLUDE_WRAPPER_TYPE);
-            return;
-        }
+			graphQLField.type(ITEM_INCLUDE_WRAPPER_TYPE);
+			return;
+		}
 
-        String datasourceName = XmlUtils.selectSingleNodeValue(contentTypeField, datasourceNameXPath);
-        String itemType = XmlUtils.selectSingleNodeValue(
-            contentTypeDefinition, String.format(datasourceItemTypeXPathFormat, datasourceName));
-        String itemGraphQLType = StringUtils.isNotEmpty(itemType)? getGraphQLName(itemType) : null;
+		String datasourceName = XmlUtils.selectSingleNodeValue(contentTypeField, datasourceNameXPath);
+		String itemType = XmlUtils.selectSingleNodeValue(
+			contentTypeDefinition, String.format(datasourceItemTypeXPathFormat, datasourceName));
+		String itemGraphQLType = StringUtils.isNotEmpty(itemType) ? getGraphQLName(itemType) : null;
 
-        if (StringUtils.isEmpty(itemGraphQLType)) {
-            // If there is no item content-type set in the datasource, use the generic item include type
-            logger.debug("No specific item type found for node selector '{}'. Won't generate additional schema " +
-                "types and fields for its items", graphQLFieldName);
+		if (StringUtils.isEmpty(itemGraphQLType)) {
+			// If there is no item content-type set in the datasource, use the generic item include type
+			logger.debug("No specific item type found for node selector '{}'. Won't generate additional schema " +
+				"types and fields for its items", graphQLFieldName);
 
-            graphQLField.type(CONTENT_INCLUDE_WRAPPER_TYPE);
-        } else {
-            // If there is an item content-type, then create a specific GraphQL type for it
-            logger.debug("Item type found for node selector '{}': '{}'. Generating additional schema types and " +
-                "fields for the items...", itemGraphQLType, graphQLFieldName);
+			graphQLField.type(CONTENT_INCLUDE_WRAPPER_TYPE);
+		} else {
+			// If there is an item content-type, then create a specific GraphQL type for it
+			logger.debug("Item type found for node selector '{}': '{}'. Generating additional schema types and " +
+				"fields for the items...", itemGraphQLType, graphQLFieldName);
 
-            GraphQLObjectType flattenedType = GraphQLObjectType.newObject()
-                .name(parentGraphQLTypeName + FIELD_SEPARATOR + graphQLFieldName + "_flattened_item")
-                .description("Contains the data from another item in the site")
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                    .name(FIELD_NAME_VALUE)
-                    .description("The name of the item")
-                    .type(nonNull(GraphQLString)))
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                    .name(FIELD_NAME_KEY)
-                    .description("The path of the item")
-                    .type(nonNull(GraphQLString)))
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                    .name(FIELD_NAME_COMPONENT)
-                    .description("The content of the item")
-                    .type(GraphQLTypeReference.typeRef(itemGraphQLType)))
-                .build();
+			GraphQLObjectType flattenedType = GraphQLObjectType.newObject()
+				.name(parentGraphQLTypeName + FIELD_SEPARATOR + graphQLFieldName + "_flattened_item")
+				.description("Contains the data from another item in the site")
+				.field(GraphQLFieldDefinition.newFieldDefinition()
+					.name(FIELD_NAME_VALUE)
+					.description("The name of the item")
+					.type(nonNull(GraphQLString)))
+				.field(GraphQLFieldDefinition.newFieldDefinition()
+					.name(FIELD_NAME_KEY)
+					.description("The path of the item")
+					.type(nonNull(GraphQLString)))
+				.field(GraphQLFieldDefinition.newFieldDefinition()
+					.name(FIELD_NAME_COMPONENT)
+					.description("The content of the item")
+					.type(GraphQLTypeReference.typeRef(itemGraphQLType)))
+				.build();
 
-            GraphQLObjectType wrapperType = GraphQLObjectType.newObject()
-                .name(parentGraphQLTypeName + FIELD_SEPARATOR + graphQLFieldName + FIELD_SUFFIX_ITEMS)
-                .description("Wrapper for flattened items")
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                    .name(FIELD_NAME_ITEM)
-                    .description("List of flattened items")
-                    .type(list(nonNull(flattenedType))))
-                .build();
+			GraphQLObjectType wrapperType = GraphQLObjectType.newObject()
+				.name(parentGraphQLTypeName + FIELD_SEPARATOR + graphQLFieldName + FIELD_SUFFIX_ITEMS)
+				.description("Wrapper for flattened items")
+				.field(GraphQLFieldDefinition.newFieldDefinition()
+					.name(FIELD_NAME_ITEM)
+					.description("List of flattened items")
+					.type(list(nonNull(flattenedType))))
+				.build();
 
-            graphQLField.type(wrapperType);
-        }
-    }
+			graphQLField.type(wrapperType);
+		}
+	}
 }

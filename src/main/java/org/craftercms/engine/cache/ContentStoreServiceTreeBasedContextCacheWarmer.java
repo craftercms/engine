@@ -36,56 +36,56 @@ import java.util.concurrent.TimeUnit;
  */
 public class ContentStoreServiceTreeBasedContextCacheWarmer implements ContextCacheWarmer {
 
-    private static final Logger logger = LoggerFactory.getLogger(ContentStoreServiceTreeBasedContextCacheWarmer.class);
+	private static final Logger logger = LoggerFactory.getLogger(ContentStoreServiceTreeBasedContextCacheWarmer.class);
 
-    protected boolean warmUpEnabled;
-    protected ContentStoreService contentStoreService;
-    protected Map<String, Integer> descriptorPreloadFolders;
+	protected boolean warmUpEnabled;
+	protected ContentStoreService contentStoreService;
+	protected Map<String, Integer> descriptorPreloadFolders;
 
-    public ContentStoreServiceTreeBasedContextCacheWarmer(boolean warmUpEnabled, ContentStoreService contentStoreService,
-                                                          String[] descriptorPreloadFolders) {
-        this.warmUpEnabled = warmUpEnabled;
-        this.contentStoreService = contentStoreService;
+	public ContentStoreServiceTreeBasedContextCacheWarmer(boolean warmUpEnabled, ContentStoreService contentStoreService,
+							      String[] descriptorPreloadFolders) {
+		this.warmUpEnabled = warmUpEnabled;
+		this.contentStoreService = contentStoreService;
 
-        // Sets the list of descriptor folder trees to preload in the cache. Each folder can have it's depth specified
-        // after a colon, like {@code PATH:DEPTH}
-        this.descriptorPreloadFolders = CacheUtils.parsePreloadFoldersList(descriptorPreloadFolders);
-    }
+		// Sets the list of descriptor folder trees to preload in the cache. Each folder can have it's depth specified
+		// after a colon, like {@code PATH:DEPTH}
+		this.descriptorPreloadFolders = CacheUtils.parsePreloadFoldersList(descriptorPreloadFolders);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void warmUpCache(Context context) {
-        for (Map.Entry<String, Integer> entry : getDescriptorPreloadFolders().entrySet()) {
-            String treeRoot = entry.getKey();
-            int depth = entry.getValue();
-            StopWatch stopWatch = new StopWatch();
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void warmUpCache(Context context) {
+		for (Map.Entry<String, Integer> entry : getDescriptorPreloadFolders().entrySet()) {
+			String treeRoot = entry.getKey();
+			int depth = entry.getValue();
+			StopWatch stopWatch = new StopWatch();
 
-            logger.info("Starting preload of tree [{}] with depth {}", treeRoot, depth);
+			logger.info("Starting preload of tree [{}] with depth {}", treeRoot, depth);
 
-            stopWatch.start();
+			stopWatch.start();
 
-            try {
-                contentStoreService.getTree(context, treeRoot, depth);
-            } catch (Exception e) {
-                logger.error("Error while preloading tree at [{}]", treeRoot, e);
-            }
+			try {
+				contentStoreService.getTree(context, treeRoot, depth);
+			} catch (Exception e) {
+				logger.error("Error while preloading tree at [{}]", treeRoot, e);
+			}
 
-            stopWatch.stop();
+			stopWatch.stop();
 
-            logger.info("Preload of tree [{}] with depth {} completed in {} secs", treeRoot, depth,
-                        stopWatch.getTime(TimeUnit.SECONDS));
-        }
-    }
+			logger.info("Preload of tree [{}] with depth {} completed in {} secs", treeRoot, depth,
+				stopWatch.getTime(TimeUnit.SECONDS));
+		}
+	}
 
-    protected Map<String, Integer> getDescriptorPreloadFolders() {
-        Map<String, Integer> preloadFolders = SiteProperties.getDescriptorPreloadFolders();
-        if (MapUtils.isNotEmpty(preloadFolders)) {
-            return preloadFolders;
-        } else {
-            return descriptorPreloadFolders;
-        }
-    }
+	protected Map<String, Integer> getDescriptorPreloadFolders() {
+		Map<String, Integer> preloadFolders = SiteProperties.getDescriptorPreloadFolders();
+		if (MapUtils.isNotEmpty(preloadFolders)) {
+			return preloadFolders;
+		} else {
+			return descriptorPreloadFolders;
+		}
+	}
 
 }

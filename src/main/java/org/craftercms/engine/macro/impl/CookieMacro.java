@@ -29,30 +29,30 @@ import org.craftercms.commons.http.RequestContext;
  */
 public class CookieMacro extends AbstractMacro {
 
-    private static final Log logger = LogFactory.getLog(CookieMacro.class);
+	private static final Log logger = LogFactory.getLog(CookieMacro.class);
 
-    private String cookieName;
+	private String cookieName;
 
-    public CookieMacro(String cookieName) {
-        this.cookieName = cookieName;
-    }
+	public CookieMacro(String cookieName) {
+		this.cookieName = cookieName;
+	}
 
-    @Override
-    protected String createMacroName() {
-        return "{" + cookieName + "}";
-    }
+	@Override
+	protected String createMacroName() {
+		return "{" + cookieName + "}";
+	}
 
-    @Override
-    protected String getMacroValue(String str) {
-        RequestContext requestContext = RequestContext.getCurrent();
-        if (requestContext != null) {
-            Cookie cookie = HttpUtils.getCookie(cookieName, requestContext.getRequest());
-            if (cookie != null) {
-                return cookie.getValue();
-            }
-        }
+	@Override
+	protected String getMacroValue(String str) {
+		RequestContext requestContext = RequestContext.getCurrent();
+		if (requestContext != null) {
+			Cookie cookie = HttpUtils.getCookie(cookieName, requestContext.getRequest());
+			if (cookie != null) {
+				return cookie.getValue();
+			}
+		}
 
-        return null;
-    }
+		return null;
+	}
 
 }

@@ -52,100 +52,100 @@ import org.springframework.web.context.ServletContextAware;
  */
 public class ConfigurationScriptJobResolver implements ScriptJobResolver, ServletContextAware {
 
-    public static final String JOB_FOLDER_KEY = "jobs.jobFolder";
-    public static final String JOB_KEY = "jobs.job";
-    public static final String PATH_KEY = "path";
-    public static final String CRON_EXPRESSION_KEY = "cronExpression";
+	public static final String JOB_FOLDER_KEY = "jobs.jobFolder";
+	public static final String JOB_KEY = "jobs.job";
+	public static final String PATH_KEY = "path";
+	public static final String CRON_EXPRESSION_KEY = "cronExpression";
 
-    protected String scriptSuffix;
-    protected ServletContext servletContext;
-    protected boolean disableVariableRestrictions;
+	protected String scriptSuffix;
+	protected ServletContext servletContext;
+	protected boolean disableVariableRestrictions;
 
-    public ConfigurationScriptJobResolver(String scriptSuffix) {
-        this.scriptSuffix = scriptSuffix;
-    }
+	public ConfigurationScriptJobResolver(String scriptSuffix) {
+		this.scriptSuffix = scriptSuffix;
+	}
 
-    @Override
-    public void setServletContext(ServletContext servletContext) {
-        this.servletContext = servletContext;
-    }
+	@Override
+	public void setServletContext(ServletContext servletContext) {
+		this.servletContext = servletContext;
+	}
 
-    public void setDisableVariableRestrictions(boolean disableVariableRestrictions) {
-        this.disableVariableRestrictions = disableVariableRestrictions;
-    }
+	public void setDisableVariableRestrictions(boolean disableVariableRestrictions) {
+		this.disableVariableRestrictions = disableVariableRestrictions;
+	}
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public List<JobContext> resolveJobs(SiteContext siteContext) throws SchedulingException {
-        HierarchicalConfiguration config = siteContext.getConfig();
-        List<JobContext> jobContexts = new ArrayList<>();
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<JobContext> resolveJobs(SiteContext siteContext) throws SchedulingException {
+		HierarchicalConfiguration config = siteContext.getConfig();
+		List<JobContext> jobContexts = new ArrayList<>();
 
-        if (config != null) {
-            List<HierarchicalConfiguration> jobFoldersConfig = config.configurationsAt(JOB_FOLDER_KEY);
-            if (CollectionUtils.isNotEmpty(jobFoldersConfig)) {
-                for (HierarchicalConfiguration jobFolderConfig : jobFoldersConfig) {
-                    List<JobContext> folderJobContexts = getJobsUnderFolder(siteContext, jobFolderConfig);
-                    if (CollectionUtils.isNotEmpty(folderJobContexts)) {
-                        jobContexts.addAll(folderJobContexts);
-                    }
-                }
-            }
+		if (config != null) {
+			List<HierarchicalConfiguration> jobFoldersConfig = config.configurationsAt(JOB_FOLDER_KEY);
+			if (CollectionUtils.isNotEmpty(jobFoldersConfig)) {
+				for (HierarchicalConfiguration jobFolderConfig : jobFoldersConfig) {
+					List<JobContext> folderJobContexts = getJobsUnderFolder(siteContext, jobFolderConfig);
+					if (CollectionUtils.isNotEmpty(folderJobContexts)) {
+						jobContexts.addAll(folderJobContexts);
+					}
+				}
+			}
 
-            List<HierarchicalConfiguration> jobsConfig = config.configurationsAt(JOB_KEY);
-            if (CollectionUtils.isNotEmpty(jobsConfig)) {
-                for (HierarchicalConfiguration jobConfig : jobsConfig) {
-                    JobContext jobContext = getJob(siteContext, jobConfig);
-                    if (jobContext != null) {
-                        jobContexts.add(jobContext);
-                    }
-                }
-            }
-        }
+			List<HierarchicalConfiguration> jobsConfig = config.configurationsAt(JOB_KEY);
+			if (CollectionUtils.isNotEmpty(jobsConfig)) {
+				for (HierarchicalConfiguration jobConfig : jobsConfig) {
+					JobContext jobContext = getJob(siteContext, jobConfig);
+					if (jobContext != null) {
+						jobContexts.add(jobContext);
+					}
+				}
+			}
+		}
 
-        return jobContexts;
-    }
+		return jobContexts;
+	}
 
-    protected List<JobContext> getJobsUnderFolder(SiteContext siteContext, HierarchicalConfiguration jobFolderConfig) {
-        List<JobContext> jobContexts = null;
-        String folderPath = jobFolderConfig.getString(PATH_KEY);
-        String cronExpression = jobFolderConfig.getString(CRON_EXPRESSION_KEY);
-        ContentStoreService storeService = siteContext.getStoreService();
-        Context context = siteContext.getContext();
+	protected List<JobContext> getJobsUnderFolder(SiteContext siteContext, HierarchicalConfiguration jobFolderConfig) {
+		List<JobContext> jobContexts = null;
+		String folderPath = jobFolderConfig.getString(PATH_KEY);
+		String cronExpression = jobFolderConfig.getString(CRON_EXPRESSION_KEY);
+		ContentStoreService storeService = siteContext.getStoreService();
+		Context context = siteContext.getContext();
 
-        if (StringUtils.isNotEmpty(folderPath) && StringUtils.isNotEmpty(cronExpression)) {
-            List<String> scriptPaths = ContentStoreUtils.findChildrenUrl(storeService, context, folderPath);
-            if (CollectionUtils.isNotEmpty(scriptPaths)) {
-                for (String scriptPath : scriptPaths) {
-                    if (scriptPath.endsWith(scriptSuffix)) {
-                        if (jobContexts == null) {
-                            jobContexts = new ArrayList<>();
-                        }
+		if (StringUtils.isNotEmpty(folderPath) && StringUtils.isNotEmpty(cronExpression)) {
+			List<String> scriptPaths = ContentStoreUtils.findChildrenUrl(storeService, context, folderPath);
+			if (CollectionUtils.isNotEmpty(scriptPaths)) {
+				for (String scriptPath : scriptPaths) {
+					if (scriptPath.endsWith(scriptSuffix)) {
+						if (jobContexts == null) {
+							jobContexts = new ArrayList<>();
+						}
 
-                        jobContexts.add(SchedulingUtils.createJobContext(siteContext, scriptPath, cronExpression,
-                                                                         disableVariableRestrictions? servletContext : null));
-                    }
-                }
-            }
-        }
+						jobContexts.add(SchedulingUtils.createJobContext(siteContext, scriptPath, cronExpression,
+							disableVariableRestrictions ? servletContext : null));
+					}
+				}
+			}
+		}
 
-        return jobContexts;
-    }
+		return jobContexts;
+	}
 
-    protected JobContext getJob(SiteContext siteContext, HierarchicalConfiguration jobConfig) {
-        String scriptPath = jobConfig.getString(PATH_KEY);
-        String cronExpression = jobConfig.getString(CRON_EXPRESSION_KEY);
+	protected JobContext getJob(SiteContext siteContext, HierarchicalConfiguration jobConfig) {
+		String scriptPath = jobConfig.getString(PATH_KEY);
+		String cronExpression = jobConfig.getString(CRON_EXPRESSION_KEY);
 
-        if (StringUtils.isNotEmpty(scriptPath) && StringUtils.isNotEmpty(cronExpression)) {
-            if (siteContext.getStoreService().exists(siteContext.getContext(), scriptPath)) {
-                return SchedulingUtils.createJobContext(siteContext, scriptPath, cronExpression,
-                        disableVariableRestrictions? servletContext: null);
-            } else {
-                throw new SchedulingException("Script job " + scriptPath + " for site '" + siteContext.getSiteName() +
-                                              "' not found");
-            }
-        } else {
-            return null;
-        }
-    }
+		if (StringUtils.isNotEmpty(scriptPath) && StringUtils.isNotEmpty(cronExpression)) {
+			if (siteContext.getStoreService().exists(siteContext.getContext(), scriptPath)) {
+				return SchedulingUtils.createJobContext(siteContext, scriptPath, cronExpression,
+					disableVariableRestrictions ? servletContext : null);
+			} else {
+				throw new SchedulingException("Script job " + scriptPath + " for site '" + siteContext.getSiteName() +
+					"' not found");
+			}
+		} else {
+			return null;
+		}
+	}
 
 }

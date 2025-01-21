@@ -17,6 +17,7 @@ package org.craftercms.engine.controller;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.IOUtils;
@@ -35,43 +36,43 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping(ErrorPageRenderController.URL_ROOT)
 public class ErrorPageRenderController {
 
-    public static final String URL_ROOT = "/crafter-controller/error";
-    public static final String ERROR_CODE_PATH_VAR = "code";
+	public static final String URL_ROOT = "/crafter-controller/error";
+	public static final String ERROR_CODE_PATH_VAR = "code";
 
-    public static final String STACK_TRACE_ATTRIBUTE = "stackTrace";
-    public static final String ERROR_MESSAGE_ATTRIBUTE = "errorMessage";
-    public static final String SERVLET_REQUEST_ERROR_MESSAGE_ATTRIBUTE = "jakarta.servlet.error.message";
+	public static final String STACK_TRACE_ATTRIBUTE = "stackTrace";
+	public static final String ERROR_MESSAGE_ATTRIBUTE = "errorMessage";
+	public static final String SERVLET_REQUEST_ERROR_MESSAGE_ATTRIBUTE = "jakarta.servlet.error.message";
 
-    private String errorViewNamePrefix;
+	private String errorViewNamePrefix;
 
-    public ErrorPageRenderController(String errorViewNamePrefix) {
-        this.errorViewNamePrefix = errorViewNamePrefix;
-    }
+	public ErrorPageRenderController(String errorViewNamePrefix) {
+		this.errorViewNamePrefix = errorViewNamePrefix;
+	}
 
-    @RequestMapping(value = "/{" + ERROR_CODE_PATH_VAR + "}")
-    public ModelAndView render(@PathVariable(ERROR_CODE_PATH_VAR) String code, HttpServletRequest request) {
-        ModelAndView mv = new ModelAndView();
-        mv.setViewName(errorViewNamePrefix + code + ".ftl");
+	@RequestMapping(value = "/{" + ERROR_CODE_PATH_VAR + "}")
+	public ModelAndView render(@PathVariable(ERROR_CODE_PATH_VAR) String code, HttpServletRequest request) {
+		ModelAndView mv = new ModelAndView();
+		mv.setViewName(errorViewNamePrefix + code + ".ftl");
 
-        Exception error = (Exception)request.getAttribute(DefaultExceptionHandler.EXCEPTION_ATTRIBUTE);
-        if (error != null) {
-            StringWriter errorWriter = new StringWriter();
+		Exception error = (Exception) request.getAttribute(DefaultExceptionHandler.EXCEPTION_ATTRIBUTE);
+		if (error != null) {
+			StringWriter errorWriter = new StringWriter();
 
-            try {
-                error.printStackTrace(new PrintWriter(errorWriter));
-            } finally {
-                IOUtils.closeQuietly(errorWriter);
-            }
+			try {
+				error.printStackTrace(new PrintWriter(errorWriter));
+			} finally {
+				IOUtils.closeQuietly(errorWriter);
+			}
 
-            mv.addObject(STACK_TRACE_ATTRIBUTE, errorWriter.toString());
-        }
+			mv.addObject(STACK_TRACE_ATTRIBUTE, errorWriter.toString());
+		}
 
-        String errorMessage = (String) request.getAttribute(SERVLET_REQUEST_ERROR_MESSAGE_ATTRIBUTE);
-        if (errorMessage != null) {
-            mv.addObject(ERROR_MESSAGE_ATTRIBUTE, errorMessage);
-        }
+		String errorMessage = (String) request.getAttribute(SERVLET_REQUEST_ERROR_MESSAGE_ATTRIBUTE);
+		if (errorMessage != null) {
+			mv.addObject(ERROR_MESSAGE_ATTRIBUTE, errorMessage);
+		}
 
-        return mv;
-    }
+		return mv;
+	}
 
 }

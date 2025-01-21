@@ -34,89 +34,89 @@ import org.dom4j.Element;
  */
 public class EmbeddedSiteItem extends AbstractXmlSiteItem {
 
-    public static final String XPATH_OBJECT_ID = "objectId";
+	public static final String XPATH_OBJECT_ID = "objectId";
 
-    /**
-     * The parent of the embedded component
-     */
-    protected SiteItem parentItem;
+	/**
+	 * The parent of the embedded component
+	 */
+	protected SiteItem parentItem;
 
-    /**
-     * The unique id of the embedded component
-     */
-    protected String componentId;
+	/**
+	 * The unique id of the embedded component
+	 */
+	protected String componentId;
 
-    /**
-     * The XML root element of the embedded component
-     */
-    protected Element rootElement;
+	/**
+	 * The XML root element of the embedded component
+	 */
+	protected Element rootElement;
 
-    public EmbeddedSiteItem(final SiteItem parentItem, final Element rootElement,
-                            final Converter<Element, Object> modelFieldConverter) {
-        super(modelFieldConverter);
-        this.parentItem = parentItem;
-        this.rootElement = rootElement;
-        this.componentId = XmlUtils.selectSingleNodeValue(rootElement, XPATH_OBJECT_ID);
-    }
+	public EmbeddedSiteItem(final SiteItem parentItem, final Element rootElement,
+				final Converter<Element, Object> modelFieldConverter) {
+		super(modelFieldConverter);
+		this.parentItem = parentItem;
+		this.rootElement = rootElement;
+		this.componentId = XmlUtils.selectSingleNodeValue(rootElement, XPATH_OBJECT_ID);
+	}
 
-    @Override
-    protected Element getRootElement() {
-        return rootElement;
-    }
+	@Override
+	protected Element getRootElement() {
+		return rootElement;
+	}
 
-    @Override
-    public Item getItem() {
-        return null;
-    }
+	@Override
+	public Item getItem() {
+		return null;
+	}
 
-    @Override
-    public String getStoreName() {
-        return parentItem.getStoreName();
-    }
+	@Override
+	public String getStoreName() {
+		return parentItem.getStoreName();
+	}
 
-    @Override
-    public String getStoreUrl() {
-        return parentItem.getStoreUrl();
-    }
+	@Override
+	public String getStoreUrl() {
+		return parentItem.getStoreUrl();
+	}
 
-    @Override
-    public boolean isFolder() {
-        return false;
-    }
+	@Override
+	public boolean isFolder() {
+		return false;
+	}
 
-    @Override
-    public Document getDom() {
-        return null;
-    }
+	@Override
+	public Document getDom() {
+		return null;
+	}
 
-    @Override
-    public Map<String, Object> getProperties() {
-        return null;
-    }
+	@Override
+	public Map<String, Object> getProperties() {
+		return null;
+	}
 
-    @Override
-    public List<SiteItem> getChildItems() {
-        return null;
-    }
+	@Override
+	public List<SiteItem> getChildItems() {
+		return null;
+	}
 
-    @Override
-    public SiteItem getChildItem(final String storeName) {
-        return null;
-    }
+	@Override
+	public SiteItem getChildItem(final String storeName) {
+		return null;
+	}
 
-    @Override
-    public List<SiteItem> sortItems(final List<SiteItem> items, final Comparator<SiteItem> comparator) {
-        return null;
-    }
+	@Override
+	public List<SiteItem> sortItems(final List<SiteItem> items, final Comparator<SiteItem> comparator) {
+		return null;
+	}
 
-    @Override
-    public SiteItem createItemWrapper(final Item item) {
-        return null;
-    }
+	@Override
+	public SiteItem createItemWrapper(final Item item) {
+		return null;
+	}
 
-    @Override
-    public String toString() {
-        return "EmbeddedSiteItem{" + "parentItem=" + parentItem + ", objectId='" + componentId + '\'' + '}';
-    }
+	@Override
+	public String toString() {
+		return "EmbeddedSiteItem{" + "parentItem=" + parentItem + ", objectId='" + componentId + '\'' + '}';
+	}
 
 }

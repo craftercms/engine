@@ -27,21 +27,22 @@ import static org.craftercms.engine.graphql.SchemaUtils.BOOLEAN_FILTER;
 
 /**
  * Implementation of {@link GraphQLFieldFactory} that handles checkbox fields
+ *
  * @author joseross
  * @since 3.1
  */
 public class CheckboxFieldFactory implements GraphQLFieldFactory {
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void createField(final Document contentTypeDefinition, final Node contentTypeField,
-                            final String contentTypeFieldId, final String parentGraphQLTypeName,
-                            final GraphQLObjectType.Builder parentGraphQLType, final String graphQLFieldName,
-                            final GraphQLFieldDefinition.Builder graphQLField) {
-        graphQLField.type(GraphQLBoolean);
-        graphQLField.argument(BOOLEAN_FILTER);
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void createField(final Document contentTypeDefinition, final Node contentTypeField,
+				final String contentTypeFieldId, final String parentGraphQLTypeName,
+				final GraphQLObjectType.Builder parentGraphQLType, final String graphQLFieldName,
+				final GraphQLFieldDefinition.Builder graphQLField) {
+		graphQLField.type(GraphQLBoolean);
+		graphQLField.argument(BOOLEAN_FILTER);
+	}
 
 }

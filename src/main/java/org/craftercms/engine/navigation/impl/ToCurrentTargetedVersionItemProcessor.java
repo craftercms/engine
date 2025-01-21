@@ -35,47 +35,47 @@ import org.craftercms.engine.properties.SiteProperties;
  */
 public class ToCurrentTargetedVersionItemProcessor implements ItemProcessor {
 
-    protected String toCurrentTargetedUrlTransformerName;
-    protected UrlTransformationEngine urlTransformationEngine;
-    protected ContentStoreService storeService;
-    protected TargetIdManager targetIdManager;
+	protected String toCurrentTargetedUrlTransformerName;
+	protected UrlTransformationEngine urlTransformationEngine;
+	protected ContentStoreService storeService;
+	protected TargetIdManager targetIdManager;
 
-    public ToCurrentTargetedVersionItemProcessor(String toCurrentTargetedUrlTransformerName,
-                                                 UrlTransformationEngine urlTransformationEngine,
-                                                 ContentStoreService storeService, TargetIdManager targetIdManager) {
-        this.toCurrentTargetedUrlTransformerName = toCurrentTargetedUrlTransformerName;
-        this.urlTransformationEngine = urlTransformationEngine;
-        this.storeService = storeService;
-        this.targetIdManager = targetIdManager;
-    }
+	public ToCurrentTargetedVersionItemProcessor(String toCurrentTargetedUrlTransformerName,
+						     UrlTransformationEngine urlTransformationEngine,
+						     ContentStoreService storeService, TargetIdManager targetIdManager) {
+		this.toCurrentTargetedUrlTransformerName = toCurrentTargetedUrlTransformerName;
+		this.urlTransformationEngine = urlTransformationEngine;
+		this.storeService = storeService;
+		this.targetIdManager = targetIdManager;
+	}
 
-    @Override
-    public Item process(Context context, CachingOptions cachingOptions, Item item) throws ItemProcessingException {
-        // Don't do this for folders, since for them this will be done by the FolderToIndexItemProcessor
-        if (!item.isFolder() && SiteProperties.isTargetingEnabled()) {
-            String url = item.getUrl();
-            String targetedUrl = urlTransformationEngine.transformUrl(context, cachingOptions,
-                                                                      toCurrentTargetedUrlTransformerName, url);
-            Item targetedItem = storeService.findItem(context, cachingOptions, targetedUrl, null);
+	@Override
+	public Item process(Context context, CachingOptions cachingOptions, Item item) throws ItemProcessingException {
+		// Don't do this for folders, since for them this will be done by the FolderToIndexItemProcessor
+		if (!item.isFolder() && SiteProperties.isTargetingEnabled()) {
+			String url = item.getUrl();
+			String targetedUrl = urlTransformationEngine.transformUrl(context, cachingOptions,
+				toCurrentTargetedUrlTransformerName, url);
+			Item targetedItem = storeService.findItem(context, cachingOptions, targetedUrl, null);
 
-            if (targetedItem != null) {
-                return targetedItem;
-            }
-        }
+			if (targetedItem != null) {
+				return targetedItem;
+			}
+		}
 
-        return item;
-    }
+		return item;
+	}
 
-    @Override
-    public String toString() {
-        // The current target ID is added because the toString() method is used for item caching, and the result of the
-        // folderToIndexFileTransformer varies by target ID
-        return "ToCurrentTargetedVersionItemProcessor{" +
-               "currentTargetId='" + targetIdManager.getCurrentTargetId() + '\'' +
-               ", toCurrentTargetedUrlTransformerName='" + toCurrentTargetedUrlTransformerName + '\'' +
-               ", urlTransformationEngine=" + urlTransformationEngine +
-               ", storeService=" + storeService +
-               '}';
-    }
+	@Override
+	public String toString() {
+		// The current target ID is added because the toString() method is used for item caching, and the result of the
+		// folderToIndexFileTransformer varies by target ID
+		return "ToCurrentTargetedVersionItemProcessor{" +
+			"currentTargetId='" + targetIdManager.getCurrentTargetId() + '\'' +
+			", toCurrentTargetedUrlTransformerName='" + toCurrentTargetedUrlTransformerName + '\'' +
+			", urlTransformationEngine=" + urlTransformationEngine +
+			", storeService=" + storeService +
+			'}';
+	}
 
 }

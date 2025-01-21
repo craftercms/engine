@@ -36,40 +36,41 @@ import static org.craftercms.commons.lang.UrlUtils.cleanUrlForLog;
  */
 public class HttpStatusCodeAwareExceptionHandler implements ExceptionHandler {
 
-    private static final Log logger = LogFactory.getLog(HttpStatusCodeAwareExceptionHandler.class);
+	private static final Log logger = LogFactory.getLog(HttpStatusCodeAwareExceptionHandler.class);
 
-    @Override
-    public boolean handle(HttpServletRequest request, HttpServletResponse response, Exception ex) throws IOException {
-        HttpStatusCodeAwareException httpStatusCodeAwareEx =
-                ExceptionUtils.getThrowableOfType(ex, HttpStatusCodeAwareException.class);
+	@Override
+	public boolean handle(HttpServletRequest request, HttpServletResponse response, Exception ex) throws IOException {
+		HttpStatusCodeAwareException httpStatusCodeAwareEx =
+			ExceptionUtils.getThrowableOfType(ex, HttpStatusCodeAwareException.class);
 
-        if (httpStatusCodeAwareEx == null) {
-            return false;
-        }
+		if (httpStatusCodeAwareEx == null) {
+			return false;
+		}
 
-        String message = String.format("%s %s failed", request.getMethod(), cleanUrlForLog(getFullRequestUri(request, true)));
-        if (httpStatusCodeAwareEx instanceof PreviewAccessException previewException) {
-            logger.debug(message, previewException);
-        } else {
-            ex = (Exception) httpStatusCodeAwareEx;
-            logger.error(message, ex);
-        }
+		String message = String.format("%s %s failed", request.getMethod(), cleanUrlForLog(getFullRequestUri(request, true)));
+		if (httpStatusCodeAwareEx instanceof PreviewAccessException previewException) {
+			logger.debug(message, previewException);
+		} else {
+			ex = (Exception) httpStatusCodeAwareEx;
+			logger.error(message, ex);
+		}
 
-        response.sendError(httpStatusCodeAwareEx.getStatusCode(), getResponseMessage(ex));
-        return true;
-    }
+		response.sendError(httpStatusCodeAwareEx.getStatusCode(), getResponseMessage(ex));
+		return true;
+	}
 
-    /**
-     * Get a response message key depends on the exception to resolve by the template
-     * @param ex the exception
-     * @return response message
-     */
-    private static String getResponseMessage(Exception ex) {
-        if (ex instanceof PreviewAccessException) {
-            return PreviewAccessException.class.getSimpleName();
-        }
+	/**
+	 * Get a response message key depends on the exception to resolve by the template
+	 *
+	 * @param ex the exception
+	 * @return response message
+	 */
+	private static String getResponseMessage(Exception ex) {
+		if (ex instanceof PreviewAccessException) {
+			return PreviewAccessException.class.getSimpleName();
+		}
 
-        return ex.getMessage();
-    }
+		return ex.getMessage();
+	}
 
 }

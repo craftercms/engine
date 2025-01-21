@@ -23,6 +23,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.beans.factory.InitializingBean;
 
 import jakarta.servlet.http.HttpServletRequest;
+
 import java.io.IOException;
 import java.util.*;
 
@@ -36,76 +37,76 @@ import java.util.*;
  */
 public class ReloadableMappingsSiteResolver implements SiteListResolver, SiteResolver, InitializingBean {
 
-    private static final Log logger = LogFactory.getLog(ReloadableMappingsSiteResolver.class);
+	private static final Log logger = LogFactory.getLog(ReloadableMappingsSiteResolver.class);
 
-    protected Resource mappingsFile;
-    protected SiteContextManager siteContextManager;
+	protected Resource mappingsFile;
+	protected SiteContextManager siteContextManager;
 
-    protected volatile Properties mappings;
+	protected volatile Properties mappings;
 
-    public ReloadableMappingsSiteResolver(Resource mappingsFile, SiteContextManager siteContextManager) {
-        this.mappingsFile = mappingsFile;
-        this.siteContextManager = siteContextManager;
-    }
+	public ReloadableMappingsSiteResolver(Resource mappingsFile, SiteContextManager siteContextManager) {
+		this.mappingsFile = mappingsFile;
+		this.siteContextManager = siteContextManager;
+	}
 
-    public void afterPropertiesSet() throws Exception {
-        loadMappings();
-    }
+	public void afterPropertiesSet() throws Exception {
+		loadMappings();
+	}
 
-    public synchronized void reloadMappings() throws CrafterException {
-        loadMappings();
+	public synchronized void reloadMappings() throws CrafterException {
+		loadMappings();
 
-        siteContextManager.syncContexts();
-    }
+		siteContextManager.syncContexts();
+	}
 
-    @Override
-    public Collection<String> getSiteList() {
-        Collection<Object> siteNames = mappings.values();
-        Set<String> result = new LinkedHashSet<>(siteNames.size());
+	@Override
+	public Collection<String> getSiteList() {
+		Collection<Object> siteNames = mappings.values();
+		Set<String> result = new LinkedHashSet<>(siteNames.size());
 
-        for (Object siteName : siteNames) {
-            result.add(siteName.toString());
-        }
+		for (Object siteName : siteNames) {
+			result.add(siteName.toString());
+		}
 
-        return result;
-    }
+		return result;
+	}
 
-    @Override
-    public String getSiteName(HttpServletRequest request) {
-        String domainName = request.getServerName();
+	@Override
+	public String getSiteName(HttpServletRequest request) {
+		String domainName = request.getServerName();
 
-        if (mappings.containsKey(domainName)) {
-            return (String)mappings.get(domainName);
-        } else {
-            if (logger.isDebugEnabled()) {
-                logger.warn("No site mapping found for domain name " + domainName);
-            }
+		if (mappings.containsKey(domainName)) {
+			return (String) mappings.get(domainName);
+		} else {
+			if (logger.isDebugEnabled()) {
+				logger.warn("No site mapping found for domain name " + domainName);
+			}
 
-            return null;
-        }
-    }
+			return null;
+		}
+	}
 
-    protected void loadMappings() throws CrafterException {
-        Properties tmpMappings = new Properties();
+	protected void loadMappings() throws CrafterException {
+		Properties tmpMappings = new Properties();
 
-        try {
-            tmpMappings.load(mappingsFile.getInputStream());
-        } catch (IOException e) {
-            throw new CrafterException("Unable to load domain name to site name mappings from " + mappingsFile, e);
-        }
+		try {
+			tmpMappings.load(mappingsFile.getInputStream());
+		} catch (IOException e) {
+			throw new CrafterException("Unable to load domain name to site name mappings from " + mappingsFile, e);
+		}
 
-        Properties newMappings = new Properties();
+		Properties newMappings = new Properties();
 
-        for (Map.Entry<Object, Object> entry : tmpMappings.entrySet()) {
-            String trimmedKey = entry.getKey().toString().trim();
-            String trimmedVal = entry.getValue().toString().trim();
+		for (Map.Entry<Object, Object> entry : tmpMappings.entrySet()) {
+			String trimmedKey = entry.getKey().toString().trim();
+			String trimmedVal = entry.getValue().toString().trim();
 
-            newMappings.setProperty(trimmedKey, trimmedVal);
-        }
+			newMappings.setProperty(trimmedKey, trimmedVal);
+		}
 
-        logger.info("Domain name to site name mappings loaded from " + mappingsFile);
+		logger.info("Domain name to site name mappings loaded from " + mappingsFile);
 
-        mappings = newMappings;
-    }
+		mappings = newMappings;
+	}
 
 }

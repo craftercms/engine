@@ -29,24 +29,24 @@ import org.springframework.security.concurrent.DelegatingSecurityContextRunnable
  */
 public class SiteAwareThreadPoolExecutor implements Executor {
 
-    /**
-     * The {@link SiteContext} to use for all threads
-     */
-    protected SiteContext siteContext;
+	/**
+	 * The {@link SiteContext} to use for all threads
+	 */
+	protected SiteContext siteContext;
 
-    /**
-     * The actual {@link Executor} to use
-     */
-    protected Executor wrappedExecutor;
+	/**
+	 * The actual {@link Executor} to use
+	 */
+	protected Executor wrappedExecutor;
 
-    public SiteAwareThreadPoolExecutor(final SiteContext siteContext, final Executor wrappedExecutor) {
-        this.siteContext = siteContext;
-        this.wrappedExecutor = wrappedExecutor;
-    }
+	public SiteAwareThreadPoolExecutor(final SiteContext siteContext, final Executor wrappedExecutor) {
+		this.siteContext = siteContext;
+		this.wrappedExecutor = wrappedExecutor;
+	}
 
-    @Override
-    public void execute(final Runnable command) {
-        wrappedExecutor.execute(new DelegatingSecurityContextRunnable(new SiteAwareRunnable(siteContext, command)));
-    }
+	@Override
+	public void execute(final Runnable command) {
+		wrappedExecutor.execute(new DelegatingSecurityContextRunnable(new SiteAwareRunnable(siteContext, command)));
+	}
 
 }

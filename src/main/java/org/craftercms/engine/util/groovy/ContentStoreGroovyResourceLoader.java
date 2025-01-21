@@ -34,33 +34,33 @@ import org.craftercms.engine.util.url.ContentStoreUrlStreamHandler;
  */
 public class ContentStoreGroovyResourceLoader implements GroovyResourceLoader {
 
-    protected SiteContext siteContext;
-    protected ContentStoreUrlStreamHandler urlStreamHandler;
-    protected String groovyResourcesUrlPrefix;
+	protected SiteContext siteContext;
+	protected ContentStoreUrlStreamHandler urlStreamHandler;
+	protected String groovyResourcesUrlPrefix;
 
-    public ContentStoreGroovyResourceLoader(SiteContext siteContext, String groovyResourcesUrlPrefix) {
-        this.siteContext = siteContext;
-        this.urlStreamHandler = new ContentStoreUrlStreamHandler(siteContext);
-        this.groovyResourcesUrlPrefix = groovyResourcesUrlPrefix;
-    }
+	public ContentStoreGroovyResourceLoader(SiteContext siteContext, String groovyResourcesUrlPrefix) {
+		this.siteContext = siteContext;
+		this.urlStreamHandler = new ContentStoreUrlStreamHandler(siteContext);
+		this.groovyResourcesUrlPrefix = groovyResourcesUrlPrefix;
+	}
 
-    @Override
-    public URL loadGroovySource(String filename) throws MalformedURLException {
-        if (filename.contains(".")) {
-            filename = filename.replace('.', '/');
-        }
-        if (!filename.endsWith(GroovyScriptFactory.GROOVY_FILE_EXTENSION)) {
-            filename += "." + GroovyScriptFactory.GROOVY_FILE_EXTENSION;
-        }
-        if (StringUtils.isNotEmpty(groovyResourcesUrlPrefix)) {
-            filename = UrlUtils.concat(groovyResourcesUrlPrefix, filename);
-        }
+	@Override
+	public URL loadGroovySource(String filename) throws MalformedURLException {
+		if (filename.contains(".")) {
+			filename = filename.replace('.', '/');
+		}
+		if (!filename.endsWith(GroovyScriptFactory.GROOVY_FILE_EXTENSION)) {
+			filename += "." + GroovyScriptFactory.GROOVY_FILE_EXTENSION;
+		}
+		if (StringUtils.isNotEmpty(groovyResourcesUrlPrefix)) {
+			filename = UrlUtils.concat(groovyResourcesUrlPrefix, filename);
+		}
 
-        if (siteContext.getStoreService().exists(siteContext.getContext(), filename)){
-            return urlStreamHandler.createUrl(filename);
-        } else {
-            return null;
-        }
-    }
+		if (siteContext.getStoreService().exists(siteContext.getContext(), filename)) {
+			return urlStreamHandler.createUrl(filename);
+		} else {
+			return null;
+		}
+	}
 
 }

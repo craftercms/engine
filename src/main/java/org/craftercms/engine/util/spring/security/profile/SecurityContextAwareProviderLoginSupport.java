@@ -18,6 +18,7 @@ package org.craftercms.engine.util.spring.security.profile;
 
 import java.util.Map;
 import java.util.Set;
+
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.craftercms.commons.crypto.TextEncryptor;
@@ -41,31 +42,31 @@ import org.springframework.social.connect.web.ConnectSupport;
  */
 public class SecurityContextAwareProviderLoginSupport extends ProviderLoginSupportImpl {
 
-    public SecurityContextAwareProviderLoginSupport(ConnectionFactoryLocator connectionFactoryLocator,
-                                                    ProfileService profileService, AuthenticationManager authenticationManager,
-                                                    TextEncryptor textEncryptor) {
-        super(connectionFactoryLocator, profileService, authenticationManager, textEncryptor);
-    }
+	public SecurityContextAwareProviderLoginSupport(ConnectionFactoryLocator connectionFactoryLocator,
+							ProfileService profileService, AuthenticationManager authenticationManager,
+							TextEncryptor textEncryptor) {
+		super(connectionFactoryLocator, profileService, authenticationManager, textEncryptor);
+	}
 
-    @Override
-    public Authentication complete(final String tenant, final String providerId, final HttpServletRequest request,
-                                   final Set<String> newUserRoles, final Map<String, Object> newUserAttributes,
-                                   final ConnectSupport connectSupport) throws AuthenticationException {
-        Authentication auth =
-            super.complete(tenant, providerId, request, newUserRoles, newUserAttributes, connectSupport);
+	@Override
+	public Authentication complete(final String tenant, final String providerId, final HttpServletRequest request,
+				       final Set<String> newUserRoles, final Map<String, Object> newUserAttributes,
+				       final ConnectSupport connectSupport) throws AuthenticationException {
+		Authentication auth =
+			super.complete(tenant, providerId, request, newUserRoles, newUserAttributes, connectSupport);
 
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-        if (securityContext == null) {
-            securityContext = new SecurityContextImpl();
-        }
+		SecurityContext securityContext = SecurityContextHolder.getContext();
+		if (securityContext == null) {
+			securityContext = new SecurityContextImpl();
+		}
 
-        ProfileUser principal = new ProfileUser(auth);
-        securityContext.setAuthentication(
-            new PreAuthenticatedAuthenticationToken(principal, "N/A", principal.getAuthorities()));
+		ProfileUser principal = new ProfileUser(auth);
+		securityContext.setAuthentication(
+			new PreAuthenticatedAuthenticationToken(principal, "N/A", principal.getAuthorities()));
 
-        SecurityContextHolder.setContext(securityContext);
+		SecurityContextHolder.setContext(securityContext);
 
-        return auth;
-    }
+		return auth;
+	}
 
 }

@@ -26,29 +26,29 @@ import org.springframework.beans.factory.InitializingBean;
  */
 public abstract class AbstractMacro implements Macro, InitializingBean {
 
-    protected String macroName;
+	protected String macroName;
 
-    public void afterPropertiesSet() {
-        macroName = createMacroName();
-    }
+	public void afterPropertiesSet() {
+		macroName = createMacroName();
+	}
 
-    @Override
-    public String getName() {
-        return macroName;
-    }
+	@Override
+	public String getName() {
+		return macroName;
+	}
 
-    @Override
-    public String resolve(String str) {
-        String macroValue = getMacroValue(str);
-        if (macroValue != null) {
-            str = str.replace(getName(), macroValue);
-        }
+	@Override
+	public String resolve(String str) {
+		String macroValue = getMacroValue(str);
+		if (macroValue != null) {
+			str = str.replace(getName(), macroValue);
+		}
 
-        return str;
-    }
+		return str;
+	}
 
-    protected abstract String createMacroName();
+	protected abstract String createMacroName();
 
-    protected abstract String getMacroValue(String str);
+	protected abstract String getMacroValue(String str);
 
 }

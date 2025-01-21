@@ -17,6 +17,7 @@
 package org.craftercms.engine.util.servlet;
 
 import java.util.Map;
+
 import jakarta.servlet.ServletContext;
 
 import org.springframework.web.context.ServletContextAware;
@@ -29,26 +30,26 @@ import org.springframework.beans.factory.InitializingBean;
  */
 public class ServletContextAttributesBootstrap implements ServletContextAware, InitializingBean {
 
-    private ServletContext servletContext;
-    private Map<String, Object> attributes;
+	private ServletContext servletContext;
+	private Map<String, Object> attributes;
 
-    public ServletContextAttributesBootstrap(Map<String, Object> attributes) {
-        this.attributes = attributes;
-    }
+	public ServletContextAttributesBootstrap(Map<String, Object> attributes) {
+		this.attributes = attributes;
+	}
 
-    @Override
-    public void setServletContext(ServletContext servletContext) {
-        this.servletContext = servletContext;
-    }
+	@Override
+	public void setServletContext(ServletContext servletContext) {
+		this.servletContext = servletContext;
+	}
 
-    public void afterPropertiesSet() {
-        if (servletContext == null) {
-            throw new IllegalStateException("There's no current ServletContext");
-        }
+	public void afterPropertiesSet() {
+		if (servletContext == null) {
+			throw new IllegalStateException("There's no current ServletContext");
+		}
 
-        for (Map.Entry<String, Object> entry : attributes.entrySet()) {
-            servletContext.setAttribute(entry.getKey(), entry.getValue());
-        }
-    }
+		for (Map.Entry<String, Object> entry : attributes.entrySet()) {
+			servletContext.setAttribute(entry.getKey(), entry.getValue());
+		}
+	}
 
 }

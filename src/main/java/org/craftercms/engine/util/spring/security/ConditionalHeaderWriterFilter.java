@@ -20,6 +20,7 @@ import org.springframework.security.web.header.HeaderWriterFilter;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+
 import java.beans.ConstructorProperties;
 import java.util.List;
 
@@ -32,18 +33,18 @@ import java.util.List;
  */
 public class ConditionalHeaderWriterFilter extends HeaderWriterFilter {
 
-    private boolean enabled;
+	private boolean enabled;
 
-    @ConstructorProperties({"enabled", "headerWriters"})
-    public ConditionalHeaderWriterFilter(boolean enabled, List<HeaderWriter> headerWriters) {
-        super(headerWriters);
-        super.setShouldWriteHeadersEagerly(true);
-        this.enabled = enabled;
-    }
+	@ConstructorProperties({"enabled", "headerWriters"})
+	public ConditionalHeaderWriterFilter(boolean enabled, List<HeaderWriter> headerWriters) {
+		super(headerWriters);
+		super.setShouldWriteHeadersEagerly(true);
+		this.enabled = enabled;
+	}
 
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        return !enabled && super.shouldNotFilter(request);
-    }
+	@Override
+	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+		return !enabled && super.shouldNotFilter(request);
+	}
 
 }

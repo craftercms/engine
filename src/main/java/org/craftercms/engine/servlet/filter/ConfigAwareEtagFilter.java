@@ -21,6 +21,7 @@ import org.springframework.web.filter.ShallowEtagHeaderFilter;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+
 import java.beans.ConstructorProperties;
 import java.util.stream.Stream;
 
@@ -32,32 +33,32 @@ import java.util.stream.Stream;
  */
 public class ConfigAwareEtagFilter extends ShallowEtagHeaderFilter {
 
-    /**
-     * Indicates if the filter is enabled
-     */
-    protected boolean enabled;
+	/**
+	 * Indicates if the filter is enabled
+	 */
+	protected boolean enabled;
 
-    /**
-     * The list of url patterns to that should be processed
-     */
-    protected String[] includedUrls;
+	/**
+	 * The list of url patterns to that should be processed
+	 */
+	protected String[] includedUrls;
 
-    /**
-     * The {@link PathMatcher} used to compare urls
-     */
-    protected PathMatcher pathMatcher;
+	/**
+	 * The {@link PathMatcher} used to compare urls
+	 */
+	protected PathMatcher pathMatcher;
 
-    @ConstructorProperties({"enabled", "includedUrls"})
-    public ConfigAwareEtagFilter(boolean enabled, String[] includedUrls) {
-        this.enabled = enabled;
-        this.includedUrls = includedUrls;
-        pathMatcher = new AntPathMatcher();
-    }
+	@ConstructorProperties({"enabled", "includedUrls"})
+	public ConfigAwareEtagFilter(boolean enabled, String[] includedUrls) {
+		this.enabled = enabled;
+		this.includedUrls = includedUrls;
+		pathMatcher = new AntPathMatcher();
+	}
 
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        return !enabled || Stream.of(includedUrls).noneMatch(url -> pathMatcher.match(url, request.getPathInfo()))
-                || super.shouldNotFilter(request);
-    }
+	@Override
+	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+		return !enabled || Stream.of(includedUrls).noneMatch(url -> pathMatcher.match(url, request.getPathInfo()))
+			|| super.shouldNotFilter(request);
+	}
 
 }

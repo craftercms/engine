@@ -38,50 +38,50 @@ import static org.craftercms.engine.util.GroovyScriptUtils.getCompilerConfigurat
  */
 public class GroovyScriptFactory implements ScriptFactory {
 
-    public static final String CACHE_CONST_KEY_ELEM_SCRIPT = "groovyScript";
+	public static final String CACHE_CONST_KEY_ELEM_SCRIPT = "groovyScript";
 
-    public static final String GROOVY_FILE_EXTENSION = "groovy";
+	public static final String GROOVY_FILE_EXTENSION = "groovy";
 
-    protected SiteContext siteContext;
-    protected GroovyScriptEngine scriptEngine;
-    protected Map<String, Object> globalVariables;
+	protected SiteContext siteContext;
+	protected GroovyScriptEngine scriptEngine;
+	protected Map<String, Object> globalVariables;
 
-    public GroovyScriptFactory(SiteContext siteContext, ResourceConnector resourceConnector,
-                               Map<String, Object> globalVariables, boolean enableScriptSandbox) {
-        this.siteContext = siteContext;
-        this.scriptEngine = new GroovyScriptEngine(resourceConnector);
-        this.scriptEngine.setConfig(getCompilerConfiguration(enableScriptSandbox));
-        this.globalVariables = globalVariables;
-    }
+	public GroovyScriptFactory(SiteContext siteContext, ResourceConnector resourceConnector,
+				   Map<String, Object> globalVariables, boolean enableScriptSandbox) {
+		this.siteContext = siteContext;
+		this.scriptEngine = new GroovyScriptEngine(resourceConnector);
+		this.scriptEngine.setConfig(getCompilerConfiguration(enableScriptSandbox));
+		this.globalVariables = globalVariables;
+	}
 
-    public GroovyScriptFactory(SiteContext siteContext, ResourceConnector resourceConnector,
-                               ClassLoader parentClassLoader, Map<String, Object> globalVariables,
-                               boolean enableScriptSandbox) {
-        this.siteContext = siteContext;
-        this.scriptEngine = new GroovyScriptEngine(resourceConnector, parentClassLoader);
-        this.scriptEngine.setConfig(getCompilerConfiguration(enableScriptSandbox));
-        this.globalVariables = globalVariables;
-    }
+	public GroovyScriptFactory(SiteContext siteContext, ResourceConnector resourceConnector,
+				   ClassLoader parentClassLoader, Map<String, Object> globalVariables,
+				   boolean enableScriptSandbox) {
+		this.siteContext = siteContext;
+		this.scriptEngine = new GroovyScriptEngine(resourceConnector, parentClassLoader);
+		this.scriptEngine.setConfig(getCompilerConfiguration(enableScriptSandbox));
+		this.globalVariables = globalVariables;
+	}
 
-    @Override
-    public String getScriptFileExtension() {
-        return GROOVY_FILE_EXTENSION;
-    }
+	@Override
+	public String getScriptFileExtension() {
+		return GROOVY_FILE_EXTENSION;
+	}
 
-    @Override
-    public Script getScript(String url) throws ScriptException {
-        return siteContext.getCacheTemplate().getObject(siteContext.getContext(), () -> {
-            try {
-                return new GroovyScript(url,scriptEngine.loadScriptByName(url), globalVariables);
-            } catch (Exception e) {
-                Throwable cause = e.getCause();
-                if (e instanceof ResourceException && cause instanceof FileNotFoundException) {
-                    throw new ScriptNotFoundException(cause.getMessage(), cause);
-                } else {
-                    throw new ScriptException(e.getMessage(), e);
-                }
-            }
-        }, url, CACHE_CONST_KEY_ELEM_SCRIPT);
-    }
+	@Override
+	public Script getScript(String url) throws ScriptException {
+		return siteContext.getCacheTemplate().getObject(siteContext.getContext(), () -> {
+			try {
+				return new GroovyScript(url, scriptEngine.loadScriptByName(url), globalVariables);
+			} catch (Exception e) {
+				Throwable cause = e.getCause();
+				if (e instanceof ResourceException && cause instanceof FileNotFoundException) {
+					throw new ScriptNotFoundException(cause.getMessage(), cause);
+				} else {
+					throw new ScriptException(e.getMessage(), e);
+				}
+			}
+		}, url, CACHE_CONST_KEY_ELEM_SCRIPT);
+	}
 
 }

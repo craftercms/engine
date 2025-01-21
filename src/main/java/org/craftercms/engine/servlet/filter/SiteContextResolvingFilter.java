@@ -17,6 +17,7 @@
 package org.craftercms.engine.servlet.filter;
 
 import java.io.IOException;
+
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -46,74 +47,74 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
  */
 public class SiteContextResolvingFilter implements Filter {
 
-    private static final Logger logger = LoggerFactory.getLogger(SiteContextResolvingFilter.class);
+	private static final Logger logger = LoggerFactory.getLogger(SiteContextResolvingFilter.class);
 
-    protected String errorTemplate;
+	protected String errorTemplate;
 
-    protected SiteContextResolver contextResolver;
+	protected SiteContextResolver contextResolver;
 
-    protected ObjectFactory<FreeMarkerConfig> freeMarkerConfigFactory;
+	protected ObjectFactory<FreeMarkerConfig> freeMarkerConfigFactory;
 
-    public SiteContextResolvingFilter(final String errorTemplate, SiteContextResolver contextResolver,
-                                      final ObjectFactory<FreeMarkerConfig> freeMarkerConfigFactory) {
-        this.errorTemplate = errorTemplate;
-        this.contextResolver = contextResolver;
-        this.freeMarkerConfigFactory = freeMarkerConfigFactory;
-    }
+	public SiteContextResolvingFilter(final String errorTemplate, SiteContextResolver contextResolver,
+					  final ObjectFactory<FreeMarkerConfig> freeMarkerConfigFactory) {
+		this.errorTemplate = errorTemplate;
+		this.contextResolver = contextResolver;
+		this.freeMarkerConfigFactory = freeMarkerConfigFactory;
+	}
 
-    @Override
-    public void init(FilterConfig filterConfig) {
-    }
+	@Override
+	public void init(FilterConfig filterConfig) {
+	}
 
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response,
-                         FilterChain chain) throws IOException, ServletException {
-        SiteContext siteContext = getContext((HttpServletRequest) request, (HttpServletResponse) response);
-        if (siteContext == null) {
-            return;
-        }
-        SiteContext.setCurrent(siteContext);
-        try {
-            chain.doFilter(request, response);
-        } finally {
-            SiteContext.clear();
-        }
-    }
+	@Override
+	public void doFilter(ServletRequest request, ServletResponse response,
+			     FilterChain chain) throws IOException, ServletException {
+		SiteContext siteContext = getContext((HttpServletRequest) request, (HttpServletResponse) response);
+		if (siteContext == null) {
+			return;
+		}
+		SiteContext.setCurrent(siteContext);
+		try {
+			chain.doFilter(request, response);
+		} finally {
+			SiteContext.clear();
+		}
+	}
 
-    protected SiteContext getContext(HttpServletRequest request, HttpServletResponse response) {
-        try {
-            return contextResolver.getContext(request);
-        } catch (RootFolderNotFoundException e) {
-            handleException(response, HttpServletResponse.SC_NOT_FOUND, e);
-        } catch (ConstraintViolationException e) {
-            handleException(response, HttpServletResponse.SC_BAD_REQUEST, e);
-        } catch (Exception e) {
-            handleException(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
-        }
-        return null;
-    }
+	protected SiteContext getContext(HttpServletRequest request, HttpServletResponse response) {
+		try {
+			return contextResolver.getContext(request);
+		} catch (RootFolderNotFoundException e) {
+			handleException(response, HttpServletResponse.SC_NOT_FOUND, e);
+		} catch (ConstraintViolationException e) {
+			handleException(response, HttpServletResponse.SC_BAD_REQUEST, e);
+		} catch (Exception e) {
+			handleException(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
+		}
+		return null;
+	}
 
-    private void handleException(HttpServletResponse response, int statusCode, Exception e) {
-        logger.error("Error while resolving site context for current request", e);
-        renderError(response, statusCode);
-    }
+	private void handleException(HttpServletResponse response, int statusCode, Exception e) {
+		logger.error("Error while resolving site context for current request", e);
+		renderError(response, statusCode);
+	}
 
-    protected void renderError(HttpServletResponse response, int responseCode) {
-        response.setStatus(responseCode);
-        try {
-            Configuration configuration = freeMarkerConfigFactory.getObject().getConfiguration();
-            Template template = configuration.getTemplate(errorTemplate);
-            SimpleHash model = new SimpleHash(configuration.getObjectWrapper());
-            configuration.setAllSharedVariables(model);
-            template.process(model, response.getWriter());
-        } catch (Exception e) {
-            logger.error("Error rendering template for site resolving error", e);
-        }
-    }
+	protected void renderError(HttpServletResponse response, int responseCode) {
+		response.setStatus(responseCode);
+		try {
+			Configuration configuration = freeMarkerConfigFactory.getObject().getConfiguration();
+			Template template = configuration.getTemplate(errorTemplate);
+			SimpleHash model = new SimpleHash(configuration.getObjectWrapper());
+			configuration.setAllSharedVariables(model);
+			template.process(model, response.getWriter());
+		} catch (Exception e) {
+			logger.error("Error rendering template for site resolving error", e);
+		}
+	}
 
-    @Override
-    public void destroy() {
+	@Override
+	public void destroy() {
 
-    }
+	}
 
 }

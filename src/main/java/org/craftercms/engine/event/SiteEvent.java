@@ -27,30 +27,29 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 public class SiteEvent extends ApplicationEvent {
 
-    /**
-     * Returns the latest event of the specified class that has been fired during the handling of the request.
-     *
-     * @param eventClass the event class
-     * @param request the request
-     *
-     * @return the latest request event
-     */
-    public static SiteEvent getLatestRequestEvent(Class<? extends SiteEvent> eventClass,
-                                                  HttpServletRequest request) {
-        return (SiteEvent) request.getAttribute(eventClass.getName());
-    }
+	/**
+	 * Returns the latest event of the specified class that has been fired during the handling of the request.
+	 *
+	 * @param eventClass the event class
+	 * @param request    the request
+	 * @return the latest request event
+	 */
+	public static SiteEvent getLatestRequestEvent(Class<? extends SiteEvent> eventClass,
+						      HttpServletRequest request) {
+		return (SiteEvent) request.getAttribute(eventClass.getName());
+	}
 
-    /**
-     * Create a new ApplicationEvent.
-     *
-     * @param siteContext the site's context
-     */
-    public SiteEvent(SiteContext siteContext) {
-        super(siteContext);
-    }
+	/**
+	 * Create a new ApplicationEvent.
+	 *
+	 * @param siteContext the site's context
+	 */
+	public SiteEvent(SiteContext siteContext) {
+		super(siteContext);
+	}
 
-    public SiteContext getSiteContext() {
-        return (SiteContext) getSource();
-    }
+	public SiteContext getSiteContext() {
+		return (SiteContext) getSource();
+	}
 
 }

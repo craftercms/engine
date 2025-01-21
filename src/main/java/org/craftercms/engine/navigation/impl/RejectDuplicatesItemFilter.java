@@ -28,20 +28,20 @@ import org.craftercms.core.service.ItemFilter;
  */
 public class RejectDuplicatesItemFilter implements ItemFilter {
 
-    @Override
-    public boolean runBeforeProcessing() {
-        return false;
-    }
+	@Override
+	public boolean runBeforeProcessing() {
+		return false;
+	}
 
-    @Override
-    public boolean runAfterProcessing() {
-        return true;
-    }
+	@Override
+	public boolean runAfterProcessing() {
+		return true;
+	}
 
-    @Override
-    public boolean accepts(Item item, List<Item> acceptedItems, List<Item> rejectedItems,
-                           boolean runningBeforeProcessing) {
-        return !acceptedItems.contains(item);
-    }
+	@Override
+	public boolean accepts(Item item, List<Item> acceptedItems, List<Item> rejectedItems,
+			       boolean runningBeforeProcessing) {
+		return !acceptedItems.contains(item);
+	}
 
 }

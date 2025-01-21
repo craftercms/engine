@@ -38,29 +38,29 @@ import java.util.*;
 @RequestMapping(RestControllerBase.REST_BASE_URI + SiteScheduledJobsController.URL_ROOT)
 public class SiteScheduledJobsController extends RestControllerBase {
 
-    public static final String URL_ROOT = "/site/jobs";
-    public static final String URL_LIST = "/list";
+	public static final String URL_ROOT = "/site/jobs";
+	public static final String URL_LIST = "/list";
 
-    @GetMapping(URL_LIST)
-    @SuppressWarnings("unchecked")
-    public List<Map<String, String>> listScheduledJobs() throws SchedulerException {
-        List<Map<String, String>> jobs = new LinkedList<>();
-        SiteContext siteContext = SiteContext.getCurrent();
-        Scheduler scheduler = siteContext.getScheduler();
-        if(scheduler != null) {
-            List<String> groups = scheduler.getJobGroupNames();
-            for (String group : groups) {
-                Set<JobKey> keys = scheduler.getJobKeys(GroupMatcher.jobGroupEquals(group));
-                for (JobKey key : keys) {
-                    List<Trigger> triggers = (List<Trigger>)scheduler.getTriggersOfJob(key);
-                    Map<String, String> job = new HashMap<>();
-                    job.put("name", key.getName());
-                    job.put("nextFireTime", triggers.get(0).getNextFireTime().toInstant().toString());
-                    jobs.add(job);
-                }
-            }
-        }
-        return jobs;
-    }
+	@GetMapping(URL_LIST)
+	@SuppressWarnings("unchecked")
+	public List<Map<String, String>> listScheduledJobs() throws SchedulerException {
+		List<Map<String, String>> jobs = new LinkedList<>();
+		SiteContext siteContext = SiteContext.getCurrent();
+		Scheduler scheduler = siteContext.getScheduler();
+		if (scheduler != null) {
+			List<String> groups = scheduler.getJobGroupNames();
+			for (String group : groups) {
+				Set<JobKey> keys = scheduler.getJobKeys(GroupMatcher.jobGroupEquals(group));
+				for (JobKey key : keys) {
+					List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(key);
+					Map<String, String> job = new HashMap<>();
+					job.put("name", key.getName());
+					job.put("nextFireTime", triggers.get(0).getNextFireTime().toInstant().toString());
+					jobs.add(job);
+				}
+			}
+		}
+		return jobs;
+	}
 
 }

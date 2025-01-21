@@ -33,64 +33,64 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
  */
 public class AllHttpScopesAndAppContextHashModel extends SimpleHash {
 
-    private ApplicationContextAccessor applicationContextAccessor;
-    private ServletContext context;
-    private HttpServletRequest request;
+	private ApplicationContextAccessor applicationContextAccessor;
+	private ServletContext context;
+	private HttpServletRequest request;
 
-    private boolean disableVariableRestrictions;
+	private boolean disableVariableRestrictions;
 
-    public AllHttpScopesAndAppContextHashModel(ObjectWrapper wrapper,
-                                               ApplicationContextAccessor applicationContextAccessor,
-                                               ServletContext context, HttpServletRequest request,
-                                               boolean disableVariableRestrictions) {
-        super(wrapper);
+	public AllHttpScopesAndAppContextHashModel(ObjectWrapper wrapper,
+						   ApplicationContextAccessor applicationContextAccessor,
+						   ServletContext context, HttpServletRequest request,
+						   boolean disableVariableRestrictions) {
+		super(wrapper);
 
-        this.applicationContextAccessor = applicationContextAccessor;
-        this.context = context;
-        this.request = request;
-        this.disableVariableRestrictions = disableVariableRestrictions;
-    }
+		this.applicationContextAccessor = applicationContextAccessor;
+		this.context = context;
+		this.request = request;
+		this.disableVariableRestrictions = disableVariableRestrictions;
+	}
 
-    @Override
-    public TemplateModel get(String key) throws TemplateModelException {
-        // Lookup in page scope
-        TemplateModel model = super.get(key);
-        if (model != null) {
-            return model;
-        }
+	@Override
+	public TemplateModel get(String key) throws TemplateModelException {
+		// Lookup in page scope
+		TemplateModel model = super.get(key);
+		if (model != null) {
+			return model;
+		}
 
-        // Lookup in request scope
-        Object obj = request.getAttribute(key);
-        if (obj != null) {
-            return wrap(obj);
-        }
+		// Lookup in request scope
+		Object obj = request.getAttribute(key);
+		if (obj != null) {
+			return wrap(obj);
+		}
 
-        // Lookup in session scope
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            obj = session.getAttribute(key);
-            if (obj != null) {
-                return wrap(obj);
-            }
-        }
+		// Lookup in session scope
+		HttpSession session = request.getSession(false);
+		if (session != null) {
+			obj = session.getAttribute(key);
+			if (obj != null) {
+				return wrap(obj);
+			}
+		}
 
-        if (disableVariableRestrictions) {
-            // Lookup in application scope
-            obj = context.getAttribute(key);
-            if (obj != null) {
-                return wrap(obj);
-            }
-        }
+		if (disableVariableRestrictions) {
+			// Lookup in application scope
+			obj = context.getAttribute(key);
+			if (obj != null) {
+				return wrap(obj);
+			}
+		}
 
-        // Lookup in application context
-        try {
-            return wrap(applicationContextAccessor.get(key));
-        } catch (NoSuchBeanDefinitionException e) {
-            // do nothing...
-        }
+		// Lookup in application context
+		try {
+			return wrap(applicationContextAccessor.get(key));
+		} catch (NoSuchBeanDefinitionException e) {
+			// do nothing...
+		}
 
-        // return wrapper's null object (probably null).
-        return wrap(null);
-    }
+		// return wrapper's null object (probably null).
+		return wrap(null);
+	}
 
 }

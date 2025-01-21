@@ -25,13 +25,13 @@ import org.craftercms.engine.service.context.SiteContext;
  */
 public interface SiteCacheWarmer {
 
-    /**
-     * Warms up the cache for the specified site context. If {@code switchCache} is true, then a new cache is created,
-     * warmed up and then switched with the current cache of the site.
-     *
-     * @param siteContext the site context
-     * @param switchCache if a new cache should be warmed and then switched with the current cache
-     */
-    void warmUpCache(SiteContext siteContext, boolean switchCache);
+	/**
+	 * Warms up the cache for the specified site context. If {@code switchCache} is true, then a new cache is created,
+	 * warmed up and then switched with the current cache of the site.
+	 *
+	 * @param siteContext the site context
+	 * @param switchCache if a new cache should be warmed and then switched with the current cache
+	 */
+	void warmUpCache(SiteContext siteContext, boolean switchCache);
 
 }

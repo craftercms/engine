@@ -65,168 +65,168 @@ import static org.craftercms.engine.util.GroovyScriptUtils.addRestScriptVariable
 @RequestMapping(path = {API_ROOT, API_1_SERVICES_ROOT})
 public class RestScriptsController implements ServletContextAware {
 
-    private static final Log logger = LogFactory.getLog(RestScriptsController.class);
+	private static final Log logger = LogFactory.getLog(RestScriptsController.class);
 
-    public static final String DEFAULT_RESPONSE_BODY_MODEL_ATTR_NAME = "responseBody";
-    public static final String DEFAULT_ERROR_MESSAGE_MODEL_ATTR_NAME = "message";
+	public static final String DEFAULT_RESPONSE_BODY_MODEL_ATTR_NAME = "responseBody";
+	public static final String DEFAULT_ERROR_MESSAGE_MODEL_ATTR_NAME = "message";
 
-    private static final String SCRIPT_URL_FORMAT = "%s.%s.%s"; // {url}.{method}.{scriptExt}
+	private static final String SCRIPT_URL_FORMAT = "%s.%s.%s"; // {url}.{method}.{scriptExt}
 
-    protected static final String API_ROOT = "/api";
+	protected static final String API_ROOT = "/api";
 
-    protected static final String API_1_SERVICES_ROOT = "/api/1/services";
+	protected static final String API_1_SERVICES_ROOT = "/api/1/services";
 
-    protected String responseBodyModelAttributeName;
-    protected String errorMessageModelAttributeName;
-    protected ScriptUrlTemplateScanner urlTemplateScanner;
-    protected boolean disableVariableRestrictions;
+	protected String responseBodyModelAttributeName;
+	protected String errorMessageModelAttributeName;
+	protected ScriptUrlTemplateScanner urlTemplateScanner;
+	protected boolean disableVariableRestrictions;
 
-    protected PluginService pluginService;
-    private ServletContext servletContext;
+	protected PluginService pluginService;
+	private ServletContext servletContext;
 
-    private AntPathMatcher antPathMatcher;
+	private AntPathMatcher antPathMatcher;
 
-    public RestScriptsController() {
-        responseBodyModelAttributeName = DEFAULT_RESPONSE_BODY_MODEL_ATTR_NAME;
-        errorMessageModelAttributeName = DEFAULT_ERROR_MESSAGE_MODEL_ATTR_NAME;
-        this.antPathMatcher = new AntPathMatcher();
-    }
+	public RestScriptsController() {
+		responseBodyModelAttributeName = DEFAULT_RESPONSE_BODY_MODEL_ATTR_NAME;
+		errorMessageModelAttributeName = DEFAULT_ERROR_MESSAGE_MODEL_ATTR_NAME;
+		this.antPathMatcher = new AntPathMatcher();
+	}
 
-    public void setResponseBodyModelAttributeName(String responseBodyModelAttributeName) {
-        this.responseBodyModelAttributeName = responseBodyModelAttributeName;
-    }
+	public void setResponseBodyModelAttributeName(String responseBodyModelAttributeName) {
+		this.responseBodyModelAttributeName = responseBodyModelAttributeName;
+	}
 
-    public void setErrorMessageModelAttributeName(String errorMessageModelAttributeName) {
-        this.errorMessageModelAttributeName = errorMessageModelAttributeName;
-    }
+	public void setErrorMessageModelAttributeName(String errorMessageModelAttributeName) {
+		this.errorMessageModelAttributeName = errorMessageModelAttributeName;
+	}
 
-    public void setUrlTemplateScanner(ScriptUrlTemplateScanner urlTemplateScanner) {
-        this.urlTemplateScanner = urlTemplateScanner;
-    }
+	public void setUrlTemplateScanner(ScriptUrlTemplateScanner urlTemplateScanner) {
+		this.urlTemplateScanner = urlTemplateScanner;
+	}
 
-    public void setDisableVariableRestrictions(boolean disableVariableRestrictions) {
-        this.disableVariableRestrictions = disableVariableRestrictions;
-    }
+	public void setDisableVariableRestrictions(boolean disableVariableRestrictions) {
+		this.disableVariableRestrictions = disableVariableRestrictions;
+	}
 
-    public void setPluginService(PluginService pluginService) {
-        this.pluginService = pluginService;
-    }
+	public void setPluginService(PluginService pluginService) {
+		this.pluginService = pluginService;
+	}
 
-    @RequestMapping(path = "/**", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    protected ResponseEntity handleRequest(final HttpServletRequest request, final HttpServletResponse response) {
-        SiteContext siteContext = SiteContext.getCurrent();
-        ScriptFactory scriptFactory = siteContext.getScriptFactory();
+	@RequestMapping(path = "/**", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+	protected ResponseEntity handleRequest(final HttpServletRequest request, final HttpServletResponse response) {
+		SiteContext siteContext = SiteContext.getCurrent();
+		ScriptFactory scriptFactory = siteContext.getScriptFactory();
 
-        if (scriptFactory == null) {
-            throw new IllegalStateException(format("No script factory associate to current site context '%s'",
-                    siteContext.getSiteName()));
-        }
+		if (scriptFactory == null) {
+			throw new IllegalStateException(format("No script factory associate to current site context '%s'",
+				siteContext.getSiteName()));
+		}
 
-        String serviceUrl = getServiceUrl(request);
-        String scriptUrl = getScriptUrl(scriptFactory, siteContext, request, serviceUrl);
-        Map<String, Object> scriptVariables = createScriptVariables(request, response);
+		String serviceUrl = getServiceUrl(request);
+		String scriptUrl = getScriptUrl(scriptFactory, siteContext, request, serviceUrl);
+		Map<String, Object> scriptVariables = createScriptVariables(request, response);
 
-        pluginService.addPluginVariables(scriptUrl, scriptVariables::put);
+		pluginService.addPluginVariables(scriptUrl, scriptVariables::put);
 
-        scriptUrl = parseScriptUrlForVariables(siteContext, scriptUrl, scriptVariables);
+		scriptUrl = parseScriptUrlForVariables(siteContext, scriptUrl, scriptVariables);
 
-        Object responseBody = executeScript(scriptFactory, scriptVariables, response, scriptUrl);
+		Object responseBody = executeScript(scriptFactory, scriptVariables, response, scriptUrl);
 
-        return ResponseEntity.status(response.getStatus()).body(responseBody);
-    }
+		return ResponseEntity.status(response.getStatus()).body(responseBody);
+	}
 
-    protected String getServiceUrl(HttpServletRequest request) {
-        String url = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        if (StringUtils.isEmpty(url)) {
-            throw new IllegalStateException(
-                    format("Required request attribute '%s' is not set", HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE));
-        }
-        String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
-        return antPathMatcher.extractPathWithinPattern(pattern, url);
-    }
+	protected String getServiceUrl(HttpServletRequest request) {
+		String url = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+		if (StringUtils.isEmpty(url)) {
+			throw new IllegalStateException(
+				format("Required request attribute '%s' is not set", HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE));
+		}
+		String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+		return antPathMatcher.extractPathWithinPattern(pattern, url);
+	}
 
-    protected String parseScriptUrlForVariables(SiteContext siteContext, String scriptUrl,
-                                                Map<String, Object> variables) {
-        ContentStoreService storeService = siteContext.getStoreService();
-        if (!storeService.exists(siteContext.getContext(), scriptUrl) && urlTemplateScanner != null) {
-            List<UriTemplate> urlTemplates = urlTemplateScanner.scan(siteContext);
-            if (CollectionUtils.isNotEmpty(urlTemplates)) {
-                for (UriTemplate template : urlTemplates) {
-                    if (template.matches(scriptUrl)) {
-                        Map<String, String> pathVars = template.match(scriptUrl);
-                        String actualScriptUrl = template.toString();
+	protected String parseScriptUrlForVariables(SiteContext siteContext, String scriptUrl,
+						    Map<String, Object> variables) {
+		ContentStoreService storeService = siteContext.getStoreService();
+		if (!storeService.exists(siteContext.getContext(), scriptUrl) && urlTemplateScanner != null) {
+			List<UriTemplate> urlTemplates = urlTemplateScanner.scan(siteContext);
+			if (CollectionUtils.isNotEmpty(urlTemplates)) {
+				for (UriTemplate template : urlTemplates) {
+					if (template.matches(scriptUrl)) {
+						Map<String, String> pathVars = template.match(scriptUrl);
+						String actualScriptUrl = template.toString();
 
-                        variables.put(GroovyScriptUtils.VARIABLE_PATH_VARS, pathVars);
+						variables.put(GroovyScriptUtils.VARIABLE_PATH_VARS, pathVars);
 
-                        return actualScriptUrl;
-                    }
-                }
-            }
-        }
+						return actualScriptUrl;
+					}
+				}
+			}
+		}
 
-        return scriptUrl;
-    }
+		return scriptUrl;
+	}
 
-    protected String getScriptUrl(ScriptFactory scriptFactory, SiteContext siteContext, HttpServletRequest request,
-                                  String serviceUrl) {
-        String baseUrl = UrlUtils.concat(siteContext.getRestScriptsPath(), FilenameUtils.removeExtension(serviceUrl));
+	protected String getScriptUrl(ScriptFactory scriptFactory, SiteContext siteContext, HttpServletRequest request,
+				      String serviceUrl) {
+		String baseUrl = UrlUtils.concat(siteContext.getRestScriptsPath(), FilenameUtils.removeExtension(serviceUrl));
 
-        return format(SCRIPT_URL_FORMAT, baseUrl, request.getMethod().toLowerCase(), scriptFactory.getScriptFileExtension());
-    }
+		return format(SCRIPT_URL_FORMAT, baseUrl, request.getMethod().toLowerCase(), scriptFactory.getScriptFileExtension());
+	}
 
-    protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response) {
-        Map<String, Object> variables = new HashMap<>();
-        addRestScriptVariables(variables, request, response, disableVariableRestrictions ? servletContext : null);
+	protected Map<String, Object> createScriptVariables(HttpServletRequest request, HttpServletResponse response) {
+		Map<String, Object> variables = new HashMap<>();
+		addRestScriptVariables(variables, request, response, disableVariableRestrictions ? servletContext : null);
 
-        return variables;
-    }
+		return variables;
+	}
 
-    protected Object executeScript(ScriptFactory scriptFactory, Map<String, Object> scriptVariables, HttpServletResponse response,
-                                   String scriptUrl) {
-        try {
-            return scriptFactory.getScript(scriptUrl).execute(scriptVariables);
-        } catch (ScriptNotFoundException e) {
-            logger.error(format("Script not found at '%s'", scriptUrl));
-            throw new HttpStatusCodeException(HttpStatus.SC_NOT_FOUND, e);
-        } catch (Exception e) {
-            logger.error(format("Error executing REST script at '%s'", scriptUrl), e);
+	protected Object executeScript(ScriptFactory scriptFactory, Map<String, Object> scriptVariables, HttpServletResponse response,
+				       String scriptUrl) {
+		try {
+			return scriptFactory.getScript(scriptUrl).execute(scriptVariables);
+		} catch (ScriptNotFoundException e) {
+			logger.error(format("Script not found at '%s'", scriptUrl));
+			throw new HttpStatusCodeException(HttpStatus.SC_NOT_FOUND, e);
+		} catch (Exception e) {
+			logger.error(format("Error executing REST script at '%s'", scriptUrl), e);
 
-            Throwable cause = checkHttpStatusCodeAwareException(e, response);
+			Throwable cause = checkHttpStatusCodeAwareException(e, response);
 
-            if (cause == null) {
-                cause = checkValidationException(e, response);
-                if (cause == null) {
-                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                }
-            }
+			if (cause == null) {
+				cause = checkValidationException(e, response);
+				if (cause == null) {
+					response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				}
+			}
 
-            return singletonMap(errorMessageModelAttributeName, cause != null ? cause.getMessage() : e.getMessage());
-        }
-    }
+			return singletonMap(errorMessageModelAttributeName, cause != null ? cause.getMessage() : e.getMessage());
+		}
+	}
 
-    protected Throwable checkHttpStatusCodeAwareException(Exception e, HttpServletResponse response) {
-        HttpStatusCodeAwareException cause = ExceptionUtils.getThrowableOfType(e, HttpStatusCodeAwareException.class);
-        if (cause != null) {
-            response.setStatus(cause.getStatusCode());
+	protected Throwable checkHttpStatusCodeAwareException(Exception e, HttpServletResponse response) {
+		HttpStatusCodeAwareException cause = ExceptionUtils.getThrowableOfType(e, HttpStatusCodeAwareException.class);
+		if (cause != null) {
+			response.setStatus(cause.getStatusCode());
 
-            return (Throwable) cause;
-        } else {
-            return null;
-        }
-    }
+			return (Throwable) cause;
+		} else {
+			return null;
+		}
+	}
 
-    protected Throwable checkValidationException(Exception e, HttpServletResponse response) {
-        Throwable cause = ExceptionUtils.getRootCause(e);
-        if (cause instanceof ValidationException || cause instanceof ValidationRuntimeException) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+	protected Throwable checkValidationException(Exception e, HttpServletResponse response) {
+		Throwable cause = ExceptionUtils.getRootCause(e);
+		if (cause instanceof ValidationException || cause instanceof ValidationRuntimeException) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
-            return cause;
-        }
-        return null;
-    }
+			return cause;
+		}
+		return null;
+	}
 
-    @Override
-    public void setServletContext(ServletContext servletContext) {
-        this.servletContext = servletContext;
-    }
+	@Override
+	public void setServletContext(ServletContext servletContext) {
+		this.servletContext = servletContext;
+	}
 }

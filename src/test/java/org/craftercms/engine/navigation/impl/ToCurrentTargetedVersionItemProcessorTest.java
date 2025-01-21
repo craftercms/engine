@@ -34,56 +34,56 @@ import static org.mockito.Mockito.*;
  */
 public class ToCurrentTargetedVersionItemProcessorTest {
 
-    private static final String TRANSFORMER_NAME = "toCurrentTargetedUrl";
-    private static final String INDEX_EN_URL = "/site/website/index_en.xml";
-    private static final String INDEX_EN_US_URL = "/site/website/index_en_US.xml";
-    private static final String INDEX_FR_URL = "/site/website/index_fr.xml";
+	private static final String TRANSFORMER_NAME = "toCurrentTargetedUrl";
+	private static final String INDEX_EN_URL = "/site/website/index_en.xml";
+	private static final String INDEX_EN_US_URL = "/site/website/index_en_US.xml";
+	private static final String INDEX_FR_URL = "/site/website/index_fr.xml";
 
-    private ToCurrentTargetedVersionItemProcessor processor;
+	private ToCurrentTargetedVersionItemProcessor processor;
 
-    @Before
-    public void setUp() throws Exception {
-        processor = new ToCurrentTargetedVersionItemProcessor(TRANSFORMER_NAME, createUrlTransformationEngine(),
-                createContentStoreService(), new LocaleTargetIdManager());
-        setUpCurrentConfig();
-    }
+	@Before
+	public void setUp() throws Exception {
+		processor = new ToCurrentTargetedVersionItemProcessor(TRANSFORMER_NAME, createUrlTransformationEngine(),
+			createContentStoreService(), new LocaleTargetIdManager());
+		setUpCurrentConfig();
+	}
 
-    @Test
-    public void testProcess() throws Exception {
-        Item item = new Item();
-        item.setFolder(false);
-        item.setUrl(INDEX_FR_URL);
+	@Test
+	public void testProcess() throws Exception {
+		Item item = new Item();
+		item.setFolder(false);
+		item.setUrl(INDEX_FR_URL);
 
-        Item processedItem = processor.process(null, null, item);
-        assertEquals(INDEX_EN_URL, processedItem.getUrl());
-    }
+		Item processedItem = processor.process(null, null, item);
+		assertEquals(INDEX_EN_URL, processedItem.getUrl());
+	}
 
-    private UrlTransformationEngine createUrlTransformationEngine() {
-        UrlTransformationEngine transformationEngine = mock(UrlTransformationEngine.class);
-        when(transformationEngine.transformUrl(null, null, TRANSFORMER_NAME, INDEX_FR_URL)).thenReturn(INDEX_EN_US_URL);
+	private UrlTransformationEngine createUrlTransformationEngine() {
+		UrlTransformationEngine transformationEngine = mock(UrlTransformationEngine.class);
+		when(transformationEngine.transformUrl(null, null, TRANSFORMER_NAME, INDEX_FR_URL)).thenReturn(INDEX_EN_US_URL);
 
-        return transformationEngine;
-    }
+		return transformationEngine;
+	}
 
-    private ContentStoreService createContentStoreService() {
-        Item item = new Item();
-        item.setUrl(INDEX_EN_URL);
+	private ContentStoreService createContentStoreService() {
+		Item item = new Item();
+		item.setUrl(INDEX_EN_URL);
 
-        ContentStoreService storeService = mock(ContentStoreService.class);
-        when(storeService.findItem(null, null, INDEX_EN_US_URL, null)).thenReturn(item);
+		ContentStoreService storeService = mock(ContentStoreService.class);
+		when(storeService.findItem(null, null, INDEX_EN_US_URL, null)).thenReturn(item);
 
-        return storeService;
-    }
+		return storeService;
+	}
 
-    private void setUpCurrentConfig() {
-        XMLConfiguration config = mock(XMLConfiguration.class);
-        when(config.getBoolean(TARGETING_ENABLED_CONFIG_KEY, false)).thenReturn(true);
+	private void setUpCurrentConfig() {
+		XMLConfiguration config = mock(XMLConfiguration.class);
+		when(config.getBoolean(TARGETING_ENABLED_CONFIG_KEY, false)).thenReturn(true);
 
-        SiteContext siteContext = spy(new SiteContext());
-        when(siteContext.getSiteName()).thenReturn("test");
-        when(siteContext.getConfig()).thenReturn(config);
+		SiteContext siteContext = spy(new SiteContext());
+		when(siteContext.getSiteName()).thenReturn("test");
+		when(siteContext.getConfig()).thenReturn(config);
 
-        SiteContext.setCurrent(siteContext);
-    }
+		SiteContext.setCurrent(siteContext);
+	}
 
 }

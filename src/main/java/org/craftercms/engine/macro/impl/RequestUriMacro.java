@@ -25,28 +25,28 @@ import org.craftercms.commons.http.RequestContext;
  */
 public class RequestUriMacro extends AbstractMacro {
 
-    @Override
-    protected String createMacroName() {
-        return "{request.uri}";
-    }
+	@Override
+	protected String createMacroName() {
+		return "{request.uri}";
+	}
 
-    @Override
-    protected String getMacroValue(String str) {
-        RequestContext requestContext = RequestContext.getCurrent();
-        if (requestContext != null) {
-            String requestUri = requestContext.getRequest().getRequestURI();
+	@Override
+	protected String getMacroValue(String str) {
+		RequestContext requestContext = RequestContext.getCurrent();
+		if (requestContext != null) {
+			String requestUri = requestContext.getRequest().getRequestURI();
 
-            if (!requestUri.startsWith("/")) {
-                requestUri = "/" + requestUri;
-            }
-            if (!requestUri.equals("/")) {
-                requestUri = StringUtils.stripEnd(requestUri, "/");
-            }
+			if (!requestUri.startsWith("/")) {
+				requestUri = "/" + requestUri;
+			}
+			if (!requestUri.equals("/")) {
+				requestUri = StringUtils.stripEnd(requestUri, "/");
+			}
 
-            return requestUri;
-        } else {
-            return null;
-        }
-    }
+			return requestUri;
+		} else {
+			return null;
+		}
+	}
 
 }

@@ -24,8 +24,8 @@ import org.craftercms.core.url.UrlTransformationEngine;
  */
 public interface UrlTransformationService {
 
-    String transform(String transformerName, String url);
+	String transform(String transformerName, String url);
 
-    String transform(String transformerName, String url, boolean cache);
+	String transform(String transformerName, String url, boolean cache);
 
 }

@@ -45,50 +45,50 @@ import static java.lang.String.format;
 @RequestMapping(RestControllerBase.REST_BASE_URI + SiteCacheRestController.URL_ROOT)
 public class SiteCacheRestController extends RestControllerBase {
 
-    private static final Log logger = LogFactory.getLog(SiteCacheRestController.class);
+	private static final Log logger = LogFactory.getLog(SiteCacheRestController.class);
 
-    public static final String URL_ROOT = "/site/cache";
-    public static final String URL_CLEAR = "/clear";
-    public static final String URL_STATS = "/statistics";
+	public static final String URL_ROOT = "/site/cache";
+	public static final String URL_CLEAR = "/clear";
+	public static final String URL_STATS = "/statistics";
 
-    private final String configuredToken;
+	private final String configuredToken;
 
-    @ConstructorProperties({"configuredToken"})
-    public SiteCacheRestController(final String configuredToken) {
-        this.configuredToken = configuredToken;
-    }
+	@ConstructorProperties({"configuredToken"})
+	public SiteCacheRestController(final String configuredToken) {
+		this.configuredToken = configuredToken;
+	}
 
-    @RequestMapping(value = URL_CLEAR, method = RequestMethod.GET)
-    public Map<String, Object> clear(HttpServletRequest request, @RequestParam String token) throws InvalidManagementTokenException {
-        validateToken(token);
-        SiteContext siteContext = SiteContext.getCurrent();
-        String siteName = siteContext.getSiteName();
-        String msg;
+	@RequestMapping(value = URL_CLEAR, method = RequestMethod.GET)
+	public Map<String, Object> clear(HttpServletRequest request, @RequestParam String token) throws InvalidManagementTokenException {
+		validateToken(token);
+		SiteContext siteContext = SiteContext.getCurrent();
+		String siteName = siteContext.getSiteName();
+		String msg;
 
-        // Don't clear cache if the context was just created in this request
-        if (SiteEvent.getLatestRequestEvent(SiteContextCreatedEvent.class, request) != null) {
-            return createResponseMessage(format("Site context for '%s' created during the request. Cache clear not necessary", siteName));
-        } else {
-            siteContext.startCacheClear();
-            msg = format("Cache clear for site '%s' started", siteName);
-        }
+		// Don't clear cache if the context was just created in this request
+		if (SiteEvent.getLatestRequestEvent(SiteContextCreatedEvent.class, request) != null) {
+			return createResponseMessage(format("Site context for '%s' created during the request. Cache clear not necessary", siteName));
+		} else {
+			siteContext.startCacheClear();
+			msg = format("Cache clear for site '%s' started", siteName);
+		}
 
-        logger.debug(msg);
+		logger.debug(msg);
 
-        return createResponseMessage(msg);
-    }
+		return createResponseMessage(msg);
+	}
 
-    @RequestMapping(value = URL_STATS, method = RequestMethod.GET)
-    public CacheStatistics getStatistics(@RequestParam String token) throws InvalidManagementTokenException {
-        validateToken(token);
+	@RequestMapping(value = URL_STATS, method = RequestMethod.GET)
+	public CacheStatistics getStatistics(@RequestParam String token) throws InvalidManagementTokenException {
+		validateToken(token);
 
-        SiteContext siteContext = SiteContext.getCurrent();
-        return siteContext.getCacheTemplate().getCacheService().getStatistics(siteContext.getContext());
-    }
+		SiteContext siteContext = SiteContext.getCurrent();
+		return siteContext.getCacheTemplate().getCacheService().getStatistics(siteContext.getContext());
+	}
 
-    protected final void validateToken(final String requestToken) throws InvalidManagementTokenException {
-        if (!StringUtils.equals(requestToken, configuredToken)) {
-            throw new InvalidManagementTokenException("Management authorization failed, invalid token.");
-        }
-    }
+	protected final void validateToken(final String requestToken) throws InvalidManagementTokenException {
+		if (!StringUtils.equals(requestToken, configuredToken)) {
+			throw new InvalidManagementTokenException("Management authorization failed, invalid token.");
+		}
+	}
 }

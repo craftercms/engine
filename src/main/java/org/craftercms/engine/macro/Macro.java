@@ -24,8 +24,8 @@ package org.craftercms.engine.macro;
  */
 public interface Macro {
 
-    String getName();
+	String getName();
 
-    String resolve(String str);
+	String resolve(String str);
 
 }

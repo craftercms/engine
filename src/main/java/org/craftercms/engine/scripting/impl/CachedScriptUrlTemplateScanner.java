@@ -32,28 +32,28 @@ import java.util.List;
  * @author avasquez
  */
 public class CachedScriptUrlTemplateScanner implements ScriptUrlTemplateScanner,
-                                                       ApplicationListener<SiteContextInitializedEvent> {
+	ApplicationListener<SiteContextInitializedEvent> {
 
-    public static final String URL_TEMPLATES_CACHE_KEY_ELEM = "restScriptUrlTemplates";
+	public static final String URL_TEMPLATES_CACHE_KEY_ELEM = "restScriptUrlTemplates";
 
-    protected CacheTemplate cacheTemplate;
-    protected ScriptUrlTemplateScanner actualScanner;
+	protected CacheTemplate cacheTemplate;
+	protected ScriptUrlTemplateScanner actualScanner;
 
-    public CachedScriptUrlTemplateScanner(CacheTemplate cacheTemplate, ScriptUrlTemplateScanner actualScanner) {
-        this.cacheTemplate = cacheTemplate;
-        this.actualScanner = actualScanner;
-    }
+	public CachedScriptUrlTemplateScanner(CacheTemplate cacheTemplate, ScriptUrlTemplateScanner actualScanner) {
+		this.cacheTemplate = cacheTemplate;
+		this.actualScanner = actualScanner;
+	}
 
-    @Override
-    public void onApplicationEvent(SiteContextInitializedEvent event) {
-        // Pre-cache the url templates after a site context is initialized.
-        scan(event.getSiteContext());
-    }
+	@Override
+	public void onApplicationEvent(SiteContextInitializedEvent event) {
+		// Pre-cache the url templates after a site context is initialized.
+		scan(event.getSiteContext());
+	}
 
-    @Override
-    public List<UriTemplate> scan(final SiteContext siteContext) {
-        return cacheTemplate.getObject(
-                siteContext.getContext(), () -> actualScanner.scan(siteContext), URL_TEMPLATES_CACHE_KEY_ELEM);
-    }
+	@Override
+	public List<UriTemplate> scan(final SiteContext siteContext) {
+		return cacheTemplate.getObject(
+			siteContext.getContext(), () -> actualScanner.scan(siteContext), URL_TEMPLATES_CACHE_KEY_ELEM);
+	}
 
 }

@@ -23,34 +23,34 @@ import org.craftercms.engine.mobile.UserAgentTemplateDetector;
 
 public class PreviewOverlayCallback {
 
-    private String scriptFormat;
+	private String scriptFormat;
 	private String[] previewServerJsScriptSources;
-    private MacroResolver macroResolver;
-    private UserAgentTemplateDetector userAgentTemplateDetector;
+	private MacroResolver macroResolver;
+	private UserAgentTemplateDetector userAgentTemplateDetector;
 
-    public PreviewOverlayCallback(String scriptFormat, String[] previewServerJsScriptSources, MacroResolver macroResolver,
-                                  UserAgentTemplateDetector userAgentTemplateDetector) {
-        this.scriptFormat = scriptFormat;
-        this.previewServerJsScriptSources = previewServerJsScriptSources;
-        this.macroResolver = macroResolver;
-        this.userAgentTemplateDetector = userAgentTemplateDetector;
-    }
+	public PreviewOverlayCallback(String scriptFormat, String[] previewServerJsScriptSources, MacroResolver macroResolver,
+				      UserAgentTemplateDetector userAgentTemplateDetector) {
+		this.scriptFormat = scriptFormat;
+		this.previewServerJsScriptSources = previewServerJsScriptSources;
+		this.macroResolver = macroResolver;
+		this.userAgentTemplateDetector = userAgentTemplateDetector;
+	}
 
-    public String render() {
-        String queryString = RequestContext.getCurrent().getRequest().getQueryString();
+	public String render() {
+		String queryString = RequestContext.getCurrent().getRequest().getQueryString();
 		StringBuilder scriptsStr = new StringBuilder();
 
-        // TODO: Shouldn't we also check if CStudio-Agent header is also present?
-		if(StringUtils.isEmpty(queryString) ||
-           !queryString.contains(userAgentTemplateDetector.getAgentQueryStringParamName())) {
+		// TODO: Shouldn't we also check if CStudio-Agent header is also present?
+		if (StringUtils.isEmpty(queryString) ||
+			!queryString.contains(userAgentTemplateDetector.getAgentQueryStringParamName())) {
 			for (String scriptSrc : previewServerJsScriptSources) {
-                String script = scriptFormat.replace("{scriptSrc}", scriptSrc);
+				String script = scriptFormat.replace("{scriptSrc}", scriptSrc);
 
-                scriptsStr.append(macroResolver.resolveMacros(script));
-                scriptsStr.append(System.getProperty("line.separator"));
+				scriptsStr.append(macroResolver.resolveMacros(script));
+				scriptsStr.append(System.getProperty("line.separator"));
 			}
 		}
-		
+
 		return scriptsStr.toString();
 	}
 

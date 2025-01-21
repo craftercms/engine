@@ -27,20 +27,20 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
  * @author Phil Nguyen
  */
 public class MappingJackson2HttpMessageConverterFactoryBean extends AbstractFactoryBean<MappingJackson2HttpMessageConverter> {
-    private ObjectMapper objectMapper;
+	private ObjectMapper objectMapper;
 
-    @Override
-    public Class<MappingJackson2HttpMessageConverter> getObjectType() {
-        return MappingJackson2HttpMessageConverter.class;
-    }
+	@Override
+	public Class<MappingJackson2HttpMessageConverter> getObjectType() {
+		return MappingJackson2HttpMessageConverter.class;
+	}
 
-    @Override
-    protected MappingJackson2HttpMessageConverter createInstance() throws Exception {
-        objectMapper.enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION);
-        return new MappingJackson2HttpMessageConverter(objectMapper);
-    }
+	@Override
+	protected MappingJackson2HttpMessageConverter createInstance() throws Exception {
+		objectMapper.enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION);
+		return new MappingJackson2HttpMessageConverter(objectMapper);
+	}
 
-    public void setObjectMapper(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
+	public void setObjectMapper(ObjectMapper objectMapper) {
+		this.objectMapper = objectMapper;
+	}
 }

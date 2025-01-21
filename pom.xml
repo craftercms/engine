@@ -16,362 +16,378 @@
   -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
-	<artifactId>crafter-engine</artifactId>
+		<modelVersion>4.0.0</modelVersion>
+		<artifactId>crafter-engine</artifactId>
 
-	<name>Crafter Engine</name>
-	<description>Crafter Content Delivery Engine</description>
-	<url>https://github.com/craftercms/engine</url>
+		<name>Crafter Engine</name>
+		<description>Crafter Content Delivery Engine</description>
+		<url>https://github.com/craftercms/engine</url>
 
-	<scm>
-		<connection>scm:git:git://github.com/craftercms/engine</connection>
-		<developerConnection>scm:git:git://github.com/craftercms/engine</developerConnection>
-		<url>scm:git:git://github.com/craftercms/engine</url>
-	</scm>
+		<scm>
+				<connection>scm:git:git://github.com/craftercms/engine</connection>
+				<developerConnection>scm:git:git://github.com/craftercms/engine</developerConnection>
+				<url>scm:git:git://github.com/craftercms/engine</url>
+		</scm>
 
-	<packaging>war</packaging>
+		<packaging>war</packaging>
 
-	<parent>
-		<groupId>org.craftercms</groupId>
-		<artifactId>craftercms</artifactId>
-		<version>5.0.0-SNAPSHOT</version><!-- craftercms version flag -->
-		<relativePath/> <!-- lookup parent from repository -->
-	</parent>
+		<parent>
+				<groupId>org.craftercms</groupId>
+				<artifactId>craftercms</artifactId>
+				<version>5.0.0-SNAPSHOT</version><!-- craftercms version flag -->
+				<relativePath/> <!-- lookup parent from repository -->
+		</parent>
 
-	<dependencies>
-		<!-- Overrides -->
-		<dependency>
-			<groupId>com.squareup.okio</groupId><!-- Override -->
-			<artifactId>okio-jvm</artifactId>
-		</dependency>
+		<dependencies>
+				<!-- Overrides -->
+				<dependency>
+						<groupId>com.squareup.okio</groupId><!-- Override -->
+						<artifactId>okio-jvm</artifactId>
+				</dependency>
 
-		<!-- Dependencies -->
-		<dependency>
-			<groupId>jakarta.servlet</groupId>
-			<artifactId>jakarta.servlet-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.angus</groupId>
-			<artifactId>angus-mail</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.craftercms</groupId>
-			<artifactId>crafter-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.craftercms</groupId>
-			<artifactId>crafter-security-provider</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.craftercms</groupId>
-			<artifactId>crafter-commons-mongo</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.craftercms</groupId>
-			<artifactId>crafter-commons-entitlements</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.craftercms</groupId>
-			<artifactId>crafter-commons-validation</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.craftercms</groupId>
-			<artifactId>crafter-search-opensearch</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents.client5</groupId>
-			<artifactId>httpclient5</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-configuration2</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cglib</groupId>
-			<artifactId>cglib</artifactId>
-		</dependency>
+				<!-- Dependencies -->
+				<dependency>
+						<groupId>jakarta.servlet</groupId>
+						<artifactId>jakarta.servlet-api</artifactId>
+						<scope>provided</scope>
+				</dependency>
+				<dependency>
+						<groupId>org.eclipse.angus</groupId>
+						<artifactId>angus-mail</artifactId>
+				</dependency>
+				<dependency>
+						<groupId>org.craftercms</groupId>
+						<artifactId>crafter-core</artifactId>
+				</dependency>
+				<dependency>
+						<groupId>org.craftercms</groupId>
+						<artifactId>crafter-security-provider</artifactId>
+				</dependency>
+				<dependency>
+						<groupId>org.craftercms</groupId>
+						<artifactId>crafter-commons-mongo</artifactId>
+				</dependency>
+				<dependency>
+						<groupId>org.craftercms</groupId>
+						<artifactId>crafter-commons-entitlements</artifactId>
+				</dependency>
+				<dependency>
+						<groupId>org.craftercms</groupId>
+						<artifactId>crafter-commons-validation</artifactId>
+				</dependency>
+				<dependency>
+						<groupId>org.craftercms</groupId>
+						<artifactId>crafter-search-opensearch</artifactId>
+				</dependency>
+				<dependency>
+						<groupId>org.apache.httpcomponents.client5</groupId>
+						<artifactId>httpclient5</artifactId>
+				</dependency>
+				<dependency>
+						<groupId>org.apache.commons</groupId>
+						<artifactId>commons-configuration2</artifactId>
+				</dependency>
+				<dependency>
+						<groupId>cglib</groupId>
+						<artifactId>cglib</artifactId>
+				</dependency>
 
-		<!-- Groovy -->
-		<dependency>
-			<groupId>org.apache.groovy</groupId>
-			<artifactId>groovy-all</artifactId>
-			<type>pom</type>
-		</dependency>
+				<!-- Groovy -->
+				<dependency>
+						<groupId>org.apache.groovy</groupId>
+						<artifactId>groovy-all</artifactId>
+						<type>pom</type>
+				</dependency>
 
-		<dependency>
-			<groupId>org.apache.ivy</groupId>
-			<artifactId>ivy</artifactId>
-		</dependency>
+				<dependency>
+						<groupId>org.apache.ivy</groupId>
+						<artifactId>ivy</artifactId>
+				</dependency>
 
-		<dependency>
-			<groupId>org.craftercms</groupId>
-			<artifactId>script-security</artifactId>
-		</dependency>
+				<dependency>
+						<groupId>org.craftercms</groupId>
+						<artifactId>script-security</artifactId>
+				</dependency>
 
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-collections4</artifactId>
-		</dependency>
+				<dependency>
+						<groupId>org.apache.commons</groupId>
+						<artifactId>commons-lang3</artifactId>
+				</dependency>
+				<dependency>
+						<groupId>org.apache.commons</groupId>
+						<artifactId>commons-collections4</artifactId>
+				</dependency>
 
-		<dependency>
-			<groupId>org.tuckey</groupId>
-			<artifactId>urlrewritefilter</artifactId>
-		</dependency>
+				<dependency>
+						<groupId>org.tuckey</groupId>
+						<artifactId>urlrewritefilter</artifactId>
+				</dependency>
 
-		<dependency>
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jaxb-api</artifactId>
-		</dependency>
+				<dependency>
+						<groupId>javax.xml.bind</groupId>
+						<artifactId>jaxb-api</artifactId>
+				</dependency>
 
-		<!-- Logging -->
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-jakarta-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-slf4j2-impl</artifactId>
-		</dependency>
+				<!-- Logging -->
+				<dependency>
+						<groupId>org.apache.logging.log4j</groupId>
+						<artifactId>log4j-api</artifactId>
+				</dependency>
+				<dependency>
+						<groupId>org.apache.logging.log4j</groupId>
+						<artifactId>log4j-core</artifactId>
+				</dependency>
+				<dependency>
+						<groupId>org.apache.logging.log4j</groupId>
+						<artifactId>log4j-jakarta-web</artifactId>
+				</dependency>
+				<dependency>
+						<groupId>org.apache.logging.log4j</groupId>
+						<artifactId>log4j-slf4j2-impl</artifactId>
+				</dependency>
 
-		<!-- Providers -->
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcpg-jdk18on</artifactId>
-		</dependency>
+				<!-- Providers -->
+				<dependency>
+						<groupId>org.bouncycastle</groupId>
+						<artifactId>bcpg-jdk18on</artifactId>
+				</dependency>
 
-		<!-- AWS -->
-		<dependency>
-			<groupId>software.amazon.awssdk</groupId>
-			<artifactId>s3</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>software.amazon.awssdk</groupId>
-			<artifactId>sts</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>software.amazon.awssdk</groupId>
-			<artifactId>sso</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>software.amazon.awssdk</groupId>
-			<artifactId>ssooidc</artifactId>
-		</dependency>
+				<!-- AWS -->
+				<dependency>
+						<groupId>software.amazon.awssdk</groupId>
+						<artifactId>s3</artifactId>
+				</dependency>
+				<dependency>
+						<groupId>software.amazon.awssdk</groupId>
+						<artifactId>sts</artifactId>
+				</dependency>
+				<dependency>
+						<groupId>software.amazon.awssdk</groupId>
+						<artifactId>sso</artifactId>
+				</dependency>
+				<dependency>
+						<groupId>software.amazon.awssdk</groupId>
+						<artifactId>ssooidc</artifactId>
+				</dependency>
 
-		<!-- Box -->
-		<!-- Override Jose4j dependency from Box -->
-		<dependency>
-			<groupId>org.bitbucket.b_c</groupId>
-			<artifactId>jose4j</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.box</groupId>
-			<artifactId>box-java-sdk</artifactId>
-		</dependency>
+				<!-- Box -->
+				<!-- Override Jose4j dependency from Box -->
+				<dependency>
+						<groupId>org.bitbucket.b_c</groupId>
+						<artifactId>jose4j</artifactId>
+				</dependency>
+				<dependency>
+						<groupId>com.box</groupId>
+						<artifactId>box-java-sdk</artifactId>
+				</dependency>
 
-		<!-- WebDAV -->
-		<dependency>
-			<groupId>com.github.lookfirst</groupId>
-			<artifactId>sardine</artifactId>
-		</dependency>
+				<!-- WebDAV -->
+				<dependency>
+						<groupId>com.github.lookfirst</groupId>
+						<artifactId>sardine</artifactId>
+				</dependency>
 
-		<!-- Override the bouncy castle dependency from Box -->
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcpkix-jdk18on</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcprov-jdk18on</artifactId>
-		</dependency>
+				<!-- Override the bouncy castle dependency from Box -->
+				<dependency>
+						<groupId>org.bouncycastle</groupId>
+						<artifactId>bcpkix-jdk18on</artifactId>
+				</dependency>
+				<dependency>
+						<groupId>org.bouncycastle</groupId>
+						<artifactId>bcprov-jdk18on</artifactId>
+				</dependency>
 
-		<!-- Override the jackson dependency from AWS -->
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-annotations</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.dataformat</groupId>
-			<artifactId>jackson-dataformat-cbor</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.dataformat</groupId>
-			<artifactId>jackson-dataformat-smile</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.dataformat</groupId>
-			<artifactId>jackson-dataformat-xml</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.dataformat</groupId>
-			<artifactId>jackson-dataformat-yaml</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.datatype</groupId>
-			<artifactId>jackson-datatype-jsr310</artifactId>
-		</dependency>
+				<!-- Override the jackson dependency from AWS -->
+				<dependency>
+						<groupId>com.fasterxml.jackson.core</groupId>
+						<artifactId>jackson-annotations</artifactId>
+				</dependency>
+				<dependency>
+						<groupId>com.fasterxml.jackson.core</groupId>
+						<artifactId>jackson-core</artifactId>
+				</dependency>
+				<dependency>
+						<groupId>com.fasterxml.jackson.core</groupId>
+						<artifactId>jackson-databind</artifactId>
+				</dependency>
+				<dependency>
+						<groupId>com.fasterxml.jackson.dataformat</groupId>
+						<artifactId>jackson-dataformat-cbor</artifactId>
+				</dependency>
+				<dependency>
+						<groupId>com.fasterxml.jackson.dataformat</groupId>
+						<artifactId>jackson-dataformat-smile</artifactId>
+				</dependency>
+				<dependency>
+						<groupId>com.fasterxml.jackson.dataformat</groupId>
+						<artifactId>jackson-dataformat-xml</artifactId>
+				</dependency>
+				<dependency>
+						<groupId>com.fasterxml.jackson.dataformat</groupId>
+						<artifactId>jackson-dataformat-yaml</artifactId>
+				</dependency>
+				<dependency>
+						<groupId>com.fasterxml.jackson.datatype</groupId>
+						<artifactId>jackson-datatype-jsr310</artifactId>
+				</dependency>
 
-		<!-- GraphQL -->
-		<dependency>
-			<groupId>com.graphql-java</groupId>
-			<artifactId>graphql-java</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.graphql-java</groupId>
-			<artifactId>graphql-java-extended-scalars</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.locationtech.spatial4j</groupId>
-			<artifactId>spatial4j</artifactId>
-		</dependency>
+				<!-- GraphQL -->
+				<dependency>
+						<groupId>com.graphql-java</groupId>
+						<artifactId>graphql-java</artifactId>
+				</dependency>
+				<dependency>
+						<groupId>com.graphql-java</groupId>
+						<artifactId>graphql-java-extended-scalars</artifactId>
+				</dependency>
+				<dependency>
+						<groupId>org.locationtech.spatial4j</groupId>
+						<artifactId>spatial4j</artifactId>
+				</dependency>
 
-		<dependency>
-			<groupId>org.mitre.dsmiley.httpproxy</groupId>
-			<artifactId>smiley-http-proxy-servlet</artifactId>
-		</dependency>
+				<dependency>
+						<groupId>org.mitre.dsmiley.httpproxy</groupId>
+						<artifactId>smiley-http-proxy-servlet</artifactId>
+				</dependency>
 
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-config</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-web</artifactId>
-		</dependency>
+				<dependency>
+						<groupId>org.springframework.security</groupId>
+						<artifactId>spring-security-core</artifactId>
+				</dependency>
+				<dependency>
+						<groupId>org.springframework.security</groupId>
+						<artifactId>spring-security-config</artifactId>
+				</dependency>
+				<dependency>
+						<groupId>org.springframework.security</groupId>
+						<artifactId>spring-security-web</artifactId>
+				</dependency>
 
-		<dependency>
-			<groupId>io.methvin</groupId>
-			<artifactId>directory-watcher</artifactId>
-		</dependency>
+				<dependency>
+						<groupId>io.methvin</groupId>
+						<artifactId>directory-watcher</artifactId>
+				</dependency>
 
-		<!-- Test dependencies -->
-		<!-- Tomcat EL -->
-		<dependency>
-			<groupId>org.apache.tomcat</groupId>
-			<artifactId>tomcat-jasper-el</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-core</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.testng</groupId>
-			<artifactId>testng</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-engine</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.vintage</groupId>
-			<artifactId>junit-vintage-engine</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.support</groupId>
-			<artifactId>testng-engine</artifactId>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+				<!-- Test dependencies -->
+				<!-- Tomcat EL -->
+				<dependency>
+						<groupId>org.apache.tomcat</groupId>
+						<artifactId>tomcat-jasper-el</artifactId>
+						<scope>test</scope>
+				</dependency>
+				<dependency>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-test</artifactId>
+						<scope>test</scope>
+				</dependency>
+				<dependency>
+						<groupId>junit</groupId>
+						<artifactId>junit</artifactId>
+						<scope>test</scope>
+				</dependency>
+				<dependency>
+						<groupId>org.mockito</groupId>
+						<artifactId>mockito-core</artifactId>
+						<scope>test</scope>
+				</dependency>
+				<dependency>
+						<groupId>org.testng</groupId>
+						<artifactId>testng</artifactId>
+						<scope>test</scope>
+				</dependency>
+				<dependency>
+						<groupId>org.junit.jupiter</groupId>
+						<artifactId>junit-jupiter-engine</artifactId>
+						<scope>test</scope>
+				</dependency>
+				<dependency>
+						<groupId>org.junit.vintage</groupId>
+						<artifactId>junit-vintage-engine</artifactId>
+						<scope>test</scope>
+				</dependency>
+				<dependency>
+						<groupId>org.junit.support</groupId>
+						<artifactId>testng-engine</artifactId>
+						<scope>test</scope>
+				</dependency>
+		</dependencies>
 
-	<build>
-		<finalName>ROOT</finalName>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<configuration>
-					<attachClasses>true</attachClasses>
-					<archive>
-						<manifest>
-							<addDefaultImplementationEntries>true
-							</addDefaultImplementationEntries>
-						</manifest>
-						<manifestEntries>
-							<Implementation-Build>${buildNumber}</Implementation-Build>
-							<Build-On>${timestamp}</Build-On>
-						</manifestEntries>
-					</archive>
-					<webResources>
-						<resource>
-							<directory>src/main/generated-resources/</directory>
-							<filtering>true</filtering>
-							<targetPath>WEB-INF/templates/system/common</targetPath>
-						</resource>
-					</webResources>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
+		<build>
+				<finalName>ROOT</finalName>
+				<plugins>
+						<plugin>
+								<groupId>org.apache.maven.plugins</groupId>
+								<artifactId>maven-checkstyle-plugin</artifactId>
+								<configuration>
+										<configLocation>https://raw.githubusercontent.com/craftercms/craftercms/refs/heads/develop/checkstyle.xml</configLocation>
+								</configuration>
+								<executions>
+										<execution>
+												<id>validate</id>
+												<phase>validate</phase>
+												<goals>
+														<goal>check</goal>
+												</goals>
+										</execution>
+								</executions>
+						</plugin>
+						<plugin>
+								<groupId>org.apache.maven.plugins</groupId>
+								<artifactId>maven-war-plugin</artifactId>
+								<configuration>
+										<attachClasses>true</attachClasses>
+										<archive>
+												<manifest>
+														<addDefaultImplementationEntries>true
+														</addDefaultImplementationEntries>
+												</manifest>
+												<manifestEntries>
+														<Implementation-Build>${buildNumber}</Implementation-Build>
+														<Build-On>${timestamp}</Build-On>
+												</manifestEntries>
+										</archive>
+										<webResources>
+												<resource>
+														<directory>src/main/generated-resources/</directory>
+														<filtering>true</filtering>
+														<targetPath>WEB-INF/templates/system/common</targetPath>
+												</resource>
+										</webResources>
+								</configuration>
+						</plugin>
+						<plugin>
+								<groupId>org.apache.maven.plugins</groupId>
+								<artifactId>maven-surefire-plugin</artifactId>
+						</plugin>
+				</plugins>
+		</build>
 
-	<repositories>
-		<repository>
-			<id>sonatype-snapshots</id>
-			<name>Sonatype Snapshot Repository</name>
-			<url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>always</updatePolicy>
-				<checksumPolicy>fail</checksumPolicy>
-			</snapshots>
-		</repository>
-	</repositories>
+		<repositories>
+				<repository>
+						<id>sonatype-snapshots</id>
+						<name>Sonatype Snapshot Repository</name>
+						<url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
+						<releases>
+								<enabled>false</enabled>
+						</releases>
+						<snapshots>
+								<enabled>true</enabled>
+								<updatePolicy>always</updatePolicy>
+								<checksumPolicy>fail</checksumPolicy>
+						</snapshots>
+				</repository>
+		</repositories>
 
-	<distributionManagement>
-		<snapshotRepository>
-			<id>sonatype-snapshots</id>
-			<url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-		<repository>
-			<id>sonatype-staging</id>
-			<url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-		</repository>
-	</distributionManagement>
+		<distributionManagement>
+				<snapshotRepository>
+						<id>sonatype-snapshots</id>
+						<url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+				</snapshotRepository>
+				<repository>
+						<id>sonatype-staging</id>
+						<url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+				</repository>
+		</distributionManagement>
 </project>

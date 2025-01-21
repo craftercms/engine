@@ -41,6 +41,7 @@ import static java.lang.String.format;
 
 /**
  * Exposes the current site {@link GraphQL} instance to perform queries.
+ *
  * @author joseross
  * @since 3.1
  */
@@ -48,63 +49,63 @@ import static java.lang.String.format;
 @RequestMapping(RestControllerBase.REST_BASE_URI + SiteGraphQLController.BASE_URL)
 public class SiteGraphQLController extends RestControllerBase {
 
-    private static final Logger logger = LoggerFactory.getLogger(SiteGraphQLController.class);
+	private static final Logger logger = LoggerFactory.getLogger(SiteGraphQLController.class);
 
-    public static final String BASE_URL = "/site/graphql";
+	public static final String BASE_URL = "/site/graphql";
 
-    protected ObjectMapper objectMapper = new ObjectMapper();
+	protected ObjectMapper objectMapper = new ObjectMapper();
 
-    @GetMapping
-    @SuppressWarnings("unchecked")
-    public Map<String, Object> query(@RequestParam String query, @RequestParam(required = false) String operationName,
-                                     @RequestParam(required = false) String variablesStr) throws IOException {
+	@GetMapping
+	@SuppressWarnings("unchecked")
+	public Map<String, Object> query(@RequestParam String query, @RequestParam(required = false) String operationName,
+					 @RequestParam(required = false) String variablesStr) throws IOException {
 
-        Map<String, Object> variables = StringUtils.isEmpty(variablesStr)?
-            Collections.emptyMap() :
-            objectMapper.readValue(variablesStr, Map.class);
+		Map<String, Object> variables = StringUtils.isEmpty(variablesStr) ?
+			Collections.emptyMap() :
+			objectMapper.readValue(variablesStr, Map.class);
 
-        return handleRequest(query, operationName, variables);
-    }
+		return handleRequest(query, operationName, variables);
+	}
 
-    @PostMapping
-    public Map<String, Object> query(@RequestBody QueryRequest request) {
-        Map<String, Object> variables = Objects.isNull(request.getVariables())?
-            Collections.emptyMap() :
-            request.getVariables();
+	@PostMapping
+	public Map<String, Object> query(@RequestBody QueryRequest request) {
+		Map<String, Object> variables = Objects.isNull(request.getVariables()) ?
+			Collections.emptyMap() :
+			request.getVariables();
 
-        return handleRequest(request.getQuery(), request.getOperationName(), variables);
-    }
+		return handleRequest(request.getQuery(), request.getOperationName(), variables);
+	}
 
-    protected Map<String, Object> handleRequest(String query, String operationName, Map<String, Object> variables) {
-        SiteContext siteContext = SiteContext.getCurrent();
-        RequestContext requestContext = RequestContext.getCurrent();
-        GraphQL graphQL = siteContext.getGraphQL();
-        if (Objects.isNull(graphQL)) {
-            logger.warn("GraphQL schema has not been initialized for site '{}'", siteContext.getSiteName());
-            return Collections.singletonMap("errors",
-                Collections.singletonList(
-                    Collections.singletonMap("message",
-                            format("GraphQL schema has not been initialized for site '%s'", siteContext.getSiteName()))
-                )
-            );
-        }
+	protected Map<String, Object> handleRequest(String query, String operationName, Map<String, Object> variables) {
+		SiteContext siteContext = SiteContext.getCurrent();
+		RequestContext requestContext = RequestContext.getCurrent();
+		GraphQL graphQL = siteContext.getGraphQL();
+		if (Objects.isNull(graphQL)) {
+			logger.warn("GraphQL schema has not been initialized for site '{}'", siteContext.getSiteName());
+			return Collections.singletonMap("errors",
+				Collections.singletonList(
+					Collections.singletonMap("message",
+						format("GraphQL schema has not been initialized for site '%s'", siteContext.getSiteName()))
+				)
+			);
+		}
 
-        ExecutionInput.Builder executionInput = newExecutionInput()
-            .query(query)
-            .operationName(operationName)
-            .variables(variables)
-            .context(requestContext);
+		ExecutionInput.Builder executionInput = newExecutionInput()
+			.query(query)
+			.operationName(operationName)
+			.variables(variables)
+			.context(requestContext);
 
-        StopWatch watch = new StopWatch("graphql - " + operationName);
-        watch.start("query");
-        ExecutionResult result = graphQL.execute(executionInput);
-        watch.stop();
+		StopWatch watch = new StopWatch("graphql - " + operationName);
+		watch.start("query");
+		ExecutionResult result = graphQL.execute(executionInput);
+		watch.stop();
 
-        if (logger.isTraceEnabled()) {
-            logger.trace(watch.prettyPrint());
-        }
+		if (logger.isTraceEnabled()) {
+			logger.trace(watch.prettyPrint());
+		}
 
-        return result.toSpecification();
-    }
+		return result.toSpecification();
+	}
 
 }

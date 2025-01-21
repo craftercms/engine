@@ -25,6 +25,6 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 public interface SiteResolver {
 
-    String getSiteName(HttpServletRequest request);
+	String getSiteName(HttpServletRequest request);
 
 }

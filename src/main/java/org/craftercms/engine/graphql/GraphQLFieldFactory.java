@@ -29,19 +29,19 @@ import org.dom4j.Node;
  */
 public interface GraphQLFieldFactory {
 
-    /**
-     * Adds all the required objects for a content-type field to a {@link GraphQLObjectType}
-     *
-     * @param contentTypeDefinition the XML document with the content type definition
-     * @param contentTypeField      the XML node with the content-type field
-     * @param contentTypeFieldId    the content-type field ID
-     * @param parentGraphQLTypeName the field's parent GraphQL type name
-     * @param parentGraphQLType     the field's parent {@link GraphQLObjectType}
-     * @param graphQLFieldName      the field's GraphQL-friendly name
-     * @param graphQLField          the field's {@link GraphQLFieldDefinition}
-     */
-    void createField(Document contentTypeDefinition, Node contentTypeField, String contentTypeFieldId,
-                     String parentGraphQLTypeName, GraphQLObjectType.Builder parentGraphQLType,
-                     String graphQLFieldName, GraphQLFieldDefinition.Builder graphQLField);
+	/**
+	 * Adds all the required objects for a content-type field to a {@link GraphQLObjectType}
+	 *
+	 * @param contentTypeDefinition the XML document with the content type definition
+	 * @param contentTypeField      the XML node with the content-type field
+	 * @param contentTypeFieldId    the content-type field ID
+	 * @param parentGraphQLTypeName the field's parent GraphQL type name
+	 * @param parentGraphQLType     the field's parent {@link GraphQLObjectType}
+	 * @param graphQLFieldName      the field's GraphQL-friendly name
+	 * @param graphQLField          the field's {@link GraphQLFieldDefinition}
+	 */
+	void createField(Document contentTypeDefinition, Node contentTypeField, String contentTypeFieldId,
+			 String parentGraphQLTypeName, GraphQLObjectType.Builder parentGraphQLType,
+			 String graphQLFieldName, GraphQLFieldDefinition.Builder graphQLField);
 
 }

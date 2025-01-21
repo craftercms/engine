@@ -40,67 +40,67 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
  */
 public class SiteCookieChangeInterceptor implements HandlerInterceptor {
 
-    private static final Log logger = LogFactory.getLog(SiteCookieChangeInterceptor.class);
+	private static final Log logger = LogFactory.getLog(SiteCookieChangeInterceptor.class);
 
-    protected boolean enabled;
+	protected boolean enabled;
 
-    protected String cookieName;
+	protected String cookieName;
 
-    protected String cookieDomain;
+	protected String cookieDomain;
 
-    protected String cookiePath;
+	protected String cookiePath;
 
-    protected int cookieMaxAge;
+	protected int cookieMaxAge;
 
-    protected boolean httpOnly;
+	protected boolean httpOnly;
 
-    protected boolean secure;
+	protected boolean secure;
 
-    @ConstructorProperties({"enabled", "cookieName", "cookieDomain", "cookiePath", "cookieMaxAge", "httpOnly",
-            "secure"})
-    public SiteCookieChangeInterceptor(final boolean enabled, final String cookieName, final String cookieDomain,
-                                       final String cookiePath, final int cookieMaxAge, final boolean httpOnly,
-                                       final boolean secure) {
-        this.enabled = enabled;
-        this.cookieName = cookieName;
-        this.cookieDomain = cookieDomain;
-        this.cookiePath = cookiePath;
-        this.cookieMaxAge = cookieMaxAge;
-        this.httpOnly = httpOnly;
-        this.secure = secure;
-    }
+	@ConstructorProperties({"enabled", "cookieName", "cookieDomain", "cookiePath", "cookieMaxAge", "httpOnly",
+		"secure"})
+	public SiteCookieChangeInterceptor(final boolean enabled, final String cookieName, final String cookieDomain,
+					   final String cookiePath, final int cookieMaxAge, final boolean httpOnly,
+					   final boolean secure) {
+		this.enabled = enabled;
+		this.cookieName = cookieName;
+		this.cookieDomain = cookieDomain;
+		this.cookiePath = cookiePath;
+		this.cookieMaxAge = cookieMaxAge;
+		this.httpOnly = httpOnly;
+		this.secure = secure;
+	}
 
-    @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
-                           ModelAndView modelAndView) {
-        if (!enabled) {
-            return;
-        }
-        SiteContext siteContext = SiteContext.getCurrent();
-        if (siteContext != null) {
-            String siteName = siteContext.getSiteName();
-            String cookieValue = HttpUtils.getCookieValue(cookieName, request);
+	@Override
+	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
+			       ModelAndView modelAndView) {
+		if (!enabled) {
+			return;
+		}
+		SiteContext siteContext = SiteContext.getCurrent();
+		if (siteContext != null) {
+			String siteName = siteContext.getSiteName();
+			String cookieValue = HttpUtils.getCookieValue(cookieName, request);
 
-            if (!siteName.equals(cookieValue)) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Setting '" + cookieName + "' cookie to '" + siteName + "'");
-                }
+			if (!siteName.equals(cookieValue)) {
+				if (logger.isDebugEnabled()) {
+					logger.debug("Setting '" + cookieName + "' cookie to '" + siteName + "'");
+				}
 
-                Cookie cookie = new Cookie(cookieName, siteName);
-                if (isEmpty(cookieDomain)) {
-                    cookie.setDomain(request.getServerName());
-                } else {
-                    cookie.setDomain(cookieDomain);
-                }
-                cookie.setPath(cookiePath);
-                cookie.setMaxAge(cookieMaxAge);
-                cookie.setHttpOnly(httpOnly);
-                cookie.setSecure(secure);
+				Cookie cookie = new Cookie(cookieName, siteName);
+				if (isEmpty(cookieDomain)) {
+					cookie.setDomain(request.getServerName());
+				} else {
+					cookie.setDomain(cookieDomain);
+				}
+				cookie.setPath(cookiePath);
+				cookie.setMaxAge(cookieMaxAge);
+				cookie.setHttpOnly(httpOnly);
+				cookie.setSecure(secure);
 
-                response.addCookie(cookie);
-            }
-        } else {
-            throw new IllegalStateException("No current site context found");
-        }
-    }
+				response.addCookie(cookie);
+			}
+		} else {
+			throw new IllegalStateException("No current site context found");
+		}
+	}
 }

@@ -26,86 +26,86 @@ import java.util.Map;
  */
 public class NavItem {
 
-    protected String label;
-    protected String url;
-    protected boolean active;
-    protected List<NavItem> subItems;
-    protected Map<String, String> attributes;
+	protected String label;
+	protected String url;
+	protected boolean active;
+	protected List<NavItem> subItems;
+	protected Map<String, String> attributes;
 
-    public String getLabel() {
-        return label;
-    }
+	public String getLabel() {
+		return label;
+	}
 
-    public void setLabel(String label) {
-        this.label = label;
-    }
+	public void setLabel(String label) {
+		this.label = label;
+	}
 
-    public String getUrl() {
-        return url;
-    }
+	public String getUrl() {
+		return url;
+	}
 
-    public void setUrl(String url) {
-        this.url = url;
-    }
+	public void setUrl(String url) {
+		this.url = url;
+	}
 
-    public boolean isActive() {
-        return active;
-    }
+	public boolean isActive() {
+		return active;
+	}
 
-    public void setActive(boolean active) {
-        this.active = active;
-    }
+	public void setActive(boolean active) {
+		this.active = active;
+	}
 
-    public List<NavItem> getSubItems() {
-        return subItems;
-    }
+	public List<NavItem> getSubItems() {
+		return subItems;
+	}
 
-    public void setSubItems(List<NavItem> subItems) {
-        this.subItems = subItems;
-    }
+	public void setSubItems(List<NavItem> subItems) {
+		this.subItems = subItems;
+	}
 
-    public Map<String, String> getAttributes() {
-        return attributes;
-    }
+	public Map<String, String> getAttributes() {
+		return attributes;
+	}
 
-    public void setAttributes(final Map<String, String> attributes) {
-        this.attributes = attributes;
-    }
+	public void setAttributes(final Map<String, String> attributes) {
+		this.attributes = attributes;
+	}
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
 
-        NavItem navItem = (NavItem)o;
+		NavItem navItem = (NavItem) o;
 
-        if (!label.equals(navItem.label)) {
-            return false;
-        }
+		if (!label.equals(navItem.label)) {
+			return false;
+		}
 
-        return url.equals(navItem.url);
-    }
+		return url.equals(navItem.url);
+	}
 
-    @Override
-    public int hashCode() {
-        int result = label.hashCode();
-        result = 31 * result + url.hashCode();
-        return result;
-    }
+	@Override
+	public int hashCode() {
+		int result = label.hashCode();
+		result = 31 * result + url.hashCode();
+		return result;
+	}
 
-    @Override
-    public String toString() {
-        return "NavItem{" +
-               "label='" + label + '\'' +
-               ", url='" + url + '\'' +
-               ", active=" + active +
-               ", subItems=" + subItems +
-               ", attributes=" + attributes +
-               '}';
-    }
+	@Override
+	public String toString() {
+		return "NavItem{" +
+			"label='" + label + '\'' +
+			", url='" + url + '\'' +
+			", active=" + active +
+			", subItems=" + subItems +
+			", attributes=" + attributes +
+			'}';
+	}
 
 }

@@ -27,6 +27,6 @@ import org.craftercms.engine.model.SiteItem;
  */
 public interface SiteItemScriptResolver {
 
-    List<String> getScriptUrls(SiteItem item);
+	List<String> getScriptUrls(SiteItem item);
 
 }

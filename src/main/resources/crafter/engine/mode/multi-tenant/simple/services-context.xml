@@ -16,84 +16,84 @@
   -->
 
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean class="org.craftercms.commons.spring.ListMergingPostProcessor">
-        <property name="order" value="0" />
-        <property name="beanName" value="crafter.properties" />
-        <property name="propertyName" value="locations" />
-        <property name="additionalElements">
-            <list>
-                <value>classpath:crafter/engine/mode/multi-tenant/simple/server-config.properties</value>
-            </list>
-        </property>
-    </bean>
+		<bean class="org.craftercms.commons.spring.ListMergingPostProcessor">
+				<property name="order" value="0"/>
+				<property name="beanName" value="crafter.properties"/>
+				<property name="propertyName" value="locations"/>
+				<property name="additionalElements">
+						<list>
+								<value>classpath:crafter/engine/mode/multi-tenant/simple/server-config.properties</value>
+						</list>
+				</property>
+		</bean>
 
-    <!-- ////////////////////////////////// -->
-    <!--								 	-->
-    <!--			 Contexts				-->
-    <!--									-->
-    <!-- ////////////////////////////////// -->
+		<!-- ////////////////////////////////// -->
+		<!--								 	-->
+		<!--			 Contexts				-->
+		<!--									-->
+		<!-- ////////////////////////////////// -->
 
-    <bean id="crafter.headerSiteResolver" class="org.craftercms.engine.service.context.HeaderSiteResolver">
-        <constructor-arg name="headerName" value="${crafter.engine.request.header.siteName}"/>
-    </bean>
+		<bean id="crafter.headerSiteResolver" class="org.craftercms.engine.service.context.HeaderSiteResolver">
+				<constructor-arg name="headerName" value="${crafter.engine.request.header.siteName}"/>
+		</bean>
 
-    <bean id="crafter.cookieSiteResolver" class="org.craftercms.engine.service.context.CookieSiteResolver">
-        <constructor-arg name="paramOrCookieName" value="${crafter.engine.request.param.siteName}"/>
-    </bean>
+		<bean id="crafter.cookieSiteResolver" class="org.craftercms.engine.service.context.CookieSiteResolver">
+				<constructor-arg name="paramOrCookieName" value="${crafter.engine.request.param.siteName}"/>
+		</bean>
 
-    <bean id="crafter.siteResolver" class="org.craftercms.engine.service.context.SiteResolverChain">
-        <constructor-arg name="chain">
-            <list>
-                <ref bean="crafter.headerSiteResolver"/>
-                <ref bean="crafter.cookieSiteResolver"/>
-            </list>
-        </constructor-arg>
-    </bean>
+		<bean id="crafter.siteResolver" class="org.craftercms.engine.service.context.SiteResolverChain">
+				<constructor-arg name="chain">
+						<list>
+								<ref bean="crafter.headerSiteResolver"/>
+								<ref bean="crafter.cookieSiteResolver"/>
+						</list>
+				</constructor-arg>
+		</bean>
 
-    <bean id="crafter.siteListResolver" class="org.craftercms.engine.service.context.FolderScanningSiteListResolver">
-        <constructor-arg name="siteRootFolderPath" value="${crafter.engine.site.default.rootFolder.path}"/>
-        <constructor-arg name="macroResolver" ref="crafter.macroResolver"/>
-    </bean>
+		<bean id="crafter.siteListResolver" class="org.craftercms.engine.service.context.FolderScanningSiteListResolver">
+				<constructor-arg name="siteRootFolderPath" value="${crafter.engine.site.default.rootFolder.path}"/>
+				<constructor-arg name="macroResolver" ref="crafter.macroResolver"/>
+		</bean>
 
-    <bean id="crafter.siteContextManager" class="org.craftercms.engine.service.context.SiteContextManager">
-        <constructor-arg name="contextFactory" ref="crafter.siteContextFactory"/>
-        <constructor-arg name="fallbackContextFactory" ref="crafter.fallbackSiteContextFactory"/>
-        <constructor-arg name="siteListResolver" ref="crafter.siteListResolver"/>
-        <constructor-arg name="waitForContextInit" value="${crafter.engine.site.context.waitForInit}"/>
-        <constructor-arg name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
-        <constructor-arg name="defaultSiteName" value="${crafter.engine.site.default.name}"/>
-        <constructor-arg name="contextBuildRetryMaxCount" value="${crafter.engine.site.context.build.retry.maxCount}"/>
-        <constructor-arg name="contextBuildRetryWaitTimeBase" value="${crafter.engine.site.context.build.retry.waitTimeBase}"/>
-        <constructor-arg name="contextBuildRetryWaitTimeMultiplier" value="${crafter.engine.site.context.build.retry.waitTimeMultiplier}"/>
-        <constructor-arg name="modePreview" value="${crafter.engine.preview}"/>
-        <constructor-arg name="watcherPaths" value="${crafter.engine.watcher.paths}"/>
-        <constructor-arg name="watcherIgnorePaths" value="${crafter.engine.watcher.ignorePaths}"/>
-        <constructor-arg name="watcherCounterLimit" value="${crafter.engine.watcher.counter.limit}"/>
-        <constructor-arg name="watcherIntervalPeriod" value="${crafter.engine.watcher.interval.period}"/>
-        <property name="entitlementValidator" ref="crafter.entitlementValidator"/>
-    </bean>
+		<bean id="crafter.siteContextManager" class="org.craftercms.engine.service.context.SiteContextManager">
+				<constructor-arg name="contextFactory" ref="crafter.siteContextFactory"/>
+				<constructor-arg name="fallbackContextFactory" ref="crafter.fallbackSiteContextFactory"/>
+				<constructor-arg name="siteListResolver" ref="crafter.siteListResolver"/>
+				<constructor-arg name="waitForContextInit" value="${crafter.engine.site.context.waitForInit}"/>
+				<constructor-arg name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
+				<constructor-arg name="defaultSiteName" value="${crafter.engine.site.default.name}"/>
+				<constructor-arg name="contextBuildRetryMaxCount" value="${crafter.engine.site.context.build.retry.maxCount}"/>
+				<constructor-arg name="contextBuildRetryWaitTimeBase" value="${crafter.engine.site.context.build.retry.waitTimeBase}"/>
+				<constructor-arg name="contextBuildRetryWaitTimeMultiplier" value="${crafter.engine.site.context.build.retry.waitTimeMultiplier}"/>
+				<constructor-arg name="modePreview" value="${crafter.engine.preview}"/>
+				<constructor-arg name="watcherPaths" value="${crafter.engine.watcher.paths}"/>
+				<constructor-arg name="watcherIgnorePaths" value="${crafter.engine.watcher.ignorePaths}"/>
+				<constructor-arg name="watcherCounterLimit" value="${crafter.engine.watcher.counter.limit}"/>
+				<constructor-arg name="watcherIntervalPeriod" value="${crafter.engine.watcher.interval.period}"/>
+				<property name="entitlementValidator" ref="crafter.entitlementValidator"/>
+		</bean>
 
-    <!-- ////////////////////////////////// -->
-    <!--								 	-->
-    <!--			Health Check			-->
-    <!--									-->
-    <!-- ////////////////////////////////// -->
-    <bean id="siteHealthCheckService" class="org.craftercms.engine.service.impl.SiteHealthCheckServiceImpl">
-        <constructor-arg name="siteListResolver" ref="crafter.siteListResolver"/>
-        <constructor-arg name="healthChecks" ref="siteHealthChecks"/>
-    </bean>
+		<!-- ////////////////////////////////// -->
+		<!--								 	-->
+		<!--			Health Check			-->
+		<!--									-->
+		<!-- ////////////////////////////////// -->
+		<bean id="siteHealthCheckService" class="org.craftercms.engine.service.impl.SiteHealthCheckServiceImpl">
+				<constructor-arg name="siteListResolver" ref="crafter.siteListResolver"/>
+				<constructor-arg name="healthChecks" ref="siteHealthChecks"/>
+		</bean>
 
-    <!-- ////////////////////////////////// -->
-    <!--								 	-->
-    <!--			 Security				-->
-    <!--									-->
-    <!-- ////////////////////////////////// -->
+		<!-- ////////////////////////////////// -->
+		<!--								 	-->
+		<!--			 Security				-->
+		<!--									-->
+		<!-- ////////////////////////////////// -->
 
-    <bean id="crafter.tenantsResolver" class="org.craftercms.engine.util.tenant.SiteNameTenantResolver"/>
+		<bean id="crafter.tenantsResolver" class="org.craftercms.engine.util.tenant.SiteNameTenantResolver"/>
 
-    <bean id="crafter.accessTokenIdResolver" class="org.craftercms.engine.security.ConfigAwareAccessTokenIdResolver"/>
+		<bean id="crafter.accessTokenIdResolver" class="org.craftercms.engine.security.ConfigAwareAccessTokenIdResolver"/>
 
 </beans>

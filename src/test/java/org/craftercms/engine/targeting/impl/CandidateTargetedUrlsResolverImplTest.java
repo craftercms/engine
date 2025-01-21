@@ -47,104 +47,104 @@ import static org.mockito.Mockito.when;
  */
 public class CandidateTargetedUrlsResolverImplTest {
 
-    private static final String SITE_NAME = "test";
-    private static final String[] ROOT_FOLDERS = { "/site/website" };
-    private static final String FALLBACK_TARGET_ID = "";
-    private static final String CURRENT_TARGET_ID = "es_cr";
-    private static final List<String> CANDIDATE_TARGET_IDS = Arrays.asList("es_cr", "es", "");
-    private static final String TARGETED_URL1 = "/products/index_es_cr.xml";
-    private static final String TARGETED_URL2 = "/products/index.xml";
-    private static final String TARGETED_FULL_URL1 = ROOT_FOLDERS[0] + TARGETED_URL1;
-    private static final String TARGETED_FULL_URL2 = ROOT_FOLDERS[0] + TARGETED_URL2;
+	private static final String SITE_NAME = "test";
+	private static final String[] ROOT_FOLDERS = {"/site/website"};
+	private static final String FALLBACK_TARGET_ID = "";
+	private static final String CURRENT_TARGET_ID = "es_cr";
+	private static final List<String> CANDIDATE_TARGET_IDS = Arrays.asList("es_cr", "es", "");
+	private static final String TARGETED_URL1 = "/products/index_es_cr.xml";
+	private static final String TARGETED_URL2 = "/products/index.xml";
+	private static final String TARGETED_FULL_URL1 = ROOT_FOLDERS[0] + TARGETED_URL1;
+	private static final String TARGETED_FULL_URL2 = ROOT_FOLDERS[0] + TARGETED_URL2;
 
-    private CandidateTargetedUrlsResolverImpl candidateUrlsResolver;
+	private CandidateTargetedUrlsResolverImpl candidateUrlsResolver;
 
-    @Before
-    public void setUp() throws Exception {
-        candidateUrlsResolver = new CandidateTargetedUrlsResolverImpl(createTargetIdManager(), createTargetedUrlStrategy(),
-                createCandidateTargetIdsResolver());
+	@Before
+	public void setUp() throws Exception {
+		candidateUrlsResolver = new CandidateTargetedUrlsResolverImpl(createTargetIdManager(), createTargetedUrlStrategy(),
+			createCandidateTargetIdsResolver());
 
-        setUpCurrentSiteContext();
-    }
+		setUpCurrentSiteContext();
+	}
 
-    @After
-    public void tearDown() throws Exception {
-        clearCurrentSiteContext();
-    }
+	@After
+	public void tearDown() throws Exception {
+		clearCurrentSiteContext();
+	}
 
-    @Test
-    public void testGetUrls() throws Exception {
-        List<String> urls = candidateUrlsResolver.getUrls(TARGETED_FULL_URL1);
+	@Test
+	public void testGetUrls() throws Exception {
+		List<String> urls = candidateUrlsResolver.getUrls(TARGETED_FULL_URL1);
 
-        assertNotNull(urls);
-        assertEquals(3, urls.size());
-        assertEquals("/site/website/products/index_es_cr.xml", urls.get(0));
-        assertEquals("/site/website/products/index_es.xml", urls.get(1));
-        assertEquals("/site/website/products/index.xml", urls.get(2));
+		assertNotNull(urls);
+		assertEquals(3, urls.size());
+		assertEquals("/site/website/products/index_es_cr.xml", urls.get(0));
+		assertEquals("/site/website/products/index_es.xml", urls.get(1));
+		assertEquals("/site/website/products/index.xml", urls.get(2));
 
-        urls = candidateUrlsResolver.getUrls(TARGETED_FULL_URL2);
+		urls = candidateUrlsResolver.getUrls(TARGETED_FULL_URL2);
 
-        assertNotNull(urls);
-        assertEquals(1, urls.size());
-        assertEquals("/site/website/products/index.xml", urls.get(0));
-    }
+		assertNotNull(urls);
+		assertEquals(1, urls.size());
+		assertEquals("/site/website/products/index.xml", urls.get(0));
+	}
 
-    private TargetIdManager createTargetIdManager() {
-        TargetIdManager targetIdManager = mock(TargetIdManager.class);
+	private TargetIdManager createTargetIdManager() {
+		TargetIdManager targetIdManager = mock(TargetIdManager.class);
 
-        when(targetIdManager.getFallbackTargetId()).thenReturn(FALLBACK_TARGET_ID);
+		when(targetIdManager.getFallbackTargetId()).thenReturn(FALLBACK_TARGET_ID);
 
-        return targetIdManager;
-    }
+		return targetIdManager;
+	}
 
-    private TargetedUrlStrategy createTargetedUrlStrategy() {
-        TargetedUrlStrategy urlStrategy = mock(TargetedUrlStrategy.class);
+	private TargetedUrlStrategy createTargetedUrlStrategy() {
+		TargetedUrlStrategy urlStrategy = mock(TargetedUrlStrategy.class);
 
-        TargetedUrlComponents urlComp = new TargetedUrlComponents();
-        urlComp.setPrefix("/products/index");
-        urlComp.setTargetId(CURRENT_TARGET_ID);
-        urlComp.setSuffix(".xml");
+		TargetedUrlComponents urlComp = new TargetedUrlComponents();
+		urlComp.setPrefix("/products/index");
+		urlComp.setTargetId(CURRENT_TARGET_ID);
+		urlComp.setSuffix(".xml");
 
-        when(urlStrategy.parseTargetedUrl(TARGETED_URL1)).thenReturn(urlComp);
-        doAnswer(new Answer<String>() {
+		when(urlStrategy.parseTargetedUrl(TARGETED_URL1)).thenReturn(urlComp);
+		doAnswer(new Answer<String>() {
 
-            @Override
-            public String answer(InvocationOnMock invocation) throws Throwable {
-                Object[] args = invocation.getArguments();
-                String prefix = (String)args[0];
-                String targetId = (String)args[1];
-                String suffix = (String)args[2];
+			@Override
+			public String answer(InvocationOnMock invocation) throws Throwable {
+				Object[] args = invocation.getArguments();
+				String prefix = (String) args[0];
+				String targetId = (String) args[1];
+				String suffix = (String) args[2];
 
-                return "" + prefix + (StringUtils.isNotEmpty(targetId)? "_" + targetId : "") + suffix;
-            }
+				return "" + prefix + (StringUtils.isNotEmpty(targetId) ? "_" + targetId : "") + suffix;
+			}
 
-        }).when(urlStrategy).buildTargetedUrl(anyString(), anyString(), anyString());
+		}).when(urlStrategy).buildTargetedUrl(anyString(), anyString(), anyString());
 
-        return urlStrategy;
-    }
+		return urlStrategy;
+	}
 
-    private CandidateTargetIdsResolver createCandidateTargetIdsResolver() {
-        CandidateTargetIdsResolver candidateTargetIdsResolver = mock(CandidateTargetIdsResolver.class);
+	private CandidateTargetIdsResolver createCandidateTargetIdsResolver() {
+		CandidateTargetIdsResolver candidateTargetIdsResolver = mock(CandidateTargetIdsResolver.class);
 
-        when(candidateTargetIdsResolver.getTargetIds(CURRENT_TARGET_ID,
-                                                     FALLBACK_TARGET_ID)).thenReturn(CANDIDATE_TARGET_IDS);
+		when(candidateTargetIdsResolver.getTargetIds(CURRENT_TARGET_ID,
+			FALLBACK_TARGET_ID)).thenReturn(CANDIDATE_TARGET_IDS);
 
-        return candidateTargetIdsResolver;
-    }
+		return candidateTargetIdsResolver;
+	}
 
-    private void setUpCurrentSiteContext() {
-        HierarchicalConfiguration config = mock(HierarchicalConfiguration.class);
-        when(config.getStringArray(ROOT_FOLDERS_CONFIG_KEY)).thenReturn(ROOT_FOLDERS);
+	private void setUpCurrentSiteContext() {
+		HierarchicalConfiguration config = mock(HierarchicalConfiguration.class);
+		when(config.getStringArray(ROOT_FOLDERS_CONFIG_KEY)).thenReturn(ROOT_FOLDERS);
 
-        SiteContext context = new SiteContext();
-        context.setSiteName(SITE_NAME);
-        context.setConfig(config);
+		SiteContext context = new SiteContext();
+		context.setSiteName(SITE_NAME);
+		context.setConfig(config);
 
-        SiteContext.setCurrent(context);
-    }
-    
-    private void clearCurrentSiteContext() {
-        SiteContext.clear();
-    }
+		SiteContext.setCurrent(context);
+	}
+
+	private void clearCurrentSiteContext() {
+		SiteContext.clear();
+	}
 
 }
