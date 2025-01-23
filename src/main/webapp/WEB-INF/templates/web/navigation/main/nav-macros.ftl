@@ -6,7 +6,7 @@
 	<li <#if active>class="dropdown active" <#else>class="dropdown"</#if>>
 		<a class="dropdown-toggle" data-toggle="dropdown" href="${navFunctions.getNavItemUrl(item)}">${navFunctions.getNavItemName(item)}</a>
 		<ul class="dropdown-menu">
-                    <#nested>
+			<#nested>
 		</ul>
 	</li>
 </#macro>
@@ -19,7 +19,7 @@
 	<li class="dropdown-submenu">
 		<a href="${navFunctions.getNavItemUrl(item)}">${navFunctions.getNavItemName(item)}</a>
 		<ul class="dropdown-menu">
-                    <#nested>
+			<#nested>
 		</ul>
 	</li>
 </#macro>

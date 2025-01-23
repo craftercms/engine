@@ -4,12 +4,12 @@
 	<title>Unable to resolve project</title>
 
 	<style>
-            body {
-                font-family: sans-serif;
-                color: #222;
-            }
+		body {
+			font-family: sans-serif;
+			color: #222;
+		}
 
-            }
+		}
 	</style>
 </head>
 <body>

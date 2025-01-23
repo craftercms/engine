@@ -24,69 +24,67 @@
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap-reboot.min.css"
 	      rel="stylesheet">
 	<style>
-            html, body {
-                height: 100%;
-            }
+		html, body {
+			height: 100%;
+		}
 
-            body {
-                font-family: 'Open Sans', sans-serif;
-                background-position: center center;
-                background-image: url('${urlTransformationService.transform('toWebAppRelativeUrl', '/static-assets/img/gears.jpg')}');
-                background-repeat: no-repeat;
-                background-size: cover;
-                align-items: center;
-                justify-content: center;
-                display: flex;
-            }
+		body {
+			font-family: 'Open Sans', sans-serif;
+			background-position: center center;
+			background-image: url('${urlTransformationService.transform('toWebAppRelativeUrl', '/static-assets/img/gears.jpg')}');
+			background-repeat: no-repeat;
+			background-size: cover;
+			align-items: center;
+			justify-content: center;
+			display: flex;
+		}
 
-            #main {
-                margin: 20px;
-                padding: 20px;
-                max-width: 400px;
-                border-radius: 20px;
-                background-color: #fff;
-                background-color: rgba(255, 255, 255, .9);
-                position: relative;
-            }
+		#main {
+			margin: 20px;
+			padding: 20px;
+			max-width: 400px;
+			border-radius: 20px;
+			background-color: #fff;
+			background-color: rgba(255, 255, 255, .9);
+			position: relative;
+		}
 
-            .footer {
-                font-size: 65%;
-                color: #999;
-            }
+		.footer {
+			font-size: 65%;
+			color: #999;
+		}
 
-            .logo {
-                width: 200px;
-                margin: 20px auto;
-                display: block;
-            }
+		.logo {
+			width: 200px;
+			margin: 20px auto;
+			display: block;
+		}
 
-            .navigation {
-                margin: 0 0 20px;
-            }
+		.navigation {
+			margin: 0 0 20px;
+		}
 
-            .navigation--title {
-                font-size: 80%;
-            }
+		.navigation--title {
+			font-size: 80%;
+		}
 
-            .navigation--link {
-                font-size: 80%;
-                display: block;
-            }
+		.navigation--link {
+			font-size: 80%;
+			display: block;
+		}
 
-            .footer,
-            .no-site-message {
-                text-align: center;
-            }
+		.footer,
+		.no-site-message {
+			text-align: center;
+		}
 	</style>
 	<!-- end CSS-->
 
 	<!-- Favicon Setting -->
-	<link rel="icon" type="image/x-icon"
-	      href='${urlTransformationService.transform('toWebAppRelativeUrl', '/static-assets/img/favicon.ico')}'/>
+	<link rel="icon" type="image/x-icon" href='${urlTransformationService.transform('toWebAppRelativeUrl', '/static-assets/img/favicon.ico')}'/>
 </head>
 
 <body>
-
 <main id="main">
 
 	<a href="https://craftercms.com">
@@ -112,8 +110,6 @@
 		Copyright &copy; 2007 - ${.now?string('yyyy')}, Crafter Software Corporation. All rights reserved.
 		CrafterCMS is open source software licensed under the GNU General Public License (GPL) version 3.0.
 	</footer>
-
 </main>
-
 </body>
 </html>
