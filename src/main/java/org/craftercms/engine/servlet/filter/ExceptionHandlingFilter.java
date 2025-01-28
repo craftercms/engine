@@ -18,6 +18,7 @@ package org.craftercms.engine.servlet.filter;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -36,41 +37,41 @@ import org.craftercms.engine.http.ExceptionHandler;
  */
 public class ExceptionHandlingFilter implements Filter {
 
-    private List<ExceptionHandler> exceptionHandlers;
+	private List<ExceptionHandler> exceptionHandlers;
 
-    public ExceptionHandlingFilter(List<ExceptionHandler> exceptionHandlers) {
-        this.exceptionHandlers = exceptionHandlers;
-    }
+	public ExceptionHandlingFilter(List<ExceptionHandler> exceptionHandlers) {
+		this.exceptionHandlers = exceptionHandlers;
+	}
 
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-    }
+	@Override
+	public void init(FilterConfig filterConfig) throws ServletException {
+	}
 
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
-        ServletException {
-        try {
-            chain.doFilter(request, response);
-        } catch (Exception e) {
-            handleException((HttpServletRequest) request, (HttpServletResponse) response, e);
-        }
-    }
+	@Override
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
+		ServletException {
+		try {
+			chain.doFilter(request, response);
+		} catch (Exception e) {
+			handleException((HttpServletRequest) request, (HttpServletResponse) response, e);
+		}
+	}
 
-    @Override
-    public void destroy() {
-    }
+	@Override
+	public void destroy() {
+	}
 
-    protected void handleException(HttpServletRequest request, HttpServletResponse response, Exception ex)
-        throws ServletException, IOException {
-        boolean handled = false;
+	protected void handleException(HttpServletRequest request, HttpServletResponse response, Exception ex)
+		throws ServletException, IOException {
+		boolean handled = false;
 
-        for (Iterator<ExceptionHandler> iter = exceptionHandlers.iterator(); iter.hasNext() && !handled;) {
-            handled = iter.next().handle(request, response, ex);
-        }
+		for (Iterator<ExceptionHandler> iter = exceptionHandlers.iterator(); iter.hasNext() && !handled; ) {
+			handled = iter.next().handle(request, response, ex);
+		}
 
-        if (!handled) {
-            throw new ServletException("Unhandled exception: " + ex.getMessage(), ex);
-        }
-    }
+		if (!handled) {
+			throw new ServletException("Unhandled exception: " + ex.getMessage(), ex);
+		}
+	}
 
 }

@@ -40,56 +40,56 @@ import java.util.List;
  */
 public class CrafterFreeMarkerConfigurer extends FreeMarkerConfigurer {
 
-    private MacroResolver macroResolver;
-    private TemplateExceptionHandler templateExceptionHandler;
-    private boolean cacheTemplates;
+	private MacroResolver macroResolver;
+	private TemplateExceptionHandler templateExceptionHandler;
+	private boolean cacheTemplates;
 
-    public CrafterFreeMarkerConfigurer() {
-        cacheTemplates = true;
-    }
+	public CrafterFreeMarkerConfigurer() {
+		cacheTemplates = true;
+	}
 
-    public void setMacroResolver(MacroResolver macroResolver) {
-        this.macroResolver = macroResolver;
-    }
+	public void setMacroResolver(MacroResolver macroResolver) {
+		this.macroResolver = macroResolver;
+	}
 
-    public void setTemplateExceptionHandler(TemplateExceptionHandler templateExceptionHandler) {
-        this.templateExceptionHandler = templateExceptionHandler;
-    }
+	public void setTemplateExceptionHandler(TemplateExceptionHandler templateExceptionHandler) {
+		this.templateExceptionHandler = templateExceptionHandler;
+	}
 
-    public void setCacheTemplates(boolean cacheTemplates) {
-        this.cacheTemplates = cacheTemplates;
-    }
+	public void setCacheTemplates(boolean cacheTemplates) {
+		this.cacheTemplates = cacheTemplates;
+	}
 
-    @Override
-    protected void postProcessConfiguration(Configuration config) throws IOException, TemplateException {
-        if (templateExceptionHandler != null) {
-            config.setTemplateExceptionHandler(templateExceptionHandler);
-        }
-        if (!cacheTemplates) {
-            config.setCacheStorage(NullCacheStorage.INSTANCE);
-        }
+	@Override
+	protected void postProcessConfiguration(Configuration config) throws IOException, TemplateException {
+		if (templateExceptionHandler != null) {
+			config.setTemplateExceptionHandler(templateExceptionHandler);
+		}
+		if (!cacheTemplates) {
+			config.setCacheStorage(NullCacheStorage.INSTANCE);
+		}
 
-        config.setTemplateLookupStrategy(new SiteAwareTemplateLookupStrategy());
-    }
+		config.setTemplateLookupStrategy(new SiteAwareTemplateLookupStrategy());
+	}
 
-    @Override
-    protected TemplateLoader getTemplateLoaderForPath(String templateLoaderPath) {
-        if (macroResolver != null) {
-            templateLoaderPath = macroResolver.resolveMacros(templateLoaderPath);
-        }
+	@Override
+	protected TemplateLoader getTemplateLoaderForPath(String templateLoaderPath) {
+		if (macroResolver != null) {
+			templateLoaderPath = macroResolver.resolveMacros(templateLoaderPath);
+		}
 
-        return super.getTemplateLoaderForPath(templateLoaderPath);
-    }
+		return super.getTemplateLoaderForPath(templateLoaderPath);
+	}
 
-    @Override
-    protected void postProcessTemplateLoaders(List<TemplateLoader> templateLoaders) {
-        // Overwrote to get rid of the log.info
-        templateLoaders.add(new ClassTemplateLoader(FreeMarkerConfigurer.class, ""));
-    }
+	@Override
+	protected void postProcessTemplateLoaders(List<TemplateLoader> templateLoaders) {
+		// Overwrote to get rid of the log.info
+		templateLoaders.add(new ClassTemplateLoader(FreeMarkerConfigurer.class, ""));
+	}
 
-    @Override
-    protected Configuration newConfiguration() {
-        return new CrafterCacheAwareConfiguration(Configuration.VERSION_2_3_30, cacheTemplates);
-    }
+	@Override
+	protected Configuration newConfiguration() {
+		return new CrafterCacheAwareConfiguration(Configuration.VERSION_2_3_30, cacheTemplates);
+	}
 
 }

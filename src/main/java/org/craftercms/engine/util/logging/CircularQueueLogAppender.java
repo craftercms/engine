@@ -56,108 +56,108 @@ import static org.apache.logging.log4j.core.Core.CATEGORY_NAME;
 @Plugin(name = CircularQueueLogAppender.PLUGIN_NAME, category = CATEGORY_NAME, elementType = ELEMENT_TYPE)
 public class CircularQueueLogAppender extends AbstractAppender {
 
-    public static final String PLUGIN_NAME = "CircularQueueLogAppender";
+	public static final String PLUGIN_NAME = "CircularQueueLogAppender";
 
-    private static Buffer buffer; //This has to be sync !!!!
+	private static Buffer buffer; //This has to be sync !!!!
 
-    private DateTimeFormatter dateFormat;
+	private DateTimeFormatter dateFormat;
 
-    private boolean global;
+	private boolean global;
 
-    protected CircularQueueLogAppender(final String name, final Filter filter,
-                                       final Layout<? extends Serializable> layout, final boolean ignoreExceptions,
-                                       final Property[] properties) {
-        super(name, filter, layout, ignoreExceptions, properties);
-    }
+	protected CircularQueueLogAppender(final String name, final Filter filter,
+					   final Layout<? extends Serializable> layout, final boolean ignoreExceptions,
+					   final Property[] properties) {
+		super(name, filter, layout, ignoreExceptions, properties);
+	}
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public void append(final LogEvent event) {
-        String siteName = StringUtils.EMPTY;
-        final SiteContext ctx = SiteContext.getCurrent();
-        if (ctx != null) {
-            siteName = ctx.getSiteName();
-        }
-        if (global || StringUtils.isNoneBlank(siteName)) {
-            Map<String, Object> mappy = new HashMap<>();
-            mappy.put("site", siteName);
-            mappy.put("level", event.getLevel().toString());
-            mappy.put("message", event.getMessage().getFormattedMessage());
-            mappy.put("thread", event.getThreadName());
-            mappy.put("exception", subAppend(event));
-            mappy.put("timestamp", dateFormat.format(Instant.ofEpochMilli(event.getTimeMillis())));
-            mappy.put("timestampm", event.getInstant().getEpochMillisecond());
-            buffer.add(mappy);
-        }
-    }
+	@Override
+	@SuppressWarnings("unchecked")
+	public void append(final LogEvent event) {
+		String siteName = StringUtils.EMPTY;
+		final SiteContext ctx = SiteContext.getCurrent();
+		if (ctx != null) {
+			siteName = ctx.getSiteName();
+		}
+		if (global || StringUtils.isNoneBlank(siteName)) {
+			Map<String, Object> mappy = new HashMap<>();
+			mappy.put("site", siteName);
+			mappy.put("level", event.getLevel().toString());
+			mappy.put("message", event.getMessage().getFormattedMessage());
+			mappy.put("thread", event.getThreadName());
+			mappy.put("exception", subAppend(event));
+			mappy.put("timestamp", dateFormat.format(Instant.ofEpochMilli(event.getTimeMillis())));
+			mappy.put("timestampm", event.getInstant().getEpochMillisecond());
+			buffer.add(mappy);
+		}
+	}
 
-    @Override
-    public void stop() {
-        super.stop();
-        buffer.clear();
-    }
+	@Override
+	public void stop() {
+		super.stop();
+		buffer.clear();
+	}
 
-    @SuppressWarnings("unchecked")
-    public static List<Map<String, Object>> getLoggedEvents(final String siteId, final long since) {
+	@SuppressWarnings("unchecked")
+	public static List<Map<String, Object>> getLoggedEvents(final String siteId, final long since) {
 
-        final Iterator<Map<String, Object>> iter = buffer.iterator();
-        final List<Map<String, Object>> str = new ArrayList<>();
-        while (iter.hasNext()) {
-            Map<String, Object> map = iter.next();
-            if (map.get("site").toString().equalsIgnoreCase(siteId)) {
-                if (Instant.ofEpochMilli((long)map.get("timestampm")).isAfter(Instant.ofEpochMilli(since))) {
-                    str.add(map);
-                }
-            }
-        }
-        return str;
-    }
+		final Iterator<Map<String, Object>> iter = buffer.iterator();
+		final List<Map<String, Object>> str = new ArrayList<>();
+		while (iter.hasNext()) {
+			Map<String, Object> map = iter.next();
+			if (map.get("site").toString().equalsIgnoreCase(siteId)) {
+				if (Instant.ofEpochMilli((long) map.get("timestampm")).isAfter(Instant.ofEpochMilli(since))) {
+					str.add(map);
+				}
+			}
+		}
+		return str;
+	}
 
-    protected String subAppend(final LogEvent event) {
-        StringBuilder sb = new StringBuilder();
-        if(!ignoreExceptions() && !Objects.isNull(event.getThrown())) {
-            sb.append(System.lineSeparator());
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            event.getThrown().printStackTrace(pw);
-            BufferedReader br = new BufferedReader(new StringReader(sw.toString()));
-            br.lines().forEach(line -> sb.append(line).append(System.lineSeparator()));
-        }
-        return sb.toString();
-    }
+	protected String subAppend(final LogEvent event) {
+		StringBuilder sb = new StringBuilder();
+		if (!ignoreExceptions() && !Objects.isNull(event.getThrown())) {
+			sb.append(System.lineSeparator());
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			event.getThrown().printStackTrace(pw);
+			BufferedReader br = new BufferedReader(new StringReader(sw.toString()));
+			br.lines().forEach(line -> sb.append(line).append(System.lineSeparator()));
+		}
+		return sb.toString();
+	}
 
-    @PluginFactory
-    public static CircularQueueLogAppender createAppender(
-        @PluginAttribute(value = "name") String name,
-        @PluginElement(value = "Filters") Filter filter,
-        @PluginElement(value = "Layout") Layout<? extends Serializable> layout,
-        @PluginAttribute(value = "ignoreExceptions") boolean ignoreExceptions,
-        @PluginAttribute(value = "maxQueueSize") int maxQueueSize,
-        @PluginAttribute(value = "dateFormat") String dateFormat,
-        @PluginAttribute(value = "global") boolean global) {
+	@PluginFactory
+	public static CircularQueueLogAppender createAppender(
+		@PluginAttribute(value = "name") String name,
+		@PluginElement(value = "Filters") Filter filter,
+		@PluginElement(value = "Layout") Layout<? extends Serializable> layout,
+		@PluginAttribute(value = "ignoreExceptions") boolean ignoreExceptions,
+		@PluginAttribute(value = "maxQueueSize") int maxQueueSize,
+		@PluginAttribute(value = "dateFormat") String dateFormat,
+		@PluginAttribute(value = "global") boolean global) {
 
-        if (StringUtils.isEmpty(name)) {
-            LOGGER.error("No name provided for " + PLUGIN_NAME);
-            return null;
-        }
+		if (StringUtils.isEmpty(name)) {
+			LOGGER.error("No name provided for " + PLUGIN_NAME);
+			return null;
+		}
 
-        if (Objects.isNull(layout)) {
-            layout = PatternLayout.createDefaultLayout();
-        }
+		if (Objects.isNull(layout)) {
+			layout = PatternLayout.createDefaultLayout();
+		}
 
-        if (Objects.isNull(buffer)) {
-            LOGGER.debug("Initializing circular log queue buffer");
-            if (maxQueueSize <= 0) {
-                throw new IllegalArgumentException("maxQueueSize must be a integer bigger that 0");
-            }
-            buffer = BufferUtils.synchronizedBuffer(new CircularFifoBuffer(maxQueueSize));
-        }
+		if (Objects.isNull(buffer)) {
+			LOGGER.debug("Initializing circular log queue buffer");
+			if (maxQueueSize <= 0) {
+				throw new IllegalArgumentException("maxQueueSize must be a integer bigger that 0");
+			}
+			buffer = BufferUtils.synchronizedBuffer(new CircularFifoBuffer(maxQueueSize));
+		}
 
-        CircularQueueLogAppender appender = new CircularQueueLogAppender(name, filter, layout, ignoreExceptions, null);
-        appender.dateFormat = DateTimeFormatter.ofPattern(dateFormat).withZone(ZoneId.of("UTC"));
-        appender.global = global;
+		CircularQueueLogAppender appender = new CircularQueueLogAppender(name, filter, layout, ignoreExceptions, null);
+		appender.dateFormat = DateTimeFormatter.ofPattern(dateFormat).withZone(ZoneId.of("UTC"));
+		appender.global = global;
 
-        return appender;
-    }
+		return appender;
+	}
 }
 

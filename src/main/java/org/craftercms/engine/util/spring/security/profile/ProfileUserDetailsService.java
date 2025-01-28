@@ -37,44 +37,44 @@ import java.beans.ConstructorProperties;
  */
 public class ProfileUserDetailsService implements UserDetailsService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProfileUserDetailsService.class);
+	private static final Logger logger = LoggerFactory.getLogger(ProfileUserDetailsService.class);
 
-    protected TenantsResolver tenantsResolver;
+	protected TenantsResolver tenantsResolver;
 
-    protected ProfileService profileService;
+	protected ProfileService profileService;
 
-    @ConstructorProperties({"tenantsResolver", "profileService"})
-    public ProfileUserDetailsService(final TenantsResolver tenantsResolver, final ProfileService profileService) {
-        this.tenantsResolver = tenantsResolver;
-        this.profileService = profileService;
-    }
+	@ConstructorProperties({"tenantsResolver", "profileService"})
+	public ProfileUserDetailsService(final TenantsResolver tenantsResolver, final ProfileService profileService) {
+		this.tenantsResolver = tenantsResolver;
+		this.profileService = profileService;
+	}
 
-    public UserDetails loadUserById(final String id) {
-        try {
-            Profile profile = profileService.getProfile(id);
-            return new ProfileUser(profile);
-        } catch (ProfileException e) {
-            logger.debug("Profile not found for id '{}'", id);
-        }
-        return null;
-    }
+	public UserDetails loadUserById(final String id) {
+		try {
+			Profile profile = profileService.getProfile(id);
+			return new ProfileUser(profile);
+		} catch (ProfileException e) {
+			logger.debug("Profile not found for id '{}'", id);
+		}
+		return null;
+	}
 
-    @Override
-    public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
-        String[] tenants = tenantsResolver.getTenants();
-        if (ArrayUtils.isEmpty(tenants)) {
-            throw new IllegalStateException("No tenants resolved for authentication");
-        }
-        for (String tenant : tenants) {
-            try {
-                Profile profile = profileService.getProfileByUsername(tenant, username);
-                return new ProfileUser(profile);
-            } catch (ProfileException e) {
-                logger.debug("Profile not found for '{}' in tenant '{}', will try next tenant", username, tenant);
-            }
-        }
-        logger.error("Profile not found for '{}' in any tenant", username);
-        return null;
-    }
+	@Override
+	public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
+		String[] tenants = tenantsResolver.getTenants();
+		if (ArrayUtils.isEmpty(tenants)) {
+			throw new IllegalStateException("No tenants resolved for authentication");
+		}
+		for (String tenant : tenants) {
+			try {
+				Profile profile = profileService.getProfileByUsername(tenant, username);
+				return new ProfileUser(profile);
+			} catch (ProfileException e) {
+				logger.debug("Profile not found for '{}' in tenant '{}', will try next tenant", username, tenant);
+			}
+		}
+		logger.error("Profile not found for '{}' in any tenant", username);
+		return null;
+	}
 
 }

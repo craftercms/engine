@@ -41,61 +41,61 @@ import static org.junit.Assert.*;
  */
 public class Dom4jExtensionTest {
 
-    private static final String XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-                                      "<root>" +
-                                      "<collection>" +
-                                      "<item>Item #1</item>" +
-                                      "<item>Item #2</item>" +
-                                      "</collection>" +
-                                      "</root>";
+	private static final String XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+		"<root>" +
+		"<collection>" +
+		"<item>Item #1</item>" +
+		"<item>Item #2</item>" +
+		"</collection>" +
+		"</root>";
 
-    private ScriptFactory scriptFactory;
+	private ScriptFactory scriptFactory;
 
-    @Before
-    public void setUp() throws Exception {
-        SiteContext siteContext = createSiteContext(createContentStoreService());
-        Map<String, Object> globalVars = Collections.emptyMap();
+	@Before
+	public void setUp() throws Exception {
+		SiteContext siteContext = createSiteContext(createContentStoreService());
+		Map<String, Object> globalVars = Collections.emptyMap();
 
-        scriptFactory = createScriptFactory(siteContext, globalVars);
-    }
+		scriptFactory = createScriptFactory(siteContext, globalVars);
+	}
 
-    @Test
-    public void testExtension() throws Exception {
-        SAXReader reader = new SAXReader();
-        reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-        reader.setFeature("http://xml.org/sax/features/external-general-entities", false);
-        reader.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-        Map<String, Object> vars = new HashMap<>(1);
-        vars.put("document", reader.read(new StringReader(XML)));
+	@Test
+	public void testExtension() throws Exception {
+		SAXReader reader = new SAXReader();
+		reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+		reader.setFeature("http://xml.org/sax/features/external-general-entities", false);
+		reader.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+		Map<String, Object> vars = new HashMap<>(1);
+		vars.put("document", reader.read(new StringReader(XML)));
 
-        Object result = scriptFactory.getScript("/scripts/testDom4jExtension.get.groovy").execute(vars);
+		Object result = scriptFactory.getScript("/scripts/testDom4jExtension.get.groovy").execute(vars);
 
-        assertEquals("Item #2", result);
-    }
+		assertEquals("Item #2", result);
+	}
 
-    private ContentStoreService createContentStoreService() {
-        ContentStoreService storeService = mock(ContentStoreService.class);
-        ContentStoreServiceMockUtils.setUpGetContentFromClassPath(storeService);
+	private ContentStoreService createContentStoreService() {
+		ContentStoreService storeService = mock(ContentStoreService.class);
+		ContentStoreServiceMockUtils.setUpGetContentFromClassPath(storeService);
 
-        return storeService;
-    }
+		return storeService;
+	}
 
-    private SiteContext createSiteContext(ContentStoreService storeService) {
-        CacheTemplate cacheTemplate = CacheTemplateMockUtils.createCacheTemplate();
+	private SiteContext createSiteContext(ContentStoreService storeService) {
+		CacheTemplate cacheTemplate = CacheTemplateMockUtils.createCacheTemplate();
 
-        SiteContext siteContext = spy( new SiteContext());
-        when(siteContext.getContext()).thenReturn(mock(Context.class));
-        when(siteContext.getSiteName()).thenReturn("default");
-        when(siteContext.getStoreService()).thenReturn(storeService);
-        when(siteContext.getCacheTemplate()).thenReturn(cacheTemplate);
+		SiteContext siteContext = spy(new SiteContext());
+		when(siteContext.getContext()).thenReturn(mock(Context.class));
+		when(siteContext.getSiteName()).thenReturn("default");
+		when(siteContext.getStoreService()).thenReturn(storeService);
+		when(siteContext.getCacheTemplate()).thenReturn(cacheTemplate);
 
-        return siteContext;
-    }
+		return siteContext;
+	}
 
-    private ScriptFactory createScriptFactory(SiteContext siteContext, Map<String, Object> globalVars) {
-        ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(siteContext);
+	private ScriptFactory createScriptFactory(SiteContext siteContext, Map<String, Object> globalVars) {
+		ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(siteContext);
 
-        return new GroovyScriptFactory(siteContext, resourceConnector, globalVars, false);
-    }
+		return new GroovyScriptFactory(siteContext, resourceConnector, globalVars, false);
+	}
 
 }

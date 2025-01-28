@@ -24,40 +24,40 @@
 <#---->includeRoot=true
 <#---->inlineRootWithImmediateChildren=true
 >
-  <#assign navTree = navTreeBuilder.getNavTree(url, depth, Request.pageUrl)/>
-  <#-- navElement will be rendered if: showNavElement = true -->
-  <#if showNavElement != false><nav <#if navElementClass != ''>class="${navElementClass}"</#if>></#if>
+	<#assign navTree = navTreeBuilder.getNavTree(url, depth, Request.pageUrl)/>
+<#-- navElement will be rendered if: showNavElement = true -->
+	<#if showNavElement != false><nav <#if navElementClass != ''>class="${navElementClass}"</#if>></#if>
 
-  <#-- containerElement will be rendered if containerElement has no empty value, and includeRoot is set to true -->
-  <#-- if includeRoot is false, then the first container will be the one containing the root subitems -->
-  <#if (containerElement != "") && (includeRoot)><${containerElement} <#if containerElementClass != ''>class="${containerElementClass}"</#if>></#if>
-    <@navigationItem
-      containerElement=containerElement
-      containerElementClass=containerElementClass
-      itemWrapperElement=itemWrapperElement
-      itemWrapperClass=itemWrapperClass
-      itemWrapperActiveClass=itemWrapperActiveClass
-      itemWrapperAttributes=itemWrapperAttributes
-      itemClass=itemClass
-      itemActiveClass=itemActiveClass
-      itemAttributes=itemAttributes
-      hasSubItemItemClass=hasSubItemItemClass
-      hasSubItemWrapperClass=hasSubItemWrapperClass
-      hasSubItemItemAttributes=hasSubItemItemAttributes
-      subItemClass=subItemClass
-      subItemClassPrefix=subItemClassPrefix
-      subItemAttributes=subItemAttributes
-      subItemWrapperClass=subItemWrapperClass
-      subItemWrapperClassPrefix=subItemWrapperClassPrefix
-      subItemContainerClass=subItemContainerClass
-      depth=depth
-      currentDepth=0
-      navItem=navTree
-      includeRoot=includeRoot
-      inlineRootWithImmediateChildren=inlineRootWithImmediateChildren
-    />
-  <#if containerElement != ""></${containerElement}></#if>
-  <#if showNavElement != false></nav></#if>
+<#-- containerElement will be rendered if containerElement has no empty value, and includeRoot is set to true -->
+<#-- if includeRoot is false, then the first container will be the one containing the root subitems -->
+	<#if (containerElement != "") && (includeRoot)><${containerElement} <#if containerElementClass != ''>class="${containerElementClass}"</#if>></#if>
+	<@navigationItem
+	containerElement=containerElement
+	containerElementClass=containerElementClass
+	itemWrapperElement=itemWrapperElement
+	itemWrapperClass=itemWrapperClass
+	itemWrapperActiveClass=itemWrapperActiveClass
+	itemWrapperAttributes=itemWrapperAttributes
+	itemClass=itemClass
+	itemActiveClass=itemActiveClass
+	itemAttributes=itemAttributes
+	hasSubItemItemClass=hasSubItemItemClass
+	hasSubItemWrapperClass=hasSubItemWrapperClass
+	hasSubItemItemAttributes=hasSubItemItemAttributes
+	subItemClass=subItemClass
+	subItemClassPrefix=subItemClassPrefix
+	subItemAttributes=subItemAttributes
+	subItemWrapperClass=subItemWrapperClass
+	subItemWrapperClassPrefix=subItemWrapperClassPrefix
+	subItemContainerClass=subItemContainerClass
+	depth=depth
+	currentDepth=0
+	navItem=navTree
+	includeRoot=includeRoot
+	inlineRootWithImmediateChildren=inlineRootWithImmediateChildren
+	/>
+	<#if containerElement != ""></${containerElement}></#if>
+	<#if showNavElement != false></nav></#if>
 </#macro>
 
 <#macro navigationItem
@@ -127,45 +127,45 @@
     <#outputFormat "HTML">
       ${navItem.label}
     </#outputFormat>
-    </@a>
-  </#if>
+</@a>
+</#if>
 
-  <#-- itemWrapperElement will not be rendered if itemWrapperElement is not empty and if root and root first level
-  children are set to be in same level-->
-  <#if (itemWrapperElement != "") && (inlineRootWithImmediateChildren)></${itemWrapperElement}></#if>
-  <#assign subItems = navItem.subItems/>
-  <#-- if current item has subitems: -->
-  <#if (depth > 0) && (currentDepth < depth) && (subItems?size > 0)>
-    <#if ((containerElement != "") && (!inlineRootWithImmediateChildren) || !includeRoot)>
-      <${containerElement}
-        class="${(currentDepth == 0 && !includeRoot)?then(containerElementClass, subItemContainerClass)}"
-      >
-    </#if>
-    <#list subItems as subItem>
-      <@navigationItem
+<#-- itemWrapperElement will not be rendered if itemWrapperElement is not empty and if root and root first level
+children are set to be in same level-->
+<#if (itemWrapperElement != "") && (inlineRootWithImmediateChildren)></${itemWrapperElement}></#if>
+<#assign subItems = navItem.subItems/>
+<#-- if current item has subitems: -->
+<#if (depth > 0) && (currentDepth < depth) && (subItems?size > 0)>
+<#if ((containerElement != "") && (!inlineRootWithImmediateChildren) || !includeRoot)>
+<${containerElement}
+class="${(currentDepth == 0 && !includeRoot)?then(containerElementClass, subItemContainerClass)}"
+>
+</#if>
+<#list subItems as subItem>
+<@navigationItem
         containerElement=containerElement
-        itemWrapperElement=itemWrapperElement
-        itemWrapperClass=itemWrapperClass
-        itemWrapperActiveClass=itemWrapperActiveClass
-        itemWrapperAttributes=itemWrapperAttributes
-        itemClass=itemClass
-        itemActiveClass=itemActiveClass
-        itemAttributes=itemAttributes
-        hasSubItemItemClass=hasSubItemItemClass
-        hasSubItemWrapperClass=hasSubItemWrapperClass
-        hasSubItemItemAttributes=hasSubItemItemAttributes
-        subItemClass=subItemClass
-        subItemClassPrefix=subItemClassPrefix
-        subItemWrapperClass=subItemWrapperClass
-        subItemWrapperClassPrefix=subItemWrapperClassPrefix
-        subItemContainerClass=subItemContainerClass
-        depth=(inlineRootWithImmediateChildren && currentDepth == 0)?then(depth - 1, currentDepth +1)
-        currentDepth=(inlineRootWithImmediateChildren && currentDepth == 0)?then(currentDepth, currentDepth + 1)
-        navItem=subItem
-        inlineRootWithImmediateChildren=false
-      />
-    </#list>
-    <#if (containerElement != "") && (!inlineRootWithImmediateChildren)></${containerElement}></#if>
-  </#if>
-  <#if (itemWrapperElement != "")  && (!inlineRootWithImmediateChildren)></${itemWrapperElement}></#if>
+itemWrapperElement=itemWrapperElement
+itemWrapperClass=itemWrapperClass
+itemWrapperActiveClass=itemWrapperActiveClass
+itemWrapperAttributes=itemWrapperAttributes
+itemClass=itemClass
+itemActiveClass=itemActiveClass
+itemAttributes=itemAttributes
+hasSubItemItemClass=hasSubItemItemClass
+hasSubItemWrapperClass=hasSubItemWrapperClass
+hasSubItemItemAttributes=hasSubItemItemAttributes
+subItemClass=subItemClass
+subItemClassPrefix=subItemClassPrefix
+subItemWrapperClass=subItemWrapperClass
+subItemWrapperClassPrefix=subItemWrapperClassPrefix
+subItemContainerClass=subItemContainerClass
+depth=(inlineRootWithImmediateChildren && currentDepth == 0)?then(depth - 1, currentDepth +1)
+currentDepth=(inlineRootWithImmediateChildren && currentDepth == 0)?then(currentDepth, currentDepth + 1)
+navItem=subItem
+inlineRootWithImmediateChildren=false
+/>
+</#list>
+<#if (containerElement != "") && (!inlineRootWithImmediateChildren)></${containerElement}></#if>
+</#if>
+<#if (itemWrapperElement != "")  && (!inlineRootWithImmediateChildren)></${itemWrapperElement}></#if>
 </#macro>

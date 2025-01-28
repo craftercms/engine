@@ -46,97 +46,97 @@ import static org.mockito.Mockito.when;
  */
 public class ContentStoreServiceMockUtils {
 
-    public static ContentStoreService setUpGetContentFromClassPath(ContentStoreService mock) {
-        Answer<Content> getContentAnswer = new Answer<Content>() {
+	public static ContentStoreService setUpGetContentFromClassPath(ContentStoreService mock) {
+		Answer<Content> getContentAnswer = new Answer<Content>() {
 
-            @Override
-            public Content answer(InvocationOnMock invocation) throws Throwable {
-                Object[] args = invocation.getArguments();
-                String url;
+			@Override
+			public Content answer(InvocationOnMock invocation) throws Throwable {
+				Object[] args = invocation.getArguments();
+				String url;
 
-                if (args.length == 2) {
-                    url = (String) args[1];
-                } else {
-                    url = (String) args[2];
-                }
+				if (args.length == 2) {
+					url = (String) args[1];
+				} else {
+					url = (String) args[2];
+				}
 
-                Content content = getContentFromClassPath(url);
-                if (content == null) {
-                    throw new PathNotFoundException();
-                }
+				Content content = getContentFromClassPath(url);
+				if (content == null) {
+					throw new PathNotFoundException();
+				}
 
-                return content;
-            }
+				return content;
+			}
 
-        };
+		};
 
-        Answer<Boolean> existsAnswer = new Answer<Boolean>() {
+		Answer<Boolean> existsAnswer = new Answer<Boolean>() {
 
-            @Override
-            public Boolean answer(InvocationOnMock invocation) throws Throwable {
-                Object[] args = invocation.getArguments();
-                String url = (String) args[1];
+			@Override
+			public Boolean answer(InvocationOnMock invocation) throws Throwable {
+				Object[] args = invocation.getArguments();
+				String url = (String) args[1];
 
-                return new ClassPathResource(url).exists();
-            }
+				return new ClassPathResource(url).exists();
+			}
 
-        };
+		};
 
-        when(mock.getContent(any(Context.class), anyString())).then(getContentAnswer);
-        when(mock.getContent(any(Context.class), any(CachingOptions.class), anyString())).then(getContentAnswer);
-        when(mock.exists(any(Context.class), anyString())).then(existsAnswer);
-        when(mock.findChildren(any(Context.class), anyString())).then(new Answer<List<Item>>() {
+		when(mock.getContent(any(Context.class), anyString())).then(getContentAnswer);
+		when(mock.getContent(any(Context.class), any(CachingOptions.class), anyString())).then(getContentAnswer);
+		when(mock.exists(any(Context.class), anyString())).then(existsAnswer);
+		when(mock.findChildren(any(Context.class), anyString())).then(new Answer<List<Item>>() {
 
-            @Override
-            public List<Item> answer(InvocationOnMock invocation) throws Throwable {
-                String folderUrl = (String)invocation.getArguments()[1];
-                Resource folderRes = new ClassPathResource(folderUrl);
-                File folder = folderRes.getFile();
-                String[] childNames = folder.list();
-                List<Item> children = new ArrayList<>(childNames.length);
+			@Override
+			public List<Item> answer(InvocationOnMock invocation) throws Throwable {
+				String folderUrl = (String) invocation.getArguments()[1];
+				Resource folderRes = new ClassPathResource(folderUrl);
+				File folder = folderRes.getFile();
+				String[] childNames = folder.list();
+				List<Item> children = new ArrayList<>(childNames.length);
 
-                for (String childName : childNames) {
-                    Item child = new Item();
-                    child.setUrl(folderUrl + "/" + childName);
+				for (String childName : childNames) {
+					Item child = new Item();
+					child.setUrl(folderUrl + "/" + childName);
 
-                    children.add(child);
-                }
+					children.add(child);
+				}
 
-                return children;
-            }
+				return children;
+			}
 
-        });
+		});
 
-        return mock;
-    }
+		return mock;
+	}
 
-    public static Content getContentFromClassPath(String url) throws IOException {
-        final ClassPathResource resource = new ClassPathResource(url);
-        if (resource.exists()) {
-            final byte[] data = IOUtils.toByteArray(resource.getInputStream());
-            final long lastModified = resource.lastModified();
+	public static Content getContentFromClassPath(String url) throws IOException {
+		final ClassPathResource resource = new ClassPathResource(url);
+		if (resource.exists()) {
+			final byte[] data = IOUtils.toByteArray(resource.getInputStream());
+			final long lastModified = resource.lastModified();
 
-            return new Content() {
+			return new Content() {
 
-                @Override
-                public long getLastModified() {
-                    return lastModified;
-                }
+				@Override
+				public long getLastModified() {
+					return lastModified;
+				}
 
-                @Override
-                public long getLength() {
-                    return data.length;
-                }
+				@Override
+				public long getLength() {
+					return data.length;
+				}
 
-                @Override
-                public InputStream getInputStream() throws IOException {
-                    return new ByteArrayInputStream(data);
-                }
+				@Override
+				public InputStream getInputStream() throws IOException {
+					return new ByteArrayInputStream(data);
+				}
 
-            };
-        } else {
-            return null;
-        }
-    }
+			};
+		} else {
+			return null;
+		}
+	}
 
 }

@@ -18,6 +18,7 @@ package org.craftercms.engine.scripting.impl;
 
 import java.io.IOException;
 import java.util.Collections;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletContext;
@@ -57,159 +58,159 @@ import static org.mockito.Mockito.*;
  */
 public class ScriptFilterTest {
 
-    @Mock
-    private CacheTemplate cacheTemplate;
-    @Mock
-    private ContentStoreService storeService;
-    @Mock
-    private FilterConfig filterConfig;
-    private SiteContext siteContext;
-    private ServletContext servletContext;
-    private ScriptFilter filter;
+	@Mock
+	private CacheTemplate cacheTemplate;
+	@Mock
+	private ContentStoreService storeService;
+	@Mock
+	private FilterConfig filterConfig;
+	private SiteContext siteContext;
+	private ServletContext servletContext;
+	private ScriptFilter filter;
 
-    @Before
-    public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+	@Before
+	public void setUp() throws Exception {
+		MockitoAnnotations.initMocks(this);
 
-        CacheTemplateMockUtils.setUpWithNoCaching(cacheTemplate);
-        ContentStoreServiceMockUtils.setUpGetContentFromClassPath(storeService);
+		CacheTemplateMockUtils.setUpWithNoCaching(cacheTemplate);
+		ContentStoreServiceMockUtils.setUpGetContentFromClassPath(storeService);
 
-        siteContext = createSiteContext(storeService);
-        servletContext = new MockServletContext();
+		siteContext = createSiteContext(storeService);
+		servletContext = new MockServletContext();
 
-        filter = new ScriptFilter(cacheTemplate);
-        filter.setPluginService(mock(PluginService.class));
-        filter.setExcludedUrls(new String[]{
-                "/api/1/monitoring/**",
-                "/api/1/site/context/**",
-                "/api/1/site/cache/**"});
+		filter = new ScriptFilter(cacheTemplate);
+		filter.setPluginService(mock(PluginService.class));
+		filter.setExcludedUrls(new String[]{
+			"/api/1/monitoring/**",
+			"/api/1/site/context/**",
+			"/api/1/site/cache/**"});
 
-        when(filterConfig.getServletContext()).thenReturn(servletContext);
+		when(filterConfig.getServletContext()).thenReturn(servletContext);
 
-        filter.init(filterConfig);
-    }
+		filter.init(filterConfig);
+	}
 
-    @Test
-    public void testFilter() throws Exception {
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/mymovies");
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        FilterChain filterChain = mock(FilterChain.class);
+	@Test
+	public void testFilter() throws Exception {
+		MockHttpServletRequest request = new MockHttpServletRequest("GET", "/mymovies");
+		MockHttpServletResponse response = new MockHttpServletResponse();
+		FilterChain filterChain = mock(FilterChain.class);
 
-        setCurrentRequestContext(request, response);
-        setCurrentSiteContext(siteContext);
+		setCurrentRequestContext(request, response);
+		setCurrentSiteContext(siteContext);
 
-        filter.doFilter(request, response, filterChain);
+		filter.doFilter(request, response, filterChain);
 
-        String greeting = (String)request.getAttribute("greeting");
+		String greeting = (String) request.getAttribute("greeting");
 
-        assertNotNull(greeting);
-        assertEquals("Hello World!", greeting);
-        assertEquals(400, response.getStatus());
-        assertEquals("You're not a subscriber", response.getErrorMessage());
+		assertNotNull(greeting);
+		assertEquals("Hello World!", greeting);
+		assertEquals(400, response.getStatus());
+		assertEquals("You're not a subscriber", response.getErrorMessage());
 
-        verify(filterChain, never()).doFilter(request, response);
+		verify(filterChain, never()).doFilter(request, response);
 
-        clearCurrentRequestContext();
-    }
+		clearCurrentRequestContext();
+	}
 
-    @Test
-    public void testFilterExclude() throws Exception {
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/static-assets/js/app.js");
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        FilterChain filterChain = mock(FilterChain.class);
+	@Test
+	public void testFilterExclude() throws Exception {
+		MockHttpServletRequest request = new MockHttpServletRequest("GET", "/static-assets/js/app.js");
+		MockHttpServletResponse response = new MockHttpServletResponse();
+		FilterChain filterChain = mock(FilterChain.class);
 
-        setCurrentRequestContext(request, response);
-        setCurrentSiteContext(siteContext);
+		setCurrentRequestContext(request, response);
+		setCurrentSiteContext(siteContext);
 
-        filter.doFilter(request, response, filterChain);
+		filter.doFilter(request, response, filterChain);
 
-        String greeting = (String)request.getAttribute("greeting");
+		String greeting = (String) request.getAttribute("greeting");
 
-        assertNotNull(greeting);
-        assertEquals("Hello World!", greeting);
-        assertEquals(200, response.getStatus());
+		assertNotNull(greeting);
+		assertEquals("Hello World!", greeting);
+		assertEquals(200, response.getStatus());
 
-        verify(filterChain).doFilter(request, response);
+		verify(filterChain).doFilter(request, response);
 
-        clearCurrentRequestContext();
-    }
+		clearCurrentRequestContext();
+	}
 
-    @Test
-    public void testRebuildContextIsIgnored() throws ServletException, IOException {
-        ScriptFilter filterSpy = spy(filter);
-        String url = "/api/1/site/context/rebuild?token=defaultManagementToken";
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", url);
-        request.setServletPath(url);
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        FilterChain filterChain = mock(FilterChain.class);
+	@Test
+	public void testRebuildContextIsIgnored() throws ServletException, IOException {
+		ScriptFilter filterSpy = spy(filter);
+		String url = "/api/1/site/context/rebuild?token=defaultManagementToken";
+		MockHttpServletRequest request = new MockHttpServletRequest("GET", url);
+		request.setServletPath(url);
+		MockHttpServletResponse response = new MockHttpServletResponse();
+		FilterChain filterChain = mock(FilterChain.class);
 
-        setCurrentRequestContext(request, response);
-        setCurrentSiteContext(siteContext);
+		setCurrentRequestContext(request, response);
+		setCurrentSiteContext(siteContext);
 
-        filterSpy.doFilter(request, response, filterChain);
+		filterSpy.doFilter(request, response, filterChain);
 
-        String greeting = (String)request.getAttribute("greeting");
+		String greeting = (String) request.getAttribute("greeting");
 
-        assertNull(greeting);
+		assertNull(greeting);
 
-        verify(filterSpy, never()).getScriptFilterChain(any(HttpServletRequest.class), any(FilterChain.class));
-    }
+		verify(filterSpy, never()).getScriptFilterChain(any(HttpServletRequest.class), any(FilterChain.class));
+	}
 
-    @Test
-    public void testNotMatchedRequestIsProcessed() throws ServletException, IOException {
-        ScriptFilter filterSpy = spy(filter);
-        String url = "/myPage";
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", url);
-        request.setServletPath(url);
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        FilterChain filterChain = mock(FilterChain.class);
+	@Test
+	public void testNotMatchedRequestIsProcessed() throws ServletException, IOException {
+		ScriptFilter filterSpy = spy(filter);
+		String url = "/myPage";
+		MockHttpServletRequest request = new MockHttpServletRequest("GET", url);
+		request.setServletPath(url);
+		MockHttpServletResponse response = new MockHttpServletResponse();
+		FilterChain filterChain = mock(FilterChain.class);
 
-        setCurrentRequestContext(request, response);
-        setCurrentSiteContext(siteContext);
+		setCurrentRequestContext(request, response);
+		setCurrentSiteContext(siteContext);
 
-        filterSpy.doFilter(request, response, filterChain);
+		filterSpy.doFilter(request, response, filterChain);
 
-        String greeting = (String)request.getAttribute("greeting");
+		String greeting = (String) request.getAttribute("greeting");
 
-        assertNotNull(greeting);
+		assertNotNull(greeting);
 
-        verify(filterSpy, times(1)).getScriptFilterChain(any(HttpServletRequest.class), any(FilterChain.class));
-    }
+		verify(filterSpy, times(1)).getScriptFilterChain(any(HttpServletRequest.class), any(FilterChain.class));
+	}
 
-    private SiteContext createSiteContext(ContentStoreService storeService) throws Exception {
-        SiteContext siteContext = spy(new SiteContext());
-        ScriptFactory scriptFactory = createScriptFactory(siteContext);
+	private SiteContext createSiteContext(ContentStoreService storeService) throws Exception {
+		SiteContext siteContext = spy(new SiteContext());
+		ScriptFactory scriptFactory = createScriptFactory(siteContext);
 
-        XMLConfiguration config =
-            ConfigUtils.readXmlConfiguration(new ClassPathResource("config/site-config.xml"), ',', null, null);
-        config.setListDelimiterHandler(new DefaultListDelimiterHandler(','));
+		XMLConfiguration config =
+			ConfigUtils.readXmlConfiguration(new ClassPathResource("config/site-config.xml"), ',', null, null);
+		config.setListDelimiterHandler(new DefaultListDelimiterHandler(','));
 
-        when(siteContext.getSiteName()).thenReturn("default");
-        when(siteContext.getContext()).thenReturn(mock(Context.class));
-        when(siteContext.getStoreService()).thenReturn(storeService);
-        when(siteContext.getConfig()).thenReturn(config);
-        when(siteContext.getScriptFactory()).thenReturn(scriptFactory);
-        when(siteContext.getCacheTemplate()).thenReturn(cacheTemplate);
+		when(siteContext.getSiteName()).thenReturn("default");
+		when(siteContext.getContext()).thenReturn(mock(Context.class));
+		when(siteContext.getStoreService()).thenReturn(storeService);
+		when(siteContext.getConfig()).thenReturn(config);
+		when(siteContext.getScriptFactory()).thenReturn(scriptFactory);
+		when(siteContext.getCacheTemplate()).thenReturn(cacheTemplate);
 
-        return siteContext;
-    }
+		return siteContext;
+	}
 
-    private ScriptFactory createScriptFactory(SiteContext siteContext) {
-        ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(siteContext);
+	private ScriptFactory createScriptFactory(SiteContext siteContext) {
+		ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(siteContext);
 
-        return new GroovyScriptFactory(siteContext, resourceConnector, Collections.emptyMap(), false);
-    }
+		return new GroovyScriptFactory(siteContext, resourceConnector, Collections.emptyMap(), false);
+	}
 
-    private void setCurrentRequestContext(HttpServletRequest request, HttpServletResponse response) {
-        RequestContext.setCurrent(new RequestContext(request, response, null));
-    }
+	private void setCurrentRequestContext(HttpServletRequest request, HttpServletResponse response) {
+		RequestContext.setCurrent(new RequestContext(request, response, null));
+	}
 
-    private void setCurrentSiteContext(SiteContext siteContext) {
-        SiteContext.setCurrent(siteContext);
-    }
+	private void setCurrentSiteContext(SiteContext siteContext) {
+		SiteContext.setCurrent(siteContext);
+	}
 
-    private void clearCurrentRequestContext() {
-        RequestContext.clear();
-    }
+	private void clearCurrentRequestContext() {
+		RequestContext.clear();
+	}
 
 }

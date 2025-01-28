@@ -27,6 +27,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+
 import java.io.IOException;
 
 import static java.lang.String.format;
@@ -36,24 +37,24 @@ import static java.lang.String.format;
  */
 public class ForbiddenUrlsFilter extends GenericFilterBean {
 
-    private final RequestMatcher matcher;
+	private final RequestMatcher matcher;
 
-    public ForbiddenUrlsFilter(final RequestMatcher matcher) {
-        this.matcher = matcher;
-    }
+	public ForbiddenUrlsFilter(final RequestMatcher matcher) {
+		this.matcher = matcher;
+	}
 
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        HttpServletRequest httpServletRequest = (HttpServletRequest) request;
-        String requestUri = httpServletRequest.getRequestURI();
-        if (matcher.matches(httpServletRequest)) {
-            String uri = UrlUtils.cleanUrlForLog(requestUri);
-            String message = format("Forbidden. You don't have permission to access '%s' on this server", uri);
+	@Override
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+		HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+		String requestUri = httpServletRequest.getRequestURI();
+		if (matcher.matches(httpServletRequest)) {
+			String uri = UrlUtils.cleanUrlForLog(requestUri);
+			String message = format("Forbidden. You don't have permission to access '%s' on this server", uri);
 
-            logger.error(message);
-            throw new HttpStatusCodeException(HttpStatus.NOT_FOUND, message);
-        }
+			logger.error(message);
+			throw new HttpStatusCodeException(HttpStatus.NOT_FOUND, message);
+		}
 
-        chain.doFilter(request, response);
-    }
+		chain.doFilter(request, response);
+	}
 }

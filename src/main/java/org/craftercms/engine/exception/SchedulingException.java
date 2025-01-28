@@ -25,12 +25,12 @@ import org.craftercms.core.exception.CrafterException;
  */
 public class SchedulingException extends CrafterException {
 
-    public SchedulingException(String message) {
-        super(message);
-    }
+	public SchedulingException(String message) {
+		super(message);
+	}
 
-    public SchedulingException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	public SchedulingException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
 }

@@ -30,26 +30,26 @@ import org.craftercms.engine.properties.SiteProperties;
  */
 public abstract class AbstractTargetIdManager implements TargetIdManager {
 
-    /**
-     * Returns the fallback ID defined in the current site configuration. If not defined, null is returned.
-     */
-    @Override
-    public String getFallbackTargetId() throws IllegalStateException {
-        return SiteProperties.getFallbackTargetId();
-    }
+	/**
+	 * Returns the fallback ID defined in the current site configuration. If not defined, null is returned.
+	 */
+	@Override
+	public String getFallbackTargetId() throws IllegalStateException {
+		return SiteProperties.getFallbackTargetId();
+	}
 
-    /**
-     * Returns the available target IDs defined in the current site configuration. If not defined, and
-     * {@link IllegalStateException} is thrown.
-     */
-    @Override
-    public List<String> getAvailableTargetIds() {
-        String[] availableTargetIds = SiteProperties.getAvailableTargetIds();
-        if (ArrayUtils.isNotEmpty(availableTargetIds)) {
-            return Arrays.asList(availableTargetIds);
-        } else {
-            throw new IllegalStateException("No available target IDs specified in the configuration");
-        }
-    }
+	/**
+	 * Returns the available target IDs defined in the current site configuration. If not defined, and
+	 * {@link IllegalStateException} is thrown.
+	 */
+	@Override
+	public List<String> getAvailableTargetIds() {
+		String[] availableTargetIds = SiteProperties.getAvailableTargetIds();
+		if (ArrayUtils.isNotEmpty(availableTargetIds)) {
+			return Arrays.asList(availableTargetIds);
+		} else {
+			throw new IllegalStateException("No available target IDs specified in the configuration");
+		}
+	}
 
 }

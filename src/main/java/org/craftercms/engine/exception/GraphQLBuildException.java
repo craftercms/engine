@@ -25,8 +25,8 @@ import org.craftercms.core.exception.CrafterException;
  */
 public class GraphQLBuildException extends CrafterException {
 
-    public GraphQLBuildException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	public GraphQLBuildException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
 }

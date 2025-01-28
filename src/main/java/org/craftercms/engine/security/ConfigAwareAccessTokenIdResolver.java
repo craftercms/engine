@@ -31,23 +31,23 @@ import org.craftercms.profile.services.impl.AccessTokenIdResolver;
  */
 public class ConfigAwareAccessTokenIdResolver implements AccessTokenIdResolver {
 
-    public static final String ACCESS_TOKEN_ID_KEY = "profile.api.accessTokenId";
+	public static final String ACCESS_TOKEN_ID_KEY = "profile.api.accessTokenId";
 
-    @Override
-    public String getAccessTokenId() {
-        String accessTokenId = null;
-        HierarchicalConfiguration config = ConfigUtils.getCurrentConfig();
+	@Override
+	public String getAccessTokenId() {
+		String accessTokenId = null;
+		HierarchicalConfiguration config = ConfigUtils.getCurrentConfig();
 
-        if (config != null) {
-            accessTokenId = config.getString(ACCESS_TOKEN_ID_KEY);
-        }
+		if (config != null) {
+			accessTokenId = config.getString(ACCESS_TOKEN_ID_KEY);
+		}
 
-        if (StringUtils.isNotEmpty(accessTokenId)) {
-            return accessTokenId;
-        } else {
-            throw new ConfigurationException("Current config for site '" + SiteContext.getCurrent().getSiteName() +
-                                            "' doesn't contain required property " + ACCESS_TOKEN_ID_KEY);
-        }
-    }
+		if (StringUtils.isNotEmpty(accessTokenId)) {
+			return accessTokenId;
+		} else {
+			throw new ConfigurationException("Current config for site '" + SiteContext.getCurrent().getSiteName() +
+				"' doesn't contain required property " + ACCESS_TOKEN_ID_KEY);
+		}
+	}
 
 }

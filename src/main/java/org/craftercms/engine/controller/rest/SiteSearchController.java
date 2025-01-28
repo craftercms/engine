@@ -42,31 +42,31 @@ import java.util.Map;
 @RequestMapping({RestControllerBase.REST_BASE_URI + SiteSearchController.URL_ROOT, RestControllerBase.REST_BASE_URI + SiteSearchController.URL_ES_ROOT})
 public class SiteSearchController extends RestControllerBase {
 
-    public static final String URL_ROOT = "/site/search";
-    // We use this for backwards compatibility with the old search endpoint
-    public static final String URL_ES_ROOT = "/site/elasticsearch";
-    public static final String URL_SEARCH = "/search";
+	public static final String URL_ROOT = "/site/search";
+	// We use this for backwards compatibility with the old search endpoint
+	public static final String URL_ES_ROOT = "/site/elasticsearch";
+	public static final String URL_SEARCH = "/search";
 
-    protected final SiteAwareOpenSearchService searchService;
+	protected final SiteAwareOpenSearchService searchService;
 
-    @ConstructorProperties({"searchService"})
-    public SiteSearchController(final SiteAwareOpenSearchService searchService) {
-        this.searchService = searchService;
-    }
+	@ConstructorProperties({"searchService"})
+	public SiteSearchController(final SiteAwareOpenSearchService searchService) {
+		this.searchService = searchService;
+	}
 
-    @PostMapping(URL_SEARCH)
-    public void search(@RequestBody Map<String, Object> request, @RequestParam Map<String, Object> parameters,
-                       HttpServletResponse response)
-            throws IOException {
-        // This is needed because we are writing manually the response
-        response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+	@PostMapping(URL_SEARCH)
+	public void search(@RequestBody Map<String, Object> request, @RequestParam Map<String, Object> parameters,
+			   HttpServletResponse response)
+		throws IOException {
+		// This is needed because we are writing manually the response
+		response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
-        // Execute the query
-        SearchResponse searchResponse = searchService.search(request, parameters);
+		// Execute the query
+		SearchResponse searchResponse = searchService.search(request, parameters);
 
-        // Write the response in ES format
-        response.setCharacterEncoding(StandardCharsets.UTF_8.toString());
-        response.getWriter().write(searchResponse.toString());
-    }
+		// Write the response in ES format
+		response.setCharacterEncoding(StandardCharsets.UTF_8.toString());
+		response.getWriter().write(searchResponse.toString());
+	}
 
 }

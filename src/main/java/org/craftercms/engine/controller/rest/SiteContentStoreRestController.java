@@ -48,54 +48,54 @@ import static org.craftercms.core.controller.rest.ContentStoreRestController.*;
 @RequestMapping(RestControllerBase.REST_BASE_URI + SiteContentStoreRestController.URL_ROOT)
 public class SiteContentStoreRestController extends RestControllerBase {
 
-    public static final String URL_ROOT = "/site/content_store";
+	public static final String URL_ROOT = "/site/content_store";
 
-    private final ContentStoreRestController wrappedController;
+	private final ContentStoreRestController wrappedController;
 
-    @ConstructorProperties({"wrappedController"})
-    public SiteContentStoreRestController(ContentStoreRestController wrappedController) {
-        this.wrappedController = wrappedController;
-    }
+	@ConstructorProperties({"wrappedController"})
+	public SiteContentStoreRestController(ContentStoreRestController wrappedController) {
+		this.wrappedController = wrappedController;
+	}
 
-    /**
-     * @deprecated Will be removed in 4.1, use {@code getItem} instead
-     */
-    @RequestMapping(value = URL_DESCRIPTOR, method = RequestMethod.GET)
-    public Document getDescriptor(WebRequest request, HttpServletResponse response,
-                                  @Size(max = 4000)
-                                  @ValidExistingContentPath
-                                  @RequestParam(REQUEST_PARAM_URL) String url,
-                                  @RequestParam(required = false, defaultValue = "false") boolean flatten) {
-        return wrappedController.getDescriptor(request, response, getCurrentContextId(), url, flatten);
-    }
+	/**
+	 * @deprecated Will be removed in 4.1, use {@code getItem} instead
+	 */
+	@RequestMapping(value = URL_DESCRIPTOR, method = RequestMethod.GET)
+	public Document getDescriptor(WebRequest request, HttpServletResponse response,
+				      @Size(max = 4000)
+				      @ValidExistingContentPath
+				      @RequestParam(REQUEST_PARAM_URL) String url,
+				      @RequestParam(required = false, defaultValue = "false") boolean flatten) {
+		return wrappedController.getDescriptor(request, response, getCurrentContextId(), url, flatten);
+	}
 
-    @RequestMapping(value = URL_ITEM, method = RequestMethod.GET)
-    public Item getItem(WebRequest request, HttpServletResponse response,
-                        @ValidExistingContentPath
-                        @RequestParam(REQUEST_PARAM_URL) String url,
-                        @RequestParam(required = false, defaultValue = "false") boolean flatten) {
-        return wrappedController.getItem(request, response, getCurrentContextId(), url, flatten);
-    }
+	@RequestMapping(value = URL_ITEM, method = RequestMethod.GET)
+	public Item getItem(WebRequest request, HttpServletResponse response,
+			    @ValidExistingContentPath
+			    @RequestParam(REQUEST_PARAM_URL) String url,
+			    @RequestParam(required = false, defaultValue = "false") boolean flatten) {
+		return wrappedController.getItem(request, response, getCurrentContextId(), url, flatten);
+	}
 
-    @RequestMapping(value = URL_CHILDREN, method = RequestMethod.GET)
-    public List<Item> getChildren(WebRequest request, HttpServletResponse response,
-                                  @ValidExistingContentPath
-                                  @RequestParam(REQUEST_PARAM_URL) String url,
-                                  @RequestParam(required = false, defaultValue = "false") boolean flatten) {
-        return wrappedController.getChildren(request, response, getCurrentContextId(), url, flatten);
-    }
+	@RequestMapping(value = URL_CHILDREN, method = RequestMethod.GET)
+	public List<Item> getChildren(WebRequest request, HttpServletResponse response,
+				      @ValidExistingContentPath
+				      @RequestParam(REQUEST_PARAM_URL) String url,
+				      @RequestParam(required = false, defaultValue = "false") boolean flatten) {
+		return wrappedController.getChildren(request, response, getCurrentContextId(), url, flatten);
+	}
 
-    @RequestMapping(value = URL_TREE, method = RequestMethod.GET)
-    public Tree getTree(WebRequest request, HttpServletResponse response,
-                        @ValidExistingContentPath
-                        @RequestParam(REQUEST_PARAM_URL) String url,
-                        @RequestParam(value = REQUEST_PARAM_TREE_DEPTH, required = false) Integer depth,
-                        @RequestParam(required = false, defaultValue = "false") boolean flatten) {
-        return wrappedController.getTree(request, response, getCurrentContextId(), url, depth, flatten);
-    }
+	@RequestMapping(value = URL_TREE, method = RequestMethod.GET)
+	public Tree getTree(WebRequest request, HttpServletResponse response,
+			    @ValidExistingContentPath
+			    @RequestParam(REQUEST_PARAM_URL) String url,
+			    @RequestParam(value = REQUEST_PARAM_TREE_DEPTH, required = false) Integer depth,
+			    @RequestParam(required = false, defaultValue = "false") boolean flatten) {
+		return wrappedController.getTree(request, response, getCurrentContextId(), url, depth, flatten);
+	}
 
-    protected String getCurrentContextId() {
-        return SiteContext.getCurrent().getContext().getId();
-    }
+	protected String getCurrentContextId() {
+		return SiteContext.getCurrent().getContext().getId();
+	}
 
 }

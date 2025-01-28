@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import jakarta.validation.constraints.NotEmpty;
+
 import java.beans.ConstructorProperties;
 
 
@@ -35,21 +36,21 @@ import java.beans.ConstructorProperties;
 @RequestMapping(ComponentRenderController.URL_ROOT)
 public class ComponentRenderController {
 
-    public static final String URL_ROOT = "/crafter-controller/component";
+	public static final String URL_ROOT = "/crafter-controller/component";
 
-    public final String COMPONENT_PATH_MODEL_NAME = "componentPath";
+	public final String COMPONENT_PATH_MODEL_NAME = "componentPath";
 
-    private final String renderComponentViewName;
+	private final String renderComponentViewName;
 
-    @ConstructorProperties({"renderComponentViewName"})
-    public ComponentRenderController(String renderComponentViewName) {
-        this.renderComponentViewName = renderComponentViewName;
-    }
+	@ConstructorProperties({"renderComponentViewName"})
+	public ComponentRenderController(String renderComponentViewName) {
+		this.renderComponentViewName = renderComponentViewName;
+	}
 
-    @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST})
-    protected ModelAndView render(@NotEmpty @ValidExistingContentPath
-                                  @RequestParam("path") String path) throws Exception {
-        return new ModelAndView(renderComponentViewName, COMPONENT_PATH_MODEL_NAME, path);
-    }
+	@RequestMapping(method = {RequestMethod.GET, RequestMethod.POST})
+	protected ModelAndView render(@NotEmpty @ValidExistingContentPath
+				      @RequestParam("path") String path) throws Exception {
+		return new ModelAndView(renderComponentViewName, COMPONENT_PATH_MODEL_NAME, path);
+	}
 
 }

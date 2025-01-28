@@ -28,44 +28,44 @@ import org.craftercms.core.service.ItemFilter;
  */
 public class IncludeByNameItemFilter implements ItemFilter {
 
-    private String[] includeRegexes;
+	private String[] includeRegexes;
 
-    public IncludeByNameItemFilter(String includeRegex) {
-        includeRegexes = new String[1];
-        includeRegexes[0] = includeRegex;
-    }
+	public IncludeByNameItemFilter(String includeRegex) {
+		includeRegexes = new String[1];
+		includeRegexes[0] = includeRegex;
+	}
 
-    public IncludeByNameItemFilter(String[] includeRegexes) {
-        this.includeRegexes = includeRegexes;
-    }
+	public IncludeByNameItemFilter(String[] includeRegexes) {
+		this.includeRegexes = includeRegexes;
+	}
 
-    @Override
-    public boolean runBeforeProcessing() {
-        return true;
-    }
+	@Override
+	public boolean runBeforeProcessing() {
+		return true;
+	}
 
-    @Override
-    public boolean runAfterProcessing() {
-        return false;
-    }
+	@Override
+	public boolean runAfterProcessing() {
+		return false;
+	}
 
-    @Override
-    public boolean accepts(Item item, List<Item> acceptedItems, List<Item> rejectedItems,
-                           boolean runningBeforeProcessing) {
-        for (String includeRegex : includeRegexes) {
-            if (item.getName().matches(includeRegex)) {
-                return true;
-            }
-        }
+	@Override
+	public boolean accepts(Item item, List<Item> acceptedItems, List<Item> rejectedItems,
+			       boolean runningBeforeProcessing) {
+		for (String includeRegex : includeRegexes) {
+			if (item.getName().matches(includeRegex)) {
+				return true;
+			}
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    @Override
-    public String toString() {
-        return "IncludeByNameItemFilter[" +
-                "includeRegexes=" + (includeRegexes == null ? null : Arrays.asList(includeRegexes)) +
-                ']';
-    }
+	@Override
+	public String toString() {
+		return "IncludeByNameItemFilter[" +
+			"includeRegexes=" + (includeRegexes == null ? null : Arrays.asList(includeRegexes)) +
+			']';
+	}
 
 }

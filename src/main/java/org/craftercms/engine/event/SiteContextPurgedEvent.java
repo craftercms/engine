@@ -19,13 +19,13 @@ import org.craftercms.engine.service.context.SiteContext;
 
 public class SiteContextPurgedEvent extends SiteEvent {
 
-    /**
-     * Create a new event.
-     *
-     * @param siteContext   the site's context
-     */
-    public SiteContextPurgedEvent(SiteContext siteContext) {
-        super(siteContext);
-    }
+	/**
+	 * Create a new event.
+	 *
+	 * @param siteContext the site's context
+	 */
+	public SiteContextPurgedEvent(SiteContext siteContext) {
+		super(siteContext);
+	}
 
 }

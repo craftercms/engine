@@ -31,15 +31,15 @@ import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuc
  */
 public class ConfigAwareLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler {
 
-    public static final String LOGOUT_SUCCESS_URL_KEY = "security.logout.successUrl";
+	public static final String LOGOUT_SUCCESS_URL_KEY = "security.logout.successUrl";
 
-    @Override
-    protected String determineTargetUrl(final HttpServletRequest request, final HttpServletResponse response) {
-        HierarchicalConfiguration siteConfig = ConfigUtils.getCurrentConfig();
-        if (siteConfig != null && siteConfig.containsKey(LOGOUT_SUCCESS_URL_KEY)) {
-            return siteConfig.getString(LOGOUT_SUCCESS_URL_KEY);
-        }
-        return super.determineTargetUrl(request, response);
-    }
+	@Override
+	protected String determineTargetUrl(final HttpServletRequest request, final HttpServletResponse response) {
+		HierarchicalConfiguration siteConfig = ConfigUtils.getCurrentConfig();
+		if (siteConfig != null && siteConfig.containsKey(LOGOUT_SUCCESS_URL_KEY)) {
+			return siteConfig.getString(LOGOUT_SUCCESS_URL_KEY);
+		}
+		return super.determineTargetUrl(request, response);
+	}
 
 }

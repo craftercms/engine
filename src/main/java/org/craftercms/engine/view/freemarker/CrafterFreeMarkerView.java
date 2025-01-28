@@ -49,6 +49,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -61,236 +62,235 @@ import java.util.Map;
  */
 public class CrafterFreeMarkerView extends FreeMarkerView {
 
-    public static final String RENDER_COMPONENT_DIRECTIVE_NAME = "renderComponent";
-    public static final String EXECUTE_CONTROLLER_DIRECTIVE_NAME = "controller";
+	public static final String RENDER_COMPONENT_DIRECTIVE_NAME = "renderComponent";
+	public static final String EXECUTE_CONTROLLER_DIRECTIVE_NAME = "controller";
 
-    public static final String KEY_APPLICATION_CAP = "Application";
-    public static final String KEY_APPLICATION = "application";
-    public static final String KEY_SESSION_CAP = "Session";
-    public static final String KEY_SESSION = "session";
-    public static final String KEY_REQUEST_CAP = "Request";
-    public static final String KEY_REQUEST = "request";
-    public static final String KEY_REQUEST_PARAMS_CAP = "RequestParameters";
-    public static final String KEY_REQUEST_PARAMS = "requestParameters";
-    public static final String KEY_APP_CONTEXT_CAP = "ApplicationContext";
-    public static final String KEY_APP_CONTEXT = "applicationContext";
-    public static final String KEY_COOKIES_CAP = "Cookies";
-    public static final String KEY_COOKIES = "cookies";
-    public static final String KEY_AUTH_TOKEN = "authToken";
-    public static final String KEY_AUTH_CAP = "Authentication";
-    public static final String KEY_AUTH = "authentication";
-    public static final String KEY_PROFILE_CAP = "Profile";
-    public static final String KEY_PROFILE = "profile";
-    public static final String KEY_STATICS_CAP = "Statics";
-    public static final String KEY_STATICS = "statics";
-    public static final String KEY_ENUMS_CAP = "Enums";
-    public static final String KEY_ENUMS = "enums";
-    public static final String KEY_SITE_CONTEXT = "siteContext";
-    public static final String KEY_SITE_CONTEXT_CAP = "SiteContext";
-    public static final String KEY_SITE_CONFIG = "siteConfig";
-    public static final String KEY_SITE_CONFIG_CAP = "SiteConfig";
-    public static final String KEY_LOCALE = "locale";
-    public static final String KEY_LOCALE_CAP = "Locale";
-    
-    protected SiteItemService siteItemService;
-    protected String componentTemplateXPathQuery;
-    protected String componentTemplateNamePrefix;
-    protected String componentTemplateNameSuffix;
-    protected String componentIncludeElementName;
-    protected String componentEmbeddedElementName;
-    protected SiteItemScriptResolver componentScriptResolver;
-    protected PluginService pluginService;
+	public static final String KEY_APPLICATION_CAP = "Application";
+	public static final String KEY_APPLICATION = "application";
+	public static final String KEY_SESSION_CAP = "Session";
+	public static final String KEY_SESSION = "session";
+	public static final String KEY_REQUEST_CAP = "Request";
+	public static final String KEY_REQUEST = "request";
+	public static final String KEY_REQUEST_PARAMS_CAP = "RequestParameters";
+	public static final String KEY_REQUEST_PARAMS = "requestParameters";
+	public static final String KEY_APP_CONTEXT_CAP = "ApplicationContext";
+	public static final String KEY_APP_CONTEXT = "applicationContext";
+	public static final String KEY_COOKIES_CAP = "Cookies";
+	public static final String KEY_COOKIES = "cookies";
+	public static final String KEY_AUTH_TOKEN = "authToken";
+	public static final String KEY_AUTH_CAP = "Authentication";
+	public static final String KEY_AUTH = "authentication";
+	public static final String KEY_PROFILE_CAP = "Profile";
+	public static final String KEY_PROFILE = "profile";
+	public static final String KEY_STATICS_CAP = "Statics";
+	public static final String KEY_STATICS = "statics";
+	public static final String KEY_ENUMS_CAP = "Enums";
+	public static final String KEY_ENUMS = "enums";
+	public static final String KEY_SITE_CONTEXT = "siteContext";
+	public static final String KEY_SITE_CONTEXT_CAP = "SiteContext";
+	public static final String KEY_SITE_CONFIG = "siteConfig";
+	public static final String KEY_SITE_CONFIG_CAP = "SiteConfig";
+	public static final String KEY_LOCALE = "locale";
+	public static final String KEY_LOCALE_CAP = "Locale";
 
-    // Needed because the field in the superclass is private
-    protected boolean disableVariableRestrictions;
+	protected SiteItemService siteItemService;
+	protected String componentTemplateXPathQuery;
+	protected String componentTemplateNamePrefix;
+	protected String componentTemplateNameSuffix;
+	protected String componentIncludeElementName;
+	protected String componentEmbeddedElementName;
+	protected SiteItemScriptResolver componentScriptResolver;
+	protected PluginService pluginService;
 
-    /**
-     * Indicates if access for static methods should be allowed in Freemarker templates
-     */
-    protected boolean enableStatics;
+	// Needed because the field in the superclass is private
+	protected boolean disableVariableRestrictions;
 
-    protected ServletContextHashModel servletContextHashModel;
-    protected ApplicationContextAccessor applicationContextAccessor;
+	/**
+	 * Indicates if access for static methods should be allowed in Freemarker templates
+	 */
+	protected boolean enableStatics;
 
-    @Override
-    protected void initServletContext(ServletContext servletContext) throws BeansException {
-        super.initServletContext(servletContext);
+	protected ServletContextHashModel servletContextHashModel;
+	protected ApplicationContextAccessor applicationContextAccessor;
 
-        servletContextHashModel = new ServletContextHashModel(servletContext, getObjectWrapper());
-        applicationContextAccessor = new ApplicationContextAccessor(getApplicationContext());
-    }
+	@Override
+	protected void initServletContext(ServletContext servletContext) throws BeansException {
+		super.initServletContext(servletContext);
 
-    @Override
-    public void setExposeSpringMacroHelpers(boolean exposeSpringMacroHelpers) {
-        super.setExposeSpringMacroHelpers(exposeSpringMacroHelpers);
-        disableVariableRestrictions = exposeSpringMacroHelpers;
-    }
+		servletContextHashModel = new ServletContextHashModel(servletContext, getObjectWrapper());
+		applicationContextAccessor = new ApplicationContextAccessor(getApplicationContext());
+	}
 
-    public void setEnableStatics(boolean enableStatics) {
-        this.enableStatics = enableStatics;
-    }
+	@Override
+	public void setExposeSpringMacroHelpers(boolean exposeSpringMacroHelpers) {
+		super.setExposeSpringMacroHelpers(exposeSpringMacroHelpers);
+		disableVariableRestrictions = exposeSpringMacroHelpers;
+	}
 
-    @Autowired
-    public void setSiteItemService(@Lazy SiteItemService siteItemService) {
-        this.siteItemService = siteItemService;
-    }
+	public void setEnableStatics(boolean enableStatics) {
+		this.enableStatics = enableStatics;
+	}
 
-    @Autowired
-    public void setComponentTemplateXPathQuery(@Lazy String componentTemplateXPathQuery) {
-        this.componentTemplateXPathQuery = componentTemplateXPathQuery;
-    }
+	@Autowired
+	public void setSiteItemService(@Lazy SiteItemService siteItemService) {
+		this.siteItemService = siteItemService;
+	}
 
-    @Autowired
-    public void setComponentTemplateNamePrefix(@Lazy String componentTemplateNamePrefix) {
-        this.componentTemplateNamePrefix = componentTemplateNamePrefix;
-    }
+	@Autowired
+	public void setComponentTemplateXPathQuery(@Lazy String componentTemplateXPathQuery) {
+		this.componentTemplateXPathQuery = componentTemplateXPathQuery;
+	}
 
-    @Autowired
-    public void setComponentTemplateNameSuffix(@Lazy String componentTemplateNameSuffix) {
-        this.componentTemplateNameSuffix = componentTemplateNameSuffix;
-    }
+	@Autowired
+	public void setComponentTemplateNamePrefix(@Lazy String componentTemplateNamePrefix) {
+		this.componentTemplateNamePrefix = componentTemplateNamePrefix;
+	}
 
-    @Autowired
-    public void setComponentIncludeElementName(@Lazy String componentIncludeElementName) {
-        this.componentIncludeElementName = componentIncludeElementName;
-    }
+	@Autowired
+	public void setComponentTemplateNameSuffix(@Lazy String componentTemplateNameSuffix) {
+		this.componentTemplateNameSuffix = componentTemplateNameSuffix;
+	}
 
-    @Autowired
-    public void setComponentEmbeddedElementName(@Lazy final String componentEmbeddedElementName) {
-        this.componentEmbeddedElementName = componentEmbeddedElementName;
-    }
+	@Autowired
+	public void setComponentIncludeElementName(@Lazy String componentIncludeElementName) {
+		this.componentIncludeElementName = componentIncludeElementName;
+	}
 
-    @Autowired
-    public void setComponentScriptResolver(@Lazy SiteItemScriptResolver componentScriptResolver) {
-        this.componentScriptResolver = componentScriptResolver;
-    }
+	@Autowired
+	public void setComponentEmbeddedElementName(@Lazy final String componentEmbeddedElementName) {
+		this.componentEmbeddedElementName = componentEmbeddedElementName;
+	}
 
-    public void setPluginService(PluginService pluginService) {
-        this.pluginService = pluginService;
-    }
+	@Autowired
+	public void setComponentScriptResolver(@Lazy SiteItemScriptResolver componentScriptResolver) {
+		this.componentScriptResolver = componentScriptResolver;
+	}
 
-    /**
-     * Instead of returning the same bean from the application context, a {@link FreeMarkerConfig} is returned for
-     * the current {@link SiteContext}.
-     */
-    @Override
-    protected FreeMarkerConfig autodetectConfiguration() throws BeansException {
-        SiteContext siteContext = SiteContext.getCurrent();
-        if (siteContext != null) {
-            return siteContext.getFreeMarkerConfig();
-        } else {
-            return super.autodetectConfiguration();
-        }
-    }
+	public void setPluginService(PluginService pluginService) {
+		this.pluginService = pluginService;
+	}
 
-    @Override
-    protected SimpleHash buildTemplateModel(final Map<String, Object> model, final HttpServletRequest request,
-                                            final HttpServletResponse response) {
-        AllHttpScopesAndAppContextHashModel templateModel = new AllHttpScopesAndAppContextHashModel(
-            getObjectWrapper(), applicationContextAccessor, getServletContext(), request, disableVariableRestrictions);
-        HttpSessionHashModel sessionModel = createSessionModel(request, response);
-        HttpRequestHashModel requestModel =
-                new HttpRequestHashModel(request, response, getObjectWrapper(), disableVariableRestrictions);
-        HttpRequestParametersHashModel requestParamsModel = new HttpRequestParametersHashModel(request);
-        Map<String, String> cookies = createCookieMap(request);
+	/**
+	 * Instead of returning the same bean from the application context, a {@link FreeMarkerConfig} is returned for
+	 * the current {@link SiteContext}.
+	 */
+	@Override
+	protected FreeMarkerConfig autodetectConfiguration() throws BeansException {
+		SiteContext siteContext = SiteContext.getCurrent();
+		if (siteContext != null) {
+			return siteContext.getFreeMarkerConfig();
+		} else {
+			return super.autodetectConfiguration();
+		}
+	}
 
-        if (disableVariableRestrictions) {
-            templateModel.put(KEY_APPLICATION_CAP, servletContextHashModel);
-            templateModel.put(KEY_APPLICATION, servletContextHashModel);
-            templateModel.put(KEY_APP_CONTEXT_CAP, applicationContextAccessor);
-            templateModel.put(KEY_APP_CONTEXT, applicationContextAccessor);
-        }
+	@Override
+	protected SimpleHash buildTemplateModel(final Map<String, Object> model, final HttpServletRequest request,
+						final HttpServletResponse response) {
+		AllHttpScopesAndAppContextHashModel templateModel = new AllHttpScopesAndAppContextHashModel(
+			getObjectWrapper(), applicationContextAccessor, getServletContext(), request, disableVariableRestrictions);
+		HttpSessionHashModel sessionModel = createSessionModel(request, response);
+		HttpRequestHashModel requestModel =
+			new HttpRequestHashModel(request, response, getObjectWrapper(), disableVariableRestrictions);
+		HttpRequestParametersHashModel requestParamsModel = new HttpRequestParametersHashModel(request);
+		Map<String, String> cookies = createCookieMap(request);
 
-        templateModel.put(KEY_SESSION_CAP, sessionModel);
-        templateModel.put(KEY_SESSION, sessionModel);
-        templateModel.put(KEY_REQUEST_CAP, requestModel);
-        templateModel.put(KEY_REQUEST, requestModel);
-        templateModel.put(KEY_REQUEST_PARAMS_CAP, requestParamsModel);
-        templateModel.put(KEY_REQUEST_PARAMS, requestParamsModel);
+		if (disableVariableRestrictions) {
+			templateModel.put(KEY_APPLICATION_CAP, servletContextHashModel);
+			templateModel.put(KEY_APPLICATION, servletContextHashModel);
+			templateModel.put(KEY_APP_CONTEXT_CAP, applicationContextAccessor);
+			templateModel.put(KEY_APP_CONTEXT, applicationContextAccessor);
+		}
 
-        templateModel.put(KEY_COOKIES_CAP, cookies);
-        templateModel.put(KEY_COOKIES, cookies);
+		templateModel.put(KEY_SESSION_CAP, sessionModel);
+		templateModel.put(KEY_SESSION, sessionModel);
+		templateModel.put(KEY_REQUEST_CAP, requestModel);
+		templateModel.put(KEY_REQUEST, requestModel);
+		templateModel.put(KEY_REQUEST_PARAMS_CAP, requestParamsModel);
+		templateModel.put(KEY_REQUEST_PARAMS, requestParamsModel);
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && !(auth instanceof AnonymousAuthenticationToken)) {
-            templateModel.put(KEY_AUTH_TOKEN, auth);
+		templateModel.put(KEY_COOKIES_CAP, cookies);
+		templateModel.put(KEY_COOKIES, cookies);
 
-            // for backwards compatibility with Profile ...
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth != null && !(auth instanceof AnonymousAuthenticationToken)) {
+			templateModel.put(KEY_AUTH_TOKEN, auth);
 
-            if (auth.getPrincipal() instanceof ProfileUser) {
-                ProfileUser details = (ProfileUser) auth.getPrincipal();
-                templateModel.put(KEY_AUTH_CAP, details.getAuthentication());
-                templateModel.put(KEY_AUTH, details.getAuthentication());
-                templateModel.put(KEY_PROFILE_CAP, details.getProfile());
-                templateModel.put(KEY_PROFILE, details.getProfile());
-            }
-        }
+			// for backwards compatibility with Profile ...
 
-        SiteContext siteContext = SiteContext.getCurrent();
-        Configuration siteConfig = siteContext.getConfig();
-        Locale locale = LocaleContextHolder.getLocale();
-        Object siteContextObject = disableVariableRestrictions?
-                siteContext : new SiteContextHashModel(getObjectWrapper());
+			if (auth.getPrincipal() instanceof ProfileUser) {
+				ProfileUser details = (ProfileUser) auth.getPrincipal();
+				templateModel.put(KEY_AUTH_CAP, details.getAuthentication());
+				templateModel.put(KEY_AUTH, details.getAuthentication());
+				templateModel.put(KEY_PROFILE_CAP, details.getProfile());
+				templateModel.put(KEY_PROFILE, details.getProfile());
+			}
+		}
 
-        if (enableStatics) {
-            TemplateHashModel staticModels = ((BeansWrapper) getObjectWrapper()).getStaticModels();
-            templateModel.put(KEY_STATICS_CAP, staticModels);
-            templateModel.put(KEY_STATICS, staticModels);
-        }
+		SiteContext siteContext = SiteContext.getCurrent();
+		Configuration siteConfig = siteContext.getConfig();
+		Locale locale = LocaleContextHolder.getLocale();
+		Object siteContextObject = disableVariableRestrictions ?
+			siteContext : new SiteContextHashModel(getObjectWrapper());
 
-        TemplateHashModel enumModels = ((BeansWrapper) getObjectWrapper()).getEnumModels();
-        templateModel.put(KEY_ENUMS_CAP, enumModels);
-        templateModel.put(KEY_ENUMS, enumModels);
+		if (enableStatics) {
+			TemplateHashModel staticModels = ((BeansWrapper) getObjectWrapper()).getStaticModels();
+			templateModel.put(KEY_STATICS_CAP, staticModels);
+			templateModel.put(KEY_STATICS, staticModels);
+		}
 
-        templateModel.put(KEY_SITE_CONTEXT_CAP, siteContextObject);
-        templateModel.put(KEY_SITE_CONTEXT, siteContextObject);
-        templateModel.put(KEY_LOCALE_CAP, locale);
-        templateModel.put(KEY_LOCALE, locale);
+		TemplateHashModel enumModels = ((BeansWrapper) getObjectWrapper()).getEnumModels();
+		templateModel.put(KEY_ENUMS_CAP, enumModels);
+		templateModel.put(KEY_ENUMS, enumModels);
 
-        if (siteConfig != null) {
-            templateModel.put(KEY_SITE_CONFIG, siteConfig);
-            templateModel.put(KEY_SITE_CONFIG_CAP, siteConfig);
-        }
+		templateModel.put(KEY_SITE_CONTEXT_CAP, siteContextObject);
+		templateModel.put(KEY_SITE_CONTEXT, siteContextObject);
+		templateModel.put(KEY_LOCALE_CAP, locale);
+		templateModel.put(KEY_LOCALE, locale);
 
-        templateModel.putAll(model);
+		if (siteConfig != null) {
+			templateModel.put(KEY_SITE_CONFIG, siteConfig);
+			templateModel.put(KEY_SITE_CONFIG_CAP, siteConfig);
+		}
 
-        pluginService.addPluginVariables(getUrl(), templateModel::put);
+		templateModel.putAll(model);
 
-        ObjectFactory<SimpleHash> componentModelFactory = () -> buildTemplateModel(model, request, response);
+		pluginService.addPluginVariables(getUrl(), templateModel::put);
 
-        RenderComponentDirective renderComponentDirective = new RenderComponentDirective(getServletContext(),
-                siteItemService, componentModelFactory, componentTemplateXPathQuery, componentTemplateNamePrefix,
-                componentTemplateNameSuffix, componentIncludeElementName, componentEmbeddedElementName, componentScriptResolver);
+		ObjectFactory<SimpleHash> componentModelFactory = () -> buildTemplateModel(model, request, response);
 
-        ExecuteControllerDirective executeControllerDirective = new ExecuteControllerDirective(getServletContext());
+		RenderComponentDirective renderComponentDirective = new RenderComponentDirective(getServletContext(),
+			siteItemService, componentModelFactory, componentTemplateXPathQuery, componentTemplateNamePrefix,
+			componentTemplateNameSuffix, componentIncludeElementName, componentEmbeddedElementName, componentScriptResolver);
 
-        templateModel.put(RENDER_COMPONENT_DIRECTIVE_NAME, renderComponentDirective);
-        templateModel.put(EXECUTE_CONTROLLER_DIRECTIVE_NAME, executeControllerDirective);
+		ExecuteControllerDirective executeControllerDirective = new ExecuteControllerDirective(getServletContext());
 
-        return templateModel;
-    }
+		templateModel.put(RENDER_COMPONENT_DIRECTIVE_NAME, renderComponentDirective);
+		templateModel.put(EXECUTE_CONTROLLER_DIRECTIVE_NAME, executeControllerDirective);
 
-    protected HttpSessionHashModel createSessionModel(HttpServletRequest request, HttpServletResponse response) {
-        HttpSession session = request.getSession(false);
-        if(session != null) {
-            return new HttpSessionHashModel(session, getObjectWrapper());
-        }
-        else {
-            return new HttpSessionHashModel(null, request, response, getObjectWrapper());
-        }
-    }
+		return templateModel;
+	}
 
-    protected Map<String, String> createCookieMap(HttpServletRequest request) {
-    	 Map<String, String> cookieMap = new HashMap<>();
-    	 Cookie[] cookies = request.getCookies();
+	protected HttpSessionHashModel createSessionModel(HttpServletRequest request, HttpServletResponse response) {
+		HttpSession session = request.getSession(false);
+		if (session != null) {
+			return new HttpSessionHashModel(session, getObjectWrapper());
+		} else {
+			return new HttpSessionHashModel(null, request, response, getObjectWrapper());
+		}
+	}
 
-        if (ArrayUtils.isNotEmpty(cookies)) {
-            for(Cookie cookie : cookies) {
-                cookieMap.put(cookie.getName(), cookie.getValue());
-    	    }
-        }
-    	 
-    	 return cookieMap;
-    }
+	protected Map<String, String> createCookieMap(HttpServletRequest request) {
+		Map<String, String> cookieMap = new HashMap<>();
+		Cookie[] cookies = request.getCookies();
+
+		if (ArrayUtils.isNotEmpty(cookies)) {
+			for (Cookie cookie : cookies) {
+				cookieMap.put(cookie.getName(), cookie.getValue());
+			}
+		}
+
+		return cookieMap;
+	}
 
 }

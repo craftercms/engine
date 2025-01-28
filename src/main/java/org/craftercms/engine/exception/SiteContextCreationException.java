@@ -24,8 +24,8 @@ import org.craftercms.core.exception.CrafterException;
  */
 public class SiteContextCreationException extends CrafterException {
 
-    public SiteContextCreationException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	public SiteContextCreationException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
 }

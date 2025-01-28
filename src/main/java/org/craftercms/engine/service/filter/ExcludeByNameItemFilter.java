@@ -29,45 +29,45 @@ import org.craftercms.core.service.ItemFilter;
  */
 public class ExcludeByNameItemFilter implements ItemFilter {
 
-    private String[] excludeRegexes;
+	private String[] excludeRegexes;
 
-    @ConstructorProperties({"excludeRegex"})
-    public ExcludeByNameItemFilter(String excludeRegex) {
-        excludeRegexes = new String[1];
-        excludeRegexes[0] = excludeRegex;
-    }
+	@ConstructorProperties({"excludeRegex"})
+	public ExcludeByNameItemFilter(String excludeRegex) {
+		excludeRegexes = new String[1];
+		excludeRegexes[0] = excludeRegex;
+	}
 
-    public ExcludeByNameItemFilter(String[] excludeRegexes) {
-        this.excludeRegexes = excludeRegexes;
-    }
+	public ExcludeByNameItemFilter(String[] excludeRegexes) {
+		this.excludeRegexes = excludeRegexes;
+	}
 
-    @Override
-    public boolean runBeforeProcessing() {
-        return true;
-    }
+	@Override
+	public boolean runBeforeProcessing() {
+		return true;
+	}
 
-    @Override
-    public boolean runAfterProcessing() {
-        return false;
-    }
+	@Override
+	public boolean runAfterProcessing() {
+		return false;
+	}
 
-    @Override
-    public boolean accepts(Item item, List<Item> acceptedItems, List<Item> rejectedItems,
-                           boolean runningBeforeProcessing) {
-        for (String regex : excludeRegexes) {
-            if (item.getName().matches(regex)) {
-                return false;
-            }
-        }
+	@Override
+	public boolean accepts(Item item, List<Item> acceptedItems, List<Item> rejectedItems,
+			       boolean runningBeforeProcessing) {
+		for (String regex : excludeRegexes) {
+			if (item.getName().matches(regex)) {
+				return false;
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    @Override
-    public String toString() {
-        return "ExcludeByNameItemFilter[" +
-                "excludeRegexes=" + (excludeRegexes == null ? null : Arrays.asList(excludeRegexes)) +
-                ']';
-    }
+	@Override
+	public String toString() {
+		return "ExcludeByNameItemFilter[" +
+			"excludeRegexes=" + (excludeRegexes == null ? null : Arrays.asList(excludeRegexes)) +
+			']';
+	}
 
 }

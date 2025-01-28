@@ -26,27 +26,27 @@ import org.craftercms.engine.service.context.SiteContext;
  */
 public class UrlTransformationServiceImpl implements UrlTransformationService {
 
-    public String transform(String transformerName, String url) {
-        SiteContext siteContext = SiteContext.getCurrent();
-        if (siteContext != null) {
-            return siteContext.getUrlTransformationEngine().transformUrl(siteContext.getContext(), transformerName,
-                                                                         url);
-        } else {
-            return url;
-        }
-    }
+	public String transform(String transformerName, String url) {
+		SiteContext siteContext = SiteContext.getCurrent();
+		if (siteContext != null) {
+			return siteContext.getUrlTransformationEngine().transformUrl(siteContext.getContext(), transformerName,
+				url);
+		} else {
+			return url;
+		}
+	}
 
-    public String transform(String transformerName, String url, boolean cache) {
-        SiteContext siteContext = SiteContext.getCurrent();
-        if (siteContext != null) {
-            CachingOptions cachingOptions = new CachingOptions();
-            cachingOptions.setDoCaching(cache);
+	public String transform(String transformerName, String url, boolean cache) {
+		SiteContext siteContext = SiteContext.getCurrent();
+		if (siteContext != null) {
+			CachingOptions cachingOptions = new CachingOptions();
+			cachingOptions.setDoCaching(cache);
 
-            return siteContext.getUrlTransformationEngine().transformUrl(siteContext.getContext(), cachingOptions,
-                                                                         transformerName, url);
-        } else {
-            return url;
-        }
-    }
+			return siteContext.getUrlTransformationEngine().transformUrl(siteContext.getContext(), cachingOptions,
+				transformerName, url);
+		} else {
+			return url;
+		}
+	}
 
 }

@@ -24,27 +24,28 @@ import org.craftercms.commons.http.RequestContext;
  * Base implementation for {@link DataFetcher} that set's the current {@link RequestContext} before actually
  * resolving the requested fields.
  *
- * @since 3.1.1
  * @author joseross
+ * @since 3.1.1
  */
 public abstract class RequestAwareDataFetcher<T> implements DataFetcher<T> {
 
-    @Override
-    public T get(final DataFetchingEnvironment environment) throws Exception {
-        try {
-            RequestContext.setCurrent(environment.getContext());
-            return doGet(environment);
-        } finally {
-            RequestContext.clear();
-        }
-    }
+	@Override
+	public T get(final DataFetchingEnvironment environment) throws Exception {
+		try {
+			RequestContext.setCurrent(environment.getContext());
+			return doGet(environment);
+		} finally {
+			RequestContext.clear();
+		}
+	}
 
-    /**
-     * Performs the actual fetching of the requested fields.
-     * @param environment the {@link DataFetchingEnvironment}
-     * @return the resolved value
-     * @throws Exception if there is any error resolving the requested field
-     */
-    public abstract T doGet(final DataFetchingEnvironment environment) throws Exception;
+	/**
+	 * Performs the actual fetching of the requested fields.
+	 *
+	 * @param environment the {@link DataFetchingEnvironment}
+	 * @return the resolved value
+	 * @throws Exception if there is any error resolving the requested field
+	 */
+	public abstract T doGet(final DataFetchingEnvironment environment) throws Exception;
 
 }

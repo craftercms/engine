@@ -48,90 +48,91 @@ import static org.craftercms.engine.graphql.SchemaUtils.setTypeFromFieldName;
 
 /**
  * Implementation of {@link GraphQLFieldFactory} that handles checkbox-group fields
+ *
  * @author joseross
  * @since 3.1
  */
 public class CheckboxGroupFieldFactory implements GraphQLFieldFactory {
 
-    private static final Logger logger = LoggerFactory.getLogger(CheckboxGroupFieldFactory.class);
+	private static final Logger logger = LoggerFactory.getLogger(CheckboxGroupFieldFactory.class);
 
-    protected String datasourceNameXPath;
-    protected String datasourceSettingsXPathFormat;
+	protected String datasourceNameXPath;
+	protected String datasourceSettingsXPathFormat;
 
-    protected ObjectMapper objectMapper = new ObjectMapper();
+	protected ObjectMapper objectMapper = new ObjectMapper();
 
-    public CheckboxGroupFieldFactory(final String datasourceNameXPath, String datasourceSettingsXPathFormat) {
-        this.datasourceNameXPath = datasourceNameXPath;
-        this.datasourceSettingsXPathFormat = datasourceSettingsXPathFormat;
-    }
+	public CheckboxGroupFieldFactory(final String datasourceNameXPath, String datasourceSettingsXPathFormat) {
+		this.datasourceNameXPath = datasourceNameXPath;
+		this.datasourceSettingsXPathFormat = datasourceSettingsXPathFormat;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @SuppressWarnings("unchecked")
-    @Override
-    public void createField(final Document contentTypeDefinition, final Node contentTypeField,
-                            final String contentTypeFieldId, final String parentGraphQLTypeName,
-                            final GraphQLObjectType.Builder parentGraphQLType, final String graphQLFieldName,
-                            final GraphQLFieldDefinition.Builder graphQLField) {
-        String datasourceName = XmlUtils.selectSingleNodeValue(contentTypeField, datasourceNameXPath);
-        String datasourceSettings = XmlUtils.selectSingleNodeValue(
-                contentTypeDefinition, String.format(datasourceSettingsXPathFormat, datasourceName));
-        String datasourceType = null;
-        String datasourceSuffix = null;
+	/**
+	 * {@inheritDoc}
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public void createField(final Document contentTypeDefinition, final Node contentTypeField,
+				final String contentTypeFieldId, final String parentGraphQLTypeName,
+				final GraphQLObjectType.Builder parentGraphQLType, final String graphQLFieldName,
+				final GraphQLFieldDefinition.Builder graphQLField) {
+		String datasourceName = XmlUtils.selectSingleNodeValue(contentTypeField, datasourceNameXPath);
+		String datasourceSettings = XmlUtils.selectSingleNodeValue(
+			contentTypeDefinition, String.format(datasourceSettingsXPathFormat, datasourceName));
+		String datasourceType = null;
+		String datasourceSuffix = null;
 
-        try {
-            if(StringUtils.isNotEmpty(datasourceSettings)) {
-                List<Map<String, Object>> typeSetting = objectMapper.readValue(datasourceSettings, List.class);
-                Optional<Map<String, Object>> selectedType =
-                    typeSetting.stream()
-                               .filter(s -> (Boolean)s.get(FIELD_NAME_SELECTED)).findFirst();
-                if (selectedType.isPresent()) {
-                    datasourceType = selectedType.get().get(FIELD_NAME_VALUE).toString();
-                    datasourceSuffix = StringUtils.substringAfter(datasourceType, FIELD_SEPARATOR);
-                }
-            }
-        } catch (IOException e) {
-            logger.warn("Error checking data source type for '{}'", contentTypeFieldId);
-        }
+		try {
+			if (StringUtils.isNotEmpty(datasourceSettings)) {
+				List<Map<String, Object>> typeSetting = objectMapper.readValue(datasourceSettings, List.class);
+				Optional<Map<String, Object>> selectedType =
+					typeSetting.stream()
+						.filter(s -> (Boolean) s.get(FIELD_NAME_SELECTED)).findFirst();
+				if (selectedType.isPresent()) {
+					datasourceType = selectedType.get().get(FIELD_NAME_VALUE).toString();
+					datasourceSuffix = StringUtils.substringAfter(datasourceType, FIELD_SEPARATOR);
+				}
+			}
+		} catch (IOException e) {
+			logger.warn("Error checking data source type for '{}'", contentTypeFieldId);
+		}
 
-        String valueKey = FIELD_NAME_VALUE;
-        if (StringUtils.isNotEmpty(datasourceSuffix)) {
-            valueKey += FIELD_SEPARATOR + datasourceSuffix + FIELD_SUFFIX_MULTIVALUE;
-        }
+		String valueKey = FIELD_NAME_VALUE;
+		if (StringUtils.isNotEmpty(datasourceSuffix)) {
+			valueKey += FIELD_SEPARATOR + datasourceSuffix + FIELD_SUFFIX_MULTIVALUE;
+		}
 
-        GraphQLFieldDefinition.Builder valueField = GraphQLFieldDefinition.newFieldDefinition()
-            .name(valueKey)
-            .description("The value of the item");
+		GraphQLFieldDefinition.Builder valueField = GraphQLFieldDefinition.newFieldDefinition()
+			.name(valueKey)
+			.description("The value of the item");
 
-        if (StringUtils.isNotEmpty(datasourceType)) {
-            setTypeFromFieldName(datasourceType, valueField);
-        } else {
-            valueField.type(GraphQLString);
-            valueField.argument(TEXT_FILTER);
-        }
+		if (StringUtils.isNotEmpty(datasourceType)) {
+			setTypeFromFieldName(datasourceType, valueField);
+		} else {
+			valueField.type(GraphQLString);
+			valueField.argument(TEXT_FILTER);
+		}
 
-        GraphQLObjectType itemType = GraphQLObjectType.newObject()
-            .name(parentGraphQLTypeName + FIELD_SEPARATOR + graphQLFieldName + FIELD_SUFFIX_ITEM)
-            .description("Item for field " + contentTypeFieldId)
-            .field(GraphQLFieldDefinition.newFieldDefinition()
-                .name(FIELD_NAME_KEY)
-                .description("The key of the item")
-                .type(GraphQLString)
-                .argument(TEXT_FILTER))
-            .field(valueField)
-            .build();
+		GraphQLObjectType itemType = GraphQLObjectType.newObject()
+			.name(parentGraphQLTypeName + FIELD_SEPARATOR + graphQLFieldName + FIELD_SUFFIX_ITEM)
+			.description("Item for field " + contentTypeFieldId)
+			.field(GraphQLFieldDefinition.newFieldDefinition()
+				.name(FIELD_NAME_KEY)
+				.description("The key of the item")
+				.type(GraphQLString)
+				.argument(TEXT_FILTER))
+			.field(valueField)
+			.build();
 
-        GraphQLObjectType itemWrapper = GraphQLObjectType.newObject()
-            .name(parentGraphQLTypeName + FIELD_SEPARATOR + graphQLFieldName + FIELD_SUFFIX_ITEMS)
-            .description("Wrapper for field " + contentTypeFieldId)
-            .field(GraphQLFieldDefinition.newFieldDefinition()
-                .name(FIELD_NAME_ITEM)
-                .description("List of items for field " + contentTypeFieldId)
-                .type(list(itemType)))
-            .build();
+		GraphQLObjectType itemWrapper = GraphQLObjectType.newObject()
+			.name(parentGraphQLTypeName + FIELD_SEPARATOR + graphQLFieldName + FIELD_SUFFIX_ITEMS)
+			.description("Wrapper for field " + contentTypeFieldId)
+			.field(GraphQLFieldDefinition.newFieldDefinition()
+				.name(FIELD_NAME_ITEM)
+				.description("List of items for field " + contentTypeFieldId)
+				.type(list(itemType)))
+			.build();
 
-        graphQLField.type(itemWrapper);
-    }
+		graphQLField.type(itemWrapper);
+	}
 
 }

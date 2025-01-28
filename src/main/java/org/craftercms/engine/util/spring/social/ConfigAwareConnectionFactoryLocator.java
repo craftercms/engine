@@ -42,82 +42,82 @@ import org.springframework.social.connect.support.ConnectionFactoryRegistry;
  */
 public class ConfigAwareConnectionFactoryLocator implements ConnectionFactoryLocator {
 
-    public static final String SOCIAL_CONNECTIONS_KEY = "socialConnections";
+	public static final String SOCIAL_CONNECTIONS_KEY = "socialConnections";
 
-    public static final String CONNECTION_FACTORY_LOCATOR_CACHE_KEY = "connectionFactoryLocator";
+	public static final String CONNECTION_FACTORY_LOCATOR_CACHE_KEY = "connectionFactoryLocator";
 
-    protected ConnectionFactoryLocator defaultLocator;
-    protected CacheTemplate cacheTemplate;
-    protected List<ConfigurationParser<?>> configParsers;
+	protected ConnectionFactoryLocator defaultLocator;
+	protected CacheTemplate cacheTemplate;
+	protected List<ConfigurationParser<?>> configParsers;
 
-    public ConfigAwareConnectionFactoryLocator(ConnectionFactoryLocator defaultLocator, CacheTemplate cacheTemplate) {
-        configParsers = new ArrayList<>(1);
-        configParsers.add(new FacebookConnectionFactoryConfigParser());
+	public ConfigAwareConnectionFactoryLocator(ConnectionFactoryLocator defaultLocator, CacheTemplate cacheTemplate) {
+		configParsers = new ArrayList<>(1);
+		configParsers.add(new FacebookConnectionFactoryConfigParser());
 
-        this.defaultLocator = defaultLocator;
-        this.cacheTemplate = cacheTemplate;
-    }
+		this.defaultLocator = defaultLocator;
+		this.cacheTemplate = cacheTemplate;
+	}
 
-    public void setConfigParsers(List<ConfigurationParser<?>> configParsers) {
-        this.configParsers = configParsers;
-    }
+	public void setConfigParsers(List<ConfigurationParser<?>> configParsers) {
+		this.configParsers = configParsers;
+	}
 
-    @Override
-    public ConnectionFactory<?> getConnectionFactory(final String providerId) {
-        return getCurrentConnectionFactoryLocator().getConnectionFactory(providerId);
-    }
+	@Override
+	public ConnectionFactory<?> getConnectionFactory(final String providerId) {
+		return getCurrentConnectionFactoryLocator().getConnectionFactory(providerId);
+	}
 
-    @Override
-    public <A> ConnectionFactory<A> getConnectionFactory(final Class<A> apiType) {
-        return getCurrentConnectionFactoryLocator().getConnectionFactory(apiType);
-    }
+	@Override
+	public <A> ConnectionFactory<A> getConnectionFactory(final Class<A> apiType) {
+		return getCurrentConnectionFactoryLocator().getConnectionFactory(apiType);
+	}
 
-    @Override
-    public Set<String> registeredProviderIds() {
-        return getCurrentConnectionFactoryLocator().registeredProviderIds();
-    }
+	@Override
+	public Set<String> registeredProviderIds() {
+		return getCurrentConnectionFactoryLocator().registeredProviderIds();
+	}
 
-    protected ConnectionFactoryLocator getCurrentConnectionFactoryLocator() {
-        Callback<ConnectionFactoryLocator> callback = new Callback<>() {
+	protected ConnectionFactoryLocator getCurrentConnectionFactoryLocator() {
+		Callback<ConnectionFactoryLocator> callback = new Callback<>() {
 
-            @Override
-            public ConnectionFactoryLocator execute() {
-                HierarchicalConfiguration config = ConfigUtils.getCurrentConfig();
-                ConnectionFactoryRegistry registry = null;
+			@Override
+			public ConnectionFactoryLocator execute() {
+				HierarchicalConfiguration config = ConfigUtils.getCurrentConfig();
+				ConnectionFactoryRegistry registry = null;
 
-                if (config != null) {
-                    try {
-                        HierarchicalConfiguration socialConnectionsConfig = config.configurationAt(SOCIAL_CONNECTIONS_KEY);
-                        for (ConfigurationParser<?> parser : configParsers) {
-                            ConnectionFactory<?> factory = (ConnectionFactory<?>) parser.parse(socialConnectionsConfig);
-                            if (factory != null) {
-                                if (registry == null) {
-                                    registry = new ConnectionFactoryRegistry();
-                                }
+				if (config != null) {
+					try {
+						HierarchicalConfiguration socialConnectionsConfig = config.configurationAt(SOCIAL_CONNECTIONS_KEY);
+						for (ConfigurationParser<?> parser : configParsers) {
+							ConnectionFactory<?> factory = (ConnectionFactory<?>) parser.parse(socialConnectionsConfig);
+							if (factory != null) {
+								if (registry == null) {
+									registry = new ConnectionFactoryRegistry();
+								}
 
-                                registry.addConnectionFactory(factory);
-                            }
-                        }
-                    } catch (IllegalArgumentException e) {
-                        // Ignore if != 1
-                    }
-                }
+								registry.addConnectionFactory(factory);
+							}
+						}
+					} catch (IllegalArgumentException e) {
+						// Ignore if != 1
+					}
+				}
 
-                if (registry != null) {
-                    return registry;
-                } else {
-                    return defaultLocator;
-                }
-            }
+				if (registry != null) {
+					return registry;
+				} else {
+					return defaultLocator;
+				}
+			}
 
-        };
+		};
 
-        SiteContext siteContext = SiteContext.getCurrent();
-        if (siteContext != null) {
-            return cacheTemplate.getObject(siteContext.getContext(), callback, CONNECTION_FACTORY_LOCATOR_CACHE_KEY);
-        } else {
-            return defaultLocator;
-        }
-    }
+		SiteContext siteContext = SiteContext.getCurrent();
+		if (siteContext != null) {
+			return cacheTemplate.getObject(siteContext.getContext(), callback, CONNECTION_FACTORY_LOCATOR_CACHE_KEY);
+		} else {
+			return defaultLocator;
+		}
+	}
 
 }

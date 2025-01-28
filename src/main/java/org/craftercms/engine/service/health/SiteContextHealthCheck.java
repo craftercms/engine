@@ -24,13 +24,13 @@ import java.beans.ConstructorProperties;
  */
 public class SiteContextHealthCheck extends AbstractHealthCheck {
 
-    @ConstructorProperties({"contextManager"})
-    public SiteContextHealthCheck(final SiteContextManager contextManager) {
-        super(contextManager);
-    }
+	@ConstructorProperties({"contextManager"})
+	public SiteContextHealthCheck(final SiteContextManager contextManager) {
+		super(contextManager);
+	}
 
-    @Override
-    protected boolean doCheckHealth(final String site) {
-        return contextManager.hasValidContext(site);
-    }
+	@Override
+	protected boolean doCheckHealth(final String site) {
+		return contextManager.hasValidContext(site);
+	}
 }

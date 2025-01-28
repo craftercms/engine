@@ -35,24 +35,24 @@ import static org.junit.Assert.assertEquals;
  */
 public class ConfigAwareAccessDeniedHandlerTest extends ConfigAwareTestBase {
 
-    private ConfigAwareAccessDeniedHandler handler;
+	private ConfigAwareAccessDeniedHandler handler;
 
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
+	@Override
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
 
-        handler = new ConfigAwareAccessDeniedHandler();
-    }
+		handler = new ConfigAwareAccessDeniedHandler();
+	}
 
-    @Test
-    public void testProcessRequest() throws Exception {
-        HttpServletRequest request = RequestContext.getCurrent().getRequest();
-        HttpServletResponse response = RequestContext.getCurrent().getResponse();
-        handler.handle(request, response, new AccessDeniedException(""));
+	@Test
+	public void testProcessRequest() throws Exception {
+		HttpServletRequest request = RequestContext.getCurrent().getRequest();
+		HttpServletResponse response = RequestContext.getCurrent().getResponse();
+		handler.handle(request, response, new AccessDeniedException(""));
 
-        assertEquals(config.getString(ConfigAwareAccessDeniedHandler.ACCESS_DENIED_ERROR_PAGE_URL_KEY),
-                     ((MockHttpServletResponse)RequestContext.getCurrent().getResponse()).getForwardedUrl());
-    }
-    
+		assertEquals(config.getString(ConfigAwareAccessDeniedHandler.ACCESS_DENIED_ERROR_PAGE_URL_KEY),
+			((MockHttpServletResponse) RequestContext.getCurrent().getResponse()).getForwardedUrl());
+	}
+
 }

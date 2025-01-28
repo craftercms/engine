@@ -36,24 +36,24 @@ import static org.junit.Assert.assertThat;
  */
 public class ConfigAwareLoginUrlAuthenticationEntryPointTest extends ConfigAwareTestBase {
 
-    private ConfigAwareLoginUrlAuthenticationEntryPoint entryPoint;
+	private ConfigAwareLoginUrlAuthenticationEntryPoint entryPoint;
 
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
+	@Override
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
 
-        entryPoint = new ConfigAwareLoginUrlAuthenticationEntryPoint("/login");
-    }
+		entryPoint = new ConfigAwareLoginUrlAuthenticationEntryPoint("/login");
+	}
 
-    @Test
-    public void testProcessRequest() throws Exception {
-        HttpServletRequest request = RequestContext.getCurrent().getRequest();
-        HttpServletResponse response = RequestContext.getCurrent().getResponse();
-        entryPoint.commence(request, response, new InsufficientAuthenticationException(""));
+	@Test
+	public void testProcessRequest() throws Exception {
+		HttpServletRequest request = RequestContext.getCurrent().getRequest();
+		HttpServletResponse response = RequestContext.getCurrent().getResponse();
+		entryPoint.commence(request, response, new InsufficientAuthenticationException(""));
 
-        assertThat(((MockHttpServletResponse)RequestContext.getCurrent().getResponse()).getRedirectedUrl(),
-            endsWith(config.getString(ConfigAwareLoginUrlAuthenticationEntryPoint.LOGIN_FORM_URL_KEY)));
-    }
-    
+		assertThat(((MockHttpServletResponse) RequestContext.getCurrent().getResponse()).getRedirectedUrl(),
+			endsWith(config.getString(ConfigAwareLoginUrlAuthenticationEntryPoint.LOGIN_FORM_URL_KEY)));
+	}
+
 }

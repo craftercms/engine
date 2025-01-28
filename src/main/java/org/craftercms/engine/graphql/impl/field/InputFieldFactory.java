@@ -40,35 +40,35 @@ import static org.craftercms.engine.graphql.SchemaUtils.setTypeFromFieldName;
  */
 public class InputFieldFactory implements GraphQLFieldFactory {
 
-    /**
-     * The XPath selector for the tokenize property
-     */
-    protected String tokenizeXPath;
+	/**
+	 * The XPath selector for the tokenize property
+	 */
+	protected String tokenizeXPath;
 
-    @ConstructorProperties({"tokenizeXPath"})
-    public InputFieldFactory(final String tokenizeXPath) {
-        this.tokenizeXPath = tokenizeXPath;
-    }
+	@ConstructorProperties({"tokenizeXPath"})
+	public InputFieldFactory(final String tokenizeXPath) {
+		this.tokenizeXPath = tokenizeXPath;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void createField(final Document contentTypeDefinition, final Node contentTypeField,
-                            final String contentTypeFieldId, final String parentGraphQLTypeName,
-                            final GraphQLObjectType.Builder parentGraphQLType, final String graphQLFieldName,
-                            final GraphQLFieldDefinition.Builder graphQLField) {
-        if (Boolean.parseBoolean(XmlUtils.selectSingleNodeValue(contentTypeField, tokenizeXPath))) {
-            // Add the tokenized field as string with text filters
-            parentGraphQLType.field(GraphQLFieldDefinition.newFieldDefinition()
-                .name(StringUtils.substringBeforeLast(graphQLFieldName, FIELD_SEPARATOR) + FIELD_SUFFIX_TOKENIZED)
-                .description("Tokenized version of " + contentTypeFieldId)
-                .type(GraphQLString)
-                .argument(TEXT_FILTER));
-        }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void createField(final Document contentTypeDefinition, final Node contentTypeField,
+				final String contentTypeFieldId, final String parentGraphQLTypeName,
+				final GraphQLObjectType.Builder parentGraphQLType, final String graphQLFieldName,
+				final GraphQLFieldDefinition.Builder graphQLField) {
+		if (Boolean.parseBoolean(XmlUtils.selectSingleNodeValue(contentTypeField, tokenizeXPath))) {
+			// Add the tokenized field as string with text filters
+			parentGraphQLType.field(GraphQLFieldDefinition.newFieldDefinition()
+				.name(StringUtils.substringBeforeLast(graphQLFieldName, FIELD_SEPARATOR) + FIELD_SUFFIX_TOKENIZED)
+				.description("Tokenized version of " + contentTypeFieldId)
+				.type(GraphQLString)
+				.argument(TEXT_FILTER));
+		}
 
-        // Add the original according to the postfix
-        setTypeFromFieldName(contentTypeFieldId, graphQLField);
-    }
+		// Add the original according to the postfix
+		setTypeFromFieldName(contentTypeFieldId, graphQLField);
+	}
 
 }

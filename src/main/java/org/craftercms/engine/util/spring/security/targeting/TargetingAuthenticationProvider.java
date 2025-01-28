@@ -28,13 +28,13 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
  */
 public class TargetingAuthenticationProvider extends PreAuthenticatedAuthenticationProvider {
 
-    @Override
-    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        if (authentication.getPrincipal() instanceof TargetingUser) {
-            return super.authenticate(authentication);
-        } else {
-            throw new AuthenticationServiceException("Unsupported principal");
-        }
-    }
+	@Override
+	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+		if (authentication.getPrincipal() instanceof TargetingUser) {
+			return super.authenticate(authentication);
+		} else {
+			throw new AuthenticationServiceException("Unsupported principal");
+		}
+	}
 
 }

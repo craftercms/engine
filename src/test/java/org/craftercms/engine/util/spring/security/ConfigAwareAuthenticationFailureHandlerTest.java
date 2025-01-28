@@ -35,25 +35,25 @@ import static org.junit.Assert.assertEquals;
  */
 public class ConfigAwareAuthenticationFailureHandlerTest extends ConfigAwareTestBase {
 
-    private ConfigAwareAuthenticationFailureHandler handler;
+	private ConfigAwareAuthenticationFailureHandler handler;
 
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
+	@Override
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
 
-        handler = new ConfigAwareAuthenticationFailureHandler();
-        handler.setDefaultFailureUrl("/login?error=true");
-    }
+		handler = new ConfigAwareAuthenticationFailureHandler();
+		handler.setDefaultFailureUrl("/login?error=true");
+	}
 
-    @Test
-    public void testProcessRequest() throws Exception {
-        HttpServletRequest request = RequestContext.getCurrent().getRequest();
-        HttpServletResponse response = RequestContext.getCurrent().getResponse();
-        handler.onAuthenticationFailure(request, response, new BadCredentialsException(""));
+	@Test
+	public void testProcessRequest() throws Exception {
+		HttpServletRequest request = RequestContext.getCurrent().getRequest();
+		HttpServletResponse response = RequestContext.getCurrent().getResponse();
+		handler.onAuthenticationFailure(request, response, new BadCredentialsException(""));
 
-        assertEquals(config.getString(ConfigAwareAuthenticationFailureHandler.LOGIN_FAILURE_URL_KEY),
-                     ((MockHttpServletResponse)RequestContext.getCurrent().getResponse()).getRedirectedUrl());
-    }
-    
+		assertEquals(config.getString(ConfigAwareAuthenticationFailureHandler.LOGIN_FAILURE_URL_KEY),
+			((MockHttpServletResponse) RequestContext.getCurrent().getResponse()).getRedirectedUrl());
+	}
+
 }

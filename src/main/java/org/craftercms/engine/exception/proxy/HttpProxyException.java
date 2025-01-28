@@ -25,8 +25,8 @@ import org.craftercms.engine.util.servlet.ConfigAwareProxyServlet;
  */
 public class HttpProxyException extends CrafterException {
 
-    public HttpProxyException(String message) {
-        super(message);
-    }
+	public HttpProxyException(String message) {
+		super(message);
+	}
 
 }

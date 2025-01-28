@@ -18,6 +18,7 @@ package org.craftercms.engine.controller;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FilenameUtils;
@@ -43,123 +44,122 @@ import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
  */
 public class StaticAssetsRequestHandler extends ResourceHttpRequestHandler {
 
-    private static final Log logger = LogFactory.getLog(StaticAssetsRequestHandler.class);
+	private static final Log logger = LogFactory.getLog(StaticAssetsRequestHandler.class);
 
-    private ContentStoreService contentStoreService;
-    private String staticAssetsPath;
+	private ContentStoreService contentStoreService;
+	private String staticAssetsPath;
 
-    public StaticAssetsRequestHandler(ContentStoreService contentStoreService, final boolean disableCaching) {
-        this.contentStoreService = contentStoreService;
+	public StaticAssetsRequestHandler(ContentStoreService contentStoreService, final boolean disableCaching) {
+		this.contentStoreService = contentStoreService;
 
-        // Don't require a session for static-assets
-        setRequireSession(false);
+		// Don't require a session for static-assets
+		setRequireSession(false);
 
-        // If cache-control is set explicitly, don't change it
-        if (getCacheControl() != null) {
-            return;
-        }
+		// If cache-control is set explicitly, don't change it
+		if (getCacheControl() != null) {
+			return;
+		}
 
-        // If caching is disabled, tell the browser not to cache
-        if (disableCaching) {
-            setCacheControl(CacheControl.noStore());
-        }
-    }
+		// If caching is disabled, tell the browser not to cache
+		if (disableCaching) {
+			setCacheControl(CacheControl.noStore());
+		}
+	}
 
-    public void setStaticAssetsPath(String staticAssetsPath) {
-        this.staticAssetsPath = staticAssetsPath;
-    }
+	public void setStaticAssetsPath(String staticAssetsPath) {
+		this.staticAssetsPath = staticAssetsPath;
+	}
 
-    @Override
-    protected MediaType getMediaType(HttpServletRequest request, Resource resource) {
-        MediaType mediaType = super.getMediaType(request, resource);
-        MediaType textType = MediaType.parseMediaType("text/*");
-        if (textType.includes(mediaType)) {
-            return MediaType.parseMediaType(new StringBuilder()
-                    .append(mediaType)
-                    .append("; charset=")
-                    .append(StandardCharsets.UTF_8.name())
-                    .toString());
-        }
+	@Override
+	protected MediaType getMediaType(HttpServletRequest request, Resource resource) {
+		MediaType mediaType = super.getMediaType(request, resource);
+		MediaType textType = MediaType.parseMediaType("text/*");
+		if (textType.includes(mediaType)) {
+			return MediaType.parseMediaType(new StringBuilder()
+				.append(mediaType)
+				.append("; charset=")
+				.append(StandardCharsets.UTF_8.name())
+				.toString());
+		}
 
-        return mediaType;
-    }
+		return mediaType;
+	}
 
-    @Override
-    protected Resource getResource(final HttpServletRequest request) {
+	@Override
+	protected Resource getResource(final HttpServletRequest request) {
 
-        SiteContext siteContext = SiteContext.getCurrent();
-        final String path = getPath(request, siteContext);
+		SiteContext siteContext = SiteContext.getCurrent();
+		final String path = getPath(request, siteContext);
 
-        if (siteContext == null) {
-            throw new IllegalStateException("No current site context found");
-        }
+		if (siteContext == null) {
+			throw new IllegalStateException("No current site context found");
+		}
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Trying to get content for static asset at [context=" + siteContext + ", path='" + path + "']");
-        }
+		if (logger.isDebugEnabled()) {
+			logger.debug("Trying to get content for static asset at [context=" + siteContext + ", path='" + path + "']");
+		}
 
-        final Content content = getContent(siteContext, path);
-        if (content == null) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("No static asset found at [context=" + siteContext + ", path='" + path +
-                    "'] - returning 404");
-            }
-            return null;
-        }
+		final Content content = getContent(siteContext, path);
+		if (content == null) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("No static asset found at [context=" + siteContext + ", path='" + path +
+					"'] - returning 404");
+			}
+			return null;
+		}
 
-        return toResource(content, path);
-    }
+		return toResource(content, path);
+	}
 
-    protected Resource toResource(Content content, String path) {
-        return new AbstractResource() {
+	protected Resource toResource(Content content, String path) {
+		return new AbstractResource() {
 
-            @Override
-            public String getFilename() {
-                return FilenameUtils.getName(path);
-            }
+			@Override
+			public String getFilename() {
+				return FilenameUtils.getName(path);
+			}
 
-            @Override
-            public long lastModified() {
-                // don't provide timestamp to rely on etag comparison instead
-                return -1;
-            }
+			@Override
+			public long lastModified() {
+				// don't provide timestamp to rely on etag comparison instead
+				return -1;
+			}
 
-            @Override
-            public long contentLength() {
-                return content.getLength();
-            }
+			@Override
+			public long contentLength() {
+				return content.getLength();
+			}
 
-            @Override
-            public String getDescription() {
-                return null;
-            }
+			@Override
+			public String getDescription() {
+				return null;
+			}
 
-            @Override
-            public InputStream getInputStream() throws IOException {
-                return content.getInputStream();
-            }
+			@Override
+			public InputStream getInputStream() throws IOException {
+				return content.getInputStream();
+			}
 
-        };
-    }
+		};
+	}
 
-    protected String getPath(HttpServletRequest request, SiteContext siteContext) {
-        String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        if (StringUtils.isEmpty(path)) {
-            throw new IllegalStateException("Required request attribute '" + HandlerMapping
-                .PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE + "' is not set");
-        }
+	protected String getPath(HttpServletRequest request, SiteContext siteContext) {
+		String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+		if (StringUtils.isEmpty(path)) {
+			throw new IllegalStateException("Required request attribute '" + HandlerMapping
+				.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE + "' is not set");
+		}
 
-        if (StringUtils.isNotEmpty(staticAssetsPath)) {
-            return UrlUtils.concat(staticAssetsPath, path);
-        } else {
-            return UrlUtils.concat(siteContext.getStaticAssetsPath(), path);
-        }
-    }
+		if (StringUtils.isNotEmpty(staticAssetsPath)) {
+			return UrlUtils.concat(staticAssetsPath, path);
+		} else {
+			return UrlUtils.concat(siteContext.getStaticAssetsPath(), path);
+		}
+	}
 
-    protected Content getContent(SiteContext siteContext, String path) {
-        return contentStoreService.findContent(siteContext.getContext(), path);
-    }
-
+	protected Content getContent(SiteContext siteContext, String path) {
+		return contentStoreService.findContent(siteContext.getContext(), path);
+	}
 
 
 }

@@ -22,7 +22,7 @@
 	<!-- start CSS -->
 	<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600" rel="stylesheet">
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap-reboot.min.css"
-				rel="stylesheet">
+	      rel="stylesheet">
 	<style>
 		html, body {
 			height: 100%;
@@ -45,7 +45,7 @@
 			max-width: 400px;
 			border-radius: 20px;
 			background-color: #fff;
-			background-color: rgba(255,255,255,.9);
+			background-color: rgba(255, 255, 255, .9);
 			position: relative;
 		}
 
@@ -81,12 +81,10 @@
 	<!-- end CSS-->
 
 	<!-- Favicon Setting -->
-	<link rel="icon" type="image/x-icon"
-				href='${urlTransformationService.transform('toWebAppRelativeUrl', '/static-assets/img/favicon.ico')}'/>
+	<link rel="icon" type="image/x-icon" href='${urlTransformationService.transform('toWebAppRelativeUrl', '/static-assets/img/favicon.ico')}'/>
 </head>
 
 <body>
-
 <main id="main">
 
 	<a href="https://craftercms.com">
@@ -112,8 +110,6 @@
 		Copyright &copy; 2007 - ${.now?string('yyyy')}, Crafter Software Corporation. All rights reserved.
 		CrafterCMS is open source software licensed under the GNU General Public License (GPL) version 3.0.
 	</footer>
-
 </main>
-
 </body>
 </html>

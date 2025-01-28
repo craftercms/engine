@@ -53,18 +53,18 @@
             <#outputFormat "HTML">
               ${item.label}
             </#outputFormat>
-          </@a>
-        <#else>
-          <@span $model=siteItem $attributes=itemAttributes>
-            <#outputFormat "HTML">
-              ${item.label}
-            </#outputFormat>
-          </@span>
-        </#if>
-      <#if (itemWrapperElement != "")>
-        </${itemWrapperElement}>
-      </#if>
-    </#list>
-  <#if (containerElement != "")></${containerElement}></#if>
-  <#if showNavElement != false></nav></#if>
+</@a>
+<#else>
+<@span $model=siteItem $attributes=itemAttributes>
+<#outputFormat "HTML">
+${item.label}
+</#outputFormat>
+</@span>
+</#if>
+<#if (itemWrapperElement != "")>
+</${itemWrapperElement}>
+</#if>
+</#list>
+<#if (containerElement != "")></${containerElement}></#if>
+<#if showNavElement != false></nav></#if>
 </#macro>

@@ -25,11 +25,11 @@ import org.craftercms.core.store.ContentStoreAdapter;
  */
 public interface ContentStoreAdapterDecorator extends ContentStoreAdapter {
 
-    /**
-     * Sets the store adapter to be decorated
-     *
-     * @param actualStoreAdapter the actual store adapter
-     */
-    void setActualStoreAdapter(ContentStoreAdapter actualStoreAdapter);
+	/**
+	 * Sets the store adapter to be decorated
+	 *
+	 * @param actualStoreAdapter the actual store adapter
+	 */
+	void setActualStoreAdapter(ContentStoreAdapter actualStoreAdapter);
 
 }

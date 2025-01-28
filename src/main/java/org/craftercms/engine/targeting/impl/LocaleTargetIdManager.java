@@ -36,35 +36,35 @@ import org.springframework.context.i18n.LocaleContextHolder;
  */
 public class LocaleTargetIdManager extends AbstractTargetIdManager {
 
-    @Override
-    public String getCurrentTargetId() throws IllegalStateException {
-        Locale currentLocale = LocaleContextHolder.getLocale();
-        if (currentLocale != null) {
-            return StringUtils.lowerCase(currentLocale.toString());
-        } else {
-            return null;
-        }
-    }
+	@Override
+	public String getCurrentTargetId() throws IllegalStateException {
+		Locale currentLocale = LocaleContextHolder.getLocale();
+		if (currentLocale != null) {
+			return StringUtils.lowerCase(currentLocale.toString());
+		} else {
+			return null;
+		}
+	}
 
-    @Override
-    public List<String> getAvailableTargetIds() {
-        String[] availableTargetIds = SiteProperties.getAvailableTargetIds();
-        if (ArrayUtils.isEmpty(availableTargetIds)) {
-            List<Locale> availableLocales = LocaleUtils.availableLocaleList();
-            List<String> availableLocaleStrs = new ArrayList<>(availableLocales.size());
+	@Override
+	public List<String> getAvailableTargetIds() {
+		String[] availableTargetIds = SiteProperties.getAvailableTargetIds();
+		if (ArrayUtils.isEmpty(availableTargetIds)) {
+			List<Locale> availableLocales = LocaleUtils.availableLocaleList();
+			List<String> availableLocaleStrs = new ArrayList<>(availableLocales.size());
 
-            for (Locale locale : availableLocales) {
-                String localeStr = locale.toString();
-                // Ignore empty ROOT locale
-                if (StringUtils.isNotEmpty(localeStr)) {
-                    availableLocaleStrs.add(StringUtils.lowerCase(localeStr));
-                }
-            }
+			for (Locale locale : availableLocales) {
+				String localeStr = locale.toString();
+				// Ignore empty ROOT locale
+				if (StringUtils.isNotEmpty(localeStr)) {
+					availableLocaleStrs.add(StringUtils.lowerCase(localeStr));
+				}
+			}
 
-            return availableLocaleStrs;
-        } else {
-            return Arrays.asList(availableTargetIds);
-        }
-    }
+			return availableLocaleStrs;
+		} else {
+			return Arrays.asList(availableTargetIds);
+		}
+	}
 
 }

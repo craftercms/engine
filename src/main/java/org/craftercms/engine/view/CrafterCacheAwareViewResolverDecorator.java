@@ -27,8 +27,8 @@ import java.util.Locale;
  * {@code ViewResolver} decorator that caches views on Crafter's own cache per site.
  *
  * <p>
- *     <strong>NOTE:</strong> if you're decorating a  {@code AbstractCachingViewResolver} please make sure you turn
- *     off the caching of that view resolver.
+ * <strong>NOTE:</strong> if you're decorating a  {@code AbstractCachingViewResolver} please make sure you turn
+ * off the caching of that view resolver.
  * </p>
  *
  * @author avasquez
@@ -36,42 +36,42 @@ import java.util.Locale;
  */
 public class CrafterCacheAwareViewResolverDecorator implements ViewResolver, Ordered {
 
-    private static final String VIEW_CONST_KEY_ELEM = "view";
+	private static final String VIEW_CONST_KEY_ELEM = "view";
 
-    protected int order;
-    protected ViewResolver actualViewResolver;
+	protected int order;
+	protected ViewResolver actualViewResolver;
 
-    @Override
-    public int getOrder() {
-        return order;
-    }
+	@Override
+	public int getOrder() {
+		return order;
+	}
 
-    public void setOrder(int order) {
-        this.order = order;
-    }
+	public void setOrder(int order) {
+		this.order = order;
+	}
 
-    public void setActualViewResolver(ViewResolver actualViewResolver) {
-        this.actualViewResolver = actualViewResolver;
-    }
+	public void setActualViewResolver(ViewResolver actualViewResolver) {
+		this.actualViewResolver = actualViewResolver;
+	}
 
-    @Override
-    public View resolveViewName(@NonNull String viewName, @NonNull Locale locale) throws Exception {
-        SiteContext siteContext = SiteContext.getCurrent();
-        if (siteContext != null) {
-            try {
-                return siteContext.getCacheTemplate().getObject(siteContext.getContext(), () -> {
-                    try {
-                        return actualViewResolver.resolveViewName(viewName, locale);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                }, viewName, locale, VIEW_CONST_KEY_ELEM);
-            } catch (RuntimeException e) {
-                throw (Exception) e.getCause();
-            }
-        } else {
-            return actualViewResolver.resolveViewName(viewName, locale);
-        }
-    }
+	@Override
+	public View resolveViewName(@NonNull String viewName, @NonNull Locale locale) throws Exception {
+		SiteContext siteContext = SiteContext.getCurrent();
+		if (siteContext != null) {
+			try {
+				return siteContext.getCacheTemplate().getObject(siteContext.getContext(), () -> {
+					try {
+						return actualViewResolver.resolveViewName(viewName, locale);
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				}, viewName, locale, VIEW_CONST_KEY_ELEM);
+			} catch (RuntimeException e) {
+				throw (Exception) e.getCause();
+			}
+		} else {
+			return actualViewResolver.resolveViewName(viewName, locale);
+		}
+	}
 
 }

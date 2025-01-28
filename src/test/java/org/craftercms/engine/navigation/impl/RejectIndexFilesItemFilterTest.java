@@ -40,66 +40,66 @@ import static org.mockito.Mockito.*;
  */
 public class RejectIndexFilesItemFilterTest {
 
-    private RejectIndexFilesItemFilter filter;
+	private RejectIndexFilesItemFilter filter;
 
-    @Before
-    public void setUp() throws Exception {
-        filter = createFilter(createTargetedUrlStrategy());
+	@Before
+	public void setUp() throws Exception {
+		filter = createFilter(createTargetedUrlStrategy());
 
-        setUpCurrentConfig();
-    }
+		setUpCurrentConfig();
+	}
 
-    @Test
-    public void testFilter() throws Exception {
-        List<Item> emptyItemList = Collections.emptyList();
+	@Test
+	public void testFilter() throws Exception {
+		List<Item> emptyItemList = Collections.emptyList();
 
-        Item item = new Item();
-        item.setName("index.xml");
+		Item item = new Item();
+		item.setName("index.xml");
 
-        boolean accepted = filter.accepts(item, emptyItemList, emptyItemList, true);
-        assertFalse(accepted);
+		boolean accepted = filter.accepts(item, emptyItemList, emptyItemList, true);
+		assertFalse(accepted);
 
-        item.setName("index_en.xml");
+		item.setName("index_en.xml");
 
-        accepted = filter.accepts(item, emptyItemList, emptyItemList, true);
-        assertFalse(accepted);
+		accepted = filter.accepts(item, emptyItemList, emptyItemList, true);
+		assertFalse(accepted);
 
-        item.setName("index_en_US.xml");
+		item.setName("index_en_US.xml");
 
-        accepted = filter.accepts(item, emptyItemList, emptyItemList, true);
-        assertFalse(accepted);
+		accepted = filter.accepts(item, emptyItemList, emptyItemList, true);
+		assertFalse(accepted);
 
-        item.setName("about-us");
+		item.setName("about-us");
 
-        accepted = filter.accepts(item, emptyItemList, emptyItemList, true);
-        assertTrue(accepted);
-    }
+		accepted = filter.accepts(item, emptyItemList, emptyItemList, true);
+		assertTrue(accepted);
+	}
 
-    private RejectIndexFilesItemFilter createFilter(TargetedUrlStrategy strategy) {
-        RejectIndexFilesItemFilter filter = new RejectIndexFilesItemFilter(strategy);
+	private RejectIndexFilesItemFilter createFilter(TargetedUrlStrategy strategy) {
+		RejectIndexFilesItemFilter filter = new RejectIndexFilesItemFilter(strategy);
 
-        return filter;
-    }
+		return filter;
+	}
 
-    private TargetedUrlStrategy createTargetedUrlStrategy() {
-        TargetIdManager targetIdManager = mock(TargetIdManager.class);
-        when(targetIdManager.getAvailableTargetIds()).thenReturn(Arrays.asList("en", "en_US"));
+	private TargetedUrlStrategy createTargetedUrlStrategy() {
+		TargetIdManager targetIdManager = mock(TargetIdManager.class);
+		when(targetIdManager.getAvailableTargetIds()).thenReturn(Arrays.asList("en", "en_US"));
 
-        TargetedUrlByFileStrategy strategy = new TargetedUrlByFileStrategy(targetIdManager);
+		TargetedUrlByFileStrategy strategy = new TargetedUrlByFileStrategy(targetIdManager);
 
-        return strategy;
-    }
+		return strategy;
+	}
 
-    private void setUpCurrentConfig() {
-        XMLConfiguration config = mock(XMLConfiguration.class);
-        when(config.getString(INDEX_FILE_NAME_CONFIG_KEY, DEFAULT_INDEX_FILE_NAME)).thenReturn(DEFAULT_INDEX_FILE_NAME);
-        when(config.getBoolean(TARGETING_ENABLED_CONFIG_KEY, false)).thenReturn(true);
+	private void setUpCurrentConfig() {
+		XMLConfiguration config = mock(XMLConfiguration.class);
+		when(config.getString(INDEX_FILE_NAME_CONFIG_KEY, DEFAULT_INDEX_FILE_NAME)).thenReturn(DEFAULT_INDEX_FILE_NAME);
+		when(config.getBoolean(TARGETING_ENABLED_CONFIG_KEY, false)).thenReturn(true);
 
-        SiteContext siteContext = spy(new SiteContext());
-        when(siteContext.getSiteName()).thenReturn("test");
-        when(siteContext.getConfig()).thenReturn(config);
+		SiteContext siteContext = spy(new SiteContext());
+		when(siteContext.getSiteName()).thenReturn("test");
+		when(siteContext.getConfig()).thenReturn(config);
 
-        SiteContext.setCurrent(siteContext);
-    }
+		SiteContext.setCurrent(siteContext);
+	}
 
 }

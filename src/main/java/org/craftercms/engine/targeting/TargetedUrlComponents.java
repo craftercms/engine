@@ -22,56 +22,56 @@ package org.craftercms.engine.targeting;
  */
 public class TargetedUrlComponents {
 
-    private String prefix;
-    private String targetId;
-    private String suffix;
+	private String prefix;
+	private String targetId;
+	private String suffix;
 
-    /**
-     * Returns the URL prefix (e.g. /products/index)
-     */
-    public String getPrefix() {
-        return prefix;
-    }
+	/**
+	 * Returns the URL prefix (e.g. /products/index)
+	 */
+	public String getPrefix() {
+		return prefix;
+	}
 
-    /**
-     * Sets the URL prefix.
-     *
-     * @param prefix the prefix to set (e.g. /products/index)
-     */
-    public void setPrefix(String prefix) {
-        this.prefix = prefix;
-    }
+	/**
+	 * Sets the URL prefix.
+	 *
+	 * @param prefix the prefix to set (e.g. /products/index)
+	 */
+	public void setPrefix(String prefix) {
+		this.prefix = prefix;
+	}
 
-    /**
-     * Returns the target ID (e.g. en_US)
-     */
-    public String getTargetId() {
-        return targetId;
-    }
+	/**
+	 * Returns the target ID (e.g. en_US)
+	 */
+	public String getTargetId() {
+		return targetId;
+	}
 
-    /**
-     * Sets the target ID (e.g. en_US).
-     *
-     * @param targetId the target ID to set
-     */
-    public void setTargetId(String targetId) {
-        this.targetId = targetId;
-    }
+	/**
+	 * Sets the target ID (e.g. en_US).
+	 *
+	 * @param targetId the target ID to set
+	 */
+	public void setTargetId(String targetId) {
+		this.targetId = targetId;
+	}
 
-    /**
-     * Returns the URL suffix (e.g. .xml)
-     */
-    public String getSuffix() {
-        return suffix;
-    }
+	/**
+	 * Returns the URL suffix (e.g. .xml)
+	 */
+	public String getSuffix() {
+		return suffix;
+	}
 
-    /**
-     * Sets the URL suffix (e.g. .xml)
-     *
-     * @param suffix the suffix to set
-     */
-    public void setSuffix(String suffix) {
-        this.suffix = suffix;
-    }
+	/**
+	 * Sets the URL suffix (e.g. .xml)
+	 *
+	 * @param suffix the suffix to set
+	 */
+	public void setSuffix(String suffix) {
+		this.suffix = suffix;
+	}
 
 }

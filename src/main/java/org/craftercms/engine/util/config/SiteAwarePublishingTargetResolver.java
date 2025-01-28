@@ -28,33 +28,33 @@ import java.beans.ConstructorProperties;
  */
 public class SiteAwarePublishingTargetResolver implements PublishingTargetResolver {
 
-    protected boolean preview;
+	protected boolean preview;
 
-    protected String stagingPattern;
+	protected String stagingPattern;
 
-    @ConstructorProperties({"preview", "stagingPattern"})
-    public SiteAwarePublishingTargetResolver(boolean preview, String stagingPattern) {
-        this.preview = preview;
-        this.stagingPattern = stagingPattern;
-    }
+	@ConstructorProperties({"preview", "stagingPattern"})
+	public SiteAwarePublishingTargetResolver(boolean preview, String stagingPattern) {
+		this.preview = preview;
+		this.stagingPattern = stagingPattern;
+	}
 
-    @Override
-    public String getPublishingTarget() {
-        SiteContext siteContext = SiteContext.getCurrent();
-        if (siteContext == null) {
-            throw new IllegalStateException("Can't resolve the current site target");
-        }
-        return getPublishingTarget(siteContext.getSiteName());
-    }
+	@Override
+	public String getPublishingTarget() {
+		SiteContext siteContext = SiteContext.getCurrent();
+		if (siteContext == null) {
+			throw new IllegalStateException("Can't resolve the current site target");
+		}
+		return getPublishingTarget(siteContext.getSiteName());
+	}
 
-    public String getPublishingTarget(String siteName) {
-        if (preview) {
-            return PREVIEW;
-        } else if(siteName.matches(stagingPattern)) {
-            return STAGING;
-        } else {
-            return LIVE;
-        }
-    }
+	public String getPublishingTarget(String siteName) {
+		if (preview) {
+			return PREVIEW;
+		} else if (siteName.matches(stagingPattern)) {
+			return STAGING;
+		} else {
+			return LIVE;
+		}
+	}
 
 }

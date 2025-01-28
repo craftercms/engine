@@ -35,62 +35,62 @@ import java.util.List;
  */
 public class AnnotationDrivenConfigCustomizer implements BeanPostProcessor {
 
-    private ContentNegotiationManager contentNegotiationManager;
-    private List<HttpMessageConverter<?>> messageConverters;
-    private List<Object> interceptors;
+	private ContentNegotiationManager contentNegotiationManager;
+	private List<HttpMessageConverter<?>> messageConverters;
+	private List<Object> interceptors;
 
-    public void setContentNegotiationManager(ContentNegotiationManager contentNegotiationManager) {
-        this.contentNegotiationManager = contentNegotiationManager;
-    }
+	public void setContentNegotiationManager(ContentNegotiationManager contentNegotiationManager) {
+		this.contentNegotiationManager = contentNegotiationManager;
+	}
 
-    public void setMessageConverters(List<HttpMessageConverter<?>> messageConverters) {
-        this.messageConverters = messageConverters;
-    }
+	public void setMessageConverters(List<HttpMessageConverter<?>> messageConverters) {
+		this.messageConverters = messageConverters;
+	}
 
-    public void setInterceptors(List<Object> interceptors) {
-        this.interceptors = interceptors;
-    }
+	public void setInterceptors(List<Object> interceptors) {
+		this.interceptors = interceptors;
+	}
 
-    @Override
-    @SuppressWarnings("deprecation")
-    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-        if (bean instanceof RequestMappingHandlerAdapter) {
-            RequestMappingHandlerAdapter adapter = (RequestMappingHandlerAdapter) bean;
-            if (contentNegotiationManager != null) {
-                adapter.setContentNegotiationManager(contentNegotiationManager);
-            }
-            if (CollectionUtils.isNotEmpty(messageConverters)) {
-                List<HttpMessageConverter<?>> mergedConverters = new ArrayList<>(messageConverters);
-                mergedConverters.addAll(adapter.getMessageConverters());
+	@Override
+	@SuppressWarnings("deprecation")
+	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+		if (bean instanceof RequestMappingHandlerAdapter) {
+			RequestMappingHandlerAdapter adapter = (RequestMappingHandlerAdapter) bean;
+			if (contentNegotiationManager != null) {
+				adapter.setContentNegotiationManager(contentNegotiationManager);
+			}
+			if (CollectionUtils.isNotEmpty(messageConverters)) {
+				List<HttpMessageConverter<?>> mergedConverters = new ArrayList<>(messageConverters);
+				mergedConverters.addAll(adapter.getMessageConverters());
 
-                adapter.setMessageConverters(mergedConverters);
-            }
-        } else if (bean instanceof RequestMappingHandlerMapping) {
-            RequestMappingHandlerMapping mapping = (RequestMappingHandlerMapping) bean;
-            // This property changed to `false` by default in Spring 5.3
-            mapping.setUseSuffixPatternMatch(true);
-            if (CollectionUtils.isNotEmpty(interceptors)) {
-                mapping.setInterceptors(interceptors.toArray(new Object[interceptors.size()]));
-            }
-        } else if (bean instanceof ExceptionHandlerExceptionResolver) {
-            ExceptionHandlerExceptionResolver exceptionResolver = (ExceptionHandlerExceptionResolver) bean;
-            if (contentNegotiationManager != null) {
-                exceptionResolver.setContentNegotiationManager(contentNegotiationManager);
-            }
-            if (CollectionUtils.isNotEmpty(messageConverters)) {
-                List<HttpMessageConverter<?>> mergedConverters = new ArrayList<>(messageConverters);
-                mergedConverters.addAll(exceptionResolver.getMessageConverters());
+				adapter.setMessageConverters(mergedConverters);
+			}
+		} else if (bean instanceof RequestMappingHandlerMapping) {
+			RequestMappingHandlerMapping mapping = (RequestMappingHandlerMapping) bean;
+			// This property changed to `false` by default in Spring 5.3
+			mapping.setUseSuffixPatternMatch(true);
+			if (CollectionUtils.isNotEmpty(interceptors)) {
+				mapping.setInterceptors(interceptors.toArray(new Object[interceptors.size()]));
+			}
+		} else if (bean instanceof ExceptionHandlerExceptionResolver) {
+			ExceptionHandlerExceptionResolver exceptionResolver = (ExceptionHandlerExceptionResolver) bean;
+			if (contentNegotiationManager != null) {
+				exceptionResolver.setContentNegotiationManager(contentNegotiationManager);
+			}
+			if (CollectionUtils.isNotEmpty(messageConverters)) {
+				List<HttpMessageConverter<?>> mergedConverters = new ArrayList<>(messageConverters);
+				mergedConverters.addAll(exceptionResolver.getMessageConverters());
 
-                exceptionResolver.setMessageConverters(mergedConverters);
-            }
-        }
+				exceptionResolver.setMessageConverters(mergedConverters);
+			}
+		}
 
-        return bean;
-    }
+		return bean;
+	}
 
-    @Override
-    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        return bean;
-    }
+	@Override
+	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+		return bean;
+	}
 
 }

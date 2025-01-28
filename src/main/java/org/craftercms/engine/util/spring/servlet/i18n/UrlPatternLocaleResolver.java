@@ -19,6 +19,7 @@ import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.craftercms.engine.service.context.SiteContext;
 
 import jakarta.servlet.http.HttpServletRequest;
+
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -41,30 +42,30 @@ import static org.craftercms.commons.locale.LocaleUtils.parseLocale;
  */
 public class UrlPatternLocaleResolver extends ConfigAwareLocaleResolver {
 
-    public static final String CONFIG_KEY_MAPPINGS = "mappings.mapping";
-    public static final String CONFIG_KEY_PATTERN = "pattern";
-    public static final String CONFIG_KEY_LOCALE = "localeCode";
+	public static final String CONFIG_KEY_MAPPINGS = "mappings.mapping";
+	public static final String CONFIG_KEY_PATTERN = "pattern";
+	public static final String CONFIG_KEY_LOCALE = "localeCode";
 
-    /**
-     * The map of URL patterns and locales
-     */
-    protected Map<String, Locale> localeMapping = new HashMap<>();
+	/**
+	 * The map of URL patterns and locales
+	 */
+	protected Map<String, Locale> localeMapping = new HashMap<>();
 
-    @Override
-    protected void init(HierarchicalConfiguration<?> config) {
-        config.configurationsAt(CONFIG_KEY_MAPPINGS).forEach(mappingConf ->
-            localeMapping.put(mappingConf.getString(CONFIG_KEY_PATTERN),
-                    parseLocale(mappingConf.getString(CONFIG_KEY_LOCALE)))
-        );
-    }
+	@Override
+	protected void init(HierarchicalConfiguration<?> config) {
+		config.configurationsAt(CONFIG_KEY_MAPPINGS).forEach(mappingConf ->
+			localeMapping.put(mappingConf.getString(CONFIG_KEY_PATTERN),
+				parseLocale(mappingConf.getString(CONFIG_KEY_LOCALE)))
+		);
+	}
 
-    @Override
-    protected Locale resolveLocale(SiteContext siteContext, HttpServletRequest request) {
-        logger.debug("Looking match for URL: {}", request.getRequestURL());
-        return localeMapping.entrySet().stream()
-                .filter(entry -> request.getRequestURL().toString().matches(entry.getKey()))
-                .map(Map.Entry::getValue)
-                .findFirst().orElse(null);
-    }
+	@Override
+	protected Locale resolveLocale(SiteContext siteContext, HttpServletRequest request) {
+		logger.debug("Looking match for URL: {}", request.getRequestURL());
+		return localeMapping.entrySet().stream()
+			.filter(entry -> request.getRequestURL().toString().matches(entry.getKey()))
+			.map(Map.Entry::getValue)
+			.findFirst().orElse(null);
+	}
 
 }

@@ -21,7 +21,7 @@
 	<!-- start CSS -->
 	<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600" rel="stylesheet">
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap-reboot.min.css"
-				rel="stylesheet">
+	      rel="stylesheet">
 	<style>
 		html, body {
 			height: 100%;
@@ -44,7 +44,7 @@
 			max-width: 400px;
 			border-radius: 20px;
 			background-color: #fff;
-			background-color: rgba(255,255,255,.9);
+			background-color: rgba(255, 255, 255, .9);
 			position: relative;
 		}
 
@@ -81,7 +81,7 @@
 
 	<!-- Favicon Setting -->
 	<link rel="icon" type="image/x-icon"
-				href='${urlTransformationService.transform('toWebAppRelativeUrl', '/static-assets/img/favicon.ico')}'/>
+	      href='${urlTransformationService.transform('toWebAppRelativeUrl', '/static-assets/img/favicon.ico')}'/>
 </head>
 
 <body>

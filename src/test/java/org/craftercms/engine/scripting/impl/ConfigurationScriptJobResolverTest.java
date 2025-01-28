@@ -47,70 +47,70 @@ import static org.mockito.Mockito.when;
  * @author avasquez
  */
 public class ConfigurationScriptJobResolverTest {
-    private static final String CONFIG_MACRO_TEST_PROPERTY = "test-property";
-    private static final String CONFIG_TEST_PROPERTY_VALUE = "This one supports macro for site crafter-test";
-    private static final String CONTEXT_NAME = "contextName";
-    private static final String CONTEXT_NAME_VALUE = "crafter-test";
-    @Mock
-    private ContentStoreService storeService;
-    @Mock
-    private SiteContext siteContext;
-    private ConfigurationScriptJobResolver resolver;
+	private static final String CONFIG_MACRO_TEST_PROPERTY = "test-property";
+	private static final String CONFIG_TEST_PROPERTY_VALUE = "This one supports macro for site crafter-test";
+	private static final String CONTEXT_NAME = "contextName";
+	private static final String CONTEXT_NAME_VALUE = "crafter-test";
+	@Mock
+	private ContentStoreService storeService;
+	@Mock
+	private SiteContext siteContext;
+	private ConfigurationScriptJobResolver resolver;
 
-    @Before
-    public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+	@Before
+	public void setUp() throws Exception {
+		MockitoAnnotations.initMocks(this);
 
-        setUpStoreService(storeService);
-        setUpSiteContext(siteContext, storeService);
+		setUpStoreService(storeService);
+		setUpSiteContext(siteContext, storeService);
 
-        resolver = new ConfigurationScriptJobResolver(".groovy");
-    }
+		resolver = new ConfigurationScriptJobResolver(".groovy");
+	}
 
-    @Test
-    public void testResolveJobs() throws Exception {
-        List<JobContext> jobContexts = resolver.resolveJobs(siteContext);
+	@Test
+	public void testResolveJobs() throws Exception {
+		List<JobContext> jobContexts = resolver.resolveJobs(siteContext);
 
-        assertNotNull(jobContexts);
-        assertEquals(2, jobContexts.size());
+		assertNotNull(jobContexts);
+		assertEquals(2, jobContexts.size());
 
-        JobDetailImpl jobDetail = (JobDetailImpl)jobContexts.get(0).getDetail();
-        CronTrigger trigger = (CronTrigger)jobContexts.get(0).getTrigger();
+		JobDetailImpl jobDetail = (JobDetailImpl) jobContexts.get(0).getDetail();
+		CronTrigger trigger = (CronTrigger) jobContexts.get(0).getTrigger();
 
-        assertEquals(ScriptJob.class, jobDetail.getJobClass());
-        assertEquals("/scripts/jobs/morejobs/testJob2.groovy",
-                     jobDetail.getJobDataMap().getString(ScriptJob.SCRIPT_URL_DATA_KEY));
-        assertEquals("0 0/15 * * * ?", trigger.getCronExpression());
+		assertEquals(ScriptJob.class, jobDetail.getJobClass());
+		assertEquals("/scripts/jobs/morejobs/testJob2.groovy",
+			jobDetail.getJobDataMap().getString(ScriptJob.SCRIPT_URL_DATA_KEY));
+		assertEquals("0 0/15 * * * ?", trigger.getCronExpression());
 
-        jobDetail = (JobDetailImpl)jobContexts.get(1).getDetail();
-        trigger = (CronTrigger)jobContexts.get(1).getTrigger();
+		jobDetail = (JobDetailImpl) jobContexts.get(1).getDetail();
+		trigger = (CronTrigger) jobContexts.get(1).getTrigger();
 
-        assertEquals(ScriptJob.class, jobDetail.getJobClass());
-        assertEquals("/scripts/jobs/testJob.groovy",
-                     jobDetail.getJobDataMap().getString(ScriptJob.SCRIPT_URL_DATA_KEY));
-        assertEquals("0 0/15 * * * ?", trigger.getCronExpression());
-    }
+		assertEquals(ScriptJob.class, jobDetail.getJobClass());
+		assertEquals("/scripts/jobs/testJob.groovy",
+			jobDetail.getJobDataMap().getString(ScriptJob.SCRIPT_URL_DATA_KEY));
+		assertEquals("0 0/15 * * * ?", trigger.getCronExpression());
+	}
 
-    @Test
-    public void testMacrosInConfig () {
-        HierarchicalConfiguration config = siteContext.getConfig();
-        assertEquals(CONFIG_TEST_PROPERTY_VALUE, config.getString(CONFIG_MACRO_TEST_PROPERTY));
-    }
+	@Test
+	public void testMacrosInConfig() {
+		HierarchicalConfiguration config = siteContext.getConfig();
+		assertEquals(CONFIG_TEST_PROPERTY_VALUE, config.getString(CONFIG_MACRO_TEST_PROPERTY));
+	}
 
-    private void setUpStoreService(ContentStoreService storeService) {
-        ContentStoreServiceMockUtils.setUpGetContentFromClassPath(storeService);
-    }
+	private void setUpStoreService(ContentStoreService storeService) {
+		ContentStoreServiceMockUtils.setUpGetContentFromClassPath(storeService);
+	}
 
-    private void setUpSiteContext(SiteContext siteContext, ContentStoreService storeService) throws Exception {
-        Map<String, String> contextConfigVariables = Map.of(CONTEXT_NAME, CONTEXT_NAME_VALUE);
-        XMLConfiguration config =
-            ConfigUtils.readXmlConfiguration(new ClassPathResource("config/site-config.xml"), ',', null, contextConfigVariables);
-        config.setListDelimiterHandler(new DefaultListDelimiterHandler(','));
+	private void setUpSiteContext(SiteContext siteContext, ContentStoreService storeService) throws Exception {
+		Map<String, String> contextConfigVariables = Map.of(CONTEXT_NAME, CONTEXT_NAME_VALUE);
+		XMLConfiguration config =
+			ConfigUtils.readXmlConfiguration(new ClassPathResource("config/site-config.xml"), ',', null, contextConfigVariables);
+		config.setListDelimiterHandler(new DefaultListDelimiterHandler(','));
 
-        when(siteContext.getSiteName()).thenReturn("default");
-        when(siteContext.getContext()).thenReturn(mock(Context.class));
-        when(siteContext.getStoreService()).thenReturn(storeService);
-        when(siteContext.getConfig()).thenReturn(config);
-    }
+		when(siteContext.getSiteName()).thenReturn("default");
+		when(siteContext.getContext()).thenReturn(mock(Context.class));
+		when(siteContext.getStoreService()).thenReturn(storeService);
+		when(siteContext.getConfig()).thenReturn(config);
+	}
 
 }

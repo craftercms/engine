@@ -17,6 +17,7 @@
 package org.craftercms.engine.util.spring.security;
 
 import java.util.Collections;
+
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
@@ -32,9 +33,9 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedG
  */
 public class DefaultAuthenticationDetailsSource extends WebAuthenticationDetailsSource {
 
-    @Override
-    public WebAuthenticationDetails buildDetails(final HttpServletRequest context) {
-        return new PreAuthenticatedGrantedAuthoritiesWebAuthenticationDetails(context, Collections.emptySet());
-    }
+	@Override
+	public WebAuthenticationDetails buildDetails(final HttpServletRequest context) {
+		return new PreAuthenticatedGrantedAuthoritiesWebAuthenticationDetails(context, Collections.emptySet());
+	}
 
 }

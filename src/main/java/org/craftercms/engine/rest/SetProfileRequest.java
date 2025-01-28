@@ -24,18 +24,18 @@ import java.util.Map;
  * Holds the necessary parameters for a set profile request.
  */
 public class SetProfileRequest {
-    private final Map<String, Object> parameters;
+	private final Map<String, Object> parameters;
 
-    public SetProfileRequest() {
-        parameters = new HashMap<>();
-    }
+	public SetProfileRequest() {
+		parameters = new HashMap<>();
+	}
 
-    @JsonAnySetter
-    public void addParameter(final String key, final Object value) {
-        parameters.put(key, value);
-    }
+	@JsonAnySetter
+	public void addParameter(final String key, final Object value) {
+		parameters.put(key, value);
+	}
 
-    public Map<String, Object> getParameters() {
-        return parameters;
-    }
+	public Map<String, Object> getParameters() {
+		return parameters;
+	}
 }

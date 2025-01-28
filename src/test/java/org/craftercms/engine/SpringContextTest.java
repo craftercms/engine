@@ -32,11 +32,11 @@ import static org.testng.Assert.assertNotNull;
 @TestPropertySource(properties = {"crafter.engine.extension.base = classpath*:crafter/engine/extension"})
 public class SpringContextTest extends AbstractTestNGSpringContextTests {
 
-    @Autowired
-    OpenSearchWrapper searchWrapper;
+	@Autowired
+	OpenSearchWrapper searchWrapper;
 
-    @Test
-    public void testOk() {
-        assertNotNull(searchWrapper);
-    }
+	@Test
+	public void testOk() {
+		assertNotNull(searchWrapper);
+	}
 }

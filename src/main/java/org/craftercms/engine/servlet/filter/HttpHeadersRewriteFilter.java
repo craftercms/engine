@@ -33,6 +33,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.beans.ConstructorProperties;
 import java.io.IOException;
 import java.util.HashMap;
@@ -44,104 +45,104 @@ import java.util.Map;
  */
 public class HttpHeadersRewriteFilter extends OncePerRequestFilter {
 
-    private static final Logger logger = LoggerFactory.getLogger(HttpHeadersRewriteFilter.class);
-    private static final String CONFIG_KEY_MAPPINGS = "headerMappings.mapping";
-    private static final String CONFIG_KEY_PATTERNS = "urlPattern";
-    private static final String CONFIG_KEY_HEADERS = "headers.header";
-    private static final String CONFIG_KEY_HEADER_NAME = "name";
-    private static final String CONFIG_KEY_HEADER_VALUE = "value";
-    private static final String HEADER_MAPPINGS_CACHE_KEY = "headerMappings";
+	private static final Logger logger = LoggerFactory.getLogger(HttpHeadersRewriteFilter.class);
+	private static final String CONFIG_KEY_MAPPINGS = "headerMappings.mapping";
+	private static final String CONFIG_KEY_PATTERNS = "urlPattern";
+	private static final String CONFIG_KEY_HEADERS = "headers.header";
+	private static final String CONFIG_KEY_HEADER_NAME = "name";
+	private static final String CONFIG_KEY_HEADER_VALUE = "value";
+	private static final String HEADER_MAPPINGS_CACHE_KEY = "headerMappings";
 
-    private CacheTemplate cacheTemplate;
-    private PathMatcher pathMatcher;
+	private CacheTemplate cacheTemplate;
+	private PathMatcher pathMatcher;
 
-    @ConstructorProperties({"cacheTemplate"})
-    public HttpHeadersRewriteFilter(CacheTemplate cacheTemplate) {
-        this.cacheTemplate = cacheTemplate;
-        this.pathMatcher = new AntPathMatcher();
-    }
+	@ConstructorProperties({"cacheTemplate"})
+	public HttpHeadersRewriteFilter(CacheTemplate cacheTemplate) {
+		this.cacheTemplate = cacheTemplate;
+		this.pathMatcher = new AntPathMatcher();
+	}
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        try {
-            String requestUri = HttpUtils.getRequestUriWithoutContextPath(request);
-            logger.debug("Try executing HTTP headers rewrite on response for request {}", requestUri);
-            List<HeaderMapping> headerMappings = getHeaderMappings(requestUri);
-            if (CollectionUtils.isNotEmpty(headerMappings)) {
-                for (HeaderMapping headerMapping: headerMappings) {
-                    String urlPattern = headerMapping.urlPattern;
-                    Map<String, String> headers = headerMapping.headers;
-                    logger.debug("Apply header mapping for request '{}' with pattern '{}'", requestUri, urlPattern);
-                    for (Map.Entry<String, String> header: headers.entrySet()) {
-                        String name = header.getKey();
-                        String value = header.getValue();
-                        logger.debug("Add header with name = '{}', value = '{}' to the response of request '{}'",
-                                name, value, requestUri);
-                        response.setHeader(name, value);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            logger.error("Error while executing HTTP headers rewrite for request '{}", request.getRequestURI(), e);
-        } finally {
-            filterChain.doFilter(request, response);
-        }
-    }
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+		try {
+			String requestUri = HttpUtils.getRequestUriWithoutContextPath(request);
+			logger.debug("Try executing HTTP headers rewrite on response for request {}", requestUri);
+			List<HeaderMapping> headerMappings = getHeaderMappings(requestUri);
+			if (CollectionUtils.isNotEmpty(headerMappings)) {
+				for (HeaderMapping headerMapping : headerMappings) {
+					String urlPattern = headerMapping.urlPattern;
+					Map<String, String> headers = headerMapping.headers;
+					logger.debug("Apply header mapping for request '{}' with pattern '{}'", requestUri, urlPattern);
+					for (Map.Entry<String, String> header : headers.entrySet()) {
+						String name = header.getKey();
+						String value = header.getValue();
+						logger.debug("Add header with name = '{}', value = '{}' to the response of request '{}'",
+							name, value, requestUri);
+						response.setHeader(name, value);
+					}
+				}
+			}
+		} catch (Exception e) {
+			logger.error("Error while executing HTTP headers rewrite for request '{}", request.getRequestURI(), e);
+		} finally {
+			filterChain.doFilter(request, response);
+		}
+	}
 
-    @SuppressWarnings("unchecked")
-    protected List<HeaderMapping> getHeaderMappings(String requestUri) {
-        final SiteContext siteContext = SiteContext.getCurrent();
-        if (siteContext == null) {
-            return null;
-        }
+	@SuppressWarnings("unchecked")
+	protected List<HeaderMapping> getHeaderMappings(String requestUri) {
+		final SiteContext siteContext = SiteContext.getCurrent();
+		if (siteContext == null) {
+			return null;
+		}
 
-        Callback<List<HeaderMapping>> callback = new Callback<>() {
+		Callback<List<HeaderMapping>> callback = new Callback<>() {
 
-            @Override
-            public List<HeaderMapping> execute() {
-                HierarchicalConfiguration config = ConfigUtils.getCurrentConfig();
-                CachingAwareList<HeaderMapping> mappings = new CachingAwareList<>();
-                if (config == null) {
-                    return mappings;
-                }
+			@Override
+			public List<HeaderMapping> execute() {
+				HierarchicalConfiguration config = ConfigUtils.getCurrentConfig();
+				CachingAwareList<HeaderMapping> mappings = new CachingAwareList<>();
+				if (config == null) {
+					return mappings;
+				}
 
-                List<HierarchicalConfiguration> mappingsConfig = config.configurationsAt(CONFIG_KEY_MAPPINGS);
-                if (CollectionUtils.isEmpty(mappingsConfig)) {
-                    return mappings;
-                }
+				List<HierarchicalConfiguration> mappingsConfig = config.configurationsAt(CONFIG_KEY_MAPPINGS);
+				if (CollectionUtils.isEmpty(mappingsConfig)) {
+					return mappings;
+				}
 
-                for (HierarchicalConfiguration mappingConfig : mappingsConfig) {
-                    String urlPattern = mappingConfig.getString(CONFIG_KEY_PATTERNS);
-                    if (pathMatcher.match(urlPattern, requestUri)) {
-                        logger.debug("Found matching url pattern '{}' for request '{}'", urlPattern, requestUri);
-                        List<HierarchicalConfiguration> headersConfig = mappingConfig.configurationsAt(CONFIG_KEY_HEADERS);
-                        if (CollectionUtils.isNotEmpty(headersConfig)) {
-                            Map<String, String> headers = new HashMap<>();
-                            for (HierarchicalConfiguration headerConfig : headersConfig) {
-                                String name = headerConfig.getString(CONFIG_KEY_HEADER_NAME);
-                                String value = headerConfig.getString(CONFIG_KEY_HEADER_VALUE);
-                                headers.put(name, value);
-                            }
+				for (HierarchicalConfiguration mappingConfig : mappingsConfig) {
+					String urlPattern = mappingConfig.getString(CONFIG_KEY_PATTERNS);
+					if (pathMatcher.match(urlPattern, requestUri)) {
+						logger.debug("Found matching url pattern '{}' for request '{}'", urlPattern, requestUri);
+						List<HierarchicalConfiguration> headersConfig = mappingConfig.configurationsAt(CONFIG_KEY_HEADERS);
+						if (CollectionUtils.isNotEmpty(headersConfig)) {
+							Map<String, String> headers = new HashMap<>();
+							for (HierarchicalConfiguration headerConfig : headersConfig) {
+								String name = headerConfig.getString(CONFIG_KEY_HEADER_NAME);
+								String value = headerConfig.getString(CONFIG_KEY_HEADER_VALUE);
+								headers.put(name, value);
+							}
 
-                            if (!headers.isEmpty()) {
-                                HeaderMapping mapping = new HeaderMapping();
-                                mapping.urlPattern = urlPattern;
-                                mapping.headers = headers;
-                                mappings.add(mapping);
-                            }
-                        }
-                    }
-                }
+							if (!headers.isEmpty()) {
+								HeaderMapping mapping = new HeaderMapping();
+								mapping.urlPattern = urlPattern;
+								mapping.headers = headers;
+								mappings.add(mapping);
+							}
+						}
+					}
+				}
 
-                return mappings;
-            }
-        };
+				return mappings;
+			}
+		};
 
-        return cacheTemplate.getObject(siteContext.getContext(), callback, requestUri, HEADER_MAPPINGS_CACHE_KEY);
-    }
+		return cacheTemplate.getObject(siteContext.getContext(), callback, requestUri, HEADER_MAPPINGS_CACHE_KEY);
+	}
 
-    protected static class HeaderMapping {
-        String urlPattern;
-        Map<String, String> headers;
-    }
+	protected static class HeaderMapping {
+		String urlPattern;
+		Map<String, String> headers;
+	}
 }

@@ -36,111 +36,111 @@ import org.dom4j.Element;
  */
 public class DefaultSiteItem extends AbstractXmlSiteItem {
 
-    protected Item item;
-    protected List<SiteItem> childItems;
-    protected Comparator<SiteItem> sortComparator;
+	protected Item item;
+	protected List<SiteItem> childItems;
+	protected Comparator<SiteItem> sortComparator;
 
-    public DefaultSiteItem(Item item, Converter<Element, Object> modelFieldConverter,
-                        Comparator<SiteItem> sortComparator) {
-        super(modelFieldConverter);
-        this.item = item;
-        this.sortComparator = sortComparator;
-    }
+	public DefaultSiteItem(Item item, Converter<Element, Object> modelFieldConverter,
+			       Comparator<SiteItem> sortComparator) {
+		super(modelFieldConverter);
+		this.item = item;
+		this.sortComparator = sortComparator;
+	}
 
-    @Override
-    public Item getItem() {
-        return item;
-    }
+	@Override
+	public Item getItem() {
+		return item;
+	}
 
-    @Override
-    public String getStoreName() {
-        return item.getName();
-    }
+	@Override
+	public String getStoreName() {
+		return item.getName();
+	}
 
-    @Override
-    public String getStoreUrl() {
-        return item.getUrl();
-    }
+	@Override
+	public String getStoreUrl() {
+		return item.getUrl();
+	}
 
-    @Override
-    public boolean isFolder() {
-        return item.isFolder();
-    }
+	@Override
+	public boolean isFolder() {
+		return item.isFolder();
+	}
 
-    @Override
-    public Document getDom() {
-        return item.getDescriptorDom();
-    }
+	@Override
+	public Document getDom() {
+		return item.getDescriptorDom();
+	}
 
-    @Override
-    public Map<String, Object> getProperties() {
-        return item.getProperties();
-    }
+	@Override
+	public Map<String, Object> getProperties() {
+		return item.getProperties();
+	}
 
-    @Override
-    protected Element getRootElement() {
-        if (getDom() != null) {
-            return getDom().getRootElement();
-        } else {
-            return null;
-        }
-    }
+	@Override
+	protected Element getRootElement() {
+		if (getDom() != null) {
+			return getDom().getRootElement();
+		} else {
+			return null;
+		}
+	}
 
-    @Override
-    public List<SiteItem> getChildItems() {
-        if (childItems == null) {
-            if (item instanceof Tree) {
-                List<Item> treeChildren = ((Tree) item).getChildren();
-                if (CollectionUtils.isNotEmpty(treeChildren)) {
-                    childItems = new ArrayList<>(treeChildren.size());
-                    for (Item treeChild : treeChildren) {
-                        childItems.add(createItemWrapper(treeChild));
-                    }
+	@Override
+	public List<SiteItem> getChildItems() {
+		if (childItems == null) {
+			if (item instanceof Tree) {
+				List<Item> treeChildren = ((Tree) item).getChildren();
+				if (CollectionUtils.isNotEmpty(treeChildren)) {
+					childItems = new ArrayList<>(treeChildren.size());
+					for (Item treeChild : treeChildren) {
+						childItems.add(createItemWrapper(treeChild));
+					}
 
-                    if (sortComparator != null) {
-                        childItems = sortItems(childItems, sortComparator);
-                    }
-                } else {
-                    childItems = Collections.emptyList();
-                }
-            } else {
-                childItems = Collections.emptyList();
-            }
-        }
+					if (sortComparator != null) {
+						childItems = sortItems(childItems, sortComparator);
+					}
+				} else {
+					childItems = Collections.emptyList();
+				}
+			} else {
+				childItems = Collections.emptyList();
+			}
+		}
 
-        return childItems;
-    }
+		return childItems;
+	}
 
-    @Override
-    public SiteItem getChildItem(String storeName) {
-        for (SiteItem childItem : getChildItems()) {
-            if (childItem.getStoreName().equals(storeName)) {
-                return childItem;
-            }
-        }
+	@Override
+	public SiteItem getChildItem(String storeName) {
+		for (SiteItem childItem : getChildItems()) {
+			if (childItem.getStoreName().equals(storeName)) {
+				return childItem;
+			}
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    @Override
-    public String toString() {
-        return "SiteItem[" +
-                "storeName='" + getStoreName() + '\'' +
-                ", storeUrl='" + getStoreUrl() + '\'' +
-                ", folder=" + isFolder() +
-                ']';
-    }
+	@Override
+	public String toString() {
+		return "SiteItem[" +
+			"storeName='" + getStoreName() + '\'' +
+			", storeUrl='" + getStoreUrl() + '\'' +
+			", folder=" + isFolder() +
+			']';
+	}
 
-    @Override
-    public List<SiteItem> sortItems(List<SiteItem> items, Comparator<SiteItem> comparator) {
-        Collections.sort(items, comparator);
+	@Override
+	public List<SiteItem> sortItems(List<SiteItem> items, Comparator<SiteItem> comparator) {
+		Collections.sort(items, comparator);
 
-        return items;
-    }
+		return items;
+	}
 
-    @Override
-    public SiteItem createItemWrapper(Item item) {
-        return new DefaultSiteItem(item, modelFieldConverter, sortComparator);
-    }
+	@Override
+	public SiteItem createItemWrapper(Item item) {
+		return new DefaultSiteItem(item, modelFieldConverter, sortComparator);
+	}
 
 }

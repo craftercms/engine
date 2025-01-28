@@ -23,32 +23,32 @@ import java.util.Map;
  */
 public class QueryRequest {
 
-    protected String query;
-    protected String operationName;
-    protected Map<String, Object> variables;
+	protected String query;
+	protected String operationName;
+	protected Map<String, Object> variables;
 
-    public String getQuery() {
-        return query;
-    }
+	public String getQuery() {
+		return query;
+	}
 
-    public void setQuery(final String query) {
-        this.query = query;
-    }
+	public void setQuery(final String query) {
+		this.query = query;
+	}
 
-    public String getOperationName() {
-        return operationName;
-    }
+	public String getOperationName() {
+		return operationName;
+	}
 
-    public void setOperationName(final String operationName) {
-        this.operationName = operationName;
-    }
+	public void setOperationName(final String operationName) {
+		this.operationName = operationName;
+	}
 
-    public Map<String, Object> getVariables() {
-        return variables;
-    }
+	public Map<String, Object> getVariables() {
+		return variables;
+	}
 
-    public void setVariables(final Map<String, Object> variables) {
-        this.variables = variables;
-    }
+	public void setVariables(final Map<String, Object> variables) {
+		this.variables = variables;
+	}
 
 }

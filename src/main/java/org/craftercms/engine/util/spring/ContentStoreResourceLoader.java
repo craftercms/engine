@@ -27,15 +27,15 @@ import org.springframework.core.io.Resource;
  */
 public class ContentStoreResourceLoader extends DefaultResourceLoader {
 
-    protected SiteContext siteContext;
+	protected SiteContext siteContext;
 
-    public ContentStoreResourceLoader(SiteContext siteContext) {
-        this.siteContext = siteContext;
-    }
+	public ContentStoreResourceLoader(SiteContext siteContext) {
+		this.siteContext = siteContext;
+	}
 
-    @Override
-    protected Resource getResourceByPath(String path) {
-        return new ContentStoreResource(siteContext, path);
-    }
+	@Override
+	protected Resource getResourceByPath(String path) {
+		return new ContentStoreResource(siteContext, path);
+	}
 
 }

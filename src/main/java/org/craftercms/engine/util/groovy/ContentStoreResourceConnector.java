@@ -31,19 +31,19 @@ import org.craftercms.engine.util.url.ContentStoreUrlStreamHandler;
  */
 public class ContentStoreResourceConnector implements ResourceConnector {
 
-    protected ContentStoreUrlStreamHandler urlStreamHandler;
+	protected ContentStoreUrlStreamHandler urlStreamHandler;
 
-    public ContentStoreResourceConnector(SiteContext siteContext) {
-        urlStreamHandler = new ContentStoreUrlStreamHandler(siteContext);
-    }
+	public ContentStoreResourceConnector(SiteContext siteContext) {
+		urlStreamHandler = new ContentStoreUrlStreamHandler(siteContext);
+	}
 
-    @Override
-    public URLConnection getResourceConnection(String name) throws ResourceException {
-        try {
-            return urlStreamHandler.createUrl(name).openConnection();
-        } catch (Exception e) {
-            throw new ResourceException("Unable to open URL connection to '" + name + "'", e);
-        }
-    }
+	@Override
+	public URLConnection getResourceConnection(String name) throws ResourceException {
+		try {
+			return urlStreamHandler.createUrl(name).openConnection();
+		} catch (Exception e) {
+			throw new ResourceException("Unable to open URL connection to '" + name + "'", e);
+		}
+	}
 
 }

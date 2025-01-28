@@ -60,70 +60,70 @@ import org.springframework.context.annotation.Lazy;
  * @author avasquez
  */
 public class TargetedContentDescriptorMergeStrategy extends InheritLevelsMergeStrategy implements
-    DescriptorMergeStrategy {
+	DescriptorMergeStrategy {
 
-    protected DescriptorMergeStrategyResolver mergeStrategyResolver;
-    protected CandidateTargetedUrlsResolver candidateTargetedUrlsResolver;
+	protected DescriptorMergeStrategyResolver mergeStrategyResolver;
+	protected CandidateTargetedUrlsResolver candidateTargetedUrlsResolver;
 
-    public TargetedContentDescriptorMergeStrategy(String levelDescriptorFileName) {
-        super(levelDescriptorFileName);
-    }
+	public TargetedContentDescriptorMergeStrategy(String levelDescriptorFileName) {
+		super(levelDescriptorFileName);
+	}
 
-    @Autowired
-    public void setMergeStrategyResolver(@Lazy DescriptorMergeStrategyResolver mergeStrategyResolver) {
-        this.mergeStrategyResolver = mergeStrategyResolver;
-    }
+	@Autowired
+	public void setMergeStrategyResolver(@Lazy DescriptorMergeStrategyResolver mergeStrategyResolver) {
+		this.mergeStrategyResolver = mergeStrategyResolver;
+	}
 
-    @Autowired
-    public void setCandidateTargetedUrlsResolver(@Lazy CandidateTargetedUrlsResolver candidateTargetedUrlsResolver) {
-        this.candidateTargetedUrlsResolver = candidateTargetedUrlsResolver;
-    }
+	@Autowired
+	public void setCandidateTargetedUrlsResolver(@Lazy CandidateTargetedUrlsResolver candidateTargetedUrlsResolver) {
+		this.candidateTargetedUrlsResolver = candidateTargetedUrlsResolver;
+	}
 
-    @Override
-    public List<MergeableDescriptor> getDescriptors(Context context, CachingOptions cachingOptions,
-                                                    String mainDescriptorUrl,
-                                                    Document mainDescriptorDom) throws XmlMergeException {
-        return getDescriptors(context, cachingOptions, mainDescriptorUrl, mainDescriptorDom, false);
-    }
+	@Override
+	public List<MergeableDescriptor> getDescriptors(Context context, CachingOptions cachingOptions,
+							String mainDescriptorUrl,
+							Document mainDescriptorDom) throws XmlMergeException {
+		return getDescriptors(context, cachingOptions, mainDescriptorUrl, mainDescriptorDom, false);
+	}
 
-    @Override
-    public List<MergeableDescriptor> getDescriptors(Context context, CachingOptions cachingOptions,
-                                                    String mainDescriptorUrl, Document mainDescriptorDom,
-                                                    boolean mainDescriptorOptional) throws XmlMergeException {
-        Set<MergeableDescriptor> results = new LinkedHashSet<>();
-        List<String> candidateUrls = candidateTargetedUrlsResolver.getUrls(mainDescriptorUrl);
+	@Override
+	public List<MergeableDescriptor> getDescriptors(Context context, CachingOptions cachingOptions,
+							String mainDescriptorUrl, Document mainDescriptorDom,
+							boolean mainDescriptorOptional) throws XmlMergeException {
+		Set<MergeableDescriptor> results = new LinkedHashSet<>();
+		List<String> candidateUrls = candidateTargetedUrlsResolver.getUrls(mainDescriptorUrl);
 
-        for (ListIterator<String> iter = candidateUrls.listIterator(candidateUrls.size()); iter.hasPrevious();) {
-            String candidateUrl = iter.previous();
-            if (!candidateUrl.equals(mainDescriptorUrl)) {
-                Document descriptorDom = getDescriptorDom(context, cachingOptions, candidateUrl);
+		for (ListIterator<String> iter = candidateUrls.listIterator(candidateUrls.size()); iter.hasPrevious(); ) {
+			String candidateUrl = iter.previous();
+			if (!candidateUrl.equals(mainDescriptorUrl)) {
+				Document descriptorDom = getDescriptorDom(context, cachingOptions, candidateUrl);
 
-                if (descriptorDom != null) {
-                    DescriptorMergeStrategy mergeStrategy = mergeStrategyResolver.getStrategy(candidateUrl,
-                                                                                              descriptorDom);
-                    List<MergeableDescriptor> descriptors = mergeStrategy.getDescriptors(context, cachingOptions,
-                                                                                         candidateUrl, descriptorDom,
-                                                                                         true);
+				if (descriptorDom != null) {
+					DescriptorMergeStrategy mergeStrategy = mergeStrategyResolver.getStrategy(candidateUrl,
+						descriptorDom);
+					List<MergeableDescriptor> descriptors = mergeStrategy.getDescriptors(context, cachingOptions,
+						candidateUrl, descriptorDom,
+						true);
 
-                    results.addAll(descriptors);
-                }
-            }
-        }
+					results.addAll(descriptors);
+				}
+			}
+		}
 
-        List<MergeableDescriptor> descriptors = super.getDescriptors(context, cachingOptions, mainDescriptorUrl,
-                                                                     mainDescriptorDom, mainDescriptorOptional);
-        results.addAll(descriptors);
+		List<MergeableDescriptor> descriptors = super.getDescriptors(context, cachingOptions, mainDescriptorUrl,
+			mainDescriptorDom, mainDescriptorOptional);
+		results.addAll(descriptors);
 
-        return new ArrayList<>(results);
-    }
+		return new ArrayList<>(results);
+	}
 
-    protected Document getDescriptorDom(Context context, CachingOptions cachingOptions, String url) {
-        Item item = context.getStoreAdapter().findItem(context, cachingOptions, url, true);
-        if (item != null) {
-            return item.getDescriptorDom();
-        } else {
-            return null;
-        }
-    }
+	protected Document getDescriptorDom(Context context, CachingOptions cachingOptions, String url) {
+		Item item = context.getStoreAdapter().findItem(context, cachingOptions, url, true);
+		if (item != null) {
+			return item.getDescriptorDom();
+		} else {
+			return null;
+		}
+	}
 
 }

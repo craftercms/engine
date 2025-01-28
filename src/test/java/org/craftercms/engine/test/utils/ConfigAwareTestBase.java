@@ -30,7 +30,9 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import static org.mockito.Mockito.mock;
+
 import java.util.Map;
+
 import static org.mockito.Mockito.when;
 
 /**
@@ -39,48 +41,48 @@ import static org.mockito.Mockito.when;
  * @author avasquez
  */
 public class ConfigAwareTestBase {
-    private static final String CONTEXT_NAME = "contextName";
-    private static final String CONTEXT_NAME_VALUE = "crafter-test";
+	private static final String CONTEXT_NAME = "contextName";
+	private static final String CONTEXT_NAME_VALUE = "crafter-test";
 
-    @Spy
-    protected SiteContext siteContext;
-    protected XMLConfiguration config;
+	@Spy
+	protected SiteContext siteContext;
+	protected XMLConfiguration config;
 
-    @Before
-    public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+	@Before
+	public void setUp() throws Exception {
+		MockitoAnnotations.initMocks(this);
 
-        when(siteContext.getSiteName()).thenReturn("test");
-        when(siteContext.getContext()).thenReturn(mock(Context.class));
+		when(siteContext.getSiteName()).thenReturn("test");
+		when(siteContext.getContext()).thenReturn(mock(Context.class));
 
-        setCurrentRequestContext();
-        setCurrentSiteContext();
-        Map<String, String> contextConfigVariables = Map.of(CONTEXT_NAME, CONTEXT_NAME_VALUE);
-        config = ConfigUtils.readXmlConfiguration(new ClassPathResource("config/site-config.xml"), ',', null, contextConfigVariables);
+		setCurrentRequestContext();
+		setCurrentSiteContext();
+		Map<String, String> contextConfigVariables = Map.of(CONTEXT_NAME, CONTEXT_NAME_VALUE);
+		config = ConfigUtils.readXmlConfiguration(new ClassPathResource("config/site-config.xml"), ',', null, contextConfigVariables);
 
-        when(siteContext.getConfig()).thenReturn(config);
-    }
+		when(siteContext.getConfig()).thenReturn(config);
+	}
 
-    @After
-    public void tearDown() throws Exception {
-        clearCurrentRequestContext();
-    }
+	@After
+	public void tearDown() throws Exception {
+		clearCurrentRequestContext();
+	}
 
-    private void setCurrentSiteContext() {
-        SiteContext.setCurrent(siteContext);
-    }
+	private void setCurrentSiteContext() {
+		SiteContext.setCurrent(siteContext);
+	}
 
-    private void setCurrentRequestContext() {
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/");
-        request.setPathInfo("/");
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        RequestContext context = new RequestContext(request, response, null);
+	private void setCurrentRequestContext() {
+		MockHttpServletRequest request = new MockHttpServletRequest("GET", "/");
+		request.setPathInfo("/");
+		MockHttpServletResponse response = new MockHttpServletResponse();
+		RequestContext context = new RequestContext(request, response, null);
 
-        RequestContext.setCurrent(context);
-    }
+		RequestContext.setCurrent(context);
+	}
 
-    private void clearCurrentRequestContext() {
-        RequestContext.clear();
-    }
+	private void clearCurrentRequestContext() {
+		RequestContext.clear();
+	}
 
 }

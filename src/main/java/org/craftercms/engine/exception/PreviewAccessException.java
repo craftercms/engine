@@ -21,7 +21,7 @@ import org.springframework.http.HttpStatus;
  * Exception thrown when the user is not authorized to preview the site.
  */
 public class PreviewAccessException extends HttpStatusCodeException {
-    public PreviewAccessException(HttpStatus status, String message) {
-        super(status, message);
-    }
+	public PreviewAccessException(HttpStatus status, String message) {
+		super(status, message);
+	}
 }

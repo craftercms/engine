@@ -35,72 +35,72 @@ import static java.util.Collections.emptyList;
  * @since 4.0.0
  */
 public abstract class LocaleUtils extends org.craftercms.commons.locale.LocaleUtils {
-    
-    public static Locale getCurrentLocale() {
-        return LocaleContextHolder.getLocale();
-    }
 
-    public static boolean isTranslationEnabled() {
-        var context = SiteContext.getCurrent();
-        if (context != null) {
-            return context.isTranslationEnabled();
-        }
-        return false;
-    }
+	public static Locale getCurrentLocale() {
+		return LocaleContextHolder.getLocale();
+	}
 
-    public static Locale getDefaultLocale() {
-        var context = SiteContext.getCurrent();
-        if (context != null) {
-            return getDefaultLocale(context.getTranslationConfig());
-        }
-        return null;
-    }
+	public static boolean isTranslationEnabled() {
+		var context = SiteContext.getCurrent();
+		if (context != null) {
+			return context.isTranslationEnabled();
+		}
+		return false;
+	}
 
-    public static Locale getDefaultLocale(Configuration config) {
-        if (config != null) {
-            return parseLocale(config.getString(CONFIG_KEY_DEFAULT_LOCALE, null));
-        }
-        return null;
-    }
+	public static Locale getDefaultLocale() {
+		var context = SiteContext.getCurrent();
+		if (context != null) {
+			return getDefaultLocale(context.getTranslationConfig());
+		}
+		return null;
+	}
 
-    public static boolean isLocaleFallbackEnabled() {
-        var context = SiteContext.getCurrent();
-        if (context != null) {
-            var config = context.getTranslationConfig();
-            if (config != null) {
-                return config.getBoolean(CONFIG_KEY_FALLBACK, false);
-            }
-        }
-        return false;
-    }
+	public static Locale getDefaultLocale(Configuration config) {
+		if (config != null) {
+			return parseLocale(config.getString(CONFIG_KEY_DEFAULT_LOCALE, null));
+		}
+		return null;
+	}
 
-    public static List<Locale> getCompatibleLocales() {
-        var currentLocale = LocaleContextHolder.getLocale();
-        var defaultLocale = isLocaleFallbackEnabled()? getDefaultLocale() : null;
-        return getCompatibleLocales(currentLocale, defaultLocale);
-    }
+	public static boolean isLocaleFallbackEnabled() {
+		var context = SiteContext.getCurrent();
+		if (context != null) {
+			var config = context.getTranslationConfig();
+			if (config != null) {
+				return config.getBoolean(CONFIG_KEY_FALLBACK, false);
+			}
+		}
+		return false;
+	}
 
-    public static String resolveLocalePath(String path, Predicate<String> exists) {
-        var currentLocale = LocaleContextHolder.getLocale();
-        var defaultLocale = isLocaleFallbackEnabled()? getDefaultLocale() : null;
-        return findPath(path, currentLocale, defaultLocale, exists);
-    }
+	public static List<Locale> getCompatibleLocales() {
+		var currentLocale = LocaleContextHolder.getLocale();
+		var defaultLocale = isLocaleFallbackEnabled() ? getDefaultLocale() : null;
+		return getCompatibleLocales(currentLocale, defaultLocale);
+	}
 
-    public static List<Locale> getSupportedLocales() {
-        var context = SiteContext.getCurrent();
-        if (context != null) {
-            return getSupportedLocales(context.getTranslationConfig());
-        }
-        return emptyList();
-    }
+	public static String resolveLocalePath(String path, Predicate<String> exists) {
+		var currentLocale = LocaleContextHolder.getLocale();
+		var defaultLocale = isLocaleFallbackEnabled() ? getDefaultLocale() : null;
+		return findPath(path, currentLocale, defaultLocale, exists);
+	}
 
-    public static List<Locale> getSupportedLocales(Configuration config) {
-        if (config != null) {
-            return parseLocales(config.getList(String.class, CONFIG_KEY_SUPPORTED_LOCALES)).stream()
-                    .map(locale -> getCompatibleLocales(locale, null))
-                    .reduce(new LinkedList<>(), ListUtils::union);
-        }
-        return emptyList();
-    }
+	public static List<Locale> getSupportedLocales() {
+		var context = SiteContext.getCurrent();
+		if (context != null) {
+			return getSupportedLocales(context.getTranslationConfig());
+		}
+		return emptyList();
+	}
+
+	public static List<Locale> getSupportedLocales(Configuration config) {
+		if (config != null) {
+			return parseLocales(config.getList(String.class, CONFIG_KEY_SUPPORTED_LOCALES)).stream()
+				.map(locale -> getCompatibleLocales(locale, null))
+				.reduce(new LinkedList<>(), ListUtils::union);
+		}
+		return emptyList();
+	}
 
 }

@@ -26,12 +26,12 @@ import org.craftercms.engine.exception.ConfigurationException;
  */
 public interface ConfigurationParser<T> {
 
-    /**
-     * Parses the specified config.
-     *
-     * @param config the config to parse
-     * @return the object created from the config
-     */
-    T parse(HierarchicalConfiguration config) throws ConfigurationException;
+	/**
+	 * Parses the specified config.
+	 *
+	 * @param config the config to parse
+	 * @return the object created from the config
+	 */
+	T parse(HierarchicalConfiguration config) throws ConfigurationException;
 
 }

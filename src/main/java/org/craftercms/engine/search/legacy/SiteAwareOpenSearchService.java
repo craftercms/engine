@@ -52,181 +52,182 @@ import static org.opensearch.index.query.QueryBuilders.*;
 /**
  * Implementation of {@link org.craftercms.search.opensearch.OpenSearchWrapper}
  * that sets the index based on the current site context for all search requests.
+ *
  * @author joseross
  * @since 3.1
  */
 public class SiteAwareOpenSearchService extends AbstractOpenSearchWrapper {
 
-    private static final String DEFAULT_ROLE_FIELD_NAME = "authorizedRoles.item.role";
+	private static final String DEFAULT_ROLE_FIELD_NAME = "authorizedRoles.item.role";
 
-    private static final String DEFAULT_LOCALES_PARAM_NAME = "locales";
+	private static final String DEFAULT_LOCALES_PARAM_NAME = "locales";
 
-    private static final String DEFAULT_FALLBACK_PARAM_NAME = "localeFallback";
+	private static final String DEFAULT_FALLBACK_PARAM_NAME = "localeFallback";
 
 
-    /**
-     * Format used to build the index id
-     */
-    protected String indexIdFormat;
+	/**
+	 * Format used to build the index id
+	 */
+	protected String indexIdFormat;
 
-    protected String roleFieldName = DEFAULT_ROLE_FIELD_NAME;
+	protected String roleFieldName = DEFAULT_ROLE_FIELD_NAME;
 
-    protected String localesParameterName = DEFAULT_LOCALES_PARAM_NAME;
+	protected String localesParameterName = DEFAULT_LOCALES_PARAM_NAME;
 
-    protected String fallbackParameterName = DEFAULT_FALLBACK_PARAM_NAME;
+	protected String fallbackParameterName = DEFAULT_FALLBACK_PARAM_NAME;
 
-    protected final boolean enableTranslation;
+	protected final boolean enableTranslation;
 
-    @ConstructorProperties({"client", "indexIdFormat", "enableTranslation"})
-    public SiteAwareOpenSearchService(RestHighLevelClient client, String indexIdFormat, boolean enableTranslation) {
-        super(client);
-        this.indexIdFormat = indexIdFormat;
-        this.enableTranslation = enableTranslation;
-    }
+	@ConstructorProperties({"client", "indexIdFormat", "enableTranslation"})
+	public SiteAwareOpenSearchService(RestHighLevelClient client, String indexIdFormat, boolean enableTranslation) {
+		super(client);
+		this.indexIdFormat = indexIdFormat;
+		this.enableTranslation = enableTranslation;
+	}
 
-    public void setRoleFieldName(final String roleFieldName) {
-        this.roleFieldName = roleFieldName;
-    }
+	public void setRoleFieldName(final String roleFieldName) {
+		this.roleFieldName = roleFieldName;
+	}
 
-    public void setLocalesParameterName(String localesParameterName) {
-        this.localesParameterName = localesParameterName;
-    }
+	public void setLocalesParameterName(String localesParameterName) {
+		this.localesParameterName = localesParameterName;
+	}
 
-    public void setFallbackParameterName(String fallbackParameterName) {
-        this.fallbackParameterName = fallbackParameterName;
-    }
+	public void setFallbackParameterName(String fallbackParameterName) {
+		this.fallbackParameterName = fallbackParameterName;
+	}
 
-    protected List<Locale> getLocales() {
-        if (!(enableTranslation && isTranslationEnabled())) {
-            return emptyList();
-        }
-        var locales = setUniqueList(new LinkedList<Locale>());
-        var requestContext = RequestContext.getCurrent();
-        String useFallback = null;
-        if (requestContext != null) {
-            var httpRequest = requestContext.getRequest();
-            var requestedLocales = httpRequest.getParameter(localesParameterName);
-            useFallback = httpRequest.getParameter(fallbackParameterName);
-            if (StringUtils.isNotEmpty(requestedLocales)) {
-                // split the locales and add all compatible versions to the list
-                Stream.of(requestedLocales.split(","))
-                        .map(LocaleUtils::parseLocale)
-                        .map(LocaleUtils::getCompatibleLocales)
-                        .forEach(locales::addAll);
-            }
-        }
-        // if no locales are requested then use the current
-        if (locales.isEmpty()) {
-            locales.addAll(getCompatibleLocales(getCurrentLocale()));
-        }
-        // if fallback is requested then include the default locale too
-        if (StringUtils.isNotEmpty(useFallback) && Boolean.parseBoolean(useFallback)) {
-            locales.addAll(getCompatibleLocales(getDefaultLocale()));
-        }
-        return locales;
-    }
+	protected List<Locale> getLocales() {
+		if (!(enableTranslation && isTranslationEnabled())) {
+			return emptyList();
+		}
+		var locales = setUniqueList(new LinkedList<Locale>());
+		var requestContext = RequestContext.getCurrent();
+		String useFallback = null;
+		if (requestContext != null) {
+			var httpRequest = requestContext.getRequest();
+			var requestedLocales = httpRequest.getParameter(localesParameterName);
+			useFallback = httpRequest.getParameter(fallbackParameterName);
+			if (StringUtils.isNotEmpty(requestedLocales)) {
+				// split the locales and add all compatible versions to the list
+				Stream.of(requestedLocales.split(","))
+					.map(LocaleUtils::parseLocale)
+					.map(LocaleUtils::getCompatibleLocales)
+					.forEach(locales::addAll);
+			}
+		}
+		// if no locales are requested then use the current
+		if (locales.isEmpty()) {
+			locales.addAll(getCompatibleLocales(getCurrentLocale()));
+		}
+		// if fallback is requested then include the default locale too
+		if (StringUtils.isNotEmpty(useFallback) && Boolean.parseBoolean(useFallback)) {
+			locales.addAll(getCompatibleLocales(getDefaultLocale()));
+		}
+		return locales;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void updateIndex(final SearchRequest request) {
-        SiteContext siteContext = SiteContext.getCurrent();
-        if (siteContext == null) {
-            throw new IllegalStateException("Current site context not found");
-        }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void updateIndex(final SearchRequest request) {
+		SiteContext siteContext = SiteContext.getCurrent();
+		if (siteContext == null) {
+			throw new IllegalStateException("Current site context not found");
+		}
 
-        // Generate the default alias for the current site
-        String aliasName = String.format(indexIdFormat, siteContext.getSiteName());
-        // Get the requested indices
-        String[] currentIndices = request.indices();
+		// Generate the default alias for the current site
+		String aliasName = String.format(indexIdFormat, siteContext.getSiteName());
+		// Get the requested indices
+		String[] currentIndices = request.indices();
 
-        // list of aliases to query
-        var aliases = new LinkedList<String>();
-        var locales = getLocales();
+		// list of aliases to query
+		var aliases = new LinkedList<String>();
+		var locales = getLocales();
 
-        if (!locales.isEmpty()) {
-            locales.stream()
-                    .map(locale -> appendLocale(aliasName, locale))
-                    .forEach(aliases::add);
-        }
+		if (!locales.isEmpty()) {
+			locales.stream()
+				.map(locale -> appendLocale(aliasName, locale))
+				.forEach(aliases::add);
+		}
 
-        // the original alias will always be included for backward compatibility
-        aliases.add(aliasName);
+		// the original alias will always be included for backward compatibility
+		aliases.add(aliasName);
 
-        if (ArrayUtils.isNotEmpty(currentIndices)) {
-            // Add the site name prefix for all indices
-            Stream.of(currentIndices).map(index -> addPrefix(siteContext, index)).forEach(aliases::add);
+		if (ArrayUtils.isNotEmpty(currentIndices)) {
+			// Add the site name prefix for all indices
+			Stream.of(currentIndices).map(index -> addPrefix(siteContext, index)).forEach(aliases::add);
 
-            // Add the site name prefix for the boosting if needed
-            List<SearchSourceBuilder.IndexBoost> indexBoosts = new ArrayList<>(request.source().indexBoosts());
-            if (isNotEmpty(indexBoosts)) {
-                indexBoosts.forEach(indexBoost ->
-                        request.source().indexBoost(addPrefix(siteContext, indexBoost.getIndex()),
-                                indexBoost.getBoost()));
-            }
-        }
+			// Add the site name prefix for the boosting if needed
+			List<SearchSourceBuilder.IndexBoost> indexBoosts = new ArrayList<>(request.source().indexBoosts());
+			if (isNotEmpty(indexBoosts)) {
+				indexBoosts.forEach(indexBoost ->
+					request.source().indexBoost(addPrefix(siteContext, indexBoost.getIndex()),
+						indexBoost.getBoost()));
+			}
+		}
 
-        logger.debug("Executing query for aliases: {}", aliases);
+		logger.debug("Executing query for aliases: {}", aliases);
 
-        // Override the indices field in the request
-        request.indices(aliases.toArray(new String[0]));
+		// Override the indices field in the request
+		request.indices(aliases.toArray(new String[0]));
 
-        if (aliases.size() > 1) {
-            // Boost the results based on the index
-            var boost = 1f;
-            var iterator = aliases.listIterator(aliases.size());
-            while (iterator.hasPrevious()) {
-                request.source().indexBoost(iterator.previous(), boost);
-                // TODO: Make this value configurable per site
-                boost += 0.05;
-            }
+		if (aliases.size() > 1) {
+			// Boost the results based on the index
+			var boost = 1f;
+			var iterator = aliases.listIterator(aliases.size());
+			while (iterator.hasPrevious()) {
+				request.source().indexBoost(iterator.previous(), boost);
+				// TODO: Make this value configurable per site
+				boost += 0.05;
+			}
 
-            // Don't fail if one of the indices doesn't exist
-            IndicesOptions originalOptions = request.indicesOptions();
-            request.indicesOptions(IndicesOptions.fromOptions(true, originalOptions.allowNoIndices(),
-                    originalOptions.expandWildcardsOpen(), originalOptions.expandWildcardsClosed(),
-                    originalOptions.allowAliasesToMultipleIndices(), originalOptions.forbidClosedIndices(),
-                    originalOptions.ignoreAliases(), originalOptions.ignoreThrottled()));
+			// Don't fail if one of the indices doesn't exist
+			IndicesOptions originalOptions = request.indicesOptions();
+			request.indicesOptions(IndicesOptions.fromOptions(true, originalOptions.allowNoIndices(),
+				originalOptions.expandWildcardsOpen(), originalOptions.expandWildcardsClosed(),
+				originalOptions.allowAliasesToMultipleIndices(), originalOptions.forbidClosedIndices(),
+				originalOptions.ignoreAliases(), originalOptions.ignoreThrottled()));
 
-            // Fix scores across multiple indices
-            request.searchType(SearchType.DFS_QUERY_THEN_FETCH);
-        }
-    }
+			// Fix scores across multiple indices
+			request.searchType(SearchType.DFS_QUERY_THEN_FETCH);
+		}
+	}
 
-    protected String addPrefix(SiteContext siteContext, String name) {
-        return String.format("%s_%s", siteContext.getSiteName(), name);
-    }
+	protected String addPrefix(SiteContext siteContext, String name) {
+		return String.format("%s_%s", siteContext.getSiteName(), name);
+	}
 
-    @Override
-    protected void updateFilters(final SearchRequest request) {
-        super.updateFilters(request);
+	@Override
+	protected void updateFilters(final SearchRequest request) {
+		super.updateFilters(request);
 
-        BoolQueryBuilder mainQuery = (BoolQueryBuilder) request.source().query();
+		BoolQueryBuilder mainQuery = (BoolQueryBuilder) request.source().query();
 
-        Authentication auth = null;
-        SecurityContext context = SecurityContextHolder.getContext();
-        if (context != null) {
-            auth = context.getAuthentication();
-        }
+		Authentication auth = null;
+		SecurityContext context = SecurityContextHolder.getContext();
+		if (context != null) {
+			auth = context.getAuthentication();
+		}
 
-        // Include all public items
-        BoolQueryBuilder securityQuery = boolQuery()
-                .should(boolQuery().mustNot(existsQuery(roleFieldName)))
-                .should(matchQuery(roleFieldName, ANONYMOUS_PSEUDO_ROLE_SEARCH_VALUE));
+		// Include all public items
+		BoolQueryBuilder securityQuery = boolQuery()
+			.should(boolQuery().mustNot(existsQuery(roleFieldName)))
+			.should(matchQuery(roleFieldName, ANONYMOUS_PSEUDO_ROLE_SEARCH_VALUE));
 
-        if (auth != null && !(auth instanceof AnonymousAuthenticationToken)) {
-            logger.debug("Filtering search results for authenticated users");
-            securityQuery.should(matchQuery(roleFieldName, AUTHENTICATED_PSEUDO_ROLE_SEARCH_VALUE));
-            if (isNotEmpty(auth.getAuthorities())) {
-                logger.debug("Filtering search results for roles: {}", auth.getAuthorities());
-                securityQuery.should(matchQuery(roleFieldName, getAuthorizedRolesMatchValue(auth.getAuthorities())));
-            }
-        } else {
-            logger.debug("Filtering search to show only public items");
-        }
+		if (auth != null && !(auth instanceof AnonymousAuthenticationToken)) {
+			logger.debug("Filtering search results for authenticated users");
+			securityQuery.should(matchQuery(roleFieldName, AUTHENTICATED_PSEUDO_ROLE_SEARCH_VALUE));
+			if (isNotEmpty(auth.getAuthorities())) {
+				logger.debug("Filtering search results for roles: {}", auth.getAuthorities());
+				securityQuery.should(matchQuery(roleFieldName, getAuthorizedRolesMatchValue(auth.getAuthorities())));
+			}
+		} else {
+			logger.debug("Filtering search to show only public items");
+		}
 
-        mainQuery.filter(boolQuery().must(securityQuery));
-    }
+		mainQuery.filter(boolQuery().must(securityQuery));
+	}
 
 }

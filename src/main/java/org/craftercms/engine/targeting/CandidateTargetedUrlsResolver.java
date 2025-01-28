@@ -25,15 +25,14 @@ import java.util.List;
  */
 public interface CandidateTargetedUrlsResolver {
 
-    /**
-     * Resolves all the candidate targeted URLs that should be used for a given targeted URL when attempting
-     * content resolution. For example, if the targeted URL is /products/index_en_US.xml, that candidate
-     * URL list could look like this: /products/index_en_US.xml, /products/index_en.xml, and /products/index.xml.
-     *
-     * @param targetedUrl the targeted URL used to generate the candidate URLs
-     *
-     * @return the list of candidate targeted URLs.
-     */
-    List<String> getUrls(String targetedUrl);
+	/**
+	 * Resolves all the candidate targeted URLs that should be used for a given targeted URL when attempting
+	 * content resolution. For example, if the targeted URL is /products/index_en_US.xml, that candidate
+	 * URL list could look like this: /products/index_en_US.xml, /products/index_en.xml, and /products/index.xml.
+	 *
+	 * @param targetedUrl the targeted URL used to generate the candidate URLs
+	 * @return the list of candidate targeted URLs.
+	 */
+	List<String> getUrls(String targetedUrl);
 
 }

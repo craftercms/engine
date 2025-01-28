@@ -34,34 +34,34 @@ import org.craftercms.engine.service.context.SiteContext;
  */
 public class ContentStoreUrlStreamHandler extends URLStreamHandler {
 
-    private static final String URL_REGEX = "[^:]+:.+";
-    private static final String URL_SCHEME = "site";
+	private static final String URL_REGEX = "[^:]+:.+";
+	private static final String URL_SCHEME = "site";
 
-    protected SiteContext siteContext;
+	protected SiteContext siteContext;
 
-    public ContentStoreUrlStreamHandler(SiteContext siteContext) {
-        this.siteContext = siteContext;
-    }
+	public ContentStoreUrlStreamHandler(SiteContext siteContext) {
+		this.siteContext = siteContext;
+	}
 
-    public URL createUrl(String filename) throws MalformedURLException {
-        if (!filename.matches(URL_REGEX)) {
-            filename = URL_SCHEME + ':' + (!filename.startsWith("/")? "/" : "") + filename;
-        }
+	public URL createUrl(String filename) throws MalformedURLException {
+		if (!filename.matches(URL_REGEX)) {
+			filename = URL_SCHEME + ':' + (!filename.startsWith("/") ? "/" : "") + filename;
+		}
 
-        return new URL(null, filename, this);
-    }
+		return new URL(null, filename, this);
+	}
 
-    @Override
-    protected URLConnection openConnection(URL url) throws IOException {
-        try {
-            Content content = siteContext.getStoreService().getContent(siteContext.getContext(), url.getFile());
+	@Override
+	protected URLConnection openConnection(URL url) throws IOException {
+		try {
+			Content content = siteContext.getStoreService().getContent(siteContext.getContext(), url.getFile());
 
-            return new ContentStoreUrlConnection(url, content);
-        } catch (PathNotFoundException e) {
-            throw new FileNotFoundException("No content found at '" + url.getFile() + "' in content store");
-        } catch (Exception e) {
-            throw new IOException("Error retrieving content at '" + url.getFile() + "' in content store", e);
-        }
-    }
+			return new ContentStoreUrlConnection(url, content);
+		} catch (PathNotFoundException e) {
+			throw new FileNotFoundException("No content found at '" + url.getFile() + "' in content store");
+		} catch (Exception e) {
+			throw new IOException("Error retrieving content at '" + url.getFile() + "' in content store", e);
+		}
+	}
 
 }

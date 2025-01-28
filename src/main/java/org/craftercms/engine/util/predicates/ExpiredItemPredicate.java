@@ -31,33 +31,33 @@ import org.craftercms.core.service.Item;
  */
 public class ExpiredItemPredicate implements Predicate<Item> {
 
-    private static final Log logger = LogFactory.getLog(ExpiredItemPredicate.class);
+	private static final Log logger = LogFactory.getLog(ExpiredItemPredicate.class);
 
-    protected String expiredXPathQuery;
-    protected Converter<String, Date> dateConverter;
+	protected String expiredXPathQuery;
+	protected Converter<String, Date> dateConverter;
 
-    public ExpiredItemPredicate(String expiredXPathQuery, Converter<String, Date> dateConverter) {
-        this.expiredXPathQuery = expiredXPathQuery;
-        this.dateConverter = dateConverter;
-    }
+	public ExpiredItemPredicate(String expiredXPathQuery, Converter<String, Date> dateConverter) {
+		this.expiredXPathQuery = expiredXPathQuery;
+		this.dateConverter = dateConverter;
+	}
 
-    @Override
-    public boolean evaluate(Item item) {
-        String expired = item.queryDescriptorValue(expiredXPathQuery);
-        if (StringUtils.isNotEmpty(expired)) {
-            Date expiredDate = dateConverter.convert(expired);
-            Date now = new Date();
+	@Override
+	public boolean evaluate(Item item) {
+		String expired = item.queryDescriptorValue(expiredXPathQuery);
+		if (StringUtils.isNotEmpty(expired)) {
+			Date expiredDate = dateConverter.convert(expired);
+			Date now = new Date();
 
-            if (now.before(expiredDate)) {
-                return true;
-            } else {
-                logger.info("Item " + item.getDescriptorUrl() + " has expired");
+			if (now.before(expiredDate)) {
+				return true;
+			} else {
+				logger.info("Item " + item.getDescriptorUrl() + " has expired");
 
-                return false;
-            }
-        } else {
-            return true;
-        }
-    }
-    
+				return false;
+			}
+		} else {
+			return true;
+		}
+	}
+
 }

@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 
 import jakarta.servlet.http.HttpServletRequest;
+
 import java.util.Enumeration;
 import java.util.Locale;
 
@@ -31,48 +32,48 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
  * Implementation of {@link ConfigAwareLocaleResolver} that reads the locale from a request header.
  *
  * <p>Supported configuration properties:</p>
- *  <ul>
- *      <li><strong>headerName</strong>: The name of the request header, defaults to
- *      {@code Accept-Language}</li>
- *  </ul>
+ * <ul>
+ *     <li><strong>headerName</strong>: The name of the request header, defaults to
+ *     {@code Accept-Language}</li>
+ * </ul>
  *
  * @author joseross
  * @since 4.0.0
  */
 public class HeaderLocaleResolver extends ConfigAwareLocaleResolver {
 
-    private static final Logger logger = LoggerFactory.getLogger(HeaderLocaleResolver.class);
+	private static final Logger logger = LoggerFactory.getLogger(HeaderLocaleResolver.class);
 
-    public static final String CONFIG_KEY_HEADER_NAME = "headerName";
-    public static final String DEFAULT_HEADER_NAME = HttpHeaders.ACCEPT_LANGUAGE;
+	public static final String CONFIG_KEY_HEADER_NAME = "headerName";
+	public static final String DEFAULT_HEADER_NAME = HttpHeaders.ACCEPT_LANGUAGE;
 
-    /**
-     * The name of the header
-     */
-    protected String headerName;
+	/**
+	 * The name of the header
+	 */
+	protected String headerName;
 
-    @Override
-    protected void init(HierarchicalConfiguration<?> config) {
-        headerName = config.getString(CONFIG_KEY_HEADER_NAME, DEFAULT_HEADER_NAME);
-    }
+	@Override
+	protected void init(HierarchicalConfiguration<?> config) {
+		headerName = config.getString(CONFIG_KEY_HEADER_NAME, DEFAULT_HEADER_NAME);
+	}
 
-    @Override
-    protected Locale resolveLocale(SiteContext siteContext, HttpServletRequest request) {
-        if (isNotEmpty(request.getHeader(headerName))) {
-            Enumeration<Locale> locales = request.getLocales();
-            while (locales.hasMoreElements()) {
-                Locale locale = locales.nextElement();
-                if (isSupported(locale)) {
-                    logger.debug("Found supported locale '{}' requested by the client", locale);
-                    return locale;
-                } else {
-                    logger.debug("Locale '{}' requested by the client is not supported, will be skipped", locale);
-                }
-            }
-        } else {
-            logger.debug("The request doesn't include a '{}' header, will be skipped", headerName);
-        }
-        return null;
-    }
+	@Override
+	protected Locale resolveLocale(SiteContext siteContext, HttpServletRequest request) {
+		if (isNotEmpty(request.getHeader(headerName))) {
+			Enumeration<Locale> locales = request.getLocales();
+			while (locales.hasMoreElements()) {
+				Locale locale = locales.nextElement();
+				if (isSupported(locale)) {
+					logger.debug("Found supported locale '{}' requested by the client", locale);
+					return locale;
+				} else {
+					logger.debug("Locale '{}' requested by the client is not supported, will be skipped", locale);
+				}
+			}
+		} else {
+			logger.debug("The request doesn't include a '{}' header, will be skipped", headerName);
+		}
+		return null;
+	}
 
 }

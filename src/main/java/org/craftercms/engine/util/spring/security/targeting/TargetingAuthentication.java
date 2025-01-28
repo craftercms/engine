@@ -26,25 +26,25 @@ import org.craftercms.security.authentication.Authentication;
  */
 public class TargetingAuthentication implements Authentication {
 
-    protected Profile profile;
+	protected Profile profile;
 
-    public TargetingAuthentication(Profile profile) {
-        this.profile = profile;
-    }
+	public TargetingAuthentication(Profile profile) {
+		this.profile = profile;
+	}
 
-    @Override
-    public String getTicket() {
-        return null;
-    }
+	@Override
+	public String getTicket() {
+		return null;
+	}
 
-    @Override
-    public Profile getProfile() {
-        return profile;
-    }
+	@Override
+	public Profile getProfile() {
+		return profile;
+	}
 
-    @Override
-    public boolean isRemembered() {
-        return false;
-    }
+	@Override
+	public boolean isRemembered() {
+		return false;
+	}
 
 }
