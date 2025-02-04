@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2025 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -15,10 +15,7 @@
  */
 package org.craftercms.engine.util.servlet;
 
-import org.apache.http.Header;
-import org.apache.http.HttpEntityEnclosingRequest;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
+import org.apache.http.*;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.craftercms.engine.websocket.WsUpgradeHandler;
@@ -94,22 +91,37 @@ public class ConfigAwareProxyServlet extends ProxyServlet {
         return super.newProxyRequestWithEntity(method, proxyRequestUri, request);
     }
 
-    /**
-     * Override how ProxyServlet copy response headers.
-     * If a header is added via HttpProxyFilter, do not add it again
-     * @param proxyResponse
-     * @param servletRequest
-     * @param servletResponse
-     */
-    @Override
-    protected void copyResponseHeaders(HttpResponse proxyResponse, HttpServletRequest servletRequest,
-                                       HttpServletResponse servletResponse) {
-        for (Header header : proxyResponse.getAllHeaders()) {
-            if (!servletResponse.containsHeader(header.getName())) {
-                copyResponseHeader(servletRequest, servletResponse, header);
-            }
-        }
-    }
+	/**
+	 * Overrides how ProxyServlet copies response headers from the proxied response to the client response.
+	 * This method ensures that headers added by HttpProxyFilter are not duplicated.
+	 * Additionally, it handles special cases for headers like SET_COOKIE, SET_COOKIE2, and LOCATION.
+	 *
+	 * @param servletRequest  The HttpServletRequest from the client.
+	 * @param servletResponse The HttpServletResponse to the client.
+	 * @param header          The header from the proxied response that needs to be copied.
+	 * Special handling includes:
+	 * - Skip copying hop-by-hop headers as they are not meant to be forwarded.
+	 * - For SET_COOKIE and SET_COOKIE2 headers, cookies are processed and set in the client response.
+	 * - For the LOCATION header, the URL is rewritten to ensure it points to the correct destination.
+	 * - For other headers, the header is only added if it does not already exist in the client response.
+	 */
+	@Override
+	protected void copyResponseHeader(HttpServletRequest servletRequest,
+									  HttpServletResponse servletResponse, Header header) {
+		String headerName = header.getName();
+		if (hopByHopHeaders.containsHeader(headerName))
+			return;
+		String headerValue = header.getValue();
+		if (headerName.equalsIgnoreCase(org.apache.http.cookie.SM.SET_COOKIE) ||
+				headerName.equalsIgnoreCase(org.apache.http.cookie.SM.SET_COOKIE2)) {
+			copyProxyCookie(servletRequest, servletResponse, headerValue);
+		} else if (headerName.equalsIgnoreCase(HttpHeaders.LOCATION)) {
+			// LOCATION Header may have to be rewritten.
+			servletResponse.addHeader(headerName, rewriteUrlFromResponse(servletRequest, headerValue));
+		} else if (!servletResponse.containsHeader(header.getName())) {
+			servletResponse.addHeader(headerName, headerValue);
+		}
+	}
 
     @Override
     protected void service(HttpServletRequest servletRequest, HttpServletResponse servletResponse)
