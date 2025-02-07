@@ -41,12 +41,6 @@
 	</parent>
 
 	<dependencies>
-		<!-- Overrides -->
-		<dependency>
-			<groupId>com.squareup.okio</groupId><!-- Override -->
-			<artifactId>okio-jvm</artifactId>
-		</dependency>
-
 		<!-- Dependencies -->
 		<dependency>
 			<groupId>jakarta.servlet</groupId>
