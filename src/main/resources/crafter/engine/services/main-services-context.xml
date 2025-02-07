@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
-  ~
-  ~ This program is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU General Public License version 3 as published by
-  ~ the Free Software Foundation.
-  ~
-  ~ This program is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~ GNU General Public License for more details.
-  ~
-  ~ You should have received a copy of the GNU General Public License
-  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  * Copyright (C) 2007-2025 Crafter Software Corporation. All Rights Reserved.
+  *
+  * This program is free software: you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License version 3 as published by
+  * the Free Software Foundation.
+  *
+  * This program is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU General Public License for more details.
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
 <beans xmlns="http://www.springframework.org/schema/beans"
@@ -941,21 +941,9 @@
         <constructor-arg name="configurationProvider" ref="crafter.configurationProvider"/>
     </bean>
 
-    <bean id="crafter.boxProfileLoader"
-          class="org.craftercms.engine.util.config.profiles.ConfigurationProfileLoaderImpl">
-        <constructor-arg name="profilesModule" value="${crafter.engine.site.default.config.box.profiles.module}"/>
-        <constructor-arg name="profilesUrl" value="${crafter.engine.site.default.config.box.profiles.path}"/>
-        <constructor-arg name="profileMapper">
-            <bean class="org.craftercms.commons.config.profiles.box.BoxProfileMapper">
-                <constructor-arg name="configurationResolver" ref="crafter.configurationResolver"/>
-            </bean>
-        </constructor-arg>
-        <constructor-arg name="configurationProvider" ref="crafter.configurationProvider"/>
-    </bean>
-
     <bean id="crafter.webDavProfileLoader"
           class="org.craftercms.engine.util.config.profiles.ConfigurationProfileLoaderImpl">
-        <constructor-arg name="profilesModule" value="${crafter.engine.site.default.config.box.profiles.module}"/>
+        <constructor-arg name="profilesModule" value="${crafter.engine.site.default.config.webdav.profiles.module}"/>
         <constructor-arg name="profilesUrl" value="${crafter.engine.site.default.config.webdav.profiles.path}"/>
         <constructor-arg name="profileMapper">
             <bean class="org.craftercms.commons.config.profiles.webdav.WebDavProfileMapper">
@@ -981,10 +969,6 @@
         <constructor-arg name="profileLoader" ref="crafter.s3ProfileLoader"/>
     </bean>
 
-    <bean id="crafter.boxFileStore" class="org.craftercms.commons.file.stores.impl.box.BoxFileStore">
-        <constructor-arg name="profileLoader" ref="crafter.boxProfileLoader"/>
-    </bean>
-
     <bean id="crafter.webDavFileStore" class="org.craftercms.commons.file.stores.impl.webdav.WebDavFileStore">
         <constructor-arg name="profileLoader" ref="crafter.webDavProfileLoader"/>
     </bean>
@@ -998,7 +982,6 @@
         <constructor-arg name="stores">
             <map>
                 <entry key="s3" value-ref="crafter.s3FileStore"/>
-                <entry key="box" value-ref="crafter.boxFileStore"/>
                 <entry key="webdav" value-ref="crafter.webDavFileStore"/>
             </map>
         </constructor-arg>
