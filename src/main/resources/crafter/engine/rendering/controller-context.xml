@@ -109,8 +109,10 @@
         <constructor-arg name="wrappedController" ref="crafter.contentStoreRestController"/>
     </bean>
 
-    <bean id="crafter.siteCacheRestController" class="org.craftercms.engine.controller.rest.SiteCacheRestController">
-        <constructor-arg name="configuredToken" value="${crafter.engine.management.authorizationToken}" />
+    <bean id="crafter.siteInternalCacheRestController"
+          class="org.craftercms.engine.controller.rest.SiteInternalCacheRestController">
+        <constructor-arg name="cacheService" ref="crafter.cacheService"/>
+        <constructor-arg name="configuredToken" value="${crafter.engine.management.authorizationToken}"/>
     </bean>
 
     <bean id="crafter.siteNavigationRestController"
@@ -142,5 +144,13 @@
         <entry key="/remote-assets/**" value-ref="crafter.remoteAssetsRequestHandler"/>
         <entry key="/*" value-ref="crafter.pageRenderController"/>
     </util:map>
+
+    <beans profile="crafter.core.applicationCache">
+        <bean id="crafter.siteAppCacheRestController"
+              class="org.craftercms.engine.controller.rest.SiteAppCacheRestController">
+            <constructor-arg name="cacheService" ref="crafter.appCacheService"/>
+            <constructor-arg name="configuredToken" value="${crafter.engine.management.authorizationToken}"/>
+        </bean>
+    </beans>
 
 </beans>

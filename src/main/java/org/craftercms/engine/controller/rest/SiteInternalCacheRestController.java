@@ -17,13 +17,12 @@
 package org.craftercms.engine.controller.rest;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.exceptions.InvalidManagementTokenException;
-import org.craftercms.core.cache.CacheStatistics;
 import org.craftercms.core.controller.rest.CrafterRestController;
 import org.craftercms.core.controller.rest.RestControllerBase;
+import org.craftercms.core.service.CacheService;
 import org.craftercms.engine.event.SiteContextCreatedEvent;
 import org.craftercms.engine.event.SiteEvent;
 import org.craftercms.engine.service.context.SiteContext;
@@ -37,39 +36,37 @@ import java.util.Map;
 import static java.lang.String.format;
 
 /**
- * REST controller for operations related to a site's cache.
+ * REST controller for operations related to a site's internal cache.
  *
- * @author Alfonso Vásquez
+ * @author avasquez
  */
 @CrafterRestController
-@RequestMapping(RestControllerBase.REST_BASE_URI + SiteCacheRestController.URL_ROOT)
-public class SiteCacheRestController extends RestControllerBase {
+@RequestMapping(RestControllerBase.REST_BASE_URI + SiteInternalCacheRestController.URL_ROOT)
+public class SiteInternalCacheRestController extends SiteCacheRestControllerBase {
 
-    private static final Log logger = LogFactory.getLog(SiteCacheRestController.class);
+    private static final Log logger = LogFactory.getLog(SiteInternalCacheRestController.class);
 
     public static final String URL_ROOT = "/site/cache";
-    public static final String URL_CLEAR = "/clear";
-    public static final String URL_STATS = "/statistics";
 
-    private final String configuredToken;
-
-    @ConstructorProperties({"configuredToken"})
-    public SiteCacheRestController(final String configuredToken) {
-        this.configuredToken = configuredToken;
+    @ConstructorProperties({"cacheService", "configuredToken"})
+    public SiteInternalCacheRestController(final CacheService cacheService, final String configuredToken) {
+        super(cacheService, configuredToken);
     }
 
     @RequestMapping(value = URL_CLEAR, method = RequestMethod.GET)
     public Map<String, Object> clear(HttpServletRequest request, @RequestParam String token) throws InvalidManagementTokenException {
         validateToken(token);
+
         SiteContext siteContext = SiteContext.getCurrent();
         String siteName = siteContext.getSiteName();
         String msg;
 
         // Don't clear cache if the context was just created in this request
         if (SiteEvent.getLatestRequestEvent(SiteContextCreatedEvent.class, request) != null) {
-            return createResponseMessage(format("Site context for '%s' created during the request. Cache clear not necessary", siteName));
+            msg = format("Site context for '%s' created during the request. Cache clear not necessary", siteName);
         } else {
             siteContext.startCacheClear();
+
             msg = format("Cache clear for site '%s' started", siteName);
         }
 
@@ -78,17 +75,4 @@ public class SiteCacheRestController extends RestControllerBase {
         return createResponseMessage(msg);
     }
 
-    @RequestMapping(value = URL_STATS, method = RequestMethod.GET)
-    public CacheStatistics getStatistics(@RequestParam String token) throws InvalidManagementTokenException {
-        validateToken(token);
-
-        SiteContext siteContext = SiteContext.getCurrent();
-        return siteContext.getCacheTemplate().getCacheService().getStatistics(siteContext.getContext());
-    }
-
-    protected final void validateToken(final String requestToken) throws InvalidManagementTokenException {
-        if (!StringUtils.equals(requestToken, configuredToken)) {
-            throw new InvalidManagementTokenException("Management authorization failed, invalid token.");
-        }
-    }
 }
