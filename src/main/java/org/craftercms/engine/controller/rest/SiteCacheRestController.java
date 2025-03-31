@@ -51,9 +51,9 @@ public class SiteCacheRestController extends RestControllerBase {
 	public static final String URL_CLEAR = "/clear";
 	public static final String URL_STATS = "/statistics";
 
-	protected Map<String, SiteCacheRestOperations> cacheRestOperationsPerCacheType;
-	protected String defaultCacheType;
-	protected String configuredToken;
+	protected final Map<String, SiteCacheRestOperations> cacheRestOperationsPerCacheType;
+	protected final String defaultCacheType;
+	protected final String configuredToken;
 
 	@ConstructorProperties({"cacheRestOperationsPerCacheType", "defaultCacheType", "configuredToken"})
 	public SiteCacheRestController(final Map<String, SiteCacheRestOperations> cacheRestOperationsPerCacheType,

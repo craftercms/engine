@@ -22,7 +22,7 @@ public class SystemSiteCacheRestOperations extends SiteCacheRestOperationsImpl {
 
 	@Override
 	public String clear(HttpServletRequest request) {
-		SiteContext siteContext = SiteContext.getCurrent();
+		SiteContext siteContext = getCurrentContext();
 		String siteName = siteContext.getSiteName();
 		String msg;
 

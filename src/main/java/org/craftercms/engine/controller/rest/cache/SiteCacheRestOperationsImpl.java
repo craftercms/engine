@@ -30,7 +30,7 @@ public class SiteCacheRestOperationsImpl implements SiteCacheRestOperations {
 
 	@Override
 	public String clear(HttpServletRequest request) {
-		SiteContext siteContext = SiteContext.getCurrent();
+		SiteContext siteContext = getCurrentContext();
 		String siteName = siteContext.getSiteName();
 
 		cacheService.clearScope(siteContext.getContext());
@@ -44,6 +44,15 @@ public class SiteCacheRestOperationsImpl implements SiteCacheRestOperations {
 
 	@Override
 	public CacheStatistics getStatistics() {
-		return cacheService.getStatistics(SiteContext.getCurrent().getContext());
+		return cacheService.getStatistics(getCurrentContext().getContext());
+	}
+
+	protected SiteContext getCurrentContext() {
+		SiteContext siteContext = SiteContext.getCurrent();
+		if (siteContext == null) {
+			throw new IllegalStateException("No current site context found");
+		} else {
+			return siteContext;
+		}
 	}
 }
