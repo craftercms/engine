@@ -34,7 +34,6 @@ import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.util.GroovyScriptUtils;
 import org.jenkinsci.plugins.scriptsecurity.sandbox.groovy.SandboxInterceptor;
 import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -154,7 +153,7 @@ public class SiteContext {
             release(current);
         }
 
-        logger.debug("Getting access lock for context {}", siteContext);
+        logger.debug("Getting access lock for {}", siteContext);
         siteContext.accessLock.lock();
 
         try {
@@ -194,7 +193,7 @@ public class SiteContext {
             siteContext.scriptSandbox.unregister();
         }
 
-        logger.debug("Releasing access lock for context {}", siteContext);
+        logger.debug("Releasing access lock for {}", siteContext);
         siteContext.accessLock.unlock();
     }
 
@@ -453,7 +452,7 @@ public class SiteContext {
                 SiteContext.setCurrent(this);
                 try {
                     logger.info("--------------------------------------------------");
-                    logger.info("<Initializing context site: " + siteName + ">");
+                    logger.info("<Initializing site context: " + siteName + ">");
                     logger.info("--------------------------------------------------");
 
                     if (cacheWarmer != null) {
@@ -466,7 +465,7 @@ public class SiteContext {
                     state = State.READY;
 
                     logger.info("--------------------------------------------------");
-                    logger.info("</Initializing context site: " + siteName + ">");
+                    logger.info("</Initializing site context: " + siteName + ">");
                     logger.info("--------------------------------------------------");
 
                     publishEvent(new SiteContextInitializedEvent(this));
@@ -535,54 +534,64 @@ public class SiteContext {
     public void destroy() throws CrafterException {
         boolean locked;
         try {
-            logger.debug("Getting shutdown lock for context {}", this);
+            logger.debug("Getting shutdown lock for {}", this);
             locked = shutdownLock.tryLock(shutdownTimeout, TimeUnit.MINUTES);
             try {
                 if (!locked) {
-                    logger.debug("Time out reached, proceeding to destroy context {}", this);
+                    logger.debug("Time out reached, proceeding to destroy {}", this);
                 } else {
-                    logger.debug("All threads released, proceeding to destroy context {}", this);
+                    logger.debug("All threads released, proceeding to destroy {}", this);
                 }
 
                 state = State.DESTROYED;
 
-                publishEvent(new SiteContextDestroyedEvent(this));
+                try {
+                    publishEvent(new SiteContextDestroyedEvent(this));
+                } catch (Exception e) {
+                    logger.error("Error while publishing SiteContextDestroyedEvent for {}", this, e);
+                }
 
-                maintenanceTaskExecutor.shutdownNow();
-
-                storeService.destroyContext(context);
+                try {
+                    maintenanceTaskExecutor.shutdownNow();
+                } catch (Exception e) {
+                    logger.error("Error while shutting down maintenance task executor for {}", this, e);
+                }
 
                 if (scheduler != null) {
                     try {
                         scheduler.shutdown();
-                    } catch (SchedulerException e) {
-                        throw new CrafterException("Unable to shutdown scheduler", e);
+                    } catch (Exception e) {
+                        logger.error("Error while shutting scheduler for {}", this, e);
                     }
                 }
                 if (applicationContext != null) {
                     try {
                         applicationContext.close();
                     } catch (Exception e) {
-                        throw new CrafterException("Unable to close application context", e);
+                        logger.error("Error while closing application context for {}", this, e);
                     }
                 }
                 if (classLoader != null) {
                     try {
                         classLoader.close();
                     } catch (Exception e) {
-                        throw new CrafterException("Unable to close class loader", e);
+                        logger.error("Error while closing class loader for {}", this, e);
                     }
                 }
-            } catch (Exception e) {
-                logger.error("Error destroying context {}", this, e);
+
+                try {
+                    storeService.destroyContext(context);
+                } catch (Exception e) {
+                    logger.error("Error while destroying core context for {}", this, e);
+                }
             } finally {
                 if (locked) {
-                    logger.debug("Releasing shutdown lock for context {}", this);
+                    logger.debug("Releasing shutdown lock for {}", this);
                     shutdownLock.unlock();
                 }
             }
         } catch (InterruptedException e) {
-            throw new CrafterException("Unable to destroy context", e);
+            throw new CrafterException("Interrupted while trying to destroy " + this, e);
         }
     }
 
