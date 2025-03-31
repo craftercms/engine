@@ -10,8 +10,8 @@ import org.craftercms.core.exception.CrafterException;
  */
 public class InvalidCacheTypeException extends CrafterException {
 
-    public InvalidCacheTypeException(String message) {
-        super(message);
-    }
+	public InvalidCacheTypeException(String message) {
+		super(message);
+	}
 
 }

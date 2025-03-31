@@ -11,19 +11,19 @@ import org.craftercms.core.cache.CacheStatistics;
  */
 public interface SiteCacheRestOperations {
 
-    /**
-     * Clear the current site's cache
-     *
-     * @param request the current request, used to resolve the site
-     * @return the response message
-     */
-    String clear(HttpServletRequest request);
+	/**
+	 * Clear the current site's cache
+	 *
+	 * @param request the current request, used to resolve the site
+	 * @return the response message
+	 */
+	String clear(HttpServletRequest request);
 
-    /**
-     * Get statistics for the current site's cache
-     *
-     * @return the {@link CacheStatistics}
-     */
-    CacheStatistics getStatistics();
+	/**
+	 * Get statistics for the current site's cache
+	 *
+	 * @return the {@link CacheStatistics}
+	 */
+	CacheStatistics getStatistics();
 
 }

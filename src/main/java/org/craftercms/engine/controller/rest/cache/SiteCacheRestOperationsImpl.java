@@ -19,31 +19,31 @@ import static java.lang.String.format;
  */
 public class SiteCacheRestOperationsImpl implements SiteCacheRestOperations {
 
-    public static final Log logger = LogFactory.getLog(SiteCacheRestOperationsImpl.class);
+	public static final Log logger = LogFactory.getLog(SiteCacheRestOperationsImpl.class);
 
-    protected CacheService cacheService;
+	protected CacheService cacheService;
 
-    @ConstructorProperties({"cacheService"})
-    public SiteCacheRestOperationsImpl(CacheService cacheService) {
-        this.cacheService = cacheService;
-    }
+	@ConstructorProperties({"cacheService"})
+	public SiteCacheRestOperationsImpl(CacheService cacheService) {
+		this.cacheService = cacheService;
+	}
 
-    @Override
-    public String clear(HttpServletRequest request) {
-        SiteContext siteContext = SiteContext.getCurrent();
-        String siteName = siteContext.getSiteName();
+	@Override
+	public String clear(HttpServletRequest request) {
+		SiteContext siteContext = SiteContext.getCurrent();
+		String siteName = siteContext.getSiteName();
 
-        cacheService.clearScope(siteContext.getContext());
+		cacheService.clearScope(siteContext.getContext());
 
-        String msg = format("Cache clear for site '%s' completed", siteName);
+		String msg = format("Cache clear for site '%s' completed", siteName);
 
-        logger.debug(msg);
+		logger.debug(msg);
 
-        return msg;
-    }
+		return msg;
+	}
 
-    @Override
-    public CacheStatistics getStatistics() {
-        return cacheService.getStatistics(SiteContext.getCurrent().getContext());
-    }
+	@Override
+	public CacheStatistics getStatistics() {
+		return cacheService.getStatistics(SiteContext.getCurrent().getContext());
+	}
 }
