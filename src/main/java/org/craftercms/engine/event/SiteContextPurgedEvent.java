@@ -17,6 +17,11 @@ package org.craftercms.engine.event;
 
 import org.craftercms.engine.service.context.SiteContext;
 
+/**
+ * Event published when a {@link SiteContext} has been completely removed from the system.
+ *
+ * @author avasquez
+ */
 public class SiteContextPurgedEvent extends SiteEvent {
 
     /**

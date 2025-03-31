@@ -283,7 +283,8 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         configVariables.put(SITE_NAME_CONFIG_VARIABLE, siteName);
         configVariables.put(SITE_ID_CONFIG_VARIABLE, siteName);
         Context context = storeService.getContext(UUID.randomUUID().toString(), storeType, resolvedRootFolderPath,
-                                                  mergingOn, cacheOn, maxAllowedItemsInCache, ignoreHiddenFiles, configVariables);
+                                                  mergingOn, cacheOn, maxAllowedItemsInCache, ignoreHiddenFiles,
+                                                  configVariables);
 
         try {
             SiteContext siteContext = new SiteContext();
