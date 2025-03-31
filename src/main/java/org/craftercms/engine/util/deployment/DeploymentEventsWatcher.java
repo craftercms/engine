@@ -179,6 +179,11 @@ public class DeploymentEventsWatcher implements ApplicationListener<ApplicationE
 		}
 	}
 
+	@Override
+	public boolean supportsAsyncExecution() {
+		return false;
+	}
+
 	private long getLatestEventTimestamp(String siteName, Class<? extends SiteEvent> eventClass) {
 		SiteEvent event = latestSiteContextEvents.get(String.format(LATEST_EVENT_KEY_FORMAT, siteName, eventClass));
 		if (event != null) {
