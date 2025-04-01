@@ -4,7 +4,7 @@ servers:
 info:
   description: |-
     Crafter Engine API
-  version: '4.3.0'
+  version: '4.3.1'
   title: Crafter Engine
   termsOfService: ''
   contact:
@@ -388,6 +388,19 @@ paths:
           schema:
             type: string
           example: "my-editorial"
+        - name: cacheType
+          in: query
+          description: |-
+            Type of cache.
+
+            Possible values are:
+            - <b>system</b> : Cache for objects cached by Engine itself.
+            - <b>user</b> : Cache for objects cached by Groovy code.
+
+            Default is "system".
+          schema:
+            type: string
+          example: system
       responses:
         '200':
           description: OK
@@ -429,6 +442,19 @@ paths:
           schema:
             type: string
           example: "my-editorial"
+        - name: cacheType
+          in: query
+          description: |-
+            Type of cache.
+
+            Possible values are:
+            - <b>system</b> : Cache for objects cached by Engine itself.
+            - <b>user</b> : Cache for objects cached by Groovy code.
+
+            Default is "system".
+          schema:
+            type: string
+          example: system
       responses:
         '200':
           description: OK
