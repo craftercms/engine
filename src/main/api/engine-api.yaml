@@ -396,6 +396,7 @@ paths:
             Possible values are:
             - <b>system</b> : Cache for objects cached by Engine itself.
             - <b>application</b> : Cache for objects cached by Groovy code.
+              This cache is enabled by specifying the value "crafter.core.applicationCache" in the <b>SPRING_PROFILES_ACTIVE</b> env variable.
 
             Default is "system".
           schema:
@@ -449,7 +450,8 @@ paths:
 
             Possible values are:
             - <b>system</b> : Cache for objects cached by Engine itself.
-            - <b>user</b> : Cache for objects cached by Groovy code.
+            - <b>application</b> : Cache for objects cached by Groovy code.
+              This cache is enabled by specifying the value "crafter.core.applicationCache" in the <b>SPRING_PROFILES_ACTIVE</b> env variable.
 
             Default is "system".
           schema:
