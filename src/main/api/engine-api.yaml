@@ -388,6 +388,20 @@ paths:
           schema:
             type: string
           example: "my-editorial"
+        - name: cacheType
+          in: query
+          description: |-
+            Type of cache.
+
+            Possible values are:
+            - <b>system</b> : Cache for objects cached by Engine itself.
+            - <b>application</b> : Cache for objects cached by Groovy code.
+              This cache is enabled by specifying the value "crafter.core.applicationCache" in the <b>SPRING_PROFILES_ACTIVE</b> env variable.
+
+            Default is "system".
+          schema:
+            type: string
+          example: system
       responses:
         '200':
           description: OK
@@ -429,6 +443,20 @@ paths:
           schema:
             type: string
           example: "my-editorial"
+        - name: cacheType
+          in: query
+          description: |-
+            Type of cache.
+
+            Possible values are:
+            - <b>system</b> : Cache for objects cached by Engine itself.
+            - <b>application</b> : Cache for objects cached by Groovy code.
+              This cache is enabled by specifying the value "crafter.core.applicationCache" in the <b>SPRING_PROFILES_ACTIVE</b> env variable.
+
+            Default is "system".
+          schema:
+            type: string
+          example: system
       responses:
         '200':
           description: OK
