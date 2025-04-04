@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2024 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2025 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -13,7 +13,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.craftercms.engine.controller.rest;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,9 +23,10 @@ import org.craftercms.commons.exceptions.InvalidManagementTokenException;
 import org.craftercms.core.cache.CacheStatistics;
 import org.craftercms.core.controller.rest.CrafterRestController;
 import org.craftercms.core.controller.rest.RestControllerBase;
-import org.craftercms.engine.event.SiteContextCreatedEvent;
-import org.craftercms.engine.event.SiteEvent;
-import org.craftercms.engine.service.context.SiteContext;
+import org.craftercms.engine.controller.rest.cache.SiteCacheRestOperations;
+import org.craftercms.engine.exception.InvalidCacheTypeException;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,12 +34,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.beans.ConstructorProperties;
 import java.util.Map;
 
-import static java.lang.String.format;
-
 /**
- * REST controller for operations related to a site's cache.
+ * REST controller for site cache operations. The controller uses a map of cache types mapped to
+ * {@link org.craftercms.engine.controller.rest.cache.SiteCacheRestOperations}, which allows REST operation
+ * implementations for different types of caches.
  *
- * @author Alfonso Vásquez
+ * @author avasquez
  */
 @CrafterRestController
 @RequestMapping(RestControllerBase.REST_BASE_URI + SiteCacheRestController.URL_ROOT)
@@ -51,44 +51,56 @@ public class SiteCacheRestController extends RestControllerBase {
 	public static final String URL_CLEAR = "/clear";
 	public static final String URL_STATS = "/statistics";
 
-	private final String configuredToken;
+	protected final Map<String, SiteCacheRestOperations> cacheRestOperationsPerCacheType;
+	protected final String defaultCacheType;
+	protected final String configuredToken;
 
-	@ConstructorProperties({"configuredToken"})
-	public SiteCacheRestController(final String configuredToken) {
+	@ConstructorProperties({"cacheRestOperationsPerCacheType", "defaultCacheType", "configuredToken"})
+	public SiteCacheRestController(final Map<String, SiteCacheRestOperations> cacheRestOperationsPerCacheType,
+								   final String defaultCacheType, final String configuredToken) {
+		this.cacheRestOperationsPerCacheType = cacheRestOperationsPerCacheType;
+		this.defaultCacheType = defaultCacheType;
 		this.configuredToken = configuredToken;
 	}
 
 	@RequestMapping(value = URL_CLEAR, method = RequestMethod.GET)
-	public Map<String, Object> clear(HttpServletRequest request, @RequestParam String token) throws InvalidManagementTokenException {
+	public Map<String, Object> clear(HttpServletRequest request, @RequestParam String token,
+									 @RequestParam(required = false) String cacheType) throws InvalidManagementTokenException {
 		validateToken(token);
-		SiteContext siteContext = SiteContext.getCurrent();
-		String siteName = siteContext.getSiteName();
-		String msg;
 
-		// Don't clear cache if the context was just created in this request
-		if (SiteEvent.getLatestRequestEvent(SiteContextCreatedEvent.class, request) != null) {
-			return createResponseMessage(format("Site context for '%s' created during the request. Cache clear not necessary", siteName));
-		} else {
-			siteContext.startCacheClear();
-			msg = format("Cache clear for site '%s' started", siteName);
-		}
-
-		logger.debug(msg);
-
-		return createResponseMessage(msg);
+		return createResponseMessage(getCacheRestOperations(cacheType).clear(request));
 	}
 
 	@RequestMapping(value = URL_STATS, method = RequestMethod.GET)
-	public CacheStatistics getStatistics(@RequestParam String token) throws InvalidManagementTokenException {
+	public CacheStatistics getStatistics(@RequestParam String token,
+										 @RequestParam(required = false) String cacheType) throws InvalidManagementTokenException {
 		validateToken(token);
 
-		SiteContext siteContext = SiteContext.getCurrent();
-		return siteContext.getCacheTemplate().getCacheService().getStatistics(siteContext.getContext());
+		return getCacheRestOperations(cacheType).getStatistics();
 	}
 
-	protected final void validateToken(final String requestToken) throws InvalidManagementTokenException {
+	@ExceptionHandler(InvalidCacheTypeException.class)
+	public ResponseEntity<Map<String, Object>> handleInvalidCacheTypeException(InvalidCacheTypeException ex) {
+		return ResponseEntity.badRequest().body(createResponseMessage(ex.getMessage()));
+	}
+
+	protected SiteCacheRestOperations getCacheRestOperations(String cacheType) {
+		if (StringUtils.isEmpty(cacheType)) {
+			cacheType = defaultCacheType;
+		}
+
+		var restOperations = cacheRestOperationsPerCacheType.get(cacheType);
+		if (restOperations == null) {
+			throw new InvalidCacheTypeException("Unrecognized cache type '" + cacheType + "'.");
+		} else {
+			return restOperations;
+		}
+	}
+
+	protected final void validateToken(String requestToken) throws InvalidManagementTokenException {
 		if (!StringUtils.equals(requestToken, configuredToken)) {
 			throw new InvalidManagementTokenException("Management authorization failed, invalid token.");
 		}
 	}
+
 }
