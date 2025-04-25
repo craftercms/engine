@@ -171,6 +171,7 @@ public class ConfigAwarePreviewAccessTokenFilter extends GenericFilterBean {
 		Cookie cookie = new Cookie(name, value);
 		cookie.setPath("/");
 		cookie.setHttpOnly(true);
+		cookie.setAttribute("SameSite", "Strict");
 		cookie.setSecure(request.isSecure());
 		cookie.setMaxAge(maxAge);
 		response.addCookie(cookie);
