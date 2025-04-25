@@ -63,6 +63,7 @@
 				<bean class="org.craftercms.engine.util.spring.security.preview.ConfigAwarePreviewAccessTokenFilter">
 					<constructor-arg name="encryptor" ref="crafter.textEncryptor"/>
 					<constructor-arg name="corsConfigSource" ref="crafter.corsConfigSource" />
+					<constructor-arg name="siteNameParam" value="${crafter.engine.request.param.siteName}"/>
 				</bean>
 			</util:list>
 		</constructor-arg>
