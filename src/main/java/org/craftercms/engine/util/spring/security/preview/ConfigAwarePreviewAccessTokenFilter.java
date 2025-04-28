@@ -27,6 +27,7 @@ import org.craftercms.commons.crypto.TextEncryptor;
 import org.craftercms.commons.http.HttpUtils;
 import org.craftercms.engine.exception.PreviewAccessException;
 import org.craftercms.engine.service.context.SiteContext;
+import org.craftercms.engine.util.http.SameSite;
 import org.craftercms.engine.util.spring.cors.SiteAwareCorsConfigurationSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.cors.CorsConfiguration;
@@ -52,15 +53,23 @@ public class ConfigAwarePreviewAccessTokenFilter extends GenericFilterBean {
     private final TextEncryptor textEncryptor;
 	private final SiteAwareCorsConfigurationSource corsConfigSource;
 	private final String siteNameParam;
+	private final String cookiePath;
+	private final boolean cookieHttpOnly;
+	private final SameSite cookieSameSite;
 
-    @ConstructorProperties({"textEncryptor", "corsConfigSource", "siteNameParam"})
-    public ConfigAwarePreviewAccessTokenFilter(final TextEncryptor textEncryptor,
+	@ConstructorProperties({"textEncryptor", "corsConfigSource", "siteNameParam", "cookiePath", "cookieHttpOnly",
+		"cookieSameSite"})
+	public ConfigAwarePreviewAccessTokenFilter(final TextEncryptor textEncryptor,
 											   final SiteAwareCorsConfigurationSource corsConfigSource,
-											   final String siteNameParam) {
-        this.textEncryptor = textEncryptor;
+											   final String siteNameParam, final String cookiePath,
+											   boolean cookieHttpOnly, String cookieSameSite) {
+		this.textEncryptor = textEncryptor;
 		this.corsConfigSource = corsConfigSource;
 		this.siteNameParam = siteNameParam;
-    }
+		this.cookiePath = cookiePath;
+		this.cookieHttpOnly = cookieHttpOnly;
+		this.cookieSameSite = SameSite.fromValue(cookieSameSite);
+	}
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
@@ -169,9 +178,9 @@ public class ConfigAwarePreviewAccessTokenFilter extends GenericFilterBean {
 	 */
 	private void createCookie(HttpServletRequest request, HttpServletResponse response, String name, String value, int maxAge) {
 		Cookie cookie = new Cookie(name, value);
-		cookie.setPath("/");
-		cookie.setHttpOnly(true);
-		cookie.setAttribute("SameSite", "Strict");
+		cookie.setPath(cookiePath);
+		cookie.setHttpOnly(cookieHttpOnly);
+		cookie.setAttribute("SameSite", cookieSameSite.getValue());
 		cookie.setSecure(request.isSecure());
 		cookie.setMaxAge(maxAge);
 		response.addCookie(cookie);
