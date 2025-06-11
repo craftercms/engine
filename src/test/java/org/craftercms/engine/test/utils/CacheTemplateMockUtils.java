@@ -32,29 +32,29 @@ import static org.mockito.Mockito.*;
  */
 public class CacheTemplateMockUtils {
 
-    @SuppressWarnings("unchecked")
-    public static void setUpWithNoCaching(CacheTemplate mock) {
-        when(mock.getObject(any(Context.class), any(Callback.class), any(Object[].class))).then(invocation -> {
-            Object[] args = invocation.getArguments();
-            Callback<?> callback = (Callback<?>) args[1];
+	@SuppressWarnings("unchecked")
+	public static void setUpWithNoCaching(CacheTemplate mock) {
+		when(mock.getObject(any(Context.class), any(Callback.class), any(Object[].class))).then(invocation -> {
+			Object[] args = invocation.getArguments();
+			Callback<?> callback = (Callback<?>) args[1];
 
-            return callback.execute();
-        });
-        when(mock.getObject(any(Context.class), any(CachingOptions.class), any(Callback.class), any(Object[].class))).then(
-                invocation -> {
-                    Object[] args = invocation.getArguments();
-                    Callback<?> callback = (Callback<?>) args[2];
+			return callback.execute();
+		});
+		when(mock.getObject(any(Context.class), any(CachingOptions.class), any(Callback.class), any(Object[].class))).then(
+			invocation -> {
+				Object[] args = invocation.getArguments();
+				Callback<?> callback = (Callback<?>) args[2];
 
-                    return callback.execute();
-                }
-        );
-    }
+				return callback.execute();
+			}
+		);
+	}
 
-    public static CacheTemplate createCacheTemplate() {
-        CacheTemplate mock = mock(CacheTemplate.class);
-        setUpWithNoCaching(mock);
+	public static CacheTemplate createCacheTemplate() {
+		CacheTemplate mock = mock(CacheTemplate.class);
+		setUpWithNoCaching(mock);
 
-        return mock;
-    }
+		return mock;
+	}
 
 }

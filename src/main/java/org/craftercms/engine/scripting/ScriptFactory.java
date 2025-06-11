@@ -24,8 +24,8 @@ import org.craftercms.engine.exception.ScriptException;
  */
 public interface ScriptFactory {
 
-    String getScriptFileExtension();
+	String getScriptFileExtension();
 
-    Script getScript(String url) throws ScriptException;
+	Script getScript(String url) throws ScriptException;
 
 }

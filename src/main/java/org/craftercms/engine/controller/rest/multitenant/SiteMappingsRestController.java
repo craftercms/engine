@@ -36,29 +36,29 @@ import java.util.Map;
 @RequestMapping(RestControllerBase.REST_BASE_URI + SiteMappingsRestController.URL_ROOT)
 public class SiteMappingsRestController {
 
-    public static final String URL_ROOT = "/site/mappings";
-    public static final String URL_RELOAD = "/reload";
+	public static final String URL_ROOT = "/site/mappings";
+	public static final String URL_RELOAD = "/reload";
 
-    private SiteResolver siteResolver;
+	private SiteResolver siteResolver;
 
-    public SiteMappingsRestController(SiteResolver siteResolver) {
-        this.siteResolver = siteResolver;
-    }
+	public SiteMappingsRestController(SiteResolver siteResolver) {
+		this.siteResolver = siteResolver;
+	}
 
-    @RequestMapping(value = URL_RELOAD, method = RequestMethod.GET)
-    public Map<String, String> reloadMappings(HttpServletResponse response) {
-        if (siteResolver instanceof ReloadableMappingsSiteResolver) {
-            ((ReloadableMappingsSiteResolver)siteResolver).reloadMappings();
+	@RequestMapping(value = URL_RELOAD, method = RequestMethod.GET)
+	public Map<String, String> reloadMappings(HttpServletResponse response) {
+		if (siteResolver instanceof ReloadableMappingsSiteResolver) {
+			((ReloadableMappingsSiteResolver) siteResolver).reloadMappings();
 
-            return Collections.singletonMap(RestControllerBase.MESSAGE_MODEL_ATTRIBUTE_NAME, "Mappings reloaded");
-        } else{
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return Collections.singletonMap(RestControllerBase.MESSAGE_MODEL_ATTRIBUTE_NAME, "Mappings reloaded");
+		} else {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
-            return Collections.singletonMap(RestControllerBase.MESSAGE_MODEL_ATTRIBUTE_NAME,
-                                            "The current resolver is not a " +
-                                            ReloadableMappingsSiteResolver.class.getSimpleName() +
-                                            ". No mappings to reload");
-        }
-    }
+			return Collections.singletonMap(RestControllerBase.MESSAGE_MODEL_ATTRIBUTE_NAME,
+				"The current resolver is not a " +
+					ReloadableMappingsSiteResolver.class.getSimpleName() +
+					". No mappings to reload");
+		}
+	}
 
 }

@@ -32,46 +32,46 @@ import static org.testng.Assert.assertEquals;
 @RunWith(MockitoJUnitRunner.class)
 public class FallbackPropertyFactoryTest {
 
-    public static final String PROPERTY1 = "property1";
-    public static final String PROPERTY2 = "property2";
-    public static final String VALUE1 = "value1";
-    public static final String VALUE2 = "value2";
-    public static final String DEFAULT_VALUE = "default_value";
-    @Mock
-    protected PropertySourcesPropertyResolver propertyResolver;
+	public static final String PROPERTY1 = "property1";
+	public static final String PROPERTY2 = "property2";
+	public static final String VALUE1 = "value1";
+	public static final String VALUE2 = "value2";
+	public static final String DEFAULT_VALUE = "default_value";
+	@Mock
+	protected PropertySourcesPropertyResolver propertyResolver;
 
-    protected List<String> properties = List.of(PROPERTY1, PROPERTY2);
+	protected List<String> properties = List.of(PROPERTY1, PROPERTY2);
 
-    @InjectMocks
-    protected FallbackPropertyFactory<String> propertyFactory = new FallbackPropertyFactory<>(properties, String.class);
+	@InjectMocks
+	protected FallbackPropertyFactory<String> propertyFactory = new FallbackPropertyFactory<>(properties, String.class);
 
-    @Before
-    public void setUp() {
-        propertyFactory.setDefaultValue(DEFAULT_VALUE);
-    }
+	@Before
+	public void setUp() {
+		propertyFactory.setDefaultValue(DEFAULT_VALUE);
+	}
 
-    @Test
-    public void propertyFallbackTest() throws Exception {
-        when(propertyResolver.getProperty(PROPERTY2, String.class)).thenReturn(VALUE2);
-        propertyFactory.afterPropertiesSet();
-        String propertyValue = this.propertyFactory.getObject();
-        assertEquals(propertyValue, VALUE2, "Property does not match the expected value");
-    }
+	@Test
+	public void propertyFallbackTest() throws Exception {
+		when(propertyResolver.getProperty(PROPERTY2, String.class)).thenReturn(VALUE2);
+		propertyFactory.afterPropertiesSet();
+		String propertyValue = this.propertyFactory.getObject();
+		assertEquals(propertyValue, VALUE2, "Property does not match the expected value");
+	}
 
-    @Test
-    public void firstPropertyExistsTest() throws Exception {
-        lenient().when(propertyResolver.getProperty(PROPERTY2, String.class)).thenReturn(VALUE2);
-        lenient().when(propertyResolver.getProperty(PROPERTY1, String.class)).thenReturn(VALUE1);
-        propertyFactory.afterPropertiesSet();
-        String propertyValue = this.propertyFactory.getObject();
-        assertEquals(propertyValue, VALUE1, "Property does not match the expected value");
-    }
+	@Test
+	public void firstPropertyExistsTest() throws Exception {
+		lenient().when(propertyResolver.getProperty(PROPERTY2, String.class)).thenReturn(VALUE2);
+		lenient().when(propertyResolver.getProperty(PROPERTY1, String.class)).thenReturn(VALUE1);
+		propertyFactory.afterPropertiesSet();
+		String propertyValue = this.propertyFactory.getObject();
+		assertEquals(propertyValue, VALUE1, "Property does not match the expected value");
+	}
 
-    @Test
-    public void defaultValueTest() throws Exception {
-        propertyFactory.afterPropertiesSet();
-        String propertyValue = this.propertyFactory.getObject();
-        assertEquals(propertyValue, DEFAULT_VALUE, "Property does not match the expected value");
-    }
+	@Test
+	public void defaultValueTest() throws Exception {
+		propertyFactory.afterPropertiesSet();
+		String propertyValue = this.propertyFactory.getObject();
+		assertEquals(propertyValue, DEFAULT_VALUE, "Property does not match the expected value");
+	}
 
 }

@@ -32,10 +32,10 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedG
  */
 public class DefaultPreAuthenticatedUserDetailsService extends PreAuthenticatedGrantedAuthoritiesUserDetailsService {
 
-    @Override
-    protected UserDetails createUserDetails(final Authentication token,
-                                            final Collection<? extends GrantedAuthority> authorities) {
-        return (UserDetails) token.getPrincipal();
-    }
+	@Override
+	protected UserDetails createUserDetails(final Authentication token,
+						final Collection<? extends GrantedAuthority> authorities) {
+		return (UserDetails) token.getPrincipal();
+	}
 
 }

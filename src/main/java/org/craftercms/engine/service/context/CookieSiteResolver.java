@@ -31,26 +31,26 @@ import org.craftercms.commons.http.HttpUtils;
  */
 public class CookieSiteResolver implements SiteResolver {
 
-    private static final Log logger = LogFactory.getLog(CookieSiteResolver.class);
+	private static final Log logger = LogFactory.getLog(CookieSiteResolver.class);
 
-    protected String paramOrCookieName;
+	protected String paramOrCookieName;
 
-    public CookieSiteResolver(String paramOrCookieName) {
-        this.paramOrCookieName = paramOrCookieName;
-    }
+	public CookieSiteResolver(String paramOrCookieName) {
+		this.paramOrCookieName = paramOrCookieName;
+	}
 
-    @Override
-    public String getSiteName(HttpServletRequest request) {
-        String siteName = request.getParameter(paramOrCookieName);
-        if (StringUtils.isEmpty(siteName)) {
-            siteName = HttpUtils.getCookieValue(paramOrCookieName, request);
-            if (StringUtils.isEmpty(siteName) && logger.isDebugEnabled()) {
-                logger.debug("No '" + paramOrCookieName + "' request param or cookie found");
-            }
-        }
+	@Override
+	public String getSiteName(HttpServletRequest request) {
+		String siteName = request.getParameter(paramOrCookieName);
+		if (StringUtils.isEmpty(siteName)) {
+			siteName = HttpUtils.getCookieValue(paramOrCookieName, request);
+			if (StringUtils.isEmpty(siteName) && logger.isDebugEnabled()) {
+				logger.debug("No '" + paramOrCookieName + "' request param or cookie found");
+			}
+		}
 
-        return siteName;
-    }
+		return siteName;
+	}
 
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2025 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -16,15 +16,10 @@
 package org.craftercms.engine.store.s3;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.bouncycastle.util.StoreException;
 import org.craftercms.core.service.Content;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.function.Supplier;
-
-import static java.lang.String.format;
 
 /**
  * Represents an S3 object.
@@ -35,61 +30,61 @@ import static java.lang.String.format;
  */
 public class S3Object extends S3File implements Content {
 
-    /**
-     * When the file was last modified.
-     */
-    protected long lastModified;
+	/**
+	 * When the file was last modified.
+	 */
+	protected long lastModified;
 
-    /**
-     * The content length.
-     */
-    protected long contentLength;
+	/**
+	 * The content length.
+	 */
+	protected long contentLength;
 
-    /**
-     * The actual content
-     */
-    protected Supplier<InputStream> contentSupplier;
+	/**
+	 * The actual content
+	 */
+	protected Supplier<InputStream> contentSupplier;
 
-    /**
-     * Main constructor.
-     *
-     * @param bucketName the S3 bucket
-     * @param key the S3 key
-     * @param lastModified the last modified timestamp
-     * @param contentLength the content size
-     * @param contentSupplier an InputStream supplier for the content
-     */
-    public S3Object(String bucketName, String key, long lastModified, long contentLength,
-                    Supplier<InputStream> contentSupplier) {
-        super(bucketName, key);
+	/**
+	 * Main constructor.
+	 *
+	 * @param bucketName      the S3 bucket
+	 * @param key             the S3 key
+	 * @param lastModified    the last modified timestamp
+	 * @param contentLength   the content size
+	 * @param contentSupplier an InputStream supplier for the content
+	 */
+	public S3Object(String bucketName, String key, long lastModified, long contentLength,
+			Supplier<InputStream> contentSupplier) {
+		super(bucketName, key);
 
-        this.lastModified = lastModified;
-        this.contentLength = contentLength;
-        this.contentSupplier = contentSupplier;
-    }
+		this.lastModified = lastModified;
+		this.contentLength = contentLength;
+		this.contentSupplier = contentSupplier;
+	}
 
-    @Override
-    public long getLastModified() {
-        return lastModified;
-    }
+	@Override
+	public long getLastModified() {
+		return lastModified;
+	}
 
-    @Override
-    public long getLength() {
-        return contentLength;
-    }
+	@Override
+	public long getLength() {
+		return contentLength;
+	}
 
-    @Override
-    public InputStream getInputStream() {
-        return this.contentSupplier.get();
-    }
+	@Override
+	public InputStream getInputStream() {
+		return this.contentSupplier.get();
+	}
 
-    @Override
-    public String toString() {
-        return "S3Object{" +
-                "bucketName='" + bucketName + '\'' +
-                ", key='" + key + '\'' +
-                ", lastModified=" + lastModified +
-                ", contentLength=" + FileUtils.byteCountToDisplaySize(contentLength) +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "S3Object{" +
+			"bucketName='" + bucketName + '\'' +
+			", key='" + key + '\'' +
+			", lastModified=" + lastModified +
+			", contentLength=" + FileUtils.byteCountToDisplaySize(contentLength) +
+			'}';
+	}
 }

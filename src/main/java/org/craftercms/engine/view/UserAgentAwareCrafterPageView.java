@@ -32,28 +32,28 @@ import java.util.Map;
 
 public class UserAgentAwareCrafterPageView extends CrafterPageView {
 
-    protected UserAgentTemplateDetector userAgentTemplateDetector;
+	protected UserAgentTemplateDetector userAgentTemplateDetector;
 
-    public UserAgentAwareCrafterPageView(SiteItem page, Locale locale, String pageViewNameXPathQuery, String mimeTypeXPathQuery,
-                                         List<Script> scripts, ViewResolver delegatedViewResolver,
-                                         UserAgentTemplateDetector userAgentTemplateDetector) {
-        super(page, locale, pageViewNameXPathQuery, mimeTypeXPathQuery, scripts, delegatedViewResolver);
-        this.userAgentTemplateDetector = userAgentTemplateDetector;
-    }
+	public UserAgentAwareCrafterPageView(SiteItem page, Locale locale, String pageViewNameXPathQuery, String mimeTypeXPathQuery,
+					     List<Script> scripts, ViewResolver delegatedViewResolver,
+					     UserAgentTemplateDetector userAgentTemplateDetector) {
+		super(page, locale, pageViewNameXPathQuery, mimeTypeXPathQuery, scripts, delegatedViewResolver);
+		this.userAgentTemplateDetector = userAgentTemplateDetector;
+	}
 
-    @Override
-    protected void renderActualView(String pageViewName, Map<String, Object> model, HttpServletRequest request,
-                                    HttpServletResponse response) throws Exception {
-        String userAgentSpecificPageViewName = userAgentTemplateDetector.resolveAgentTemplate(request, pageViewName);
-        View actualView = delegatedViewResolver.resolveViewName(userAgentSpecificPageViewName, locale);
-        if (actualView == null) {
-            actualView = delegatedViewResolver.resolveViewName(pageViewName, locale);
-            if (actualView == null) {
-                throw new RenderingException("No view was resolved for page view name '" + pageViewName + "'");
-            }
-        }
+	@Override
+	protected void renderActualView(String pageViewName, Map<String, Object> model, HttpServletRequest request,
+					HttpServletResponse response) throws Exception {
+		String userAgentSpecificPageViewName = userAgentTemplateDetector.resolveAgentTemplate(request, pageViewName);
+		View actualView = delegatedViewResolver.resolveViewName(userAgentSpecificPageViewName, locale);
+		if (actualView == null) {
+			actualView = delegatedViewResolver.resolveViewName(pageViewName, locale);
+			if (actualView == null) {
+				throw new RenderingException("No view was resolved for page view name '" + pageViewName + "'");
+			}
+		}
 
-        actualView.render(model, request, response);
-    }
+		actualView.render(model, request, response);
+	}
 
 }

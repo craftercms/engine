@@ -25,6 +25,7 @@ import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 
 import jakarta.servlet.http.HttpServletRequest;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -36,38 +37,38 @@ import java.io.IOException;
  */
 public class RemoteAssetsRequestHandler extends ResourceHttpRequestHandler {
 
-    private RemoteFileResolver remoteFileResolver;
+	private RemoteFileResolver remoteFileResolver;
 
-    public RemoteAssetsRequestHandler(RemoteFileResolver remoteFileResolver, final boolean disableCaching) {
-        this.remoteFileResolver = remoteFileResolver;
+	public RemoteAssetsRequestHandler(RemoteFileResolver remoteFileResolver, final boolean disableCaching) {
+		this.remoteFileResolver = remoteFileResolver;
 
-        if (disableCaching) {
-            setCacheControl(CacheControl.noCache());
-        }
-        setRequireSession(false);
-        setResourceRegionHttpMessageConverter(new RangeAwareResourceRegionHttpMessageConverter());
-    }
+		if (disableCaching) {
+			setCacheControl(CacheControl.noCache());
+		}
+		setRequireSession(false);
+		setResourceRegionHttpMessageConverter(new RangeAwareResourceRegionHttpMessageConverter());
+	}
 
-    @Override
-    protected Resource getResource(final HttpServletRequest request) throws IOException {
-        String path = getPath(request);
+	@Override
+	protected Resource getResource(final HttpServletRequest request) throws IOException {
+		String path = getPath(request);
 
-        RemoteFile file = remoteFileResolver.resolve(path);
-        if (file != null) {
-            return file.toResource();
-        } else {
-            throw new FileNotFoundException("No remote file found for " + path);
-        }
-    }
+		RemoteFile file = remoteFileResolver.resolve(path);
+		if (file != null) {
+			return file.toResource();
+		} else {
+			throw new FileNotFoundException("No remote file found for " + path);
+		}
+	}
 
-    protected String getPath(HttpServletRequest request) {
-        String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        if (StringUtils.isNotEmpty(path)) {
-            return !path.startsWith("/") ? "/" + path : path;
-        } else {
-            throw new IllegalStateException("Required request attribute '" +
-                                            HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE + "' is not set");
-        }
-    }
+	protected String getPath(HttpServletRequest request) {
+		String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+		if (StringUtils.isNotEmpty(path)) {
+			return !path.startsWith("/") ? "/" + path : path;
+		} else {
+			throw new IllegalStateException("Required request attribute '" +
+				HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE + "' is not set");
+		}
+	}
 
 }

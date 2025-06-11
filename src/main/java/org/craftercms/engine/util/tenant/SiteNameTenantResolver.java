@@ -26,9 +26,9 @@ import org.craftercms.security.utils.tenant.TenantsResolver;
  */
 public class SiteNameTenantResolver implements TenantsResolver {
 
-    @Override
-    public String[] getTenants() {
-        return new String[] { SiteContext.getCurrent().getSiteName() };
-    }
+	@Override
+	public String[] getTenants() {
+		return new String[]{SiteContext.getCurrent().getSiteName()};
+	}
 
 }

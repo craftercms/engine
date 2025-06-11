@@ -18,6 +18,7 @@ package org.craftercms.engine.util.spring.security.profile;
 
 import java.beans.ConstructorProperties;
 import java.util.Arrays;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -44,101 +45,101 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
  */
 public class ProfileRememberMeServices extends AbstractRememberMeServices {
 
-    protected AuthenticationService authenticationService;
+	protected AuthenticationService authenticationService;
 
-    @ConstructorProperties({"key", "userDetailsService", "authenticationService"})
-    public ProfileRememberMeServices(final String key, final UserDetailsService userDetailsService,
-                                     final AuthenticationService authenticationService) {
-        super(key, userDetailsService);
-        this.authenticationService = authenticationService;
-    }
+	@ConstructorProperties({"key", "userDetailsService", "authenticationService"})
+	public ProfileRememberMeServices(final String key, final UserDetailsService userDetailsService,
+					 final AuthenticationService authenticationService) {
+		super(key, userDetailsService);
+		this.authenticationService = authenticationService;
+	}
 
-    @Override
-    protected void onLoginSuccess(final HttpServletRequest request, final HttpServletResponse response,
-                                  final Authentication successfulAuthentication) {
-        ProfileUser profileUser = (ProfileUser) successfulAuthentication.getPrincipal();
-        try {
-            PersistentLogin persistentLogin =
-                authenticationService.createPersistentLogin(profileUser.getProfile().getId().toHexString());
-            setCookie(new String[]{ persistentLogin.getId(), persistentLogin.getToken() }, getTokenValiditySeconds(),
-                request, response);
-        } catch (ProfileException e) {
-            throw new RememberMeAuthenticationException(
-                "Error creating persistent login for " + profileUser.getUsername(), e);
-        }
-    }
+	@Override
+	protected void onLoginSuccess(final HttpServletRequest request, final HttpServletResponse response,
+				      final Authentication successfulAuthentication) {
+		ProfileUser profileUser = (ProfileUser) successfulAuthentication.getPrincipal();
+		try {
+			PersistentLogin persistentLogin =
+				authenticationService.createPersistentLogin(profileUser.getProfile().getId().toHexString());
+			setCookie(new String[]{persistentLogin.getId(), persistentLogin.getToken()}, getTokenValiditySeconds(),
+				request, response);
+		} catch (ProfileException e) {
+			throw new RememberMeAuthenticationException(
+				"Error creating persistent login for " + profileUser.getUsername(), e);
+		}
+	}
 
-    @Override
-    public void logout(final HttpServletRequest request, final HttpServletResponse response,
-                       final Authentication authentication) {
-        super.logout(request, response, authentication);
+	@Override
+	public void logout(final HttpServletRequest request, final HttpServletResponse response,
+			   final Authentication authentication) {
+		super.logout(request, response, authentication);
 
-        // Needed because the super class expects to work only with the username
-        String cookie = extractRememberMeCookie(request);
-        if (authentication != null && isNotEmpty(cookie)) {
-            String persistentLoginId = decodeCookie(cookie)[0];
-            try {
-                authenticationService.deletePersistentLogin(persistentLoginId);
-            } catch (ProfileException e) {
-                throw new RememberMeAuthenticationException(
-                    "Error deleting persistent login " + persistentLoginId, e);
-            }
-        }
-    }
+		// Needed because the super class expects to work only with the username
+		String cookie = extractRememberMeCookie(request);
+		if (authentication != null && isNotEmpty(cookie)) {
+			String persistentLoginId = decodeCookie(cookie)[0];
+			try {
+				authenticationService.deletePersistentLogin(persistentLoginId);
+			} catch (ProfileException e) {
+				throw new RememberMeAuthenticationException(
+					"Error deleting persistent login " + persistentLoginId, e);
+			}
+		}
+	}
 
-    @Override
-    protected UserDetails processAutoLoginCookie(final String[] cookieTokens, final HttpServletRequest request,
-                                                 final HttpServletResponse response)
-        throws RememberMeAuthenticationException, UsernameNotFoundException {
+	@Override
+	protected UserDetails processAutoLoginCookie(final String[] cookieTokens, final HttpServletRequest request,
+						     final HttpServletResponse response)
+		throws RememberMeAuthenticationException, UsernameNotFoundException {
 
-        if (cookieTokens.length != 2) {
-            throw new InvalidCookieException(
-                "Cookie token did not contain 2 tokens, but contained '" + Arrays.asList(cookieTokens) + "'");
-        }
+		if (cookieTokens.length != 2) {
+			throw new InvalidCookieException(
+				"Cookie token did not contain 2 tokens, but contained '" + Arrays.asList(cookieTokens) + "'");
+		}
 
-        final String presentedId = cookieTokens[0];
-        final String presentedToken = cookieTokens[1];
+		final String presentedId = cookieTokens[0];
+		final String presentedToken = cookieTokens[1];
 
-        try {
-            PersistentLogin persistentLogin = authenticationService.getPersistentLogin(presentedId);
+		try {
+			PersistentLogin persistentLogin = authenticationService.getPersistentLogin(presentedId);
 
-            if (persistentLogin == null) {
-                // No series match, so we can't authenticate using this cookie
-                throw new RememberMeAuthenticationException(
-                    "No persistent token found for id: " + presentedId);
-            }
+			if (persistentLogin == null) {
+				// No series match, so we can't authenticate using this cookie
+				throw new RememberMeAuthenticationException(
+					"No persistent token found for id: " + presentedId);
+			}
 
-            // We have a match for this user/series combination
-            if (!presentedToken.equals(persistentLogin.getToken())) {
-                // Token doesn't match series value. Delete all logins for this user and throw
-                // an exception to warn them.
-                authenticationService.deletePersistentLogin(presentedId);
+			// We have a match for this user/series combination
+			if (!presentedToken.equals(persistentLogin.getToken())) {
+				// Token doesn't match series value. Delete all logins for this user and throw
+				// an exception to warn them.
+				authenticationService.deletePersistentLogin(presentedId);
 
-                throw new CookieTheftException(
-                    "Invalid remember-me token (id/token) mismatch. Implies previous cookie theft attack.");
-            }
+				throw new CookieTheftException(
+					"Invalid remember-me token (id/token) mismatch. Implies previous cookie theft attack.");
+			}
 
-            if (persistentLogin.getTimestamp().getTime() + getTokenValiditySeconds() * 1000L < currentTimeMillis()) {
-                throw new RememberMeAuthenticationException("Remember-me login has expired");
-            }
+			if (persistentLogin.getTimestamp().getTime() + getTokenValiditySeconds() * 1000L < currentTimeMillis()) {
+				throw new RememberMeAuthenticationException("Remember-me login has expired");
+			}
 
-            // Token also matches, so login is valid. Update the token value, keeping the
-            // *same* series number.
-            if (logger.isDebugEnabled()) {
-                logger.debug("Refreshing persistent login token for profile '"
-                    + persistentLogin.getProfileId() + "', id '" + persistentLogin.getId() + "'");
-            }
+			// Token also matches, so login is valid. Update the token value, keeping the
+			// *same* series number.
+			if (logger.isDebugEnabled()) {
+				logger.debug("Refreshing persistent login token for profile '"
+					+ persistentLogin.getProfileId() + "', id '" + persistentLogin.getId() + "'");
+			}
 
-            persistentLogin = authenticationService.refreshPersistentLoginToken(presentedId);
+			persistentLogin = authenticationService.refreshPersistentLoginToken(presentedId);
 
-            setCookie(new String[]{ persistentLogin.getId(), persistentLogin.getToken() }, getTokenValiditySeconds(),
-                request, response);
+			setCookie(new String[]{persistentLogin.getId(), persistentLogin.getToken()}, getTokenValiditySeconds(),
+				request, response);
 
-            return ((ProfileUserDetailsService) getUserDetailsService()).loadUserById(persistentLogin.getProfileId());
+			return ((ProfileUserDetailsService) getUserDetailsService()).loadUserById(persistentLogin.getProfileId());
 
-        } catch (ProfileException e) {
-            throw new RememberMeAuthenticationException("Error validating persistent login " + presentedId, e);
-        }
-    }
+		} catch (ProfileException e) {
+			throw new RememberMeAuthenticationException("Error validating persistent login " + presentedId, e);
+		}
+	}
 
 }

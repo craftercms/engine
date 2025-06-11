@@ -36,21 +36,21 @@ import static java.util.Collections.singletonMap;
 @RequestMapping(RestControllerBase.REST_BASE_URI + ConfigRestController.URL_ROOT)
 public class ConfigRestController {
 
-    public static final String URL_ROOT = "/config";
-    public static final String URL_MODE_PREVIEW = "/preview";
+	public static final String URL_ROOT = "/config";
+	public static final String URL_MODE_PREVIEW = "/preview";
 
-    protected boolean modePreview;
+	protected boolean modePreview;
 
-    public ConfigRestController(final boolean modePreview) {
-        this.modePreview = modePreview;
-    }
+	public ConfigRestController(final boolean modePreview) {
+		this.modePreview = modePreview;
+	}
 
-    /**
-     * Indicates if the system is currently configured for preview
-     */
-    @GetMapping(URL_MODE_PREVIEW)
-    public Map<String, Boolean> getModePreview() {
-        return singletonMap("preview", modePreview);
-    }
+	/**
+	 * Indicates if the system is currently configured for preview
+	 */
+	@GetMapping(URL_MODE_PREVIEW)
+	public Map<String, Boolean> getModePreview() {
+		return singletonMap("preview", modePreview);
+	}
 
 }

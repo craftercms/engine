@@ -36,68 +36,68 @@ import static org.apache.commons.collections4.MapUtils.isNotEmpty;
  */
 public class TargetingPreAuthenticatedFilter extends ConfigAwarePreAuthenticationFilter {
 
-    public TargetingPreAuthenticatedFilter() {
-        // always enabled
-        super(null);
-        setAlwaysEnabled(true);
-        setSupportedPrincipalClass(TargetingUser.class);
+	public TargetingPreAuthenticatedFilter() {
+		// always enabled
+		super(null);
+		setAlwaysEnabled(true);
+		setSupportedPrincipalClass(TargetingUser.class);
 
-        setCheckForPrincipalChanges(true);
-    }
+		setCheckForPrincipalChanges(true);
+	}
 
-    @Override
-    @SuppressWarnings("unchecked")
-    protected Object getPreAuthenticatedPrincipal(final HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        if (session != null) {
-            Map<String, Object> attributes = (Map<String, Object>)
-                session.getAttribute(ProfileRestController.PROFILE_SESSION_ATTRIBUTE);
+	@Override
+	@SuppressWarnings("unchecked")
+	protected Object getPreAuthenticatedPrincipal(final HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		if (session != null) {
+			Map<String, Object> attributes = (Map<String, Object>)
+				session.getAttribute(ProfileRestController.PROFILE_SESSION_ATTRIBUTE);
 
-            if (isNotEmpty(attributes)) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Non-anonymous persona set: " + attributes);
-                }
+			if (isNotEmpty(attributes)) {
+				if (logger.isDebugEnabled()) {
+					logger.debug("Non-anonymous persona set: " + attributes);
+				}
 
-                Profile profile = new Profile();
-                profile.setId(new ObjectId((String) attributes.get("id")));
-                profile.setUsername("preview");
-                profile.setEnabled(true);
-                profile.setCreatedOn(new Date());
-                profile.setLastModified(new Date());
-                profile.setTenant("preview");
+				Profile profile = new Profile();
+				profile.setId(new ObjectId((String) attributes.get("id")));
+				profile.setUsername("preview");
+				profile.setEnabled(true);
+				profile.setCreatedOn(new Date());
+				profile.setLastModified(new Date());
+				profile.setTenant("preview");
 
-                Object rolesAttr = attributes.get("roles");
-                String[] roles = null;
-                if (rolesAttr instanceof String[]) {
-                    roles = (String[]) rolesAttr;
-                } else if (rolesAttr instanceof ArrayList<?>) {
-                    roles = ((ArrayList<?>) rolesAttr).toArray(new String[0]);
-                } else if (rolesAttr instanceof String) {
-                    roles = ((String) rolesAttr).split(",");
-                }
-                if (roles != null) {
-                    profile.getRoles().addAll(Arrays.stream(roles).filter(StringUtils::isNotBlank).toList());
-                }
+				Object rolesAttr = attributes.get("roles");
+				String[] roles = null;
+				if (rolesAttr instanceof String[]) {
+					roles = (String[]) rolesAttr;
+				} else if (rolesAttr instanceof ArrayList<?>) {
+					roles = ((ArrayList<?>) rolesAttr).toArray(new String[0]);
+				} else if (rolesAttr instanceof String) {
+					roles = ((String) rolesAttr).split(",");
+				}
+				if (roles != null) {
+					profile.getRoles().addAll(Arrays.stream(roles).filter(StringUtils::isNotBlank).toList());
+				}
 
-                Map<String, Object> customAttributes = new HashMap<>(attributes);
-                customAttributes.remove("id");
-                customAttributes.remove("username");
-                customAttributes.remove("roles");
+				Map<String, Object> customAttributes = new HashMap<>(attributes);
+				customAttributes.remove("id");
+				customAttributes.remove("username");
+				customAttributes.remove("roles");
 
-                profile.setAttributes(customAttributes);
+				profile.setAttributes(customAttributes);
 
-                return new TargetingUser(new TargetingAuthentication(profile));
-            }
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("No persona set. Trying to resolve authentication normally");
-        }
-        return null;
-    }
+				return new TargetingUser(new TargetingAuthentication(profile));
+			}
+		}
+		if (logger.isDebugEnabled()) {
+			logger.debug("No persona set. Trying to resolve authentication normally");
+		}
+		return null;
+	}
 
-    @Override
-    protected Object getPreAuthenticatedCredentials(final HttpServletRequest request) {
-        return "N/A";
-    }
-    
+	@Override
+	protected Object getPreAuthenticatedCredentials(final HttpServletRequest request) {
+		return "N/A";
+	}
+
 }

@@ -34,79 +34,79 @@ import java.util.concurrent.TimeUnit;
  */
 public class SiteCacheWarmerImpl implements SiteCacheWarmer {
 
-    private static final Logger logger = LoggerFactory.getLogger(SiteCacheWarmerImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(SiteCacheWarmerImpl.class);
 
-    protected CacheService cacheService;
-    protected List<ContextCacheWarmer> contextCacheWarmers;
+	protected CacheService cacheService;
+	protected List<ContextCacheWarmer> contextCacheWarmers;
 
-    public SiteCacheWarmerImpl(CacheService cacheService, List<ContextCacheWarmer> contextCacheWarmers) {
-        this.cacheService = cacheService;
-        this.contextCacheWarmers = contextCacheWarmers;
-    }
+	public SiteCacheWarmerImpl(CacheService cacheService, List<ContextCacheWarmer> contextCacheWarmers) {
+		this.cacheService = cacheService;
+		this.contextCacheWarmers = contextCacheWarmers;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void warmUpCache(SiteContext siteContext, boolean switchCache) {
-        String siteName = siteContext.getSiteName();
-        StopWatch stopWatch = new StopWatch();
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void warmUpCache(SiteContext siteContext, boolean switchCache) {
+		String siteName = siteContext.getSiteName();
+		StopWatch stopWatch = new StopWatch();
 
-        if (switchCache) {
-            Context currentContext = siteContext.getContext();
-            long oldCacheVersion = currentContext.getCacheVersion();
-            long newCacheVersion = System.nanoTime();
+		if (switchCache) {
+			Context currentContext = siteContext.getContext();
+			long oldCacheVersion = currentContext.getCacheVersion();
+			long newCacheVersion = System.nanoTime();
 
-            // Create a tmp context that will be used to warm up a new version of the cache
-            Context tmpContext = currentContext.clone();
-            tmpContext.setCacheVersion(newCacheVersion);
+			// Create a tmp context that will be used to warm up a new version of the cache
+			Context tmpContext = currentContext.clone();
+			tmpContext.setCacheVersion(newCacheVersion);
 
-            cacheService.addScope(tmpContext);
+			cacheService.addScope(tmpContext);
 
-            try {
-                logger.info("Starting warm up for new cache of site '{}'", siteName);
+			try {
+				logger.info("Starting warm up for new cache of site '{}'", siteName);
 
-                stopWatch.start();
+				stopWatch.start();
 
-                doCacheWarmUp(tmpContext);
-                if (siteContext.isValid()) {
-                    // Switch cache versions
-                    currentContext.setCacheVersion(newCacheVersion);
-                    tmpContext.setCacheVersion(oldCacheVersion);
+				doCacheWarmUp(tmpContext);
+				if (siteContext.isValid()) {
+					// Switch cache versions
+					currentContext.setCacheVersion(newCacheVersion);
+					tmpContext.setCacheVersion(oldCacheVersion);
 
-                    // Delete old cache version
-                    cacheService.removeScope(tmpContext);
-                } else {
-                    throw new CrafterException("The site context has become invalid (possibly destroyed)");
-                }
+					// Delete old cache version
+					cacheService.removeScope(tmpContext);
+				} else {
+					throw new CrafterException("The site context has become invalid (possibly destroyed)");
+				}
 
-                stopWatch.stop();
+				stopWatch.stop();
 
-                logger.info("Warm up for new cache of site '{}' completed (switched with old cache) in {} secs",
-                            siteName, stopWatch.getTime(TimeUnit.SECONDS));
-            } catch (Exception e) {
-                cacheService.removeScope(tmpContext);
+				logger.info("Warm up for new cache of site '{}' completed (switched with old cache) in {} secs",
+					siteName, stopWatch.getTime(TimeUnit.SECONDS));
+			} catch (Exception e) {
+				cacheService.removeScope(tmpContext);
 
-                logger.error("Cache warm up failed", e);
-            }
-        } else {
-            logger.info("Starting warm up for cache of site '{}'", siteName);
+				logger.error("Cache warm up failed", e);
+			}
+		} else {
+			logger.info("Starting warm up for cache of site '{}'", siteName);
 
-            stopWatch.start();
+			stopWatch.start();
 
-            doCacheWarmUp(siteContext.getContext());
+			doCacheWarmUp(siteContext.getContext());
 
-            stopWatch.stop();
+			stopWatch.stop();
 
-            logger.info("Warm up for cache of site '{}' completed in {} secs", siteName,
-                        stopWatch.getTime(TimeUnit.SECONDS));
-        }
-    }
+			logger.info("Warm up for cache of site '{}' completed in {} secs", siteName,
+				stopWatch.getTime(TimeUnit.SECONDS));
+		}
+	}
 
-    private void doCacheWarmUp(Context cacheContext) {
-        for (ContextCacheWarmer cacheWarmer : contextCacheWarmers) {
-            cacheWarmer.warmUpCache(cacheContext);
-        }
-    }
+	private void doCacheWarmUp(Context cacheContext) {
+		for (ContextCacheWarmer cacheWarmer : contextCacheWarmers) {
+			cacheWarmer.warmUpCache(cacheContext);
+		}
+	}
 
 }

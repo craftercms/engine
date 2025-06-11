@@ -32,21 +32,21 @@ import static org.craftercms.engine.util.LocaleUtils.getCompatibleLocales;
  */
 public class SiteAwareTemplateLookupStrategy extends TemplateLookupStrategy {
 
-    @Override
-    public TemplateLookupResult lookup(TemplateLookupContext ctx) throws IOException {
-        var templateName = ctx.getTemplateName();
+	@Override
+	public TemplateLookupResult lookup(TemplateLookupContext ctx) throws IOException {
+		var templateName = ctx.getTemplateName();
 
-        var locales = getCompatibleLocales();
+		var locales = getCompatibleLocales();
 
-        for(var locale : locales) {
-            var localizedTemplate = localizePath(templateName, locale);
-            var result = ctx.lookupWithAcquisitionStrategy(localizedTemplate);
-            if (result.isPositive()) {
-                return result;
-            }
-        }
+		for (var locale : locales) {
+			var localizedTemplate = localizePath(templateName, locale);
+			var result = ctx.lookupWithAcquisitionStrategy(localizedTemplate);
+			if (result.isPositive()) {
+				return result;
+			}
+		}
 
-        return ctx.lookupWithAcquisitionStrategy(templateName);
-    }
+		return ctx.lookupWithAcquisitionStrategy(templateName);
+	}
 
 }

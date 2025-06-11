@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-///**
+/// **
 // *
 // */
 //package org.craftercms.engine.mobile;
@@ -30,7 +30,7 @@
 //import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 //
 //
-///**
+/// **
 // * @author mverkaik
 // *
 // */

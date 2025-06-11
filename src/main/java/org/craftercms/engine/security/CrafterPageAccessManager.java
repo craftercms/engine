@@ -18,6 +18,7 @@ package org.craftercms.engine.security;
 import org.craftercms.engine.model.SiteItem;
 import org.craftercms.engine.util.SecurityUtils;
 import org.craftercms.security.annotations.RunIfSecurityEnabled;
+
 import java.util.List;
 
 /**
@@ -28,32 +29,32 @@ import java.util.List;
  */
 public class CrafterPageAccessManager {
 
-    protected String authorizedRolesXPathQuery;
+	protected String authorizedRolesXPathQuery;
 
-    public CrafterPageAccessManager(String authorizedRolesXPathQuery) {
-        this.authorizedRolesXPathQuery = authorizedRolesXPathQuery;
-    }
+	public CrafterPageAccessManager(String authorizedRolesXPathQuery) {
+		this.authorizedRolesXPathQuery = authorizedRolesXPathQuery;
+	}
 
-    /**
-     * Checks if the user has sufficient rights to access the specified page:
-     *
-     * <ol>
-     *     <li>If the page doesn't contain any required role, no authentication is needed.</li>
-     *     <li>If the page has the role "Anonymous", no authentication is needed.</li>
-     *     <li>If the page has the role "Authenticated", just authentication is needed.</li>
-     *     <li>If the page has any other the roles, the user needs to have any of those roles.</li>
-     * </ol>
-     */
-    @RunIfSecurityEnabled
-    public void checkAccess(SiteItem page) {
-        String pageUrl = page.getStoreUrl();
+	/**
+	 * Checks if the user has sufficient rights to access the specified page:
+	 *
+	 * <ol>
+	 *     <li>If the page doesn't contain any required role, no authentication is needed.</li>
+	 *     <li>If the page has the role "Anonymous", no authentication is needed.</li>
+	 *     <li>If the page has the role "Authenticated", just authentication is needed.</li>
+	 *     <li>If the page has any other the roles, the user needs to have any of those roles.</li>
+	 * </ol>
+	 */
+	@RunIfSecurityEnabled
+	public void checkAccess(SiteItem page) {
+		String pageUrl = page.getStoreUrl();
 
-        List<String> authorizedRoles = getAuthorizedRolesForPage(page);
-        SecurityUtils.checkAccess(authorizedRoles, pageUrl);
-    }
+		List<String> authorizedRoles = getAuthorizedRolesForPage(page);
+		SecurityUtils.checkAccess(authorizedRoles, pageUrl);
+	}
 
-    protected List<String> getAuthorizedRolesForPage(SiteItem page) {
-        return page.queryValues(authorizedRolesXPathQuery);
-    }
+	protected List<String> getAuthorizedRolesForPage(SiteItem page) {
+		return page.queryValues(authorizedRolesXPathQuery);
+	}
 
 }

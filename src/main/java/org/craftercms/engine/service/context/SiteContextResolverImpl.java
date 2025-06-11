@@ -34,60 +34,60 @@ import org.springframework.context.annotation.Lazy;
  */
 public class SiteContextResolverImpl implements SiteContextResolver {
 
-    public static final String SITE_NAME_ATTRIBUTE = "siteName";
+	public static final String SITE_NAME_ATTRIBUTE = "siteName";
 
-    private static final Log logger = LogFactory.getLog(SiteContextResolverImpl.class);
+	private static final Log logger = LogFactory.getLog(SiteContextResolverImpl.class);
 
-    protected SiteResolver siteResolver;
-    protected SiteContextManager siteContextManager;
-    protected String fallbackSiteName;
+	protected SiteResolver siteResolver;
+	protected SiteContextManager siteContextManager;
+	protected String fallbackSiteName;
 
-    public SiteContextResolverImpl(SiteResolver siteResolver, String fallbackSiteName) {
-        this.siteResolver = siteResolver;
-        this.fallbackSiteName = fallbackSiteName;
-    }
+	public SiteContextResolverImpl(SiteResolver siteResolver, String fallbackSiteName) {
+		this.siteResolver = siteResolver;
+		this.fallbackSiteName = fallbackSiteName;
+	}
 
-    @Autowired
-    public void setSiteContextManager(@Lazy SiteContextManager siteContextManager) {
-        this.siteContextManager = siteContextManager;
-    }
+	@Autowired
+	public void setSiteContextManager(@Lazy SiteContextManager siteContextManager) {
+		this.siteContextManager = siteContextManager;
+	}
 
-    @Override
-    public SiteContext getContext(HttpServletRequest request) {
-        boolean fallback = false;
-        String siteName = StringUtils.lowerCase(siteResolver.getSiteName(request));
+	@Override
+	public SiteContext getContext(HttpServletRequest request) {
+		boolean fallback = false;
+		String siteName = StringUtils.lowerCase(siteResolver.getSiteName(request));
 
-        if (StringUtils.isNotEmpty(siteName)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Site name resolved for current request: '" + siteName + "'");
-            }
-        } else {
-            fallback = true;
-            siteName = fallbackSiteName;
+		if (StringUtils.isNotEmpty(siteName)) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("Site name resolved for current request: '" + siteName + "'");
+			}
+		} else {
+			fallback = true;
+			siteName = fallbackSiteName;
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("Unable to resolve a site name for the request. Using fallback site");
-            }
-        }
+			if (logger.isDebugEnabled()) {
+				logger.debug("Unable to resolve a site name for the request. Using fallback site");
+			}
+		}
 
-        SiteContext siteContext = getContext(siteName, fallback);
-        if (siteContext == null) {
-            throw new IllegalStateException("Unable to resolve context for site name '" + siteName + "'");
-        }
+		SiteContext siteContext = getContext(siteName, fallback);
+		if (siteContext == null) {
+			throw new IllegalStateException("Unable to resolve context for site name '" + siteName + "'");
+		}
 
-        request.setAttribute(SITE_NAME_ATTRIBUTE, siteName);
+		request.setAttribute(SITE_NAME_ATTRIBUTE, siteName);
 
-        return siteContext;
-    }
+		return siteContext;
+	}
 
-    protected SiteContext getContext(String siteName, boolean fallback) {
-        SiteContext siteContext = siteContextManager.getContext(siteName, fallback);
+	protected SiteContext getContext(String siteName, boolean fallback) {
+		SiteContext siteContext = siteContextManager.getContext(siteName, fallback);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Site context resolved for current request: " + siteContext);
-        }
+		if (logger.isDebugEnabled()) {
+			logger.debug("Site context resolved for current request: " + siteContext);
+		}
 
-        return siteContext;
-    }
+		return siteContext;
+	}
 
 }

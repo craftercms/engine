@@ -27,26 +27,24 @@ import org.craftercms.engine.model.SiteItem;
  */
 public interface NavBreadcrumbBuilder {
 
-    /**
-     * Returns the navigation items that form the breadcrumb for the specified store URL.
-     *
-     * @param url   the current URL used to build the breadcrumb
-     * @param root  the root URL, basically the starting point of the breadcrumb
-     *
-     * @return the list of {@link NavItem}s that represent the breadcrumb
-     */
-    List<NavItem> getBreadcrumb(String url, String root);
+	/**
+	 * Returns the navigation items that form the breadcrumb for the specified store URL.
+	 *
+	 * @param url  the current URL used to build the breadcrumb
+	 * @param root the root URL, basically the starting point of the breadcrumb
+	 * @return the list of {@link NavItem}s that represent the breadcrumb
+	 */
+	List<NavItem> getBreadcrumb(String url, String root);
 
-    /**
-     * Returns the navigation items that form the breadcrumb for the specified store URL.
-     *
-     * @param url           the current URL used to build the breadcrumb
-     * @param root          the root URL, basically the starting point of the breadcrumb
-     * @param itemConverter the converter that should be used to convert from {@link SiteItem}s to the actual
-     *                      {@link NavItem}s
-     *
-     * @return the list of {@link NavItem}s that represent the breadcrumb
-     */
-    List<NavItem> getBreadcrumb(String url, String root, Converter<SiteItem, NavItem> itemConverter);
+	/**
+	 * Returns the navigation items that form the breadcrumb for the specified store URL.
+	 *
+	 * @param url           the current URL used to build the breadcrumb
+	 * @param root          the root URL, basically the starting point of the breadcrumb
+	 * @param itemConverter the converter that should be used to convert from {@link SiteItem}s to the actual
+	 *                      {@link NavItem}s
+	 * @return the list of {@link NavItem}s that represent the breadcrumb
+	 */
+	List<NavItem> getBreadcrumb(String url, String root, Converter<SiteItem, NavItem> itemConverter);
 
 }

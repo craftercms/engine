@@ -26,22 +26,22 @@ import org.craftercms.engine.service.context.SiteContext;
  */
 public class SiteAwareRunnable implements Runnable {
 
-    protected SiteContext siteContext;
-    protected Runnable wrappedRunnable;
+	protected SiteContext siteContext;
+	protected Runnable wrappedRunnable;
 
-    public SiteAwareRunnable(final SiteContext siteContext, final Runnable wrappedRunnable) {
-        this.siteContext = siteContext;
-        this.wrappedRunnable = wrappedRunnable;
-    }
+	public SiteAwareRunnable(final SiteContext siteContext, final Runnable wrappedRunnable) {
+		this.siteContext = siteContext;
+		this.wrappedRunnable = wrappedRunnable;
+	}
 
-    @Override
-    public void run() {
-        SiteContext.setCurrent(siteContext);
-        try {
-            wrappedRunnable.run();
-        } finally {
-            SiteContext.clear();
-        }
-    }
+	@Override
+	public void run() {
+		SiteContext.setCurrent(siteContext);
+		try {
+			wrappedRunnable.run();
+		} finally {
+			SiteContext.clear();
+		}
+	}
 
 }

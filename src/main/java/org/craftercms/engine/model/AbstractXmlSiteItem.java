@@ -31,62 +31,62 @@ import org.dom4j.Element;
  */
 public abstract class AbstractXmlSiteItem implements SiteItem {
 
-    protected Converter<Element, Object> modelFieldConverter;
+	protected Converter<Element, Object> modelFieldConverter;
 
-    public AbstractXmlSiteItem(Converter<Element, Object> modelFieldConverter) {
-        this.modelFieldConverter = modelFieldConverter;
-    }
+	public AbstractXmlSiteItem(Converter<Element, Object> modelFieldConverter) {
+		this.modelFieldConverter = modelFieldConverter;
+	}
 
-    protected abstract Element getRootElement();
+	protected abstract Element getRootElement();
 
-    @Override
-    public Object get(String xpathExpression) {
-        if (getRootElement() != null) {
-            Object result = XmlUtils.selectObject(getRootElement(), xpathExpression);
-            if (result instanceof Element) {
-                return modelFieldConverter.convert((Element) result);
-            } else {
-                return result;
-            }
-        } else {
-            return null;
-        }
-    }
+	@Override
+	public Object get(String xpathExpression) {
+		if (getRootElement() != null) {
+			Object result = XmlUtils.selectObject(getRootElement(), xpathExpression);
+			if (result instanceof Element) {
+				return modelFieldConverter.convert((Element) result);
+			} else {
+				return result;
+			}
+		} else {
+			return null;
+		}
+	}
 
-    @Override
-    public String queryValue(String xpathExpression) {
-        if (getRootElement() != null) {
-            return XmlUtils.selectSingleNodeValue(getRootElement(), xpathExpression);
-        } else {
-            return null;
-        }
-    }
+	@Override
+	public String queryValue(String xpathExpression) {
+		if (getRootElement() != null) {
+			return XmlUtils.selectSingleNodeValue(getRootElement(), xpathExpression);
+		} else {
+			return null;
+		}
+	}
 
-    @Override
-    public List<String> queryValues(String xpathExpression) {
-        if (getRootElement() != null) {
-            return XmlUtils.selectNodeValues(getRootElement(), xpathExpression);
-        } else {
-            return null;
-        }
-    }
+	@Override
+	public List<String> queryValues(String xpathExpression) {
+		if (getRootElement() != null) {
+			return XmlUtils.selectNodeValues(getRootElement(), xpathExpression);
+		} else {
+			return null;
+		}
+	}
 
-    @Override
-    public String queryValue(String xpathExpression, Map<String, String> namespaceUris) {
-        if (getRootElement() != null) {
-            return XmlUtils.selectSingleNodeValue(getRootElement(), xpathExpression, namespaceUris);
-        } else {
-            return null;
-        }
-    }
+	@Override
+	public String queryValue(String xpathExpression, Map<String, String> namespaceUris) {
+		if (getRootElement() != null) {
+			return XmlUtils.selectSingleNodeValue(getRootElement(), xpathExpression, namespaceUris);
+		} else {
+			return null;
+		}
+	}
 
-    @Override
-    public List<String> queryValues(String xpathExpression, Map<String, String> namespaceUris) {
-        if (getRootElement() != null) {
-            return XmlUtils.selectNodeValues(getRootElement(), xpathExpression, namespaceUris);
-        } else {
-            return null;
-        }
-    }
+	@Override
+	public List<String> queryValues(String xpathExpression, Map<String, String> namespaceUris) {
+		if (getRootElement() != null) {
+			return XmlUtils.selectNodeValues(getRootElement(), xpathExpression, namespaceUris);
+		} else {
+			return null;
+		}
+	}
 
 }

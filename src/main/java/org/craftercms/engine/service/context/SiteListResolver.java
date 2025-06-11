@@ -24,9 +24,9 @@ import java.util.Collection;
  */
 public interface SiteListResolver {
 
-    /**
-     * Returns the entire list of sites.
-     */
-    Collection<String> getSiteList();
+	/**
+	 * Returns the entire list of sites.
+	 */
+	Collection<String> getSiteList();
 
 }

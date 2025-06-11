@@ -28,34 +28,34 @@ import static org.craftercms.engine.graphql.SchemaUtils.ARG_NAME_TRANSFORM;
 /**
  * Implementation of {@link graphql.schema.DataFetcher} that transforms a field using a {@link UrlTransformationService}
  *
- * @since 3.1.1
  * @author joseross
+ * @since 3.1.1
  */
 public class UrlTransformDataFetcher extends RequestAwareDataFetcher {
 
-    /**
-     * The {@link UrlTransformationService}
-     */
-    protected UrlTransformationService urlTransformationService;
+	/**
+	 * The {@link UrlTransformationService}
+	 */
+	protected UrlTransformationService urlTransformationService;
 
-    public UrlTransformDataFetcher(final UrlTransformationService urlTransformationService) {
-        this.urlTransformationService = urlTransformationService;
-    }
+	public UrlTransformDataFetcher(final UrlTransformationService urlTransformationService) {
+		this.urlTransformationService = urlTransformationService;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Object doGet(final DataFetchingEnvironment environment) {
-        String fieldName = environment.getField().getName();
-        Map<String, Object> source = environment.getSource();
-        if (source.containsKey(fieldName) && nonNull(source.get(fieldName))) {
-            String transformerName = environment.getArgument(ARG_NAME_TRANSFORM);
-            if (isNotEmpty(transformerName)) {
-                return urlTransformationService.transform(transformerName, source.get(fieldName).toString());
-            }
-        }
-        return source.get(fieldName);
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Object doGet(final DataFetchingEnvironment environment) {
+		String fieldName = environment.getField().getName();
+		Map<String, Object> source = environment.getSource();
+		if (source.containsKey(fieldName) && nonNull(source.get(fieldName))) {
+			String transformerName = environment.getArgument(ARG_NAME_TRANSFORM);
+			if (isNotEmpty(transformerName)) {
+				return urlTransformationService.transform(transformerName, source.get(fieldName).toString());
+			}
+		}
+		return source.get(fieldName);
+	}
 
 }

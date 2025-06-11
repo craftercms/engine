@@ -24,123 +24,150 @@
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
     http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
-    <!-- ////////////////////////////////// -->
-    <!--								 	-->
-    <!--			Validations				-->
-    <!--									-->
-    <!-- ////////////////////////////////// -->
-    <mvc:annotation-driven validator="commonValidator">
-        <mvc:path-matching registered-suffixes-only="true"/>
-    </mvc:annotation-driven>
+	<!-- ////////////////////////////////// -->
+	<!--								 	-->
+	<!--			Validations				-->
+	<!--									-->
+	<!-- ////////////////////////////////// -->
+	<mvc:annotation-driven validator="commonValidator">
+		<mvc:path-matching registered-suffixes-only="true"/>
+	</mvc:annotation-driven>
 
-    <!--
-    This allows to validate params for "in-line annotated methods"
-    e.g.: public ResponseBody clearCache(@EsapiValidatedParam(type = SITE_ID) @RequestParam String siteId)
-     -->
-    <bean id="methodValidationPostProcessor" class="org.springframework.validation.beanvalidation.MethodValidationPostProcessor">
-        <property name="validator" ref="commonValidator"/>
-    </bean>
+	<!--
+	This allows to validate params for "in-line annotated methods"
+	e.g.: public ResponseBody clearCache(@EsapiValidatedParam(type = SITE_ID) @RequestParam String siteId)
+	 -->
+	<bean id="methodValidationPostProcessor" class="org.springframework.validation.beanvalidation.MethodValidationPostProcessor">
+		<property name="validator" ref="commonValidator"/>
+	</bean>
 
-    <!-- ////////////////////////////////// -->
-    <!--								 	-->
-    <!--			Controllers				-->
-    <!--									-->
-    <!-- ////////////////////////////////// -->
+	<!-- ////////////////////////////////// -->
+	<!--								 	-->
+	<!--			Controllers				-->
+	<!--									-->
+	<!-- ////////////////////////////////// -->
 
-    <bean class="org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter"/>
-    <bean class="org.springframework.web.servlet.mvc.HttpRequestHandlerAdapter"/>
+	<bean class="org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter"/>
+	<bean class="org.springframework.web.servlet.mvc.HttpRequestHandlerAdapter"/>
 
-    <bean id="crafter.mainHandlerMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
-        <property name="order" value="#{T(org.springframework.core.Ordered).LOWEST_PRECEDENCE}"/>
-        <property name="interceptors" ref="crafter.interceptors"/>
-        <property name="urlMap" ref="crafter.urlMappings"/>
-        <!-- This property became false by default in Spring 5.3 -->
-        <property name="useTrailingSlashMatch" value="true"/>
+	<bean id="crafter.mainHandlerMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+		<property name="order" value="#{T(org.springframework.core.Ordered).LOWEST_PRECEDENCE}"/>
+		<property name="interceptors" ref="crafter.interceptors"/>
+		<property name="urlMap" ref="crafter.urlMappings"/>
+		<!-- This property became false by default in Spring 5.3 -->
+		<property name="useTrailingSlashMatch" value="true"/>
 
-        <!-- https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/servlet/handler/AbstractHandlerMapping.html#setPatternParser(org.springframework.web.util.pattern.PathPatternParser)
-        Since Spring 6.0, this is populated to a PathPatternParser by default. Setting to null to keep current behavior.
-        -->
-        <property name="patternParser">
-            <null/>
-        </property>
-    </bean>
+		<!-- https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/servlet/handler/AbstractHandlerMapping.html#setPatternParser(org.springframework.web.util.pattern.PathPatternParser)
+		Since Spring 6.0, this is populated to a PathPatternParser by default. Setting to null to keep current behavior.
+		-->
+		<property name="patternParser">
+			<null/>
+		</property>
+	</bean>
 
-    <bean id="crafter.restScriptsController" class="org.craftercms.engine.controller.rest.RestScriptsController">
-        <property name="urlTemplateScanner" ref="crafter.scriptUrlTemplateScanner"/>
-        <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
-        <property name="pluginService" ref="crafter.pluginService"/>
-    </bean>
+	<bean id="crafter.restScriptsController" class="org.craftercms.engine.controller.rest.RestScriptsController">
+		<property name="urlTemplateScanner" ref="crafter.scriptUrlTemplateScanner"/>
+		<property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
+		<property name="pluginService" ref="crafter.pluginService"/>
+	</bean>
 
-    <bean id="crafter.staticAssetsRequestHandler" class="org.craftercms.engine.controller.StaticAssetsRequestHandler">
-        <constructor-arg name="contentStoreService" ref="crafter.contentStoreService"/>
-        <constructor-arg name="disableCaching" value="${crafter.engine.staticAssets.disableCaching}"/>
-    </bean>
+	<bean id="crafter.staticAssetsRequestHandler" class="org.craftercms.engine.controller.StaticAssetsRequestHandler">
+		<constructor-arg name="contentStoreService" ref="crafter.contentStoreService"/>
+		<constructor-arg name="disableCaching" value="${crafter.engine.staticAssets.disableCaching}"/>
+	</bean>
 
-    <bean id="crafter.remoteAssetsRequestHandler" class="org.craftercms.engine.controller.RemoteAssetsRequestHandler">
-        <constructor-arg name="remoteFileResolver" ref="crafter.remoteFileResolver"/>
-        <constructor-arg name="disableCaching" value="${crafter.engine.remoteAssets.disableCaching}"/>
-    </bean>
+	<bean id="crafter.remoteAssetsRequestHandler" class="org.craftercms.engine.controller.RemoteAssetsRequestHandler">
+		<constructor-arg name="remoteFileResolver" ref="crafter.remoteFileResolver"/>
+		<constructor-arg name="disableCaching" value="${crafter.engine.remoteAssets.disableCaching}"/>
+	</bean>
 
-    <bean id="crafter.pageRenderController" class="org.craftercms.engine.controller.PageRenderController">
-        <constructor-arg name="fallbackPageUrl" value="/no-site.html"/>
-        <constructor-arg name="storeService" ref="crafter.contentStoreService"/>
-        <property name="fallbackMessage" value="${crafter.engine.site.fallback.message}"/>
-        <property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
-        <property name="pluginService" ref="crafter.pluginService"/>
-    </bean>
+	<bean id="crafter.pageRenderController" class="org.craftercms.engine.controller.PageRenderController">
+		<constructor-arg name="fallbackPageUrl" value="/no-site.html"/>
+		<constructor-arg name="storeService" ref="crafter.contentStoreService"/>
+		<property name="fallbackMessage" value="${crafter.engine.site.fallback.message}"/>
+		<property name="disableVariableRestrictions" value="${crafter.engine.disableVariableRestrictions}"/>
+		<property name="pluginService" ref="crafter.pluginService"/>
+	</bean>
 
-    <bean id="crafter.errorPageRenderController" class="org.craftercms.engine.controller.ErrorPageRenderController">
-        <constructor-arg name="errorViewNamePrefix" value="${crafter.engine.error.viewName.prefix}"/>
-    </bean>
+	<bean id="crafter.errorPageRenderController" class="org.craftercms.engine.controller.ErrorPageRenderController">
+		<constructor-arg name="errorViewNamePrefix" value="${crafter.engine.error.viewName.prefix}"/>
+	</bean>
 
-    <bean id="crafter.monitoringRenderController" class="org.craftercms.engine.controller.rest.MonitoringController">
-        <constructor-arg name="siteHealthCheckService" ref="siteHealthCheckService"/>
-        <constructor-arg name="configuredToken" value="${crafter.engine.management.authorizationToken}" />
-    </bean>
+	<bean id="crafter.monitoringRenderController" class="org.craftercms.engine.controller.rest.MonitoringController">
+		<constructor-arg name="siteHealthCheckService" ref="siteHealthCheckService"/>
+		<constructor-arg name="configuredToken" value="${crafter.engine.management.authorizationToken}"/>
+	</bean>
 
-    <bean id="crafter.siteContextRestController"
-          class="org.craftercms.engine.controller.rest.SiteContextRestController">
-        <constructor-arg name="contextManager" ref="crafter.siteContextManager"/>
-        <constructor-arg name="configuredToken" value="${crafter.engine.management.authorizationToken}" />
-    </bean>
+	<bean id="crafter.siteContextRestController"
+	      class="org.craftercms.engine.controller.rest.SiteContextRestController">
+		<constructor-arg name="contextManager" ref="crafter.siteContextManager"/>
+		<constructor-arg name="configuredToken" value="${crafter.engine.management.authorizationToken}"/>
+	</bean>
 
-    <bean id="crafter.siteContentStoreRestController"
-          class="org.craftercms.engine.controller.rest.SiteContentStoreRestController">
-        <constructor-arg name="wrappedController" ref="crafter.contentStoreRestController"/>
-    </bean>
+	<bean id="crafter.siteContentStoreRestController"
+	      class="org.craftercms.engine.controller.rest.SiteContentStoreRestController">
+		<constructor-arg name="wrappedController" ref="crafter.contentStoreRestController"/>
+	</bean>
 
-    <bean id="crafter.siteCacheRestController" class="org.craftercms.engine.controller.rest.SiteCacheRestController">
-        <constructor-arg name="configuredToken" value="${crafter.engine.management.authorizationToken}" />
-    </bean>
+	<bean id="crafter.siteCacheRestController"
+		  class="org.craftercms.engine.controller.rest.SiteCacheRestController">
+		<constructor-arg name="cacheRestOperationsPerCacheType" ref="crafter.cacheRestOperationsPerCacheType"/>
+		<constructor-arg name="defaultCacheType" value="system"/>
+		<constructor-arg name="configuredToken" value="${crafter.engine.management.authorizationToken}"/>
+	</bean>
 
-    <bean id="crafter.siteNavigationRestController"
-          class="org.craftercms.engine.controller.rest.SiteNavigationController">
-        <constructor-arg name="navTreeBuilder" ref="crafter.navTreeBuilder"/>
-        <constructor-arg name="navBreadcrumbBuilder" ref="crafter.navBreadcrumbBuilder"/>
-    </bean>
+	<bean id="crafter.siteNavigationRestController"
+	      class="org.craftercms.engine.controller.rest.SiteNavigationController">
+		<constructor-arg name="navTreeBuilder" ref="crafter.navTreeBuilder"/>
+		<constructor-arg name="navBreadcrumbBuilder" ref="crafter.navBreadcrumbBuilder"/>
+	</bean>
 
-    <bean id="crafter.siteScheduledJobsController"
-          class="org.craftercms.engine.controller.rest.SiteScheduledJobsController"/>
+	<bean id="crafter.siteScheduledJobsController"
+	      class="org.craftercms.engine.controller.rest.SiteScheduledJobsController"/>
 
-    <bean id="crafter.siteUrlRestController" class="org.craftercms.engine.controller.rest.SiteUrlController">
-        <constructor-arg name="urlTransformationService" ref="crafter.urlTransformationService"/>
-    </bean>
+	<bean id="crafter.siteUrlRestController" class="org.craftercms.engine.controller.rest.SiteUrlController">
+		<constructor-arg name="urlTransformationService" ref="crafter.urlTransformationService"/>
+	</bean>
 
-    <bean id="crafter.siteSearchController"
-          class="org.craftercms.engine.controller.rest.SiteSearchController">
-        <constructor-arg name="searchService" ref="crafter.searchService"/>
-    </bean>
+	<bean id="crafter.siteSearchController"
+	      class="org.craftercms.engine.controller.rest.SiteSearchController">
+		<constructor-arg name="searchService" ref="crafter.searchService"/>
+	</bean>
 
-    <bean id="crafter.siteGraphQLController" class="org.craftercms.engine.controller.rest.SiteGraphQLController"/>
+	<bean id="crafter.siteGraphQLController" class="org.craftercms.engine.controller.rest.SiteGraphQLController"/>
 
-    <bean id="crafter.siteConfigController" class="org.craftercms.engine.controller.rest.ConfigRestController">
-        <constructor-arg name="modePreview" value="${crafter.engine.preview}"/>
-    </bean>
+	<bean id="crafter.siteConfigController" class="org.craftercms.engine.controller.rest.ConfigRestController">
+		<constructor-arg name="modePreview" value="${crafter.engine.preview}"/>
+	</bean>
 
-    <util:map id="crafter.urlMappings">
-        <entry key="/static-assets/**" value-ref="crafter.staticAssetsRequestHandler"/>
-        <entry key="/remote-assets/**" value-ref="crafter.remoteAssetsRequestHandler"/>
-        <entry key="/*" value-ref="crafter.pageRenderController"/>
-    </util:map>
+	<bean id="crafter.systemSiteCacheRestOperations"
+		  class="org.craftercms.engine.controller.rest.cache.SystemSiteCacheRestOperations">
+		<constructor-arg name="cacheService" ref="crafter.cacheService"/>
+	</bean>
+
+	<util:map id="crafter.urlMappings">
+		<entry key="/static-assets/**" value-ref="crafter.staticAssetsRequestHandler"/>
+		<entry key="/remote-assets/**" value-ref="crafter.remoteAssetsRequestHandler"/>
+		<entry key="/*" value-ref="crafter.pageRenderController"/>
+	</util:map>
+
+
+	<beans profile="!crafter.core.applicationCache">
+		<util:map id="crafter.cacheRestOperationsPerCacheType">
+			<entry key="system" value-ref="crafter.systemSiteCacheRestOperations"/>
+		</util:map>
+	</beans>
+
+	<beans profile="crafter.core.applicationCache">
+		<bean id="crafter.appSiteCacheRestOperations"
+			  class="org.craftercms.engine.controller.rest.cache.SiteCacheRestOperationsImpl">
+			<constructor-arg name="cacheService" ref="crafter.appCacheService"/>
+		</bean>
+
+		<util:map id="crafter.cacheRestOperationsPerCacheType">
+			<entry key="system" value-ref="crafter.systemSiteCacheRestOperations"/>
+			<entry key="application" value-ref="crafter.appSiteCacheRestOperations"/>
+		</util:map>
+	</beans>
 
 </beans>

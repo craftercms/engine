@@ -41,54 +41,54 @@ import static org.quartz.TriggerBuilder.newTrigger;
  */
 public class SchedulingUtils {
 
-    private SchedulingUtils() {
-    }
+	private SchedulingUtils() {
+	}
 
-    public static Trigger createCronTrigger(String triggerName, String cronExpression) {
-        Trigger trigger = newTrigger()
-            .withIdentity(triggerName)
-            .withSchedule(cronSchedule(cronExpression))
-            .build();
+	public static Trigger createCronTrigger(String triggerName, String cronExpression) {
+		Trigger trigger = newTrigger()
+			.withIdentity(triggerName)
+			.withSchedule(cronSchedule(cronExpression))
+			.build();
 
-        return trigger;
-    }
+		return trigger;
+	}
 
-    public static JobDetail createScriptJob(SiteContext siteContext, String jobName, String scriptUrl,
-                                            ServletContext servletContext) {
-        JobDataMap dataMap = new JobDataMap();
-        dataMap.put(SITE_CONTEXT_DATA_KEY, siteContext);
-        dataMap.put(SCRIPT_URL_DATA_KEY, scriptUrl);
-        dataMap.put(SERVLET_CONTEXT_DATA_KEY, servletContext);
+	public static JobDetail createScriptJob(SiteContext siteContext, String jobName, String scriptUrl,
+						ServletContext servletContext) {
+		JobDataMap dataMap = new JobDataMap();
+		dataMap.put(SITE_CONTEXT_DATA_KEY, siteContext);
+		dataMap.put(SCRIPT_URL_DATA_KEY, scriptUrl);
+		dataMap.put(SERVLET_CONTEXT_DATA_KEY, servletContext);
 
-        JobDetail job = newJob(ScriptJob.class)
-            .withIdentity(jobName)
-            .setJobData(dataMap)
-            .build();
+		JobDetail job = newJob(ScriptJob.class)
+			.withIdentity(jobName)
+			.setJobData(dataMap)
+			.build();
 
-        return job;
-    }
+		return job;
+	}
 
-    public static JobContext createJobContext(SiteContext siteContext, String scriptUrl, String cronExpression,
-                                              ServletContext servletContext) {
-        String jobName = siteContext.getSiteName() + ":" + scriptUrl;
-        JobDetail detail = SchedulingUtils.createScriptJob(siteContext, jobName, scriptUrl, servletContext);
-        Trigger trigger = SchedulingUtils.createCronTrigger("trigger for " + jobName, cronExpression);
-        String description = "Job{url='" + scriptUrl + "', cron='" + cronExpression + "'}";
+	public static JobContext createJobContext(SiteContext siteContext, String scriptUrl, String cronExpression,
+						  ServletContext servletContext) {
+		String jobName = siteContext.getSiteName() + ":" + scriptUrl;
+		JobDetail detail = SchedulingUtils.createScriptJob(siteContext, jobName, scriptUrl, servletContext);
+		Trigger trigger = SchedulingUtils.createCronTrigger("trigger for " + jobName, cronExpression);
+		String description = "Job{url='" + scriptUrl + "', cron='" + cronExpression + "'}";
 
-        return new JobContext(detail, trigger, description);
-    }
+		return new JobContext(detail, trigger, description);
+	}
 
-    public static Scheduler createScheduler(String schedulerName, Executor threaPoolExecutor) throws SchedulerException {
-        try {
-            SchedulerFactoryBean schedulerFactoryBean = new SchedulerFactoryBean();
-            schedulerFactoryBean.setSchedulerName(schedulerName);
-            schedulerFactoryBean.setTaskExecutor(threaPoolExecutor);
-            schedulerFactoryBean.afterPropertiesSet();
+	public static Scheduler createScheduler(String schedulerName, Executor threaPoolExecutor) throws SchedulerException {
+		try {
+			SchedulerFactoryBean schedulerFactoryBean = new SchedulerFactoryBean();
+			schedulerFactoryBean.setSchedulerName(schedulerName);
+			schedulerFactoryBean.setTaskExecutor(threaPoolExecutor);
+			schedulerFactoryBean.afterPropertiesSet();
 
-            return schedulerFactoryBean.getObject();
-        } catch (Exception e) {
-            throw new SchedulerException("Unable to create scheduler", e);
-        }
-    }
+			return schedulerFactoryBean.getObject();
+		} catch (Exception e) {
+			throw new SchedulerException("Unable to create scheduler", e);
+		}
+	}
 
 }

@@ -45,64 +45,64 @@ import static org.junit.Assert.*;
  */
 public class ConfigAwareConnectionFactoryLocatorTest extends ConfigAwareTestBase {
 
-    private ConfigAwareConnectionFactoryLocator locator;
-    @Mock
-    private CacheTemplate cacheTemplate;
+	private ConfigAwareConnectionFactoryLocator locator;
+	@Mock
+	private CacheTemplate cacheTemplate;
 
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
+	@Override
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
 
-        CacheTemplateMockUtils.setUpWithNoCaching(cacheTemplate);
+		CacheTemplateMockUtils.setUpWithNoCaching(cacheTemplate);
 
-        ConfigurationParser<?> configParserStub = new FacebookConnectionFactoryConfigParser() {
+		ConfigurationParser<?> configParserStub = new FacebookConnectionFactoryConfigParser() {
 
-            @Override
-            protected ConnectionFactory<Facebook> createFacebookConnectionFactory(String appId, String appSecret) {
-                return new FacebookConnectionFactoryStub(appId, appSecret);
-            }
+			@Override
+			protected ConnectionFactory<Facebook> createFacebookConnectionFactory(String appId, String appSecret) {
+				return new FacebookConnectionFactoryStub(appId, appSecret);
+			}
 
-        };
+		};
 
-        locator = new ConfigAwareConnectionFactoryLocator(new ConnectionFactoryRegistry(), cacheTemplate);
-        locator.setConfigParsers(Arrays.<ConfigurationParser<?>>asList(configParserStub));
-    }
+		locator = new ConfigAwareConnectionFactoryLocator(new ConnectionFactoryRegistry(), cacheTemplate);
+		locator.setConfigParsers(Arrays.<ConfigurationParser<?>>asList(configParserStub));
+	}
 
-    @Test
-    public void testGetConnectionFactoryWithProviderId() throws Exception {
-        FacebookConnectionFactoryStub factory = (FacebookConnectionFactoryStub)locator.getConnectionFactory("facebook");
+	@Test
+	public void testGetConnectionFactoryWithProviderId() throws Exception {
+		FacebookConnectionFactoryStub factory = (FacebookConnectionFactoryStub) locator.getConnectionFactory("facebook");
 
-        assertNotNull(factory);
-        assertEquals(config.getString(SOCIAL_CONNECTIONS_KEY + "." + FACEBOOK_CONNECTION_FACTORY_APP_ID_KEY), factory.appId);
-        assertEquals(config.getString(SOCIAL_CONNECTIONS_KEY + "." + FACEBOOK_CONNECTION_FACTORY_APP_SECRET_KEY), factory.appSecret);
-    }
+		assertNotNull(factory);
+		assertEquals(config.getString(SOCIAL_CONNECTIONS_KEY + "." + FACEBOOK_CONNECTION_FACTORY_APP_ID_KEY), factory.appId);
+		assertEquals(config.getString(SOCIAL_CONNECTIONS_KEY + "." + FACEBOOK_CONNECTION_FACTORY_APP_SECRET_KEY), factory.appSecret);
+	}
 
-    @Test
-    public void testGetConnectionFactoryWithApiType() throws Exception {
-        FacebookConnectionFactoryStub factory = (FacebookConnectionFactoryStub)locator.getConnectionFactory(Facebook.class);
+	@Test
+	public void testGetConnectionFactoryWithApiType() throws Exception {
+		FacebookConnectionFactoryStub factory = (FacebookConnectionFactoryStub) locator.getConnectionFactory(Facebook.class);
 
-        assertNotNull(factory);
-        assertEquals(config.getString(SOCIAL_CONNECTIONS_KEY + "." + FACEBOOK_CONNECTION_FACTORY_APP_ID_KEY), factory.appId);
-        assertEquals(config.getString(SOCIAL_CONNECTIONS_KEY + "." + FACEBOOK_CONNECTION_FACTORY_APP_SECRET_KEY), factory.appSecret);
-    }
+		assertNotNull(factory);
+		assertEquals(config.getString(SOCIAL_CONNECTIONS_KEY + "." + FACEBOOK_CONNECTION_FACTORY_APP_ID_KEY), factory.appId);
+		assertEquals(config.getString(SOCIAL_CONNECTIONS_KEY + "." + FACEBOOK_CONNECTION_FACTORY_APP_SECRET_KEY), factory.appSecret);
+	}
 
-    private static class FacebookConnectionFactoryStub extends ConnectionFactory<Facebook> {
+	private static class FacebookConnectionFactoryStub extends ConnectionFactory<Facebook> {
 
-        private String appId;
-        private String appSecret;
+		private String appId;
+		private String appSecret;
 
-        public FacebookConnectionFactoryStub(String appId, String appSecret) {
-            super("facebook", new FacebookServiceProvider(appId, appSecret, null), new FacebookAdapter());
+		public FacebookConnectionFactoryStub(String appId, String appSecret) {
+			super("facebook", new FacebookServiceProvider(appId, appSecret, null), new FacebookAdapter());
 
-            this.appId = appId;
-            this.appSecret = appSecret;
-        }
+			this.appId = appId;
+			this.appSecret = appSecret;
+		}
 
-        @Override
-        public Connection<Facebook> createConnection(ConnectionData data) {
-            return null;
-        }
-    }
+		@Override
+		public Connection<Facebook> createConnection(ConnectionData data) {
+			return null;
+		}
+	}
 
 }

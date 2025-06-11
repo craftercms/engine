@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import jakarta.servlet.http.HttpUpgradeHandler;
 import jakarta.servlet.http.WebConnection;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -32,94 +33,96 @@ import java.util.concurrent.Future;
  */
 public class WsUpgradeHandler implements HttpUpgradeHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(WsUpgradeHandler.class);
-    private static final int WEBSOCKET_READ_BUFFER = 1024 * 4; // 4KB
+	private static final Logger logger = LoggerFactory.getLogger(WsUpgradeHandler.class);
+	private static final int WEBSOCKET_READ_BUFFER = 1024 * 4; // 4KB
 
-    ExecutorService exec;
-    InputStream socketIn;
-    OutputStream socketOut;
-    Socket socket;
-    Future<?> future;
+	ExecutorService exec;
+	InputStream socketIn;
+	OutputStream socketOut;
+	Socket socket;
+	Future<?> future;
 
-    public void preInit(ExecutorService exec, InputStream socketIn, OutputStream socketOut, Socket socket) {
-        this.exec = exec;
-        this.socketIn = socketIn;
-        this.socketOut = socketOut;
-        this.socket = socket;
-    }
+	public void preInit(ExecutorService exec, InputStream socketIn, OutputStream socketOut, Socket socket) {
+		this.exec = exec;
+		this.socketIn = socketIn;
+		this.socketOut = socketOut;
+		this.socket = socket;
+	}
 
-    /**
-     * Forward back and forth the websocket stream between websocket server and web client via engine as the proxy
-     * @param wc the WebConnection object associated to this upgrade request
-     */
-    @Override
-    public void init(WebConnection wc) {
-        logger.debug("* Websocket| Upgrade begin");
-        try {
-            var servletIn = wc.getInputStream();
-            var servletOut = wc.getOutputStream();
-            future = exec.submit(() -> {
-                logger.debug("> Websocket| Websocket server -> Engine");
-                try {
-                    forwardStreamData(socketIn, servletOut, true);
-                } catch (IOException e) {
-                    logger.error("Error while forwarding websocket stream", e);
-                }
+	/**
+	 * Forward back and forth the websocket stream between websocket server and web client via engine as the proxy
+	 *
+	 * @param wc the WebConnection object associated to this upgrade request
+	 */
+	@Override
+	public void init(WebConnection wc) {
+		logger.debug("* Websocket| Upgrade begin");
+		try {
+			var servletIn = wc.getInputStream();
+			var servletOut = wc.getOutputStream();
+			future = exec.submit(() -> {
+				logger.debug("> Websocket| Websocket server -> Engine");
+				try {
+					forwardStreamData(socketIn, servletOut, true);
+				} catch (IOException e) {
+					logger.error("Error while forwarding websocket stream", e);
+				}
 
-                return null;
-            });
+				return null;
+			});
 
-            logger.debug("> Websocket| Client -> Engine");
-            forwardStreamData(servletIn, socketOut, false);
+			logger.debug("> Websocket| Client -> Engine");
+			forwardStreamData(servletIn, socketOut, false);
 
-            future.get();
-        } catch (Exception e) {
-            logger.error("Error while forwarding websocket stream", e);
-        } finally {
-            if (future != null) {
-                future.cancel(true);
-            }
-        }
-    }
+			future.get();
+		} catch (Exception e) {
+			logger.error("Error while forwarding websocket stream", e);
+		} finally {
+			if (future != null) {
+				future.cancel(true);
+			}
+		}
+	}
 
-    @Override
-    public void destroy() {
-        logger.debug("* Websocket| Upgrade closing");
-        if (future != null) {
-            future.cancel(true);
-        }
-        try {
-            socket.close();
-        } catch (IOException ex) {
-            logger.debug("Exception while closing socket", ex);
-        }
-        logger.debug("* Websocket| Upgrade close");
-    }
+	@Override
+	public void destroy() {
+		logger.debug("* Websocket| Upgrade closing");
+		if (future != null) {
+			future.cancel(true);
+		}
+		try {
+			socket.close();
+		} catch (IOException ex) {
+			logger.debug("Exception while closing socket", ex);
+		}
+		logger.debug("* Websocket| Upgrade close");
+	}
 
-    /**
-     * Forward the whole bytes from an input stream to an output stream
-     * @param inputStream the input stream to read bytes from
-     * @param outputStream the output stream to write bytes into
-     * @param flushOutput true to flush output stream right after reading each block
-     * @throws IOException if there is an error close the output stream
-     */
-    private void forwardStreamData(InputStream inputStream, OutputStream outputStream, boolean flushOutput) throws IOException {
-        int i = 0;
-        int count;
-        try {
-            byte[] buffer = new byte[WEBSOCKET_READ_BUFFER];
-            while ((count = inputStream.read(buffer)) > 0) {
-                outputStream.write(buffer, 0, count);
-                if (flushOutput) {
-                    outputStream.flush();
-                }
-                i++;
-            }
-        } catch (Exception exc) {
-            logger.debug("> Websocket| Read/Write streams interrupted", exc);
-        } finally {
-            socketOut.close();
-        }
-        logger.debug("> Websocket| Done: {}", i);
-    }
+	/**
+	 * Forward the whole bytes from an input stream to an output stream
+	 *
+	 * @param inputStream  the input stream to read bytes from
+	 * @param outputStream the output stream to write bytes into
+	 * @param flushOutput  true to flush output stream right after reading each block
+	 * @throws IOException if there is an error close the output stream
+	 */
+	private void forwardStreamData(InputStream inputStream, OutputStream outputStream, boolean flushOutput) throws IOException {
+		int i = 0;
+		int count;
+		try {
+			byte[] buffer = new byte[WEBSOCKET_READ_BUFFER];
+			while ((count = inputStream.read(buffer)) > 0) {
+				outputStream.write(buffer, 0, count);
+				if (flushOutput) {
+					outputStream.flush();
+				}
+				i++;
+			}
+		} catch (Exception exc) {
+			logger.debug("> Websocket| Read/Write streams interrupted", exc);
+		} finally {
+			socketOut.close();
+		}
+		logger.debug("> Websocket| Done: {}", i);
+	}
 }

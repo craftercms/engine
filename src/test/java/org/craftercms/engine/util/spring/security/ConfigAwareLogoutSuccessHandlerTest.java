@@ -35,25 +35,25 @@ import static org.junit.Assert.assertEquals;
  */
 public class ConfigAwareLogoutSuccessHandlerTest extends ConfigAwareTestBase {
 
-    private ConfigAwareLogoutSuccessHandler handler;
+	private ConfigAwareLogoutSuccessHandler handler;
 
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
+	@Override
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
 
-        handler = new ConfigAwareLogoutSuccessHandler();
-        handler.setDefaultTargetUrl("/");
-    }
+		handler = new ConfigAwareLogoutSuccessHandler();
+		handler.setDefaultTargetUrl("/");
+	}
 
-    @Test
-    public void testProcessRequest() throws Exception {
-        HttpServletRequest request = RequestContext.getCurrent().getRequest();
-        HttpServletResponse response = RequestContext.getCurrent().getResponse();
-        handler.onLogoutSuccess(request, response, new UsernamePasswordAuthenticationToken("", ""));
+	@Test
+	public void testProcessRequest() throws Exception {
+		HttpServletRequest request = RequestContext.getCurrent().getRequest();
+		HttpServletResponse response = RequestContext.getCurrent().getResponse();
+		handler.onLogoutSuccess(request, response, new UsernamePasswordAuthenticationToken("", ""));
 
-        assertEquals(config.getString(ConfigAwareLogoutSuccessHandler.LOGOUT_SUCCESS_URL_KEY),
-                     ((MockHttpServletResponse)RequestContext.getCurrent().getResponse()).getRedirectedUrl());
-    }
-    
+		assertEquals(config.getString(ConfigAwareLogoutSuccessHandler.LOGOUT_SUCCESS_URL_KEY),
+			((MockHttpServletResponse) RequestContext.getCurrent().getResponse()).getRedirectedUrl());
+	}
+
 }

@@ -38,113 +38,113 @@ import org.craftercms.core.service.Content;
  */
 public class ContentStoreUrlConnection extends URLConnection {
 
-    private static final String CONTENT_LENGTH = "content-length";
-    private static final String CONTENT_TYPE = "content-type";
-    private static final String LAST_MODIFIED = "last-modified";
-    private static final String DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss 'GMT'";
-    private static final String TIMEZONE = "GMT";
+	private static final String CONTENT_LENGTH = "content-length";
+	private static final String CONTENT_TYPE = "content-type";
+	private static final String LAST_MODIFIED = "last-modified";
+	private static final String DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss 'GMT'";
+	private static final String TIMEZONE = "GMT";
 
-    protected Content content;
-    protected Map<String, String> headers;
-    protected String contentType;
-    protected long length;
-    protected long lastModified;
-    protected InputStream is;
+	protected Content content;
+	protected Map<String, String> headers;
+	protected String contentType;
+	protected long length;
+	protected long lastModified;
+	protected InputStream is;
 
-    protected boolean connected;
-    protected boolean initializedHeaders;
+	protected boolean connected;
+	protected boolean initializedHeaders;
 
-    public ContentStoreUrlConnection(URL url, Content content) {
-        super(url);
+	public ContentStoreUrlConnection(URL url, Content content) {
+		super(url);
 
-        this.content = content;
-        this.headers = new LinkedHashMap<>();
-    }
+		this.content = content;
+		this.headers = new LinkedHashMap<>();
+	}
 
-    @Override
-    public void connect() throws IOException {
-        if (!connected) {
-            is = content.getInputStream();
-            connected = true;
-        }
-    }
+	@Override
+	public void connect() throws IOException {
+		if (!connected) {
+			is = content.getInputStream();
+			connected = true;
+		}
+	}
 
-    @Override
-    public InputStream getInputStream() throws IOException {
-        connect();
+	@Override
+	public InputStream getInputStream() throws IOException {
+		connect();
 
-        return is;
-    }
+		return is;
+	}
 
-    protected void initializeHeaders() {
-        if (!initializedHeaders) {
-            length = content.getLength();
-            lastModified = content.getLastModified();
+	protected void initializeHeaders() {
+		if (!initializedHeaders) {
+			length = content.getLength();
+			lastModified = content.getLastModified();
 
-            FileNameMap map = getFileNameMap();
-            contentType = map.getContentTypeFor(url.getFile());
+			FileNameMap map = getFileNameMap();
+			contentType = map.getContentTypeFor(url.getFile());
 
-            if (contentType != null) {
-                headers.put(CONTENT_TYPE, contentType);
-            }
+			if (contentType != null) {
+				headers.put(CONTENT_TYPE, contentType);
+			}
 
-            headers.put(CONTENT_LENGTH, String.valueOf(length));
+			headers.put(CONTENT_LENGTH, String.valueOf(length));
 
-            /*
-             * Format the last-modified field into the preferred
-             * Internet standard - ie: fixed-length subset of that
-             * defined by RFC 1123
-             * */
-            Date date = new Date(lastModified);
-            SimpleDateFormat dateFormat = new SimpleDateFormat (DATE_FORMAT, Locale.US);
-            dateFormat.setTimeZone(TimeZone.getTimeZone(TIMEZONE));
+			/*
+			 * Format the last-modified field into the preferred
+			 * Internet standard - ie: fixed-length subset of that
+			 * defined by RFC 1123
+			 * */
+			Date date = new Date(lastModified);
+			SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT, Locale.US);
+			dateFormat.setTimeZone(TimeZone.getTimeZone(TIMEZONE));
 
-            headers.put(LAST_MODIFIED, dateFormat.format(date));
+			headers.put(LAST_MODIFIED, dateFormat.format(date));
 
-            initializedHeaders = true;
-        }
-    }
+			initializedHeaders = true;
+		}
+	}
 
-    @Override
-    public String getHeaderField(String name) {
-        initializeHeaders();
+	@Override
+	public String getHeaderField(String name) {
+		initializeHeaders();
 
-        return headers.get(name);
-    }
+		return headers.get(name);
+	}
 
-    @Override
-    public String getHeaderField(int n) {
-        initializeHeaders();
+	@Override
+	public String getHeaderField(int n) {
+		initializeHeaders();
 
-        Collection<String> values = headers.values();
-        String[] valuesArray = values.toArray(new String[values.size()]);
+		Collection<String> values = headers.values();
+		String[] valuesArray = values.toArray(new String[values.size()]);
 
-        return valuesArray[n];
-    }
+		return valuesArray[n];
+	}
 
-    @Override
-    public String getHeaderFieldKey(int n) {
-        initializeHeaders();
+	@Override
+	public String getHeaderFieldKey(int n) {
+		initializeHeaders();
 
-        Collection<String> keys = headers.keySet();
-        String[] keysArray = keys.toArray(new String[keys.size()]);
+		Collection<String> keys = headers.keySet();
+		String[] keysArray = keys.toArray(new String[keys.size()]);
 
-        return keysArray[n];
-    }
+		return keysArray[n];
+	}
 
-    @Override
-    public int getContentLength() {
-        initializeHeaders();
+	@Override
+	public int getContentLength() {
+		initializeHeaders();
 
-        return (int) length;
-    }
+		return (int) length;
+	}
 
-    @Override
-    public long getLastModified() {
-        initializeHeaders();
+	@Override
+	public long getLastModified() {
+		initializeHeaders();
 
-        return lastModified;
-    }
+		return lastModified;
+	}
 
 }
 

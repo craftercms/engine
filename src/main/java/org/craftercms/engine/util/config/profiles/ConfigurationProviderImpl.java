@@ -32,30 +32,30 @@ import java.util.Map;
  */
 public class ConfigurationProviderImpl implements ConfigurationProvider {
 
-    protected SiteItemService siteItemService;
+	protected SiteItemService siteItemService;
 
-    @ConstructorProperties({"siteItemService"})
-    public ConfigurationProviderImpl(SiteItemService siteItemService) {
-        this.siteItemService = siteItemService;
-    }
+	@ConstructorProperties({"siteItemService"})
+	public ConfigurationProviderImpl(SiteItemService siteItemService) {
+		this.siteItemService = siteItemService;
+	}
 
-    @Override
-    public boolean configExists(String path) {
-        return siteItemService.getSiteItem(path) != null;
-    }
+	@Override
+	public boolean configExists(String path) {
+		return siteItemService.getSiteItem(path) != null;
+	}
 
-    @Override
-    public InputStream getConfig(String path) throws IOException {
-        return siteItemService.getRawContent(path).getInputStream();
-    }
+	@Override
+	public InputStream getConfig(String path) throws IOException {
+		return siteItemService.getRawContent(path).getInputStream();
+	}
 
-    @Override
-    public Map<String,String> getLookupVariables() {
-        SiteContext siteContext = SiteContext.getCurrent();
+	@Override
+	public Map<String, String> getLookupVariables() {
+		SiteContext siteContext = SiteContext.getCurrent();
 
-        if (siteContext == null) {
-            throw new IllegalStateException("No current site context found");
-        }
-        return siteContext.getContext().getConfigLookupVariables();
-    }
+		if (siteContext == null) {
+			throw new IllegalStateException("No current site context found");
+		}
+		return siteContext.getContext().getConfigLookupVariables();
+	}
 }

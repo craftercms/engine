@@ -29,22 +29,22 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 public class HeaderSiteResolver implements SiteResolver {
 
-    private static final Logger logger = LoggerFactory.getLogger(HeaderSiteResolver.class);
+	private static final Logger logger = LoggerFactory.getLogger(HeaderSiteResolver.class);
 
-    public HeaderSiteResolver(String headerName) {
-        this.headerName = headerName;
-    }
+	public HeaderSiteResolver(String headerName) {
+		this.headerName = headerName;
+	}
 
-    protected String headerName;
+	protected String headerName;
 
-    @Override
-    public String getSiteName(HttpServletRequest request) {
-        String siteName = request.getHeader(headerName);
-        if (StringUtils.isEmpty(siteName)) {
-            logger.debug("No '{}' request header found", headerName);
-        }
+	@Override
+	public String getSiteName(HttpServletRequest request) {
+		String siteName = request.getHeader(headerName);
+		if (StringUtils.isEmpty(siteName)) {
+			logger.debug("No '{}' request header found", headerName);
+		}
 
-        return siteName;
-    }
+		return siteName;
+	}
 
 }

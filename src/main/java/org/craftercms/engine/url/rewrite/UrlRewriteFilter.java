@@ -26,6 +26,7 @@ import org.tuckey.web.filters.urlrewrite.utils.Log;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 
 /**
@@ -35,58 +36,57 @@ import java.io.IOException;
  * XML style configuration) or {@code /config/engine/urlrewrite.conf} (for Apache's mod_rewrite style configuration).
  *
  * @author avasquez
- *
  * @see <a href="http://tuckey.org/urlrewrite/">Tuckey URL Rewrite</a>
  */
 public class UrlRewriteFilter implements Filter, InitializingBean {
 
-    private static final Logger logger = LoggerFactory.getLogger(UrlRewriteFilter.class);
+	private static final Logger logger = LoggerFactory.getLogger(UrlRewriteFilter.class);
 
-    @Override
-    public void init(FilterConfig filterConfig) {
-        // Do nothing
-    }
+	@Override
+	public void init(FilterConfig filterConfig) {
+		// Do nothing
+	}
 
-    public void afterPropertiesSet() {
-        // Set Tuckey logging to use slf4j
-        Log.setLevel("slf4j");
-    }
+	public void afterPropertiesSet() {
+		// Set Tuckey logging to use slf4j
+		Log.setLevel("slf4j");
+	}
 
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response,
-                         FilterChain chain) throws IOException, ServletException {
-        HttpServletRequest httpServletRequest = (HttpServletRequest) request;
-        HttpServletResponse httpServletResponse = (HttpServletResponse) response;
-        UrlRewriter urlRewriter = getUrlRewriter();
-        boolean requestRewritten = false;
+	@Override
+	public void doFilter(ServletRequest request, ServletResponse response,
+			     FilterChain chain) throws IOException, ServletException {
+		HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+		HttpServletResponse httpServletResponse = (HttpServletResponse) response;
+		UrlRewriter urlRewriter = getUrlRewriter();
+		boolean requestRewritten = false;
 
-        if (urlRewriter != null) {
-            httpServletResponse = new UrlRewriteWrappedResponse(httpServletResponse, httpServletRequest, urlRewriter);
-            requestRewritten = urlRewriter.processRequest(httpServletRequest, httpServletResponse, chain);
-        } else {
-            if (logger.isDebugEnabled()) {
-                logger.debug("URL rewriter engine not loaded, ignoring request");
-            }
-        }
+		if (urlRewriter != null) {
+			httpServletResponse = new UrlRewriteWrappedResponse(httpServletResponse, httpServletRequest, urlRewriter);
+			requestRewritten = urlRewriter.processRequest(httpServletRequest, httpServletResponse, chain);
+		} else {
+			if (logger.isDebugEnabled()) {
+				logger.debug("URL rewriter engine not loaded, ignoring request");
+			}
+		}
 
-        // if no rewrite has taken place continue as normal
-        if (!requestRewritten) {
-            chain.doFilter(httpServletRequest, httpServletResponse);
-        }
-    }
+		// if no rewrite has taken place continue as normal
+		if (!requestRewritten) {
+			chain.doFilter(httpServletRequest, httpServletResponse);
+		}
+	}
 
-    protected UrlRewriter getUrlRewriter() {
-        SiteContext siteContext = SiteContext.getCurrent();
-        if (siteContext != null) {
-            return siteContext.getUrlRewriter();
-        } else {
-            throw new IllegalStateException("No site context found to get the URL rewriter from");
-        }
-    }
+	protected UrlRewriter getUrlRewriter() {
+		SiteContext siteContext = SiteContext.getCurrent();
+		if (siteContext != null) {
+			return siteContext.getUrlRewriter();
+		} else {
+			throw new IllegalStateException("No site context found to get the URL rewriter from");
+		}
+	}
 
-    @Override
-    public void destroy() {
-        // Do nothing
-    }
+	@Override
+	public void destroy() {
+		// Do nothing
+	}
 
 }

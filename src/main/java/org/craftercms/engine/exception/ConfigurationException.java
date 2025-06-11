@@ -25,12 +25,12 @@ import org.craftercms.core.exception.CrafterException;
  */
 public class ConfigurationException extends CrafterException {
 
-    public ConfigurationException(String message) {
-        super(message);
-    }
+	public ConfigurationException(String message) {
+		super(message);
+	}
 
-    public ConfigurationException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	public ConfigurationException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
 }

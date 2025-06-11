@@ -18,6 +18,7 @@ package org.craftercms.engine.scripting.impl;
 
 import java.util.Arrays;
 import java.util.List;
+
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.craftercms.commons.http.RequestContext;
@@ -41,109 +42,109 @@ import static org.mockito.Mockito.*;
  */
 public class SiteItemScriptResolverImplTest {
 
-    private ContentStoreService storeService;
-    private SiteItemScriptResolver scriptResolver;
+	private ContentStoreService storeService;
+	private SiteItemScriptResolver scriptResolver;
 
-    @Before
-    public void setUp() throws Exception {
-        storeService = createContentStoreService();
-        scriptResolver = createScriptResolver(storeService);
+	@Before
+	public void setUp() throws Exception {
+		storeService = createContentStoreService();
+		scriptResolver = createScriptResolver(storeService);
 
-        setCurrentRequest(createRequest());
-        setCurrentSiteContext(createSiteContext());
-    }
+		setCurrentRequest(createRequest());
+		setCurrentSiteContext(createSiteContext());
+	}
 
-    @After
-    public void tearDown() throws Exception {
-        removeCurrentRequest();
-        removeCurrentSiteContext();
-    }
+	@After
+	public void tearDown() throws Exception {
+		removeCurrentRequest();
+		removeCurrentSiteContext();
+	}
 
-    @Test
-    public void testGetScriptUrlsExisting() throws Exception {
+	@Test
+	public void testGetScriptUrlsExisting() throws Exception {
 
-        SiteItem siteItem = mock(SiteItem.class);
-        when(siteItem.queryValue("content-type")).thenReturn("/page/mypage1");
-        when(siteItem.queryValues("scripts/item/key")).thenReturn(Arrays.asList(
-            "/scripts/pages/script1.groovy"));
+		SiteItem siteItem = mock(SiteItem.class);
+		when(siteItem.queryValue("content-type")).thenReturn("/page/mypage1");
+		when(siteItem.queryValues("scripts/item/key")).thenReturn(Arrays.asList(
+			"/scripts/pages/script1.groovy"));
 
-        List<String> scriptUrls = scriptResolver.getScriptUrls(siteItem);
-        assertNotNull(scriptUrls);
-        assertEquals(2, scriptUrls.size());
-        assertEquals("/scripts/pages/mypage1.groovy", scriptUrls.get(0));
-        assertEquals("/scripts/pages/script1.groovy", scriptUrls.get(1));
-    }
+		List<String> scriptUrls = scriptResolver.getScriptUrls(siteItem);
+		assertNotNull(scriptUrls);
+		assertEquals(2, scriptUrls.size());
+		assertEquals("/scripts/pages/mypage1.groovy", scriptUrls.get(0));
+		assertEquals("/scripts/pages/script1.groovy", scriptUrls.get(1));
+	}
 
-    @Test
-    public void testGetScriptUrlNotFound() throws Exception {
-        SiteItem siteItem = mock(SiteItem.class);
-        when(siteItem.queryValue("content-type")).thenReturn("/page/mypage2");
-        when(siteItem.queryValues("scripts/item/key")).thenReturn(Arrays.asList(
-            "/scripts/pages/script1.groovy"));
+	@Test
+	public void testGetScriptUrlNotFound() throws Exception {
+		SiteItem siteItem = mock(SiteItem.class);
+		when(siteItem.queryValue("content-type")).thenReturn("/page/mypage2");
+		when(siteItem.queryValues("scripts/item/key")).thenReturn(Arrays.asList(
+			"/scripts/pages/script1.groovy"));
 
-        List<String> scriptUrls = scriptResolver.getScriptUrls(siteItem);
-        assertNotNull(scriptUrls);
-        assertEquals(1, scriptUrls.size());
-        assertEquals("/scripts/pages/script1.groovy", scriptUrls.get(0));
-    }
+		List<String> scriptUrls = scriptResolver.getScriptUrls(siteItem);
+		assertNotNull(scriptUrls);
+		assertEquals(1, scriptUrls.size());
+		assertEquals("/scripts/pages/script1.groovy", scriptUrls.get(0));
+	}
 
-    @Test
-    public void testGetScriptUrlError() throws Exception {
-        SiteItem siteItem = mock(SiteItem.class);
-        when(siteItem.queryValue("content-type")).thenReturn("/page/mypage3");
-        when(siteItem.queryValues("scripts/item/key")).thenReturn(Arrays.asList(
-            "/scripts/pages/script1.groovy"));
+	@Test
+	public void testGetScriptUrlError() throws Exception {
+		SiteItem siteItem = mock(SiteItem.class);
+		when(siteItem.queryValue("content-type")).thenReturn("/page/mypage3");
+		when(siteItem.queryValues("scripts/item/key")).thenReturn(Arrays.asList(
+			"/scripts/pages/script1.groovy"));
 
-        List<String> scriptUrls = scriptResolver.getScriptUrls(siteItem);
-        assertNotNull(scriptUrls);
-        assertEquals(1, scriptUrls.size());
-        assertEquals("/scripts/pages/script1.groovy", scriptUrls.get(0));
-    }
+		List<String> scriptUrls = scriptResolver.getScriptUrls(siteItem);
+		assertNotNull(scriptUrls);
+		assertEquals(1, scriptUrls.size());
+		assertEquals("/scripts/pages/script1.groovy", scriptUrls.get(0));
+	}
 
-    private ContentStoreService createContentStoreService() {
-        ContentStoreService storeService = mock(ContentStoreService.class);
-        when(storeService.exists(any(Context.class), eq("/scripts/pages/mypage1.groovy"))).thenReturn(true);
-        when(storeService.exists(any(Context.class), eq("/scripts/pages/mypage2.groovy"))).thenReturn(false);
-        when(storeService.exists(any(Context.class), eq("/scripts/pages/mypage3.groovy"))).thenThrow(new CrafterException());
+	private ContentStoreService createContentStoreService() {
+		ContentStoreService storeService = mock(ContentStoreService.class);
+		when(storeService.exists(any(Context.class), eq("/scripts/pages/mypage1.groovy"))).thenReturn(true);
+		when(storeService.exists(any(Context.class), eq("/scripts/pages/mypage2.groovy"))).thenReturn(false);
+		when(storeService.exists(any(Context.class), eq("/scripts/pages/mypage3.groovy"))).thenThrow(new CrafterException());
 
-        return storeService;
-    }
+		return storeService;
+	}
 
-    private SiteItemScriptResolver createScriptResolver(ContentStoreService storeService) {
-        SiteItemScriptResolverImpl scriptResolver = new SiteItemScriptResolverImpl(storeService, "content-type",
-                "^/page/(.+)$", "/scripts/pages/%s.groovy", "scripts/item/key");
+	private SiteItemScriptResolver createScriptResolver(ContentStoreService storeService) {
+		SiteItemScriptResolverImpl scriptResolver = new SiteItemScriptResolverImpl(storeService, "content-type",
+			"^/page/(.+)$", "/scripts/pages/%s.groovy", "scripts/item/key");
 
-        return scriptResolver;
-    }
+		return scriptResolver;
+	}
 
-    private SiteContext createSiteContext()  {
-        SiteContext siteContext = spy(new SiteContext());
-        when(siteContext.getSiteName()).thenReturn("test");
-        when(siteContext.getContext()).thenReturn(mock(Context.class));
+	private SiteContext createSiteContext() {
+		SiteContext siteContext = spy(new SiteContext());
+		when(siteContext.getSiteName()).thenReturn("test");
+		when(siteContext.getContext()).thenReturn(mock(Context.class));
 
-        return siteContext;
-    }
+		return siteContext;
+	}
 
-    private void setCurrentSiteContext(SiteContext siteContext)  {
-        SiteContext.setCurrent(siteContext);
-    }
+	private void setCurrentSiteContext(SiteContext siteContext) {
+		SiteContext.setCurrent(siteContext);
+	}
 
-    private void removeCurrentSiteContext() {
-        SiteContext.clear();
-    }
+	private void removeCurrentSiteContext() {
+		SiteContext.clear();
+	}
 
-    private MockHttpServletRequest createRequest()  {
-        MockHttpServletRequest request = new MockHttpServletRequest();
+	private MockHttpServletRequest createRequest() {
+		MockHttpServletRequest request = new MockHttpServletRequest();
 
-        return request;
-    }
+		return request;
+	}
 
-    private void setCurrentRequest(HttpServletRequest request) {
-        RequestContext.setCurrent(new RequestContext(request, null, null));
-    }
+	private void setCurrentRequest(HttpServletRequest request) {
+		RequestContext.setCurrent(new RequestContext(request, null, null));
+	}
 
-    private void removeCurrentRequest() {
-        RequestContext.clear();
-    }
+	private void removeCurrentRequest() {
+		RequestContext.clear();
+	}
 
 }

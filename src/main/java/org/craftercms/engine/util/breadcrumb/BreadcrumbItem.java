@@ -19,26 +19,25 @@ package org.craftercms.engine.util.breadcrumb;
  * Represents a breadcrumb part or component
  *
  * @author Alfonso Vásquez
- *
  * @deprecated Please use instead {@link org.craftercms.engine.navigation.NavBreadcrumbBuilder}.
  */
 @Deprecated
 public class BreadcrumbItem {
 
-    private String url;
-    private String name;
+	private String url;
+	private String name;
 
-    public BreadcrumbItem(String url, String name) {
-        this.url = url;
-        this.name = name;
-    }
+	public BreadcrumbItem(String url, String name) {
+		this.url = url;
+		this.name = name;
+	}
 
-    public String getUrl() {
-        return url;
-    }
+	public String getUrl() {
+		return url;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public String getName() {
+		return name;
+	}
 
 }

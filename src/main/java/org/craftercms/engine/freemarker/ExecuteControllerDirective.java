@@ -18,6 +18,7 @@ package org.craftercms.engine.freemarker;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
 import jakarta.servlet.ServletContext;
 
 import freemarker.core.Environment;
@@ -45,133 +46,133 @@ import org.craftercms.engine.view.CrafterPageView;
  */
 public class ExecuteControllerDirective implements TemplateDirectiveModel {
 
-    private static final Log logger = LogFactory.getLog(ExecuteControllerDirective.class);
+	private static final Log logger = LogFactory.getLog(ExecuteControllerDirective.class);
 
-    public static final String PATH_PARAM_NAME = "path";
+	public static final String PATH_PARAM_NAME = "path";
 
-    protected ServletContext servletContext;
+	protected ServletContext servletContext;
 
-    public ExecuteControllerDirective(ServletContext servletContext) {
-        this.servletContext = servletContext;
-    }
+	public ExecuteControllerDirective(ServletContext servletContext) {
+		this.servletContext = servletContext;
+	}
 
-    @Override
-    public void execute(Environment env, Map params, TemplateModel[] loopVars,
-                        TemplateDirectiveBody body) throws TemplateException, IOException {
-        TemplateModel pathParam = (TemplateModel) params.get(PATH_PARAM_NAME);
-        if (pathParam == null) {
-            throw new IllegalArgumentException("No '" + PATH_PARAM_NAME + "' param specified");
-        } else {
-            executeController(getPath(pathParam, env), env);
-        }
-    }
+	@Override
+	public void execute(Environment env, Map params, TemplateModel[] loopVars,
+			    TemplateDirectiveBody body) throws TemplateException, IOException {
+		TemplateModel pathParam = (TemplateModel) params.get(PATH_PARAM_NAME);
+		if (pathParam == null) {
+			throw new IllegalArgumentException("No '" + PATH_PARAM_NAME + "' param specified");
+		} else {
+			executeController(getPath(pathParam, env), env);
+		}
+	}
 
-    protected void executeController(String path, Environment env) throws TemplateException {
-        Map<String, Object> scriptVariables = createScriptVariables(env);
-        SiteContext siteContext = SiteContext.getCurrent();
+	protected void executeController(String path, Environment env) throws TemplateException {
+		Map<String, Object> scriptVariables = createScriptVariables(env);
+		SiteContext siteContext = SiteContext.getCurrent();
 
-        if (siteContext != null) {
-            ScriptFactory scriptFactory = siteContext.getScriptFactory();
+		if (siteContext != null) {
+			ScriptFactory scriptFactory = siteContext.getScriptFactory();
 
-            if (scriptFactory == null) {
-                throw new IllegalStateException("No script factory associate to current site context '" +
-                                                siteContext.getSiteName() + "'");
-            }
+			if (scriptFactory == null) {
+				throw new IllegalStateException("No script factory associate to current site context '" +
+					siteContext.getSiteName() + "'");
+			}
 
-            Script script;
-            try {
-                script = scriptFactory.getScript(path);
-            } catch (Exception e) {
-                throw new TemplateException("Unable to load controller at '" + path + "'", e, env);
-            }
+			Script script;
+			try {
+				script = scriptFactory.getScript(path);
+			} catch (Exception e) {
+				throw new TemplateException("Unable to load controller at '" + path + "'", e, env);
+			}
 
-            executeController(script, scriptVariables, env);
-        } else {
-            throw new IllegalStateException("No current site context found");
-        }
-    }
+			executeController(script, scriptVariables, env);
+		} else {
+			throw new IllegalStateException("No current site context found");
+		}
+	}
 
-    protected void executeController(Script script, Map<String, Object> variables, Environment env) throws TemplateException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Executing controller at " + script.getUrl());
-        }
+	protected void executeController(Script script, Map<String, Object> variables, Environment env) throws TemplateException {
+		if (logger.isDebugEnabled()) {
+			logger.debug("Executing controller at " + script.getUrl());
+		}
 
-        try {
-            script.execute(variables);
-        } catch (Exception e) {
-            throw new TemplateException("Error executing controller at " + script.getUrl(), e, env);
-        }
-    }
+		try {
+			script.execute(variables);
+		} catch (Exception e) {
+			throw new TemplateException("Error executing controller at " + script.getUrl(), e, env);
+		}
+	}
 
-    protected Map<String, Object> createScriptVariables(Environment env) throws TemplateException {
-        Map<String, Object> variables = new HashMap<>();
-        RequestContext context = RequestContext.getCurrent();
-        SiteItem contentModel = getContentModel(env);
-        Object templateModel = getTemplateModel(env);
+	protected Map<String, Object> createScriptVariables(Environment env) throws TemplateException {
+		Map<String, Object> variables = new HashMap<>();
+		RequestContext context = RequestContext.getCurrent();
+		SiteItem contentModel = getContentModel(env);
+		Object templateModel = getTemplateModel(env);
 
-        if (context != null) {
-            GroovyScriptUtils.addSiteItemScriptVariables(variables, context.getRequest(), context.getResponse(),
-                                                         servletContext, contentModel, templateModel);
-        } else {
-            throw new IllegalStateException("No current request context found");
-        }
+		if (context != null) {
+			GroovyScriptUtils.addSiteItemScriptVariables(variables, context.getRequest(), context.getResponse(),
+				servletContext, contentModel, templateModel);
+		} else {
+			throw new IllegalStateException("No current request context found");
+		}
 
-        return variables;
-    }
+		return variables;
+	}
 
-    protected String getPath(TemplateModel pathParam, Environment env) throws TemplateException {
-        Object unwrappedPath = DeepUnwrap.unwrap(pathParam);
-        if (unwrappedPath instanceof String) {
-            return (String)unwrappedPath;
-        } else {
-            throw new TemplateException("Param '" + PATH_PARAM_NAME + " of unexpected type: expected: " + String.class.getName() +
-                                        ", actual: " + unwrappedPath.getClass().getName(), env);
-        }
-    }
+	protected String getPath(TemplateModel pathParam, Environment env) throws TemplateException {
+		Object unwrappedPath = DeepUnwrap.unwrap(pathParam);
+		if (unwrappedPath instanceof String) {
+			return (String) unwrappedPath;
+		} else {
+			throw new TemplateException("Param '" + PATH_PARAM_NAME + " of unexpected type: expected: " + String.class.getName() +
+				", actual: " + unwrappedPath.getClass().getName(), env);
+		}
+	}
 
-    protected SiteItem getContentModel(Environment env) throws TemplateException {
-        TemplateModel contentModel = env.getVariable(CrafterPageView.KEY_CONTENT_MODEL);
-        if (contentModel != null) {
-            Object unwrappedContentModel = DeepUnwrap.unwrap(contentModel);
-            if (unwrappedContentModel instanceof SiteItem) {
-                return (SiteItem)unwrappedContentModel;
-            } else {
-                throw new TemplateException("Variable '" + CrafterPageView.KEY_CONTENT_MODEL + " of unexpected type: expected: " +
-                                            SiteItem.class.getName() + ", actual: " + unwrappedContentModel.getClass().getName(),
-                                            env);
-            }
-        } else {
-            return null;
-        }
-    }
+	protected SiteItem getContentModel(Environment env) throws TemplateException {
+		TemplateModel contentModel = env.getVariable(CrafterPageView.KEY_CONTENT_MODEL);
+		if (contentModel != null) {
+			Object unwrappedContentModel = DeepUnwrap.unwrap(contentModel);
+			if (unwrappedContentModel instanceof SiteItem) {
+				return (SiteItem) unwrappedContentModel;
+			} else {
+				throw new TemplateException("Variable '" + CrafterPageView.KEY_CONTENT_MODEL + " of unexpected type: expected: " +
+					SiteItem.class.getName() + ", actual: " + unwrappedContentModel.getClass().getName(),
+					env);
+			}
+		} else {
+			return null;
+		}
+	}
 
-    @SuppressWarnings("unchecked")
-    protected Object getTemplateModel(Environment env) throws TemplateException {
-        return new EnvironmentGroovyBeanWrapper(env);
-    }
+	@SuppressWarnings("unchecked")
+	protected Object getTemplateModel(Environment env) throws TemplateException {
+		return new EnvironmentGroovyBeanWrapper(env);
+	}
 
-    public static class EnvironmentGroovyBeanWrapper {
+	public static class EnvironmentGroovyBeanWrapper {
 
-        protected Environment env;
+		protected Environment env;
 
-        public EnvironmentGroovyBeanWrapper(Environment env) {
-            this.env = env;
-        }
+		public EnvironmentGroovyBeanWrapper(Environment env) {
+			this.env = env;
+		}
 
-        public Object get(String varName) throws TemplateModelException {
-            TemplateModel var = env.getVariable(varName);
-            if (var != null) {
-                return DeepUnwrap.unwrap(var);
-            } else {
-                return null;
-            }
-        }
+		public Object get(String varName) throws TemplateModelException {
+			TemplateModel var = env.getVariable(varName);
+			if (var != null) {
+				return DeepUnwrap.unwrap(var);
+			} else {
+				return null;
+			}
+		}
 
-        public void set(String varName, Object varValue) throws TemplateModelException {
-            env.setVariable(varName, env.getObjectWrapper().wrap(varValue));
-        }
+		public void set(String varName, Object varValue) throws TemplateModelException {
+			env.setVariable(varName, env.getObjectWrapper().wrap(varValue));
+		}
 
-    }
+	}
 
 
 }

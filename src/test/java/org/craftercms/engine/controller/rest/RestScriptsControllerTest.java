@@ -39,6 +39,7 @@ import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.util.Collections;
 import java.util.Map;
 
@@ -52,159 +53,159 @@ import static org.mockito.Mockito.*;
  */
 public class RestScriptsControllerTest {
 
-    private ContentStoreService storeService;
-    private RestScriptsController controller;
+	private ContentStoreService storeService;
+	private RestScriptsController controller;
 
-    @Before
-    public void setUp() throws Exception {
-        storeService = createContentStoreService();
+	@Before
+	public void setUp() throws Exception {
+		storeService = createContentStoreService();
 
-        controller = new RestScriptsController();
-        controller.setServletContext(createServletContext());
+		controller = new RestScriptsController();
+		controller.setServletContext(createServletContext());
 
-        PluginService pluginService = mock(PluginService.class);
-        controller.setPluginService(pluginService);
-    }
+		PluginService pluginService = mock(PluginService.class);
+		controller.setPluginService(pluginService);
+	}
 
-    @Test
-    public void testHandleRequest() throws Exception {
-        MockHttpServletRequest request = createRequest("/test.json");
-        MockHttpServletResponse response = createResponse();
+	@Test
+	public void testHandleRequest() throws Exception {
+		MockHttpServletRequest request = createRequest("/test.json");
+		MockHttpServletResponse response = createResponse();
 
-        setCurrentRequest(request);
-        setCurrentSiteContext(storeService);
+		setCurrentRequest(request);
+		setCurrentSiteContext(storeService);
 
-        ResponseEntity<Map<String,Object>> responseEntity = controller.handleRequest(request, response);
+		ResponseEntity<Map<String, Object>> responseEntity = controller.handleRequest(request, response);
 
-        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+		assertEquals(HttpServletResponse.SC_OK, response.getStatus());
 
-        Map<String, Object> responseBody = responseEntity.getBody();
-        assertEquals("test", responseBody.get("test-param"));
-        assertEquals("test", responseBody.get("test-header"));
-        assertEquals("test", responseBody.get("test-cookie"));
+		Map<String, Object> responseBody = responseEntity.getBody();
+		assertEquals("test", responseBody.get("test-param"));
+		assertEquals("test", responseBody.get("test-header"));
+		assertEquals("test", responseBody.get("test-cookie"));
 
-        removeCurrentRequest();
-        removeCurrentSiteContext();
-    }
+		removeCurrentRequest();
+		removeCurrentSiteContext();
+	}
 
-    @Test
-    public void testScriptNotFound() throws Exception {
-        testError("/testErrorNotFound.json", HttpServletResponse.SC_NOT_FOUND, "REST script not found");
-    }
+	@Test
+	public void testScriptNotFound() throws Exception {
+		testError("/testErrorNotFound.json", HttpServletResponse.SC_NOT_FOUND, "REST script not found");
+	}
 
-    @Test
-    public void testError() throws Exception {
-        testError("/testError.json", HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "This is an error test message");
-    }
+	@Test
+	public void testError() throws Exception {
+		testError("/testError.json", HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "This is an error test message");
+	}
 
-    @Test
-    public void testError2() throws Exception {
-        testError("/testError2.json", HttpServletResponse.SC_BAD_REQUEST, "This is an error test message");
-    }
+	@Test
+	public void testError2() throws Exception {
+		testError("/testError2.json", HttpServletResponse.SC_BAD_REQUEST, "This is an error test message");
+	}
 
-    @Test
-    public void testRedirect() throws Exception {
-        MockHttpServletRequest request = createRequest("/testRedirect.json");
-        MockHttpServletResponse response = createResponse();
+	@Test
+	public void testRedirect() throws Exception {
+		MockHttpServletRequest request = createRequest("/testRedirect.json");
+		MockHttpServletResponse response = createResponse();
 
-        setCurrentRequest(request);
-        setCurrentSiteContext(storeService);
+		setCurrentRequest(request);
+		setCurrentSiteContext(storeService);
 
-        ResponseEntity responseEntity = controller.handleRequest(request, response);
+		ResponseEntity responseEntity = controller.handleRequest(request, response);
 
-        assertNull(responseEntity.getBody());
-        assertTrue(response.isCommitted());
-        assertEquals(HttpServletResponse.SC_MOVED_TEMPORARILY, response.getStatus());
-        assertEquals("/api/1/services/test.json", response.getRedirectedUrl());
+		assertNull(responseEntity.getBody());
+		assertTrue(response.isCommitted());
+		assertEquals(HttpServletResponse.SC_MOVED_TEMPORARILY, response.getStatus());
+		assertEquals("/api/1/services/test.json", response.getRedirectedUrl());
 
-        removeCurrentRequest();
-        removeCurrentSiteContext();
-    }
+		removeCurrentRequest();
+		removeCurrentSiteContext();
+	}
 
-    @SuppressWarnings("unchecked")
-    private void testError(String serviceUrl, int statusCode, String message) throws Exception {
-        MockHttpServletRequest request = createRequest(serviceUrl);
-        MockHttpServletResponse response = createResponse();
+	@SuppressWarnings("unchecked")
+	private void testError(String serviceUrl, int statusCode, String message) throws Exception {
+		MockHttpServletRequest request = createRequest(serviceUrl);
+		MockHttpServletResponse response = createResponse();
 
-        setCurrentRequest(request);
-        setCurrentSiteContext(storeService);
+		setCurrentRequest(request);
+		setCurrentSiteContext(storeService);
 
-        try {
-            ResponseEntity responseEntity = controller.handleRequest(request, response);
-            assertEquals(statusCode, response.getStatus());
+		try {
+			ResponseEntity responseEntity = controller.handleRequest(request, response);
+			assertEquals(statusCode, response.getStatus());
 
-            Map<String, Object> responseBody = (Map<String, Object>) responseEntity.getBody();
-            assertEquals(message, responseBody.get(RestScriptsController.DEFAULT_ERROR_MESSAGE_MODEL_ATTR_NAME));
-        } catch (HttpStatusCodeException e) {
-            assertEquals(statusCode, e.getStatusCode());
-        } finally {
-            removeCurrentRequest();
-            removeCurrentSiteContext();
-        }
-    }
+			Map<String, Object> responseBody = (Map<String, Object>) responseEntity.getBody();
+			assertEquals(message, responseBody.get(RestScriptsController.DEFAULT_ERROR_MESSAGE_MODEL_ATTR_NAME));
+		} catch (HttpStatusCodeException e) {
+			assertEquals(statusCode, e.getStatusCode());
+		} finally {
+			removeCurrentRequest();
+			removeCurrentSiteContext();
+		}
+	}
 
-    private ServletContext createServletContext() {
-        return mock(ServletContext.class);
-    }
+	private ServletContext createServletContext() {
+		return mock(ServletContext.class);
+	}
 
-    private ContentStoreService createContentStoreService() {
-        ContentStoreService storeService = mock(ContentStoreService.class);
-        ContentStoreServiceMockUtils.setUpGetContentFromClassPath(storeService);
+	private ContentStoreService createContentStoreService() {
+		ContentStoreService storeService = mock(ContentStoreService.class);
+		ContentStoreServiceMockUtils.setUpGetContentFromClassPath(storeService);
 
-        return storeService;
-    }
+		return storeService;
+	}
 
-    private SiteContext createSiteContext(ContentStoreService storeService) {
-        SiteContext siteContext = spy(new SiteContext());
-        CacheTemplate cacheTemplate = CacheTemplateMockUtils.createCacheTemplate();
+	private SiteContext createSiteContext(ContentStoreService storeService) {
+		SiteContext siteContext = spy(new SiteContext());
+		CacheTemplate cacheTemplate = CacheTemplateMockUtils.createCacheTemplate();
 
-        ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(siteContext);
-        ScriptFactory scriptFactory =
-                new GroovyScriptFactory(siteContext, resourceConnector, Collections.emptyMap(), false);
+		ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(siteContext);
+		ScriptFactory scriptFactory =
+			new GroovyScriptFactory(siteContext, resourceConnector, Collections.emptyMap(), false);
 
-        when(siteContext.getSiteName()).thenReturn("test");
-        when(siteContext.getContext()).thenReturn(mock(Context.class));
-        when(siteContext.getRestScriptsPath()).thenReturn("/scripts");
-        when(siteContext.getStoreService()).thenReturn(storeService);
-        when(siteContext.getScriptFactory()).thenReturn(scriptFactory);
-        when(siteContext.getCacheTemplate()).thenReturn(cacheTemplate);
+		when(siteContext.getSiteName()).thenReturn("test");
+		when(siteContext.getContext()).thenReturn(mock(Context.class));
+		when(siteContext.getRestScriptsPath()).thenReturn("/scripts");
+		when(siteContext.getStoreService()).thenReturn(storeService);
+		when(siteContext.getScriptFactory()).thenReturn(scriptFactory);
+		when(siteContext.getCacheTemplate()).thenReturn(cacheTemplate);
 
-        return siteContext;
-    }
+		return siteContext;
+	}
 
-    private void setCurrentSiteContext(ContentStoreService storeService)  {
-        SiteContext.setCurrent(createSiteContext(storeService));
-    }
+	private void setCurrentSiteContext(ContentStoreService storeService) {
+		SiteContext.setCurrent(createSiteContext(storeService));
+	}
 
-    private void removeCurrentSiteContext() {
-        SiteContext.clear();
-    }
+	private void removeCurrentSiteContext() {
+		SiteContext.clear();
+	}
 
-    private MockHttpServletRequest createRequest(String serviceUrl) {
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", serviceUrl);
+	private MockHttpServletRequest createRequest(String serviceUrl) {
+		MockHttpServletRequest request = new MockHttpServletRequest("GET", serviceUrl);
 
-        request.setParameter("test-param", "test");
-        request.addHeader("test-header", "test");
+		request.setParameter("test-param", "test");
+		request.addHeader("test-header", "test");
 
-        Cookie testCookie = new Cookie("test-cookie", "test");
-        request.setCookies(testCookie);
+		Cookie testCookie = new Cookie("test-cookie", "test");
+		request.setCookies(testCookie);
 
-        request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, serviceUrl);
-        request.setAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE, "/**");
+		request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, serviceUrl);
+		request.setAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE, "/**");
 
-        return request;
-    }
+		return request;
+	}
 
-    private MockHttpServletResponse createResponse() {
-        return new MockHttpServletResponse();
-    }
+	private MockHttpServletResponse createResponse() {
+		return new MockHttpServletResponse();
+	}
 
-    private void setCurrentRequest(HttpServletRequest request) {
-        RequestContext.setCurrent(new RequestContext(request, null, null));
-    }
+	private void setCurrentRequest(HttpServletRequest request) {
+		RequestContext.setCurrent(new RequestContext(request, null, null));
+	}
 
-    private void removeCurrentRequest() {
-        RequestContext.clear();
-    }
+	private void removeCurrentRequest() {
+		RequestContext.clear();
+	}
 
 }

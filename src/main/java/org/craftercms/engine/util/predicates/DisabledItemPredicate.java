@@ -28,24 +28,24 @@ import org.craftercms.core.service.Item;
  */
 public class DisabledItemPredicate implements Predicate<Item> {
 
-    private static final Log logger = LogFactory.getLog(DisabledItemPredicate.class);
+	private static final Log logger = LogFactory.getLog(DisabledItemPredicate.class);
 
-    protected String disabledXPathQuery;
+	protected String disabledXPathQuery;
 
-    public DisabledItemPredicate(String disabledXPathQuery) {
-        this.disabledXPathQuery = disabledXPathQuery;
-    }
+	public DisabledItemPredicate(String disabledXPathQuery) {
+		this.disabledXPathQuery = disabledXPathQuery;
+	}
 
-    @Override
-    public boolean evaluate(Item item) {
-        String disabled = item.queryDescriptorValue(disabledXPathQuery);
-        if (StringUtils.isNotEmpty(disabled) && Boolean.parseBoolean(disabled)) {
-            logger.info("Item " + item.getDescriptorUrl() + " is disabled");
+	@Override
+	public boolean evaluate(Item item) {
+		String disabled = item.queryDescriptorValue(disabledXPathQuery);
+		if (StringUtils.isNotEmpty(disabled) && Boolean.parseBoolean(disabled)) {
+			logger.info("Item " + item.getDescriptorUrl() + " is disabled");
 
-            return false;
-        } else {
-            return true;
-        }
-    }
-    
+			return false;
+		} else {
+			return true;
+		}
+	}
+
 }

@@ -53,194 +53,194 @@ import java.util.Map;
  */
 public class TargetedContentStoreAdapterDecorator implements ContentStoreAdapterDecorator {
 
-    public static final Log logger = LogFactory.getLog(TargetedContentStoreAdapterDecorator.class);
+	public static final Log logger = LogFactory.getLog(TargetedContentStoreAdapterDecorator.class);
 
-    protected ContentStoreAdapter actualStoreAdapter;
-    protected CandidateTargetedUrlsResolver candidateTargetedUrlsResolver;
+	protected ContentStoreAdapter actualStoreAdapter;
+	protected CandidateTargetedUrlsResolver candidateTargetedUrlsResolver;
 
-    public TargetedContentStoreAdapterDecorator(CandidateTargetedUrlsResolver candidateTargetedUrlsResolver) {
-        this.candidateTargetedUrlsResolver = candidateTargetedUrlsResolver;
-    }
+	public TargetedContentStoreAdapterDecorator(CandidateTargetedUrlsResolver candidateTargetedUrlsResolver) {
+		this.candidateTargetedUrlsResolver = candidateTargetedUrlsResolver;
+	}
 
-    @Override
-    public void setActualStoreAdapter(ContentStoreAdapter actualStoreAdapter) {
-        this.actualStoreAdapter = actualStoreAdapter;
-    }
+	@Override
+	public void setActualStoreAdapter(ContentStoreAdapter actualStoreAdapter) {
+		this.actualStoreAdapter = actualStoreAdapter;
+	}
 
-    @Override
-    public Context createContext(String id, String rootFolderPath, boolean mergingOn, boolean cacheOn,
-                                 int maxAllowedItemsInCache, boolean ignoreHiddenFiles,
-                                 Map<String, String> configurationVariables)
-            throws StoreException, AuthenticationException {
-        Context context = actualStoreAdapter.createContext(id, rootFolderPath, mergingOn, cacheOn,
-                maxAllowedItemsInCache, ignoreHiddenFiles,
-                configurationVariables);
+	@Override
+	public Context createContext(String id, String rootFolderPath, boolean mergingOn, boolean cacheOn,
+				     int maxAllowedItemsInCache, boolean ignoreHiddenFiles,
+				     Map<String, String> configurationVariables)
+		throws StoreException, AuthenticationException {
+		Context context = actualStoreAdapter.createContext(id, rootFolderPath, mergingOn, cacheOn,
+			maxAllowedItemsInCache, ignoreHiddenFiles,
+			configurationVariables);
 
-        return new DecoratedStoreAdapterContext(context, this);
-    }
+		return new DecoratedStoreAdapterContext(context, this);
+	}
 
-    @Override
-    public boolean validate(Context context) throws StoreException, AuthenticationException {
-        return actualStoreAdapter.validate(((DecoratedStoreAdapterContext)context).getActualContext());
-    }
+	@Override
+	public boolean validate(Context context) throws StoreException, AuthenticationException {
+		return actualStoreAdapter.validate(((DecoratedStoreAdapterContext) context).getActualContext());
+	}
 
-    @Override
-    public void destroyContext(
-        Context context) throws InvalidContextException, StoreException, AuthenticationException {
-        context = ((DecoratedStoreAdapterContext)context).getActualContext();
+	@Override
+	public void destroyContext(
+		Context context) throws InvalidContextException, StoreException, AuthenticationException {
+		context = ((DecoratedStoreAdapterContext) context).getActualContext();
 
-        actualStoreAdapter.destroyContext(context);
-    }
+		actualStoreAdapter.destroyContext(context);
+	}
 
-    @Override
-    public boolean exists(Context context, CachingOptions cachingOptions, String path)
-        throws InvalidContextException, StoreException {
-        context = ((DecoratedStoreAdapterContext)context).getActualContext();
+	@Override
+	public boolean exists(Context context, CachingOptions cachingOptions, String path)
+		throws InvalidContextException, StoreException {
+		context = ((DecoratedStoreAdapterContext) context).getActualContext();
 
-        if (SiteProperties.isTargetingEnabled() && !TargetingUtils.excludePath(path)) {
-            List<String> candidatePaths = candidateTargetedUrlsResolver.getUrls(path);
-            if (CollectionUtils.isNotEmpty(candidatePaths)) {
-                for (String candidatePath : candidatePaths) {
-                    if (actualStoreAdapter.exists(context, cachingOptions, candidatePath)) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("Targeted of " + path + " found at " + candidatePath);
-                        }
+		if (SiteProperties.isTargetingEnabled() && !TargetingUtils.excludePath(path)) {
+			List<String> candidatePaths = candidateTargetedUrlsResolver.getUrls(path);
+			if (CollectionUtils.isNotEmpty(candidatePaths)) {
+				for (String candidatePath : candidatePaths) {
+					if (actualStoreAdapter.exists(context, cachingOptions, candidatePath)) {
+						if (logger.isDebugEnabled()) {
+							logger.debug("Targeted of " + path + " found at " + candidatePath);
+						}
 
-                        return true;
-                    }
-                }
+						return true;
+					}
+				}
 
-                return false;
-            } else {
-                return actualStoreAdapter.exists(context, cachingOptions, path);
-            }
-        } else {
-            return actualStoreAdapter.exists(context, cachingOptions, path);
-        }
-    }
+				return false;
+			} else {
+				return actualStoreAdapter.exists(context, cachingOptions, path);
+			}
+		} else {
+			return actualStoreAdapter.exists(context, cachingOptions, path);
+		}
+	}
 
-    @Override
-    public Content findContent(Context context, CachingOptions cachingOptions,
-                               String path) throws InvalidContextException, StoreException {
-        context = ((DecoratedStoreAdapterContext)context).getActualContext();
+	@Override
+	public Content findContent(Context context, CachingOptions cachingOptions,
+				   String path) throws InvalidContextException, StoreException {
+		context = ((DecoratedStoreAdapterContext) context).getActualContext();
 
-        if (SiteProperties.isTargetingEnabled() && !TargetingUtils.excludePath(path)) {
-            List<String> candidatePaths = candidateTargetedUrlsResolver.getUrls(path);
-            if (CollectionUtils.isNotEmpty(candidatePaths)) {
-                for (String candidatePath : candidatePaths) {
-                    Content content = actualStoreAdapter.findContent(context, cachingOptions, candidatePath);
-                    if (content != null) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("Targeted version of " + path + " found at " + candidatePath);
-                        }
+		if (SiteProperties.isTargetingEnabled() && !TargetingUtils.excludePath(path)) {
+			List<String> candidatePaths = candidateTargetedUrlsResolver.getUrls(path);
+			if (CollectionUtils.isNotEmpty(candidatePaths)) {
+				for (String candidatePath : candidatePaths) {
+					Content content = actualStoreAdapter.findContent(context, cachingOptions, candidatePath);
+					if (content != null) {
+						if (logger.isDebugEnabled()) {
+							logger.debug("Targeted version of " + path + " found at " + candidatePath);
+						}
 
-                        return content;
-                    }
-                }
+						return content;
+					}
+				}
 
-                return null;
-            } else {
-                return actualStoreAdapter.findContent(context, cachingOptions, path);
-            }
-        } else {
-            return actualStoreAdapter.findContent(context, cachingOptions, path);
-        }
-    }
+				return null;
+			} else {
+				return actualStoreAdapter.findContent(context, cachingOptions, path);
+			}
+		} else {
+			return actualStoreAdapter.findContent(context, cachingOptions, path);
+		}
+	}
 
-    @Override
-    public Item findItem(Context context, CachingOptions cachingOptions, String path,
-                         boolean withDescriptor) throws InvalidContextException, XmlFileParseException, StoreException {
-        context = ((DecoratedStoreAdapterContext)context).getActualContext();
+	@Override
+	public Item findItem(Context context, CachingOptions cachingOptions, String path,
+			     boolean withDescriptor) throws InvalidContextException, XmlFileParseException, StoreException {
+		context = ((DecoratedStoreAdapterContext) context).getActualContext();
 
-        if (SiteProperties.isTargetingEnabled() && !TargetingUtils.excludePath(path)) {
-            List<String> candidatePaths = candidateTargetedUrlsResolver.getUrls(path);
-            if (CollectionUtils.isNotEmpty(candidatePaths)) {
-                for (String candidatePath : candidatePaths) {
-                    Item item = actualStoreAdapter.findItem(context, cachingOptions, candidatePath, withDescriptor);
-                    if (item != null) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("Targeted version of " + path + " found at " + candidatePath);
-                        }
+		if (SiteProperties.isTargetingEnabled() && !TargetingUtils.excludePath(path)) {
+			List<String> candidatePaths = candidateTargetedUrlsResolver.getUrls(path);
+			if (CollectionUtils.isNotEmpty(candidatePaths)) {
+				for (String candidatePath : candidatePaths) {
+					Item item = actualStoreAdapter.findItem(context, cachingOptions, candidatePath, withDescriptor);
+					if (item != null) {
+						if (logger.isDebugEnabled()) {
+							logger.debug("Targeted version of " + path + " found at " + candidatePath);
+						}
 
-                        return item;
-                    }
-                }
+						return item;
+					}
+				}
 
-                return null;
-            } else {
-                return actualStoreAdapter.findItem(context, cachingOptions, path, withDescriptor);
-            }
-        } else {
-            return actualStoreAdapter.findItem(context, cachingOptions, path, withDescriptor);
-        }
-    }
+				return null;
+			} else {
+				return actualStoreAdapter.findItem(context, cachingOptions, path, withDescriptor);
+			}
+		} else {
+			return actualStoreAdapter.findItem(context, cachingOptions, path, withDescriptor);
+		}
+	}
 
-    @Override
-    public List<Item> findItems(Context context, CachingOptions cachingOptions, String path)
-            throws InvalidContextException, XmlFileParseException,
-        StoreException {
-        context = ((DecoratedStoreAdapterContext)context).getActualContext();
+	@Override
+	public List<Item> findItems(Context context, CachingOptions cachingOptions, String path)
+		throws InvalidContextException, XmlFileParseException,
+		StoreException {
+		context = ((DecoratedStoreAdapterContext) context).getActualContext();
 
-        if (SiteProperties.isTargetingEnabled() && !TargetingUtils.excludePath(path)) {
-            List<String> candidatePaths = candidateTargetedUrlsResolver.getUrls(path);
-            if (CollectionUtils.isNotEmpty(candidatePaths)) {
-                if (SiteProperties.isMergeFolders()) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Merging child items of " + candidatePaths);
-                    }
+		if (SiteProperties.isTargetingEnabled() && !TargetingUtils.excludePath(path)) {
+			List<String> candidatePaths = candidateTargetedUrlsResolver.getUrls(path);
+			if (CollectionUtils.isNotEmpty(candidatePaths)) {
+				if (SiteProperties.isMergeFolders()) {
+					if (logger.isDebugEnabled()) {
+						logger.debug("Merging child items of " + candidatePaths);
+					}
 
-                    List<Item> mergedItems = null;
+					List<Item> mergedItems = null;
 
-                    for (String candidatePath : candidatePaths) {
-                        List<Item> items = actualStoreAdapter.findItems(context, cachingOptions, candidatePath);
-                        mergedItems = mergeItems(mergedItems, items);
-                    }
+					for (String candidatePath : candidatePaths) {
+						List<Item> items = actualStoreAdapter.findItems(context, cachingOptions, candidatePath);
+						mergedItems = mergeItems(mergedItems, items);
+					}
 
-                    return mergedItems;
-                } else {
-                    for (String candidatePath : candidatePaths) {
-                        List<Item> items = actualStoreAdapter.findItems(context, cachingOptions, candidatePath);
-                        if (CollectionUtils.isNotEmpty(items)) {
-                            if (logger.isDebugEnabled()) {
-                                logger.debug("Targeted version of " + path + " found at " + candidatePath);
-                            }
+					return mergedItems;
+				} else {
+					for (String candidatePath : candidatePaths) {
+						List<Item> items = actualStoreAdapter.findItems(context, cachingOptions, candidatePath);
+						if (CollectionUtils.isNotEmpty(items)) {
+							if (logger.isDebugEnabled()) {
+								logger.debug("Targeted version of " + path + " found at " + candidatePath);
+							}
 
-                            return items;
-                        }
-                    }
+							return items;
+						}
+					}
 
-                    return null;
-                }
-            } else {
-                return actualStoreAdapter.findItems(context, cachingOptions, path);
-            }
-        } else {
-            return actualStoreAdapter.findItems(context, cachingOptions, path);
-        }
-    }
+					return null;
+				}
+			} else {
+				return actualStoreAdapter.findItems(context, cachingOptions, path);
+			}
+		} else {
+			return actualStoreAdapter.findItems(context, cachingOptions, path);
+		}
+	}
 
-    protected List<Item> mergeItems(List<Item> overriding, List<Item> original) {
-        if (overriding == null) {
-            return original;
-        } else if (original == null) {
-            return overriding;
-        } else {
-            List<Item> merged = new CachingAwareList<>(new ArrayList<>(overriding));
+	protected List<Item> mergeItems(List<Item> overriding, List<Item> original) {
+		if (overriding == null) {
+			return original;
+		} else if (original == null) {
+			return overriding;
+		} else {
+			List<Item> merged = new CachingAwareList<>(new ArrayList<>(overriding));
 
-            for (Item item : original) {
-                if (!containsItem(merged, item)) {
-                    merged.add(item);
-                }
-            }
+			for (Item item : original) {
+				if (!containsItem(merged, item)) {
+					merged.add(item);
+				}
+			}
 
-            return merged;
-        }
-    }
+			return merged;
+		}
+	}
 
-    protected boolean containsItem(final List<Item> list, final Item item) {
-        int idx = ListUtils.indexOf(list, it -> it.getName().equals(item.getName()));
+	protected boolean containsItem(final List<Item> list, final Item item) {
+		int idx = ListUtils.indexOf(list, it -> it.getName().equals(item.getName()));
 
-        return idx >= 0;
-    }
+		return idx >= 0;
+	}
 
 }

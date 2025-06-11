@@ -34,52 +34,52 @@ import static org.mockito.Mockito.when;
  */
 public class FolderToIndexItemProcessorTest {
 
-    private static final String TRANSFORMER_NAME = "folderToIndexUrl";
-    private static final String WEBSITE_FOLDER_URL = "/site/website";
-    private static final String INDEX_EN_URL = "/site/website/index_en.xml";
-    private static final String XML = "<page><file-name>index_en.xml</file-name></page>";
+	private static final String TRANSFORMER_NAME = "folderToIndexUrl";
+	private static final String WEBSITE_FOLDER_URL = "/site/website";
+	private static final String INDEX_EN_URL = "/site/website/index_en.xml";
+	private static final String XML = "<page><file-name>index_en.xml</file-name></page>";
 
-    private FolderToIndexItemProcessor processor;
+	private FolderToIndexItemProcessor processor;
 
-    @Before
-    public void setUp() throws Exception {
-        processor = new FolderToIndexItemProcessor(TRANSFORMER_NAME, createUrlTransformationEngine(),
-                createContentStoreService(), new LocaleTargetIdManager());
-    }
+	@Before
+	public void setUp() throws Exception {
+		processor = new FolderToIndexItemProcessor(TRANSFORMER_NAME, createUrlTransformationEngine(),
+			createContentStoreService(), new LocaleTargetIdManager());
+	}
 
-    @Test
-    public void testProcess() throws Exception {
-        Item item = new Item();
-        item.setFolder(true);
-        item.setUrl(WEBSITE_FOLDER_URL);
+	@Test
+	public void testProcess() throws Exception {
+		Item item = new Item();
+		item.setFolder(true);
+		item.setUrl(WEBSITE_FOLDER_URL);
 
-        Item processedItem = processor.process(null, null, item);
-        assertEquals(WEBSITE_FOLDER_URL, processedItem.getUrl());
-        assertEquals(INDEX_EN_URL, processedItem.getDescriptorUrl());
-        assertEquals(XML, processedItem.getDescriptorDom().asXML());
-    }
+		Item processedItem = processor.process(null, null, item);
+		assertEquals(WEBSITE_FOLDER_URL, processedItem.getUrl());
+		assertEquals(INDEX_EN_URL, processedItem.getDescriptorUrl());
+		assertEquals(XML, processedItem.getDescriptorDom().asXML());
+	}
 
-    private UrlTransformationEngine createUrlTransformationEngine() {
-        UrlTransformationEngine transformationEngine = mock(UrlTransformationEngine.class);
-        when(transformationEngine.transformUrl(null, null, TRANSFORMER_NAME, WEBSITE_FOLDER_URL))
-            .thenReturn(INDEX_EN_URL);
+	private UrlTransformationEngine createUrlTransformationEngine() {
+		UrlTransformationEngine transformationEngine = mock(UrlTransformationEngine.class);
+		when(transformationEngine.transformUrl(null, null, TRANSFORMER_NAME, WEBSITE_FOLDER_URL))
+			.thenReturn(INDEX_EN_URL);
 
-        return transformationEngine;
-    }
+		return transformationEngine;
+	}
 
-    private ContentStoreService createContentStoreService() {
-        Document dom = mock(Document.class);
-        when(dom.asXML()).thenReturn(XML);
+	private ContentStoreService createContentStoreService() {
+		Document dom = mock(Document.class);
+		when(dom.asXML()).thenReturn(XML);
 
-        Item item = new Item();
-        item.setDescriptorUrl(INDEX_EN_URL);
-        item.setDescriptorDom(dom);
-        item.setKey(INDEX_EN_URL);
+		Item item = new Item();
+		item.setDescriptorUrl(INDEX_EN_URL);
+		item.setDescriptorDom(dom);
+		item.setKey(INDEX_EN_URL);
 
-        ContentStoreService storeService = mock(ContentStoreService.class);
-        when(storeService.findItem(null, null, INDEX_EN_URL, null)).thenReturn(item);
+		ContentStoreService storeService = mock(ContentStoreService.class);
+		when(storeService.findItem(null, null, INDEX_EN_URL, null)).thenReturn(item);
 
-        return storeService;
-    }
+		return storeService;
+	}
 
 }

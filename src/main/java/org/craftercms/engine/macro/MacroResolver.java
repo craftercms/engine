@@ -21,28 +21,25 @@ import java.util.Map;
  * Resolves the macros in the given string.
  *
  * @author Alfonso Vásquez
- *
  * @see Macro
  */
 public interface MacroResolver {
 
-    /**
-     * Resolve the macros found in the string.
-     *
-     * @param str           the string with the macros
-     *
-     * @return the resolved string
-     */
-    String resolveMacros(String str);
+	/**
+	 * Resolve the macros found in the string.
+	 *
+	 * @param str the string with the macros
+	 * @return the resolved string
+	 */
+	String resolveMacros(String str);
 
-    /**
-     * Resolve the macros found in the string.
-     *
-     * @param str           the string with the macros
-     * @param macroValues   additional macros values
-     *
-     * @return the resolved string
-     */
-    String resolveMacros(String str, Map<String, ?> macroValues);
+	/**
+	 * Resolve the macros found in the string.
+	 *
+	 * @param str         the string with the macros
+	 * @param macroValues additional macros values
+	 * @return the resolved string
+	 */
+	String resolveMacros(String str, Map<String, ?> macroValues);
 
 }

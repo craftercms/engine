@@ -42,70 +42,70 @@ import static org.mockito.Mockito.mock;
  */
 public class FolderScanningSiteListResolverTest {
 
-    private static final String BROCHURE_SITE_NAME = "brochure";
-    private static final String CORPORATE_SITE_NAME = "corporate";
-    private static final String PLUTON_SITE_NAME = "pluton";
-    private static final String BROCHURE_SITE_FOLDER_NAME = BROCHURE_SITE_NAME + "app";
-    private static final String CORPORATE_SITE_FOLDER_NAME = CORPORATE_SITE_NAME + "app";
-    private static final String PLUTON_SITE_FOLDER_NAME = PLUTON_SITE_NAME + "app";
-    private static final String SITE_NAME_MACRO_NAME = "siteName";
-    private static final String SITE_FOLDER_NAME = "{" + SITE_NAME_MACRO_NAME + "}" + "app";
-    private static final String SITE_ROOT_FOLDER_PATH_SUFFIX = File.separator + "{" + SITE_NAME_MACRO_NAME + "}" +
-                                                               File.separator + "work-area";
+	private static final String BROCHURE_SITE_NAME = "brochure";
+	private static final String CORPORATE_SITE_NAME = "corporate";
+	private static final String PLUTON_SITE_NAME = "pluton";
+	private static final String BROCHURE_SITE_FOLDER_NAME = BROCHURE_SITE_NAME + "app";
+	private static final String CORPORATE_SITE_FOLDER_NAME = CORPORATE_SITE_NAME + "app";
+	private static final String PLUTON_SITE_FOLDER_NAME = PLUTON_SITE_NAME + "app";
+	private static final String SITE_NAME_MACRO_NAME = "siteName";
+	private static final String SITE_FOLDER_NAME = "{" + SITE_NAME_MACRO_NAME + "}" + "app";
+	private static final String SITE_ROOT_FOLDER_PATH_SUFFIX = File.separator + "{" + SITE_NAME_MACRO_NAME + "}" +
+		File.separator + "work-area";
 
 
-    @Rule
-    public TemporaryFolder sitesFolder = new TemporaryFolder();
+	@Rule
+	public TemporaryFolder sitesFolder = new TemporaryFolder();
 
-    private FolderScanningSiteListResolver siteListResolver;
+	private FolderScanningSiteListResolver siteListResolver;
 
-    @Before
-    public void setUp() throws Exception {
-        String siteRootFolderPath = "file:" + sitesFolder.getRoot().getAbsolutePath() + File.separator +
-                                    SITE_FOLDER_NAME + SITE_ROOT_FOLDER_PATH_SUFFIX;
+	@Before
+	public void setUp() throws Exception {
+		String siteRootFolderPath = "file:" + sitesFolder.getRoot().getAbsolutePath() + File.separator +
+			SITE_FOLDER_NAME + SITE_ROOT_FOLDER_PATH_SUFFIX;
 
-        sitesFolder.newFolder(BROCHURE_SITE_FOLDER_NAME);
-        sitesFolder.newFolder(CORPORATE_SITE_FOLDER_NAME);
-        sitesFolder.newFolder(PLUTON_SITE_FOLDER_NAME);
+		sitesFolder.newFolder(BROCHURE_SITE_FOLDER_NAME);
+		sitesFolder.newFolder(CORPORATE_SITE_FOLDER_NAME);
+		sitesFolder.newFolder(PLUTON_SITE_FOLDER_NAME);
 
-        siteListResolver = new FolderScanningSiteListResolver(siteRootFolderPath, createMacroResolver());
-        siteListResolver.setResourceLoader(createResourceLoader());
-        siteListResolver.setSiteNameMacroName(SITE_NAME_MACRO_NAME);
+		siteListResolver = new FolderScanningSiteListResolver(siteRootFolderPath, createMacroResolver());
+		siteListResolver.setResourceLoader(createResourceLoader());
+		siteListResolver.setSiteNameMacroName(SITE_NAME_MACRO_NAME);
 
-        siteListResolver.afterPropertiesSet();
-    }
+		siteListResolver.afterPropertiesSet();
+	}
 
-    @Test
-    public void testGetSiteList() throws Exception {
-        List<String> siteNames = (List<String>)siteListResolver.getSiteList();
+	@Test
+	public void testGetSiteList() throws Exception {
+		List<String> siteNames = (List<String>) siteListResolver.getSiteList();
 
-        assertNotNull(siteNames);
-        assertEquals(3, siteNames.size());
+		assertNotNull(siteNames);
+		assertEquals(3, siteNames.size());
 
-        Collections.sort(siteNames);
+		Collections.sort(siteNames);
 
-        assertEquals(BROCHURE_SITE_NAME, siteNames.get(0));
-        assertEquals(CORPORATE_SITE_NAME, siteNames.get(1));
-        assertEquals(PLUTON_SITE_NAME, siteNames.get(2));
-    }
+		assertEquals(BROCHURE_SITE_NAME, siteNames.get(0));
+		assertEquals(CORPORATE_SITE_NAME, siteNames.get(1));
+		assertEquals(PLUTON_SITE_NAME, siteNames.get(2));
+	}
 
-    private MacroResolver createMacroResolver() {
-        MacroResolver macroResolver = mock(MacroResolver.class);
+	private MacroResolver createMacroResolver() {
+		MacroResolver macroResolver = mock(MacroResolver.class);
 
-        doAnswer(new Answer<String>() {
+		doAnswer(new Answer<String>() {
 
-            @Override
-            public String answer(InvocationOnMock invocation) throws Throwable {
-                return (String)invocation.getArguments()[0];
-            }
+			@Override
+			public String answer(InvocationOnMock invocation) throws Throwable {
+				return (String) invocation.getArguments()[0];
+			}
 
-        }).when(macroResolver).resolveMacros(anyString());
+		}).when(macroResolver).resolveMacros(anyString());
 
-        return macroResolver;
-    }
+		return macroResolver;
+	}
 
-    private ResourceLoader createResourceLoader() {
-        return new FileSystemResourceLoader();
-    }
+	private ResourceLoader createResourceLoader() {
+		return new FileSystemResourceLoader();
+	}
 
 }

@@ -20,6 +20,7 @@ import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import jakarta.servlet.http.HttpServletRequest;
+
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -27,16 +28,16 @@ import java.util.stream.Collectors;
  * RequestMatcher that matches if any of the given ant patterns matches.
  */
 public class OrAntPathRequestMatcher implements RequestMatcher {
-    private final RequestMatcher matcher;
+	private final RequestMatcher matcher;
 
-    public OrAntPathRequestMatcher(final Collection<String> antPatterns) {
-        matcher = new OrRequestMatcher(antPatterns.stream()
-                .map(AntPathRequestMatcher::new)
-                .collect(Collectors.toList()));
-    }
+	public OrAntPathRequestMatcher(final Collection<String> antPatterns) {
+		matcher = new OrRequestMatcher(antPatterns.stream()
+			.map(AntPathRequestMatcher::new)
+			.collect(Collectors.toList()));
+	}
 
-    @Override
-    public boolean matches(HttpServletRequest request) {
-        return matcher.matches(request);
-    }
+	@Override
+	public boolean matches(HttpServletRequest request) {
+		return matcher.matches(request);
+	}
 }

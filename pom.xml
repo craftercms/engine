@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
-  ~
-  ~ This program is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU General Public License version 3 as published by
-  ~ the Free Software Foundation.
-  ~
-  ~ This program is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~ GNU General Public License for more details.
-  ~
-  ~ You should have received a copy of the GNU General Public License
-  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  * Copyright (C) 2007-2025 Crafter Software Corporation. All Rights Reserved.
+  *
+  * This program is free software: you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License version 3 as published by
+  * the Free Software Foundation.
+  *
+  * This program is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU General Public License for more details.
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -41,12 +41,6 @@
 	</parent>
 
 	<dependencies>
-		<!-- Overrides -->
-		<dependency>
-			<groupId>com.squareup.okio</groupId><!-- Override -->
-			<artifactId>okio-jvm</artifactId>
-		</dependency>
-
 		<!-- Dependencies -->
 		<dependency>
 			<groupId>jakarta.servlet</groupId>
@@ -163,32 +157,19 @@
 			<groupId>software.amazon.awssdk</groupId>
 			<artifactId>sts</artifactId>
 		</dependency>
-
-		<!-- Box -->
-		<!-- Override Jose4j dependency from Box -->
 		<dependency>
-			<groupId>org.bitbucket.b_c</groupId>
-			<artifactId>jose4j</artifactId>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>sso</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.box</groupId>
-			<artifactId>box-java-sdk</artifactId>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>ssooidc</artifactId>
 		</dependency>
 
 		<!-- WebDAV -->
 		<dependency>
 			<groupId>com.github.lookfirst</groupId>
 			<artifactId>sardine</artifactId>
-		</dependency>
-
-		<!-- Override the bouncy castle dependency from Box -->
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcpkix-jdk18on</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcprov-jdk18on</artifactId>
 		</dependency>
 
 		<!-- Override the jackson dependency from AWS -->
@@ -340,30 +321,15 @@
 		</plugins>
 	</build>
 
-	<repositories>
-		<repository>
-			<id>sonatype-snapshots</id>
-			<name>Sonatype Snapshot Repository</name>
-			<url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>always</updatePolicy>
-				<checksumPolicy>fail</checksumPolicy>
-			</snapshots>
-		</repository>
-	</repositories>
-
 	<distributionManagement>
 		<snapshotRepository>
-			<id>sonatype-snapshots</id>
-			<url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+			<id>central-snapshots</id>
+			<url>https://central.sonatype.com/repository/maven-snapshots/</url>
 		</snapshotRepository>
 		<repository>
-			<id>sonatype-staging</id>
-			<url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+			<id>github</id>
+			<name>GitHub Maven Packages</name>
+			<url>https://maven.pkg.github.com/craftercms/craftercms</url>
 		</repository>
 	</distributionManagement>
 </project>

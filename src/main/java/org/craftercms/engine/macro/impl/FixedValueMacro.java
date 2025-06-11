@@ -20,22 +20,22 @@ package org.craftercms.engine.macro.impl;
  */
 public class FixedValueMacro extends AbstractMacro {
 
-    private String macroName;
-    private String macroValue;
+	private String macroName;
+	private String macroValue;
 
-    public FixedValueMacro(String macroName, String macroValue) {
-        this.macroName = macroName;
-        this.macroValue = macroValue;
-    }
+	public FixedValueMacro(String macroName, String macroValue) {
+		this.macroName = macroName;
+		this.macroValue = macroValue;
+	}
 
-    @Override
-    protected String createMacroName() {
-        return "{" + macroName + "}";
-    }
+	@Override
+	protected String createMacroName() {
+		return "{" + macroName + "}";
+	}
 
-    @Override
-    protected String getMacroValue(String str) {
-        return macroValue;
-    }
+	@Override
+	protected String getMacroValue(String str) {
+		return macroValue;
+	}
 
 }

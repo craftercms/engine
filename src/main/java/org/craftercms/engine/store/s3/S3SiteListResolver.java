@@ -40,84 +40,87 @@ import static org.craftercms.engine.store.s3.S3ContentStoreAdapter.DELIMITER;
 
 /**
  * Implementation of {@link SiteListResolver} for AWS S3.
+ *
  * @author joseross
  */
 public class S3SiteListResolver implements SiteListResolver {
 
-    protected String siteNameMacroPlaceholder;
-    protected S3Uri s3Uri;
-    protected S3ClientBuilder clientBuilder;
+	protected String siteNameMacroPlaceholder;
+	protected S3Uri s3Uri;
+	protected S3ClientBuilder clientBuilder;
 
-    public S3SiteListResolver(String s3Uri, final S3ClientBuilder clientBuilder) {
-        setSiteNameMacroName(SiteContextFactory.DEFAULT_SITE_NAME_MACRO_NAME);
+	public S3SiteListResolver(String s3Uri, final S3ClientBuilder clientBuilder) {
+		setSiteNameMacroName(SiteContextFactory.DEFAULT_SITE_NAME_MACRO_NAME);
 
-        this.clientBuilder = clientBuilder;
-        this.s3Uri = clientBuilder.getClient().utilities().parseUri(URI.create(HttpUtils.encodeUrlMacro(s3Uri)));
-    }
+		this.clientBuilder = clientBuilder;
+		this.s3Uri = clientBuilder.getClient().utilities().parseUri(URI.create(HttpUtils.encodeUrlMacro(s3Uri)));
+	}
 
-    public void setSiteNameMacroName(String siteNameMacroName) {
-        this.siteNameMacroPlaceholder = "{" + siteNameMacroName + "}";
-    }
+	public void setSiteNameMacroName(String siteNameMacroName) {
+		this.siteNameMacroPlaceholder = "{" + siteNameMacroName + "}";
+	}
 
-    @Override
-    public Collection<String> getSiteList() {
-        String bucketName = s3Uri.bucket().orElseThrow(() -> new S3BucketNotConfiguredException());
-        if (bucketName.contains(siteNameMacroPlaceholder)) {
-            String bucketNameRegex = bucketName.replace(siteNameMacroPlaceholder, "(.+)");
-            return getSiteListFromBucketNames(bucketNameRegex);
-        } else {
-            String rootPrefix = StringUtils.substringBefore(s3Uri.key().orElse(""), siteNameMacroPlaceholder);
-            return getSiteListFromBucketKeys(bucketName, rootPrefix);
-        }
-    }
+	@Override
+	public Collection<String> getSiteList() {
+		String bucketName = s3Uri.bucket().orElseThrow(() -> new S3BucketNotConfiguredException());
+		if (bucketName.contains(siteNameMacroPlaceholder)) {
+			String bucketNameRegex = bucketName.replace(siteNameMacroPlaceholder, "(.+)");
+			return getSiteListFromBucketNames(bucketNameRegex);
+		} else {
+			String rootPrefix = StringUtils.substringBefore(s3Uri.key().orElse(""), siteNameMacroPlaceholder);
+			return getSiteListFromBucketKeys(bucketName, rootPrefix);
+		}
+	}
 
-    /**
-     * Get site list of site from buckets match a regex
-     * @param bucketNameRegex the regex to match sites
-     * @return list of sites
-     */
-    protected Collection<String> getSiteListFromBucketNames(String bucketNameRegex) {
-        List<String> siteNames = new ArrayList<>();
-        S3Client client = clientBuilder.getClient();
+	/**
+	 * Get site list of site from buckets match a regex
+	 *
+	 * @param bucketNameRegex the regex to match sites
+	 * @return list of sites
+	 */
+	protected Collection<String> getSiteListFromBucketNames(String bucketNameRegex) {
+		List<String> siteNames = new ArrayList<>();
+		S3Client client = clientBuilder.getClient();
 
-        List<Bucket> buckets = client.listBuckets().buckets();
-        if (CollectionUtils.isNotEmpty(buckets)) {
-            for (Bucket bucket : buckets) {
-                Matcher bucketNameMatcher = Pattern.compile(bucketNameRegex).matcher(bucket.name());
-                if (bucketNameMatcher.matches()) {
-                    siteNames.add(bucketNameMatcher.group(1));
-                }
-            }
-        }
+		List<Bucket> buckets = client.listBuckets().buckets();
+		if (CollectionUtils.isNotEmpty(buckets)) {
+			for (Bucket bucket : buckets) {
+				Matcher bucketNameMatcher = Pattern.compile(bucketNameRegex).matcher(bucket.name());
+				if (bucketNameMatcher.matches()) {
+					siteNames.add(bucketNameMatcher.group(1));
+				}
+			}
+		}
 
-        return siteNames;
-    }
+		return siteNames;
+	}
 
-    /**
-     * Get sites list from a bucket with a root prefix
-     * @param bucketName the bucket name
-     * @param rootPrefix the root prefix
-     * @return list of sites
-     */
-    protected Collection<String> getSiteListFromBucketKeys(String bucketName, String rootPrefix) {
-        List<String> siteNames = new ArrayList<>();
-        S3Client client = clientBuilder.getClient();
+	/**
+	 * Get sites list from a bucket with a root prefix
+	 *
+	 * @param bucketName the bucket name
+	 * @param rootPrefix the root prefix
+	 * @return list of sites
+	 */
+	protected Collection<String> getSiteListFromBucketKeys(String bucketName, String rootPrefix) {
+		List<String> siteNames = new ArrayList<>();
+		S3Client client = clientBuilder.getClient();
 
-        ListObjectsV2Request request = ListObjectsV2Request.builder()
-                .bucket(bucketName)
-                .prefix(rootPrefix)
-                .delimiter(DELIMITER)
-                .build();
+		ListObjectsV2Request request = ListObjectsV2Request.builder()
+			.bucket(bucketName)
+			.prefix(rootPrefix)
+			.delimiter(DELIMITER)
+			.build();
 
-        ListObjectsV2Response result = client.listObjectsV2(request);
-        if (CollectionUtils.isNotEmpty(result.commonPrefixes())) {
-            result.commonPrefixes()
-                  .stream()
-                  .map(p -> StringUtils.stripEnd(StringUtils.removeStart(p.prefix(), rootPrefix), DELIMITER))
-                  .forEach(siteNames::add);
-        }
+		ListObjectsV2Response result = client.listObjectsV2(request);
+		if (CollectionUtils.isNotEmpty(result.commonPrefixes())) {
+			result.commonPrefixes()
+				.stream()
+				.map(p -> StringUtils.stripEnd(StringUtils.removeStart(p.prefix(), rootPrefix), DELIMITER))
+				.forEach(siteNames::add);
+		}
 
-        return siteNames;
-    }
+		return siteNames;
+	}
 
 }

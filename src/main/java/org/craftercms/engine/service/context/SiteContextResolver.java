@@ -25,6 +25,6 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 public interface SiteContextResolver {
 
-    SiteContext getContext(HttpServletRequest request);
+	SiteContext getContext(HttpServletRequest request);
 
 }

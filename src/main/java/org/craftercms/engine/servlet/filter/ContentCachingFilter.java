@@ -22,6 +22,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.beans.ConstructorProperties;
 import java.io.IOException;
 
@@ -38,23 +39,23 @@ import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VAL
  */
 public class ContentCachingFilter extends OncePerRequestFilter {
 
-    protected boolean enabled;
+	protected boolean enabled;
 
-    @ConstructorProperties({"enabled"})
-    public ContentCachingFilter(boolean enabled) {
-        this.enabled = enabled;
-    }
+	@ConstructorProperties({"enabled"})
+	public ContentCachingFilter(boolean enabled) {
+		this.enabled = enabled;
+	}
 
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
-        return !(enabled && POST.matches(request.getMethod()) &&
-                equalsIgnoreCase(request.getContentType(), APPLICATION_FORM_URLENCODED_VALUE));
-    }
+	@Override
+	protected boolean shouldNotFilter(HttpServletRequest request) {
+		return !(enabled && POST.matches(request.getMethod()) &&
+			equalsIgnoreCase(request.getContentType(), APPLICATION_FORM_URLENCODED_VALUE));
+	}
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
-        filterChain.doFilter(new ContentCachingRequestWrapper(request), response);
-    }
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+		throws ServletException, IOException {
+		filterChain.doFilter(new ContentCachingRequestWrapper(request), response);
+	}
 
 }

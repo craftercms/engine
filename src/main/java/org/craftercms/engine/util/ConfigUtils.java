@@ -25,16 +25,16 @@ import org.craftercms.engine.service.context.SiteContext;
  */
 public abstract class ConfigUtils {
 
-    /**
-     * Returns the configuration from the current site context.
-     */
-    public static HierarchicalConfiguration getCurrentConfig() {
-        SiteContext siteContext = SiteContext.getCurrent();
-        if (siteContext != null) {
-            return siteContext.getConfig();
-        } else {
-            return null;
-        }
-    }
+	/**
+	 * Returns the configuration from the current site context.
+	 */
+	public static HierarchicalConfiguration getCurrentConfig() {
+		SiteContext siteContext = SiteContext.getCurrent();
+		if (siteContext != null) {
+			return siteContext.getConfig();
+		} else {
+			return null;
+		}
+	}
 
 }

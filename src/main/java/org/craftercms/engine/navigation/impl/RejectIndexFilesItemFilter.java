@@ -31,46 +31,46 @@ import org.craftercms.engine.properties.SiteProperties;
  */
 public class RejectIndexFilesItemFilter implements ItemFilter {
 
-    protected TargetedUrlStrategy targetedUrlStrategy;
+	protected TargetedUrlStrategy targetedUrlStrategy;
 
-    public RejectIndexFilesItemFilter(TargetedUrlStrategy targetedUrlStrategy) {
-        this.targetedUrlStrategy = targetedUrlStrategy;
-    }
+	public RejectIndexFilesItemFilter(TargetedUrlStrategy targetedUrlStrategy) {
+		this.targetedUrlStrategy = targetedUrlStrategy;
+	}
 
-    @Override
-    public boolean runBeforeProcessing() {
-        return true;
-    }
+	@Override
+	public boolean runBeforeProcessing() {
+		return true;
+	}
 
-    @Override
-    public boolean runAfterProcessing() {
-        return false;
-    }
+	@Override
+	public boolean runAfterProcessing() {
+		return false;
+	}
 
-    @Override
-    public boolean accepts(Item item, List<Item> acceptedItems, List<Item> rejectedItems,
-                           boolean runningBeforeProcessing) {
-        String indexFileName = SiteProperties.getIndexFileName();
-        String itemFileName = item.getName();
+	@Override
+	public boolean accepts(Item item, List<Item> acceptedItems, List<Item> rejectedItems,
+			       boolean runningBeforeProcessing) {
+		String indexFileName = SiteProperties.getIndexFileName();
+		String itemFileName = item.getName();
 
-        if (indexFileName.equals(itemFileName)) {
-            return false;
-        } else if (SiteProperties.isTargetingEnabled() && targetedUrlStrategy.isFileNameBasedStrategy()) {
-            TargetedUrlComponents targetedFileNameComponents = targetedUrlStrategy.parseTargetedUrl(itemFileName);
-            if (targetedFileNameComponents != null) {
-                String prefix = targetedFileNameComponents.getPrefix();
-                String suffix = targetedFileNameComponents.getSuffix();
-                String nonTargetedItemFileName = targetedUrlStrategy.buildTargetedUrl(prefix, null, suffix);
+		if (indexFileName.equals(itemFileName)) {
+			return false;
+		} else if (SiteProperties.isTargetingEnabled() && targetedUrlStrategy.isFileNameBasedStrategy()) {
+			TargetedUrlComponents targetedFileNameComponents = targetedUrlStrategy.parseTargetedUrl(itemFileName);
+			if (targetedFileNameComponents != null) {
+				String prefix = targetedFileNameComponents.getPrefix();
+				String suffix = targetedFileNameComponents.getSuffix();
+				String nonTargetedItemFileName = targetedUrlStrategy.buildTargetedUrl(prefix, null, suffix);
 
-                nonTargetedItemFileName = StringUtils.strip(nonTargetedItemFileName, "/");
+				nonTargetedItemFileName = StringUtils.strip(nonTargetedItemFileName, "/");
 
-                if (indexFileName.equals(nonTargetedItemFileName)) {
-                    return false;
-                }
-            }
-        }
+				if (indexFileName.equals(nonTargetedItemFileName)) {
+					return false;
+				}
+			}
+		}
 
-        return true;
-    }
+		return true;
+	}
 
 }

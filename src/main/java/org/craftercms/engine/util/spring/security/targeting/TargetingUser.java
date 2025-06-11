@@ -26,8 +26,8 @@ import org.craftercms.security.authentication.Authentication;
  */
 public class TargetingUser extends ProfileUser {
 
-    public TargetingUser(Authentication auth) {
-        super(auth);
-    }
+	public TargetingUser(Authentication auth) {
+		super(auth);
+	}
 
 }

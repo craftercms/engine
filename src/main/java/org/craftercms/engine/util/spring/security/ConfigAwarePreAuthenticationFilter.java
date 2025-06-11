@@ -17,6 +17,7 @@
 package org.craftercms.engine.util.spring.security;
 
 import java.io.IOException;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -39,7 +40,7 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
  *     <li>If the site configuration contains the {@code enabledConfigKey} with a value of {@code true} the filter
  *     will be executed</li>
  * </ul>
- *
+ * <p>
  * Additionally, if the existing principal is an instance of any class other than {@code supportedPrincipalClass} the
  * filter will not be executed
  *
@@ -48,57 +49,57 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
  */
 public abstract class ConfigAwarePreAuthenticationFilter extends AbstractPreAuthenticatedProcessingFilter {
 
-    protected boolean alwaysEnabled = false;
-    protected String enabledConfigKey;
-    protected Class<? extends UserDetails> supportedPrincipalClass;
+	protected boolean alwaysEnabled = false;
+	protected String enabledConfigKey;
+	protected Class<? extends UserDetails> supportedPrincipalClass;
 
-    public ConfigAwarePreAuthenticationFilter(final String enabledConfigKey) {
-        this.enabledConfigKey = enabledConfigKey;
-    }
+	public ConfigAwarePreAuthenticationFilter(final String enabledConfigKey) {
+		this.enabledConfigKey = enabledConfigKey;
+	}
 
-    public void setAlwaysEnabled(final boolean alwaysEnabled) {
-        this.alwaysEnabled = alwaysEnabled;
-    }
+	public void setAlwaysEnabled(final boolean alwaysEnabled) {
+		this.alwaysEnabled = alwaysEnabled;
+	}
 
-    public void setSupportedPrincipalClass(final Class<? extends UserDetails> supportedPrincipalClass) {
-        this.supportedPrincipalClass = supportedPrincipalClass;
-    }
+	public void setSupportedPrincipalClass(final Class<? extends UserDetails> supportedPrincipalClass) {
+		this.supportedPrincipalClass = supportedPrincipalClass;
+	}
 
-    public boolean isEnabled() {
-        HierarchicalConfiguration siteConfig = ConfigUtils.getCurrentConfig();
-        return alwaysEnabled || siteConfig != null && siteConfig.getBoolean(enabledConfigKey, false);
-    }
+	public boolean isEnabled() {
+		HierarchicalConfiguration siteConfig = ConfigUtils.getCurrentConfig();
+		return alwaysEnabled || siteConfig != null && siteConfig.getBoolean(enabledConfigKey, false);
+	}
 
-    @Override
-    public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
-        throws IOException, ServletException {
-        if (isEnabled()) {
-            logger.debug("Filter is enabled, processing request");
-            super.doFilter(request, response, chain);
-        } else {
-            logger.debug("Filter is disabled, skipping execution");
-            chain.doFilter(request, response);
-        }
-    }
+	@Override
+	public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
+		throws IOException, ServletException {
+		if (isEnabled()) {
+			logger.debug("Filter is enabled, processing request");
+			super.doFilter(request, response, chain);
+		} else {
+			logger.debug("Filter is disabled, skipping execution");
+			chain.doFilter(request, response);
+		}
+	}
 
-    @Override
-    protected boolean principalChanged(final HttpServletRequest request, final Authentication currentAuthentication) {
-        logger.debug("Current authentication class: " + currentAuthentication.getClass().getSimpleName());
-        logger.debug("Current principal class:" + currentAuthentication.getPrincipal().getClass().getSimpleName());
-        if (currentAuthentication instanceof PreAuthenticatedAuthenticationToken &&
-            (supportedPrincipalClass == null ||
-            currentAuthentication.getPrincipal().getClass().equals(supportedPrincipalClass))) {
-            logger.debug("Current authentication and principal are supported, continuing verification");
-            return super.principalChanged(request, currentAuthentication);
-        } else {
-            logger.debug("Current authentication or principal class is not supported, skipping verification");
-            return false;
-        }
-    }
+	@Override
+	protected boolean principalChanged(final HttpServletRequest request, final Authentication currentAuthentication) {
+		logger.debug("Current authentication class: " + currentAuthentication.getClass().getSimpleName());
+		logger.debug("Current principal class:" + currentAuthentication.getPrincipal().getClass().getSimpleName());
+		if (currentAuthentication instanceof PreAuthenticatedAuthenticationToken &&
+			(supportedPrincipalClass == null ||
+				currentAuthentication.getPrincipal().getClass().equals(supportedPrincipalClass))) {
+			logger.debug("Current authentication and principal are supported, continuing verification");
+			return super.principalChanged(request, currentAuthentication);
+		} else {
+			logger.debug("Current authentication or principal class is not supported, skipping verification");
+			return false;
+		}
+	}
 
-    @Override
-    protected Object getPreAuthenticatedCredentials(final HttpServletRequest request) {
-        return "N/A";
-    }
+	@Override
+	protected Object getPreAuthenticatedCredentials(final HttpServletRequest request) {
+		return "N/A";
+	}
 
 }

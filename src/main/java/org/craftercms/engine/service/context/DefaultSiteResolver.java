@@ -18,6 +18,7 @@ package org.craftercms.engine.service.context;
 
 import java.util.Collection;
 import java.util.Collections;
+
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
@@ -28,20 +29,20 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 public class DefaultSiteResolver implements SiteListResolver, SiteResolver {
 
-    private String defaultSiteName;
+	private String defaultSiteName;
 
-    public DefaultSiteResolver(String defaultSiteName) {
-        this.defaultSiteName = defaultSiteName;
-    }
+	public DefaultSiteResolver(String defaultSiteName) {
+		this.defaultSiteName = defaultSiteName;
+	}
 
-    @Override
-    public Collection<String> getSiteList() {
-        return Collections.singleton(defaultSiteName);
-    }
+	@Override
+	public Collection<String> getSiteList() {
+		return Collections.singleton(defaultSiteName);
+	}
 
-    @Override
-    public String getSiteName(HttpServletRequest request) {
-        return defaultSiteName;
-    }
+	@Override
+	public String getSiteName(HttpServletRequest request) {
+		return defaultSiteName;
+	}
 
 }

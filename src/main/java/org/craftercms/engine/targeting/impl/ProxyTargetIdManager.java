@@ -29,28 +29,28 @@ import org.craftercms.engine.util.spring.ApplicationContextAccessor;
  */
 public class ProxyTargetIdManager extends AbstractProxyBean<TargetIdManager> implements TargetIdManager {
 
-    public ProxyTargetIdManager(ApplicationContextAccessor applicationContext, String beanName) {
-        super(applicationContext, beanName);
-    }
+	public ProxyTargetIdManager(ApplicationContextAccessor applicationContext, String beanName) {
+		super(applicationContext, beanName);
+	}
 
-    @Override
-    public String getCurrentTargetId() throws IllegalStateException {
-        return getBean().getCurrentTargetId();
-    }
+	@Override
+	public String getCurrentTargetId() throws IllegalStateException {
+		return getBean().getCurrentTargetId();
+	}
 
-    @Override
-    public String getFallbackTargetId() throws IllegalStateException {
-        return getBean().getFallbackTargetId();
-    }
+	@Override
+	public String getFallbackTargetId() throws IllegalStateException {
+		return getBean().getFallbackTargetId();
+	}
 
-    @Override
-    public List<String> getAvailableTargetIds() throws IllegalStateException {
-        return getBean().getAvailableTargetIds();
-    }
+	@Override
+	public List<String> getAvailableTargetIds() throws IllegalStateException {
+		return getBean().getAvailableTargetIds();
+	}
 
-    @Override
-    protected Class<? extends TargetIdManager> getBeanClass() {
-        return TargetIdManager.class;
-    }
+	@Override
+	protected Class<? extends TargetIdManager> getBeanClass() {
+		return TargetIdManager.class;
+	}
 
 }

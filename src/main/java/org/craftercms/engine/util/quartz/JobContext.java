@@ -26,31 +26,31 @@ import org.quartz.Trigger;
  */
 public class JobContext {
 
-    protected JobDetail detail;
-    protected Trigger trigger;
-    protected String description;
+	protected JobDetail detail;
+	protected Trigger trigger;
+	protected String description;
 
-    public JobContext(JobDetail detail, Trigger trigger, String description) {
-        this.detail = detail;
-        this.trigger = trigger;
-        this.description = description;
-    }
+	public JobContext(JobDetail detail, Trigger trigger, String description) {
+		this.detail = detail;
+		this.trigger = trigger;
+		this.description = description;
+	}
 
-    public JobDetail getDetail() {
-        return detail;
-    }
+	public JobDetail getDetail() {
+		return detail;
+	}
 
-    public Trigger getTrigger() {
-        return trigger;
-    }
+	public Trigger getTrigger() {
+		return trigger;
+	}
 
-    public String getDescription() {
-        return description;
-    }
+	public String getDescription() {
+		return description;
+	}
 
-    @Override
-    public String toString() {
-        return description;
-    }
+	@Override
+	public String toString() {
+		return description;
+	}
 
 }

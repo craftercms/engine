@@ -17,6 +17,7 @@
 package org.craftercms.engine.util.spring.security;
 
 import java.io.IOException;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -36,51 +37,49 @@ import org.springframework.util.Assert;
  */
 public class ConfigAwareAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
-    public static final String LOGIN_FAILURE_URL_KEY = "security.login.failureUrl";
+	public static final String LOGIN_FAILURE_URL_KEY = "security.login.failureUrl";
 
-    protected String defaultFailureUrl;
+	protected String defaultFailureUrl;
 
-    protected String determineFailureUrl() {
-        HierarchicalConfiguration siteConfig = ConfigUtils.getCurrentConfig();
-        if (siteConfig != null && siteConfig.containsKey(LOGIN_FAILURE_URL_KEY)) {
-            return siteConfig.getString(LOGIN_FAILURE_URL_KEY);
-        }
-        return defaultFailureUrl;
-    }
+	protected String determineFailureUrl() {
+		HierarchicalConfiguration siteConfig = ConfigUtils.getCurrentConfig();
+		if (siteConfig != null && siteConfig.containsKey(LOGIN_FAILURE_URL_KEY)) {
+			return siteConfig.getString(LOGIN_FAILURE_URL_KEY);
+		}
+		return defaultFailureUrl;
+	}
 
-    // This was needed because the super class doesn't use getter for the url :(
+	// This was needed because the super class doesn't use getter for the url :(
 
-    public void setDefaultFailureUrl(String defaultFailureUrl) {
-        Assert.isTrue(UrlUtils.isValidRedirectUrl(defaultFailureUrl), "'"
-            + defaultFailureUrl + "' is not a valid redirect URL");
-        this.defaultFailureUrl = defaultFailureUrl;
-    }
+	public void setDefaultFailureUrl(String defaultFailureUrl) {
+		Assert.isTrue(UrlUtils.isValidRedirectUrl(defaultFailureUrl), "'"
+			+ defaultFailureUrl + "' is not a valid redirect URL");
+		this.defaultFailureUrl = defaultFailureUrl;
+	}
 
-    public void onAuthenticationFailure(HttpServletRequest request,
-                                        HttpServletResponse response, AuthenticationException exception)
-        throws IOException, ServletException {
+	public void onAuthenticationFailure(HttpServletRequest request,
+					    HttpServletResponse response, AuthenticationException exception)
+		throws IOException, ServletException {
 
-        String failureUrl = determineFailureUrl();
-        if (failureUrl == null) {
-            logger.debug("No failure URL set, sending 401 Unauthorized error");
+		String failureUrl = determineFailureUrl();
+		if (failureUrl == null) {
+			logger.debug("No failure URL set, sending 401 Unauthorized error");
 
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-                "Authentication Failed: " + exception.getMessage());
-        }
-        else {
-            saveException(request, exception);
+			response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+				"Authentication Failed: " + exception.getMessage());
+		} else {
+			saveException(request, exception);
 
-            if (isUseForward()) {
-                logger.debug("Forwarding to " + failureUrl);
+			if (isUseForward()) {
+				logger.debug("Forwarding to " + failureUrl);
 
-                request.getRequestDispatcher(failureUrl)
-                    .forward(request, response);
-            }
-            else {
-                logger.debug("Redirecting to " + failureUrl);
-                getRedirectStrategy().sendRedirect(request, response, failureUrl);
-            }
-        }
-    }
+				request.getRequestDispatcher(failureUrl)
+					.forward(request, response);
+			} else {
+				logger.debug("Redirecting to " + failureUrl);
+				getRedirectStrategy().sendRedirect(request, response, failureUrl);
+			}
+		}
+	}
 
 }

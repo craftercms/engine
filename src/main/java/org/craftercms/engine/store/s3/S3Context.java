@@ -30,31 +30,31 @@ import java.util.Map;
  */
 public class S3Context extends ContextImpl {
 
-    /**
-     * AWS S3 bucket uri to use as root folder for the site.
-     */
-    protected S3Uri rootFolderUri;
+	/**
+	 * AWS S3 bucket uri to use as root folder for the site.
+	 */
+	protected S3Uri rootFolderUri;
 
-    public S3Context(final String id, final ContentStoreAdapter storeAdapter, final String rootFolderPath,
-                     final boolean mergingOn, final boolean cacheOn, final int maxAllowedItemsInCache,
-                     final boolean ignoreHiddenFiles, final S3Uri rootFolderUri,
-                     final Map<String, String> configurationVariables) {
-        super(id, storeAdapter, rootFolderPath, mergingOn, cacheOn, maxAllowedItemsInCache, ignoreHiddenFiles, configurationVariables);
-        this.rootFolderUri = rootFolderUri;
-    }
+	public S3Context(final String id, final ContentStoreAdapter storeAdapter, final String rootFolderPath,
+			 final boolean mergingOn, final boolean cacheOn, final int maxAllowedItemsInCache,
+			 final boolean ignoreHiddenFiles, final S3Uri rootFolderUri,
+			 final Map<String, String> configurationVariables) {
+		super(id, storeAdapter, rootFolderPath, mergingOn, cacheOn, maxAllowedItemsInCache, ignoreHiddenFiles, configurationVariables);
+		this.rootFolderUri = rootFolderUri;
+	}
 
-    /**
-     * Returns the name of the bucket.
-     */
-    public String getBucket() {
-        return rootFolderUri.bucket().orElseThrow(() -> new S3BucketNotConfiguredException());
-    }
+	/**
+	 * Returns the name of the bucket.
+	 */
+	public String getBucket() {
+		return rootFolderUri.bucket().orElseThrow(() -> new S3BucketNotConfiguredException());
+	}
 
-    /**
-     * Returns the key of the folder.
-     */
-    public String getKey() {
-        return rootFolderUri.key().orElse("");
-    }
+	/**
+	 * Returns the key of the folder.
+	 */
+	public String getKey() {
+		return rootFolderUri.key().orElse("");
+	}
 
 }

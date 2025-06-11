@@ -17,6 +17,7 @@
 package org.craftercms.engine.util.spring.security;
 
 import java.io.IOException;
+
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,41 +38,40 @@ import org.springframework.security.web.access.AccessDeniedHandler;
  */
 public class ConfigAwareAccessDeniedHandler implements AccessDeniedHandler {
 
-    public static final String ACCESS_DENIED_ERROR_PAGE_URL_KEY = "security.accessDenied.errorPageUrl";
+	public static final String ACCESS_DENIED_ERROR_PAGE_URL_KEY = "security.accessDenied.errorPageUrl";
 
-    public String getErrorPage() {
-        HierarchicalConfiguration siteConfig = ConfigUtils.getCurrentConfig();
-        if (siteConfig != null && siteConfig.containsKey(ACCESS_DENIED_ERROR_PAGE_URL_KEY)) {
-            return siteConfig.getString(ACCESS_DENIED_ERROR_PAGE_URL_KEY);
-        }
-        return null;
-    }
+	public String getErrorPage() {
+		HierarchicalConfiguration siteConfig = ConfigUtils.getCurrentConfig();
+		if (siteConfig != null && siteConfig.containsKey(ACCESS_DENIED_ERROR_PAGE_URL_KEY)) {
+			return siteConfig.getString(ACCESS_DENIED_ERROR_PAGE_URL_KEY);
+		}
+		return null;
+	}
 
-    // Copied from Spring's AccessDeniedHandlerImpl
-    // Can't be reused because the field is private and it's used directly without a getter
-    @Override
-    public void handle(HttpServletRequest request, HttpServletResponse response,
-                       AccessDeniedException accessDeniedException) throws IOException,
-        ServletException {
-        if (!response.isCommitted()) {
-            String errorPage = getErrorPage();
-            if (StringUtils.isNotEmpty(errorPage)) {
-                // Put exception into request scope (perhaps of use to a view)
-                request.setAttribute(WebAttributes.ACCESS_DENIED_403,
-                    accessDeniedException);
+	// Copied from Spring's AccessDeniedHandlerImpl
+	// Can't be reused because the field is private and it's used directly without a getter
+	@Override
+	public void handle(HttpServletRequest request, HttpServletResponse response,
+			   AccessDeniedException accessDeniedException) throws IOException,
+		ServletException {
+		if (!response.isCommitted()) {
+			String errorPage = getErrorPage();
+			if (StringUtils.isNotEmpty(errorPage)) {
+				// Put exception into request scope (perhaps of use to a view)
+				request.setAttribute(WebAttributes.ACCESS_DENIED_403,
+					accessDeniedException);
 
-                // Set the 403 status code.
-                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+				// Set the 403 status code.
+				response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 
-                // forward to error page.
-                RequestDispatcher dispatcher = request.getRequestDispatcher(errorPage);
-                dispatcher.forward(request, response);
-            }
-            else {
-                response.sendError(HttpServletResponse.SC_FORBIDDEN,
-                    accessDeniedException.getMessage());
-            }
-        }
-    }
+				// forward to error page.
+				RequestDispatcher dispatcher = request.getRequestDispatcher(errorPage);
+				dispatcher.forward(request, response);
+			} else {
+				response.sendError(HttpServletResponse.SC_FORBIDDEN,
+					accessDeniedException.getMessage());
+			}
+		}
+	}
 
 }

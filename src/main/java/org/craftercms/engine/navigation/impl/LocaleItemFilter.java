@@ -36,51 +36,51 @@ import static org.craftercms.engine.util.LocaleUtils.getCompatibleLocales;
  */
 public class LocaleItemFilter implements ItemFilter {
 
-    protected String localeCodeXPathQuery;
+	protected String localeCodeXPathQuery;
 
-    protected ContentStoreService contentStoreService;
+	protected ContentStoreService contentStoreService;
 
-    @ConstructorProperties({"localeCodeSelector", "contentStoreService"})
-    public LocaleItemFilter(String localeCodeSelector, ContentStoreService contentStoreService) {
-        this.localeCodeXPathQuery = localeCodeSelector;
-        this.contentStoreService = contentStoreService;
-    }
+	@ConstructorProperties({"localeCodeSelector", "contentStoreService"})
+	public LocaleItemFilter(String localeCodeSelector, ContentStoreService contentStoreService) {
+		this.localeCodeXPathQuery = localeCodeSelector;
+		this.contentStoreService = contentStoreService;
+	}
 
-    @Override
-    public boolean runBeforeProcessing() {
-        return false;
-    }
+	@Override
+	public boolean runBeforeProcessing() {
+		return false;
+	}
 
-    @Override
-    public boolean runAfterProcessing() {
-        return true;
-    }
+	@Override
+	public boolean runAfterProcessing() {
+		return true;
+	}
 
-    @Override
-    public boolean accepts(Item item, List<Item> acceptedItems, List<Item> rejectedItems,
-                           boolean runningBeforeProcessing) {
-        // If there is no descriptor, accept it
-        if (item.getDescriptorDom() == null) {
-            return true;
-        }
+	@Override
+	public boolean accepts(Item item, List<Item> acceptedItems, List<Item> rejectedItems,
+			       boolean runningBeforeProcessing) {
+		// If there is no descriptor, accept it
+		if (item.getDescriptorDom() == null) {
+			return true;
+		}
 
-        // If it has a compatible version, accept it
-        var itemUrl = item.getDescriptorUrl();
-        var localeUrl = LocaleUtils.resolveLocalePath(itemUrl,
-                url -> contentStoreService.exists(SiteContext.getCurrent().getContext(), url));
+		// If it has a compatible version, accept it
+		var itemUrl = item.getDescriptorUrl();
+		var localeUrl = LocaleUtils.resolveLocalePath(itemUrl,
+			url -> contentStoreService.exists(SiteContext.getCurrent().getContext(), url));
 
-        if (!StringUtils.equals(itemUrl, localeUrl)) {
-            return true;
-        }
+		if (!StringUtils.equals(itemUrl, localeUrl)) {
+			return true;
+		}
 
-        // If it doesn't have a compatible version, check if the locale code is compatible
-        var itemLocale = parseLocale(item.queryDescriptorValue(localeCodeXPathQuery));
-        if (itemLocale != null) {
-            return getCompatibleLocales().contains(itemLocale);
-        }
+		// If it doesn't have a compatible version, check if the locale code is compatible
+		var itemLocale = parseLocale(item.queryDescriptorValue(localeCodeXPathQuery));
+		if (itemLocale != null) {
+			return getCompatibleLocales().contains(itemLocale);
+		}
 
-        // If it doesn't have a locale code then accept it for backward compatibility
-        return true;
-    }
+		// If it doesn't have a locale code then accept it for backward compatibility
+		return true;
+	}
 
 }

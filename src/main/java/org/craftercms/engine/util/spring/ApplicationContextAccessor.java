@@ -27,24 +27,24 @@ import org.springframework.context.ApplicationContext;
  */
 public class ApplicationContextAccessor extends org.craftercms.commons.spring.context.ApplicationContextAccessor {
 
-    public ApplicationContextAccessor() {
-    }
+	public ApplicationContextAccessor() {
+	}
 
-    public ApplicationContextAccessor(ApplicationContext actualApplicationContext) {
-        super(actualApplicationContext);
-    }
+	public ApplicationContextAccessor(ApplicationContext actualApplicationContext) {
+		super(actualApplicationContext);
+	}
 
-    @Override
-    protected ApplicationContext getApplicationContext() {
-        SiteContext siteContext = SiteContext.getCurrent();
-        if (siteContext != null) {
-            ApplicationContext applicationContext = siteContext.getApplicationContext();
-            if (applicationContext != null) {
-                return applicationContext;
-            }
-        }
+	@Override
+	protected ApplicationContext getApplicationContext() {
+		SiteContext siteContext = SiteContext.getCurrent();
+		if (siteContext != null) {
+			ApplicationContext applicationContext = siteContext.getApplicationContext();
+			if (applicationContext != null) {
+				return applicationContext;
+			}
+		}
 
-        return super.getApplicationContext();
-    }
+		return super.getApplicationContext();
+	}
 
 }

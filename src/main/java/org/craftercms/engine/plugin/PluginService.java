@@ -27,18 +27,20 @@ import java.util.function.BiConsumer;
  */
 public interface PluginService {
 
-    /**
-     * Loads the configuration for a given plugin
-     * @param pluginId the id of the plugin
-     * @return the configuration object
-     */
-    HierarchicalConfiguration<?> getPluginConfig(String pluginId);
+	/**
+	 * Loads the configuration for a given plugin
+	 *
+	 * @param pluginId the id of the plugin
+	 * @return the configuration object
+	 */
+	HierarchicalConfiguration<?> getPluginConfig(String pluginId);
 
-    /**
-     * Adds variables related to plugins if the given URL belongs to a plugin
-     * @param url the URL to check
-     * @param setter the setter for the variables
-     */
-    void addPluginVariables(String url, BiConsumer<String, Object> setter);
+	/**
+	 * Adds variables related to plugins if the given URL belongs to a plugin
+	 *
+	 * @param url    the URL to check
+	 * @param setter the setter for the variables
+	 */
+	void addPluginVariables(String url, BiConsumer<String, Object> setter);
 
 }

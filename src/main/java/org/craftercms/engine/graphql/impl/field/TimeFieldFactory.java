@@ -36,20 +36,20 @@ import static org.craftercms.engine.graphql.SchemaUtils.setTypeFromFieldName;
  */
 public class TimeFieldFactory implements GraphQLFieldFactory {
 
-    @Override
-    public void createField(final Document contentTypeDefinition, final Node contentTypeField,
-                            final String contentTypeFieldId, final String parentGraphQLTypeName,
-                            final GraphQLObjectType.Builder parentGraphQLType, final String graphQLFieldName,
-                            final GraphQLFieldDefinition.Builder graphQLField) {
-        // Add the timezone field as text
-        parentGraphQLType.field(GraphQLFieldDefinition.newFieldDefinition()
-            .name(getGraphQLName(graphQLFieldName) + FIELD_SUFFIX_TZ)
-            .description("Time Zone for field " + contentTypeFieldId)
-            .type(GraphQLString)
-            .argument(TEXT_FILTER));
+	@Override
+	public void createField(final Document contentTypeDefinition, final Node contentTypeField,
+				final String contentTypeFieldId, final String parentGraphQLTypeName,
+				final GraphQLObjectType.Builder parentGraphQLType, final String graphQLFieldName,
+				final GraphQLFieldDefinition.Builder graphQLField) {
+		// Add the timezone field as text
+		parentGraphQLType.field(GraphQLFieldDefinition.newFieldDefinition()
+			.name(getGraphQLName(graphQLFieldName) + FIELD_SUFFIX_TZ)
+			.description("Time Zone for field " + contentTypeFieldId)
+			.type(GraphQLString)
+			.argument(TEXT_FILTER));
 
-        // Add the original according to the suffix
-        setTypeFromFieldName(contentTypeFieldId, graphQLField);
-    }
+		// Add the original according to the suffix
+		setTypeFromFieldName(contentTypeFieldId, graphQLField);
+	}
 
 }

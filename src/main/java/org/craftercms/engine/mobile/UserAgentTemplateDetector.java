@@ -20,16 +20,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 
 public class UserAgentTemplateDetector {
-	
+
 	private List<UserAgent> supportedAgents;
 	private String agentHeaderName;
 	private String agentQueryStringParamName;
-	
+
 	public List<UserAgent> getSupportedAgents() {
 		return supportedAgents;
 	}
@@ -38,25 +39,25 @@ public class UserAgentTemplateDetector {
 		this.supportedAgents = supportedAgents;
 	}
 
-    public String getAgentHeaderName() {
-        return agentHeaderName;
-    }
+	public String getAgentHeaderName() {
+		return agentHeaderName;
+	}
 
-    public void setAgentHeaderName(String agentHeaderName) {
+	public void setAgentHeaderName(String agentHeaderName) {
 		this.agentHeaderName = agentHeaderName;
 	}
 
-    public String getAgentQueryStringParamName() {
-        return agentQueryStringParamName;
-    }
+	public String getAgentQueryStringParamName() {
+		return agentQueryStringParamName;
+	}
 
-    public void setAgentQueryStringParamName(String agentQueryStringParamName) {
+	public void setAgentQueryStringParamName(String agentQueryStringParamName) {
 		this.agentQueryStringParamName = agentQueryStringParamName;
 	}
-	
+
 	public String resolveAgentTemplate(HttpServletRequest request, String template) {
-		String templatePath = template.substring(0, template.lastIndexOf('/')+1);
-		String templateFile = template.substring(template.lastIndexOf('/')+1);
+		String templatePath = template.substring(0, template.lastIndexOf('/') + 1);
+		String templateFile = template.substring(template.lastIndexOf('/') + 1);
 		String queryStringParam = request.getParameter(agentQueryStringParamName);
 
 		if (!StringUtils.isEmpty(queryStringParam)) {
@@ -79,14 +80,14 @@ public class UserAgentTemplateDetector {
 				boolean found = false;
 				while (!found && iter.hasNext()) {
 					UserAgent userAgent = iter.next();
-                    if (StringUtils.isNotEmpty(userAgent.getDetectionRegex())) {
-                        Pattern pattern = Pattern.compile(userAgent.getDetectionRegex());
-                        Matcher matcher = pattern.matcher(agent);
-                        found = matcher.find();
-                        if (found) {
-                            templateFile = userAgent.getTemplatePrefix() + templateFile;
-                        }
-                    }
+					if (StringUtils.isNotEmpty(userAgent.getDetectionRegex())) {
+						Pattern pattern = Pattern.compile(userAgent.getDetectionRegex());
+						Matcher matcher = pattern.matcher(agent);
+						found = matcher.find();
+						if (found) {
+							templateFile = userAgent.getTemplatePrefix() + templateFile;
+						}
+					}
 				}
 			}
 

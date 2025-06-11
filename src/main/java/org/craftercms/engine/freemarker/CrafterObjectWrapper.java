@@ -38,46 +38,46 @@ import java.lang.reflect.Modifier;
  */
 public class CrafterObjectWrapper extends DefaultObjectWrapper {
 
-    protected final boolean enableSandbox;
+	protected final boolean enableSandbox;
 
-    public CrafterObjectWrapper(boolean enableSandbox) {
-        super(Configuration.VERSION_2_3_30);
-        this.enableSandbox = enableSandbox;
-    }
+	public CrafterObjectWrapper(boolean enableSandbox) {
+		super(Configuration.VERSION_2_3_30);
+		this.enableSandbox = enableSandbox;
+	}
 
-    @Override
-    public TemplateModel wrap(Object obj) throws TemplateModelException {
-        if (obj instanceof Element && !SiteProperties.isDisableFullModelTypeConversion()) {
-            Object result = ContentModelUtils.convertField((Element)obj);
-            if (result instanceof Node) {
-                return new Dom4jNodeModel((Node)obj, this);
-            } else {
-                return super.wrap(result);
-            }
-        } else if (obj instanceof Node) {
-            return new Dom4jNodeModel((Node)obj, this);
-        } else {
-            return super.wrap(obj);
-        }
-    }
+	@Override
+	public TemplateModel wrap(Object obj) throws TemplateModelException {
+		if (obj instanceof Element && !SiteProperties.isDisableFullModelTypeConversion()) {
+			Object result = ContentModelUtils.convertField((Element) obj);
+			if (result instanceof Node) {
+				return new Dom4jNodeModel((Node) obj, this);
+			} else {
+				return super.wrap(result);
+			}
+		} else if (obj instanceof Node) {
+			return new Dom4jNodeModel((Node) obj, this);
+		} else {
+			return super.wrap(obj);
+		}
+	}
 
-    @Override
-    protected TemplateModel invokeMethod(Object object, Method method, Object[] args) throws InvocationTargetException, IllegalAccessException, TemplateModelException {
-        if (enableSandbox) {
-            boolean blocked;
+	@Override
+	protected TemplateModel invokeMethod(Object object, Method method, Object[] args) throws InvocationTargetException, IllegalAccessException, TemplateModelException {
+		if (enableSandbox) {
+			boolean blocked;
 
-            if (Modifier.isStatic(method.getModifiers())) {
-                blocked = StaticWhitelist.isPermanentlyBlacklistedStaticMethod(method);
-            } else {
-                blocked = StaticWhitelist.isPermanentlyBlacklistedMethod(method);
-            }
+			if (Modifier.isStatic(method.getModifiers())) {
+				blocked = StaticWhitelist.isPermanentlyBlacklistedStaticMethod(method);
+			} else {
+				blocked = StaticWhitelist.isPermanentlyBlacklistedMethod(method);
+			}
 
-            if (blocked) {
-                return null;
-            }
-        }
+			if (blocked) {
+				return null;
+			}
+		}
 
-        return super.invokeMethod(object, method, args);
-    }
+		return super.invokeMethod(object, method, args);
+	}
 
 }

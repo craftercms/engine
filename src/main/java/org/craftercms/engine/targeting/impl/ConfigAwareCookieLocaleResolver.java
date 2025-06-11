@@ -16,6 +16,7 @@
 package org.craftercms.engine.targeting.impl;
 
 import java.util.Locale;
+
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.configuration2.Configuration;
@@ -26,51 +27,50 @@ import org.craftercms.engine.util.ConfigUtils;
 /**
  * {@link CookieLocaleResolver} extension that uses the default locale specified in the site configuration if
  * the user has not current locale associated.
- *
+ * <p>
  * TODO: This class extends `CookieLocaleResolver` version 5.3.33 to keep the override `getCookieName()`. Review this to use the latest
- *
  *
  * @author avasquez
  */
 public class ConfigAwareCookieLocaleResolver extends CookieLocaleResolver {
 
-    public static final String DEFAULT_LOCALE_CONFIG_KEY = "defaultLocale";
+	public static final String DEFAULT_LOCALE_CONFIG_KEY = "defaultLocale";
 
-    @Override
-    public String getCookieName() {
-        SiteContext siteContext = SiteContext.getCurrent();
-        if (siteContext != null) {
-            return String.format("%s-%s", super.getCookieName(), siteContext.getSiteName());
-        }
-        return super.getCookieName();
-    }
+	@Override
+	public String getCookieName() {
+		SiteContext siteContext = SiteContext.getCurrent();
+		if (siteContext != null) {
+			return String.format("%s-%s", super.getCookieName(), siteContext.getSiteName());
+		}
+		return super.getCookieName();
+	}
 
-    @Override
-    protected Locale determineDefaultLocale(HttpServletRequest request) {
-        Locale defaultLocale = getDefaultLocaleFromConfig();
-        if (defaultLocale != null) {
-            return defaultLocale;
-        } else {
-            return super.determineDefaultLocale(request);
-        }
-    }
+	@Override
+	protected Locale determineDefaultLocale(HttpServletRequest request) {
+		Locale defaultLocale = getDefaultLocaleFromConfig();
+		if (defaultLocale != null) {
+			return defaultLocale;
+		} else {
+			return super.determineDefaultLocale(request);
+		}
+	}
 
-    protected Locale getDefaultLocaleFromConfig() {
-        Configuration config = ConfigUtils.getCurrentConfig();
-        if (config != null) {
-            Locale defaultLocale = LocaleUtils.toLocale(config.getString(DEFAULT_LOCALE_CONFIG_KEY));
-            if (defaultLocale != null && !LocaleUtils.isAvailableLocale(defaultLocale)) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug(defaultLocale + " is not one of the available locales");
-                }
+	protected Locale getDefaultLocaleFromConfig() {
+		Configuration config = ConfigUtils.getCurrentConfig();
+		if (config != null) {
+			Locale defaultLocale = LocaleUtils.toLocale(config.getString(DEFAULT_LOCALE_CONFIG_KEY));
+			if (defaultLocale != null && !LocaleUtils.isAvailableLocale(defaultLocale)) {
+				if (logger.isDebugEnabled()) {
+					logger.debug(defaultLocale + " is not one of the available locales");
+				}
 
-                return null;
-            }
+				return null;
+			}
 
-            return defaultLocale;
-        } else {
-            return null;
-        }
-    }
+			return defaultLocale;
+		} else {
+			return null;
+		}
+	}
 
 }

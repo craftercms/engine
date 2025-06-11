@@ -28,35 +28,35 @@ import java.util.List;
  */
 public class FallbackPropertyFactory<T> extends AbstractFactoryBean<T> {
 
-    @Autowired
-    private PropertySourcesPropertyResolver propertyResolver;
+	@Autowired
+	private PropertySourcesPropertyResolver propertyResolver;
 
-    private final List<String> properties;
-    private final Class<T> type;
-    private T defaultValue;
+	private final List<String> properties;
+	private final Class<T> type;
+	private T defaultValue;
 
-    public FallbackPropertyFactory(final List<String> properties, final Class<T> type) {
-        this.properties = properties;
-        this.type = type;
-    }
+	public FallbackPropertyFactory(final List<String> properties, final Class<T> type) {
+		this.properties = properties;
+		this.type = type;
+	}
 
-    public void setDefaultValue(T defaultValue) {
-        this.defaultValue = defaultValue;
-    }
+	public void setDefaultValue(T defaultValue) {
+		this.defaultValue = defaultValue;
+	}
 
-    @Override
-    public Class<?> getObjectType() {
-        return String.class;
-    }
+	@Override
+	public Class<?> getObjectType() {
+		return String.class;
+	}
 
-    @Override
-    protected T createInstance() throws Exception {
-        for (String propertyName : properties) {
-            T propertyValue = propertyResolver.getProperty(propertyName, type);
-            if (ObjectUtils.isNotEmpty(propertyValue)) {
-                return propertyValue;
-            }
-        }
-        return defaultValue;
-    }
+	@Override
+	protected T createInstance() throws Exception {
+		for (String propertyName : properties) {
+			T propertyValue = propertyResolver.getProperty(propertyName, type);
+			if (ObjectUtils.isNotEmpty(propertyValue)) {
+				return propertyValue;
+			}
+		}
+		return defaultValue;
+	}
 }

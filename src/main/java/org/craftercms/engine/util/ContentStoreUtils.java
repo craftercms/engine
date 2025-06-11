@@ -30,20 +30,20 @@ import org.craftercms.core.service.Item;
  */
 public class ContentStoreUtils {
 
-    private ContentStoreUtils() {
-    }
+	private ContentStoreUtils() {
+	}
 
-    public static List<String> findChildrenUrl(ContentStoreService storeService, Context context, String folderUrl) {
-        List<Item> children = storeService.findChildren(context, folderUrl);
-        List<String> childrenUrl = new ArrayList<>();
+	public static List<String> findChildrenUrl(ContentStoreService storeService, Context context, String folderUrl) {
+		List<Item> children = storeService.findChildren(context, folderUrl);
+		List<String> childrenUrl = new ArrayList<>();
 
-        if (CollectionUtils.isNotEmpty(children)) {
-            for (Item child : children) {
-                childrenUrl.add(child.getUrl());
-            }
-        }
+		if (CollectionUtils.isNotEmpty(children)) {
+			for (Item child : children) {
+				childrenUrl.add(child.getUrl());
+			}
+		}
 
-        return childrenUrl;
-    }
+		return childrenUrl;
+	}
 
 }

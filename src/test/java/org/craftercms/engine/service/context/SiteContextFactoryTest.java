@@ -42,45 +42,45 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class SiteContextFactoryTest {
 
-    private static final String SITE_NAME_VARIABLE = "siteName";
-    private static final String SITE_NAME = "my-test-site";
+	private static final String SITE_NAME_VARIABLE = "siteName";
+	private static final String SITE_NAME = "my-test-site";
 
-    @Mock
-    MacroResolver macroResolver;
-    @Spy
-    ContentStoreService contentStoreService;
-    @Mock
-    ObjectFactory<FreeMarkerConfig> freeMarkerConfigurationFactory;
-    @Mock
-    UrlTransformationEngine urlTransformationEngine;
-    @Mock
-    CacheTemplate cacheTemplate;
-    @Mock
-    Executor jobThreadPoolExecutor;
-    @Mock
-    GraphQLFactory graphQLFactory;
-    @Mock
-    SiteCacheWarmer cacheWarmer;
-    @Mock
-    EncryptionAwareConfigurationReader configurationReader;
-    SiteContextFactory siteContextFactory;
+	@Mock
+	MacroResolver macroResolver;
+	@Spy
+	ContentStoreService contentStoreService;
+	@Mock
+	ObjectFactory<FreeMarkerConfig> freeMarkerConfigurationFactory;
+	@Mock
+	UrlTransformationEngine urlTransformationEngine;
+	@Mock
+	CacheTemplate cacheTemplate;
+	@Mock
+	Executor jobThreadPoolExecutor;
+	@Mock
+	GraphQLFactory graphQLFactory;
+	@Mock
+	SiteCacheWarmer cacheWarmer;
+	@Mock
+	EncryptionAwareConfigurationReader configurationReader;
+	SiteContextFactory siteContextFactory;
 
-    @Before
-    public void setUp() throws Exception {
-        siteContextFactory = new SiteContextFactory("", "", "", "",
-                "", "", "", new String[]{}, new String[]{}, new String[]{}, new String[]{},
-                "", new HashMap<>(), freeMarkerConfigurationFactory, urlTransformationEngine, contentStoreService, cacheTemplate,
-                macroResolver, new ArrayList<>(), jobThreadPoolExecutor, graphQLFactory, false,
-                cacheWarmer, configurationReader, new String[0]);
-        siteContextFactory.setTranslationConfigPaths(new String[]{});
-        when(macroResolver.resolveMacros(any(), any())).thenReturn("");
-    }
+	@Before
+	public void setUp() throws Exception {
+		siteContextFactory = new SiteContextFactory("", "", "", "",
+			"", "", "", new String[]{}, new String[]{}, new String[]{}, new String[]{},
+			"", new HashMap<>(), freeMarkerConfigurationFactory, urlTransformationEngine, contentStoreService, cacheTemplate,
+			macroResolver, new ArrayList<>(), jobThreadPoolExecutor, graphQLFactory, false,
+			cacheWarmer, configurationReader, new String[0]);
+		siteContextFactory.setTranslationConfigPaths(new String[]{});
+		when(macroResolver.resolveMacros(any(), any())).thenReturn("");
+	}
 
-    @Test
-    public void testCreateDefaultConfigVariablesContext() {
-        siteContextFactory.createContext(SITE_NAME);
-        verify(contentStoreService).getContext(any(), any(), any(), anyBoolean(), anyBoolean(), anyInt(), anyBoolean(), argThat(variables ->
-                SITE_NAME.equals(variables.get(SITE_NAME_VARIABLE))
-        ));
-    }
+	@Test
+	public void testCreateDefaultConfigVariablesContext() {
+		siteContextFactory.createContext(SITE_NAME);
+		verify(contentStoreService).getContext(any(), any(), any(), anyBoolean(), anyBoolean(), anyInt(), anyBoolean(), argThat(variables ->
+			SITE_NAME.equals(variables.get(SITE_NAME_VARIABLE))
+		));
+	}
 }

@@ -27,35 +27,35 @@ import org.craftercms.engine.properties.SiteProperties;
  */
 public class OrderDefaultComparator implements Comparator<SiteItem> {
 
-    public static final String ORDER_DEFAULT_VALUE_KEY = "orderDefault_f";
-    public static final float DEFAULT_ORDER_DEFAULT_VALUE = -1;
+	public static final String ORDER_DEFAULT_VALUE_KEY = "orderDefault_f";
+	public static final float DEFAULT_ORDER_DEFAULT_VALUE = -1;
 
-    @Override
-    public int compare(SiteItem siteItem1, SiteItem siteItem2) {
-        Float orderDefault1 = getOrderDefault(siteItem1);
-        Float orderDefault2 = getOrderDefault(siteItem2);
+	@Override
+	public int compare(SiteItem siteItem1, SiteItem siteItem2) {
+		Float orderDefault1 = getOrderDefault(siteItem1);
+		Float orderDefault2 = getOrderDefault(siteItem2);
 
-        if (orderDefault1 == null) {
-            orderDefault1 = DEFAULT_ORDER_DEFAULT_VALUE;
-        }
-        if (orderDefault2 == null) {
-            orderDefault2 = DEFAULT_ORDER_DEFAULT_VALUE;
-        }
+		if (orderDefault1 == null) {
+			orderDefault1 = DEFAULT_ORDER_DEFAULT_VALUE;
+		}
+		if (orderDefault2 == null) {
+			orderDefault2 = DEFAULT_ORDER_DEFAULT_VALUE;
+		}
 
-        return orderDefault1.compareTo(orderDefault2);
-    }
+		return orderDefault1.compareTo(orderDefault2);
+	}
 
-    protected Float getOrderDefault(SiteItem siteItem) {
-        Float value = (Float) siteItem.get(ORDER_DEFAULT_VALUE_KEY);
+	protected Float getOrderDefault(SiteItem siteItem) {
+		Float value = (Float) siteItem.get(ORDER_DEFAULT_VALUE_KEY);
 
-        if (value == null && siteItem.isFolder()) {
-            siteItem = siteItem.getChildItem(SiteProperties.getIndexFileName());
-            if (siteItem != null) {
-                value = (Float) siteItem.get(ORDER_DEFAULT_VALUE_KEY);
-            }
-        }
+		if (value == null && siteItem.isFolder()) {
+			siteItem = siteItem.getChildItem(SiteProperties.getIndexFileName());
+			if (siteItem != null) {
+				value = (Float) siteItem.get(ORDER_DEFAULT_VALUE_KEY);
+			}
+		}
 
-        return value;
-    }
+		return value;
+	}
 
 }

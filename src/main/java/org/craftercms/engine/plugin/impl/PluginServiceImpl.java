@@ -52,98 +52,98 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
  */
 public class PluginServiceImpl implements PluginService {
 
-    private static final Logger logger = LoggerFactory.getLogger(PluginService.class);
+	private static final Logger logger = LoggerFactory.getLogger(PluginService.class);
 
-    public static final String PLUGIN_ID_KEY = "pluginId";
+	public static final String PLUGIN_ID_KEY = "pluginId";
 
-    public static final String PLUGIN_CONFIG_KEY = "pluginConfig";
+	public static final String PLUGIN_CONFIG_KEY = "pluginConfig";
 
-    public static final String PLUGIN_ID_PLACEHOLDER = "pluginId";
+	public static final String PLUGIN_ID_PLACEHOLDER = "pluginId";
 
-    protected Pattern pattern = Pattern.compile(".*plugins/(.+)");
+	protected Pattern pattern = Pattern.compile(".*plugins/(.+)");
 
-    protected ContentStoreService contentStoreService;
+	protected ContentStoreService contentStoreService;
 
-    protected EncryptionAwareConfigurationReader configurationReader;
+	protected EncryptionAwareConfigurationReader configurationReader;
 
-    protected String configurationPathPattern;
+	protected String configurationPathPattern;
 
-    @ConstructorProperties({"contentStoreService", "configurationReader", "configurationPathPattern"})
-    public PluginServiceImpl(ContentStoreService contentStoreService,
-                             EncryptionAwareConfigurationReader configurationReader,
-                             String configurationPathPattern) {
-        this.contentStoreService = contentStoreService;
-        this.configurationReader = configurationReader;
-        this.configurationPathPattern = configurationPathPattern;
-    }
+	@ConstructorProperties({"contentStoreService", "configurationReader", "configurationPathPattern"})
+	public PluginServiceImpl(ContentStoreService contentStoreService,
+				 EncryptionAwareConfigurationReader configurationReader,
+				 String configurationPathPattern) {
+		this.contentStoreService = contentStoreService;
+		this.configurationReader = configurationReader;
+		this.configurationPathPattern = configurationPathPattern;
+	}
 
-    @Override
-    public HierarchicalConfiguration<?> getPluginConfig(String pluginId) {
-        Context context = getCurrentContext();
-        String pluginPath = pluginId.replaceAll("\\.", File.separator);
-        return loadPluginConfiguration(context, getPluginConfigPath(pluginPath));
-    }
+	@Override
+	public HierarchicalConfiguration<?> getPluginConfig(String pluginId) {
+		Context context = getCurrentContext();
+		String pluginPath = pluginId.replaceAll("\\.", File.separator);
+		return loadPluginConfiguration(context, getPluginConfigPath(pluginPath));
+	}
 
-    protected HierarchicalConfiguration<?> loadPluginConfiguration(Context context, String pluginPath) {
-        try (InputStream is =
-                     contentStoreService.getContent(context, pluginPath).getInputStream()) {
-            Map<String, String> lookupVariables = new HashMap<>();
-            Context currentContext = SiteContext.getCurrent().getContext();
-            if (currentContext != null) {
-                lookupVariables = currentContext.getConfigLookupVariables();
-            }
-            return configurationReader.readXmlConfiguration(is, lookupVariables);
-        } catch (ConfigurationException | IOException e) {
-            logger.error("Error loading plugin configuration", e);
-            return new XMLConfiguration();
-        }
-    }
+	protected HierarchicalConfiguration<?> loadPluginConfiguration(Context context, String pluginPath) {
+		try (InputStream is =
+			     contentStoreService.getContent(context, pluginPath).getInputStream()) {
+			Map<String, String> lookupVariables = new HashMap<>();
+			Context currentContext = SiteContext.getCurrent().getContext();
+			if (currentContext != null) {
+				lookupVariables = currentContext.getConfigLookupVariables();
+			}
+			return configurationReader.readXmlConfiguration(is, lookupVariables);
+		} catch (ConfigurationException | IOException e) {
+			logger.error("Error loading plugin configuration", e);
+			return new XMLConfiguration();
+		}
+	}
 
-    public void addPluginVariables(String url, BiConsumer<String, Object> setter) {
-        Context context = getCurrentContext();
-        Matcher matcher = pattern.matcher(url);
+	public void addPluginVariables(String url, BiConsumer<String, Object> setter) {
+		Context context = getCurrentContext();
+		Matcher matcher = pattern.matcher(url);
 
-        if (!matcher.matches()) {
-            // The url doesn't belong to a plugin for sure
-            return;
-        }
+		if (!matcher.matches()) {
+			// The url doesn't belong to a plugin for sure
+			return;
+		}
 
-        // Iterate over all possible ids
-        String parentUrl = matcher.group(1);
-        boolean pluginFound = false;
-        while (!pluginFound && isNotEmpty(parentUrl)) {
-            parentUrl = FilenameUtils.getPathNoEndSeparator(parentUrl);
-            pluginFound = pluginConfigExists(parentUrl);
-        }
+		// Iterate over all possible ids
+		String parentUrl = matcher.group(1);
+		boolean pluginFound = false;
+		while (!pluginFound && isNotEmpty(parentUrl)) {
+			parentUrl = FilenameUtils.getPathNoEndSeparator(parentUrl);
+			pluginFound = pluginConfigExists(parentUrl);
+		}
 
-        if (isEmpty(parentUrl)) {
-            return;
-        }
+		if (isEmpty(parentUrl)) {
+			return;
+		}
 
-        String pluginId = getPluginId(parentUrl);
-        Configuration pluginConfig = loadPluginConfiguration(context, getPluginConfigPath(parentUrl));
+		String pluginId = getPluginId(parentUrl);
+		Configuration pluginConfig = loadPluginConfiguration(context, getPluginConfigPath(parentUrl));
 
-        setter.accept(PLUGIN_ID_KEY, pluginId);
-        setter.accept(PLUGIN_CONFIG_KEY, pluginConfig);
-    }
+		setter.accept(PLUGIN_ID_KEY, pluginId);
+		setter.accept(PLUGIN_CONFIG_KEY, pluginConfig);
+	}
 
-    protected boolean pluginConfigExists(String path) {
-        Context context = getCurrentContext();
-        return contentStoreService.exists(context, getPluginConfigPath(path));
-    }
+	protected boolean pluginConfigExists(String path) {
+		Context context = getCurrentContext();
+		return contentStoreService.exists(context, getPluginConfigPath(path));
+	}
 
-    protected String getPluginId(String pluginPath) {
-        return RegExUtils.replaceAll(pluginPath, File.separator, "\\.");
-    }
+	protected String getPluginId(String pluginPath) {
+		return RegExUtils.replaceAll(pluginPath, File.separator, "\\.");
+	}
 
-    protected String getPluginConfigPath(String pluginPath) {
-        return StringSubstitutor.replace(configurationPathPattern, Map.of(PLUGIN_ID_PLACEHOLDER, pluginPath));
-    }
+	protected String getPluginConfigPath(String pluginPath) {
+		return StringSubstitutor.replace(configurationPathPattern, Map.of(PLUGIN_ID_PLACEHOLDER, pluginPath));
+	}
 
-    protected Context getCurrentContext() {
-        return Optional.ofNullable(SiteContext.getCurrent())
-                .orElseThrow(IllegalStateException::new)
-                .getContext();
-    }
+	protected Context getCurrentContext() {
+		return Optional.ofNullable(SiteContext.getCurrent())
+			.orElseThrow(IllegalStateException::new)
+			.getContext();
+	}
 
 }

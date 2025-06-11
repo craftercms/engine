@@ -44,83 +44,83 @@ import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class S3SiteListResolverTest {
-    private static final String SITE_NAME_MACRO_NAME = "siteName";
-    private static final String SITE_NAME_MACRO_PLACEHOLDER = "{" + SITE_NAME_MACRO_NAME + "}";
-    private static final String TEST_URI_ROOT = "s3://test-bucket-" + SITE_NAME_MACRO_PLACEHOLDER;
-    private static final String TEST_URI_SUB_FOLDER = "s3://test-bucket/sites/" + SITE_NAME_MACRO_PLACEHOLDER;
+	private static final String SITE_NAME_MACRO_NAME = "siteName";
+	private static final String SITE_NAME_MACRO_PLACEHOLDER = "{" + SITE_NAME_MACRO_NAME + "}";
+	private static final String TEST_URI_ROOT = "s3://test-bucket-" + SITE_NAME_MACRO_PLACEHOLDER;
+	private static final String TEST_URI_SUB_FOLDER = "s3://test-bucket/sites/" + SITE_NAME_MACRO_PLACEHOLDER;
 
-    @Mock
-    private S3ClientBuilder clientBuilderMock;
+	@Mock
+	private S3ClientBuilder clientBuilderMock;
 
-    @Mock
-    private S3Client s3ClientMock;
+	@Mock
+	private S3Client s3ClientMock;
 
-    private static S3Client defaultClient;
+	private static S3Client defaultClient;
 
-    private static S3Utilities defaultUtilities;
+	private static S3Utilities defaultUtilities;
 
-    @Mock
-    private static S3Utilities mockUtilities;
+	@Mock
+	private static S3Utilities mockUtilities;
 
-    private S3SiteListResolver resolver;
+	private S3SiteListResolver resolver;
 
-    @Before
-    public void setup() {
-        defaultClient = S3Client.builder()
-                .credentialsProvider(dummyCreds())
-                .region(Region.US_EAST_1)
-                .build();
-        defaultUtilities = defaultClient.utilities();
-        when(clientBuilderMock.getClient()).thenReturn(s3ClientMock);
-        when(s3ClientMock.utilities()).thenReturn(defaultUtilities);
-    }
+	@Before
+	public void setup() {
+		defaultClient = S3Client.builder()
+			.credentialsProvider(dummyCreds())
+			.region(Region.US_EAST_1)
+			.build();
+		defaultUtilities = defaultClient.utilities();
+		when(clientBuilderMock.getClient()).thenReturn(s3ClientMock);
+		when(s3ClientMock.utilities()).thenReturn(defaultUtilities);
+	}
 
-    @Test
-    public void testGetSiteListFromBucketNames() {
-        resolver = new S3SiteListResolver(TEST_URI_ROOT, clientBuilderMock);
+	@Test
+	public void testGetSiteListFromBucketNames() {
+		resolver = new S3SiteListResolver(TEST_URI_ROOT, clientBuilderMock);
 
-        Bucket bucket1 = Bucket.builder().name("test-bucket-testSite").build();
-        Bucket bucket2 = Bucket.builder().name("test-bucket/testSite").build();
-        List<Bucket> buckets = Arrays.asList(bucket1, bucket2);
+		Bucket bucket1 = Bucket.builder().name("test-bucket-testSite").build();
+		Bucket bucket2 = Bucket.builder().name("test-bucket/testSite").build();
+		List<Bucket> buckets = Arrays.asList(bucket1, bucket2);
 
-        when(s3ClientMock.listBuckets()).thenReturn(ListBucketsResponse.builder().buckets(buckets).build());
+		when(s3ClientMock.listBuckets()).thenReturn(ListBucketsResponse.builder().buckets(buckets).build());
 
-        Collection<String> siteList = resolver.getSiteList();
+		Collection<String> siteList = resolver.getSiteList();
 
-        assertEquals(1, siteList.size());
-        assertEquals(List.of("testSite"), siteList);
-    }
+		assertEquals(1, siteList.size());
+		assertEquals(List.of("testSite"), siteList);
+	}
 
-    @Test
-    public void testGetSiteListFromBucketKeys() {
-        resolver = new S3SiteListResolver(TEST_URI_SUB_FOLDER, clientBuilderMock);
+	@Test
+	public void testGetSiteListFromBucketKeys() {
+		resolver = new S3SiteListResolver(TEST_URI_SUB_FOLDER, clientBuilderMock);
 
-        ListObjectsV2Response response = ListObjectsV2Response.builder()
-                .commonPrefixes(CommonPrefix.builder().prefix("sites/site1/").build(),
-                        CommonPrefix.builder().prefix("sites/site2/").build())
-                .build();
+		ListObjectsV2Response response = ListObjectsV2Response.builder()
+			.commonPrefixes(CommonPrefix.builder().prefix("sites/site1/").build(),
+				CommonPrefix.builder().prefix("sites/site2/").build())
+			.build();
 
-        when(s3ClientMock.listObjectsV2(any(ListObjectsV2Request.class))).thenReturn(response);
+		when(s3ClientMock.listObjectsV2(any(ListObjectsV2Request.class))).thenReturn(response);
 
-        Collection<String> siteList = resolver.getSiteList();
+		Collection<String> siteList = resolver.getSiteList();
 
-        assertEquals(2, siteList.size());
-        assertEquals(List.of("site1", "site2"), siteList);
-    }
+		assertEquals(2, siteList.size());
+		assertEquals(List.of("site1", "site2"), siteList);
+	}
 
-    @Test
-    public void testNoBucketException() {
-        when(s3ClientMock.utilities()).thenReturn(mockUtilities);
-        when(mockUtilities.parseUri(any())).thenReturn(S3Uri.builder()
-                .uri(URI.create("s3://sample-bucket/folder"))
-                .build()); // empty bucket name
-        resolver = new S3SiteListResolver(TEST_URI_SUB_FOLDER, clientBuilderMock);
-        assertThrows(S3BucketNotConfiguredException.class, () -> {
-            resolver.getSiteList();
-        });
-    }
+	@Test
+	public void testNoBucketException() {
+		when(s3ClientMock.utilities()).thenReturn(mockUtilities);
+		when(mockUtilities.parseUri(any())).thenReturn(S3Uri.builder()
+			.uri(URI.create("s3://sample-bucket/folder"))
+			.build()); // empty bucket name
+		resolver = new S3SiteListResolver(TEST_URI_SUB_FOLDER, clientBuilderMock);
+		assertThrows(S3BucketNotConfiguredException.class, () -> {
+			resolver.getSiteList();
+		});
+	}
 
-    private static AwsCredentialsProvider dummyCreds() {
-        return StaticCredentialsProvider.create(AwsBasicCredentials.create("akid", "skid"));
-    }
+	private static AwsCredentialsProvider dummyCreds() {
+		return StaticCredentialsProvider.create(AwsBasicCredentials.create("akid", "skid"));
+	}
 }

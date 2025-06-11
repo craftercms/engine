@@ -26,43 +26,41 @@ import org.craftercms.engine.properties.SiteProperties;
  */
 public class TargetingUtils {
 
-    private TargetingUtils() {
-    }
+	private TargetingUtils() {
+	}
 
-    /**
-     * Return the root folder of the specified targeted URL
-     *
-     * @param targetedUrl the targeted URL
-     *
-     * @return the root folder that matches the targeted URL
-     */
-    public static String getMatchingRootFolder(String targetedUrl) {
-        String[] targetedRootFolders = SiteProperties.getRootFolders();
-        if (ArrayUtils.isNotEmpty(targetedRootFolders)) {
-            for (String targetedRootFolder : targetedRootFolders) {
-                if (targetedUrl.startsWith(targetedRootFolder)) {
-                    return targetedRootFolder;
-                }
-            }
-        }
+	/**
+	 * Return the root folder of the specified targeted URL
+	 *
+	 * @param targetedUrl the targeted URL
+	 * @return the root folder that matches the targeted URL
+	 */
+	public static String getMatchingRootFolder(String targetedUrl) {
+		String[] targetedRootFolders = SiteProperties.getRootFolders();
+		if (ArrayUtils.isNotEmpty(targetedRootFolders)) {
+			for (String targetedRootFolder : targetedRootFolders) {
+				if (targetedUrl.startsWith(targetedRootFolder)) {
+					return targetedRootFolder;
+				}
+			}
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    /**
-     * Returns true if the path should be excluded or ignored for targeting.
-     *
-     * @param path  the path
-     *
-     * @return true if the path should be excluded
-     */
-    public static boolean excludePath(String path) {
-        String[] excludePatterns = SiteProperties.getExcludePatterns();
-        if (ArrayUtils.isNotEmpty(excludePatterns)) {
-            return RegexUtils.matchesAny(path, excludePatterns);
-        } else {
-            return false;
-        }
-    }
+	/**
+	 * Returns true if the path should be excluded or ignored for targeting.
+	 *
+	 * @param path the path
+	 * @return true if the path should be excluded
+	 */
+	public static boolean excludePath(String path) {
+		String[] excludePatterns = SiteProperties.getExcludePatterns();
+		if (ArrayUtils.isNotEmpty(excludePatterns)) {
+			return RegexUtils.matchesAny(path, excludePatterns);
+		} else {
+			return false;
+		}
+	}
 
 }

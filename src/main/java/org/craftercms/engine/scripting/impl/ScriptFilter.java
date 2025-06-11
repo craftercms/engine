@@ -37,6 +37,7 @@ import org.springframework.util.PathMatcher;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,167 +51,167 @@ import java.util.stream.Collectors;
  */
 public class ScriptFilter implements Filter {
 
-    public static final String FILTER_KEY = "filters.filter";
-    public static final String SCRIPT_KEY = "script";
-    public static final String INCLUDE_MAPPINGS_KEY = "mapping.include";
-    public static final String EXCLUDE_MAPPINGS_KEY = "mapping.exclude";
+	public static final String FILTER_KEY = "filters.filter";
+	public static final String SCRIPT_KEY = "script";
+	public static final String INCLUDE_MAPPINGS_KEY = "mapping.include";
+	public static final String EXCLUDE_MAPPINGS_KEY = "mapping.exclude";
 
-    public static final String FILTER_MAPPINGS_CACHE_KEY = "filterMappings";
+	public static final String FILTER_MAPPINGS_CACHE_KEY = "filterMappings";
 
-    private ServletContext servletContext;
-    private CacheTemplate cacheTemplate;
-    protected PathMatcher pathMatcher;
-    protected boolean disableVariableRestrictions;
+	private ServletContext servletContext;
+	private CacheTemplate cacheTemplate;
+	protected PathMatcher pathMatcher;
+	protected boolean disableVariableRestrictions;
 
-    protected PluginService pluginService;
+	protected PluginService pluginService;
 
-    protected RequestMatcher excludedUrlsMatcher;
+	protected RequestMatcher excludedUrlsMatcher;
 
-    public ScriptFilter(CacheTemplate cacheTemplate) {
-        pathMatcher = new AntPathMatcher();
-        excludedUrlsMatcher = new NegatedRequestMatcher(AnyRequestMatcher.INSTANCE);
-        this.cacheTemplate = cacheTemplate;
-    }
+	public ScriptFilter(CacheTemplate cacheTemplate) {
+		pathMatcher = new AntPathMatcher();
+		excludedUrlsMatcher = new NegatedRequestMatcher(AnyRequestMatcher.INSTANCE);
+		this.cacheTemplate = cacheTemplate;
+	}
 
-    public void setPathMatcher(PathMatcher pathMatcher) {
-        this.pathMatcher = pathMatcher;
-    }
+	public void setPathMatcher(PathMatcher pathMatcher) {
+		this.pathMatcher = pathMatcher;
+	}
 
-    public void setDisableVariableRestrictions(boolean disableVariableRestrictions) {
-        this.disableVariableRestrictions = disableVariableRestrictions;
-    }
+	public void setDisableVariableRestrictions(boolean disableVariableRestrictions) {
+		this.disableVariableRestrictions = disableVariableRestrictions;
+	}
 
-    public void setPluginService(PluginService pluginService) {
-        this.pluginService = pluginService;
-    }
+	public void setPluginService(PluginService pluginService) {
+		this.pluginService = pluginService;
+	}
 
-    public void setExcludedUrls(String[] excludedUrls) {
-        this.excludedUrlsMatcher = new OrRequestMatcher(Arrays.stream(excludedUrls)
-                .map(AntPathRequestMatcher::new)
-                .collect(Collectors.toList()));
-    }
+	public void setExcludedUrls(String[] excludedUrls) {
+		this.excludedUrlsMatcher = new OrRequestMatcher(Arrays.stream(excludedUrls)
+			.map(AntPathRequestMatcher::new)
+			.collect(Collectors.toList()));
+	}
 
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-        this.servletContext = filterConfig.getServletContext();
-    }
+	@Override
+	public void init(FilterConfig filterConfig) throws ServletException {
+		this.servletContext = filterConfig.getServletContext();
+	}
 
-    @Override
-    public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain originalChain) throws IOException,
-        ServletException {
-        HttpServletRequest httpRequest = (HttpServletRequest) request;
-        FilterChain chain = originalChain;
-        if (!excludedUrlsMatcher.matches(httpRequest)) {
-            chain = getScriptFilterChain(httpRequest, originalChain);
-        }
-        chain.doFilter(request, response);
-    }
+	@Override
+	public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain originalChain) throws IOException,
+		ServletException {
+		HttpServletRequest httpRequest = (HttpServletRequest) request;
+		FilterChain chain = originalChain;
+		if (!excludedUrlsMatcher.matches(httpRequest)) {
+			chain = getScriptFilterChain(httpRequest, originalChain);
+		}
+		chain.doFilter(request, response);
+	}
 
-    protected FilterChain getScriptFilterChain(HttpServletRequest httpRequest, FilterChain chain) {
-        List<FilterMapping> filterMappings = getFilterMappings();
-        if (CollectionUtils.isNotEmpty(filterMappings)) {
-            String requestUri = HttpUtils.getRequestUriWithoutContextPath(httpRequest);
-            List<Script> scripts = new ArrayList<>();
+	protected FilterChain getScriptFilterChain(HttpServletRequest httpRequest, FilterChain chain) {
+		List<FilterMapping> filterMappings = getFilterMappings();
+		if (CollectionUtils.isNotEmpty(filterMappings)) {
+			String requestUri = HttpUtils.getRequestUriWithoutContextPath(httpRequest);
+			List<Script> scripts = new ArrayList<>();
 
-            for (FilterMapping mapping : filterMappings) {
-                if (!excludeFilter(requestUri, mapping.excludes) && includeFilter(requestUri, mapping.includes)) {
-                    scripts.add(mapping.script);
-                }
-            }
+			for (FilterMapping mapping : filterMappings) {
+				if (!excludeFilter(requestUri, mapping.excludes) && includeFilter(requestUri, mapping.includes)) {
+					scripts.add(mapping.script);
+				}
+			}
 
-            if (CollectionUtils.isNotEmpty(scripts)) {
-                chain = new ScriptFilterChainImpl(scripts.iterator(),
-                                                  chain,
-                                                  disableVariableRestrictions ? servletContext : null,
-                                                  pluginService);
-            }
-        }
-        return chain;
-    }
+			if (CollectionUtils.isNotEmpty(scripts)) {
+				chain = new ScriptFilterChainImpl(scripts.iterator(),
+					chain,
+					disableVariableRestrictions ? servletContext : null,
+					pluginService);
+			}
+		}
+		return chain;
+	}
 
-    @Override
-    public void destroy() {
-    }
+	@Override
+	public void destroy() {
+	}
 
-    @SuppressWarnings("unchecked")
-    protected List<FilterMapping> getFilterMappings() {
-        final SiteContext siteContext = SiteContext.getCurrent();
-        if (siteContext != null) {
-            Callback<List<FilterMapping>> callback = new Callback<>() {
+	@SuppressWarnings("unchecked")
+	protected List<FilterMapping> getFilterMappings() {
+		final SiteContext siteContext = SiteContext.getCurrent();
+		if (siteContext != null) {
+			Callback<List<FilterMapping>> callback = new Callback<>() {
 
-                @Override
-                public List<FilterMapping> execute() {
-                    HierarchicalConfiguration config = ConfigUtils.getCurrentConfig();
-                    CachingAwareList<FilterMapping> mappings = new CachingAwareList<>();
+				@Override
+				public List<FilterMapping> execute() {
+					HierarchicalConfiguration config = ConfigUtils.getCurrentConfig();
+					CachingAwareList<FilterMapping> mappings = new CachingAwareList<>();
 
-                    if (config != null) {
-                        List<HierarchicalConfiguration> filtersConfig = config.configurationsAt(FILTER_KEY);
-                        if (CollectionUtils.isNotEmpty(filtersConfig)) {
-                            for (HierarchicalConfiguration filterConfig : filtersConfig) {
-                                String scriptUrl = filterConfig.getString(SCRIPT_KEY);
-                                String[] includes = filterConfig.getStringArray(INCLUDE_MAPPINGS_KEY);
-                                String[] excludes = filterConfig.getStringArray(EXCLUDE_MAPPINGS_KEY);
+					if (config != null) {
+						List<HierarchicalConfiguration> filtersConfig = config.configurationsAt(FILTER_KEY);
+						if (CollectionUtils.isNotEmpty(filtersConfig)) {
+							for (HierarchicalConfiguration filterConfig : filtersConfig) {
+								String scriptUrl = filterConfig.getString(SCRIPT_KEY);
+								String[] includes = filterConfig.getStringArray(INCLUDE_MAPPINGS_KEY);
+								String[] excludes = filterConfig.getStringArray(EXCLUDE_MAPPINGS_KEY);
 
-                                if (StringUtils.isNotEmpty(scriptUrl) && ArrayUtils.isNotEmpty(includes)) {
-                                    ContentStoreService storeService = siteContext.getStoreService();
-                                    ScriptFactory scriptFactory = siteContext.getScriptFactory();
+								if (StringUtils.isNotEmpty(scriptUrl) && ArrayUtils.isNotEmpty(includes)) {
+									ContentStoreService storeService = siteContext.getStoreService();
+									ScriptFactory scriptFactory = siteContext.getScriptFactory();
 
-                                    if (!storeService.exists(siteContext.getContext(), scriptUrl)) {
-                                        throw new ConfigurationException("No filter script found at " + scriptUrl);
-                                    }
+									if (!storeService.exists(siteContext.getContext(), scriptUrl)) {
+										throw new ConfigurationException("No filter script found at " + scriptUrl);
+									}
 
-                                    FilterMapping mapping = new FilterMapping();
-                                    mapping.script = scriptFactory.getScript(scriptUrl);
-                                    mapping.includes = includes;
-                                    mapping.excludes = excludes;
+									FilterMapping mapping = new FilterMapping();
+									mapping.script = scriptFactory.getScript(scriptUrl);
+									mapping.includes = includes;
+									mapping.excludes = excludes;
 
-                                    mappings.add(mapping);
-                                }
-                            }
-                        }
-                    }
+									mappings.add(mapping);
+								}
+							}
+						}
+					}
 
-                    return mappings;
-                }
+					return mappings;
+				}
 
-            };
+			};
 
-            return cacheTemplate.getObject(siteContext.getContext(), callback, FILTER_MAPPINGS_CACHE_KEY);
-        } else {
-            return null;
-        }
-    }
+			return cacheTemplate.getObject(siteContext.getContext(), callback, FILTER_MAPPINGS_CACHE_KEY);
+		} else {
+			return null;
+		}
+	}
 
-    protected boolean excludeFilter(String requestUri, String[] excludes) {
-        if (ArrayUtils.isNotEmpty(excludes)) {
-            for (String uriPattern : excludes) {
-                if (pathMatcher.match(uriPattern, requestUri)) {
-                    return true;
-                }
-            }
-        }
+	protected boolean excludeFilter(String requestUri, String[] excludes) {
+		if (ArrayUtils.isNotEmpty(excludes)) {
+			for (String uriPattern : excludes) {
+				if (pathMatcher.match(uriPattern, requestUri)) {
+					return true;
+				}
+			}
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    protected boolean includeFilter(String requestUri, String[] includes) {
-        if (ArrayUtils.isNotEmpty(includes)) {
-            for (String uriPattern : includes) {
-                if (pathMatcher.match(uriPattern, requestUri)) {
-                    return true;
-                }
-            }
-        }
+	protected boolean includeFilter(String requestUri, String[] includes) {
+		if (ArrayUtils.isNotEmpty(includes)) {
+			for (String uriPattern : includes) {
+				if (pathMatcher.match(uriPattern, requestUri)) {
+					return true;
+				}
+			}
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    protected static class FilterMapping {
+	protected static class FilterMapping {
 
-        private Script script;
-        private String[] includes;
-        private String[] excludes;
+		private Script script;
+		private String[] includes;
+		private String[] excludes;
 
-    }
+	}
 
 }

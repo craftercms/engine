@@ -19,6 +19,7 @@ package org.craftercms.engine.scripting.impl;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
 import jakarta.servlet.http.HttpServletRequest;
 
 import groovy.lang.GroovyClassLoader;
@@ -48,115 +49,115 @@ import static org.mockito.Mockito.*;
  */
 public class GroovyScriptFactoryTest {
 
-    private ContentStoreService storeService;
-    private ScriptFactory scriptFactory;
-    private GroovyClassLoader classLoader;
-    private Map<String, Object> globalVars;
+	private ContentStoreService storeService;
+	private ScriptFactory scriptFactory;
+	private GroovyClassLoader classLoader;
+	private Map<String, Object> globalVars;
 
-    @Before
-    public void setUp() throws Exception {
-        storeService = createContentStoreService();
+	@Before
+	public void setUp() throws Exception {
+		storeService = createContentStoreService();
 
-        setCurrentRequest(createRequest());
-        setCurrentSiteContext(createSiteContext(storeService));
+		setCurrentRequest(createRequest());
+		setCurrentSiteContext(createSiteContext(storeService));
 
-        classLoader = createGroovyClassLoader();
-        globalVars = createGlobalVars(classLoader);
-        scriptFactory = createScriptFactory(classLoader, globalVars);
-    }
+		classLoader = createGroovyClassLoader();
+		globalVars = createGlobalVars(classLoader);
+		scriptFactory = createScriptFactory(classLoader, globalVars);
+	}
 
-    @After
-    public void tearDown() throws Exception {
-        removeCurrentRequest();
-        destroyApplicationContext();
-    }
+	@After
+	public void tearDown() throws Exception {
+		removeCurrentRequest();
+		destroyApplicationContext();
+	}
 
-    @Test
-    public void testExecuteScript() throws Exception {
-        Map<String, Object> vars = Collections.<String, Object>singletonMap("name", "Alfonso");
+	@Test
+	public void testExecuteScript() throws Exception {
+		Map<String, Object> vars = Collections.<String, Object>singletonMap("name", "Alfonso");
 
-        String result = (String) scriptFactory.getScript("/scripts/testImport.get.groovy").execute(vars);
+		String result = (String) scriptFactory.getScript("/scripts/testImport.get.groovy").execute(vars);
 
-        assertEquals("Hello Alfonso!", result);
+		assertEquals("Hello Alfonso!", result);
 
-        result = (String) scriptFactory.getScript("/scripts/testAppContext.get.groovy").execute(vars);
+		result = (String) scriptFactory.getScript("/scripts/testAppContext.get.groovy").execute(vars);
 
-        assertEquals("Hello Alfonso!", result);
-    }
+		assertEquals("Hello Alfonso!", result);
+	}
 
-    private SiteContext createSiteContext(ContentStoreService storeService) {
-        CacheTemplate cacheTemplate = CacheTemplateMockUtils.createCacheTemplate();
+	private SiteContext createSiteContext(ContentStoreService storeService) {
+		CacheTemplate cacheTemplate = CacheTemplateMockUtils.createCacheTemplate();
 
-        SiteContext siteContext = spy(new SiteContext());
-        when(siteContext.getSiteName()).thenReturn("default");
-        when(siteContext.getContext()).thenReturn(mock(Context.class));
-        when(siteContext.getStoreService()).thenReturn(storeService);
-        when(siteContext.getCacheTemplate()).thenReturn(cacheTemplate);
+		SiteContext siteContext = spy(new SiteContext());
+		when(siteContext.getSiteName()).thenReturn("default");
+		when(siteContext.getContext()).thenReturn(mock(Context.class));
+		when(siteContext.getStoreService()).thenReturn(storeService);
+		when(siteContext.getCacheTemplate()).thenReturn(cacheTemplate);
 
-        return siteContext;
-    }
+		return siteContext;
+	}
 
-    private ContentStoreService createContentStoreService() {
-        ContentStoreService storeService = mock(ContentStoreService.class);
-        ContentStoreServiceMockUtils.setUpGetContentFromClassPath(storeService);
+	private ContentStoreService createContentStoreService() {
+		ContentStoreService storeService = mock(ContentStoreService.class);
+		ContentStoreServiceMockUtils.setUpGetContentFromClassPath(storeService);
 
-        return storeService;
-    }
+		return storeService;
+	}
 
-    private GroovyClassLoader createGroovyClassLoader() {
-        ContentStoreGroovyResourceLoader resourceLoader = new ContentStoreGroovyResourceLoader(SiteContext.getCurrent(),
-                                                                                               "/classes");
-        GroovyClassLoader classLoader = new GroovyClassLoader(getClass().getClassLoader());
+	private GroovyClassLoader createGroovyClassLoader() {
+		ContentStoreGroovyResourceLoader resourceLoader = new ContentStoreGroovyResourceLoader(SiteContext.getCurrent(),
+			"/classes");
+		GroovyClassLoader classLoader = new GroovyClassLoader(getClass().getClassLoader());
 
-        classLoader.setResourceLoader(resourceLoader);
+		classLoader.setResourceLoader(resourceLoader);
 
-        return classLoader;
-    }
+		return classLoader;
+	}
 
-    private Map<String, Object> createGlobalVars(GroovyClassLoader classLoader) {
-        GenericApplicationContext context = new GenericApplicationContext();
-        context.setClassLoader(classLoader);
+	private Map<String, Object> createGlobalVars(GroovyClassLoader classLoader) {
+		GenericApplicationContext context = new GenericApplicationContext();
+		context.setClassLoader(classLoader);
 
-        XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader(context);
-        xmlReader.loadBeanDefinitions(new ClassPathResource("config/application-context.xml"));
+		XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader(context);
+		xmlReader.loadBeanDefinitions(new ClassPathResource("config/application-context.xml"));
 
-        context.refresh();
+		context.refresh();
 
-        Map<String, Object> globalVars = new HashMap<>(1);
-        globalVars.put("applicationContext", context);
+		Map<String, Object> globalVars = new HashMap<>(1);
+		globalVars.put("applicationContext", context);
 
-        return globalVars;
-    }
+		return globalVars;
+	}
 
-    private ScriptFactory createScriptFactory(GroovyClassLoader parentClassLoader, Map<String, Object> globalVars) {
-        ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(SiteContext.getCurrent());
+	private ScriptFactory createScriptFactory(GroovyClassLoader parentClassLoader, Map<String, Object> globalVars) {
+		ContentStoreResourceConnector resourceConnector = new ContentStoreResourceConnector(SiteContext.getCurrent());
 
-        return new GroovyScriptFactory(SiteContext.getCurrent(), resourceConnector, parentClassLoader,
-                globalVars, true);
-    }
+		return new GroovyScriptFactory(SiteContext.getCurrent(), resourceConnector, parentClassLoader,
+			globalVars, true);
+	}
 
-    private void setCurrentSiteContext(SiteContext siteContext) {
-        SiteContext.setCurrent(siteContext);
-    }
+	private void setCurrentSiteContext(SiteContext siteContext) {
+		SiteContext.setCurrent(siteContext);
+	}
 
-    private void removeCurrentSiteContext() {
-        SiteContext.clear();
-    }
+	private void removeCurrentSiteContext() {
+		SiteContext.clear();
+	}
 
-    private MockHttpServletRequest createRequest() throws Exception {
-        return new MockHttpServletRequest();
-    }
+	private MockHttpServletRequest createRequest() throws Exception {
+		return new MockHttpServletRequest();
+	}
 
-    private void setCurrentRequest(HttpServletRequest request) {
-        RequestContext.setCurrent(new RequestContext(request, null, null));
-    }
+	private void setCurrentRequest(HttpServletRequest request) {
+		RequestContext.setCurrent(new RequestContext(request, null, null));
+	}
 
-    private void removeCurrentRequest() {
-        RequestContext.clear();
-    }
+	private void removeCurrentRequest() {
+		RequestContext.clear();
+	}
 
-    private void destroyApplicationContext() {
-        ((GenericApplicationContext)globalVars.get("applicationContext")).close();
-    }
+	private void destroyApplicationContext() {
+		((GenericApplicationContext) globalVars.get("applicationContext")).close();
+	}
 
 }

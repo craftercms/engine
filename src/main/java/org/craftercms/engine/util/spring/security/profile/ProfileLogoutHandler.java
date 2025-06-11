@@ -36,28 +36,28 @@ import java.beans.ConstructorProperties;
  */
 public class ProfileLogoutHandler implements LogoutHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProfileLogoutHandler.class);
+	private static final Logger logger = LoggerFactory.getLogger(ProfileLogoutHandler.class);
 
-    protected AuthenticationManager profileAuthenticationManager;
+	protected AuthenticationManager profileAuthenticationManager;
 
-    @ConstructorProperties({"profileAuthenticationManager"})
-    public ProfileLogoutHandler(final AuthenticationManager profileAuthenticationManager) {
-        this.profileAuthenticationManager = profileAuthenticationManager;
-    }
+	@ConstructorProperties({"profileAuthenticationManager"})
+	public ProfileLogoutHandler(final AuthenticationManager profileAuthenticationManager) {
+		this.profileAuthenticationManager = profileAuthenticationManager;
+	}
 
-    @Override
-    public void logout(final HttpServletRequest request, final HttpServletResponse response,
-                       final Authentication authentication) {
-        if (authentication.getPrincipal() instanceof ProfileUser) {
-            ProfileUser profileUser = (ProfileUser) authentication.getPrincipal();
-            if (profileUser.authentication != null) {
-                try {
-                    profileAuthenticationManager.invalidateAuthentication(profileUser.authentication);
-                } catch (AuthenticationSystemException e) {
-                    logger.error("Error invalidating authentication for {}", profileUser.profile, e);
-                }
-            }
-        }
-    }
+	@Override
+	public void logout(final HttpServletRequest request, final HttpServletResponse response,
+			   final Authentication authentication) {
+		if (authentication.getPrincipal() instanceof ProfileUser) {
+			ProfileUser profileUser = (ProfileUser) authentication.getPrincipal();
+			if (profileUser.authentication != null) {
+				try {
+					profileAuthenticationManager.invalidateAuthentication(profileUser.authentication);
+				} catch (AuthenticationSystemException e) {
+					logger.error("Error invalidating authentication for {}", profileUser.profile, e);
+				}
+			}
+		}
+	}
 
 }

@@ -30,33 +30,33 @@ import static org.apache.commons.collections.CollectionUtils.isEmpty;
  * Default {@link SiteHealthCheckService} implementation.
  */
 public class SiteHealthCheckServiceImpl implements SiteHealthCheckService {
-    private static final Logger logger = LoggerFactory.getLogger(SiteHealthCheckServiceImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(SiteHealthCheckServiceImpl.class);
 
-    protected SiteListResolver siteListResolver;
+	protected SiteListResolver siteListResolver;
 
-    protected Collection<HealthCheck> healthChecks;
+	protected Collection<HealthCheck> healthChecks;
 
-    @ConstructorProperties({"siteListResolver", "healthChecks"})
-    public SiteHealthCheckServiceImpl(final SiteListResolver siteListResolver,
-                                      final Collection<HealthCheck> healthChecks) {
-        this.siteListResolver = siteListResolver;
-        this.healthChecks = healthChecks;
-    }
+	@ConstructorProperties({"siteListResolver", "healthChecks"})
+	public SiteHealthCheckServiceImpl(final SiteListResolver siteListResolver,
+					  final Collection<HealthCheck> healthChecks) {
+		this.siteListResolver = siteListResolver;
+		this.healthChecks = healthChecks;
+	}
 
-    @Override
-    public boolean healthCheck() {
-        logger.debug("Check health for all sites");
-        Collection<String> siteNames = siteListResolver.getSiteList();
+	@Override
+	public boolean healthCheck() {
+		logger.debug("Check health for all sites");
+		Collection<String> siteNames = siteListResolver.getSiteList();
 
-        return isEmpty(siteNames) || siteNames
-                .stream()
-                .anyMatch(this::healthCheck);
-    }
+		return isEmpty(siteNames) || siteNames
+			.stream()
+			.anyMatch(this::healthCheck);
+	}
 
-    @Override
-    public boolean healthCheck(final String site) {
-        logger.debug("Checking health for site '{}'", site);
-        return healthChecks.stream()
-                .allMatch(checker -> checker.checkHealth(site));
-    }
+	@Override
+	public boolean healthCheck(final String site) {
+		logger.debug("Checking health for site '{}'", site);
+		return healthChecks.stream()
+			.allMatch(checker -> checker.checkHealth(site));
+	}
 }

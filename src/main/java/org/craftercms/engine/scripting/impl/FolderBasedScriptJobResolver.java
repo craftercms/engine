@@ -39,47 +39,47 @@ import org.springframework.web.context.ServletContextAware;
  */
 public class FolderBasedScriptJobResolver implements ScriptJobResolver, ServletContextAware {
 
-    protected String folderUrl;
-    protected String cronExpression;
-    protected String scriptSuffix;
-    protected ServletContext servletContext;
-    protected boolean disableVariableRestrictions;
+	protected String folderUrl;
+	protected String cronExpression;
+	protected String scriptSuffix;
+	protected ServletContext servletContext;
+	protected boolean disableVariableRestrictions;
 
-    public FolderBasedScriptJobResolver(String scriptSuffix, String folderUrl, String cronExpression) {
-        this.scriptSuffix = scriptSuffix;
-        this.folderUrl = folderUrl;
-        this.cronExpression = cronExpression;
-    }
+	public FolderBasedScriptJobResolver(String scriptSuffix, String folderUrl, String cronExpression) {
+		this.scriptSuffix = scriptSuffix;
+		this.folderUrl = folderUrl;
+		this.cronExpression = cronExpression;
+	}
 
-    @Override
-    public void setServletContext(ServletContext servletContext) {
-        this.servletContext = servletContext;
-    }
+	@Override
+	public void setServletContext(ServletContext servletContext) {
+		this.servletContext = servletContext;
+	}
 
-    public void setDisableVariableRestrictions(boolean disableVariableRestrictions) {
-        this.disableVariableRestrictions = disableVariableRestrictions;
-    }
+	public void setDisableVariableRestrictions(boolean disableVariableRestrictions) {
+		this.disableVariableRestrictions = disableVariableRestrictions;
+	}
 
-    @Override
-    public List<JobContext> resolveJobs(SiteContext siteContext) throws SchedulingException {
-        List<String> scriptUrls = ContentStoreUtils.findChildrenUrl(siteContext.getStoreService(),
-                                                                    siteContext.getContext(), folderUrl);
-        List<JobContext> jobContexts = null;
+	@Override
+	public List<JobContext> resolveJobs(SiteContext siteContext) throws SchedulingException {
+		List<String> scriptUrls = ContentStoreUtils.findChildrenUrl(siteContext.getStoreService(),
+			siteContext.getContext(), folderUrl);
+		List<JobContext> jobContexts = null;
 
-        if (CollectionUtils.isNotEmpty(scriptUrls)) {
-            for (String scriptUrl : scriptUrls) {
-                if (scriptUrl.endsWith(scriptSuffix)) {
-                    if (jobContexts == null) {
-                        jobContexts = new ArrayList<>();
-                    }
+		if (CollectionUtils.isNotEmpty(scriptUrls)) {
+			for (String scriptUrl : scriptUrls) {
+				if (scriptUrl.endsWith(scriptSuffix)) {
+					if (jobContexts == null) {
+						jobContexts = new ArrayList<>();
+					}
 
-                    jobContexts.add(SchedulingUtils.createJobContext(siteContext, scriptUrl, cronExpression,
-                            disableVariableRestrictions? servletContext : null));
-                }
-            }
-        }
+					jobContexts.add(SchedulingUtils.createJobContext(siteContext, scriptUrl, cronExpression,
+						disableVariableRestrictions ? servletContext : null));
+				}
+			}
+		}
 
-        return jobContexts;
-    }
+		return jobContexts;
+	}
 
 }

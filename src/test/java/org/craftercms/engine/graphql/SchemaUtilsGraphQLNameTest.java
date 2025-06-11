@@ -22,63 +22,63 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SchemaUtilsGraphQLNameTest {
 
-    @Test
-    public void getComponentTypeNameTest() {
-        checkGraphQLContentTypeConversion("component_header", "/component/header");
-    }
+	@Test
+	public void getComponentTypeNameTest() {
+		checkGraphQLContentTypeConversion("component_header", "/component/header");
+	}
 
-    @Test
-    public void getPageTypeNameTest() {
-        checkGraphQLContentTypeConversion("page_article", "/page/article");
-    }
+	@Test
+	public void getPageTypeNameTest() {
+		checkGraphQLContentTypeConversion("page_article", "/page/article");
+	}
 
-    @Test
-    public void getDashInTypeNameTest() {
-        checkGraphQLContentTypeConversion("page_news__article", "/page/news-article");
-    }
+	@Test
+	public void getDashInTypeNameTest() {
+		checkGraphQLContentTypeConversion("page_news__article", "/page/news-article");
+	}
 
-    @Test
-    public void getMultipleLevelsTypeNameTest() {
-        checkGraphQLContentTypeConversion("page_articles___news", "/page/articles/news");
-    }
+	@Test
+	public void getMultipleLevelsTypeNameTest() {
+		checkGraphQLContentTypeConversion("page_articles___news", "/page/articles/news");
+	}
 
-    @Test
-    public void getTaxonomyTypeNameTest() {
-        checkGraphQLContentTypeConversion("taxonomy___category", "/taxonomy/category");
-    }
+	@Test
+	public void getTaxonomyTypeNameTest() {
+		checkGraphQLContentTypeConversion("taxonomy___category", "/taxonomy/category");
+	}
 
-    @Test
-    public void getCustomContentTypeNameTest() {
-        checkGraphQLContentTypeConversion("content_left__toolbar", "/content/left-toolbar");
-    }
+	@Test
+	public void getCustomContentTypeNameTest() {
+		checkGraphQLContentTypeConversion("content_left__toolbar", "/content/left-toolbar");
+	}
 
-    @Test
-    public void getMultiLevelCustomContentTypeNameTest() {
-        checkGraphQLContentTypeConversion("content_widget___left__toolbar", "/content/widget/left-toolbar");
-    }
+	@Test
+	public void getMultiLevelCustomContentTypeNameTest() {
+		checkGraphQLContentTypeConversion("content_widget___left__toolbar", "/content/widget/left-toolbar");
+	}
 
-    @Test
-    public void fieldNameUnderscoreTest() {
-        checkGraphQLConversion("title_s", "title_s");
-    }
+	@Test
+	public void fieldNameUnderscoreTest() {
+		checkGraphQLConversion("title_s", "title_s");
+	}
 
-    @Test
-    public void fieldNameSingleWordTest() {
-        checkGraphQLConversion("title", "title");
-    }
+	@Test
+	public void fieldNameSingleWordTest() {
+		checkGraphQLConversion("title", "title");
+	}
 
-    @Test
-    public void fieldNameDashTest() {
-        checkGraphQLConversion("title__alt", "title-alt");
-    }
+	@Test
+	public void fieldNameDashTest() {
+		checkGraphQLConversion("title__alt", "title-alt");
+	}
 
-    public void checkGraphQLConversion(String expected, String original) {
-        assertEquals(expected, getGraphQLName(original), "GraphQL name is not correct");
-        assertEquals(original, getOriginalName(expected), "Original name is not correct");
-    }
+	public void checkGraphQLConversion(String expected, String original) {
+		assertEquals(expected, getGraphQLName(original), "GraphQL name is not correct");
+		assertEquals(original, getOriginalName(expected), "Original name is not correct");
+	}
 
-    public void checkGraphQLContentTypeConversion(String expected, String original) {
-        assertEquals(expected, getGraphQLName(original), "GraphQL name is not correct");
-        assertEquals(original, getContentTypeOriginalName(expected), "Original name is not correct");
-    }
+	public void checkGraphQLContentTypeConversion(String expected, String original) {
+		assertEquals(expected, getGraphQLName(original), "GraphQL name is not correct");
+		assertEquals(original, getContentTypeOriginalName(expected), "Original name is not correct");
+	}
 }

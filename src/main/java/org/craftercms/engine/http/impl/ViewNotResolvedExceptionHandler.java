@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,25 +36,25 @@ import org.springframework.web.util.UriUtils;
  */
 public class ViewNotResolvedExceptionHandler implements ExceptionHandler {
 
-    private static final Log logger = LogFactory.getLog(ViewNotResolvedExceptionHandler.class);
-    private static final Pattern viewNotResolvedMsgPattern = Pattern.compile("Could not resolve view with name " +
-                                                                             "'(.+)' in servlet with name '(.+)'");
+	private static final Log logger = LogFactory.getLog(ViewNotResolvedExceptionHandler.class);
+	private static final Pattern viewNotResolvedMsgPattern = Pattern.compile("Could not resolve view with name " +
+		"'(.+)' in servlet with name '(.+)'");
 
-    @Override
-    public boolean handle(HttpServletRequest request, HttpServletResponse response, Exception ex) throws IOException {
-        if (ex instanceof ServletException) {
-            Matcher viewNotResolvedMsgMatcher = viewNotResolvedMsgPattern.matcher(ex.getMessage());
-            if (viewNotResolvedMsgMatcher.matches()) {
-                logger.warn("Resource '" + UriUtils.encodePathSegment(viewNotResolvedMsgMatcher.group(1),
-                        StandardCharsets.UTF_8.name()) + "' not found");
+	@Override
+	public boolean handle(HttpServletRequest request, HttpServletResponse response, Exception ex) throws IOException {
+		if (ex instanceof ServletException) {
+			Matcher viewNotResolvedMsgMatcher = viewNotResolvedMsgPattern.matcher(ex.getMessage());
+			if (viewNotResolvedMsgMatcher.matches()) {
+				logger.warn("Resource '" + UriUtils.encodePathSegment(viewNotResolvedMsgMatcher.group(1),
+					StandardCharsets.UTF_8.name()) + "' not found");
 
-                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+				response.sendError(HttpServletResponse.SC_NOT_FOUND);
 
-                return true;
-            }
-        }
+				return true;
+			}
+		}
 
-        return false;
-    }
+		return false;
+	}
 
 }

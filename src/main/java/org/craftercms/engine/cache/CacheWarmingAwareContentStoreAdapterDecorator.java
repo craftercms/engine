@@ -36,128 +36,128 @@ import java.util.function.Supplier;
  */
 public class CacheWarmingAwareContentStoreAdapterDecorator implements ContentStoreAdapterDecorator {
 
-    private static final Logger logger = LoggerFactory.getLogger(CacheWarmingAwareContentStoreAdapterDecorator.class);
+	private static final Logger logger = LoggerFactory.getLogger(CacheWarmingAwareContentStoreAdapterDecorator.class);
 
-    protected boolean warmUpEnabled;
-    protected ContentStoreAdapter actualStoreAdapter;
-    protected CacheService cacheService;
+	protected boolean warmUpEnabled;
+	protected ContentStoreAdapter actualStoreAdapter;
+	protected CacheService cacheService;
 
-    public CacheWarmingAwareContentStoreAdapterDecorator(boolean warmUpEnabled, CacheService cacheService) {
-        this.warmUpEnabled = warmUpEnabled;
-        this.cacheService = cacheService;
-    }
+	public CacheWarmingAwareContentStoreAdapterDecorator(boolean warmUpEnabled, CacheService cacheService) {
+		this.warmUpEnabled = warmUpEnabled;
+		this.cacheService = cacheService;
+	}
 
-    @Override
-    public void setActualStoreAdapter(ContentStoreAdapter actualStoreAdapter) {
-        this.actualStoreAdapter = actualStoreAdapter;
-    }
+	@Override
+	public void setActualStoreAdapter(ContentStoreAdapter actualStoreAdapter) {
+		this.actualStoreAdapter = actualStoreAdapter;
+	}
 
-    @Override
-    public Context createContext(String id, String rootFolderPath, boolean mergingOn, boolean cacheOn,
-                                 int maxAllowedItemsInCache, boolean ignoreHiddenFiles, Map<String, String> configurationVariables)
-            throws RootFolderNotFoundException, StoreException, AuthenticationException {
-        Context context = actualStoreAdapter.createContext(id, rootFolderPath, mergingOn, cacheOn,
-                                                           maxAllowedItemsInCache, ignoreHiddenFiles, configurationVariables);
-        if (warmUpEnabled) {
-            return new PreloadedFoldersAwareContext(context, actualStoreAdapter, cacheService);
-        } else {
-            return context;
-        }
-    }
+	@Override
+	public Context createContext(String id, String rootFolderPath, boolean mergingOn, boolean cacheOn,
+				     int maxAllowedItemsInCache, boolean ignoreHiddenFiles, Map<String, String> configurationVariables)
+		throws RootFolderNotFoundException, StoreException, AuthenticationException {
+		Context context = actualStoreAdapter.createContext(id, rootFolderPath, mergingOn, cacheOn,
+			maxAllowedItemsInCache, ignoreHiddenFiles, configurationVariables);
+		if (warmUpEnabled) {
+			return new PreloadedFoldersAwareContext(context, actualStoreAdapter, cacheService);
+		} else {
+			return context;
+		}
+	}
 
-    @Override
-    public boolean validate(Context context) throws StoreException, AuthenticationException {
-        if (warmUpEnabled) {
-            return actualStoreAdapter.validate(((PreloadedFoldersAwareContext) context).getActualContext());
-        } else {
-            return actualStoreAdapter.validate(context);
-        }
-    }
+	@Override
+	public boolean validate(Context context) throws StoreException, AuthenticationException {
+		if (warmUpEnabled) {
+			return actualStoreAdapter.validate(((PreloadedFoldersAwareContext) context).getActualContext());
+		} else {
+			return actualStoreAdapter.validate(context);
+		}
+	}
 
-    @Override
-    public void destroyContext(Context context) throws StoreException, AuthenticationException {
-        if (warmUpEnabled) {
-            actualStoreAdapter.destroyContext(((PreloadedFoldersAwareContext) context).getActualContext());
-        } else {
-            actualStoreAdapter.destroyContext(context);
-        }
-    }
+	@Override
+	public void destroyContext(Context context) throws StoreException, AuthenticationException {
+		if (warmUpEnabled) {
+			actualStoreAdapter.destroyContext(((PreloadedFoldersAwareContext) context).getActualContext());
+		} else {
+			actualStoreAdapter.destroyContext(context);
+		}
+	}
 
-    @Override
-    public boolean exists(Context context, CachingOptions cachingOptions, String path)
-            throws InvalidContextException, StoreException {
-        return findItem(context, cachingOptions, path, false) != null;
-    }
+	@Override
+	public boolean exists(Context context, CachingOptions cachingOptions, String path)
+		throws InvalidContextException, StoreException {
+		return findItem(context, cachingOptions, path, false) != null;
+	}
 
-    @Override
-    public Content findContent(Context context, CachingOptions cachingOptions, String path)
-            throws InvalidContextException, StoreException {
-        if (warmUpEnabled) {
-            String normalizedPath = ContentStoreUtils.normalizePath(path);
+	@Override
+	public Content findContent(Context context, CachingOptions cachingOptions, String path)
+		throws InvalidContextException, StoreException {
+		if (warmUpEnabled) {
+			String normalizedPath = ContentStoreUtils.normalizePath(path);
 
-            PreloadedFoldersAwareContext contextWrapper = (PreloadedFoldersAwareContext) context;
-            Context actualContext = contextWrapper.getActualContext();
+			PreloadedFoldersAwareContext contextWrapper = (PreloadedFoldersAwareContext) context;
+			Context actualContext = contextWrapper.getActualContext();
 
-            return executeIfNotPreloadedOrIfExistsInPreloadedPaths(contextWrapper, normalizedPath, () ->
-                    actualStoreAdapter.findContent(actualContext, cachingOptions, normalizedPath));
-        } else {
-            return actualStoreAdapter.findContent(context, cachingOptions, path);
-        }
-    }
+			return executeIfNotPreloadedOrIfExistsInPreloadedPaths(contextWrapper, normalizedPath, () ->
+				actualStoreAdapter.findContent(actualContext, cachingOptions, normalizedPath));
+		} else {
+			return actualStoreAdapter.findContent(context, cachingOptions, path);
+		}
+	}
 
-    @Override
-    public Item findItem(Context context, CachingOptions cachingOptions, String path, boolean withDescriptor)
-            throws InvalidContextException, XmlFileParseException, StoreException {
-        if (warmUpEnabled) {
-            String normalizedPath = ContentStoreUtils.normalizePath(path);
+	@Override
+	public Item findItem(Context context, CachingOptions cachingOptions, String path, boolean withDescriptor)
+		throws InvalidContextException, XmlFileParseException, StoreException {
+		if (warmUpEnabled) {
+			String normalizedPath = ContentStoreUtils.normalizePath(path);
 
-            PreloadedFoldersAwareContext contextWrapper = (PreloadedFoldersAwareContext) context;
-            Context actualContext = contextWrapper.getActualContext();
+			PreloadedFoldersAwareContext contextWrapper = (PreloadedFoldersAwareContext) context;
+			Context actualContext = contextWrapper.getActualContext();
 
-            return executeIfNotPreloadedOrIfExistsInPreloadedPaths(contextWrapper, normalizedPath, () ->
-                    actualStoreAdapter.findItem(actualContext, cachingOptions, normalizedPath, withDescriptor));
-        } else {
-            return actualStoreAdapter.findItem(context, cachingOptions, path, withDescriptor);
-        }
-    }
+			return executeIfNotPreloadedOrIfExistsInPreloadedPaths(contextWrapper, normalizedPath, () ->
+				actualStoreAdapter.findItem(actualContext, cachingOptions, normalizedPath, withDescriptor));
+		} else {
+			return actualStoreAdapter.findItem(context, cachingOptions, path, withDescriptor);
+		}
+	}
 
-    @Override
-    public List<Item> findItems(Context context, CachingOptions cachingOptions, String path)
-            throws InvalidContextException, XmlFileParseException, StoreException {
-        if (warmUpEnabled) {
-            String normalizedPath = ContentStoreUtils.normalizePath(path);
+	@Override
+	public List<Item> findItems(Context context, CachingOptions cachingOptions, String path)
+		throws InvalidContextException, XmlFileParseException, StoreException {
+		if (warmUpEnabled) {
+			String normalizedPath = ContentStoreUtils.normalizePath(path);
 
-            PreloadedFoldersAwareContext contextWrapper = (PreloadedFoldersAwareContext) context;
-            Context actualContext = contextWrapper.getActualContext();
+			PreloadedFoldersAwareContext contextWrapper = (PreloadedFoldersAwareContext) context;
+			Context actualContext = contextWrapper.getActualContext();
 
-            return executeIfNotPreloadedOrIfExistsInPreloadedPaths(contextWrapper, normalizedPath, () ->
-                    actualStoreAdapter.findItems(actualContext, cachingOptions, normalizedPath));
-        } else {
-            return actualStoreAdapter.findItems(context, cachingOptions, path);
-        }
-    }
+			return executeIfNotPreloadedOrIfExistsInPreloadedPaths(contextWrapper, normalizedPath, () ->
+				actualStoreAdapter.findItems(actualContext, cachingOptions, normalizedPath));
+		} else {
+			return actualStoreAdapter.findItems(context, cachingOptions, path);
+		}
+	}
 
-    protected <T> T executeIfNotPreloadedOrIfExistsInPreloadedPaths(PreloadedFoldersAwareContext contextWrapper,
-                                                                    String path, Supplier<T> actualCall) {
-        PreloadedFolder preloadedAncestor = findPreloadedAncestor(contextWrapper.getPreloadedFolders(), path);
-        if (preloadedAncestor != null) {
-            Boolean exists = preloadedAncestor.exists(path);
-            // Don't proceed if path is preloaded and doesn't exist (null means the path's level wasn't preloaded)
-            if (exists != null && !exists) {
-                logger.debug("Path {} not found in preloaded descendants of {}", path, preloadedAncestor);
+	protected <T> T executeIfNotPreloadedOrIfExistsInPreloadedPaths(PreloadedFoldersAwareContext contextWrapper,
+									String path, Supplier<T> actualCall) {
+		PreloadedFolder preloadedAncestor = findPreloadedAncestor(contextWrapper.getPreloadedFolders(), path);
+		if (preloadedAncestor != null) {
+			Boolean exists = preloadedAncestor.exists(path);
+			// Don't proceed if path is preloaded and doesn't exist (null means the path's level wasn't preloaded)
+			if (exists != null && !exists) {
+				logger.debug("Path {} not found in preloaded descendants of {}", path, preloadedAncestor);
 
-                return null;
-            }
-        }
+				return null;
+			}
+		}
 
-        return actualCall.get();
-    }
+		return actualCall.get();
+	}
 
-    protected PreloadedFolder findPreloadedAncestor(List<PreloadedFolder> preloadedFolders, String path) {
-        return preloadedFolders.stream()
-                               .filter(folder -> path.startsWith(folder.getPath()))
-                               .findFirst()
-                               .orElse(null);
-    }
+	protected PreloadedFolder findPreloadedAncestor(List<PreloadedFolder> preloadedFolders, String path) {
+		return preloadedFolders.stream()
+			.filter(folder -> path.startsWith(folder.getPath()))
+			.findFirst()
+			.orElse(null);
+	}
 
 }

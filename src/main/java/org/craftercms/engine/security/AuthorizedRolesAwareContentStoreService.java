@@ -44,70 +44,70 @@ import java.util.stream.Collectors;
  */
 public class AuthorizedRolesAwareContentStoreService extends ContentStoreServiceImpl {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthorizedRolesAwareContentStoreService.class);
+	private static final Logger logger = LoggerFactory.getLogger(AuthorizedRolesAwareContentStoreService.class);
 
-    // Meant to support any root element name
-    private static final String ROOT_ELEMENT_XPATH_PREFIX = "*/";
-    private final String authorizedRolesXPathQuery;
+	// Meant to support any root element name
+	private static final String ROOT_ELEMENT_XPATH_PREFIX = "*/";
+	private final String authorizedRolesXPathQuery;
 
-    public AuthorizedRolesAwareContentStoreService(CacheTemplate cacheTemplate, ContentStoreAdapterRegistry storeAdapterRegistry,
-                                                   DescriptorMergeStrategyResolver mergeStrategyResolver,
-                                                   DescriptorMerger merger, ItemProcessorResolver processorResolver,
-                                                   BlobUrlResolver blobUrlResolver, BlobStoreResolver blobStoreResolver,
-                                                   String sourceAttributeName, String sourceTypeAttributeName,
-                                                   String sourceTypeXPath, String authorizedRolesXPathQuery) {
-        super(cacheTemplate, storeAdapterRegistry, mergeStrategyResolver, merger, processorResolver, blobUrlResolver, blobStoreResolver, sourceAttributeName, sourceTypeAttributeName, sourceTypeXPath);
-        this.authorizedRolesXPathQuery = ROOT_ELEMENT_XPATH_PREFIX + authorizedRolesXPathQuery;
-    }
+	public AuthorizedRolesAwareContentStoreService(CacheTemplate cacheTemplate, ContentStoreAdapterRegistry storeAdapterRegistry,
+						       DescriptorMergeStrategyResolver mergeStrategyResolver,
+						       DescriptorMerger merger, ItemProcessorResolver processorResolver,
+						       BlobUrlResolver blobUrlResolver, BlobStoreResolver blobStoreResolver,
+						       String sourceAttributeName, String sourceTypeAttributeName,
+						       String sourceTypeXPath, String authorizedRolesXPathQuery) {
+		super(cacheTemplate, storeAdapterRegistry, mergeStrategyResolver, merger, processorResolver, blobUrlResolver, blobStoreResolver, sourceAttributeName, sourceTypeAttributeName, sourceTypeXPath);
+		this.authorizedRolesXPathQuery = ROOT_ELEMENT_XPATH_PREFIX + authorizedRolesXPathQuery;
+	}
 
-    @Override
-    public Item findItem(Context context, CachingOptions cachingOptions, String url, ItemProcessor processor, boolean flatten) throws InvalidContextException, XmlFileParseException, XmlMergeException, ItemProcessingException, StoreException {
-        Item item = super.findItem(context, cachingOptions, url, processor, flatten);
-        if (item == null) {
-            return null;
-        }
-        checkAccess(item, context, cachingOptions, processor, flatten);
-        return item;
-    }
+	@Override
+	public Item findItem(Context context, CachingOptions cachingOptions, String url, ItemProcessor processor, boolean flatten) throws InvalidContextException, XmlFileParseException, XmlMergeException, ItemProcessingException, StoreException {
+		Item item = super.findItem(context, cachingOptions, url, processor, flatten);
+		if (item == null) {
+			return null;
+		}
+		checkAccess(item, context, cachingOptions, processor, flatten);
+		return item;
+	}
 
-    @Override
-    protected List<Item> getChildrenInternal(Context context, CachingOptions cachingOptions, String url, ItemProcessor processor, boolean flatten) {
-        List<Item> children = super.getChildrenInternal(context, cachingOptions, url, processor, flatten);
-        if (children == null) {
-            return null;
-        }
-        return children.stream()
-                .filter(item -> {
-                    try {
-                        checkAccess(item, context, cachingOptions, processor, flatten);
-                        return true;
-                    } catch (Exception e) {
-                        return false;
-                    }
-                })
-                .collect(Collectors.toList());
-    }
+	@Override
+	protected List<Item> getChildrenInternal(Context context, CachingOptions cachingOptions, String url, ItemProcessor processor, boolean flatten) {
+		List<Item> children = super.getChildrenInternal(context, cachingOptions, url, processor, flatten);
+		if (children == null) {
+			return null;
+		}
+		return children.stream()
+			.filter(item -> {
+				try {
+					checkAccess(item, context, cachingOptions, processor, flatten);
+					return true;
+				} catch (Exception e) {
+					return false;
+				}
+			})
+			.collect(Collectors.toList());
+	}
 
-    protected void checkAccess(Item item, Context context, CachingOptions cachingOptions, ItemProcessor processor, boolean flatten) {
-        Item accessHolderItem = item;
-        if (item.isFolder()) {
-            // For folders, check if there is an /index.xml file and use that item to check access
-            Item defaultPageItem = super.findItem(context, cachingOptions, item.getUrl() + File.separator + SiteProperties.DEFAULT_INDEX_FILE_NAME, processor, flatten);
-            if (defaultPageItem != null) {
-                accessHolderItem = defaultPageItem;
-            }
-        }
-        try {
-            List<String> roles = accessHolderItem.queryDescriptorValues(authorizedRolesXPathQuery);
-            SecurityUtils.checkAccess(roles, accessHolderItem.getUrl());
-        } catch (AccessDeniedException e) {
-            // User is authenticated but does not have access to the item
-            logger.debug("Access denied for item: '{}': '{}'", item.getUrl(), e.getMessage());
-            throw new ForbiddenPathException(e.getMessage());
-        } catch (AuthenticationException e) {
-            // User is anonymous and item requires authentication
-            logger.debug("Authentication failed for item: '{}': '{}'", item.getUrl(), e.getMessage());
-            throw new org.craftercms.core.exception.AuthenticationException(e.getMessage(), e);
-        }
-    }
+	protected void checkAccess(Item item, Context context, CachingOptions cachingOptions, ItemProcessor processor, boolean flatten) {
+		Item accessHolderItem = item;
+		if (item.isFolder()) {
+			// For folders, check if there is an /index.xml file and use that item to check access
+			Item defaultPageItem = super.findItem(context, cachingOptions, item.getUrl() + File.separator + SiteProperties.DEFAULT_INDEX_FILE_NAME, processor, flatten);
+			if (defaultPageItem != null) {
+				accessHolderItem = defaultPageItem;
+			}
+		}
+		try {
+			List<String> roles = accessHolderItem.queryDescriptorValues(authorizedRolesXPathQuery);
+			SecurityUtils.checkAccess(roles, accessHolderItem.getUrl());
+		} catch (AccessDeniedException e) {
+			// User is authenticated but does not have access to the item
+			logger.debug("Access denied for item: '{}': '{}'", item.getUrl(), e.getMessage());
+			throw new ForbiddenPathException(e.getMessage());
+		} catch (AuthenticationException e) {
+			// User is anonymous and item requires authentication
+			logger.debug("Authentication failed for item: '{}': '{}'", item.getUrl(), e.getMessage());
+			throw new org.craftercms.core.exception.AuthenticationException(e.getMessage(), e);
+		}
+	}
 }

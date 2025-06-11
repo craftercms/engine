@@ -29,36 +29,36 @@ import org.springframework.context.event.ContextRefreshedEvent;
  */
 public class SiteContextsBootstrap implements ApplicationListener<ContextRefreshedEvent>, ApplicationContextAware {
 
-    protected ApplicationContext applicationContext;
-    protected boolean createContextsOnStartup;
-    protected boolean createConcurrently;
-    protected SiteContextManager siteContextManager;
+	protected ApplicationContext applicationContext;
+	protected boolean createContextsOnStartup;
+	protected boolean createConcurrently;
+	protected SiteContextManager siteContextManager;
 
-    protected boolean triggered;
+	protected boolean triggered;
 
-    public SiteContextsBootstrap(boolean createContextsOnStartup, SiteContextManager siteContextManager) {
-        createConcurrently = false;
-        this.createContextsOnStartup = createContextsOnStartup;
-        this.siteContextManager = siteContextManager;
-    }
+	public SiteContextsBootstrap(boolean createContextsOnStartup, SiteContextManager siteContextManager) {
+		createConcurrently = false;
+		this.createContextsOnStartup = createContextsOnStartup;
+		this.siteContextManager = siteContextManager;
+	}
 
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
-    }
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) {
+		this.applicationContext = applicationContext;
+	}
 
-    public void setCreateConcurrently(boolean createConcurrently) {
-        this.createConcurrently = createConcurrently;
-    }
+	public void setCreateConcurrently(boolean createConcurrently) {
+		this.createConcurrently = createConcurrently;
+	}
 
-    @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
-        if (!triggered && createContextsOnStartup) {
-            triggered = true;
+	@Override
+	public void onApplicationEvent(ContextRefreshedEvent event) {
+		if (!triggered && createContextsOnStartup) {
+			triggered = true;
 
-            siteContextManager.createContexts(createConcurrently);
+			siteContextManager.createContexts(createConcurrently);
 
-            applicationContext.publishEvent(new SiteContextsBootstrappedEvent(this));
-        }
-    }
+			applicationContext.publishEvent(new SiteContextsBootstrappedEvent(this));
+		}
+	}
 }
