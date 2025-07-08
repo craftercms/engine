@@ -63,10 +63,14 @@
                 <bean class="org.craftercms.engine.util.spring.security.preview.ConfigAwarePreviewAccessTokenFilter">
                     <constructor-arg name="encryptor" ref="crafter.textEncryptor"/>
 					<constructor-arg name="corsConfigSource" ref="crafter.corsConfigSource" />
-                </bean>
-            </util:list>
-        </constructor-arg>
-    </bean>
+					<constructor-arg name="siteNameParam" value="${crafter.engine.request.param.siteName}"/>
+					<constructor-arg name="cookiePath" value="${crafter.security.preview.cookie.path}"/>
+					<constructor-arg name="cookieHttpOnly" value="${crafter.security.preview.cookie.httpOnly}"/>
+					<constructor-arg name="cookieSameSite" value="${crafter.security.preview.cookie.sameSite}"/>
+				</bean>
+			</util:list>
+		</constructor-arg>
+	</bean>
 
     <bean id="crafter.previewSecurityFilter" class="org.springframework.security.web.FilterChainProxy">
         <constructor-arg index="0" ref="crafter.previewSecurityFilterChain"/>
