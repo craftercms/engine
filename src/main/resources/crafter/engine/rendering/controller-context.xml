@@ -110,7 +110,7 @@
 	</bean>
 
 	<bean id="crafter.siteCacheRestController"
-		  class="org.craftercms.engine.controller.rest.SiteCacheRestController">
+	      class="org.craftercms.engine.controller.rest.SiteCacheRestController">
 		<constructor-arg name="cacheRestOperationsPerCacheType" ref="crafter.cacheRestOperationsPerCacheType"/>
 		<constructor-arg name="defaultCacheType" value="system"/>
 		<constructor-arg name="configuredToken" value="${crafter.engine.management.authorizationToken}"/>
@@ -141,7 +141,7 @@
 	</bean>
 
 	<bean id="crafter.systemSiteCacheRestOperations"
-		  class="org.craftercms.engine.controller.rest.cache.SystemSiteCacheRestOperations">
+	      class="org.craftercms.engine.controller.rest.cache.SystemSiteCacheRestOperations">
 		<constructor-arg name="cacheService" ref="crafter.cacheService"/>
 	</bean>
 
@@ -151,16 +151,15 @@
 		<entry key="/*" value-ref="crafter.pageRenderController"/>
 	</util:map>
 
-
-	<beans profile="!crafter.core.applicationCache">
+	<beans profile="!crafter_core_applicationCache">
 		<util:map id="crafter.cacheRestOperationsPerCacheType">
 			<entry key="system" value-ref="crafter.systemSiteCacheRestOperations"/>
 		</util:map>
 	</beans>
 
-	<beans profile="crafter.core.applicationCache">
+	<beans profile="crafter_core_applicationCache">
 		<bean id="crafter.appSiteCacheRestOperations"
-			  class="org.craftercms.engine.controller.rest.cache.SiteCacheRestOperationsImpl">
+		      class="org.craftercms.engine.controller.rest.cache.SiteCacheRestOperationsImpl">
 			<constructor-arg name="cacheService" ref="crafter.appCacheService"/>
 		</bean>
 
