@@ -159,7 +159,7 @@
         subItemWrapperClass=subItemWrapperClass
         subItemWrapperClassPrefix=subItemWrapperClassPrefix
         subItemContainerClass=subItemContainerClass
-        depth=(inlineRootWithImmediateChildren && currentDepth == 0)?then(depth - 1, currentDepth +1)
+        depth=depth - 1
         currentDepth=(inlineRootWithImmediateChildren && currentDepth == 0)?then(currentDepth, currentDepth + 1)
         navItem=subItem
         inlineRootWithImmediateChildren=false
