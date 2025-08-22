@@ -21,26 +21,30 @@ public class UserAgent {
 	private String queryStringParamValue;
 	private String detectionRegex;
 	private String templatePrefix;
-	
-	public UserAgent() { }
-	
+
+	public UserAgent() {
+	}
+
 	public String getDetectionRegex() {
 		return detectionRegex;
 	}
+
 	public void setDetectionRegex(String detectionRegex) {
 		this.detectionRegex = detectionRegex;
 	}
+
 	public String getTemplatePrefix() {
 		return templatePrefix;
 	}
+
 	public void setTemplatePrefix(String templatePrefix) {
 		this.templatePrefix = templatePrefix;
 	}
-	
+
 	public String getQueryStringParamValue() {
 		return this.queryStringParamValue;
 	}
-	
+
 	public void setQueryStringParamValue(String queryStringParamValue) {
 		this.queryStringParamValue = queryStringParamValue;
 	}

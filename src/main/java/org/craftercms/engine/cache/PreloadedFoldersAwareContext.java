@@ -32,33 +32,33 @@ import java.util.List;
  */
 class PreloadedFoldersAwareContext extends DecoratedStoreAdapterContext {
 
-    public static final String PRELOADED_FOLDERS_CACHE_KEY = "cache.warmUp.preloadedFolders";
+	public static final String PRELOADED_FOLDERS_CACHE_KEY = "cache.warmUp.preloadedFolders";
 
-    protected CacheService cacheService;
+	protected CacheService cacheService;
 
-    public PreloadedFoldersAwareContext(Context actualContext, ContentStoreAdapter decoratedStoreAdapter,
-                                        CacheService cacheService) {
-        super(actualContext, decoratedStoreAdapter);
-        this.cacheService = cacheService;
-    }
+	public PreloadedFoldersAwareContext(Context actualContext, ContentStoreAdapter decoratedStoreAdapter,
+					    CacheService cacheService) {
+		super(actualContext, decoratedStoreAdapter);
+		this.cacheService = cacheService;
+	}
 
-    @SuppressWarnings("unchecked")
-    public List<PreloadedFolder> getPreloadedFolders() {
-        List<PreloadedFolder> folders = (List<PreloadedFolder>) cacheService.get(this, PRELOADED_FOLDERS_CACHE_KEY);
-        if (folders != null) {
-            return folders;
-        } else {
-            return Collections.emptyList();
-        }
-    }
+	@SuppressWarnings("unchecked")
+	public List<PreloadedFolder> getPreloadedFolders() {
+		List<PreloadedFolder> folders = (List<PreloadedFolder>) cacheService.get(this, PRELOADED_FOLDERS_CACHE_KEY);
+		if (folders != null) {
+			return folders;
+		} else {
+			return Collections.emptyList();
+		}
+	}
 
-    public void setPreloadedFolders(List<PreloadedFolder> preloadedFolders) {
-        cacheService.put(this, PRELOADED_FOLDERS_CACHE_KEY, preloadedFolders);
-    }
+	public void setPreloadedFolders(List<PreloadedFolder> preloadedFolders) {
+		cacheService.put(this, PRELOADED_FOLDERS_CACHE_KEY, preloadedFolders);
+	}
 
-    @Override
-    public Context clone() {
-        return new PreloadedFoldersAwareContext(actualContext.clone(), decoratedStoreAdapter, cacheService);
-    }
+	@Override
+	public Context clone() {
+		return new PreloadedFoldersAwareContext(actualContext.clone(), decoratedStoreAdapter, cacheService);
+	}
 
 }

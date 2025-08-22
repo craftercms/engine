@@ -24,28 +24,28 @@ import java.util.List;
  */
 public interface TargetIdManager {
 
-    /**
-     * Returns the target ID for the current request, or null or empty if there's no target ID.
-     */
-    String getCurrentTargetId() throws IllegalStateException;
+	/**
+	 * Returns the target ID for the current request, or null or empty if there's no target ID.
+	 */
+	String getCurrentTargetId() throws IllegalStateException;
 
-    /**
-     * Returns the fallback target ID. The fallback target ID is used in case none of the resolved candidate targeted
-     * URLs map to existing content. A null or an empty string indicates that the non-targeted version should be the
-     * last candidate URL.
-     *
-     * <p>
-     * For example, if the candidate targeted URLs are /site/website/index_es_CR.xml and /site/website/index_es.xml,
-     * and the fallback target ID is "en", then /site/website/index_en.xml is added to the list of candidate URLs,
-     * but if an empty or null string is the fallback target ID instead, /site/website/index.xml is the last candidate
-     * URL.
-     * </p>
-     */
-    String getFallbackTargetId() throws IllegalStateException;
+	/**
+	 * Returns the fallback target ID. The fallback target ID is used in case none of the resolved candidate targeted
+	 * URLs map to existing content. A null or an empty string indicates that the non-targeted version should be the
+	 * last candidate URL.
+	 *
+	 * <p>
+	 * For example, if the candidate targeted URLs are /site/website/index_es_CR.xml and /site/website/index_es.xml,
+	 * and the fallback target ID is "en", then /site/website/index_en.xml is added to the list of candidate URLs,
+	 * but if an empty or null string is the fallback target ID instead, /site/website/index.xml is the last candidate
+	 * URL.
+	 * </p>
+	 */
+	String getFallbackTargetId() throws IllegalStateException;
 
-    /**
-     * Returns the list of all available target IDs used by the site.
-     */
-    List<String> getAvailableTargetIds() throws IllegalStateException;
+	/**
+	 * Returns the list of all available target IDs used by the site.
+	 */
+	List<String> getAvailableTargetIds() throws IllegalStateException;
 
 }

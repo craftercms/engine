@@ -28,13 +28,12 @@ import org.springframework.web.util.UriTemplate;
  */
 public interface ScriptUrlTemplateScanner {
 
-    /**
-     * Scans the site context at a certain path to discover script URL templates.
-     *
-     * @param siteContext the site context to scan
-     *
-     * @return the list of URL templates
-     */
-    List<UriTemplate> scan(SiteContext siteContext);
+	/**
+	 * Scans the site context at a certain path to discover script URL templates.
+	 *
+	 * @param siteContext the site context to scan
+	 * @return the list of URL templates
+	 */
+	List<UriTemplate> scan(SiteContext siteContext);
 
 }

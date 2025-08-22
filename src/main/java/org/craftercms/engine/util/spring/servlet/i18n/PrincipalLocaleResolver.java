@@ -22,6 +22,7 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import jakarta.servlet.http.HttpServletRequest;
+
 import java.util.Locale;
 
 import static org.craftercms.commons.locale.LocaleUtils.parseLocale;
@@ -30,39 +31,39 @@ import static org.craftercms.commons.locale.LocaleUtils.parseLocale;
  * Implementation of {@link ConfigAwareLocaleResolver} that extracts the locale from the current authenticated user
  *
  * <p>Supported configuration properties:</p>
- *  <ul>
- *      <li><strong>attributeName</strong>: The name of the attribute to use, defaults to {@code preferredLanguage}</li>
- *  </ul>
+ * <ul>
+ *     <li><strong>attributeName</strong>: The name of the attribute to use, defaults to {@code preferredLanguage}</li>
+ * </ul>
  *
  * @author joseross
  * @since 4.0.0
  */
 public class PrincipalLocaleResolver extends ConfigAwareLocaleResolver {
 
-    public static final String DEFAULT_ATTRIBUTE_NAME = "preferredLanguage";
+	public static final String DEFAULT_ATTRIBUTE_NAME = "preferredLanguage";
 
-    public static final String CONFIG_KEY_ATTRIBUTE_NAME = "attributeName";
+	public static final String CONFIG_KEY_ATTRIBUTE_NAME = "attributeName";
 
-    protected String attributeName;
+	protected String attributeName;
 
-    @Override
-    protected void init(HierarchicalConfiguration<?> config) {
-        attributeName = config.getString(CONFIG_KEY_ATTRIBUTE_NAME, DEFAULT_ATTRIBUTE_NAME);
-    }
+	@Override
+	protected void init(HierarchicalConfiguration<?> config) {
+		attributeName = config.getString(CONFIG_KEY_ATTRIBUTE_NAME, DEFAULT_ATTRIBUTE_NAME);
+	}
 
-    @Override
-    protected Locale resolveLocale(SiteContext siteContext, HttpServletRequest request) {
-        var context = SecurityContextHolder.getContext();
-        if (context != null) {
-            var authentication = context.getAuthentication();
-            if (authentication != null && !(authentication instanceof AnonymousAuthenticationToken)) {
-                var principal = (CustomUser) authentication.getPrincipal();
-                if (principal != null) {
-                    return parseLocale(principal.getAttribute(attributeName));
-                }
-            }
-        }
-        return null;
-    }
+	@Override
+	protected Locale resolveLocale(SiteContext siteContext, HttpServletRequest request) {
+		var context = SecurityContextHolder.getContext();
+		if (context != null) {
+			var authentication = context.getAuthentication();
+			if (authentication != null && !(authentication instanceof AnonymousAuthenticationToken)) {
+				var principal = (CustomUser) authentication.getPrincipal();
+				if (principal != null) {
+					return parseLocale(principal.getAttribute(attributeName));
+				}
+			}
+		}
+		return null;
+	}
 
 }

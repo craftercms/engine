@@ -32,29 +32,29 @@ import static org.mockito.Mockito.when;
  */
 public class ConfigAwareAccessTokenIdResolverTest extends ConfigAwareTestBase {
 
-    private ConfigAwareAccessTokenIdResolver accessTokenIdResolver;
+	private ConfigAwareAccessTokenIdResolver accessTokenIdResolver;
 
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
+	@Override
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
 
-        accessTokenIdResolver = new ConfigAwareAccessTokenIdResolver();
-    }
+		accessTokenIdResolver = new ConfigAwareAccessTokenIdResolver();
+	}
 
-    @Test
-    public void testGetAccessTokenId() throws Exception {
-        String accessTokenId = accessTokenIdResolver.getAccessTokenId();
+	@Test
+	public void testGetAccessTokenId() throws Exception {
+		String accessTokenId = accessTokenIdResolver.getAccessTokenId();
 
-        assertEquals(config.getString(ACCESS_TOKEN_ID_KEY), accessTokenId);
-    }
+		assertEquals(config.getString(ACCESS_TOKEN_ID_KEY), accessTokenId);
+	}
 
-    @Test(expected = ConfigurationException.class)
-    public void testGetAccessTokenIdNoConfig() throws Exception {
-        when(siteContext.getConfig()).thenReturn(null);
+	@Test(expected = ConfigurationException.class)
+	public void testGetAccessTokenIdNoConfig() throws Exception {
+		when(siteContext.getConfig()).thenReturn(null);
 
-        accessTokenIdResolver.getAccessTokenId();
-    }
+		accessTokenIdResolver.getAccessTokenId();
+	}
 
 
 }

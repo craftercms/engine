@@ -26,11 +26,11 @@ import org.craftercms.core.service.Context;
  */
 public interface ContextCacheWarmer {
 
-    /**
-     * Warm ups the cache associate to the context
-     *
-     * @param context the context
-     */
-    void warmUpCache(Context context);
+	/**
+	 * Warm ups the cache associate to the context
+	 *
+	 * @param context the context
+	 */
+	void warmUpCache(Context context);
 
 }

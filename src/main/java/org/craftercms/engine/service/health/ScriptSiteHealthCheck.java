@@ -30,32 +30,32 @@ import java.util.Map;
  */
 public class ScriptSiteHealthCheck extends AbstractHealthCheck {
 
-    private final boolean disableVariableRestrictions;
-    private final String scriptPath;
+	private final boolean disableVariableRestrictions;
+	private final String scriptPath;
 
-    @ConstructorProperties({"contextManager", "scriptPath", "disableVariableRestrictions"})
-    public ScriptSiteHealthCheck(final SiteContextManager contextManager, final String scriptPath, final boolean disableVariableRestrictions) {
-        super(contextManager);
-        this.scriptPath = scriptPath;
-        this.disableVariableRestrictions = disableVariableRestrictions;
-    }
+	@ConstructorProperties({"contextManager", "scriptPath", "disableVariableRestrictions"})
+	public ScriptSiteHealthCheck(final SiteContextManager contextManager, final String scriptPath, final boolean disableVariableRestrictions) {
+		super(contextManager);
+		this.scriptPath = scriptPath;
+		this.disableVariableRestrictions = disableVariableRestrictions;
+	}
 
-    @Override
-    protected boolean doCheckHealth(final String site) {
-        SiteContext siteContext = contextManager.getContext(site, false);
-        try {
-            Script script = siteContext.getScriptFactory().getScript(scriptPath);
-            Map<String, Object> scriptVariables = new HashMap<>();
-            GroovyScriptUtils.addHealthCheckScriptVariables(scriptVariables, disableVariableRestrictions);
-            script.execute(scriptVariables);
-            return true;
-        } catch (ScriptNotFoundException e) {
-            logger.debug("Script '{}' not found for site '{}'", scriptPath, site);
-            return true;
-        } catch (Exception e) {
-            logger.error("Error executing script '{}' for site '{}': '{}'", scriptPath, site, e.getMessage());
-            logger.debug("Script failed with exception: ", e);
-            return false;
-        }
-    }
+	@Override
+	protected boolean doCheckHealth(final String site) {
+		SiteContext siteContext = contextManager.getContext(site, false);
+		try {
+			Script script = siteContext.getScriptFactory().getScript(scriptPath);
+			Map<String, Object> scriptVariables = new HashMap<>();
+			GroovyScriptUtils.addHealthCheckScriptVariables(scriptVariables, disableVariableRestrictions);
+			script.execute(scriptVariables);
+			return true;
+		} catch (ScriptNotFoundException e) {
+			logger.debug("Script '{}' not found for site '{}'", scriptPath, site);
+			return true;
+		} catch (Exception e) {
+			logger.error("Error executing script '{}' for site '{}': '{}'", scriptPath, site, e.getMessage());
+			logger.debug("Script failed with exception: ", e);
+			return false;
+		}
+	}
 }

@@ -16,15 +16,16 @@
 package org.craftercms.engine.util.spring.security;
 
 import jakarta.servlet.*;
+
 import java.io.IOException;
 
 /**
  * Convenience class for a no-op filter.
  */
 public class NoopFilter implements Filter {
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
-        chain.doFilter(request, response); // no-op
-    }
+	@Override
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+		throws IOException, ServletException {
+		chain.doFilter(request, response); // no-op
+	}
 }

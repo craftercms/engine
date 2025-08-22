@@ -22,25 +22,26 @@ import org.slf4j.LoggerFactory;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 
 /**
  * Handler for {@link jakarta.validation.ConstraintViolationException} exceptions
  */
 public class ConstraintViolationExceptionHandler implements ExceptionHandler {
-    private static final Logger logger = LoggerFactory.getLogger(ConstraintViolationExceptionHandler.class);
+	private static final Logger logger = LoggerFactory.getLogger(ConstraintViolationExceptionHandler.class);
 
-    @Override
-    public boolean handle(HttpServletRequest request, HttpServletResponse response, Exception ex) throws IOException {
-        Exception constraintViolationException =
-                ExceptionUtils.getThrowableOfType(ex, jakarta.validation.ConstraintViolationException.class);
+	@Override
+	public boolean handle(HttpServletRequest request, HttpServletResponse response, Exception ex) throws IOException {
+		Exception constraintViolationException =
+			ExceptionUtils.getThrowableOfType(ex, jakarta.validation.ConstraintViolationException.class);
 
-        if (constraintViolationException != null) {
-            logger.warn("Failed to validate request parameters: {}", constraintViolationException.getMessage());
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, constraintViolationException.getMessage());
-            return true;
-        }
+		if (constraintViolationException != null) {
+			logger.warn("Failed to validate request parameters: {}", constraintViolationException.getMessage());
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, constraintViolationException.getMessage());
+			return true;
+		}
 
-        return false;
-    }
+		return false;
+	}
 }

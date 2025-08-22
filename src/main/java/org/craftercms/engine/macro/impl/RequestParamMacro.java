@@ -26,28 +26,28 @@ import org.craftercms.commons.http.RequestContext;
  */
 public class RequestParamMacro extends AbstractMacro {
 
-    private static final Log logger = LogFactory.getLog(RequestParamMacro.class);
+	private static final Log logger = LogFactory.getLog(RequestParamMacro.class);
 
-    private String requestParamName;
+	private String requestParamName;
 
-    public RequestParamMacro(String requestParamName) {
-        this.requestParamName = requestParamName;
-    }
+	public RequestParamMacro(String requestParamName) {
+		this.requestParamName = requestParamName;
+	}
 
-    @Override
-    protected String createMacroName() {
-        return "{" + requestParamName + "}";
-    }
+	@Override
+	protected String createMacroName() {
+		return "{" + requestParamName + "}";
+	}
 
-    @Override
-    protected String getMacroValue(String str) {
-        RequestContext requestContext = RequestContext.getCurrent();
-        if (requestContext != null) {
-            return requestContext.getRequest().getParameter(requestParamName);
-        } else {
-            return null;
-        }
-    }
+	@Override
+	protected String getMacroValue(String str) {
+		RequestContext requestContext = RequestContext.getCurrent();
+		if (requestContext != null) {
+			return requestContext.getRequest().getParameter(requestParamName);
+		} else {
+			return null;
+		}
+	}
 
 }
 

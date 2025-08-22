@@ -34,50 +34,50 @@ import org.slf4j.MDC;
  */
 public class GroovyScript extends AbstractCachingAwareObject implements Script {
 
-    private static final String SCRIPT_URL_MDC_KEY = "scriptUrl";
+	private static final String SCRIPT_URL_MDC_KEY = "scriptUrl";
 
-    protected String scriptUrl;
-    protected Class<?> scriptClass;
-    protected Map<String, Object> globalVariables;
+	protected String scriptUrl;
+	protected Class<?> scriptClass;
+	protected Map<String, Object> globalVariables;
 
-    public GroovyScript(String scriptUrl, Class<?> scriptClass, Map<String, Object> globalVariables) {
-        this.scriptUrl = scriptUrl;
-        this.scriptClass = scriptClass;
-        this.globalVariables = globalVariables;
-    }
+	public GroovyScript(String scriptUrl, Class<?> scriptClass, Map<String, Object> globalVariables) {
+		this.scriptUrl = scriptUrl;
+		this.scriptClass = scriptClass;
+		this.globalVariables = globalVariables;
+	}
 
-    @Override
-    public String getUrl() {
-        return scriptUrl;
-    }
+	@Override
+	public String getUrl() {
+		return scriptUrl;
+	}
 
-    @Override
-    public Object execute(Map<String, Object> variables) throws ScriptException {
-        Map<String, Object> allVariables = new HashMap<>();
+	@Override
+	public Object execute(Map<String, Object> variables) throws ScriptException {
+		Map<String, Object> allVariables = new HashMap<>();
 
-        if (MapUtils.isNotEmpty(globalVariables)) {
-            allVariables.putAll(globalVariables);
-        }
-        if (MapUtils.isNotEmpty(variables)) {
-            allVariables.putAll(variables);
-        }
+		if (MapUtils.isNotEmpty(globalVariables)) {
+			allVariables.putAll(globalVariables);
+		}
+		if (MapUtils.isNotEmpty(variables)) {
+			allVariables.putAll(variables);
+		}
 
-        MDC.put(SCRIPT_URL_MDC_KEY, scriptUrl);
+		MDC.put(SCRIPT_URL_MDC_KEY, scriptUrl);
 
-        try  {
-            return InvokerHelper.createScript(scriptClass, new Binding(allVariables)).run();
-        } catch (Exception e) {
-            throw new ScriptException(e.getMessage(), e);
-        } finally {
-            MDC.remove(SCRIPT_URL_MDC_KEY);
-        }
-    }
+		try {
+			return InvokerHelper.createScript(scriptClass, new Binding(allVariables)).run();
+		} catch (Exception e) {
+			throw new ScriptException(e.getMessage(), e);
+		} finally {
+			MDC.remove(SCRIPT_URL_MDC_KEY);
+		}
+	}
 
-    @Override
-    public String toString() {
-        return "GroovyScript{" +
-            "scriptUrl='" + scriptUrl + '\'' +
-            '}';
-    }
+	@Override
+	public String toString() {
+		return "GroovyScript{" +
+			"scriptUrl='" + scriptUrl + '\'' +
+			'}';
+	}
 
 }

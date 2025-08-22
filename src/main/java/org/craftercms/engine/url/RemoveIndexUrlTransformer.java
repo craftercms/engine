@@ -29,10 +29,10 @@ import static org.craftercms.commons.locale.LocaleUtils.delocalizePath;
  */
 public class RemoveIndexUrlTransformer implements UrlTransformer {
 
-    @Override
-    public String transformUrl(Context context, CachingOptions cachingOptions,
-                               String url) throws UrlTransformationException {
-        return StringUtils.removeEnd(delocalizePath(url), SiteProperties.getIndexFileName());
-    }
+	@Override
+	public String transformUrl(Context context, CachingOptions cachingOptions,
+				   String url) throws UrlTransformationException {
+		return StringUtils.removeEnd(delocalizePath(url), SiteProperties.getIndexFileName());
+	}
 
 }

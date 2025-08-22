@@ -40,34 +40,34 @@ import static org.mockito.Mockito.when;
  */
 public class ConfigAwareAuthenticationSuccessHandlerTest extends ConfigAwareTestBase {
 
-    private ConfigAwareAuthenticationSuccessHandler handler;
-    @Mock
-    private RequestCache requestCache;
-    @Mock
-    private SavedRequest savedRequest;
+	private ConfigAwareAuthenticationSuccessHandler handler;
+	@Mock
+	private RequestCache requestCache;
+	@Mock
+	private SavedRequest savedRequest;
 
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
+	@Override
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
 
-        when(savedRequest.getRedirectUrl()).thenReturn("/about");
-        when(requestCache.getRequest(any(HttpServletRequest.class), any(HttpServletResponse.class)))
-            .thenReturn(savedRequest);
+		when(savedRequest.getRedirectUrl()).thenReturn("/about");
+		when(requestCache.getRequest(any(HttpServletRequest.class), any(HttpServletResponse.class)))
+			.thenReturn(savedRequest);
 
-        handler = new ConfigAwareAuthenticationSuccessHandler();
-        handler.setDefaultTargetUrl("/");
-        handler.setAlwaysUseDefaultTargetUrl(false);
-    }
+		handler = new ConfigAwareAuthenticationSuccessHandler();
+		handler.setDefaultTargetUrl("/");
+		handler.setAlwaysUseDefaultTargetUrl(false);
+	}
 
-    @Test
-    public void testProcessRequest() throws Exception {
-        HttpServletRequest request = RequestContext.getCurrent().getRequest();
-        HttpServletResponse response = RequestContext.getCurrent().getResponse();
-        handler.onAuthenticationSuccess(request, response, new UsernamePasswordAuthenticationToken("", ""));
+	@Test
+	public void testProcessRequest() throws Exception {
+		HttpServletRequest request = RequestContext.getCurrent().getRequest();
+		HttpServletResponse response = RequestContext.getCurrent().getResponse();
+		handler.onAuthenticationSuccess(request, response, new UsernamePasswordAuthenticationToken("", ""));
 
-        assertEquals(config.getString(ConfigAwareAuthenticationSuccessHandler.LOGIN_DEFAULT_SUCCESS_URL_KEY),
-                     ((MockHttpServletResponse)RequestContext.getCurrent().getResponse()).getRedirectedUrl());
-    }
-    
+		assertEquals(config.getString(ConfigAwareAuthenticationSuccessHandler.LOGIN_DEFAULT_SUCCESS_URL_KEY),
+			((MockHttpServletResponse) RequestContext.getCurrent().getResponse()).getRedirectedUrl());
+	}
+
 }

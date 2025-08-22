@@ -23,6 +23,7 @@ import org.springframework.web.servlet.LocaleResolver;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.util.List;
 import java.util.Locale;
 
@@ -39,50 +40,50 @@ import static org.apache.commons.collections4.CollectionUtils.isEmpty;
  */
 public abstract class ConfigAwareLocaleResolver implements LocaleResolver {
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    /**
-     * The supported locales
-     */
-    private List<Locale> supportedLocales;
+	/**
+	 * The supported locales
+	 */
+	private List<Locale> supportedLocales;
 
-    public void setSupportedLocales(List<Locale> supportedLocales) {
-        this.supportedLocales = supportedLocales;
-    }
+	public void setSupportedLocales(List<Locale> supportedLocales) {
+		this.supportedLocales = supportedLocales;
+	}
 
-    protected boolean isSupported(Locale locale) {
-        return isEmpty(supportedLocales) || supportedLocales.contains(locale);
-    }
+	protected boolean isSupported(Locale locale) {
+		return isEmpty(supportedLocales) || supportedLocales.contains(locale);
+	}
 
-    /**
-     * Performs any customization needed
-     *
-     * @param config the configuration
-     */
-    protected abstract void init(HierarchicalConfiguration<?> config);
+	/**
+	 * Performs any customization needed
+	 *
+	 * @param config the configuration
+	 */
+	protected abstract void init(HierarchicalConfiguration<?> config);
 
-    @Override
-    public Locale resolveLocale(HttpServletRequest request) {
-        SiteContext siteContext = SiteContext.getCurrent();
-        if (siteContext == null) {
-            throw new IllegalStateException("Site context could not be resolved");
-        }
+	@Override
+	public Locale resolveLocale(HttpServletRequest request) {
+		SiteContext siteContext = SiteContext.getCurrent();
+		if (siteContext == null) {
+			throw new IllegalStateException("Site context could not be resolved");
+		}
 
-        return resolveLocale(siteContext, request);
-    }
+		return resolveLocale(siteContext, request);
+	}
 
-    /**
-     * Performs the actual work to resolve a locale
-     *
-     * @param siteContext the current site context
-     * @param request the current request
-     * @return a locale object or null
-     */
-    protected abstract Locale resolveLocale(SiteContext siteContext, HttpServletRequest request);
+	/**
+	 * Performs the actual work to resolve a locale
+	 *
+	 * @param siteContext the current site context
+	 * @param request     the current request
+	 * @return a locale object or null
+	 */
+	protected abstract Locale resolveLocale(SiteContext siteContext, HttpServletRequest request);
 
-    @Override
-    public void setLocale(HttpServletRequest request, HttpServletResponse response, Locale locale) {
-        throw new UnsupportedOperationException("This class in unable to store locales");
-    }
+	@Override
+	public void setLocale(HttpServletRequest request, HttpServletResponse response, Locale locale) {
+		throw new UnsupportedOperationException("This class in unable to store locales");
+	}
 
 }

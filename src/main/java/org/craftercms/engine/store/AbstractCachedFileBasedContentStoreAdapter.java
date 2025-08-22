@@ -36,67 +36,67 @@ import java.util.List;
  */
 public abstract class AbstractCachedFileBasedContentStoreAdapter extends AbstractFileBasedContentStoreAdapter {
 
-    public static final String CONST_KEY_ELEM_FILE= "fileBasedContentStoreAdapter.file";
-    public static final String CONST_KEY_ELEM_CHILDREN = "fileBasedContentStoreAdapter.children";
+	public static final String CONST_KEY_ELEM_FILE = "fileBasedContentStoreAdapter.file";
+	public static final String CONST_KEY_ELEM_CHILDREN = "fileBasedContentStoreAdapter.children";
 
-    public AbstractCachedFileBasedContentStoreAdapter(Validator pathValidator, String descriptorFileExtension,
-                                                      String metadataFileExtension, CacheTemplate cacheTemplate) {
-        super(pathValidator, descriptorFileExtension, metadataFileExtension, cacheTemplate);
-    }
+	public AbstractCachedFileBasedContentStoreAdapter(Validator pathValidator, String descriptorFileExtension,
+							  String metadataFileExtension, CacheTemplate cacheTemplate) {
+		super(pathValidator, descriptorFileExtension, metadataFileExtension, cacheTemplate);
+	}
 
-    @Override
-    protected File findFile(Context context, CachingOptions cachingOptions,
-                            String path) throws InvalidContextException, StoreException {
-        final CachingOptions actualCachingOptions = cachingOptions != null? cachingOptions: defaultCachingOptions;
+	@Override
+	protected File findFile(Context context, CachingOptions cachingOptions,
+				String path) throws InvalidContextException, StoreException {
+		final CachingOptions actualCachingOptions = cachingOptions != null ? cachingOptions : defaultCachingOptions;
 
-        return cacheTemplate.getObject(context, actualCachingOptions, new Callback<>() {
+		return cacheTemplate.getObject(context, actualCachingOptions, new Callback<>() {
 
-            @Override
-            public File execute() {
-                return doFindFile(context, path);
-            }
+			@Override
+			public File execute() {
+				return doFindFile(context, path);
+			}
 
-            @Override
-            public String toString() {
-                return String.format(AbstractCachedFileBasedContentStoreAdapter.this.getClass().getName() +
-                        ".findFile(%s, %s)", context, path);
-            }
+			@Override
+			public String toString() {
+				return String.format(AbstractCachedFileBasedContentStoreAdapter.this.getClass().getName() +
+					".findFile(%s, %s)", context, path);
+			}
 
-        }, path, CONST_KEY_ELEM_FILE);
-    }
+		}, path, CONST_KEY_ELEM_FILE);
+	}
 
-    @Override
-    protected List<File> getChildren(Context context, CachingOptions cachingOptions,
-                                     File dir) throws InvalidContextException, StoreException {
-        final CachingOptions actualCachingOptions = cachingOptions != null? cachingOptions: defaultCachingOptions;
+	@Override
+	protected List<File> getChildren(Context context, CachingOptions cachingOptions,
+					 File dir) throws InvalidContextException, StoreException {
+		final CachingOptions actualCachingOptions = cachingOptions != null ? cachingOptions : defaultCachingOptions;
 
-        return cacheTemplate.getObject(context, actualCachingOptions, new Callback<>() {
+		return cacheTemplate.getObject(context, actualCachingOptions, new Callback<>() {
 
-            @Override
-            public List<File> execute() {
-                List<File> children = doGetChildren(context, dir);
-                if (children != null) {
-                    if (children instanceof CachingAwareList) {
-                        return children;
-                    } else {
-                        return new CachingAwareList<>(children);
-                    }
-                } else {
-                    return null;
-                }
-            }
+			@Override
+			public List<File> execute() {
+				List<File> children = doGetChildren(context, dir);
+				if (children != null) {
+					if (children instanceof CachingAwareList) {
+						return children;
+					} else {
+						return new CachingAwareList<>(children);
+					}
+				} else {
+					return null;
+				}
+			}
 
-            @Override
-            public String toString() {
-                return String.format(AbstractCachedFileBasedContentStoreAdapter.this.getClass().getName() +
-                        ".getChildren(%s, %s)", context, dir);
-            }
+			@Override
+			public String toString() {
+				return String.format(AbstractCachedFileBasedContentStoreAdapter.this.getClass().getName() +
+					".getChildren(%s, %s)", context, dir);
+			}
 
-        }, dir, CONST_KEY_ELEM_CHILDREN);
-    }
+		}, dir, CONST_KEY_ELEM_CHILDREN);
+	}
 
-    protected abstract File doFindFile(Context context, String path) throws InvalidContextException, StoreException;
+	protected abstract File doFindFile(Context context, String path) throws InvalidContextException, StoreException;
 
-    protected abstract List<File> doGetChildren(Context context, File dir) throws InvalidContextException, StoreException;
+	protected abstract List<File> doGetChildren(Context context, File dir) throws InvalidContextException, StoreException;
 
 }

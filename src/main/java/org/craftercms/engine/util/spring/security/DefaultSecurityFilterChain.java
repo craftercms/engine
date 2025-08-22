@@ -19,6 +19,7 @@ package org.craftercms.engine.util.spring.security;
 import java.beans.ConstructorProperties;
 import java.util.List;
 import java.util.stream.Stream;
+
 import jakarta.servlet.Filter;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -35,28 +36,28 @@ import static java.util.stream.Collectors.toList;
  */
 public class DefaultSecurityFilterChain implements SecurityFilterChain {
 
-    protected boolean securityEnabled;
+	protected boolean securityEnabled;
 
-    protected List<AntPathRequestMatcher> urlsToExclude;
+	protected List<AntPathRequestMatcher> urlsToExclude;
 
-    protected List<Filter> filters;
+	protected List<Filter> filters;
 
-    @ConstructorProperties({"securityEnabled", "urlsToExclude", "filters"})
-    public DefaultSecurityFilterChain(final boolean securityEnabled, final String[] urlsToExclude,
-                                      final List<Filter> filters) {
-        this.securityEnabled = securityEnabled;
-        this.urlsToExclude = Stream.of(urlsToExclude).map(AntPathRequestMatcher::new).collect(toList());
-        this.filters = filters;
-    }
+	@ConstructorProperties({"securityEnabled", "urlsToExclude", "filters"})
+	public DefaultSecurityFilterChain(final boolean securityEnabled, final String[] urlsToExclude,
+					  final List<Filter> filters) {
+		this.securityEnabled = securityEnabled;
+		this.urlsToExclude = Stream.of(urlsToExclude).map(AntPathRequestMatcher::new).collect(toList());
+		this.filters = filters;
+	}
 
-    @Override
-    public boolean matches(final HttpServletRequest request) {
-        return securityEnabled && urlsToExclude.stream().noneMatch(matcher -> matcher.matches(request));
-    }
+	@Override
+	public boolean matches(final HttpServletRequest request) {
+		return securityEnabled && urlsToExclude.stream().noneMatch(matcher -> matcher.matches(request));
+	}
 
-    @Override
-    public List<Filter> getFilters() {
-        return filters;
-    }
+	@Override
+	public List<Filter> getFilters() {
+		return filters;
+	}
 
 }

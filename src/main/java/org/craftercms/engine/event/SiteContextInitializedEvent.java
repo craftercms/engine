@@ -24,13 +24,13 @@ import org.craftercms.engine.service.context.SiteContext;
  */
 public class SiteContextInitializedEvent extends SiteEvent {
 
-    /**
-     * Create a new event.
-     *
-     * @param siteContext   the site's context
-     */
-    public SiteContextInitializedEvent(SiteContext siteContext) {
-        super(siteContext);
-    }
+	/**
+	 * Create a new event.
+	 *
+	 * @param siteContext the site's context
+	 */
+	public SiteContextInitializedEvent(SiteContext siteContext) {
+		super(siteContext);
+	}
 
 }

@@ -29,13 +29,12 @@ import org.craftercms.engine.util.quartz.JobContext;
  */
 public interface ScriptJobResolver {
 
-    /**
-     * Resolves any number of script jobs to be scheduled and executed.
-     *
-     * @param siteContext the context used to look up for the scripts
-     *
-     * @return the details of the jobs to be scheduled
-     */
-    List<JobContext> resolveJobs(SiteContext siteContext) throws SchedulingException;
+	/**
+	 * Resolves any number of script jobs to be scheduled and executed.
+	 *
+	 * @param siteContext the context used to look up for the scripts
+	 * @return the details of the jobs to be scheduled
+	 */
+	List<JobContext> resolveJobs(SiteContext siteContext) throws SchedulingException;
 
 }

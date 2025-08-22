@@ -27,25 +27,25 @@ import java.util.Map;
  */
 public class CacheUtils {
 
-    /**
-     * Parses a list of preloaded folder paths and their depths, in the following format: {PATH}:{DEPTH}
-     *
-     * @param preloadFolders the list of folder paths to preload
-     * @return a map with {@code key = preload path} and {@code value = depth}
-     */
-    public static Map<String, Integer> parsePreloadFoldersList(String[] preloadFolders) {
-        Map<String, Integer> preloadFoldersMappings = new HashMap<>();
+	/**
+	 * Parses a list of preloaded folder paths and their depths, in the following format: {PATH}:{DEPTH}
+	 *
+	 * @param preloadFolders the list of folder paths to preload
+	 * @return a map with {@code key = preload path} and {@code value = depth}
+	 */
+	public static Map<String, Integer> parsePreloadFoldersList(String[] preloadFolders) {
+		Map<String, Integer> preloadFoldersMappings = new HashMap<>();
 
-        for (String folder : preloadFolders) {
-            String[] folderAndDepth = folder.split(":");
-            if (folderAndDepth.length > 1) {
-                preloadFoldersMappings.put(folderAndDepth[0], Integer.parseInt(folderAndDepth[1]));
-            } else if (folderAndDepth.length == 1) {
-                preloadFoldersMappings.put(folderAndDepth[0], ContentStoreService.UNLIMITED_TREE_DEPTH);
-            }
-        }
+		for (String folder : preloadFolders) {
+			String[] folderAndDepth = folder.split(":");
+			if (folderAndDepth.length > 1) {
+				preloadFoldersMappings.put(folderAndDepth[0], Integer.parseInt(folderAndDepth[1]));
+			} else if (folderAndDepth.length == 1) {
+				preloadFoldersMappings.put(folderAndDepth[0], ContentStoreService.UNLIMITED_TREE_DEPTH);
+			}
+		}
 
-        return preloadFoldersMappings;
-    }
+		return preloadFoldersMappings;
+	}
 
 }

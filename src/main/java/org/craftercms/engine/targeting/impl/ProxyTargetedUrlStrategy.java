@@ -28,33 +28,33 @@ import org.craftercms.engine.util.spring.ApplicationContextAccessor;
  */
 public class ProxyTargetedUrlStrategy extends AbstractProxyBean<TargetedUrlStrategy> implements TargetedUrlStrategy {
 
-    public ProxyTargetedUrlStrategy(ApplicationContextAccessor applicationContext, String beanName) {
-        super(applicationContext, beanName);
-    }
+	public ProxyTargetedUrlStrategy(ApplicationContextAccessor applicationContext, String beanName) {
+		super(applicationContext, beanName);
+	}
 
-    @Override
-    public boolean isFileNameBasedStrategy() {
-        return getBean().isFileNameBasedStrategy();
-    }
+	@Override
+	public boolean isFileNameBasedStrategy() {
+		return getBean().isFileNameBasedStrategy();
+	}
 
-    @Override
-    public String toTargetedUrl(String url, boolean forceCurrentTargetId) {
-        return getBean().toTargetedUrl(url, forceCurrentTargetId);
-    }
+	@Override
+	public String toTargetedUrl(String url, boolean forceCurrentTargetId) {
+		return getBean().toTargetedUrl(url, forceCurrentTargetId);
+	}
 
-    @Override
-    public TargetedUrlComponents parseTargetedUrl(String targetedUrl) {
-        return getBean().parseTargetedUrl(targetedUrl);
-    }
+	@Override
+	public TargetedUrlComponents parseTargetedUrl(String targetedUrl) {
+		return getBean().parseTargetedUrl(targetedUrl);
+	}
 
-    @Override
-    public String buildTargetedUrl(String prefix, String targetId, String suffix) {
-        return getBean().buildTargetedUrl(prefix, targetId, suffix);
-    }
+	@Override
+	public String buildTargetedUrl(String prefix, String targetId, String suffix) {
+		return getBean().buildTargetedUrl(prefix, targetId, suffix);
+	}
 
-    @Override
-    protected Class<? extends TargetedUrlStrategy> getBeanClass() {
-        return TargetedUrlStrategy.class;
-    }
+	@Override
+	protected Class<? extends TargetedUrlStrategy> getBeanClass() {
+		return TargetedUrlStrategy.class;
+	}
 
 }

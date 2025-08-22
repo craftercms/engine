@@ -31,34 +31,34 @@ import org.dom4j.Document;
  */
 public interface SiteItem {
 
-    Item getItem();
+	Item getItem();
 
-    String getStoreName();
+	String getStoreName();
 
-    String getStoreUrl();
+	String getStoreUrl();
 
-    boolean isFolder();
+	boolean isFolder();
 
-    Document getDom();
+	Document getDom();
 
-    Map<String, Object> getProperties();
+	Map<String, Object> getProperties();
 
-    Object get(String xpathExpression);
+	Object get(String xpathExpression);
 
-    String queryValue(String xpathExpression);
+	String queryValue(String xpathExpression);
 
-    List<String> queryValues(String xpathExpression);
+	List<String> queryValues(String xpathExpression);
 
-    String queryValue(String xpathExpression, Map<String, String> namespaceUris);
+	String queryValue(String xpathExpression, Map<String, String> namespaceUris);
 
-    List<String> queryValues(String xpathExpression, Map<String, String> namespaceUris);
+	List<String> queryValues(String xpathExpression, Map<String, String> namespaceUris);
 
-    List<SiteItem> getChildItems();
+	List<SiteItem> getChildItems();
 
-    SiteItem getChildItem(String storeName);
+	SiteItem getChildItem(String storeName);
 
-    List<SiteItem> sortItems(List<SiteItem> items, Comparator<SiteItem> comparator);
+	List<SiteItem> sortItems(List<SiteItem> items, Comparator<SiteItem> comparator);
 
-    SiteItem createItemWrapper(Item item);
+	SiteItem createItemWrapper(Item item);
 
 }

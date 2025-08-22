@@ -45,77 +45,77 @@ import static org.apache.logging.log4j.core.Core.CATEGORY_NAME;
 @Plugin(name = ThreadContextKeyExistsFilter.PLUGIN_NAME, category = CATEGORY_NAME, elementType = ELEMENT_TYPE)
 public class ThreadContextKeyExistsFilter extends AbstractFilter {
 
-    public static final String PLUGIN_NAME = "ThreadContextKeyExistsFilter";
+	public static final String PLUGIN_NAME = "ThreadContextKeyExistsFilter";
 
-    private String key;
-    private boolean acceptIfKeyExists;
-    private boolean denyIfKeyDoesNotExist;
+	private String key;
+	private boolean acceptIfKeyExists;
+	private boolean denyIfKeyDoesNotExist;
 
-    public void setKey(String key) {
-        this.key = key;
-    }
+	public void setKey(String key) {
+		this.key = key;
+	}
 
-    public void setAcceptIfKeyExists(boolean acceptIfKeyExists) {
-        this.acceptIfKeyExists = acceptIfKeyExists;
-    }
+	public void setAcceptIfKeyExists(boolean acceptIfKeyExists) {
+		this.acceptIfKeyExists = acceptIfKeyExists;
+	}
 
-    public void setDenyIfKeyDoesNotExist(boolean denyIfKeyDoesNotExist) {
-        this.denyIfKeyDoesNotExist = denyIfKeyDoesNotExist;
-    }
+	public void setDenyIfKeyDoesNotExist(boolean denyIfKeyDoesNotExist) {
+		this.denyIfKeyDoesNotExist = denyIfKeyDoesNotExist;
+	}
 
-    @Override
-    public Result filter(final LogEvent event) {
-        return filter();
-    }
+	@Override
+	public Result filter(final LogEvent event) {
+		return filter();
+	}
 
-    @Override
-    public Result filter(final Logger logger, final Level level, final Marker marker, final Message msg,
-                         final Throwable t) {
-        return filter();
-    }
+	@Override
+	public Result filter(final Logger logger, final Level level, final Marker marker, final Message msg,
+			     final Throwable t) {
+		return filter();
+	}
 
-    @Override
-    public Result filter(final Logger logger, final Level level, final Marker marker, final Object msg,
-                         final Throwable t) {
-        return filter();
-    }
+	@Override
+	public Result filter(final Logger logger, final Level level, final Marker marker, final Object msg,
+			     final Throwable t) {
+		return filter();
+	}
 
-    @Override
-    public Result filter(final Logger logger, final Level level, final Marker marker, final String msg,
-                         final Object... params) {
-        return filter();
-    }
+	@Override
+	public Result filter(final Logger logger, final Level level, final Marker marker, final String msg,
+			     final Object... params) {
+		return filter();
+	}
 
-    public Result filter() {
-        if (key == null) {
-            return Result.NEUTRAL;
-        }
+	public Result filter() {
+		if (key == null) {
+			return Result.NEUTRAL;
+		}
 
-        if (ThreadContext.get(key) != null) {
-            if (acceptIfKeyExists) {
-                return Result.ACCEPT;
-            } else {
-                return Result.DENY;
-            }
-        } else {
-            if (denyIfKeyDoesNotExist) {
-                return Result.DENY;
-            } else {
-                return Result.NEUTRAL;
-            }
-        }
-    }
+		if (ThreadContext.get(key) != null) {
+			if (acceptIfKeyExists) {
+				return Result.ACCEPT;
+			} else {
+				return Result.DENY;
+			}
+		} else {
+			if (denyIfKeyDoesNotExist) {
+				return Result.DENY;
+			} else {
+				return Result.NEUTRAL;
+			}
+		}
+	}
 
-    @PluginFactory
-    public static ThreadContextKeyExistsFilter createFilter(
-        @PluginAttribute(value = "key") String key,
-        @PluginAttribute(value = "acceptIfKeyExists") boolean acceptIfKeyExists,
-        @PluginAttribute(value = "denyIfKeyDoesNotExist") boolean denyIfKeyDoesNotExist) {
-        ThreadContextKeyExistsFilter filter = new ThreadContextKeyExistsFilter();
-        filter.setKey(key);
-        filter.setAcceptIfKeyExists(acceptIfKeyExists);
-        filter.setDenyIfKeyDoesNotExist(denyIfKeyDoesNotExist);
-        return filter;
-    }
+	@PluginFactory
+	public static ThreadContextKeyExistsFilter createFilter(
+		@PluginAttribute(value = "key") String key,
+		@PluginAttribute(value = "acceptIfKeyExists") boolean acceptIfKeyExists,
+		@PluginAttribute(value = "denyIfKeyDoesNotExist") boolean denyIfKeyDoesNotExist) {
+		ThreadContextKeyExistsFilter filter = new ThreadContextKeyExistsFilter();
+		filter.setKey(key);
+		filter.setAcceptIfKeyExists(acceptIfKeyExists);
+		filter.setDenyIfKeyDoesNotExist(denyIfKeyDoesNotExist);
+		return filter;
+	}
 
 }

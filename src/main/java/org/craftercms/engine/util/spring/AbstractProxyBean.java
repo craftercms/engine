@@ -21,18 +21,18 @@ package org.craftercms.engine.util.spring;
  */
 public abstract class AbstractProxyBean<T> {
 
-    protected ApplicationContextAccessor applicationContext;
-    protected String beanName;
+	protected ApplicationContextAccessor applicationContext;
+	protected String beanName;
 
-    public AbstractProxyBean(ApplicationContextAccessor applicationContext, String beanName) {
-        this.applicationContext = applicationContext;
-        this.beanName = beanName;
-    }
+	public AbstractProxyBean(ApplicationContextAccessor applicationContext, String beanName) {
+		this.applicationContext = applicationContext;
+		this.beanName = beanName;
+	}
 
-    protected T getBean() {
-        return applicationContext.get(beanName, getBeanClass());
-    }
+	protected T getBean() {
+		return applicationContext.get(beanName, getBeanClass());
+	}
 
-    protected abstract Class<? extends T> getBeanClass();
+	protected abstract Class<? extends T> getBeanClass();
 
 }

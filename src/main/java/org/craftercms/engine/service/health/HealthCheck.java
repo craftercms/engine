@@ -19,11 +19,11 @@ package org.craftercms.engine.service.health;
  * Represents a site health check.
  */
 public interface HealthCheck {
-    /**
-     * Performs a site health check.
-     *
-     * @param site the site to check.
-     * @return true if the given site passes the check, false otherwise.
-     */
-    boolean checkHealth(String site);
+	/**
+	 * Performs a site health check.
+	 *
+	 * @param site the site to check.
+	 * @return true if the given site passes the check, false otherwise.
+	 */
+	boolean checkHealth(String site);
 }

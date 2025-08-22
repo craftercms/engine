@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2025 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -15,16 +15,16 @@
  */
 package org.craftercms.engine.http.impl;
 
-import java.io.IOException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.craftercms.commons.http.HttpUtils;
 import org.craftercms.core.util.ExceptionUtils;
 import org.craftercms.engine.exception.HttpStatusCodeAwareException;
+import org.craftercms.engine.exception.PreviewAccessException;
 import org.craftercms.engine.http.ExceptionHandler;
+
+import java.io.IOException;
 
 import static org.craftercms.commons.http.HttpUtils.getFullRequestUri;
 import static org.craftercms.commons.lang.UrlUtils.cleanUrlForLog;
@@ -36,24 +36,41 @@ import static org.craftercms.commons.lang.UrlUtils.cleanUrlForLog;
  */
 public class HttpStatusCodeAwareExceptionHandler implements ExceptionHandler {
 
-    private static final Log logger = LogFactory.getLog(HttpStatusCodeAwareExceptionHandler.class);
+	private static final Log logger = LogFactory.getLog(HttpStatusCodeAwareExceptionHandler.class);
 
-    @Override
-    public boolean handle(HttpServletRequest request, HttpServletResponse response, Exception ex) throws IOException {
-        HttpStatusCodeAwareException httpStatusCodeAwareEx =
-            ExceptionUtils.getThrowableOfType(ex, HttpStatusCodeAwareException.class);
+	@Override
+	public boolean handle(HttpServletRequest request, HttpServletResponse response, Exception ex) throws IOException {
+		HttpStatusCodeAwareException httpStatusCodeAwareEx =
+			ExceptionUtils.getThrowableOfType(ex, HttpStatusCodeAwareException.class);
 
-        if (httpStatusCodeAwareEx != null) {
-            ex = (Exception) httpStatusCodeAwareEx;
+		if (httpStatusCodeAwareEx == null) {
+			return false;
+		}
 
-            logger.error(request.getMethod() + " " + cleanUrlForLog(getFullRequestUri(request, true)) + " failed", ex);
+		String message = String.format("%s %s failed", request.getMethod(), cleanUrlForLog(getFullRequestUri(request, true)));
+		if (httpStatusCodeAwareEx instanceof PreviewAccessException previewException) {
+			logger.debug(message, previewException);
+		} else {
+			ex = (Exception) httpStatusCodeAwareEx;
+			logger.error(message, ex);
+		}
 
-            response.sendError(httpStatusCodeAwareEx.getStatusCode(), ex.getMessage());
+		response.sendError(httpStatusCodeAwareEx.getStatusCode(), getResponseMessage(ex));
+		return true;
+	}
 
-            return true;
-        }
+	/**
+	 * Get a response message key depends on the exception to resolve by the template
+	 *
+	 * @param ex the exception
+	 * @return response message
+	 */
+	private static String getResponseMessage(Exception ex) {
+		if (ex instanceof PreviewAccessException) {
+			return PreviewAccessException.class.getSimpleName();
+		}
 
-        return false;
-    }
+		return ex.getMessage();
+	}
 
 }

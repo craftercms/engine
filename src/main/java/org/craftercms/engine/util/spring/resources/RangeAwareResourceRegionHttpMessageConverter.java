@@ -44,104 +44,104 @@ import java.util.Collection;
  */
 public class RangeAwareResourceRegionHttpMessageConverter extends ResourceRegionHttpMessageConverter {
 
-    @Override
-    @SuppressWarnings("unchecked")
-    protected void writeInternal(Object object, Type type, HttpOutputMessage outputMessage)
-            throws IOException, HttpMessageNotWritableException {
-        if (object instanceof ResourceRegion) {
-            writeResourceRegion((ResourceRegion) object, outputMessage);
-        } else {
-            Collection<ResourceRegion> regions = (Collection<ResourceRegion>) object;
-            if (regions.size() == 1) {
-                writeResourceRegion(regions.iterator().next(), outputMessage);
-            } else {
-                writeResourceRegionCollection((Collection<ResourceRegion>) object, outputMessage);
-            }
-        }
-    }
+	@Override
+	@SuppressWarnings("unchecked")
+	protected void writeInternal(Object object, Type type, HttpOutputMessage outputMessage)
+		throws IOException, HttpMessageNotWritableException {
+		if (object instanceof ResourceRegion) {
+			writeResourceRegion((ResourceRegion) object, outputMessage);
+		} else {
+			Collection<ResourceRegion> regions = (Collection<ResourceRegion>) object;
+			if (regions.size() == 1) {
+				writeResourceRegion(regions.iterator().next(), outputMessage);
+			} else {
+				writeResourceRegionCollection((Collection<ResourceRegion>) object, outputMessage);
+			}
+		}
+	}
 
 
-    protected void writeResourceRegion(ResourceRegion region, HttpOutputMessage outputMessage) throws IOException {
-        Assert.notNull(region, "ResourceRegion must not be null");
-        HttpHeaders responseHeaders = outputMessage.getHeaders();
+	protected void writeResourceRegion(ResourceRegion region, HttpOutputMessage outputMessage) throws IOException {
+		Assert.notNull(region, "ResourceRegion must not be null");
+		HttpHeaders responseHeaders = outputMessage.getHeaders();
 
-        long start = region.getPosition();
-        long end = start + region.getCount() - 1;
-        Long resourceLength = region.getResource().contentLength();
-        end = Math.min(end, resourceLength - 1);
-        long rangeLength = end - start + 1;
-        responseHeaders.add("Content-Range", "bytes " + start + '-' + end + '/' + resourceLength);
-        responseHeaders.setContentLength(rangeLength);
+		long start = region.getPosition();
+		long end = start + region.getCount() - 1;
+		Long resourceLength = region.getResource().contentLength();
+		end = Math.min(end, resourceLength - 1);
+		long rangeLength = end - start + 1;
+		responseHeaders.add("Content-Range", "bytes " + start + '-' + end + '/' + resourceLength);
+		responseHeaders.setContentLength(rangeLength);
 
-        InputStream in = null;
-        try {
-            Resource resource = region.getResource();
-            if (resource instanceof RangeAwareResource) {
-                in = ((RangeAwareResource) resource).getInputStream(start, end);
-                StreamUtils.copy(in, outputMessage.getBody());
-            } else {
-                in = resource.getInputStream();
-                StreamUtils.copyRange(in, outputMessage.getBody(), start, end);
-            }
-        } finally {
-            IOUtils.closeQuietly(in);
-        }
-    }
+		InputStream in = null;
+		try {
+			Resource resource = region.getResource();
+			if (resource instanceof RangeAwareResource) {
+				in = ((RangeAwareResource) resource).getInputStream(start, end);
+				StreamUtils.copy(in, outputMessage.getBody());
+			} else {
+				in = resource.getInputStream();
+				StreamUtils.copyRange(in, outputMessage.getBody(), start, end);
+			}
+		} finally {
+			IOUtils.closeQuietly(in);
+		}
+	}
 
-    protected void writeResourceRegionCollection(Collection<ResourceRegion> resourceRegions,
-                                                 HttpOutputMessage outputMessage) throws IOException {
-        Assert.notNull(resourceRegions, "Collection of ResourceRegion should not be null");
-        HttpHeaders responseHeaders = outputMessage.getHeaders();
+	protected void writeResourceRegionCollection(Collection<ResourceRegion> resourceRegions,
+						     HttpOutputMessage outputMessage) throws IOException {
+		Assert.notNull(resourceRegions, "Collection of ResourceRegion should not be null");
+		HttpHeaders responseHeaders = outputMessage.getHeaders();
 
-        MediaType contentType = responseHeaders.getContentType();
-        String boundaryString = MimeTypeUtils.generateMultipartBoundaryString();
-        responseHeaders.set(HttpHeaders.CONTENT_TYPE, "multipart/byteranges; boundary=" + boundaryString);
-        OutputStream out = outputMessage.getBody();
+		MediaType contentType = responseHeaders.getContentType();
+		String boundaryString = MimeTypeUtils.generateMultipartBoundaryString();
+		responseHeaders.set(HttpHeaders.CONTENT_TYPE, "multipart/byteranges; boundary=" + boundaryString);
+		OutputStream out = outputMessage.getBody();
 
-        for (ResourceRegion region : resourceRegions) {
-            long start = region.getPosition();
-            long end = start + region.getCount() - 1;
-            InputStream in = null;
-            try {
-                // Writing MIME header.
-                println(out);
-                print(out, "--" + boundaryString);
-                println(out);
-                if (contentType != null) {
-                    print(out, "Content-Type: " + contentType.toString());
-                    println(out);
-                }
-                Long resourceLength = region.getResource().contentLength();
-                end = Math.min(end, resourceLength - 1);
-                print(out, "Content-Range: bytes " + start + '-' + end + '/' + resourceLength);
-                println(out);
-                println(out);
+		for (ResourceRegion region : resourceRegions) {
+			long start = region.getPosition();
+			long end = start + region.getCount() - 1;
+			InputStream in = null;
+			try {
+				// Writing MIME header.
+				println(out);
+				print(out, "--" + boundaryString);
+				println(out);
+				if (contentType != null) {
+					print(out, "Content-Type: " + contentType.toString());
+					println(out);
+				}
+				Long resourceLength = region.getResource().contentLength();
+				end = Math.min(end, resourceLength - 1);
+				print(out, "Content-Range: bytes " + start + '-' + end + '/' + resourceLength);
+				println(out);
+				println(out);
 
-                // Printing content
-                Resource resource = region.getResource();
-                if (resource instanceof RangeAwareResource) {
-                    in = ((RangeAwareResource) resource).getInputStream(start, end);
-                    StreamUtils.copy(in, out);
-                } else {
-                    in = resource.getInputStream();
-                    StreamUtils.copyRange(in, out, start, end);
-                }
-            } finally {
-                IOUtils.closeQuietly(in);
-            }
-        }
+				// Printing content
+				Resource resource = region.getResource();
+				if (resource instanceof RangeAwareResource) {
+					in = ((RangeAwareResource) resource).getInputStream(start, end);
+					StreamUtils.copy(in, out);
+				} else {
+					in = resource.getInputStream();
+					StreamUtils.copyRange(in, out, start, end);
+				}
+			} finally {
+				IOUtils.closeQuietly(in);
+			}
+		}
 
-        println(out);
-        print(out, "--" + boundaryString + "--");
-    }
+		println(out);
+		print(out, "--" + boundaryString + "--");
+	}
 
-    protected void println(OutputStream os) throws IOException {
-        os.write('\r');
-        os.write('\n');
-    }
+	protected void println(OutputStream os) throws IOException {
+		os.write('\r');
+		os.write('\n');
+	}
 
-    protected void print(OutputStream os, String buf) throws IOException {
-        os.write(buf.getBytes(StandardCharsets.US_ASCII));
-    }
+	protected void print(OutputStream os, String buf) throws IOException {
+		os.write(buf.getBytes(StandardCharsets.US_ASCII));
+	}
 
 }

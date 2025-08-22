@@ -42,48 +42,48 @@ import static org.mockito.Mockito.when;
  */
 public class FolderBasedScriptJobResolverTest {
 
-    private static final String HOURLY_CRON_EXPRESSION = "0 0 * * * ?";
+	private static final String HOURLY_CRON_EXPRESSION = "0 0 * * * ?";
 
-    @Mock
-    private ContentStoreService storeService;
-    @Mock
-    private SiteContext siteContext;
-    private FolderBasedScriptJobResolver resolver;
+	@Mock
+	private ContentStoreService storeService;
+	@Mock
+	private SiteContext siteContext;
+	private FolderBasedScriptJobResolver resolver;
 
-    @Before
-    public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+	@Before
+	public void setUp() throws Exception {
+		MockitoAnnotations.initMocks(this);
 
-        setUpStoreService(storeService);
-        setUpSiteContext(siteContext, storeService);
+		setUpStoreService(storeService);
+		setUpSiteContext(siteContext, storeService);
 
-        resolver = new FolderBasedScriptJobResolver(".groovy", "/scripts/jobs", HOURLY_CRON_EXPRESSION);
-    }
+		resolver = new FolderBasedScriptJobResolver(".groovy", "/scripts/jobs", HOURLY_CRON_EXPRESSION);
+	}
 
-    @Test
-    public void testResolveJobs() throws Exception {
-        List<JobContext> jobContexts = resolver.resolveJobs(siteContext);
+	@Test
+	public void testResolveJobs() throws Exception {
+		List<JobContext> jobContexts = resolver.resolveJobs(siteContext);
 
-        assertNotNull(jobContexts);
-        assertEquals(1, jobContexts.size());
+		assertNotNull(jobContexts);
+		assertEquals(1, jobContexts.size());
 
-        JobDetailImpl jobDetail = (JobDetailImpl)jobContexts.get(0).getDetail();
-        CronTrigger trigger = (CronTrigger)jobContexts.get(0).getTrigger();
+		JobDetailImpl jobDetail = (JobDetailImpl) jobContexts.get(0).getDetail();
+		CronTrigger trigger = (CronTrigger) jobContexts.get(0).getTrigger();
 
-        assertEquals(ScriptJob.class, jobDetail.getJobClass());
-        assertEquals("/scripts/jobs/testJob.groovy",
-                     jobDetail.getJobDataMap().getString(ScriptJob.SCRIPT_URL_DATA_KEY));
-        assertEquals(HOURLY_CRON_EXPRESSION, trigger.getCronExpression());
-    }
+		assertEquals(ScriptJob.class, jobDetail.getJobClass());
+		assertEquals("/scripts/jobs/testJob.groovy",
+			jobDetail.getJobDataMap().getString(ScriptJob.SCRIPT_URL_DATA_KEY));
+		assertEquals(HOURLY_CRON_EXPRESSION, trigger.getCronExpression());
+	}
 
-    private void setUpStoreService(ContentStoreService storeService) {
-        ContentStoreServiceMockUtils.setUpGetContentFromClassPath(storeService);
-    }
+	private void setUpStoreService(ContentStoreService storeService) {
+		ContentStoreServiceMockUtils.setUpGetContentFromClassPath(storeService);
+	}
 
-    private void setUpSiteContext(SiteContext siteContext, ContentStoreService storeService) throws Exception {
-        when(siteContext.getSiteName()).thenReturn("default");
-        when(siteContext.getContext()).thenReturn(mock(Context.class));
-        when(siteContext.getStoreService()).thenReturn(storeService);
-    }
+	private void setUpSiteContext(SiteContext siteContext, ContentStoreService storeService) throws Exception {
+		when(siteContext.getSiteName()).thenReturn("default");
+		when(siteContext.getContext()).thenReturn(mock(Context.class));
+		when(siteContext.getStoreService()).thenReturn(storeService);
+	}
 
 }

@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
@@ -43,51 +44,51 @@ import org.craftercms.engine.util.GroovyScriptUtils;
  */
 public class ScriptFilterChainImpl implements FilterChain {
 
-    private static final Log logger = LogFactory.getLog(ScriptFilterChainImpl.class);
+	private static final Log logger = LogFactory.getLog(ScriptFilterChainImpl.class);
 
-    private Iterator<Script> scriptIterator;
-    private FilterChain delegateChain;
-    private ServletContext servletContext;
-    private PluginService pluginService;
+	private Iterator<Script> scriptIterator;
+	private FilterChain delegateChain;
+	private ServletContext servletContext;
+	private PluginService pluginService;
 
-    public ScriptFilterChainImpl(Iterator<Script> scriptIterator, FilterChain delegateChain,
-                                 ServletContext servletContext, PluginService pluginService) {
-        this.scriptIterator = scriptIterator;
-        this.delegateChain = delegateChain;
-        this.servletContext = servletContext;
-        this.pluginService = pluginService;
-    }
+	public ScriptFilterChainImpl(Iterator<Script> scriptIterator, FilterChain delegateChain,
+				     ServletContext servletContext, PluginService pluginService) {
+		this.scriptIterator = scriptIterator;
+		this.delegateChain = delegateChain;
+		this.servletContext = servletContext;
+		this.pluginService = pluginService;
+	}
 
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response) throws IOException, ServletException {
-        if (scriptIterator.hasNext()){
-            Script script = scriptIterator.next();
+	@Override
+	public void doFilter(ServletRequest request, ServletResponse response) throws IOException, ServletException {
+		if (scriptIterator.hasNext()) {
+			Script script = scriptIterator.next();
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("Executing filter script at " + script.getUrl());
-            }
+			if (logger.isDebugEnabled()) {
+				logger.debug("Executing filter script at " + script.getUrl());
+			}
 
-            HttpServletRequest httpRequest = (HttpServletRequest)request;
-            HttpServletResponse httpResponse = (HttpServletResponse)response;
-            Map<String, Object> variables = new HashMap<>();
+			HttpServletRequest httpRequest = (HttpServletRequest) request;
+			HttpServletResponse httpResponse = (HttpServletResponse) response;
+			Map<String, Object> variables = new HashMap<>();
 
-            GroovyScriptUtils.addFilterScriptVariables(variables, httpRequest, httpResponse, servletContext, this);
+			GroovyScriptUtils.addFilterScriptVariables(variables, httpRequest, httpResponse, servletContext, this);
 
-            pluginService.addPluginVariables(script.getUrl(), variables::put);
+			pluginService.addPluginVariables(script.getUrl(), variables::put);
 
-            try {
-                script.execute(variables);
-            } catch (ScriptException e) {
-                Throwable cause = e.getCause();
-                if (cause instanceof ServletException) {
-                    throw (ServletException)cause;
-                } else {
-                    throw new ServletException("Error executing filter script at " + script.getUrl(), cause);
-                }
-            }
-        } else {
-            delegateChain.doFilter(request, response);
-        }
-    }
+			try {
+				script.execute(variables);
+			} catch (ScriptException e) {
+				Throwable cause = e.getCause();
+				if (cause instanceof ServletException) {
+					throw (ServletException) cause;
+				} else {
+					throw new ServletException("Error executing filter script at " + script.getUrl(), cause);
+				}
+			}
+		} else {
+			delegateChain.doFilter(request, response);
+		}
+	}
 
 }

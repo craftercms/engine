@@ -44,159 +44,159 @@ import static org.craftercms.engine.graphql.SchemaUtils.*;
  */
 public class GraphQLTypeFactoryImpl implements GraphQLTypeFactory {
 
-    private static final Logger logger = LoggerFactory.getLogger(GraphQLTypeFactoryImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(GraphQLTypeFactoryImpl.class);
 
-    public static final String CONTENT_TYPE_REGEX_PAGE = "^/?page/.*$";
+	public static final String CONTENT_TYPE_REGEX_PAGE = "^/?page/.*$";
 
-    /**
-     * The name for the root Query type
-     */
-    protected String rootQueryTypeName;
+	/**
+	 * The name for the root Query type
+	 */
+	protected String rootQueryTypeName;
 
-    /**
-     * The list of fields that should not be added to the {@link GraphQLSchema}
-     */
-    protected String[] ignoredFields;
+	/**
+	 * The list of fields that should not be added to the {@link GraphQLSchema}
+	 */
+	protected String[] ignoredFields;
 
-    /**
-     * XPath selectors for the content-type definition file
-     */
-    protected String contentTypeNameXPath;
-    protected String contentTypeTitleXPath;
-    protected String contentTypeFieldsXPath;
-    protected String contentTypeFieldIdXPath;
-    protected String contentTypeFieldTypeXPath;
-    protected String contentTypeFieldTitleXPath;
+	/**
+	 * XPath selectors for the content-type definition file
+	 */
+	protected String contentTypeNameXPath;
+	protected String contentTypeTitleXPath;
+	protected String contentTypeFieldsXPath;
+	protected String contentTypeFieldIdXPath;
+	protected String contentTypeFieldTypeXPath;
+	protected String contentTypeFieldTitleXPath;
 
-    /**
-     * All known field factories to use during type build
-     */
-    protected Map<String, GraphQLFieldFactory> fieldFactories;
+	/**
+	 * All known field factories to use during type build
+	 */
+	protected Map<String, GraphQLFieldFactory> fieldFactories;
 
-    /**
-     * Custom {@link DataFetcher}s to use for specific fields
-     */
-    protected Map<String, DataFetcher> customFetchers;
+	/**
+	 * Custom {@link DataFetcher}s to use for specific fields
+	 */
+	protected Map<String, DataFetcher> customFetchers;
 
-    public GraphQLTypeFactoryImpl(final Map<String, DataFetcher> customFetchers, final String rootQueryTypeName,
-                                  final String[] ignoredFields, final String contentTypeNameXPath,
-                                  final String contentTypeTitleXPath, final String contentTypeFieldsXPath,
-                                  final String contentTypeFieldIdXPath, final String contentTypeFieldTypeXPath,
-                                  final String contentTypeFieldTitleXPath) {
-        this.customFetchers = customFetchers;
-        this.rootQueryTypeName = rootQueryTypeName;
-        this.ignoredFields = ignoredFields;
-        this.contentTypeNameXPath = contentTypeNameXPath;
-        this.contentTypeTitleXPath = contentTypeTitleXPath;
-        this.contentTypeFieldsXPath = contentTypeFieldsXPath;
-        this.contentTypeFieldIdXPath = contentTypeFieldIdXPath;
-        this.contentTypeFieldTypeXPath = contentTypeFieldTypeXPath;
-        this.contentTypeFieldTitleXPath = contentTypeFieldTitleXPath;
-    }
+	public GraphQLTypeFactoryImpl(final Map<String, DataFetcher> customFetchers, final String rootQueryTypeName,
+				      final String[] ignoredFields, final String contentTypeNameXPath,
+				      final String contentTypeTitleXPath, final String contentTypeFieldsXPath,
+				      final String contentTypeFieldIdXPath, final String contentTypeFieldTypeXPath,
+				      final String contentTypeFieldTitleXPath) {
+		this.customFetchers = customFetchers;
+		this.rootQueryTypeName = rootQueryTypeName;
+		this.ignoredFields = ignoredFields;
+		this.contentTypeNameXPath = contentTypeNameXPath;
+		this.contentTypeTitleXPath = contentTypeTitleXPath;
+		this.contentTypeFieldsXPath = contentTypeFieldsXPath;
+		this.contentTypeFieldIdXPath = contentTypeFieldIdXPath;
+		this.contentTypeFieldTypeXPath = contentTypeFieldTypeXPath;
+		this.contentTypeFieldTitleXPath = contentTypeFieldTitleXPath;
+	}
 
-    @Autowired
-    public void setFieldFactories(@Lazy final Map<String, GraphQLFieldFactory> fieldFactories) {
-        this.fieldFactories = fieldFactories;
-    }
+	@Autowired
+	public void setFieldFactories(@Lazy final Map<String, GraphQLFieldFactory> fieldFactories) {
+		this.fieldFactories = fieldFactories;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void createType(Item formDefinition, GraphQLObjectType.Builder rootGraphQLType,
-                           GraphQLCodeRegistry.Builder codeRegistry, DataFetcher<?> dataFetcher,
-                           Map<String, GraphQLObjectType.Builder> siteTypes) {
-        logger.debug("Creating GraphQL Type from '{}'", formDefinition.getUrl());
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void createType(Item formDefinition, GraphQLObjectType.Builder rootGraphQLType,
+			       GraphQLCodeRegistry.Builder codeRegistry, DataFetcher<?> dataFetcher,
+			       Map<String, GraphQLObjectType.Builder> siteTypes) {
+		logger.debug("Creating GraphQL Type from '{}'", formDefinition.getUrl());
 
-        Document contentTypeDefinition = formDefinition.getDescriptorDom();
-        String contentTypeName = XmlUtils.selectSingleNodeValue(contentTypeDefinition, contentTypeNameXPath);
-        String graphQLTypeName = getGraphQLName(contentTypeName);
+		Document contentTypeDefinition = formDefinition.getDescriptorDom();
+		String contentTypeName = XmlUtils.selectSingleNodeValue(contentTypeDefinition, contentTypeNameXPath);
+		String graphQLTypeName = getGraphQLName(contentTypeName);
 
-        logger.debug("Creating GraphQL Type '{}' for '{}'", graphQLTypeName, contentTypeName);
+		logger.debug("Creating GraphQL Type '{}' for '{}'", graphQLTypeName, contentTypeName);
 
-        GraphQLObjectType.Builder graphQLType = GraphQLObjectType.newObject()
-            .withInterface(CONTENT_ITEM_INTERFACE_TYPE)
-            .name(graphQLTypeName)
-            .description(XmlUtils.selectSingleNodeValue(contentTypeDefinition, contentTypeTitleXPath));
+		GraphQLObjectType.Builder graphQLType = GraphQLObjectType.newObject()
+			.withInterface(CONTENT_ITEM_INTERFACE_TYPE)
+			.name(graphQLTypeName)
+			.description(XmlUtils.selectSingleNodeValue(contentTypeDefinition, contentTypeTitleXPath));
 
-        // Add commons fields
-        graphQLType.fields(CONTENT_ITEM_FIELDS);
+		// Add commons fields
+		graphQLType.fields(CONTENT_ITEM_FIELDS);
 
-        if (contentTypeName.matches(CONTENT_TYPE_REGEX_PAGE)) {
-            graphQLType.withInterface(PAGE_INTERFACE_TYPE);
-            graphQLType.fields(PAGE_FIELDS);
-        }
+		if (contentTypeName.matches(CONTENT_TYPE_REGEX_PAGE)) {
+			graphQLType.withInterface(PAGE_INTERFACE_TYPE);
+			graphQLType.fields(PAGE_FIELDS);
+		}
 
-        // Add the type builder so it's available later to the customizer
-        siteTypes.put(graphQLTypeName, graphQLType);
+		// Add the type builder so it's available later to the customizer
+		siteTypes.put(graphQLTypeName, graphQLType);
 
-        List<Node> contentTypeFields = XmlUtils.selectNodes(contentTypeDefinition, contentTypeFieldsXPath,
-                                                            Collections.emptyMap());
-        // Add the content-type specific fields
-        if (CollectionUtils.isNotEmpty(contentTypeFields)) {
-            for(Node contentTypeField : contentTypeFields) {
-                createField(contentTypeDefinition, contentTypeField, graphQLTypeName, graphQLType);
-            }
-        }
+		List<Node> contentTypeFields = XmlUtils.selectNodes(contentTypeDefinition, contentTypeFieldsXPath,
+			Collections.emptyMap());
+		// Add the content-type specific fields
+		if (CollectionUtils.isNotEmpty(contentTypeFields)) {
+			for (Node contentTypeField : contentTypeFields) {
+				createField(contentTypeDefinition, contentTypeField, graphQLTypeName, graphQLType);
+			}
+		}
 
-        // Create a wrapper type for the queries of the content-type
-        GraphQLType queryType = createQueryWrapperType(graphQLTypeName, "Query for content-type " + contentTypeName);
+		// Create a wrapper type for the queries of the content-type
+		GraphQLType queryType = createQueryWrapperType(graphQLTypeName, "Query for content-type " + contentTypeName);
 
-        // Add a field in the root type
-        rootGraphQLType.field(GraphQLFieldDefinition.newFieldDefinition()
-                                                    .name(graphQLTypeName)
-                                                    .description("Items of content-type " + contentTypeName)
-                                                    .type(nonNull(queryType))
-                                                    .arguments(TYPE_ARGUMENTS)
-                             );
+		// Add a field in the root type
+		rootGraphQLType.field(GraphQLFieldDefinition.newFieldDefinition()
+			.name(graphQLTypeName)
+			.description("Items of content-type " + contentTypeName)
+			.type(nonNull(queryType))
+			.arguments(TYPE_ARGUMENTS)
+		);
 
-        // Add the data fetcher for the new field
-        codeRegistry.dataFetcher(coordinates(rootQueryTypeName, graphQLTypeName), dataFetcher);
+		// Add the data fetcher for the new field
+		codeRegistry.dataFetcher(coordinates(rootQueryTypeName, graphQLTypeName), dataFetcher);
 
-        // Add the custom data fetchers for fields
-        if (MapUtils.isNotEmpty(customFetchers)) {
-            customFetchers.forEach((fieldName, customFetcher) -> {
-                String graphQLFieldName = getGraphQLName(fieldName);
-                if (graphQLType.hasField(graphQLFieldName)) {
-                    codeRegistry.dataFetcher(coordinates(graphQLTypeName, graphQLFieldName), customFetcher);
-                }
-            });
-        }
-    }
+		// Add the custom data fetchers for fields
+		if (MapUtils.isNotEmpty(customFetchers)) {
+			customFetchers.forEach((fieldName, customFetcher) -> {
+				String graphQLFieldName = getGraphQLName(fieldName);
+				if (graphQLType.hasField(graphQLFieldName)) {
+					codeRegistry.dataFetcher(coordinates(graphQLTypeName, graphQLFieldName), customFetcher);
+				}
+			});
+		}
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void createField(Document contentTypeDefinition, Node contentTypeField, String parentGraphQLTypeName,
-                            GraphQLObjectType.Builder parentGraphQLType) {
-        String contentTypeFieldId = XmlUtils.selectSingleNodeValue(contentTypeField, contentTypeFieldIdXPath);
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void createField(Document contentTypeDefinition, Node contentTypeField, String parentGraphQLTypeName,
+				GraphQLObjectType.Builder parentGraphQLType) {
+		String contentTypeFieldId = XmlUtils.selectSingleNodeValue(contentTypeField, contentTypeFieldIdXPath);
 
-        if (ArrayUtils.isNotEmpty(ignoredFields) && ArrayUtils.contains(ignoredFields, contentTypeFieldId)) {
-            return;
-        }
+		if (ArrayUtils.isNotEmpty(ignoredFields) && ArrayUtils.contains(ignoredFields, contentTypeFieldId)) {
+			return;
+		}
 
-        String contentTypeFieldType = XmlUtils.selectSingleNodeValue(contentTypeField, contentTypeFieldTypeXPath);
-        String graphQLFieldName = getGraphQLName(contentTypeFieldId);
+		String contentTypeFieldType = XmlUtils.selectSingleNodeValue(contentTypeField, contentTypeFieldTypeXPath);
+		String graphQLFieldName = getGraphQLName(contentTypeFieldId);
 
-        // Don't add the field again if it already exists
-        if (!parentGraphQLType.hasField(graphQLFieldName)) {
-            logger.debug("Creating GraphQL field '{}' for '{}'", graphQLFieldName, contentTypeFieldId);
+		// Don't add the field again if it already exists
+		if (!parentGraphQLType.hasField(graphQLFieldName)) {
+			logger.debug("Creating GraphQL field '{}' for '{}'", graphQLFieldName, contentTypeFieldId);
 
-            GraphQLFieldDefinition.Builder graphQLField = GraphQLFieldDefinition.newFieldDefinition()
-                .name(graphQLFieldName)
-                .description(XmlUtils.selectSingleNodeValue(contentTypeField, contentTypeFieldTitleXPath));
+			GraphQLFieldDefinition.Builder graphQLField = GraphQLFieldDefinition.newFieldDefinition()
+				.name(graphQLFieldName)
+				.description(XmlUtils.selectSingleNodeValue(contentTypeField, contentTypeFieldTitleXPath));
 
-            if (fieldFactories.containsKey(contentTypeFieldType)) {
-                fieldFactories.get(contentTypeFieldType).createField(contentTypeDefinition, contentTypeField,
-                                                                     contentTypeFieldId, parentGraphQLTypeName,
-                                                                     parentGraphQLType, graphQLFieldName, graphQLField);
-            } else {
-                setTypeFromFieldName(contentTypeFieldId, graphQLField);
-            }
+			if (fieldFactories.containsKey(contentTypeFieldType)) {
+				fieldFactories.get(contentTypeFieldType).createField(contentTypeDefinition, contentTypeField,
+					contentTypeFieldId, parentGraphQLTypeName,
+					parentGraphQLType, graphQLFieldName, graphQLField);
+			} else {
+				setTypeFromFieldName(contentTypeFieldId, graphQLField);
+			}
 
-            parentGraphQLType.field(graphQLField);
-        }
-    }
+			parentGraphQLType.field(graphQLField);
+		}
+	}
 
 }

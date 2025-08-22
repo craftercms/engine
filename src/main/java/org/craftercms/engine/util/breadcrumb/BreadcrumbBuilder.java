@@ -32,61 +32,60 @@ import org.craftercms.engine.service.context.SiteContext;
  * Helper class to create navigation breadcrumbs.
  *
  * @author Alfonso Vásquez
- *
  * @deprecated Please use instead {@link org.craftercms.engine.navigation.NavBreadcrumbBuilder}.
  */
 @Deprecated
 public class BreadcrumbBuilder {
 
-    public static final String BREADCRUMB_CONST_KEY_ELEM = "breadcrumb";
-    public static final String HOME_BREADCRUMB_NAME = "Home";
+	public static final String BREADCRUMB_CONST_KEY_ELEM = "breadcrumb";
+	public static final String HOME_BREADCRUMB_NAME = "Home";
 
-    protected CacheTemplate cacheTemplate;
-    protected SiteItemService siteItemService;
-    protected String homePath;
-    protected String breadcrumbNameXPathQuery;
+	protected CacheTemplate cacheTemplate;
+	protected SiteItemService siteItemService;
+	protected String homePath;
+	protected String breadcrumbNameXPathQuery;
 
-    public BreadcrumbBuilder(CacheTemplate cacheTemplate, final SiteItemService siteItemService, String homePath,
-                             String breadcrumbNameXPathQuery) {
-        this.cacheTemplate = cacheTemplate;
-        this.siteItemService = siteItemService;
-        this.homePath = homePath;
-        this.breadcrumbNameXPathQuery = breadcrumbNameXPathQuery;
-    }
+	public BreadcrumbBuilder(CacheTemplate cacheTemplate, final SiteItemService siteItemService, String homePath,
+				 String breadcrumbNameXPathQuery) {
+		this.cacheTemplate = cacheTemplate;
+		this.siteItemService = siteItemService;
+		this.homePath = homePath;
+		this.breadcrumbNameXPathQuery = breadcrumbNameXPathQuery;
+	}
 
-    public List<BreadcrumbItem> buildBreadcrumb(final String url) {
-        final Context context = SiteContext.getCurrent().getContext();
+	public List<BreadcrumbItem> buildBreadcrumb(final String url) {
+		final Context context = SiteContext.getCurrent().getContext();
 
-        return cacheTemplate.getObject(context, (Callback<List<BreadcrumbItem>>) () -> {
-            String indexFileName = SiteProperties.getIndexFileName();
-            CachingAwareList<BreadcrumbItem> breadcrumb = new CachingAwareList<>();
-            String breadcrumbUrl = StringUtils.substringBeforeLast(StringUtils.substringAfter(url, homePath), indexFileName);
-            String[] breadcrumbUrlComponents = breadcrumbUrl.split("/");
-            String currentUrl = homePath;
+		return cacheTemplate.getObject(context, (Callback<List<BreadcrumbItem>>) () -> {
+			String indexFileName = SiteProperties.getIndexFileName();
+			CachingAwareList<BreadcrumbItem> breadcrumb = new CachingAwareList<>();
+			String breadcrumbUrl = StringUtils.substringBeforeLast(StringUtils.substringAfter(url, homePath), indexFileName);
+			String[] breadcrumbUrlComponents = breadcrumbUrl.split("/");
+			String currentUrl = homePath;
 
-            for (String breadcrumbUrlComponent : breadcrumbUrlComponents) {
-                if (StringUtils.isNotEmpty(breadcrumbUrlComponent)) {
-                    currentUrl += "/" + breadcrumbUrlComponent;
-                }
+			for (String breadcrumbUrlComponent : breadcrumbUrlComponents) {
+				if (StringUtils.isNotEmpty(breadcrumbUrlComponent)) {
+					currentUrl += "/" + breadcrumbUrlComponent;
+				}
 
-                SiteItem siteItem = siteItemService.getSiteItem(UrlUtils.concat(currentUrl, indexFileName));
+				SiteItem siteItem = siteItemService.getSiteItem(UrlUtils.concat(currentUrl, indexFileName));
 
-                if (siteItem != null && siteItem.getDom() != null) {
-                    String breadcrumbName = siteItem.queryValue(breadcrumbNameXPathQuery);
-                    if (StringUtils.isEmpty(breadcrumbName)) {
-                        if (StringUtils.isNotEmpty(breadcrumbUrlComponent)) {
-                            breadcrumbName = StringUtils.capitalize(breadcrumbUrlComponent.replace("-", " ").replace(".xml", ""));
-                        } else {
-                            breadcrumbName = HOME_BREADCRUMB_NAME;
-                        }
-                    }
+				if (siteItem != null && siteItem.getDom() != null) {
+					String breadcrumbName = siteItem.queryValue(breadcrumbNameXPathQuery);
+					if (StringUtils.isEmpty(breadcrumbName)) {
+						if (StringUtils.isNotEmpty(breadcrumbUrlComponent)) {
+							breadcrumbName = StringUtils.capitalize(breadcrumbUrlComponent.replace("-", " ").replace(".xml", ""));
+						} else {
+							breadcrumbName = HOME_BREADCRUMB_NAME;
+						}
+					}
 
-                    breadcrumb.add(new BreadcrumbItem(currentUrl, breadcrumbName));
-                }
-            }
+					breadcrumb.add(new BreadcrumbItem(currentUrl, breadcrumbName));
+				}
+			}
 
-            return breadcrumb;
-        }, url, BREADCRUMB_CONST_KEY_ELEM);
-    }
+			return breadcrumb;
+		}, url, BREADCRUMB_CONST_KEY_ELEM);
+	}
 
 }

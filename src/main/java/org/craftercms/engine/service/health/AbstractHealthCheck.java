@@ -24,33 +24,33 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractHealthCheck implements HealthCheck {
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected final SiteContextManager contextManager;
+	protected final SiteContextManager contextManager;
 
-    public AbstractHealthCheck(final SiteContextManager contextManager) {
-        this.contextManager = contextManager;
-    }
+	public AbstractHealthCheck(final SiteContextManager contextManager) {
+		this.contextManager = contextManager;
+	}
 
-    @Override
-    public boolean checkHealth(String site) {
-        logger.debug("Check health for site: '{}'", site);
-        try {
-            boolean isValid = doCheckHealth(site);
-            logger.debug("Check health passed for site: '{}': {}", site, isValid);
-            return isValid;
-        } catch (Exception e) {
-            logger.warn("Check health failed for site: '{}'", site, e);
-            return false;
-        }
-    }
+	@Override
+	public boolean checkHealth(String site) {
+		logger.debug("Check health for site: '{}'", site);
+		try {
+			boolean isValid = doCheckHealth(site);
+			logger.debug("Check health passed for site: '{}': {}", site, isValid);
+			return isValid;
+		} catch (Exception e) {
+			logger.warn("Check health failed for site: '{}'", site, e);
+			return false;
+		}
+	}
 
-    /**
-     * Performs the actual health check.
-     *
-     * @param site the site to check.
-     * @return true if the site is healthy, false otherwise.
-     */
-    protected abstract boolean doCheckHealth(String site);
+	/**
+	 * Performs the actual health check.
+	 *
+	 * @param site the site to check.
+	 * @return true if the site is healthy, false otherwise.
+	 */
+	protected abstract boolean doCheckHealth(String site);
 
 }

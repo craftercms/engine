@@ -29,66 +29,66 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
  */
 public class CrafterFreeMarkerViewResolver extends FreeMarkerViewResolver {
 
-    protected SiteItemService siteItemService;
-    protected String componentTemplateXPathQuery;
-    protected String componentIncludeElementName;
-    protected String componentEmbeddedElementName;
-    protected SiteItemScriptResolver componentScriptResolver;
-    protected PluginService pluginService;
+	protected SiteItemService siteItemService;
+	protected String componentTemplateXPathQuery;
+	protected String componentIncludeElementName;
+	protected String componentEmbeddedElementName;
+	protected SiteItemScriptResolver componentScriptResolver;
+	protected PluginService pluginService;
 
-    /**
-     * Indicates if access for static methods should be allowed in Freemarker templates
-     */
-    protected boolean enableStatics;
+	/**
+	 * Indicates if access for static methods should be allowed in Freemarker templates
+	 */
+	protected boolean enableStatics;
 
-    public void setSiteItemService(SiteItemService siteItemService) {
-        this.siteItemService = siteItemService;
-    }
+	public void setSiteItemService(SiteItemService siteItemService) {
+		this.siteItemService = siteItemService;
+	}
 
-    public void setComponentTemplateXPathQuery(String componentTemplateXPathQuery) {
-        this.componentTemplateXPathQuery = componentTemplateXPathQuery;
-    }
+	public void setComponentTemplateXPathQuery(String componentTemplateXPathQuery) {
+		this.componentTemplateXPathQuery = componentTemplateXPathQuery;
+	}
 
-    public void setComponentIncludeElementName(String componentIncludeElementName) {
-        this.componentIncludeElementName = componentIncludeElementName;
-    }
+	public void setComponentIncludeElementName(String componentIncludeElementName) {
+		this.componentIncludeElementName = componentIncludeElementName;
+	}
 
-    public void setComponentEmbeddedElementName(final String componentEmbeddedElementName) {
-        this.componentEmbeddedElementName = componentEmbeddedElementName;
-    }
+	public void setComponentEmbeddedElementName(final String componentEmbeddedElementName) {
+		this.componentEmbeddedElementName = componentEmbeddedElementName;
+	}
 
-    public void setComponentScriptResolver(SiteItemScriptResolver componentScriptResolver) {
-        this.componentScriptResolver = componentScriptResolver;
-    }
+	public void setComponentScriptResolver(SiteItemScriptResolver componentScriptResolver) {
+		this.componentScriptResolver = componentScriptResolver;
+	}
 
-    public void setEnableStatics(boolean enableStatics) {
-        this.enableStatics = enableStatics;
-    }
+	public void setEnableStatics(boolean enableStatics) {
+		this.enableStatics = enableStatics;
+	}
 
-    public void setPluginService(PluginService pluginService) {
-        this.pluginService = pluginService;
-    }
+	public void setPluginService(PluginService pluginService) {
+		this.pluginService = pluginService;
+	}
 
-    @Override
-    @NonNull
-    protected Class<?> requiredViewClass() {
-        return CrafterFreeMarkerView.class;
-    }
+	@Override
+	@NonNull
+	protected Class<?> requiredViewClass() {
+		return CrafterFreeMarkerView.class;
+	}
 
-    @Override
-    @NonNull
-    protected AbstractUrlBasedView buildView(@NonNull String viewName) throws Exception {
-        CrafterFreeMarkerView view = (CrafterFreeMarkerView) super.buildView(viewName);
-        view.setSiteItemService(siteItemService);
-        view.setComponentTemplateXPathQuery(componentTemplateXPathQuery);
-        view.setComponentTemplateNamePrefix(getPrefix());
-        view.setComponentTemplateNameSuffix(getSuffix());
-        view.setComponentIncludeElementName(componentIncludeElementName);
-        view.setComponentEmbeddedElementName(componentEmbeddedElementName);
-        view.setComponentScriptResolver(componentScriptResolver);
-        view.setEnableStatics(enableStatics);
-        view.setPluginService(pluginService);
+	@Override
+	@NonNull
+	protected AbstractUrlBasedView buildView(@NonNull String viewName) throws Exception {
+		CrafterFreeMarkerView view = (CrafterFreeMarkerView) super.buildView(viewName);
+		view.setSiteItemService(siteItemService);
+		view.setComponentTemplateXPathQuery(componentTemplateXPathQuery);
+		view.setComponentTemplateNamePrefix(getPrefix());
+		view.setComponentTemplateNameSuffix(getSuffix());
+		view.setComponentIncludeElementName(componentIncludeElementName);
+		view.setComponentEmbeddedElementName(componentEmbeddedElementName);
+		view.setComponentScriptResolver(componentScriptResolver);
+		view.setEnableStatics(enableStatics);
+		view.setPluginService(pluginService);
 
-        return view;
-    }
+		return view;
+	}
 }

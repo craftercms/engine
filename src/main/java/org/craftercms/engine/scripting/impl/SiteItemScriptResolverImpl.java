@@ -38,82 +38,82 @@ import org.craftercms.engine.service.context.SiteContext;
  */
 public class SiteItemScriptResolverImpl implements SiteItemScriptResolver {
 
-    private static final Log logger = LogFactory.getLog(SiteItemScriptResolverImpl.class);
+	private static final Log logger = LogFactory.getLog(SiteItemScriptResolverImpl.class);
 
-    protected ContentStoreService storeService;
-    protected String contentTypeXPathQuery;
-    protected Pattern contentTypePattern;
-    protected String scriptUrlFormat;
-    protected String scriptsXPathQuery;
+	protected ContentStoreService storeService;
+	protected String contentTypeXPathQuery;
+	protected Pattern contentTypePattern;
+	protected String scriptUrlFormat;
+	protected String scriptsXPathQuery;
 
-    public SiteItemScriptResolverImpl(ContentStoreService storeService, String contentTypeXPathQuery, String contentTypePattern,
-                                      String scriptUrlFormat, String scriptsXPathQuery) {
-        this.storeService = storeService;
-        this.contentTypeXPathQuery = contentTypeXPathQuery;
-        this.contentTypePattern = Pattern.compile(contentTypePattern);
-        this.scriptUrlFormat = scriptUrlFormat;
-        this.scriptsXPathQuery = scriptsXPathQuery;
-    }
+	public SiteItemScriptResolverImpl(ContentStoreService storeService, String contentTypeXPathQuery, String contentTypePattern,
+					  String scriptUrlFormat, String scriptsXPathQuery) {
+		this.storeService = storeService;
+		this.contentTypeXPathQuery = contentTypeXPathQuery;
+		this.contentTypePattern = Pattern.compile(contentTypePattern);
+		this.scriptUrlFormat = scriptUrlFormat;
+		this.scriptsXPathQuery = scriptsXPathQuery;
+	}
 
-    @Override
-    public List<String> getScriptUrls(SiteItem item) {
-        List<String> scriptUrls = null;
-        SiteContext siteContext = SiteContext.getCurrent();
+	@Override
+	public List<String> getScriptUrls(SiteItem item) {
+		List<String> scriptUrls = null;
+		SiteContext siteContext = SiteContext.getCurrent();
 
-        if (siteContext != null) {
-            String contentType = item.queryValue(contentTypeXPathQuery);
+		if (siteContext != null) {
+			String contentType = item.queryValue(contentTypeXPathQuery);
 
-            if (StringUtils.isNotEmpty(contentType)) {
-                String scriptUrl = getScriptUrlForContentType(contentType);
-                if (StringUtils.isNotEmpty(scriptUrl)) {
-                    try {
-                        // Check that the script exists. If not, ignore.
-                        if (storeService.exists(siteContext.getContext(), scriptUrl)) {
-                            if (logger.isDebugEnabled()) {
-                                logger.debug("Script for content type '" + contentType + "' found at " + scriptUrl);
-                            }
+			if (StringUtils.isNotEmpty(contentType)) {
+				String scriptUrl = getScriptUrlForContentType(contentType);
+				if (StringUtils.isNotEmpty(scriptUrl)) {
+					try {
+						// Check that the script exists. If not, ignore.
+						if (storeService.exists(siteContext.getContext(), scriptUrl)) {
+							if (logger.isDebugEnabled()) {
+								logger.debug("Script for content type '" + contentType + "' found at " + scriptUrl);
+							}
 
-                            scriptUrls = new ArrayList<>();
-                            scriptUrls.add(scriptUrl);
-                        }
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("No script for content type '" + contentType + "' found at " + scriptUrl);
-                        }
-                    } catch (CrafterException e) {
-                        logger.error("Error retrieving script for content type '" + contentType + "' at " +
-                                     scriptUrl, e);
-                    }
-                }
-            }
+							scriptUrls = new ArrayList<>();
+							scriptUrls.add(scriptUrl);
+						}
+						if (logger.isDebugEnabled()) {
+							logger.debug("No script for content type '" + contentType + "' found at " + scriptUrl);
+						}
+					} catch (CrafterException e) {
+						logger.error("Error retrieving script for content type '" + contentType + "' at " +
+							scriptUrl, e);
+					}
+				}
+			}
 
-            if (CollectionUtils.isNotEmpty(scriptUrls)) {
-                List<String> additionalUrls = item.queryValues(scriptsXPathQuery);
+			if (CollectionUtils.isNotEmpty(scriptUrls)) {
+				List<String> additionalUrls = item.queryValues(scriptsXPathQuery);
 
-                if (scriptUrls == null) {
-                    scriptUrls = new ArrayList<>();
-                }
+				if (scriptUrls == null) {
+					scriptUrls = new ArrayList<>();
+				}
 
-                if (CollectionUtils.isNotEmpty(additionalUrls)) {
-                    scriptUrls.addAll(additionalUrls);
-                }
-            } else {
-                scriptUrls = item.queryValues(scriptsXPathQuery);
-            }
-        }
+				if (CollectionUtils.isNotEmpty(additionalUrls)) {
+					scriptUrls.addAll(additionalUrls);
+				}
+			} else {
+				scriptUrls = item.queryValues(scriptsXPathQuery);
+			}
+		}
 
-        return scriptUrls;
-    }
+		return scriptUrls;
+	}
 
-    protected String getScriptUrlForContentType(String contentType) {
-        Matcher contentTypeMatcher = contentTypePattern.matcher(contentType);
-        if (contentTypeMatcher.matches()) {
-            String contentTypeName = contentTypeMatcher.group(1);
-            contentTypeName = StringUtils.strip(contentTypeName, "/");
+	protected String getScriptUrlForContentType(String contentType) {
+		Matcher contentTypeMatcher = contentTypePattern.matcher(contentType);
+		if (contentTypeMatcher.matches()) {
+			String contentTypeName = contentTypeMatcher.group(1);
+			contentTypeName = StringUtils.strip(contentTypeName, "/");
 
-            return String.format(scriptUrlFormat, contentTypeName);
-        } else {
-            return null;
-        }
-    }
+			return String.format(scriptUrlFormat, contentTypeName);
+		} else {
+			return null;
+		}
+	}
 
 }

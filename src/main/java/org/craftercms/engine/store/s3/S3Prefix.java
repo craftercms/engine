@@ -25,51 +25,64 @@ import static org.craftercms.engine.store.s3.S3ContentStoreAdapter.DELIMITER;
 
 /**
  * Implementation of {@link File} for AWS S3 prefixes (used as folders).
+ *
  * @author joseross
  */
 public class S3Prefix extends AbstractCachingAwareObject implements File {
 
-    /**
-     * The full prefix.
-     */
-    protected String prefix;
+	/**
+	 * The bucket name.
+	 */
+	protected String bucketName;
+	/**
+	 * The full prefix.
+	 */
+	protected String prefix;
 
-    public S3Prefix(String prefix) {
-        if (!prefix.equals(DELIMITER)) {
-            prefix = StringUtils.stripStart(prefix, DELIMITER);
-            prefix = StringUtils.appendIfMissing(prefix, DELIMITER);
-        }
+	public S3Prefix(String bucketName, String prefix) {
+		this.bucketName = bucketName;
+		if (!prefix.equals(DELIMITER)) {
+			prefix = StringUtils.stripStart(prefix, DELIMITER);
+			prefix = StringUtils.appendIfMissing(prefix, DELIMITER);
+		}
 
-        this.prefix = prefix;
-    }
+		this.prefix = prefix;
+	}
 
-    public String getPrefix() {
-        return prefix;
-    }
+	public String getBucketName() {
+		return bucketName;
+	}
 
-    @Override
-    public String getName() {
-        return FilenameUtils.getName(StringUtils.removeEnd(prefix, DELIMITER));
-    }
+	public String getPrefix() {
+		return prefix;
+	}
 
-    @Override
-    public String getPath() {
-        return prefix;
-    }
+	@Override
+	public String getName() {
+		return FilenameUtils.getName(StringUtils.removeEnd(prefix, DELIMITER));
+	}
 
-    @Override
-    public boolean isFile() {
-        return false;
-    }
+	@Override
+	public String getPath() {
+		return prefix;
+	}
 
-    @Override
-    public boolean isDirectory() {
-        return true;
-    }
+	@Override
+	public boolean isFile() {
+		return false;
+	}
 
-    @Override
-    public String toString() {
-        return "S3Prefix{" + "prefix='" + prefix + '\'' + '}';
-    }
+	@Override
+	public boolean isDirectory() {
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "S3Prefix{" +
+			"bucketName='" + bucketName + '\'' +
+			", prefix='" + prefix + '\'' +
+			'}';
+	}
 
 }

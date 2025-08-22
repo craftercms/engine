@@ -24,16 +24,15 @@ import java.util.List;
  */
 public interface CandidateTargetIdsResolver {
 
-    /**
-     * Resolves the target IDs to use to build the candidate targeted URLs. For example, if the specified target ID
-     * is es_CR, and the fallback target ID is en, then the candidate target IDs are: es_CR, es and en. An empty
-     * string will be added if the fallback target ID is empty or null.
-     *
-     * @param targetId          the target ID from where to resolve the candidate target IDs
-     * @param fallbackTargetId  the last candidate target ID to use
-     *
-     * @return the list of candidate target IDs
-     */
-    List<String> getTargetIds(String targetId, String fallbackTargetId);
+	/**
+	 * Resolves the target IDs to use to build the candidate targeted URLs. For example, if the specified target ID
+	 * is es_CR, and the fallback target ID is en, then the candidate target IDs are: es_CR, es and en. An empty
+	 * string will be added if the fallback target ID is empty or null.
+	 *
+	 * @param targetId         the target ID from where to resolve the candidate target IDs
+	 * @param fallbackTargetId the last candidate target ID to use
+	 * @return the list of candidate target IDs
+	 */
+	List<String> getTargetIds(String targetId, String fallbackTargetId);
 
 }

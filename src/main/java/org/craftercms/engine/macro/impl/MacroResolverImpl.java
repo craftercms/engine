@@ -30,33 +30,33 @@ import org.craftercms.engine.macro.MacroResolver;
  */
 public class MacroResolverImpl implements MacroResolver {
 
-    private List<Macro> macros;
+	private List<Macro> macros;
 
-    public MacroResolverImpl(List<Macro> macros) {
-        this.macros = macros;
-    }
+	public MacroResolverImpl(List<Macro> macros) {
+		this.macros = macros;
+	}
 
-    @Override
-    public String resolveMacros(String str) {
-        return resolveMacros(str, null);
-    }
+	@Override
+	public String resolveMacros(String str) {
+		return resolveMacros(str, null);
+	}
 
-    @Override
-    public String resolveMacros(String str, Map<String, ?> macroValues) {
-        if (MapUtils.isNotEmpty(macroValues)) {
-            for (Map.Entry<String, ?> entry : macroValues.entrySet()) {
-                String macroName = "{" + entry.getKey() + "}";
-                Object macroValue = entry.getValue();
+	@Override
+	public String resolveMacros(String str, Map<String, ?> macroValues) {
+		if (MapUtils.isNotEmpty(macroValues)) {
+			for (Map.Entry<String, ?> entry : macroValues.entrySet()) {
+				String macroName = "{" + entry.getKey() + "}";
+				Object macroValue = entry.getValue();
 
-                str = str.replace(macroName, macroValue.toString());
-            }
-        }
+				str = str.replace(macroName, macroValue.toString());
+			}
+		}
 
-        for (Macro macro : macros) {
-            str = macro.resolve(str);
-        }
+		for (Macro macro : macros) {
+			str = macro.resolve(str);
+		}
 
-        return str;
-    }
+		return str;
+	}
 
 }

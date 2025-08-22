@@ -24,13 +24,13 @@ import org.craftercms.engine.service.context.SiteContext;
  */
 public class CacheClearedEvent extends SiteEvent {
 
-    /**
-     * Create a new event.
-     *
-     * @param siteContext   the site's context
-     */
-    public CacheClearedEvent(SiteContext siteContext) {
-        super(siteContext);
-    }
+	/**
+	 * Create a new event.
+	 *
+	 * @param siteContext the site's context
+	 */
+	public CacheClearedEvent(SiteContext siteContext) {
+		super(siteContext);
+	}
 
 }

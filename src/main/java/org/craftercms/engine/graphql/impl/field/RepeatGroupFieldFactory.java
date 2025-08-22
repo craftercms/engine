@@ -38,52 +38,53 @@ import static org.craftercms.engine.graphql.SchemaUtils.FIELD_SUFFIX_ITEMS;
 
 /**
  * Implementation of {@link GraphQLFieldFactory} that handles repeating-group fields
+ *
  * @author joseross
  * @since 3.1
  */
 public class RepeatGroupFieldFactory implements GraphQLFieldFactory {
 
-    protected String fieldsXPath;
+	protected String fieldsXPath;
 
-    protected GraphQLTypeFactory typeFactory;
+	protected GraphQLTypeFactory typeFactory;
 
-    public RepeatGroupFieldFactory(final String fieldsXPath) {
-        this.fieldsXPath = fieldsXPath;
-    }
+	public RepeatGroupFieldFactory(final String fieldsXPath) {
+		this.fieldsXPath = fieldsXPath;
+	}
 
-    @Autowired
-    public void setTypeFactory(@Lazy final GraphQLTypeFactory typeFactory) {
-        this.typeFactory = typeFactory;
-    }
+	@Autowired
+	public void setTypeFactory(@Lazy final GraphQLTypeFactory typeFactory) {
+		this.typeFactory = typeFactory;
+	}
 
-    @Override
-    public void createField(final Document contentTypeDefinition, final Node contentTypeField,
-                            final String contentTypeFieldId, final String parentGraphQLTypeName,
-                            final GraphQLObjectType.Builder parentGraphQLType, final String graphQLFieldName,
-                            final GraphQLFieldDefinition.Builder graphQLField) {
-        // For Repeating Groups we need to create a wrapper type and do everything all over
-        GraphQLObjectType.Builder repeatType = GraphQLObjectType.newObject()
-            .name(parentGraphQLTypeName + FIELD_SEPARATOR + graphQLFieldName + FIELD_SUFFIX_ITEM)
-            .description("Item for repeat group of " + contentTypeFieldId);
+	@Override
+	public void createField(final Document contentTypeDefinition, final Node contentTypeField,
+				final String contentTypeFieldId, final String parentGraphQLTypeName,
+				final GraphQLObjectType.Builder parentGraphQLType, final String graphQLFieldName,
+				final GraphQLFieldDefinition.Builder graphQLField) {
+		// For Repeating Groups we need to create a wrapper type and do everything all over
+		GraphQLObjectType.Builder repeatType = GraphQLObjectType.newObject()
+			.name(parentGraphQLTypeName + FIELD_SEPARATOR + graphQLFieldName + FIELD_SUFFIX_ITEM)
+			.description("Item for repeat group of " + contentTypeFieldId);
 
-        List<Node> fields =
-            XmlUtils.selectNodes(contentTypeField, fieldsXPath, Collections.emptyMap());
+		List<Node> fields =
+			XmlUtils.selectNodes(contentTypeField, fieldsXPath, Collections.emptyMap());
 
-        // Call recursively for all fields in the repeating group
-        if (CollectionUtils.isNotEmpty(fields)) {
-            fields.forEach(f -> typeFactory.createField(contentTypeDefinition, f, parentGraphQLTypeName, repeatType));
-        }
+		// Call recursively for all fields in the repeating group
+		if (CollectionUtils.isNotEmpty(fields)) {
+			fields.forEach(f -> typeFactory.createField(contentTypeDefinition, f, parentGraphQLTypeName, repeatType));
+		}
 
-        GraphQLObjectType wrapperType = GraphQLObjectType.newObject()
-            .name(parentGraphQLTypeName + FIELD_SEPARATOR + graphQLFieldName + FIELD_SUFFIX_ITEMS)
-            .description("Wrapper for list of items of " + contentTypeFieldId)
-            .field(GraphQLFieldDefinition.newFieldDefinition()
-                .name(FIELD_NAME_ITEM)
-                .description("List of items of " + contentTypeFieldId)
-                .type(list(repeatType.build())))
-            .build();
+		GraphQLObjectType wrapperType = GraphQLObjectType.newObject()
+			.name(parentGraphQLTypeName + FIELD_SEPARATOR + graphQLFieldName + FIELD_SUFFIX_ITEMS)
+			.description("Wrapper for list of items of " + contentTypeFieldId)
+			.field(GraphQLFieldDefinition.newFieldDefinition()
+				.name(FIELD_NAME_ITEM)
+				.description("List of items of " + contentTypeFieldId)
+				.type(list(repeatType.build())))
+			.build();
 
-        graphQLField.type(wrapperType);
-    }
+		graphQLField.type(wrapperType);
+	}
 
 }

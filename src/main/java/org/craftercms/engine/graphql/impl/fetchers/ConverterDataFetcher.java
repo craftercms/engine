@@ -23,7 +23,7 @@ import java.util.Map;
 
 /**
  * Implementation of {@link DataFetcher} to converts the result to {@link Map}.
- *
+ * <p>
  * This is a workaround because the {@link graphql.schema.PropertyDataFetcher} has an internal cache for methods that
  * causes a conflict when Groovy classes are reloaded and at the moment is not possible to change the DataFetcher used.
  *
@@ -32,26 +32,26 @@ import java.util.Map;
  */
 public class ConverterDataFetcher implements DataFetcher<Object> {
 
-    public static ConverterDataFetcher of(DataFetcher<?> dataFetcher) {
-        return new ConverterDataFetcher(dataFetcher);
-    }
+	public static ConverterDataFetcher of(DataFetcher<?> dataFetcher) {
+		return new ConverterDataFetcher(dataFetcher);
+	}
 
-    private static final ObjectMapper MAPPER = new ObjectMapper().findAndRegisterModules();
+	private static final ObjectMapper MAPPER = new ObjectMapper().findAndRegisterModules();
 
-    protected DataFetcher<?> dataFetcher;
+	protected DataFetcher<?> dataFetcher;
 
-    public ConverterDataFetcher(DataFetcher<?> dataFetcher) {
-        this.dataFetcher = dataFetcher;
-    }
+	public ConverterDataFetcher(DataFetcher<?> dataFetcher) {
+		this.dataFetcher = dataFetcher;
+	}
 
-    @Override
-    public Object get(DataFetchingEnvironment environment) throws Exception {
-        Object source = dataFetcher.get(environment);
-        if (source != null) {
-            return MAPPER.convertValue(source, Object.class);
-        } else {
-            return null;
-        }
-    }
+	@Override
+	public Object get(DataFetchingEnvironment environment) throws Exception {
+		Object source = dataFetcher.get(environment);
+		if (source != null) {
+			return MAPPER.convertValue(source, Object.class);
+		} else {
+			return null;
+		}
+	}
 
 }

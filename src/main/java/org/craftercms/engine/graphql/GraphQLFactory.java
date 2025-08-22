@@ -21,16 +21,18 @@ import org.craftercms.engine.service.context.SiteContext;
 
 /**
  * Creates a {@link graphql.schema.GraphQLSchema} and returns a {@link GraphQL} instance for a specific site.
+ *
  * @author joseross
  * @since 3.1
  */
 public interface GraphQLFactory {
 
-    /**
-     * Returns the instance for the given {@link SiteContext}
-     * @param siteContext the site context used to build the {@link graphql.schema.GraphQLSchema}
-     * @return a {@link GraphQL} instance
-     */
-    GraphQL getInstance(SiteContext siteContext);
+	/**
+	 * Returns the instance for the given {@link SiteContext}
+	 *
+	 * @param siteContext the site context used to build the {@link graphql.schema.GraphQLSchema}
+	 * @return a {@link GraphQL} instance
+	 */
+	GraphQL getInstance(SiteContext siteContext);
 
 }

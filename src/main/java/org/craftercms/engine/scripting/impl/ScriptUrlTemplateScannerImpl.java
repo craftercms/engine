@@ -37,56 +37,56 @@ import org.springframework.web.util.UriTemplate;
  */
 public class ScriptUrlTemplateScannerImpl implements ScriptUrlTemplateScanner {
 
-    public static final String DEFAULT_URL_VARIABLE_PLACEHOLDER_PATTERN = "\\{[^{}]+\\}";
+	public static final String DEFAULT_URL_VARIABLE_PLACEHOLDER_PATTERN = "\\{[^{}]+\\}";
 
-    protected Pattern urlVariablePlaceholderPattern;
-    protected String scriptsFolder;
+	protected Pattern urlVariablePlaceholderPattern;
+	protected String scriptsFolder;
 
-    public ScriptUrlTemplateScannerImpl(String scriptsFolder) {
-        urlVariablePlaceholderPattern = Pattern.compile(DEFAULT_URL_VARIABLE_PLACEHOLDER_PATTERN);
-        this.scriptsFolder = scriptsFolder;
-    }
+	public ScriptUrlTemplateScannerImpl(String scriptsFolder) {
+		urlVariablePlaceholderPattern = Pattern.compile(DEFAULT_URL_VARIABLE_PLACEHOLDER_PATTERN);
+		this.scriptsFolder = scriptsFolder;
+	}
 
-    public void setUrlVariablePlaceholderPattern(String urlVariablePlaceholderPattern) {
-        this.urlVariablePlaceholderPattern = Pattern.compile(urlVariablePlaceholderPattern);
-    }
+	public void setUrlVariablePlaceholderPattern(String urlVariablePlaceholderPattern) {
+		this.urlVariablePlaceholderPattern = Pattern.compile(urlVariablePlaceholderPattern);
+	}
 
-    @Override
-    public List<UriTemplate> scan(SiteContext siteContext) {
-        Context context = siteContext.getContext();
-        ContentStoreService storeService = siteContext.getStoreService();
-        ScriptFactory scriptFactory = siteContext.getScriptFactory();
-        List<String> scriptUrls = new ArrayList<>();
-        List<UriTemplate> urlTemplates = new ArrayList<>();
+	@Override
+	public List<UriTemplate> scan(SiteContext siteContext) {
+		Context context = siteContext.getContext();
+		ContentStoreService storeService = siteContext.getStoreService();
+		ScriptFactory scriptFactory = siteContext.getScriptFactory();
+		List<String> scriptUrls = new ArrayList<>();
+		List<UriTemplate> urlTemplates = new ArrayList<>();
 
-        findScripts(context, storeService, scriptFactory, scriptsFolder, scriptUrls);
+		findScripts(context, storeService, scriptFactory, scriptsFolder, scriptUrls);
 
-        if (CollectionUtils.isNotEmpty(scriptUrls)) {
-            for (String scriptUrl : scriptUrls) {
-                Matcher matcher = urlVariablePlaceholderPattern.matcher(scriptUrl);
-                if (matcher.find()) {
-                    urlTemplates.add(new UriTemplate(scriptUrl));
-                }
-            }
-        }
+		if (CollectionUtils.isNotEmpty(scriptUrls)) {
+			for (String scriptUrl : scriptUrls) {
+				Matcher matcher = urlVariablePlaceholderPattern.matcher(scriptUrl);
+				if (matcher.find()) {
+					urlTemplates.add(new UriTemplate(scriptUrl));
+				}
+			}
+		}
 
-        return urlTemplates;
-    }
+		return urlTemplates;
+	}
 
-    public void findScripts(Context context, ContentStoreService storeService, ScriptFactory scriptFactory,
-                            String folder, List<String> scriptUrls) {
-        List<Item> items = storeService.findChildren(context, null, folder, null, null);
-        String scriptFileExtension = scriptFactory.getScriptFileExtension();
+	public void findScripts(Context context, ContentStoreService storeService, ScriptFactory scriptFactory,
+				String folder, List<String> scriptUrls) {
+		List<Item> items = storeService.findChildren(context, null, folder, null, null);
+		String scriptFileExtension = scriptFactory.getScriptFileExtension();
 
-        if (CollectionUtils.isNotEmpty(items)) {
-            for (Item item : items) {
-                if (!item.isFolder() && item.getName().endsWith(scriptFileExtension)) {
-                    scriptUrls.add(item.getUrl());
-                } else if (item.isFolder()) {
-                    findScripts(context, storeService, scriptFactory, item.getUrl(), scriptUrls);
-                }
-            }
-        }
-    }
+		if (CollectionUtils.isNotEmpty(items)) {
+			for (Item item : items) {
+				if (!item.isFolder() && item.getName().endsWith(scriptFileExtension)) {
+					scriptUrls.add(item.getUrl());
+				} else if (item.isFolder()) {
+					findScripts(context, storeService, scriptFactory, item.getUrl(), scriptUrls);
+				}
+			}
+		}
+	}
 
 }

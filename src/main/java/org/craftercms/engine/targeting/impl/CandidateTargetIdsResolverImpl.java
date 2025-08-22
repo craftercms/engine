@@ -32,38 +32,38 @@ import org.craftercms.engine.targeting.CandidateTargetIdsResolver;
  */
 public class CandidateTargetIdsResolverImpl implements CandidateTargetIdsResolver {
 
-    public static final String DEFAULT_TARGET_ID_SEPARATOR = "_";
+	public static final String DEFAULT_TARGET_ID_SEPARATOR = "_";
 
-    protected String targetIdSeparator;
+	protected String targetIdSeparator;
 
-    public CandidateTargetIdsResolverImpl() {
-        targetIdSeparator = DEFAULT_TARGET_ID_SEPARATOR;
-    }
+	public CandidateTargetIdsResolverImpl() {
+		targetIdSeparator = DEFAULT_TARGET_ID_SEPARATOR;
+	}
 
-    public void setTargetIdSeparator(String targetIdSeparator) {
-        this.targetIdSeparator = targetIdSeparator;
-    }
+	public void setTargetIdSeparator(String targetIdSeparator) {
+		this.targetIdSeparator = targetIdSeparator;
+	}
 
-    @Override
-    public List<String> getTargetIds(String targetId, String fallbackTargetId) {
-        List<String> targetIds = new ArrayList<>();
-        String[] targetIdComponents = StringUtils.split(targetId, targetIdSeparator);
+	@Override
+	public List<String> getTargetIds(String targetId, String fallbackTargetId) {
+		List<String> targetIds = new ArrayList<>();
+		String[] targetIdComponents = StringUtils.split(targetId, targetIdSeparator);
 
-        targetIds.add(targetId);
+		targetIds.add(targetId);
 
-        if (ArrayUtils.isNotEmpty(targetIdComponents)) {
-            for (int i = targetIdComponents.length - 1; i > 0; i--) {
-                targetIds.add(StringUtils.join(targetIdComponents, targetIdSeparator, 0, i));
-            }
-        }
+		if (ArrayUtils.isNotEmpty(targetIdComponents)) {
+			for (int i = targetIdComponents.length - 1; i > 0; i--) {
+				targetIds.add(StringUtils.join(targetIdComponents, targetIdSeparator, 0, i));
+			}
+		}
 
-        if (StringUtils.isEmpty(fallbackTargetId)) {
-            targetIds.add("");
-        } else if (!targetIds.contains(fallbackTargetId)) {
-            targetIds.add(fallbackTargetId);
-        }
+		if (StringUtils.isEmpty(fallbackTargetId)) {
+			targetIds.add("");
+		} else if (!targetIds.contains(fallbackTargetId)) {
+			targetIds.add(fallbackTargetId);
+		}
 
-        return targetIds;
-    }
+		return targetIds;
+	}
 
 }

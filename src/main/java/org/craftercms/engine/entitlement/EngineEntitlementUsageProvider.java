@@ -33,38 +33,38 @@ import java.util.List;
  */
 public class EngineEntitlementUsageProvider implements EntitlementUsageProvider {
 
-    /**
-     * Current {@link SiteContextManager} instance.
-     */
-    protected SiteContextManager siteContextManager;
+	/**
+	 * Current {@link SiteContextManager} instance.
+	 */
+	protected SiteContextManager siteContextManager;
 
-    @Autowired
-    public void setSiteContextManager(@Lazy final SiteContextManager siteContextManager) {
-        this.siteContextManager = siteContextManager;
-    }
+	@Autowired
+	public void setSiteContextManager(@Lazy final SiteContextManager siteContextManager) {
+		this.siteContextManager = siteContextManager;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Module getModule() {
-        return Module.ENGINE;
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Module getModule() {
+		return Module.ENGINE;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<EntitlementType> getSupportedEntitlements() {
-        return Collections.singletonList(EntitlementType.SITE);
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<EntitlementType> getSupportedEntitlements() {
+		return Collections.singletonList(EntitlementType.SITE);
+	}
 
-    @Override
-    public int doGetEntitlementUsage(final EntitlementType type) {
-        return (int) siteContextManager.listContexts()
-            .stream()
-            .filter(context -> !context.isFallback())
-            .count();
-    }
+	@Override
+	public int doGetEntitlementUsage(final EntitlementType type) {
+		return (int) siteContextManager.listContexts()
+			.stream()
+			.filter(context -> !context.isFallback())
+			.count();
+	}
 
 }

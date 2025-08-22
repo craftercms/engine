@@ -27,28 +27,28 @@ import org.springframework.web.context.ServletContextAware;
  */
 public class WebAppPathMacro extends AbstractMacro implements ServletContextAware {
 
-    private ServletContext servletContext;
+	private ServletContext servletContext;
 
-    @Override
-    public void setServletContext(ServletContext servletContext) {
-        this.servletContext = servletContext;
-    }
+	@Override
+	public void setServletContext(ServletContext servletContext) {
+		this.servletContext = servletContext;
+	}
 
-    @Override
-    protected String createMacroName() {
-        return "{webapp.path}";
-    }
+	@Override
+	protected String createMacroName() {
+		return "{webapp.path}";
+	}
 
-    @Override
-    protected String getMacroValue(String str) {
-        if (servletContext != null) {
-            String webAppPath = servletContext.getRealPath("/");
-            webAppPath = StringUtils.stripEnd(webAppPath, "/");
+	@Override
+	protected String getMacroValue(String str) {
+		if (servletContext != null) {
+			String webAppPath = servletContext.getRealPath("/");
+			webAppPath = StringUtils.stripEnd(webAppPath, "/");
 
-            return webAppPath;
-        } else {
-            return null;
-        }
-    }
+			return webAppPath;
+		} else {
+			return null;
+		}
+	}
 
 }

@@ -23,12 +23,12 @@ import org.craftercms.core.exception.CrafterException;
  */
 public class ScriptException extends CrafterException {
 
-    public ScriptException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	public ScriptException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
-    public ScriptException(String message) {
-        super(message);
-    }
+	public ScriptException(String message) {
+		super(message);
+	}
 
 }

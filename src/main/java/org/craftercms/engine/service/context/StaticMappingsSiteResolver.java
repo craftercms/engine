@@ -19,6 +19,7 @@ package org.craftercms.engine.service.context;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Map;
+
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
@@ -32,32 +33,32 @@ import org.apache.commons.logging.LogFactory;
  */
 public class StaticMappingsSiteResolver implements SiteListResolver, SiteResolver {
 
-    private static final Log logger = LogFactory.getLog(StaticMappingsSiteResolver.class);
+	private static final Log logger = LogFactory.getLog(StaticMappingsSiteResolver.class);
 
-    private Map<String, String> mappings;
+	private Map<String, String> mappings;
 
-    public StaticMappingsSiteResolver(Map<String, String> mappings) {
-        this.mappings = mappings;
-    }
+	public StaticMappingsSiteResolver(Map<String, String> mappings) {
+		this.mappings = mappings;
+	}
 
-    @Override
-    public Collection<String> getSiteList() {
-        return new LinkedHashSet<>(mappings.values());
-    }
+	@Override
+	public Collection<String> getSiteList() {
+		return new LinkedHashSet<>(mappings.values());
+	}
 
-    @Override
-    public String getSiteName(HttpServletRequest request) {
-        String domainName = request.getServerName();
+	@Override
+	public String getSiteName(HttpServletRequest request) {
+		String domainName = request.getServerName();
 
-        if (mappings.containsKey(domainName)) {
-            return mappings.get(domainName);
-        } else {
-            if (logger.isDebugEnabled()) {
-                logger.debug("No site mapping found for domain name " + domainName);
-            }
+		if (mappings.containsKey(domainName)) {
+			return mappings.get(domainName);
+		} else {
+			if (logger.isDebugEnabled()) {
+				logger.debug("No site mapping found for domain name " + domainName);
+			}
 
-            return null;
-        }
-    }
+			return null;
+		}
+	}
 
 }

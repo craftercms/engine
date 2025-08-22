@@ -19,26 +19,26 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean class="org.craftercms.commons.spring.ListMergingPostProcessor">
-        <property name="order" value="0" />
-        <property name="beanName" value="crafter.properties" />
-        <property name="propertyName" value="locations" />
-        <property name="additionalElements">
-            <list>
-                <value>classpath:crafter/engine/mode/multi-tenant/mapped/server-config.properties</value>
-            </list>
-        </property>
-    </bean>
+	<bean class="org.craftercms.commons.spring.ListMergingPostProcessor">
+		<property name="order" value="0"/>
+		<property name="beanName" value="crafter.properties"/>
+		<property name="propertyName" value="locations"/>
+		<property name="additionalElements">
+			<list>
+				<value>classpath:crafter/engine/mode/multi-tenant/mapped/server-config.properties</value>
+			</list>
+		</property>
+	</bean>
 
-    <!-- ////////////////////////////////// -->
-    <!--								 	-->
-    <!--			Controllers				-->
-    <!--									-->
-    <!-- ////////////////////////////////// -->
+	<!-- ////////////////////////////////// -->
+	<!--								 	-->
+	<!--			Controllers				-->
+	<!--									-->
+	<!-- ////////////////////////////////// -->
 
-    <bean id="crafter.siteMappingsRestController"
-          class="org.craftercms.engine.controller.rest.multitenant.SiteMappingsRestController">
-        <constructor-arg name="siteResolver" ref="crafter.mappingsSiteResolver"/>
-    </bean>
+	<bean id="crafter.siteMappingsRestController"
+	      class="org.craftercms.engine.controller.rest.multitenant.SiteMappingsRestController">
+		<constructor-arg name="siteResolver" ref="crafter.mappingsSiteResolver"/>
+	</bean>
 
 </beans>

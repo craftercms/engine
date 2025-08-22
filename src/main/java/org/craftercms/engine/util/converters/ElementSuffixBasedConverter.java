@@ -26,57 +26,57 @@ import org.dom4j.Element;
 
 public class ElementSuffixBasedConverter implements Converter<Element, Object> {
 
-    private static final Log logger = LogFactory.getLog(ElementSuffixBasedConverter.class);
+	private static final Log logger = LogFactory.getLog(ElementSuffixBasedConverter.class);
 
-    public static final String[] DEFAULT_SUPPORTED_SUFFIXES_ON_DISABLED_FULL_MODEL_CONVERSION =  { "i", "l", "b", "f", "d" };
+	public static final String[] DEFAULT_SUPPORTED_SUFFIXES_ON_DISABLED_FULL_MODEL_CONVERSION = {"i", "l", "b", "f", "d"};
 
-    protected Map<String, Converter<String, ?>> suffixMappedConverters;
-    protected String[] supportedSuffixesOnDisabledFullModelTypeConversion;
+	protected Map<String, Converter<String, ?>> suffixMappedConverters;
+	protected String[] supportedSuffixesOnDisabledFullModelTypeConversion;
 
-    public ElementSuffixBasedConverter(Map<String, Converter<String, ?>> suffixMappedConverters) {
-        supportedSuffixesOnDisabledFullModelTypeConversion = DEFAULT_SUPPORTED_SUFFIXES_ON_DISABLED_FULL_MODEL_CONVERSION;
+	public ElementSuffixBasedConverter(Map<String, Converter<String, ?>> suffixMappedConverters) {
+		supportedSuffixesOnDisabledFullModelTypeConversion = DEFAULT_SUPPORTED_SUFFIXES_ON_DISABLED_FULL_MODEL_CONVERSION;
 
-        this.suffixMappedConverters = suffixMappedConverters;
-    }
+		this.suffixMappedConverters = suffixMappedConverters;
+	}
 
-    public void setSupportedSuffixesOnDisabledFullModelTypeConversion(String[] supportedSuffixesOnDisabledFullModelTypeConversion) {
-        this.supportedSuffixesOnDisabledFullModelTypeConversion = supportedSuffixesOnDisabledFullModelTypeConversion;
-    }
+	public void setSupportedSuffixesOnDisabledFullModelTypeConversion(String[] supportedSuffixesOnDisabledFullModelTypeConversion) {
+		this.supportedSuffixesOnDisabledFullModelTypeConversion = supportedSuffixesOnDisabledFullModelTypeConversion;
+	}
 
-    @Override
-    public Class<?> getSourceClass() {
-        return Element.class;
-    }
+	@Override
+	public Class<?> getSourceClass() {
+		return Element.class;
+	}
 
-    @Override
-    public Class<?> getTargetClass() {
-        return Object.class;
-    }
+	@Override
+	public Class<?> getTargetClass() {
+		return Object.class;
+	}
 
-    @Override
-    public Object convert(Element source) {
-        String name = source.getName();
-        int converterIdSuffixSepIdx = name.lastIndexOf("_");
+	@Override
+	public Object convert(Element source) {
+		String name = source.getName();
+		int converterIdSuffixSepIdx = name.lastIndexOf("_");
 
-        if (converterIdSuffixSepIdx >= 0) {
-            String converterId = name.substring(converterIdSuffixSepIdx + 1);
-            Converter<String, ?> converter = suffixMappedConverters.get(converterId);
+		if (converterIdSuffixSepIdx >= 0) {
+			String converterId = name.substring(converterIdSuffixSepIdx + 1);
+			Converter<String, ?> converter = suffixMappedConverters.get(converterId);
 
-            if (converter != null) {
-                if (!SiteProperties.isDisableFullModelTypeConversion() ||
-                    ArrayUtils.contains(supportedSuffixesOnDisabledFullModelTypeConversion, converterId)) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Converting value of <" + name + "> to " + converter.getTargetClass().getName());
-                    }
+			if (converter != null) {
+				if (!SiteProperties.isDisableFullModelTypeConversion() ||
+					ArrayUtils.contains(supportedSuffixesOnDisabledFullModelTypeConversion, converterId)) {
+					if (logger.isDebugEnabled()) {
+						logger.debug("Converting value of <" + name + "> to " + converter.getTargetClass().getName());
+					}
 
-                    return converter.convert(source.getText());
-                }
-            } else if (logger.isDebugEnabled()) {
-                logger.debug("No converter found for suffix '" + converterId + "' for <" + name + ">");
-            }
-        }
+					return converter.convert(source.getText());
+				}
+			} else if (logger.isDebugEnabled()) {
+				logger.debug("No converter found for suffix '" + converterId + "' for <" + name + ">");
+			}
+		}
 
-        return source;
-    }
+		return source;
+	}
 
 }

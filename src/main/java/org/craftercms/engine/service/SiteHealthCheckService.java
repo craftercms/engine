@@ -20,21 +20,21 @@ package org.craftercms.engine.service;
  */
 public interface SiteHealthCheckService {
 
-    /**
-     * Determine if current engine has valid healthy sites
-     * Engine has valid healthy sites when:
-     * 1. There are no sites at all
-     * 2. There is one or more valid healthy site
-     *
-     * @return true if engine has healthy sites, false otherwise
-     */
-    boolean healthCheck();
+	/**
+	 * Determine if current engine has valid healthy sites
+	 * Engine has valid healthy sites when:
+	 * 1. There are no sites at all
+	 * 2. There is one or more valid healthy site
+	 *
+	 * @return true if engine has healthy sites, false otherwise
+	 */
+	boolean healthCheck();
 
-    /**
-     * Performs the health checks for the given site.
-     *
-     * @param site the site to check.
-     * @return true if all the health checks pass, false otherwise.
-     */
-    boolean healthCheck(String site);
+	/**
+	 * Performs the health checks for the given site.
+	 *
+	 * @param site the site to check.
+	 * @return true if all the health checks pass, false otherwise.
+	 */
+	boolean healthCheck(String site);
 }

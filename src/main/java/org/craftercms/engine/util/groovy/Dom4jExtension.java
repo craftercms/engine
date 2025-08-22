@@ -29,27 +29,26 @@ import org.dom4j.Node;
  */
 public class Dom4jExtension {
 
-    /**
-     * Adds a get method to Dom4j nodes, which allows XPath queries through dot notation properties, e.g
-     * {@code siteItem.collection.item[1].text}. Also, if the result is an {@code Element}, then the
-     * element will attempted to be converted based on the content model field conversion algorithm.
-     *
-     * @param node              the Node object (this)
-     * @param xpathExpression   the XPath expression or query
-     *
-     * @return the result of the XPath query
-     */
-    public static Object get(Node node, String xpathExpression) {
-        Object result = XmlUtils.selectObject(node, xpathExpression);
-        if (result != null) {
-            if (result instanceof Element && !SiteProperties.isDisableFullModelTypeConversion()) {
-                return ContentModelUtils.convertField((Element)result);
-            } else {
-                return result;
-            }
-        } else {
-            return null;
-        }
-    }
+	/**
+	 * Adds a get method to Dom4j nodes, which allows XPath queries through dot notation properties, e.g
+	 * {@code siteItem.collection.item[1].text}. Also, if the result is an {@code Element}, then the
+	 * element will attempted to be converted based on the content model field conversion algorithm.
+	 *
+	 * @param node            the Node object (this)
+	 * @param xpathExpression the XPath expression or query
+	 * @return the result of the XPath query
+	 */
+	public static Object get(Node node, String xpathExpression) {
+		Object result = XmlUtils.selectObject(node, xpathExpression);
+		if (result != null) {
+			if (result instanceof Element && !SiteProperties.isDisableFullModelTypeConversion()) {
+				return ContentModelUtils.convertField((Element) result);
+			} else {
+				return result;
+			}
+		} else {
+			return null;
+		}
+	}
 
 }

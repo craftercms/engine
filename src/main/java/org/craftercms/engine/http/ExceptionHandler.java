@@ -17,6 +17,7 @@ package org.craftercms.engine.http;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 
 /**
@@ -26,9 +27,9 @@ import java.io.IOException;
  */
 public interface ExceptionHandler {
 
-    /**
-     * Attempts to handle the exception. If it can be handled, returns true, else false is returned.
-     */
-    boolean handle(HttpServletRequest request, HttpServletResponse response, Exception ex) throws IOException;
+	/**
+	 * Attempts to handle the exception. If it can be handled, returns true, else false is returned.
+	 */
+	boolean handle(HttpServletRequest request, HttpServletResponse response, Exception ex) throws IOException;
 
 }

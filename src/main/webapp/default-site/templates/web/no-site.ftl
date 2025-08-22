@@ -21,7 +21,7 @@
 	<!-- start CSS -->
 	<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600" rel="stylesheet">
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap-reboot.min.css"
-				rel="stylesheet">
+	      rel="stylesheet">
 	<style>
 		html, body {
 			height: 100%;
@@ -44,7 +44,7 @@
 			max-width: 400px;
 			border-radius: 20px;
 			background-color: #fff;
-			background-color: rgba(255,255,255,.9);
+			background-color: rgba(255, 255, 255, .9);
 			position: relative;
 		}
 
@@ -81,14 +81,14 @@
 
 	<!-- Favicon Setting -->
 	<link rel="icon" type="image/x-icon"
-				href='${urlTransformationService.transform('toWebAppRelativeUrl', '/static-assets/img/favicon.ico')}'/>
+	      href='${urlTransformationService.transform('toWebAppRelativeUrl', '/static-assets/img/favicon.ico')}'/>
 </head>
 
 <body>
 
 <main id="main">
 
-	<a href="https://craftercms.org">
+	<a href="https://craftercms.com">
 		<img src="${urlTransformationService.transform('toWebAppRelativeUrl', '/static-assets/img/logo.svg')}" alt="CrafterCMS"/>
 	</a>
 
@@ -102,7 +102,7 @@
 	<nav class="navigation">
 		<h2 class="navigation--title">Helpful links:</h2>
 		<a class="navigation--link" href="/studio">Authoring environment</a>
-		<a class="navigation--link" href="http://docs.craftercms.org">Docs Homepage</a>
+		<a class="navigation--link" href="http://craftercms.com/docs">Docs Homepage</a>
 		<a class="navigation--link" href="http://www.craftercms.com/resources">Tutorials &amp; Screencasts</a>
 		<a class="navigation--link" href="http://www.craftercms.com/about/partners">Professional Services</a>
 	</nav>

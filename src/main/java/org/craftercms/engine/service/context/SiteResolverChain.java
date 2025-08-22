@@ -16,6 +16,7 @@
 package org.craftercms.engine.service.context;
 
 import java.util.List;
+
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -28,22 +29,22 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class SiteResolverChain implements SiteResolver {
 
-    protected List<SiteResolver> chain;
+	protected List<SiteResolver> chain;
 
-    public SiteResolverChain(List<SiteResolver> chain) {
-        this.chain = chain;
-    }
+	public SiteResolverChain(List<SiteResolver> chain) {
+		this.chain = chain;
+	}
 
-    @Override
-    public String getSiteName(HttpServletRequest request) {
-        for (SiteResolver resolver : chain) {
-            String site = resolver.getSiteName(request);
-            if (StringUtils.isNotEmpty(site)) {
-                return site;
-            }
-        }
+	@Override
+	public String getSiteName(HttpServletRequest request) {
+		for (SiteResolver resolver : chain) {
+			String site = resolver.getSiteName(request);
+			if (StringUtils.isNotEmpty(site)) {
+				return site;
+			}
+		}
 
-        return null;
-    }
+		return null;
+	}
 
 }

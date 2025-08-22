@@ -42,53 +42,53 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class PluginServiceImplTest {
 
-    public static final String PLUGIN_PATH = "org/craftercms/test/plugin";
+	public static final String PLUGIN_PATH = "org/craftercms/test/plugin";
 
-    public static final String PLUGIN_CONFIG_PATH = "/config/plugins/" + PLUGIN_PATH + "/config.xml";
+	public static final String PLUGIN_CONFIG_PATH = "/config/plugins/" + PLUGIN_PATH + "/config.xml";
 
-    public static final String PLUGIN_SCRIPT_URL = "/scripts/rest/plugins/" + PLUGIN_PATH + "/foo/hello.get.groovy";
+	public static final String PLUGIN_SCRIPT_URL = "/scripts/rest/plugins/" + PLUGIN_PATH + "/foo/hello.get.groovy";
 
-    public static final String REGULAR_SCRIPT_URL = "/scripts/rest/hello.get.groovy";
+	public static final String REGULAR_SCRIPT_URL = "/scripts/rest/hello.get.groovy";
 
-    @Spy
-    private SiteContext siteContext;
+	@Spy
+	private SiteContext siteContext;
 
-    @Mock
-    private ContentStoreService contentStoreService;
+	@Mock
+	private ContentStoreService contentStoreService;
 
-    @Mock
-    private EncryptionAwareConfigurationReader configurationReader;
+	@Mock
+	private EncryptionAwareConfigurationReader configurationReader;
 
-    @Mock
-    private Content content;
+	@Mock
+	private Content content;
 
-    @InjectMocks
-    private PluginServiceImpl pluginService;
+	@InjectMocks
+	private PluginServiceImpl pluginService;
 
-    @Before
-    public void setUp() throws IOException {
-        SiteContext.setCurrent(siteContext);
+	@Before
+	public void setUp() throws IOException {
+		SiteContext.setCurrent(siteContext);
 
-        pluginService.configurationPathPattern = "/config/plugins/${pluginId}/config.xml";
+		pluginService.configurationPathPattern = "/config/plugins/${pluginId}/config.xml";
 
-        when(contentStoreService.exists(any(), eq(PLUGIN_CONFIG_PATH))).thenReturn(true);
-        when(contentStoreService.getContent(any(), eq(PLUGIN_CONFIG_PATH))).thenReturn(content);
-    }
+		when(contentStoreService.exists(any(), eq(PLUGIN_CONFIG_PATH))).thenReturn(true);
+		when(contentStoreService.getContent(any(), eq(PLUGIN_CONFIG_PATH))).thenReturn(content);
+	}
 
-    @Test
-    public void pluginUrlTest() {
-        Map<String, Object> variables = new HashMap<>();
-        pluginService.addPluginVariables(PLUGIN_SCRIPT_URL, variables::put);
+	@Test
+	public void pluginUrlTest() {
+		Map<String, Object> variables = new HashMap<>();
+		pluginService.addPluginVariables(PLUGIN_SCRIPT_URL, variables::put);
 
-        assertEquals(2, variables.size());
-    }
+		assertEquals(2, variables.size());
+	}
 
-    @Test
-    public void regularUrlTest() {
-        Map<String, Object> variables = new HashMap<>();
-        pluginService.addPluginVariables(REGULAR_SCRIPT_URL, variables::put);
+	@Test
+	public void regularUrlTest() {
+		Map<String, Object> variables = new HashMap<>();
+		pluginService.addPluginVariables(REGULAR_SCRIPT_URL, variables::put);
 
-        assertEquals(0, variables.size());
-    }
+		assertEquals(0, variables.size());
+	}
 
 }

@@ -24,9 +24,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.craftercms.engine.macro.MacroResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.beans.factory.InitializingBean;
@@ -45,93 +45,93 @@ import org.springframework.beans.factory.InitializingBean;
  */
 public class FolderScanningSiteListResolver implements SiteListResolver, ResourceLoaderAware, InitializingBean {
 
-    private static final Log logger = LogFactory.getLog(FolderScanningSiteListResolver.class);
+	private static final Logger logger = LoggerFactory.getLogger(FolderScanningSiteListResolver.class);
 
-    public static final String SITE_ROOT_FOLDER_PATH_REGEX = "^(([^:]+:)?(.+?/))([^/]*\\{%s\\}[^/]*)(/.*)?$";
-    public static final int SITES_FOLDER_PATH_GROUP = 1;
-    public static final int SITE_FOLDER_NAME_FORMAT_GROUP = 4;
+	public static final String SITE_ROOT_FOLDER_PATH_REGEX = "^(([^:]+:)?(.+?/))([^/]*\\{%s\\}[^/]*)(/.*)?$";
+	public static final int SITES_FOLDER_PATH_GROUP = 1;
+	public static final int SITE_FOLDER_NAME_FORMAT_GROUP = 4;
 
-    protected String siteRootFolderPath;
-    protected String siteNameMacroName;
-    protected MacroResolver macroResolver;
-    protected ResourceLoader resourceLoader;
+	protected String siteRootFolderPath;
+	protected String siteNameMacroName;
+	protected MacroResolver macroResolver;
+	protected ResourceLoader resourceLoader;
 
-    protected String sitesFolderPath;
-    protected Pattern siteFolderNamePattern;
+	protected String sitesFolderPath;
+	protected Pattern siteFolderNamePattern;
 
-    public FolderScanningSiteListResolver(String siteRootFolderPath, MacroResolver macroResolver) {
-        this.siteNameMacroName = SiteContextFactory.DEFAULT_SITE_NAME_MACRO_NAME;
-        this.siteRootFolderPath = siteRootFolderPath;
-        this.macroResolver = macroResolver;
-    }
+	public FolderScanningSiteListResolver(String siteRootFolderPath, MacroResolver macroResolver) {
+		this.siteNameMacroName = SiteContextFactory.DEFAULT_SITE_NAME_MACRO_NAME;
+		this.siteRootFolderPath = siteRootFolderPath;
+		this.macroResolver = macroResolver;
+	}
 
-    public void setSiteNameMacroName(String siteNameMacroName) {
-        this.siteNameMacroName = siteNameMacroName;
-    }
+	public void setSiteNameMacroName(String siteNameMacroName) {
+		this.siteNameMacroName = siteNameMacroName;
+	}
 
-    @Override
-    public void setResourceLoader(ResourceLoader resourceLoader) {
-        this.resourceLoader = resourceLoader;
-    }
+	@Override
+	public void setResourceLoader(ResourceLoader resourceLoader) {
+		this.resourceLoader = resourceLoader;
+	}
 
-    public void afterPropertiesSet() {
-        String siteRootFolderPathRegex = String.format(SITE_ROOT_FOLDER_PATH_REGEX, siteNameMacroName);
-        Pattern siteRootFolderPathPattern = Pattern.compile(siteRootFolderPathRegex);
-        Matcher siteRootFolderPathMatcher = siteRootFolderPathPattern.matcher(siteRootFolderPath);
+	public void afterPropertiesSet() {
+		String siteRootFolderPathRegex = String.format(SITE_ROOT_FOLDER_PATH_REGEX, siteNameMacroName);
+		Pattern siteRootFolderPathPattern = Pattern.compile(siteRootFolderPathRegex);
+		Matcher siteRootFolderPathMatcher = siteRootFolderPathPattern.matcher(siteRootFolderPath);
 
-        if (siteRootFolderPathMatcher.matches()) {
-            sitesFolderPath = siteRootFolderPathMatcher.group(SITES_FOLDER_PATH_GROUP);
-            sitesFolderPath = macroResolver.resolveMacros(sitesFolderPath);
+		if (siteRootFolderPathMatcher.matches()) {
+			sitesFolderPath = siteRootFolderPathMatcher.group(SITES_FOLDER_PATH_GROUP);
+			sitesFolderPath = macroResolver.resolveMacros(sitesFolderPath);
 
-            String siteFolderNameFormat = siteRootFolderPathMatcher.group(SITE_FOLDER_NAME_FORMAT_GROUP);
-            String siteFolderNameRegex = siteFolderNameFormat.replace("{" + siteNameMacroName + "}", "(.+)");
+			String siteFolderNameFormat = siteRootFolderPathMatcher.group(SITE_FOLDER_NAME_FORMAT_GROUP);
+			String siteFolderNameRegex = siteFolderNameFormat.replace("{" + siteNameMacroName + "}", "(.+)");
 
-            siteFolderNamePattern = Pattern.compile(siteFolderNameRegex);
-        } else {
-            throw new IllegalStateException("The site root folder path " + siteRootFolderPath + " doesn't match " +
-                                            "the regex " + siteRootFolderPathRegex);
-        }
-    }
+			siteFolderNamePattern = Pattern.compile(siteFolderNameRegex);
+		} else {
+			throw new IllegalStateException("The site root folder path " + siteRootFolderPath + " doesn't match " +
+				"the regex " + siteRootFolderPathRegex);
+		}
+	}
 
-    @Override
-    public Collection<String> getSiteList() {
-        List<String> siteNames = new ArrayList<>();
-        File sitesFolder = getSitesFolder();
+	@Override
+	public Collection<String> getSiteList() {
+		List<String> siteNames = new ArrayList<>();
+		File sitesFolder = getSitesFolder();
 
-        if (sitesFolder != null) {
-            File[] files = sitesFolder.listFiles();
+		if (sitesFolder != null) {
+			File[] files = sitesFolder.listFiles();
 
-            if (ArrayUtils.isNotEmpty(files)) {
-                for (File file : files) {
-                    if (file.isDirectory()) {
-                        Matcher siteFolderNameMatcher = siteFolderNamePattern.matcher(file.getName());
-                        if (siteFolderNameMatcher.matches()) {
-                            siteNames.add(siteFolderNameMatcher.group(1));
-                        }
-                    }
-                }
-            }
-        }
+			if (ArrayUtils.isNotEmpty(files)) {
+				for (File file : files) {
+					if (file.isDirectory()) {
+						Matcher siteFolderNameMatcher = siteFolderNamePattern.matcher(file.getName());
+						if (siteFolderNameMatcher.matches()) {
+							siteNames.add(siteFolderNameMatcher.group(1));
+						}
+					}
+				}
+			}
+		}
 
-        return siteNames;
-    }
+		return siteNames;
+	}
 
-    protected File getSitesFolder() {
-        try {
-            File sitesFolder = resourceLoader.getResource(sitesFolderPath).getFile();
-            if (sitesFolder.exists()) {
-                logger.info("Sites folder resolved to " + sitesFolder.getAbsolutePath());
+	protected File getSitesFolder() {
+		try {
+			File sitesFolder = resourceLoader.getResource(sitesFolderPath).getFile();
+			if (sitesFolder.exists()) {
+				logger.debug("Sites folder resolved to '{}'", sitesFolder.getAbsolutePath());
 
-                return sitesFolder;
-            } else {
-                logger.error("Sites folder " + sitesFolderPath + " doesn't exist");
+				return sitesFolder;
+			} else {
+				logger.error("Sites folder '{}' doesn't exist", sitesFolderPath);
 
-                return null;
-            }
-        } catch (IOException e) {
-            logger.error("Unable to retrieve sites folder " + sitesFolderPath, e);
+				return null;
+			}
+		} catch (IOException e) {
+			logger.error("Unable to retrieve sites folder '{}'", sitesFolderPath, e);
 
-            return null;
-        }
-    }
+			return null;
+		}
+	}
 }
