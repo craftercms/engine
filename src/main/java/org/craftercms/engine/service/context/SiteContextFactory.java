@@ -16,6 +16,7 @@
 package org.craftercms.engine.service.context;
 
 import groovy.lang.GroovyClassLoader;
+import jakarta.servlet.ServletContext;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.logging.Log;
@@ -25,6 +26,7 @@ import org.craftercms.commons.config.EncryptionAwareConfigurationReader;
 import org.craftercms.commons.config.PublishingTargetResolver;
 import org.craftercms.commons.spring.ApacheCommonsConfiguration2PropertySource;
 import org.craftercms.commons.spring.context.RestrictedApplicationContext;
+import org.craftercms.commons.spring.groovy.SandboxInterceptorFactory;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.url.UrlTransformationEngine;
@@ -44,10 +46,6 @@ import org.craftercms.engine.util.groovy.Dom4jExtension;
 import org.craftercms.engine.util.quartz.JobContext;
 import org.craftercms.engine.util.spring.ContentStoreResourceLoader;
 import org.craftercms.engine.util.spring.servlet.i18n.ChainLocaleResolver;
-import org.jenkinsci.plugins.scriptsecurity.sandbox.Whitelist;
-import org.jenkinsci.plugins.scriptsecurity.sandbox.blacklists.Blacklist;
-import org.jenkinsci.plugins.scriptsecurity.sandbox.groovy.SandboxInterceptor;
-import org.jenkinsci.plugins.scriptsecurity.sandbox.whitelists.PermitAllWhitelist;
 import org.quartz.Scheduler;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectFactory;
@@ -65,11 +63,8 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
 import org.tuckey.web.filters.urlrewrite.Conf;
 import org.tuckey.web.filters.urlrewrite.UrlRewriter;
 
-import jakarta.servlet.ServletContext;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLClassLoader;
@@ -145,9 +140,11 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     protected boolean enableScriptSandbox;
     protected boolean enableSandboxBlacklist;
     protected String sandboxBlacklist;
+    protected boolean enableSandboxWhitelist;
+    protected String sandboxWhitelist;
     protected boolean enableExpressions;
     protected boolean enableTranslation;
-    protected List<String> whitelistGetEnvRegex;
+    protected String[] whitelistGetEnvRegex;
 
     public SiteContextFactory(String storeType, String rootFolderPath, String staticAssetsPath, String templatesPath,
                               String initScriptPath, String restScriptsPath, final String controllerScriptsPath,
@@ -192,7 +189,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         this.cacheWarmUpEnabled = cacheWarmUpEnabled;
         this.cacheWarmer = cacheWarmer;
         this.configurationReader = configurationReader;
-        this.whitelistGetEnvRegex = Arrays.stream(whitelistGetEnvRegex).toList();
+        this.whitelistGetEnvRegex = whitelistGetEnvRegex;
     }
 
     @Override
@@ -254,6 +251,14 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
 
     public void setSandboxBlacklist(String sandboxBlacklist) {
         this.sandboxBlacklist = sandboxBlacklist;
+    }
+
+    public void setEnableSandboxWhitelist(boolean enableSandboxWhitelist) {
+        this.enableSandboxWhitelist = enableSandboxWhitelist;
+    }
+
+    public void setSandboxWhitelist(String sandboxWhitelist) {
+        this.sandboxWhitelist = sandboxWhitelist;
     }
 
     public void setEnableExpressions(boolean enableExpressions) {
@@ -418,24 +423,25 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         }
     }
 
+    /**
+     * Configure script sandbox for the given site context
+     * If sandbox is enabled, it will set the sandbox interceptor in the site context
+     *
+     * @param siteContext    the site context to configure
+     * @param resourceLoader the resource loader to use to load the whitelist/blacklist resources
+     */
     protected void configureScriptSandbox(SiteContext siteContext, ResourceLoader resourceLoader) {
         try {
-            // Enable both hardcoded & configurable blacklists
-            if (enableScriptSandbox && enableSandboxBlacklist) {
-                Resource sandboxBlacklist = resourceLoader.getResource(this.sandboxBlacklist);
-                try (InputStream is = sandboxBlacklist.getInputStream()) {
-                    Blacklist blacklist = new Blacklist(new InputStreamReader(is));
-                    blacklist.setGetEnvWhitelistRegex(whitelistGetEnvRegex);
-                    siteContext.scriptSandbox = new SandboxInterceptor(blacklist, singletonList(Dom4jExtension.class));
-                }
-            // Enable only the hardcoded blacklist
-            } else if (enableScriptSandbox) {
-                Whitelist whitelist = new PermitAllWhitelist();
-                whitelist.setGetEnvWhitelistRegex(whitelistGetEnvRegex);
-                siteContext.scriptSandbox = new SandboxInterceptor(whitelist, singletonList(Dom4jExtension.class));
+            if (enableScriptSandbox) {
+                Resource whitelistResource = enableSandboxWhitelist ? resourceLoader.getResource(sandboxWhitelist) : null;
+                Resource blacklistResource = enableSandboxBlacklist ? resourceLoader.getResource(sandboxBlacklist) : null;
+                SandboxInterceptorFactory sandboxInterceptorFactory = new SandboxInterceptorFactory(enableScriptSandbox, enableSandboxBlacklist, blacklistResource,
+                        enableSandboxWhitelist, whitelistResource, whitelistGetEnvRegex, singletonList(Dom4jExtension.class));
+                sandboxInterceptorFactory.afterPropertiesSet();
+                siteContext.scriptSandbox = sandboxInterceptorFactory.getObject();
             }
-        } catch (IOException e) {
-            throw new SiteContextCreationException("Unable to load sandbox blacklist for site '" +
+        } catch (Exception e) {
+            throw new SiteContextCreationException("Unable to load sandbox whitelist for site '" +
                     siteContext.getSiteName() + "'", e);
         }
     }
