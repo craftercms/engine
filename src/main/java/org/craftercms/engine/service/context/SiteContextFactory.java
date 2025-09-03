@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2024 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2025 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -16,6 +16,7 @@
 package org.craftercms.engine.service.context;
 
 import groovy.lang.GroovyClassLoader;
+import jakarta.servlet.ServletContext;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.logging.Log;
@@ -25,6 +26,7 @@ import org.craftercms.commons.config.EncryptionAwareConfigurationReader;
 import org.craftercms.commons.config.PublishingTargetResolver;
 import org.craftercms.commons.spring.ApacheCommonsConfiguration2PropertySource;
 import org.craftercms.commons.spring.context.RestrictedApplicationContext;
+import org.craftercms.commons.spring.groovy.SandboxInterceptorFactory;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Context;
 import org.craftercms.core.url.UrlTransformationEngine;
@@ -44,10 +46,6 @@ import org.craftercms.engine.util.groovy.Dom4jExtension;
 import org.craftercms.engine.util.quartz.JobContext;
 import org.craftercms.engine.util.spring.ContentStoreResourceLoader;
 import org.craftercms.engine.util.spring.servlet.i18n.ChainLocaleResolver;
-import org.jenkinsci.plugins.scriptsecurity.sandbox.Whitelist;
-import org.jenkinsci.plugins.scriptsecurity.sandbox.blacklists.Blacklist;
-import org.jenkinsci.plugins.scriptsecurity.sandbox.groovy.SandboxInterceptor;
-import org.jenkinsci.plugins.scriptsecurity.sandbox.whitelists.PermitAllWhitelist;
 import org.quartz.Scheduler;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectFactory;
@@ -65,12 +63,8 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
 import org.tuckey.web.filters.urlrewrite.Conf;
 import org.tuckey.web.filters.urlrewrite.UrlRewriter;
 
-import jakarta.servlet.ServletContext;
-
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLClassLoader;
@@ -146,19 +140,21 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
 	protected boolean enableScriptSandbox;
 	protected boolean enableSandboxBlacklist;
 	protected String sandboxBlacklist;
+	protected boolean enableSandboxWhitelist;
+	protected String sandboxWhitelist;
 	protected boolean enableExpressions;
 	protected boolean enableTranslation;
-	protected List<String> whitelistGetEnvRegex;
+	protected String[] whitelistGetEnvRegex;
 
 	public SiteContextFactory(String storeType, String rootFolderPath, String staticAssetsPath, String templatesPath,
-				  String initScriptPath, String restScriptsPath, final String controllerScriptsPath,
-				  String[] configPaths, String[] applicationContextPaths, String[] urlRewriteConfPaths,
-				  String[] proxyConfigPaths, String groovyClassesPath, Map<String, Object> groovyGlobalVars,
-				  ObjectFactory<FreeMarkerConfig> freeMarkerConfigFactory, UrlTransformationEngine urlTransformationEngine,
-				  ContentStoreService storeService, CacheTemplate cacheTemplate, MacroResolver macroResolver,
-				  List<ScriptJobResolver> jobResolvers, Executor jobThreadPoolExecutor, GraphQLFactory graphQLFactory,
-				  boolean cacheWarmUpEnabled, SiteCacheWarmer cacheWarmer, EncryptionAwareConfigurationReader configurationReader,
-				  String[] whitelistGetEnvRegex) {
+							  String initScriptPath, String restScriptsPath, final String controllerScriptsPath,
+							  String[] configPaths, String[] applicationContextPaths, String[] urlRewriteConfPaths,
+							  String[] proxyConfigPaths, String groovyClassesPath, Map<String, Object> groovyGlobalVars,
+							  ObjectFactory<FreeMarkerConfig> freeMarkerConfigFactory, UrlTransformationEngine urlTransformationEngine,
+							  ContentStoreService storeService, CacheTemplate cacheTemplate, MacroResolver macroResolver,
+							  List<ScriptJobResolver> jobResolvers, Executor jobThreadPoolExecutor, GraphQLFactory graphQLFactory,
+							  boolean cacheWarmUpEnabled, SiteCacheWarmer cacheWarmer, EncryptionAwareConfigurationReader configurationReader,
+							  String[] whitelistGetEnvRegex) {
 		siteNameMacroName = DEFAULT_SITE_NAME_MACRO_NAME;
 		mergingOn = Context.DEFAULT_MERGING_ON;
 		cacheOn = Context.DEFAULT_CACHE_ON;
@@ -193,7 +189,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
 		this.cacheWarmUpEnabled = cacheWarmUpEnabled;
 		this.cacheWarmer = cacheWarmer;
 		this.configurationReader = configurationReader;
-		this.whitelistGetEnvRegex = Arrays.stream(whitelistGetEnvRegex).toList();
+		this.whitelistGetEnvRegex = whitelistGetEnvRegex;
 	}
 
 	@Override
@@ -257,6 +253,14 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
 		this.sandboxBlacklist = sandboxBlacklist;
 	}
 
+	public void setEnableSandboxWhitelist(boolean enableSandboxWhitelist) {
+		this.enableSandboxWhitelist = enableSandboxWhitelist;
+	}
+
+	public void setSandboxWhitelist(String sandboxWhitelist) {
+		this.sandboxWhitelist = sandboxWhitelist;
+	}
+
 	public void setEnableExpressions(boolean enableExpressions) {
 		this.enableExpressions = enableExpressions;
 	}
@@ -284,7 +288,8 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
 		configVariables.put(SITE_NAME_CONFIG_VARIABLE, siteName);
 		configVariables.put(SITE_ID_CONFIG_VARIABLE, siteName);
 		Context context = storeService.getContext(UUID.randomUUID().toString(), storeType, resolvedRootFolderPath,
-			mergingOn, cacheOn, maxAllowedItemsInCache, ignoreHiddenFiles, configVariables);
+				mergingOn, cacheOn, maxAllowedItemsInCache, ignoreHiddenFiles,
+				configVariables);
 
 		try {
 			SiteContext siteContext = new SiteContext();
@@ -419,33 +424,34 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
 		}
 	}
 
+	/**
+	 * Configure script sandbox for the given site context
+	 * If sandbox is enabled, it will set the sandbox interceptor in the site context
+	 *
+	 * @param siteContext    the site context to configure
+	 * @param resourceLoader the resource loader to use to load the whitelist/blacklist resources
+	 */
 	protected void configureScriptSandbox(SiteContext siteContext, ResourceLoader resourceLoader) {
 		try {
-			// Enable both hardcoded & configurable blacklists
-			if (enableScriptSandbox && enableSandboxBlacklist) {
-				Resource sandboxBlacklist = resourceLoader.getResource(this.sandboxBlacklist);
-				try (InputStream is = sandboxBlacklist.getInputStream()) {
-					Blacklist blacklist = new Blacklist(new InputStreamReader(is));
-					blacklist.setGetEnvWhitelistRegex(whitelistGetEnvRegex);
-					siteContext.scriptSandbox = new SandboxInterceptor(blacklist, singletonList(Dom4jExtension.class));
-				}
-				// Enable only the hardcoded blacklist
-			} else if (enableScriptSandbox) {
-				Whitelist whitelist = new PermitAllWhitelist();
-				whitelist.setGetEnvWhitelistRegex(whitelistGetEnvRegex);
-				siteContext.scriptSandbox = new SandboxInterceptor(whitelist, singletonList(Dom4jExtension.class));
+			if (enableScriptSandbox) {
+				Resource whitelistResource = enableSandboxWhitelist ? resourceLoader.getResource(sandboxWhitelist) : null;
+				Resource blacklistResource = enableSandboxBlacklist ? resourceLoader.getResource(sandboxBlacklist) : null;
+				SandboxInterceptorFactory sandboxInterceptorFactory = new SandboxInterceptorFactory(enableScriptSandbox, enableSandboxBlacklist, blacklistResource,
+						enableSandboxWhitelist, whitelistResource, whitelistGetEnvRegex, singletonList(Dom4jExtension.class));
+				sandboxInterceptorFactory.afterPropertiesSet();
+				siteContext.scriptSandbox = sandboxInterceptorFactory.getObject();
 			}
-		} catch (IOException e) {
-			throw new SiteContextCreationException("Unable to load sandbox blacklist for site '" +
-				siteContext.getSiteName() + "'", e);
+		} catch (Exception e) {
+			throw new SiteContextCreationException("Unable to load sandbox whitelist for site '" +
+					siteContext.getSiteName() + "'", e);
 		}
 	}
 
 	protected URLClassLoader getClassLoader(SiteContext siteContext) {
 		GroovyClassLoader classLoader =
-			new GroovyClassLoader(getClass().getClassLoader(), getCompilerConfiguration(enableScriptSandbox));
+				new GroovyClassLoader(getClass().getClassLoader(), getCompilerConfiguration(enableScriptSandbox));
 		ContentStoreGroovyResourceLoader resourceLoader = new ContentStoreGroovyResourceLoader(siteContext,
-			groovyClassesPath);
+				groovyClassesPath);
 
 		classLoader.setResourceLoader(resourceLoader);
 
@@ -453,9 +459,9 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
 	}
 
 	protected ConfigurableApplicationContext getApplicationContext(SiteContext siteContext, URLClassLoader classLoader,
-								       HierarchicalConfiguration config,
-								       String[] applicationContextPaths,
-								       ResourceLoader resourceLoader) {
+																   HierarchicalConfiguration config,
+																   String[] applicationContextPaths,
+																   ResourceLoader resourceLoader) {
 		String siteName = siteContext.getSiteName();
 
 		logger.info("--------------------------------------------------");
@@ -513,7 +519,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
 	}
 
 	protected UrlRewriter getUrlRewriter(SiteContext siteContext, String[] urlRewriteConfPaths,
-					     ResourceLoader resourceLoader) {
+										 ResourceLoader resourceLoader) {
 		String siteName = siteContext.getSiteName();
 		String confPath = null;
 		Resource confResource = null;
@@ -567,7 +573,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
 	}
 
 	protected HierarchicalConfiguration getProxyConfig(SiteContext siteContext, List<String> configPaths,
-							   ResourceLoader resourceLoader) {
+													   ResourceLoader resourceLoader) {
 		String siteName = siteContext.getSiteName();
 
 		logger.info("-------------------------------------------------------");
@@ -593,7 +599,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
 	}
 
 	protected HierarchicalConfiguration getTranslationConfig(SiteContext siteContext, List<String> configPaths,
-								 ResourceLoader resourceLoader) {
+															 ResourceLoader resourceLoader) {
 		String siteName = siteContext.getSiteName();
 
 		logger.info("-------------------------------------------------------");
@@ -611,7 +617,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
 			return null;
 		} catch (ConfigurationException e) {
 			throw new SiteContextCreationException("Unable to load translation configuration for site '" + siteName +
-				"'", e);
+					"'", e);
 		} finally {
 			logger.info("---------------------------------------------------------");
 			logger.info("</Loading translation configuration for site: " + siteName + ">");
@@ -628,7 +634,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
 
 	protected ScriptFactory getScriptFactory(SiteContext siteContext, URLClassLoader classLoader) {
 		return new GroovyScriptFactory(siteContext, new ContentStoreResourceConnector(siteContext), classLoader,
-			groovyGlobalVars, enableScriptSandbox);
+				groovyGlobalVars, enableScriptSandbox);
 	}
 
 	protected Scheduler scheduleJobs(SiteContext siteContext) {
@@ -650,8 +656,8 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
 
 			if (CollectionUtils.isNotEmpty(allJobContexts)) {
 				Scheduler scheduler = SchedulingUtils.createScheduler(
-					String.format("%s_%s_scheduler", siteName, siteContext.getContext().getId()),
-					jobThreadPoolExecutor);
+						String.format("%s_%s_scheduler", siteName, siteContext.getContext().getId()),
+						jobThreadPoolExecutor);
 
 				for (JobContext jobContext : allJobContexts) {
 					scheduler.scheduleJob(jobContext.getDetail(), jobContext.getTrigger());
