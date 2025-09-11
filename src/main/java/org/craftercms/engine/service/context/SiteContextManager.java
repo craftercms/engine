@@ -597,6 +597,9 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
                     logger.warn("Error while removing directory watcher register for site '{}'", siteName, e);
                 }
             }
+            // Clear per-site watcher state
+            directoryWatcherLastProcessedHash.remove(siteName);
+            directoryWatcherCounter.remove(siteName);
 
             if (directoryWatcherExecutor.get(siteName) != null) {
                 ScheduledExecutorService executor = directoryWatcherExecutor.remove(siteName);
