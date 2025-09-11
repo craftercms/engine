@@ -272,10 +272,16 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
                 byte[] content = IOUtils.toByteArray(objectIS, contentLength);
                 return new S3CachedObject(bucket, key, lastModified, contentLength, content);
             } else {
+                String eTag = objectResp.eTag();
+
                 objectIS.abort();
 
-                Supplier<InputStream> contentSupplier = getContentSupplierForS3Object(bucket, key);
-                return new S3Object(bucket, key, lastModified, contentLength, contentSupplier);
+                return new S3Object(
+                        bucket,
+                        key,
+                        lastModified,
+                        contentLength,
+                        getContentSupplierForS3Object(bucket, key, eTag));
             }
         } catch (NoSuchKeyException e) {
             logger.debug("No S3 object found at 's3://{}/{}'", bucket, key);
@@ -307,10 +313,11 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
         return contentLength <= contentMaxLength;
     }
 
-    protected Supplier<InputStream> getContentSupplierForS3Object(String bucket, String key) {
+    protected Supplier<InputStream> getContentSupplierForS3Object(String bucket, String key, String eTag) {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucket)
                 .key(key)
+                .ifMatch(eTag)
                 .build();
 
         return () -> client.getObject(getObjectRequest);

@@ -79,8 +79,8 @@ public class SiteContextRestController extends RestControllerBase {
 
         contextManager.startRemoveSiteContext(siteName);
 
-        return createResponseMessage(format("Started remove of site context for '%s' from the system. If a request " +
-                                            "for the site is received in the future, a new site context will be created and registered", siteName));
+        return createResponseMessage(format("Started removal of site context for '%s' from the system. If a request " +
+                "for the site is received in the future, a new site context will be created and registered.", siteName));
     }
 
     @GetMapping(URL_REBUILD_ALL)
