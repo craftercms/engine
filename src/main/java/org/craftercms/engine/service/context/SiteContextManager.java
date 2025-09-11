@@ -24,7 +24,7 @@ import org.craftercms.commons.entitlements.exception.EntitlementException;
 import org.craftercms.commons.entitlements.model.EntitlementType;
 import org.craftercms.commons.entitlements.validator.EntitlementValidator;
 import org.craftercms.commons.validation.annotations.param.ValidSiteId;
-import org.craftercms.engine.event.SiteContextPurgedEvent;
+import org.craftercms.engine.event.SiteContextRemovedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -370,9 +370,9 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
         contextRegistry.forEach((siteName, siteContext) -> {
             if (!siteContext.isFallback() && !siteNames.contains(siteName)) {
                 try {
-                    destroyContext(siteName);
+                    removeSiteContext(siteName);
                 } catch (Exception e) {
-                    logger.error("Error destroying site context for site '{}'", siteName, e);
+                    logger.error("Error removing site context for site '{}'", siteName, e);
                 }
             }
         });
@@ -478,7 +478,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
         } else if (!siteContext.isValid()) {
             logger.error("Site context '{}' is not valid anymore", siteContext);
 
-            destroyContext(siteName);
+            removeSiteContext(siteName);
 
             siteContext = null;
         }
@@ -566,12 +566,12 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
     }
 
     /**
-     * Starts a destroy context in the background
+     * Starts a remove site context in the background
      *
      * @param siteName the site name of the context
      */
-    public void startDestroyContext(String siteName) {
-        jobThreadPoolExecutor.execute(() -> destroyContext(siteName));
+    public void startRemoveSiteContext(String siteName) {
+        jobThreadPoolExecutor.execute(() -> removeSiteContext(siteName));
     }
 
     /**
@@ -579,8 +579,13 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
      *
      * @param siteName the site name of the context to destroy
      */
-    protected void destroyContext(String siteName) {
+    protected void removeSiteContext(String siteName) {
         SiteContext siteContext;
+
+        logger.info("==================================================");
+        logger.info("<Removing site context: '{}'>", siteName);
+        logger.info("==================================================");
+
         Lock siteLock = siteLockFactory.getLock(siteName);
         siteLock.lock();
         try {
@@ -604,39 +609,15 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
         }
 
         if (siteContext != null) {
-            logger.info("==================================================");
-            logger.info("<Destroying site context: '{}'>", siteName);
-            logger.info("==================================================");
-
             try {
                 destroyContext(siteContext);
             } finally {
-                applicationContext.publishEvent(new SiteContextPurgedEvent(siteContext));
-            }
-
-            logger.info("==================================================");
-            logger.info("</Destroying site context: '{}'>", siteName);
-            logger.info("==================================================");
-        }
-    }
-
-    protected void destroyContexts(Collection<String> siteNames) {
-        logger.info("==================================================");
-        logger.info("<DESTROYING SITE CONTEXTS>");
-        logger.info("==================================================");
-
-        if (CollectionUtils.isNotEmpty(siteNames)) {
-            for (String siteName : siteNames) {
-                try {
-                    destroyContext(siteName);
-                } catch (Exception e) {
-                    logger.error("Error destroying site context for site '{}'", siteName, e);
-                }
+                applicationContext.publishEvent(new SiteContextRemovedEvent(siteContext));
             }
         }
 
         logger.info("==================================================");
-        logger.info("</DESTROYING SITE CONTEXTS>");
+        logger.info("</Removing site context: '{}'>", siteName);
         logger.info("==================================================");
     }
 

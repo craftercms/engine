@@ -18,7 +18,6 @@ package org.craftercms.engine.store.s3;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.craftercms.commons.lang.RegexUtils;
 import org.craftercms.core.exception.AuthenticationException;
@@ -46,7 +45,6 @@ import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.paginators.ListObjectsV2Iterable;
 
 import java.beans.ConstructorProperties;
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
@@ -58,6 +56,7 @@ import static org.apache.commons.lang3.StringUtils.*;
 
 /**
  * Implementation of {@link org.craftercms.core.store.ContentStoreAdapter} to read files from AWS S3.
+ *
  * @author joseross
  */
 public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAdapter implements InitializingBean, DisposableBean {
@@ -72,7 +71,7 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
     protected final String[] cacheAllowedPaths;
 
     @ConstructorProperties({"pathValidator", "descriptorFileExtension", "metadataFileExtension", "cacheTemplate",
-            "clientBuilder", "contentMaxLength", "cacheAllowedPaths"})
+                            "clientBuilder", "contentMaxLength", "cacheAllowedPaths"})
     public S3ContentStoreAdapter(Validator pathValidator, String descriptorFileExtension,
                                  String metadataFileExtension, CacheTemplate cacheTemplate,
                                  final S3ClientBuilder clientBuilder, final int contentMaxLength, final String[] cacheAllowedPaths) {
@@ -93,12 +92,13 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
 
     /**
      * Check if the result of listing S3 object response is empty
+     *
      * @param result instance of {@link ListObjectsV2Response}
      * @return true if the result is empty, false otherwise
      */
     protected boolean isResultEmpty(ListObjectsV2Response result) {
         return (!result.hasCommonPrefixes() || result.commonPrefixes().isEmpty())
-            && (!result.hasContents() || result.contents().isEmpty());
+               && (!result.hasContents() || result.contents().isEmpty());
     }
 
     /**
@@ -108,7 +108,7 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
     public Context createContext(final String id, final String rootFolderPath, final boolean mergingOn,
                                  final boolean cacheOn, final int maxAllowedItemsInCache,
                                  final boolean ignoreHiddenFiles, Map<String, String> configurationVariables)
-        throws RootFolderNotFoundException, StoreException, AuthenticationException {
+            throws RootFolderNotFoundException, StoreException, AuthenticationException {
 
         S3Uri uri = client.utilities().parseUri(URI.create(removeEnd(rootFolderPath, DELIMITER)));
         ListObjectsV2Request request = ListObjectsV2Request.builder()
@@ -122,7 +122,7 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
         }
 
         return new S3Context(id, this, rootFolderPath, mergingOn, cacheOn, maxAllowedItemsInCache,
-                             ignoreHiddenFiles, uri, configurationVariables);
+                ignoreHiddenFiles, uri, configurationVariables);
     }
 
     @Override
@@ -171,7 +171,7 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
             }
         } else {
             // If it is a file, get metadata and content for the file
-           return getObject(s3Context, client, bucketName, key);
+            return getObject(s3Context, client, bucketName, key);
         }
         return null;
     }
@@ -181,7 +181,7 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
      */
     @Override
     protected List<File> doGetChildren(Context context, File dir)
-        throws InvalidContextException, StoreException {
+            throws InvalidContextException, StoreException {
 
         if (!(dir instanceof S3Prefix s3Prefix)) {
             throw new StoreException(format("'%s' is not an S3 prefix", dir));
@@ -205,7 +205,7 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
                     .forEach(p -> children.add(new S3Prefix(bucketName, p.prefix())));
 
             page.contents().stream()
-                    .filter(s-> !context.ignoreHiddenFiles() || !isHidden(s.key()))
+                    .filter(s -> !context.ignoreHiddenFiles() || !isHidden(s.key()))
                     .forEach(s -> children.add(new S3File(bucketName, s.key())));
         }
 
@@ -227,6 +227,7 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
                 .bucket(bucketName)
                 .prefix(rootPrefix)
                 .delimiter(DELIMITER)
+                .maxKeys(1)
                 .build();
         ListObjectsV2Response result = client.listObjectsV2(request);
 
@@ -245,16 +246,16 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
         return FilenameUtils.getName(path).startsWith(".");
     }
 
-
     /**
      * Get S3 object metadata and content
+     *
      * @param context the S3 context
-     * @param client instance of {@link S3Client}
-     * @param bucket bucket name
-     * @param key key name
+     * @param client  instance of {@link S3Client}
+     * @param bucket  bucket name
+     * @param key     key name
      * @return the S3 object, metadata and content included
      */
-    private S3Object getObject(S3Context context, S3Client client, String bucket, String key) {
+    protected S3Object getObject(S3Context context, S3Client client, String bucket, String key) {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucket)
                 .key(key)
@@ -266,17 +267,16 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
             GetObjectResponse objectResp = objectIS.response();
             long lastModified = objectResp.lastModified().toEpochMilli();
             long contentLength = objectResp.contentLength();
-            Supplier<InputStream> contentSupplier;
 
             if (shouldCache(context, key, contentLength)) {
                 byte[] content = IOUtils.toByteArray(objectIS, contentLength);
-                contentSupplier = () -> new ByteArrayInputStream(content);
+                return new S3CachedObject(bucket, key, lastModified, contentLength, content);
             } else {
                 objectIS.abort();
-                contentSupplier = () -> client.getObject(getObjectRequest);
-            }
 
-            return new S3Object(bucket, key, lastModified, contentLength, contentSupplier);
+                Supplier<InputStream> contentSupplier = getContentSupplierForS3Object(bucket, key);
+                return new S3Object(bucket, key, lastModified, contentLength, contentSupplier);
+            }
         } catch (NoSuchKeyException e) {
             logger.debug("No S3 object found at 's3://{}/{}'", bucket, key);
 
@@ -290,19 +290,30 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
      * Indicates if the content should be cached in memory.
      * Content is cached if path matches the 'cacheAllowedPaths` and
      * the content length is not greater than contentMaxLength
-     * @param context the S3 context
-     * @param key the S3 object key
+     *
+     * @param context       the S3 context
+     * @param key           the S3 object key
      * @param contentLength the S3 object content length
      * @return true if the content should be cached in memory, false otherwise
      */
-    private boolean shouldCache(S3Context context, String key, long contentLength) {
+    protected boolean shouldCache(S3Context context, String key, long contentLength) {
         String folderPrefix = context.getKey();
         String path = removeStart(stripStart(key, DELIMITER), stripStart(folderPrefix, DELIMITER));
 
         if (!RegexUtils.matchesAny(path, cacheAllowedPaths)) {
             return false;
         }
+
         return contentLength <= contentMaxLength;
+    }
+
+    protected Supplier<InputStream> getContentSupplierForS3Object(String bucket, String key) {
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucket)
+                .key(key)
+                .build();
+
+        return () -> client.getObject(getObjectRequest);
     }
 
 }

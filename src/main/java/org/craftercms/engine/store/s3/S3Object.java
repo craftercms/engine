@@ -48,10 +48,10 @@ public class S3Object extends S3File implements Content {
     /**
      * Main constructor.
      *
-     * @param bucketName the S3 bucket
-     * @param key the S3 key
-     * @param lastModified the last modified timestamp
-     * @param contentLength the content size
+     * @param bucketName      the S3 bucket
+     * @param key             the S3 key
+     * @param lastModified    the last modified timestamp
+     * @param contentLength   the content size
      * @param contentSupplier an InputStream supplier for the content
      */
     public S3Object(String bucketName, String key, long lastModified, long contentLength,
@@ -81,10 +81,10 @@ public class S3Object extends S3File implements Content {
     @Override
     public String toString() {
         return "S3Object{" +
-                "bucketName='" + bucketName + '\'' +
-                ", key='" + key + '\'' +
-                ", lastModified=" + lastModified +
-                ", contentLength=" + FileUtils.byteCountToDisplaySize(contentLength) +
-                '}';
+               "bucketName='" + bucketName + '\'' +
+               ", key='" + key + '\'' +
+               ", lastModified=" + lastModified +
+               ", contentLength=" + FileUtils.byteCountToDisplaySize(contentLength) +
+               '}';
     }
 }
