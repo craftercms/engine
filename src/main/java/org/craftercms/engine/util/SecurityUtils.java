@@ -63,6 +63,7 @@ public class SecurityUtils {
 						return Arrays.asList(role, prependIfMissing(role, ROLE_PREFIX)).stream();
 					}
 				})
+				.distinct()
 				.toList();
 	}
 

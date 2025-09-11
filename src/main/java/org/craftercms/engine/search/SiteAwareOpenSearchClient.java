@@ -25,6 +25,7 @@ import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.SearchType;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
+import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch.core.SearchRequest;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -39,7 +40,6 @@ import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.collections4.list.SetUniqueList.setUniqueList;
-import static org.apache.commons.lang3.StringUtils.SPACE;
 import static org.craftercms.commons.locale.LocaleUtils.appendLocale;
 import static org.craftercms.commons.locale.LocaleUtils.getCompatibleLocales;
 import static org.craftercms.engine.util.LocaleUtils.*;
@@ -200,7 +200,10 @@ public class SiteAwareOpenSearchClient extends AbstractOpenSearchClientWrapper {
 		super.updateQuery(request, parameters, updates);
 
 		// Use the updated if it exists
-		BoolQuery mainQuery = Optional.ofNullable(updates.getQuery()).orElse(request.query()).bool();
+		Query mainQuery = Optional.ofNullable(updates.getQuery()).orElse(request.query());
+		if (mainQuery == null) {
+			mainQuery = new Query.Builder().matchAll(_m -> _m).build();
+		}
 
 		Authentication auth = SecurityContextHolder.getContext() != null?
 				SecurityContextHolder.getContext().getAuthentication() : null;
@@ -254,9 +257,10 @@ public class SiteAwareOpenSearchClient extends AbstractOpenSearchClientWrapper {
 			logger.debug("Filtering search to show only public items");
 		}
 
+		Query finalMainQuery = mainQuery;
 		updates.setQuery(q -> q
 				.bool(b -> b
-						.must(mainQuery._toQuery())
+						.must(finalMainQuery)
 						.filter(securityQuery.build()._toQuery())
 				)
 		);
