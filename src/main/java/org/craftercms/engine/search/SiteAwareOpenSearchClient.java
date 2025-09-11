@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2025 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -15,12 +15,14 @@
  */
 package org.craftercms.engine.search;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.collections4.list.SetUniqueList;
 import org.apache.commons.lang3.StringUtils;
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.LocaleUtils;
 import org.craftercms.search.opensearch.impl.client.AbstractOpenSearchClientWrapper;
+import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.SearchType;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
@@ -29,7 +31,6 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.beans.ConstructorProperties;
 import java.util.*;
 import java.util.stream.Stream;
@@ -58,6 +59,10 @@ public class SiteAwareOpenSearchClient extends AbstractOpenSearchClientWrapper {
 
     private static final String DEFAULT_FALLBACK_PARAM_NAME = "localeFallback";
 
+    private static final String DISABLED_FIELD_NAME = "disabled";
+    private static final String EXPIRED_FIELD_NAME = "expired_dt";
+    private static final String NOW = "now";
+
     /**
      * Format used to build the index id
      */
@@ -71,21 +76,27 @@ public class SiteAwareOpenSearchClient extends AbstractOpenSearchClientWrapper {
 
     protected final boolean enableTranslation;
 
-    @ConstructorProperties({"client", "indexIdFormat", "enableTranslation"})
-    public SiteAwareOpenSearchClient(OpenSearchClient client, String indexIdFormat, boolean enableTranslation) {
+    protected final boolean enableDefaultFilters;
+
+    @ConstructorProperties({"client", "indexIdFormat", "enableTranslation", "enableDefaultFilters"})
+    public SiteAwareOpenSearchClient(OpenSearchClient client, String indexIdFormat, boolean enableTranslation, boolean enableDefaultFilters) {
         super(client);
         this.indexIdFormat = indexIdFormat;
         this.enableTranslation = enableTranslation;
+        this.enableDefaultFilters = enableDefaultFilters;
     }
 
+    @SuppressWarnings("unused")
     public void setRoleFieldName(final String roleFieldName) {
         this.roleFieldName = roleFieldName;
     }
 
+    @SuppressWarnings("unused")
     public void setLocalesParameterName(String localesParameterName) {
         this.localesParameterName = localesParameterName;
     }
 
+    @SuppressWarnings("unused")
     public void setFallbackParameterName(String fallbackParameterName) {
         this.fallbackParameterName = fallbackParameterName;
     }
@@ -245,11 +256,41 @@ public class SiteAwareOpenSearchClient extends AbstractOpenSearchClientWrapper {
             logger.debug("Filtering search to show only public items");
         }
         updates.setQuery(q -> q
-            .bool(b -> b
-                .must(mainQuery._toQuery())
-                .filter(securityQuery.build()._toQuery())
+                .bool(b ->
+                        b.must(mainQuery.toQuery())
+                .filter(securityQuery.build().toQuery())
+                .filter(getDefaultFiltersQuery().build().toQuery())
             )
         );
+    }
+
+    /**
+     * Builds the default filters query to be applied to all searches
+     * if {@link #enableDefaultFilters} is set to {@code true}.
+     *
+     * @return the default filters query
+     */
+    protected BoolQuery.Builder getDefaultFiltersQuery() {
+        BoolQuery.Builder defaultFiltersQuery = new BoolQuery.Builder();
+        if (enableDefaultFilters) {
+            logger.debug("Adding default filters to search query");
+            defaultFiltersQuery
+                    .mustNot(b -> b
+                            .term(t -> t
+                                    .field(DISABLED_FIELD_NAME)
+                                    .value(v -> v.booleanValue(true))
+                            )
+                    )
+                    .mustNot(b ->
+                            b.range(r -> r
+                                    .field(EXPIRED_FIELD_NAME)
+                                    .lte(JsonData.of(NOW))
+                            )
+                    );
+        } else {
+            logger.debug("Default filters are disabled, not adding them to the search query");
+        }
+        return defaultFiltersQuery;
     }
 
 }

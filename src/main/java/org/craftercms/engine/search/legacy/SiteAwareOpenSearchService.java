@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2025 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -63,6 +63,9 @@ public class SiteAwareOpenSearchService extends AbstractOpenSearchWrapper {
 
     private static final String DEFAULT_FALLBACK_PARAM_NAME = "localeFallback";
 
+    private static final String DISABLED_FIELD_NAME = "disabled";
+    private static final String EXPIRED_FIELD_NAME = "expired_dt";
+    private static final String NOW = "now";
 
     /**
      * Format used to build the index id
@@ -77,21 +80,27 @@ public class SiteAwareOpenSearchService extends AbstractOpenSearchWrapper {
 
     protected final boolean enableTranslation;
 
-    @ConstructorProperties({"client", "indexIdFormat", "enableTranslation"})
-    public SiteAwareOpenSearchService(RestHighLevelClient client, String indexIdFormat, boolean enableTranslation) {
+    protected final boolean enableDefaultFilters;
+
+    @ConstructorProperties({"client", "indexIdFormat", "enableTranslation", "enableDefaultFilters"})
+    public SiteAwareOpenSearchService(RestHighLevelClient client, String indexIdFormat, boolean enableTranslation, boolean enableDefaultFilters) {
         super(client);
         this.indexIdFormat = indexIdFormat;
         this.enableTranslation = enableTranslation;
+        this.enableDefaultFilters = enableDefaultFilters;
     }
 
+    @SuppressWarnings("unused")
     public void setRoleFieldName(final String roleFieldName) {
         this.roleFieldName = roleFieldName;
     }
 
+    @SuppressWarnings("unused")
     public void setLocalesParameterName(String localesParameterName) {
         this.localesParameterName = localesParameterName;
     }
 
+    @SuppressWarnings("unused")
     public void setFallbackParameterName(String fallbackParameterName) {
         this.fallbackParameterName = fallbackParameterName;
     }
@@ -226,7 +235,26 @@ public class SiteAwareOpenSearchService extends AbstractOpenSearchWrapper {
             logger.debug("Filtering search to show only public items");
         }
 
-        mainQuery.filter(boolQuery().must(securityQuery));
+        mainQuery.filter(boolQuery().must(securityQuery))
+                .filter(boolQuery().must(getDefaultFiltersQuery()));
     }
 
+	/**
+	 * Builds the default filters query to be applied to all searches
+	 * if {@link #enableDefaultFilters} is set to {@code true}.
+	 *
+	 * @return the default filters query
+	 */
+	protected BoolQueryBuilder getDefaultFiltersQuery() {
+		BoolQueryBuilder defaultFiltersQuery = boolQuery();
+		if (enableDefaultFilters) {
+			logger.debug("Adding default filters to search query");
+			defaultFiltersQuery
+					.mustNot(termQuery(DISABLED_FIELD_NAME, true))
+					.mustNot(rangeQuery(EXPIRED_FIELD_NAME).lte(NOW));
+		} else {
+			logger.debug("Default filters are disabled, not adding them to the search query");
+		}
+		return defaultFiltersQuery;
+	}
 }
