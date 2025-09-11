@@ -22,6 +22,7 @@ import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.LocaleUtils;
 import org.craftercms.search.opensearch.impl.client.AbstractOpenSearchClientWrapper;
 import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.SearchType;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
 import org.opensearch.client.opensearch.core.SearchRequest;
@@ -38,6 +39,7 @@ import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.collections4.list.SetUniqueList.setUniqueList;
+import static org.apache.commons.lang3.StringUtils.SPACE;
 import static org.craftercms.commons.locale.LocaleUtils.appendLocale;
 import static org.craftercms.commons.locale.LocaleUtils.getCompatibleLocales;
 import static org.craftercms.engine.util.LocaleUtils.*;
@@ -193,63 +195,82 @@ public class SiteAwareOpenSearchClient extends AbstractOpenSearchClientWrapper {
         }
     }
 
-    @Override
-    protected void updateQuery(SearchRequest request, Map<String, Object> parameters, RequestUpdates updates) {
-        super.updateQuery(request, parameters, updates);
+	@Override
+	protected void updateQuery(SearchRequest request, Map<String, Object> parameters, RequestUpdates updates) {
+		super.updateQuery(request, parameters, updates);
 
-        // Use the updated if it exists
-        BoolQuery mainQuery = Optional.ofNullable(updates.getQuery()).orElse(request.query()).bool();
+		// Use the updated if it exists
+		BoolQuery mainQuery = Optional.ofNullable(updates.getQuery()).orElse(request.query()).bool();
 
-        Authentication auth = SecurityContextHolder.getContext() != null?
-                                SecurityContextHolder.getContext().getAuthentication() : null;
+		Authentication auth = SecurityContextHolder.getContext() != null?
+				SecurityContextHolder.getContext().getAuthentication() : null;
 
+		// Include all public items
+		BoolQuery.Builder securityQuery = new BoolQuery.Builder()
+				.should(s -> s
+						.bool(b -> b
+								.mustNot(n -> n
+										.exists(e -> e
+												.field(roleFieldName)
+										)
+								)
+						)
+				)
+				.should(s -> s
+						.terms(t -> t
+								.field(roleFieldNameWithKeyword())
+								.terms(terms -> terms
+										.value(ANONYMOUS_PSEUDO_ROLES_SEARCH_VALUES.stream().map(r ->
+											new FieldValue.Builder().stringValue(r).build()).toList())
+								)
+						)
+				);
 
+		if (auth != null && !(auth instanceof AnonymousAuthenticationToken)) {
+			logger.debug("Filtering search results for authenticated users");
+			securityQuery.should(s -> s
+					.terms(t -> t
+							.field(roleFieldNameWithKeyword())
+							.terms(terms -> terms
+									.value(AUTHENTICATED_PSEUDO_ROLES_SEARCH_VALUES.stream().map(r ->
+										new FieldValue.Builder().stringValue(r).build()).toList())
+							)
+					));
 
-        // Include all public items
-        BoolQuery.Builder securityQuery = new BoolQuery.Builder()
-            .should(s -> s
-                .bool(b -> b
-                    .mustNot(n -> n
-                        .exists(e -> e
-                            .field(roleFieldName)
-                        )
-                    )
-                )
-            )
-            .should(s -> s
-                .match(m -> m
-                    .field(roleFieldName)
-                    .query(q -> q
-                        .stringValue(ANONYMOUS_PSEUDO_ROLE_SEARCH_VALUE)
-                    )
-                )
-            );
+			if (isNotEmpty(auth.getAuthorities())) {
+				logger.debug("Filtering search results for roles: '{}'", auth.getAuthorities());
+				List<String> roles = getAuthorizedRolesMatchValue(auth.getAuthorities());
 
-        if (auth != null && !(auth instanceof AnonymousAuthenticationToken)) {
-            logger.debug("Filtering search results for authenticated users");
-            securityQuery.should(s -> s
-                    .match(m -> m
-                            .field(roleFieldName)
-                            .query(q -> q.stringValue(AUTHENTICATED_PSEUDO_ROLE_SEARCH_VALUE))
-                    ));
-            if (isNotEmpty(auth.getAuthorities())) {
-                logger.debug("Filtering search results for roles: {}", auth.getAuthorities());
-                securityQuery.should(s -> s
-                        .match(m -> m
-                                .field(roleFieldName)
-                                .query(q -> q.stringValue(getAuthorizedRolesMatchValue(auth.getAuthorities()))
-                                )
-                        ));
-            }
-        } else {
-            logger.debug("Filtering search to show only public items");
-        }
-        updates.setQuery(q -> q
-            .bool(b -> b
-                .must(mainQuery._toQuery())
-                .filter(securityQuery.build()._toQuery())
-            )
-        );
-    }
+				securityQuery.should(s -> s
+						.terms(t -> t
+								.field(roleFieldNameWithKeyword())
+								.terms(terms -> terms
+										.value(roles.stream().map(r ->
+												new FieldValue.Builder().stringValue(r).build()).toList())
+								)
+						));
+			}
+		} else {
+			logger.debug("Filtering search to show only public items");
+		}
+
+		updates.setQuery(q -> q
+				.bool(b -> b
+						.must(mainQuery._toQuery())
+						.filter(securityQuery.build()._toQuery())
+				)
+		);
+	}
+
+	/**
+	 * Returns the role field name ensuring it ends with ".keyword"
+	 * @return the role field name with ".keyword" suffix for exact matching
+	 */
+	private String roleFieldNameWithKeyword() {
+		if (roleFieldName.endsWith(".keyword")) {
+			return roleFieldName;
+		}
+		return roleFieldName + ".keyword";
+	}
 
 }
