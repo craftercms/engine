@@ -47,6 +47,7 @@ import software.amazon.awssdk.services.s3.paginators.ListObjectsV2Iterable;
 import java.beans.ConstructorProperties;
 import java.io.InputStream;
 import java.net.URI;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -272,8 +273,6 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
                 byte[] content = IOUtils.toByteArray(objectIS, contentLength);
                 return new S3CachedObject(bucket, key, lastModified, contentLength, content);
             } else {
-                String eTag = objectResp.eTag();
-
                 objectIS.abort();
 
                 return new S3Object(
@@ -281,7 +280,7 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
                         key,
                         lastModified,
                         contentLength,
-                        getContentSupplierForS3Object(bucket, key, eTag));
+                        getContentSupplierForS3Object(bucket, key, lastModified));
             }
         } catch (NoSuchKeyException e) {
             logger.debug("No S3 object found at 's3://{}/{}'", bucket, key);
@@ -313,11 +312,11 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
         return contentLength <= contentMaxLength;
     }
 
-    protected Supplier<InputStream> getContentSupplierForS3Object(String bucket, String key, String eTag) {
+    protected Supplier<InputStream> getContentSupplierForS3Object(String bucket, String key, long lastModified) {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucket)
                 .key(key)
-                .ifMatch(eTag)
+                .ifUnmodifiedSince(Instant.ofEpochMilli(lastModified))
                 .build();
 
         return () -> client.getObject(getObjectRequest);
