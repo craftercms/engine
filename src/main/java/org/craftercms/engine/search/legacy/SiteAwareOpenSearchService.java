@@ -17,6 +17,7 @@
 package org.craftercms.engine.search.legacy;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.engine.service.context.SiteContext;
@@ -28,6 +29,7 @@ import org.opensearch.action.search.SearchType;
 import org.opensearch.action.support.IndicesOptions;
 import org.opensearch.client.RestHighLevelClient;
 import org.opensearch.index.query.BoolQueryBuilder;
+import org.opensearch.index.query.QueryBuilder;
 import org.opensearch.search.builder.SearchSourceBuilder;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -212,7 +214,10 @@ public class SiteAwareOpenSearchService extends AbstractOpenSearchWrapper {
     protected void updateFilters(final SearchRequest request) {
         super.updateFilters(request);
 
-        BoolQueryBuilder mainQuery = (BoolQueryBuilder) request.source().query();
+        QueryBuilder existing = request.source().query();
+        BoolQueryBuilder mainQuery = boolQuery();
+        mainQuery.must(ObjectUtils.getIfNull(existing, matchAllQuery()));
+        request.source().query(mainQuery);
 
         Authentication auth = null;
         SecurityContext context = SecurityContextHolder.getContext();
