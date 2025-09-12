@@ -41,8 +41,8 @@ public class SecurityUtils {
     public static final String ANONYMOUS_PSEUDO_ROLE = "anonymous";
     public static final String ROLE_PREFIX = "ROLE_";
     public static final String AUTHENTICATED_PSEUDO_ROLE = "authenticated";
-	public static final List<String> AUTHENTICATED_PSEUDO_ROLES_SEARCH_VALUES = Arrays.asList(AUTHENTICATED_PSEUDO_ROLE, ROLE_PREFIX + AUTHENTICATED_PSEUDO_ROLE);
-	public static final List<String> ANONYMOUS_PSEUDO_ROLES_SEARCH_VALUES = Arrays.asList(ANONYMOUS_PSEUDO_ROLE, ROLE_PREFIX + ANONYMOUS_PSEUDO_ROLE);
+	public static final List<String> AUTHENTICATED_PSEUDO_ROLES_SEARCH_VALUES = List.of(AUTHENTICATED_PSEUDO_ROLE, ROLE_PREFIX + AUTHENTICATED_PSEUDO_ROLE);
+	public static final List<String> ANONYMOUS_PSEUDO_ROLES_SEARCH_VALUES = List.of(ANONYMOUS_PSEUDO_ROLE, ROLE_PREFIX + ANONYMOUS_PSEUDO_ROLE);
 	public static final String KEYWORD_SUFFIX = ".keyword";
 
     private SecurityUtils() {
