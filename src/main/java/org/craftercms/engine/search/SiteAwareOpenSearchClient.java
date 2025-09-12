@@ -28,6 +28,7 @@ import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.SearchType;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
+import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch.core.SearchRequest;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -211,7 +212,7 @@ public class SiteAwareOpenSearchClient extends AbstractOpenSearchClientWrapper {
 		super.updateQuery(request, parameters, updates);
 
 		// Use the updated if it exists
-		BoolQuery mainQuery = Optional.ofNullable(updates.getQuery()).orElse(request.query()).bool();
+		Query existingQuery = Optional.ofNullable(updates.getQuery()).orElse(request.query());
 
 		Authentication auth = SecurityContextHolder.getContext() != null ?
 				SecurityContextHolder.getContext().getAuthentication() : null;
@@ -265,13 +266,16 @@ public class SiteAwareOpenSearchClient extends AbstractOpenSearchClientWrapper {
 			logger.debug("Filtering search to show only public items");
 		}
 
-		updates.setQuery(q -> q
-				.bool(b ->
-						b.must(mainQuery.toQuery())
-								.filter(securityQuery.build().toQuery())
-								.filter(getDefaultFiltersQuery().build().toQuery())
-				)
-		);
+		updates.setQuery(q -> q.bool(b -> {
+			if (existingQuery != null) {
+				b.must(existingQuery);
+			} else {
+				b.must(m -> m.matchAll(ma -> ma));
+			}
+			b.filter(securityQuery.build().toQuery())
+					.filter(getDefaultFiltersQuery().build().toQuery());
+			return b;
+		}));
 	}
 
 	/**
