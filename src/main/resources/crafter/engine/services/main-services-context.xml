@@ -707,6 +707,10 @@
         <constructor-arg name="indexIdFormat" value="${crafter.engine.search.index.format}"/>
         <constructor-arg name="enableTranslation" value="${crafter.engine.translation.enable}"/>
         <property name="filterQueries" value="${crafter.engine.search.filters}"/>
+        <property name="regexNegativeTermQuery" value="${crafter.engine.search.filters.regex.negativeTermQuery}"/>
+        <property name="regexPositiveTermQuery" value="${crafter.engine.search.filters.regex.positiveTermQuery}"/>
+        <property name="regexNegativeRangeQuery" value="${crafter.engine.search.filters.regex.negativeRangeQuery}"/>
+        <property name="regexPositiveRangeQuery" value="${crafter.engine.search.filters.regex.positiveRangeQuery}"/>
     </bean>
     <alias name="crafter.searchService" alias="crafter.elasticsearchService"/>
     <alias name="crafter.searchClient" alias="crafter.elasticsearchClient"/>
@@ -726,6 +730,10 @@
         <constructor-arg name="indexIdFormat" value="${crafter.engine.search.index.format}"/>
         <constructor-arg name="enableTranslation" value="${crafter.engine.translation.enable}"/>
         <property name="filterQueries" value="${crafter.engine.search.filters}"/>
+        <property name="regexNegativeTermQuery" value="${crafter.engine.search.filters.regex.negativeTermQuery}"/>
+        <property name="regexPositiveTermQuery" value="${crafter.engine.search.filters.regex.positiveTermQuery}"/>
+        <property name="regexNegativeRangeQuery" value="${crafter.engine.search.filters.regex.negativeRangeQuery}"/>
+        <property name="regexPositiveRangeQuery" value="${crafter.engine.search.filters.regex.positiveRangeQuery}"/>
     </bean>
 
     <!-- ////////////////////////////////// -->
