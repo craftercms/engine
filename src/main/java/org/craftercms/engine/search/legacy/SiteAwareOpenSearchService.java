@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.LocaleUtils;
+import org.craftercms.engine.util.SecurityUtils;
 import org.craftercms.search.opensearch.impl.AbstractOpenSearchWrapper;
 import org.opensearch.action.search.SearchRequest;
 import org.opensearch.action.search.SearchType;
@@ -246,10 +247,7 @@ public class SiteAwareOpenSearchService extends AbstractOpenSearchWrapper {
      * @return the role field name ensuring it ends with ".keyword"
      */
     private String roleFieldNameWithKeyword() {
-        if (roleFieldName.endsWith(".keyword")) {
-            return roleFieldName;
-        }
-        return roleFieldName + ".keyword";
+        return SecurityUtils.getRoleFieldNameWithKeyword(roleFieldName);
     }
 
 	/**

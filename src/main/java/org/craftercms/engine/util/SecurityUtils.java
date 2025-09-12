@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2025 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -15,6 +15,7 @@
  */
 package org.craftercms.engine.util;
 
+import org.apache.commons.lang3.Strings;
 import org.springframework.lang.NonNull;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -42,6 +43,7 @@ public class SecurityUtils {
     public static final String AUTHENTICATED_PSEUDO_ROLE = "authenticated";
 	public static final List<String> AUTHENTICATED_PSEUDO_ROLES_SEARCH_VALUES = Arrays.asList(AUTHENTICATED_PSEUDO_ROLE, ROLE_PREFIX + AUTHENTICATED_PSEUDO_ROLE);
 	public static final List<String> ANONYMOUS_PSEUDO_ROLES_SEARCH_VALUES = Arrays.asList(ANONYMOUS_PSEUDO_ROLE, ROLE_PREFIX + ANONYMOUS_PSEUDO_ROLE);
+	public static final String KEYWORD_SUFFIX = ".keyword";
 
     private SecurityUtils() {
     }
@@ -66,7 +68,16 @@ public class SecurityUtils {
 				.toList();
 	}
 
-    /**
+	/**
+	 * Returns the role field name ensuring it ends with ".keyword"
+	 *
+	 * @return the role field name with ".keyword" suffix for search exact matching
+	 */
+	public static String getRoleFieldNameWithKeyword(String roleFieldName) {
+		return Strings.CS.appendIfMissing(roleFieldName, KEYWORD_SUFFIX);
+	}
+
+	/**
      * Validates that the user has access to a content protected by the specified roles.
      * This method will throw an {@link AccessDeniedException} if the user doesn't have access.
      * Access is granted if:
