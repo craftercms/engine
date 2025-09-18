@@ -702,6 +702,8 @@
                 <property name="socketTimeout" ref="crafter.searchSocketTimeout"/>
                 <property name="threadCount" ref="crafter.searchThreadCount"/>
                 <property name="socketKeepAlive" ref="crafter.searchSocketKeepAlive"/>
+                <property name="maxTotalConnections" value="${crafter.engine.search.maxTotalConnections}"/>
+                <property name="maxConnectionsPerRoute" value="${crafter.engine.search.maxConnectionsPerRoute}"/>
             </bean>
         </constructor-arg>
         <constructor-arg name="indexIdFormat" value="${crafter.engine.search.index.format}"/>
@@ -721,6 +723,8 @@
                 <property name="socketTimeout" ref="crafter.searchSocketTimeout"/>
                 <property name="threadCount" ref="crafter.searchThreadCount"/>
                 <property name="socketKeepAlive" ref="crafter.searchSocketKeepAlive"/>
+                <property name="maxTotalConnections" value="${crafter.engine.search.maxTotalConnections}"/>
+                <property name="maxConnectionsPerRoute" value="${crafter.engine.search.maxConnectionsPerRoute}"/>
             </bean>
         </constructor-arg>
         <constructor-arg name="indexIdFormat" value="${crafter.engine.search.index.format}"/>
