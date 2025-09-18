@@ -135,7 +135,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
         siteLocks = Striped.lazyWeakLock(siteLocksStripeCount);
         contextRegistry = new ConcurrentHashMap<>();
         directoryWatcherRegistry = new ConcurrentHashMap<>();
-        directoryWatcherLastProcessedHash = new HashMap<>();
+        directoryWatcherLastProcessedHash = new ConcurrentHashMap<>();
         directoryWatcherCounter = new ConcurrentHashMap<>();
         directoryWatcherExecutor = new ConcurrentHashMap<>();
 
@@ -319,7 +319,9 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
             siteLock.lock();
             try {
                 ScheduledExecutorService oldExecutor = directoryWatcherExecutor.remove(siteName);
-                oldExecutor.shutdown();
+                if (oldExecutor != null) {
+                    oldExecutor.shutdown();
+                }
             } finally {
                 siteLock.unlock();
             }
@@ -673,7 +675,9 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
             SiteContext oldSiteContext = contextRegistry.get(siteName);
             SiteContext newContext = createContext(siteName, fallback);
 
-            oldSiteContext.destroy();
+            if (oldSiteContext != null) {
+                oldSiteContext.destroy();
+            }
 
             logger.info("==================================================");
             logger.info("</Rebuilding site context: '{}'>", siteName);
