@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+m<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
   ~
@@ -65,6 +65,7 @@
         <constructor-arg name="watcherIgnorePaths" value="${crafter.engine.watcher.ignorePaths}"/>
         <constructor-arg name="watcherCounterLimit" value="${crafter.engine.watcher.counter.limit}"/>
         <constructor-arg name="watcherIntervalPeriod" value="${crafter.engine.watcher.interval.period}"/>
+        <constructor-arg name="siteLocksStripeCount" value="${crafter.engine.site.context.locks.stripeCount}"/>
         <property name="entitlementValidator" ref="crafter.entitlementValidator"/>
     </bean>
 

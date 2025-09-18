@@ -15,11 +15,10 @@
  */
 package org.craftercms.engine.service.context;
 
+import com.google.common.util.concurrent.Striped;
 import io.methvin.watcher.DirectoryWatcher;
 import io.methvin.watcher.hashing.FileHasher;
 import org.apache.commons.collections4.CollectionUtils;
-import org.craftercms.commons.concurrent.locks.KeyBasedLockFactory;
-import org.craftercms.commons.concurrent.locks.WeakKeyBasedReentrantLockFactory;
 import org.craftercms.commons.entitlements.exception.EntitlementException;
 import org.craftercms.commons.entitlements.model.EntitlementType;
 import org.craftercms.commons.entitlements.validator.EntitlementValidator;
@@ -41,7 +40,6 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -58,7 +56,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
     private static final Logger logger = LoggerFactory.getLogger(SiteContextManager.class);
 
     protected ApplicationContext applicationContext;
-    protected KeyBasedLockFactory<ReentrantLock> siteLockFactory;
+    protected Striped<Lock> siteLocks;
     protected Map<String, SiteContext> contextRegistry;
     protected SiteContextFactory contextFactory;
     protected SiteContextFactory fallbackContextFactory;
@@ -133,8 +131,8 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
                               Executor jobThreadPoolExecutor, final String defaultSiteName, final int contextBuildRetryMaxCount,
                               final long contextBuildRetryWaitTimeBase, final int contextBuildRetryWaitTimeMultiplier,
                               final boolean modePreview, final String[] watcherPaths, final String[] watcherIgnorePaths,
-                              final int watcherCounterLimit, final int watcherIntervalPeriod) {
-        siteLockFactory = new WeakKeyBasedReentrantLockFactory();
+                              final int watcherCounterLimit, final int watcherIntervalPeriod, final int siteLocksStripeCount) {
+        siteLocks = Striped.lazyWeakLock(siteLocksStripeCount);
         contextRegistry = new ConcurrentHashMap<>();
         directoryWatcherRegistry = new ConcurrentHashMap<>();
         directoryWatcherLastProcessedHash = new HashMap<>();
@@ -255,7 +253,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
                                 // This prevents multiple events for batch files change with same modified date such as from a git pull
                                 String lastProcessedHash = directoryWatcherLastProcessedHash.get(siteName);
                                 if (lastProcessedHash == null || event.hash() == null || !lastProcessedHash.equals(hashValue)) {
-                                    Lock siteLock = siteLockFactory.getLock(siteName);
+                                    Lock siteLock = siteLocks.get(siteName);
                                     siteLock.lock();
                                     try {
                                         if (event.hash() != null) {
@@ -283,7 +281,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
 
             // Remove old watcher before register a new one
             if (directoryWatcherRegistry.get(siteName) != null) {
-                Lock siteLock = siteLockFactory.getLock(siteName);
+                Lock siteLock = siteLocks.get(siteName);
                 siteLock.lock();
                 try {
                     DirectoryWatcher oldWatcher = directoryWatcherRegistry.remove(siteName);
@@ -312,7 +310,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
     public void registerPreviewRebuildTask(String siteName, boolean isFallback) {
         // Remove old executor then register a new one
         if (directoryWatcherExecutor.get(siteName) != null) {
-            Lock siteLock = siteLockFactory.getLock(siteName);
+            Lock siteLock = siteLocks.get(siteName);
             siteLock.lock();
             try {
                 ScheduledExecutorService oldExecutor = directoryWatcherExecutor.remove(siteName);
@@ -404,7 +402,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
             logger.info("<Destroying site context: '{}'>", siteName);
             logger.info("==================================================");
 
-            Lock siteLock = siteLockFactory.getLock(siteName);
+            Lock siteLock = siteLocks.get(siteName);
             siteLock.lock();
             try {
                 if (directoryWatcherRegistry.get(siteName) != null) {
@@ -450,7 +448,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
                 return null;
             }
 
-            Lock siteLock = siteLockFactory.getLock(siteName);
+            Lock siteLock = siteLocks.get(siteName);
             siteLock.lock();
             try {
                 // Double check locking, in case the context has been created already by another thread
@@ -586,7 +584,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
         logger.info("<Removing site context: '{}'>", siteName);
         logger.info("==================================================");
 
-        Lock siteLock = siteLockFactory.getLock(siteName);
+        Lock siteLock = siteLocks.get(siteName);
         siteLock.lock();
         try {
             if (directoryWatcherRegistry.get(siteName) != null) {
@@ -641,7 +639,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
     }
 
     protected SiteContext rebuildContext(String siteName, boolean fallback) {
-        Lock siteLock = siteLockFactory.getLock(siteName);
+        Lock siteLock = siteLocks.get(siteName);
         siteLock.lock();
         try {
             logger.info("==================================================");
