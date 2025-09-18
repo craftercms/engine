@@ -281,13 +281,18 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
 
             // Remove old watcher before register a new one
             if (directoryWatcherRegistry.get(siteName) != null) {
+                DirectoryWatcher oldWatcher;
+
                 Lock siteLock = siteLocks.get(siteName);
                 siteLock.lock();
                 try {
-                    DirectoryWatcher oldWatcher = directoryWatcherRegistry.remove(siteName);
-                    oldWatcher.close();
+                    oldWatcher = directoryWatcherRegistry.remove(siteName);
                 } finally {
                     siteLock.unlock();
+                }
+
+                if (oldWatcher != null) {
+                    oldWatcher.close();
                 }
             }
             directoryWatcherRegistry.put(siteName, watcher);
@@ -402,29 +407,42 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
             logger.info("<Destroying site context: '{}'>", siteName);
             logger.info("==================================================");
 
+            DirectoryWatcher watcher;
+            ScheduledExecutorService executor;
+
             Lock siteLock = siteLocks.get(siteName);
             siteLock.lock();
             try {
-                if (directoryWatcherRegistry.get(siteName) != null) {
-                    DirectoryWatcher watcher = directoryWatcherRegistry.remove(siteName);
+                watcher = directoryWatcherRegistry.remove(siteName);
+                executor = directoryWatcherExecutor.remove(siteName);
+                iter.remove();
+            } finally {
+                siteLock.unlock();
+            }
+
+            if (watcher != null) {
+                try {
                     watcher.close();
+                } catch (Exception e) {
+                    logger.warn("Error while closing directory watcher for site '{}'", siteName, e);
                 }
-                if (directoryWatcherExecutor.get(siteName) != null) {
-                    ScheduledExecutorService executor = directoryWatcherExecutor.remove(siteName);
-                    executor.shutdown();
+            }
+            if (executor != null) {
+                try {
+                    executor.shutdownNow();
+                } catch (Exception e) {
+                    logger.warn("Error while shutting down directory watcher executor for site '{}'", siteName, e);
                 }
+            }
+            try {
                 destroyContext(siteContext);
             } catch (Exception e) {
                 logger.error("Error destroying site context for site '{}'", siteName, e);
-            } finally {
-                siteLock.unlock();
             }
 
             logger.info("==================================================");
             logger.info("</Destroying site context: '{}'>", siteName);
             logger.info("==================================================");
-
-            iter.remove();
         }
 
         logger.info("==================================================");
@@ -578,37 +596,43 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
      * @param siteName the site name of the context to destroy
      */
     protected void removeSiteContext(String siteName) {
-        SiteContext siteContext;
-
         logger.info("==================================================");
         logger.info("<Removing site context: '{}'>", siteName);
         logger.info("==================================================");
 
+        SiteContext siteContext;
+        DirectoryWatcher watcher;
+        ScheduledExecutorService executor;
+
         Lock siteLock = siteLocks.get(siteName);
         siteLock.lock();
         try {
-            if (directoryWatcherRegistry.get(siteName) != null) {
-                try {
-                    DirectoryWatcher watcher = directoryWatcherRegistry.remove(siteName);
-                    watcher.close();
-                } catch (IOException e) {
-                    logger.warn("Error while removing directory watcher register for site '{}'", siteName, e);
-                }
-            }
-
-            if (directoryWatcherExecutor.get(siteName) != null) {
-                ScheduledExecutorService executor = directoryWatcherExecutor.remove(siteName);
-                executor.shutdown();
-            }
-
+            watcher = directoryWatcherRegistry.remove(siteName);
+            executor = directoryWatcherExecutor.remove(siteName);
             siteContext = contextRegistry.remove(siteName);
         } finally {
             siteLock.unlock();
         }
 
+        if (watcher != null) {
+            try {
+                watcher.close();
+            } catch (Exception e) {
+                logger.warn("Error while closing directory watcher for site '{}'", siteName, e);
+            }
+        }
+        if (executor != null) {
+            try {
+                executor.shutdownNow();
+            } catch (Exception e) {
+                logger.warn("Error while shutting down directory watcher executor for site '{}'", siteName, e);
+            }
+        }
         if (siteContext != null) {
             try {
                 destroyContext(siteContext);
+            } catch (Exception e) {
+                logger.error("Error destroying site context for site '{}'", siteName, e);
             } finally {
                 applicationContext.publishEvent(new SiteContextRemovedEvent(siteContext));
             }
