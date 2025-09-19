@@ -95,13 +95,4 @@
         <constructor-arg name="type" value="java.lang.Boolean"/>
     </bean>
 
-    <bean id="crafter.searchFilters" class="org.craftercms.engine.util.spring.properties.FallbackPropertyFactory">
-        <constructor-arg>
-            <util:list>
-                <value>crafter.engine.search.filters</value>
-                <value>crafter.engine.elasticsearch.filters</value>
-            </util:list>
-        </constructor-arg>
-        <constructor-arg name="type" value="java.lang.String"/>
-    </bean>
 </beans>
