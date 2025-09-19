@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2025 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -15,6 +15,7 @@
  */
 package org.craftercms.engine.util;
 
+import org.apache.commons.lang3.Strings;
 import org.springframework.lang.NonNull;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -25,10 +26,11 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import static java.lang.String.format;
-import static java.util.stream.Collectors.joining;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.*;
 
@@ -39,30 +41,43 @@ public class SecurityUtils {
     public static final String ANONYMOUS_PSEUDO_ROLE = "anonymous";
     public static final String ROLE_PREFIX = "ROLE_";
     public static final String AUTHENTICATED_PSEUDO_ROLE = "authenticated";
-    public static final String AUTHENTICATED_PSEUDO_ROLE_SEARCH_VALUE = AUTHENTICATED_PSEUDO_ROLE + SPACE + ROLE_PREFIX + AUTHENTICATED_PSEUDO_ROLE;
-    public static final String ANONYMOUS_PSEUDO_ROLE_SEARCH_VALUE = ANONYMOUS_PSEUDO_ROLE + SPACE + ROLE_PREFIX + ANONYMOUS_PSEUDO_ROLE;
-
+	public static final List<String> AUTHENTICATED_PSEUDO_ROLES_SEARCH_VALUES = List.of(AUTHENTICATED_PSEUDO_ROLE, ROLE_PREFIX + AUTHENTICATED_PSEUDO_ROLE);
+	public static final List<String> ANONYMOUS_PSEUDO_ROLES_SEARCH_VALUES = List.of(ANONYMOUS_PSEUDO_ROLE, ROLE_PREFIX + ANONYMOUS_PSEUDO_ROLE);
+	public static final String KEYWORD_SUFFIX = ".keyword";
 
     private SecurityUtils() {
     }
 
-    /**
-     * Returns the value to be used in the authorizedRoles field of a search request. <br />
-     * For each role, this method will include the role itself and the role with the ROLE_ prefix.
-     *
-     * @param authorities the user authorities/roles
-     * @return the value to be used in the authorizedRoles field of a search request
-     */
-    public static String getAuthorizedRolesMatchValue(@NonNull final Collection<? extends GrantedAuthority> authorities) {
-        return authorities.stream()
-                .map(GrantedAuthority::getAuthority)
-                .map(role -> role + " " +
-                        (startsWith(role, ROLE_PREFIX) ? removeStart(role, ROLE_PREFIX)
-                                : prependIfMissing(role, ROLE_PREFIX)))
-                .collect(joining(SPACE));
-    }
+	/**
+	 * Returns a list of values to be used for authorized roles matching. <br />
+	 * For each role, this method will include the role itself and the role with the ROLE_ prefix.
+	 *
+	 * @param authorities the user authorities/roles
+	 * @return a list of authorized roles for matching
+	 */
+	public static List<String> getAuthorizedRolesMatchValue(@NonNull final Collection<? extends GrantedAuthority> authorities) {
+		return authorities.stream()
+				.map(GrantedAuthority::getAuthority)
+				.flatMap(role -> {
+					if (startsWith(role, ROLE_PREFIX)) {
+						return Arrays.asList(role, removeStart(role, ROLE_PREFIX)).stream();
+					} else {
+						return Arrays.asList(role, prependIfMissing(role, ROLE_PREFIX)).stream();
+					}
+				})
+				.toList();
+	}
 
-    /**
+	/**
+	 * Returns the role field name ensuring it ends with ".keyword"
+	 *
+	 * @return the role field name with ".keyword" suffix for search exact matching
+	 */
+	public static String getRoleFieldNameWithKeyword(String roleFieldName) {
+		return Strings.CS.appendIfMissing(roleFieldName, KEYWORD_SUFFIX);
+	}
+
+	/**
      * Validates that the user has access to a content protected by the specified roles.
      * This method will throw an {@link AccessDeniedException} if the user doesn't have access.
      * Access is granted if:
