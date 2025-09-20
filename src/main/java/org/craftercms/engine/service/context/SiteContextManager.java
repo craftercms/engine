@@ -33,7 +33,6 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.validation.annotation.Validated;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -131,8 +130,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
                               Executor jobThreadPoolExecutor, final String defaultSiteName, final int contextBuildRetryMaxCount,
                               final long contextBuildRetryWaitTimeBase, final int contextBuildRetryWaitTimeMultiplier,
                               final boolean modePreview, final String[] watcherPaths, final String[] watcherIgnorePaths,
-                              final int watcherCounterLimit, final int watcherIntervalPeriod, final int siteLocksStripeCount) {
-        siteLocks = Striped.lazyWeakLock(siteLocksStripeCount);
+                              final int watcherCounterLimit, final int watcherIntervalPeriod, final Striped<Lock> siteLocks) {
         contextRegistry = new ConcurrentHashMap<>();
         directoryWatcherRegistry = new ConcurrentHashMap<>();
         directoryWatcherLastProcessedHash = new ConcurrentHashMap<>();
@@ -153,6 +151,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
         this.watcherIgnorePaths = watcherIgnorePaths;
         this.watcherCounterLimit = watcherCounterLimit;
         this.watcherIntervalPeriod = watcherIntervalPeriod;
+        this.siteLocks = siteLocks;
     }
 
     @Override
