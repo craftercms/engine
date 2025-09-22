@@ -562,12 +562,12 @@ paths:
                               key: /site/components/features/sapien-veroeros.xml
                               value: "Sapien Veroeros"
                               include: /site/components/features/sapien-veroeros.xml
-                              disableFlattening": false
+                              disableFlattening: false
                         hero_image: /static-assets/images/strawberries.jpg
                         features_title: "Erat lacinia"
-                    properties:
-                      "//page/merge-strategy: inherit-levels
-                      //page/content-type: /page/home"
+                    properties: |
+                      //page/merge-strategy: inherit-levels
+                      //page/content-type: /page/home
                     folder: false
                 WithoutAdditionalProperties:
                   value:
@@ -611,12 +611,12 @@ paths:
                               key: "/site/components/features/quam-lorem-ipsum.xml"
                               value: "Quam lorem ipsum"
                               include: /site/components/features/quam-lorem-ipsum.xml
-                              disableFlattening: false},
+                              disableFlattening: false
                             -
                               key: /site/components/features/sapien-veroeros.xml
                               value: "Sapien Veroeros"
                               include: "/site/components/features/sapien-veroeros.xml"
-                              disableFlattening: false}
+                              disableFlattening: false
                         hero_image: "/static-assets/images/strawberries.jpg"
                         features_title: "Erat lacinia"
                     properties: "null"
@@ -679,26 +679,26 @@ paths:
                     "url": "/site/website/crafter-level-descriptor.level.xml",
                     "descriptorUrl": "/site/website/crafter-level-descriptor.level.xml",
                     "descriptorDom": {
-                        "component": {
-                          "content-type": "/component/level-descriptor",
-                          "display-template": {
-                             "crafter-source": "/site/website/crafter-level-descriptor.level.xml",
-                             "crafter-source-content-type-id": "/component/level-descriptor"
-                          },
-                          "merge-strategy": "inherit-levels",
-                          "file-name": "crafter-level-descriptor.level.xml",
-                          "objectGroupId": "0a68",
-                          "objectId": "0a68e8ad-77d8-0a58-e7bf-09a71fb3077b",
-                          "folder-name": {
-                            "crafter-source": "/site/website/crafter-level-descriptor.level.xml",
-                            "crafter-source-content-type-id": "/component/level-descriptor"
-                          },
-                          "header_o": {
-                            "item": {
-                              "key": "/site/components/headers/header.xml",
-                              "value": "Header",
-                              "include": "/site/components/headers/header.xml",
-                              "disableFlattening": "false"
+                      "component": {
+                        "content-type": "/component/level-descriptor",
+                        "display-template": {
+                          "crafter-source": "/site/website/crafter-level-descriptor.level.xml",
+                          "crafter-source-content-type-id": "/component/level-descriptor"
+                        },
+                        "merge-strategy": "inherit-levels",
+                        "file-name": "crafter-level-descriptor.level.xml",
+                        "objectGroupId": "0a68",
+                        "objectId": "0a68e8ad-77d8-0a58-e7bf-09a71fb3077b",
+                        "folder-name": {
+                          "crafter-source": "/site/website/crafter-level-descriptor.level.xml",
+                          "crafter-source-content-type-id": "/component/level-descriptor"
+                        },
+                        "header_o": {
+                          "item": {
+                            "key": "/site/components/headers/header.xml",
+                            "value": "Header",
+                            "include": "/site/components/headers/header.xml",
+                            "disableFlattening": "false"
                           }
                         },
                         "createdDate": "2017-03-13T20:26:50.000Z",
@@ -1209,7 +1209,7 @@ paths:
                   type: integer
                   example: 1
                 query:
-                  type:  object
+                  type: object
                   example:
                     match_all: {}
       responses:
@@ -1297,10 +1297,10 @@ paths:
                           "title_t": "New ACME Phone Released Today"
                         },
                         {
-                           "title_t": "Top Clubs In Virginia"
+                          "title_t": "Top Clubs In Virginia"
                         },
                         {
-                           "title_t": "Coffee is Good for Your Health"
+                          "title_t": "Coffee is Good for Your Health"
                         },
                         {
                           "title_t": "5 Popular Diets for Women"
@@ -1373,7 +1373,7 @@ paths:
                   type: string
                   example: ArticlesByAuthor
               required:
-                -  query
+                - query
       responses:
         '200':
           description: OK
@@ -1672,7 +1672,7 @@ paths:
                       type: string
                     timestampm:
                       type: integer
-                    timestaamp:
+                    timestamp:
                       type: string
                 example:
                   - exception: ""
@@ -1741,8 +1741,8 @@ paths:
               schema:
                 type: string
               example:
-                  <!-- Feature Component -->\n
-                    <article
+                <!-- Feature Component -->\n
+                  <article
                       class="feature"
                       data-craftercms-model-path="/site/components/features/4be0a368-783c-8f73-7469-63a62636bd4c.xml"
                       data-craftercms-model-id="4be0a368-783c-8f73-7469-63a62636bd4c"
@@ -1767,7 +1767,7 @@ paths:
                       </div>
                     </div>
                   </article>
-                  <!-- /Feature Component -->
+                <!-- /Feature Component -->
 
 components:
   schemas:
