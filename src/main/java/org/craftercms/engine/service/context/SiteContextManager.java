@@ -15,10 +15,10 @@
  */
 package org.craftercms.engine.service.context;
 
-import com.google.common.util.concurrent.Striped;
 import io.methvin.watcher.DirectoryWatcher;
 import io.methvin.watcher.hashing.FileHasher;
 import org.apache.commons.collections4.CollectionUtils;
+import org.craftercms.commons.concurrency.locks.LockByKey;
 import org.craftercms.commons.entitlements.exception.EntitlementException;
 import org.craftercms.commons.entitlements.model.EntitlementType;
 import org.craftercms.commons.entitlements.validator.EntitlementValidator;
@@ -38,7 +38,6 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.Lock;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -55,7 +54,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
     private static final Logger logger = LoggerFactory.getLogger(SiteContextManager.class);
 
     protected ApplicationContext applicationContext;
-    protected Striped<Lock> siteLocks;
+    protected LockByKey<String> sitesLock;
     protected Map<String, SiteContext> contextRegistry;
     protected SiteContextFactory contextFactory;
     protected SiteContextFactory fallbackContextFactory;
@@ -130,7 +129,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
                               Executor jobThreadPoolExecutor, final String defaultSiteName, final int contextBuildRetryMaxCount,
                               final long contextBuildRetryWaitTimeBase, final int contextBuildRetryWaitTimeMultiplier,
                               final boolean modePreview, final String[] watcherPaths, final String[] watcherIgnorePaths,
-                              final int watcherCounterLimit, final int watcherIntervalPeriod, final Striped<Lock> siteLocks) {
+                              final int watcherCounterLimit, final int watcherIntervalPeriod, final LockByKey<String> lockByKey) {
         contextRegistry = new ConcurrentHashMap<>();
         directoryWatcherRegistry = new ConcurrentHashMap<>();
         directoryWatcherLastProcessedHash = new ConcurrentHashMap<>();
@@ -151,7 +150,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
         this.watcherIgnorePaths = watcherIgnorePaths;
         this.watcherCounterLimit = watcherCounterLimit;
         this.watcherIntervalPeriod = watcherIntervalPeriod;
-        this.siteLocks = siteLocks;
+        this.sitesLock = lockByKey;
     }
 
     @Override
@@ -252,8 +251,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
                                 // This prevents multiple events for batch files change with same modified date such as from a git pull
                                 String lastProcessedHash = directoryWatcherLastProcessedHash.get(siteName);
                                 if (lastProcessedHash == null || event.hash() == null || !lastProcessedHash.equals(hashValue)) {
-                                    Lock siteLock = siteLocks.get(siteName);
-                                    siteLock.lock();
+                                    sitesLock.lock(siteName);
                                     try {
                                         if (event.hash() != null) {
                                             directoryWatcherLastProcessedHash.put(siteName, hashValue);
@@ -265,7 +263,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
                                         counter.getAndIncrement();
                                         directoryWatcherCounter.put(siteName, counter);
                                     } finally {
-                                        siteLock.unlock();
+                                        sitesLock.unlock(siteName);
                                     }
                                 } else {
                                     logger.debug("File watch for hash '{}' has already processed. No action required.", hashValue);
@@ -282,12 +280,11 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
             if (directoryWatcherRegistry.get(siteName) != null) {
                 DirectoryWatcher oldWatcher;
 
-                Lock siteLock = siteLocks.get(siteName);
-                siteLock.lock();
+                sitesLock.lock(siteName);
                 try {
                     oldWatcher = directoryWatcherRegistry.remove(siteName);
                 } finally {
-                    siteLock.unlock();
+                    sitesLock.unlock(siteName);
                 }
 
                 if (oldWatcher != null) {
@@ -314,15 +311,14 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
     public void registerPreviewRebuildTask(String siteName, boolean isFallback) {
         // Remove old executor then register a new one
         if (directoryWatcherExecutor.get(siteName) != null) {
-            Lock siteLock = siteLocks.get(siteName);
-            siteLock.lock();
+            sitesLock.lock(siteName);
             try {
                 ScheduledExecutorService oldExecutor = directoryWatcherExecutor.remove(siteName);
                 if (oldExecutor != null) {
                     oldExecutor.shutdown();
                 }
             } finally {
-                siteLock.unlock();
+                sitesLock.unlock(siteName);
             }
         }
 
@@ -411,14 +407,13 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
             DirectoryWatcher watcher;
             ScheduledExecutorService executor;
 
-            Lock siteLock = siteLocks.get(siteName);
-            siteLock.lock();
+            sitesLock.lock(siteName);
             try {
                 watcher = directoryWatcherRegistry.remove(siteName);
                 executor = directoryWatcherExecutor.remove(siteName);
                 iter.remove();
             } finally {
-                siteLock.unlock();
+                sitesLock.unlock(siteName);
             }
 
             if (watcher != null) {
@@ -467,8 +462,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
                 return null;
             }
 
-            Lock siteLock = siteLocks.get(siteName);
-            siteLock.lock();
+            sitesLock.lock(siteName);
             try {
                 // Double check locking, in case the context has been created already by another thread
                 siteContext = contextRegistry.get(siteName);
@@ -490,7 +484,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
                     logger.info("==================================================");
                 }
             } finally {
-                siteLock.unlock();
+                sitesLock.unlock(siteName);
             }
         } else if (!siteContext.isValid()) {
             logger.error("Site context '{}' is not valid anymore", siteContext);
@@ -605,14 +599,13 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
         DirectoryWatcher watcher;
         ScheduledExecutorService executor;
 
-        Lock siteLock = siteLocks.get(siteName);
-        siteLock.lock();
+        sitesLock.lock(siteName);
         try {
             watcher = directoryWatcherRegistry.remove(siteName);
             executor = directoryWatcherExecutor.remove(siteName);
             siteContext = contextRegistry.remove(siteName);
         } finally {
-            siteLock.unlock();
+            sitesLock.unlock(siteName);
         }
 
         if (watcher != null) {
@@ -664,8 +657,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
     }
 
     protected SiteContext rebuildContext(String siteName, boolean fallback) {
-        Lock siteLock = siteLocks.get(siteName);
-        siteLock.lock();
+        sitesLock.lock(siteName);
         try {
             logger.info("==================================================");
             logger.info("<Rebuilding site context: '{}'>", siteName);
@@ -684,7 +676,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
 
             return newContext;
         } finally {
-            siteLock.unlock();
+            sitesLock.unlock(siteName);
         }
     }
 
