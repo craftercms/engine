@@ -75,4 +75,14 @@
 		<entry key="elasticsearchClient" value-ref="crafter.searchClient"/>
 	</util:map>
 
+    <!-- Disable Grape auto-download -->
+    <bean id="grapeAutoDownloadDisabler" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetClass" value="groovy.grape.Grape" />
+        <property name="targetMethod" value="setEnableAutoDownload" />
+        <property name="arguments">
+            <list>
+                <value>${crafter.engine.groovy.grapes.download.enabled}</value>
+            </list>
+        </property>
+    </bean>
 </beans>
