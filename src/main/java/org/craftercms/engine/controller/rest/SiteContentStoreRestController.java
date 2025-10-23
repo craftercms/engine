@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2024 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2025 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -17,7 +17,6 @@
 package org.craftercms.engine.controller.rest;
 
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.constraints.Size;
 import org.craftercms.commons.validation.annotations.param.ValidExistingContentPath;
 import org.craftercms.core.controller.rest.ContentStoreRestController;
 import org.craftercms.core.controller.rest.CrafterRestController;
@@ -25,7 +24,6 @@ import org.craftercms.core.controller.rest.RestControllerBase;
 import org.craftercms.core.service.Item;
 import org.craftercms.core.service.Tree;
 import org.craftercms.engine.service.context.SiteContext;
-import org.dom4j.Document;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -55,18 +53,6 @@ public class SiteContentStoreRestController extends RestControllerBase {
 	@ConstructorProperties({"wrappedController"})
 	public SiteContentStoreRestController(ContentStoreRestController wrappedController) {
 		this.wrappedController = wrappedController;
-	}
-
-	/**
-	 * @deprecated Will be removed in 4.1, use {@code getItem} instead
-	 */
-	@RequestMapping(value = URL_DESCRIPTOR, method = RequestMethod.GET)
-	public Document getDescriptor(WebRequest request, HttpServletResponse response,
-				      @Size(max = 4000)
-				      @ValidExistingContentPath
-				      @RequestParam(REQUEST_PARAM_URL) String url,
-				      @RequestParam(required = false, defaultValue = "false") boolean flatten) {
-		return wrappedController.getDescriptor(request, response, getCurrentContextId(), url, flatten);
 	}
 
 	@RequestMapping(value = URL_ITEM, method = RequestMethod.GET)
