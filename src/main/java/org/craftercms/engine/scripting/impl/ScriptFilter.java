@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2025 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -16,6 +16,8 @@
 
 package org.craftercms.engine.scripting.impl;
 
+import jakarta.servlet.*;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.lang3.ArrayUtils;
@@ -31,12 +33,13 @@ import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.ConfigUtils;
-import org.springframework.security.web.util.matcher.*;
+import org.craftercms.engine.util.spring.security.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.AnyRequestMatcher;
+import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
-
-import jakarta.servlet.*;
-import jakarta.servlet.http.HttpServletRequest;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -59,7 +62,7 @@ public class ScriptFilter implements Filter {
 	public static final String FILTER_MAPPINGS_CACHE_KEY = "filterMappings";
 
 	private ServletContext servletContext;
-	private CacheTemplate cacheTemplate;
+	private final CacheTemplate cacheTemplate;
 	protected PathMatcher pathMatcher;
 	protected boolean disableVariableRestrictions;
 
@@ -67,7 +70,7 @@ public class ScriptFilter implements Filter {
 
 	protected RequestMatcher excludedUrlsMatcher;
 
-	public ScriptFilter(CacheTemplate cacheTemplate) {
+	public ScriptFilter(final CacheTemplate cacheTemplate) {
 		pathMatcher = new AntPathMatcher();
 		excludedUrlsMatcher = new NegatedRequestMatcher(AnyRequestMatcher.INSTANCE);
 		this.cacheTemplate = cacheTemplate;
