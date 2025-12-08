@@ -277,6 +277,11 @@
 		<constructor-arg name="cacheTemplate" ref="crafter.cacheTemplate"/>
 	</bean>
 
+	<bean id="crafter.suffixStrippingFilter" class="org.craftercms.commons.http.SuffixStrippingFilter">
+		<constructor-arg name="suffixes" value="${crafter.engine.api.stripSuffixes.suffixes}"/>
+		<constructor-arg name="includedUrls" value="${crafter.engine.api.stripSuffixes.includedUrls}"/>
+	</bean>
+
 	<!-- ////////////////////////////////// -->
 	<!--								 	-->
 	<!--			Services				-->
