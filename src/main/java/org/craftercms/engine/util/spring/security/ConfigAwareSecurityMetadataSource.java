@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2025 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -16,11 +16,6 @@
 
 package org.craftercms.engine.util.spring.security;
 
-import java.beans.ConstructorProperties;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.lang3.StringUtils;
@@ -28,6 +23,7 @@ import org.craftercms.commons.lang.Callback;
 import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.ConfigUtils;
+import org.craftercms.engine.util.spring.security.matcher.AntPathRequestMatcher;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.access.SecurityMetadataSource;
@@ -36,8 +32,12 @@ import org.springframework.security.web.access.expression.DefaultWebSecurityExpr
 import org.springframework.security.web.access.expression.ExpressionBasedFilterInvocationSecurityMetadataSource;
 import org.springframework.security.web.access.intercept.DefaultFilterInvocationSecurityMetadataSource;
 import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+
+import java.beans.ConstructorProperties;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 import static java.util.Collections.singleton;
 
