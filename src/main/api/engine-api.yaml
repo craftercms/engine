@@ -14,7 +14,7 @@ info:
         url: 'https://www.gnu.org/licenses/gpl-3.0.en.html'
 externalDocs:
     description: CrafterCMS - Engine
-    url: 'https://craftercms.com/docs/current/reference/modules/engine/index.html'
+    url: 'https://craftercms.com/docs/current/reference/modules/engine.html'
 tags:
     -   name: content
         description: Content retrieval operations
@@ -388,6 +388,19 @@ paths:
                     schema:
                         type: string
                     example: "my-editorial"
+                -   name: cacheType
+                    in: query
+                    description: |-
+                      Type of cache.
+                      
+                      Possible values are:
+                      - <b>system</b> : Cache for objects cached by Engine itself.
+                      - <b>application</b> : Cache for objects cached by Groovy code.
+                        This cache is enabled by specifying the value "crafter_core_applicationCache" in the <b>SPRING_PROFILES_ACTIVE</b> env variable.
+                      
+                      Default is "system".
+                    schema:
+                        type: string
             responses:
                 '200':
                     description: OK
@@ -429,6 +442,18 @@ paths:
                     schema:
                         type: string
                     example: "my-editorial"
+                -   name: cacheType
+                    in: query
+                    description: |-
+                        Type of cache.
+                        Possible values are:
+                            - <b>system</b> : Cache for objects cached by Engine itself.
+                            - <b>application</b> : Cache for objects cached by Groovy code.
+                                This cache is enabled by specifying the value "crafter_core_applicationCache" in the <b>SPRING_PROFILES_ACTIVE</b> env variable.
+                                Default is "system".
+                    schema:
+                        type: string
+                    example: system
             responses:
                 '200':
                     description: OK

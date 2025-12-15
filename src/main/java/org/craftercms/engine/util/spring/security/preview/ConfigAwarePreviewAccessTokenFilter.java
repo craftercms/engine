@@ -19,13 +19,15 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.collections4.CollectionUtils;
+import jakarta.servlet.http.HttpServletResponse;
 import org.craftercms.commons.crypto.CryptoException;
 import org.craftercms.commons.crypto.TextEncryptor;
 import org.craftercms.commons.http.HttpUtils;
 import org.craftercms.engine.exception.PreviewAccessException;
 import org.craftercms.engine.service.context.SiteContext;
+import org.craftercms.engine.util.http.SameSite;
 import org.craftercms.engine.util.spring.cors.SiteAwareCorsConfigurationSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.cors.CorsConfiguration;
@@ -34,7 +36,6 @@ import org.springframework.web.filter.GenericFilterBean;
 
 import java.beans.ConstructorProperties;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -43,6 +44,7 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
  * Filter that checks if the user is authorized to preview the site.
+ * If the authorized token is from the QSA, it will set the cookies to support preview workflow.
  */
 public class ConfigAwarePreviewAccessTokenFilter extends GenericFilterBean {
 	private final static String PREVIEW_SITE_TOKEN_NAME = "crafterPreview";
@@ -50,17 +52,29 @@ public class ConfigAwarePreviewAccessTokenFilter extends GenericFilterBean {
 
 	private final TextEncryptor textEncryptor;
 	private final SiteAwareCorsConfigurationSource corsConfigSource;
+	private final String siteNameParam;
+	private final String cookiePath;
+	private final boolean cookieHttpOnly;
+	private final SameSite cookieSameSite;
 
-	@ConstructorProperties({"textEncryptor", "corsConfigSource"})
+	@ConstructorProperties({"textEncryptor", "corsConfigSource", "siteNameParam", "cookiePath", "cookieHttpOnly",
+		"cookieSameSite"})
 	public ConfigAwarePreviewAccessTokenFilter(final TextEncryptor textEncryptor,
-											   final SiteAwareCorsConfigurationSource corsConfigSource) {
+											   final SiteAwareCorsConfigurationSource corsConfigSource,
+											   final String siteNameParam, final String cookiePath,
+											   boolean cookieHttpOnly, String cookieSameSite) {
 		this.textEncryptor = textEncryptor;
 		this.corsConfigSource = corsConfigSource;
+		this.siteNameParam = siteNameParam;
+		this.cookiePath = cookiePath;
+		this.cookieHttpOnly = cookieHttpOnly;
+		this.cookieSameSite = SameSite.fromValue(cookieSameSite);
 	}
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+		HttpServletResponse httpServletResponse = (HttpServletResponse) response;
 		String site = SiteContext.getCurrent().getSiteName();
 		if (isEmpty(site)) {
 			chain.doFilter(request, response);
@@ -72,9 +86,11 @@ public class ConfigAwarePreviewAccessTokenFilter extends GenericFilterBean {
 			return;
 		}
 
+		boolean tokenFromQueryParam = false;
 		String previewToken = httpServletRequest.getHeader(PREVIEW_SITE_TOKEN_HEADER_NAME);
 		if (isEmpty(previewToken)) {
 			previewToken = httpServletRequest.getParameter(PREVIEW_SITE_TOKEN_NAME);
+			tokenFromQueryParam = !isEmpty(previewToken);
 		}
 		if (isEmpty(previewToken)) {
 			previewToken = HttpUtils.getCookieValue(PREVIEW_SITE_TOKEN_NAME, httpServletRequest);
@@ -95,8 +111,8 @@ public class ConfigAwarePreviewAccessTokenFilter extends GenericFilterBean {
 			throw new PreviewAccessException(HttpStatus.UNAUTHORIZED, message);
 		}
 
-		long tokenTimestamp = Long.parseLong(tokens[1]);
-		boolean isExpired = tokenTimestamp < System.currentTimeMillis();
+		long tokenExpiryTimestamp = Long.parseLong(tokens[1]);
+		boolean isExpired = tokenExpiryTimestamp < System.currentTimeMillis();
 		if (isExpired) {
 			String message = format("User is not authorized to preview site '%s', '%s' header or '%s' token has expired",
 				site, PREVIEW_SITE_TOKEN_HEADER_NAME, PREVIEW_SITE_TOKEN_NAME);
@@ -113,7 +129,61 @@ public class ConfigAwarePreviewAccessTokenFilter extends GenericFilterBean {
 			throw new PreviewAccessException(HttpStatus.FORBIDDEN, message);
 		}
 
+		// Create preview token and site name cookies to support preview workflow
+		int maxAge = Math.max((int)((tokenExpiryTimestamp - System.currentTimeMillis()) / 1000), 0);
+		if (tokenFromQueryParam && maxAge > 0) {
+			createPreviewCookie(httpServletRequest, httpServletResponse, previewToken, maxAge);
+			createSiteNameCookie(httpServletRequest, httpServletResponse, maxAge);
+		}
+
 		chain.doFilter(request, response);
+	}
+
+	/**
+	 * Creates a preview cookie with the given token.
+	 *
+	 * @param request the HTTP request
+	 * @param response the HTTP response
+	 * @param previewToken the preview token
+	 * @param  maxAge the max-age value
+	 */
+	private void createPreviewCookie(HttpServletRequest request, HttpServletResponse response, String previewToken, int maxAge) {
+		createCookie(request, response, PREVIEW_SITE_TOKEN_NAME, previewToken, maxAge);
+	}
+
+	/**
+	 * Creates a cookie with the site name.
+	 *
+	 * @param request the HTTP request
+	 * @param response the HTTP response
+	 * @param maxAge the max-age value
+	 */
+	private void createSiteNameCookie(HttpServletRequest request, HttpServletResponse response, int maxAge) {
+		String siteName = request.getParameter(siteNameParam);
+		if (isEmpty(siteName)) {
+			return;
+		}
+
+		createCookie(request, response, siteNameParam, siteName, maxAge);
+	}
+
+	/**
+	 * Creates a cookie with the given name and value.
+	 *
+	 * @param request the HTTP request
+	 * @param response the HTTP response
+	 * @param name the name of the cookie
+	 * @param value the value of the cookie
+	 * @param maxAge the max-age value
+	 */
+	private void createCookie(HttpServletRequest request, HttpServletResponse response, String name, String value, int maxAge) {
+		Cookie cookie = new Cookie(name, value);
+		cookie.setPath(cookiePath);
+		cookie.setHttpOnly(cookieHttpOnly);
+		cookie.setAttribute("SameSite", cookieSameSite.getValue());
+		cookie.setSecure(request.isSecure());
+		cookie.setMaxAge(maxAge);
+		response.addCookie(cookie);
 	}
 
 	/**
