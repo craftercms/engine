@@ -566,6 +566,7 @@
         <constructor-arg name="watcherIgnorePaths" value="${crafter.engine.watcher.ignorePaths}"/>
         <constructor-arg name="watcherCounterLimit" value="${crafter.engine.watcher.counter.limit}"/>
         <constructor-arg name="watcherIntervalPeriod" value="${crafter.engine.watcher.interval.period}"/>
+        <constructor-arg name="lockByKey" ref="crafter.lockByKey"/>
         <property name="entitlementValidator" ref="crafter.entitlementValidator"/>
     </bean>
 
@@ -708,7 +709,7 @@
         </constructor-arg>
         <constructor-arg name="indexIdFormat" value="${crafter.engine.search.index.format}"/>
         <constructor-arg name="enableTranslation" value="${crafter.engine.translation.enable}"/>
-        <property name="filterQueries" value="${crafter.engine.search.filters}"/>
+        <constructor-arg name="enableDefaultFilters" value="${crafter.engine.search.defaultFilters.enabled}"/>
     </bean>
     <alias name="crafter.searchService" alias="crafter.elasticsearchService"/>
     <alias name="crafter.searchClient" alias="crafter.elasticsearchClient"/>
@@ -729,7 +730,7 @@
         </constructor-arg>
         <constructor-arg name="indexIdFormat" value="${crafter.engine.search.index.format}"/>
         <constructor-arg name="enableTranslation" value="${crafter.engine.translation.enable}"/>
-        <property name="filterQueries" value="${crafter.engine.search.filters}"/>
+        <constructor-arg name="enableDefaultFilters" value="${crafter.engine.search.defaultFilters.enabled}"/>
     </bean>
 
     <!-- ////////////////////////////////// -->

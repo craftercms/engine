@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2023 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2025 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -17,16 +17,19 @@
 package org.craftercms.engine.search.legacy;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.craftercms.commons.http.RequestContext;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.LocaleUtils;
+import org.craftercms.engine.util.SecurityUtils;
 import org.craftercms.search.opensearch.impl.AbstractOpenSearchWrapper;
 import org.opensearch.action.search.SearchRequest;
 import org.opensearch.action.search.SearchType;
 import org.opensearch.action.support.IndicesOptions;
 import org.opensearch.client.RestHighLevelClient;
 import org.opensearch.index.query.BoolQueryBuilder;
+import org.opensearch.index.query.QueryBuilder;
 import org.opensearch.search.builder.SearchSourceBuilder;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -63,6 +66,9 @@ public class SiteAwareOpenSearchService extends AbstractOpenSearchWrapper {
 
     private static final String DEFAULT_FALLBACK_PARAM_NAME = "localeFallback";
 
+    private static final String DISABLED_FIELD_NAME = "disabled";
+    private static final String EXPIRED_FIELD_NAME = "expired_dt";
+    private static final String NOW = "now";
 
     /**
      * Format used to build the index id
@@ -77,21 +83,27 @@ public class SiteAwareOpenSearchService extends AbstractOpenSearchWrapper {
 
     protected final boolean enableTranslation;
 
-    @ConstructorProperties({"client", "indexIdFormat", "enableTranslation"})
-    public SiteAwareOpenSearchService(RestHighLevelClient client, String indexIdFormat, boolean enableTranslation) {
+    protected final boolean enableDefaultFilters;
+
+    @ConstructorProperties({"client", "indexIdFormat", "enableTranslation", "enableDefaultFilters"})
+    public SiteAwareOpenSearchService(RestHighLevelClient client, String indexIdFormat, boolean enableTranslation, boolean enableDefaultFilters) {
         super(client);
         this.indexIdFormat = indexIdFormat;
         this.enableTranslation = enableTranslation;
+        this.enableDefaultFilters = enableDefaultFilters;
     }
 
+    @SuppressWarnings("unused")
     public void setRoleFieldName(final String roleFieldName) {
         this.roleFieldName = roleFieldName;
     }
 
+    @SuppressWarnings("unused")
     public void setLocalesParameterName(String localesParameterName) {
         this.localesParameterName = localesParameterName;
     }
 
+    @SuppressWarnings("unused")
     public void setFallbackParameterName(String fallbackParameterName) {
         this.fallbackParameterName = fallbackParameterName;
     }
@@ -202,7 +214,10 @@ public class SiteAwareOpenSearchService extends AbstractOpenSearchWrapper {
     protected void updateFilters(final SearchRequest request) {
         super.updateFilters(request);
 
-        BoolQueryBuilder mainQuery = (BoolQueryBuilder) request.source().query();
+        QueryBuilder existing = request.source().query();
+        BoolQueryBuilder mainQuery = boolQuery();
+        mainQuery.must(ObjectUtils.getIfNull(existing, matchAllQuery()));
+        request.source().query(mainQuery);
 
         Authentication auth = null;
         SecurityContext context = SecurityContextHolder.getContext();
@@ -213,20 +228,49 @@ public class SiteAwareOpenSearchService extends AbstractOpenSearchWrapper {
         // Include all public items
         BoolQueryBuilder securityQuery = boolQuery()
                 .should(boolQuery().mustNot(existsQuery(roleFieldName)))
-                .should(matchQuery(roleFieldName, ANONYMOUS_PSEUDO_ROLE_SEARCH_VALUE));
+                .should(termsQuery(roleFieldNameWithKeyword(), ANONYMOUS_PSEUDO_ROLES_SEARCH_VALUES));
 
         if (auth != null && !(auth instanceof AnonymousAuthenticationToken)) {
             logger.debug("Filtering search results for authenticated users");
-            securityQuery.should(matchQuery(roleFieldName, AUTHENTICATED_PSEUDO_ROLE_SEARCH_VALUE));
+            securityQuery.should(termsQuery(roleFieldNameWithKeyword(), AUTHENTICATED_PSEUDO_ROLES_SEARCH_VALUES));
+
             if (isNotEmpty(auth.getAuthorities())) {
-                logger.debug("Filtering search results for roles: {}", auth.getAuthorities());
-                securityQuery.should(matchQuery(roleFieldName, getAuthorizedRolesMatchValue(auth.getAuthorities())));
+                logger.debug("Filtering search results for roles: '{}'", auth.getAuthorities());
+                List<String> roles = getAuthorizedRolesMatchValue(auth.getAuthorities());
+                securityQuery.should(termsQuery(roleFieldNameWithKeyword(), roles));
             }
         } else {
             logger.debug("Filtering search to show only public items");
         }
 
-        mainQuery.filter(boolQuery().must(securityQuery));
+        mainQuery.filter(securityQuery)
+                .filter(getDefaultFiltersQuery());
     }
 
+    /**
+     * Returns the role field name ensuring it ends with ".keyword"
+     * @return the role field name ensuring it ends with ".keyword"
+     */
+    private String roleFieldNameWithKeyword() {
+        return SecurityUtils.getRoleFieldNameWithKeyword(roleFieldName);
+    }
+
+	/**
+	 * Builds the default filters query to be applied to all searches
+	 * if {@link #enableDefaultFilters} is set to {@code true}.
+	 *
+	 * @return the default filters query
+	 */
+	protected BoolQueryBuilder getDefaultFiltersQuery() {
+		BoolQueryBuilder defaultFiltersQuery = boolQuery();
+		if (enableDefaultFilters) {
+			logger.debug("Adding default filters to search query");
+			defaultFiltersQuery
+					.mustNot(termQuery(DISABLED_FIELD_NAME, true))
+					.mustNot(rangeQuery(EXPIRED_FIELD_NAME).lte(NOW));
+		} else {
+			logger.debug("Default filters are disabled, not adding them to the search query");
+		}
+		return defaultFiltersQuery;
+	}
 }
