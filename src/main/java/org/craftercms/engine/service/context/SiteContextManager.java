@@ -24,7 +24,7 @@ import org.craftercms.commons.entitlements.exception.EntitlementException;
 import org.craftercms.commons.entitlements.model.EntitlementType;
 import org.craftercms.commons.entitlements.validator.EntitlementValidator;
 import org.craftercms.commons.validation.annotations.param.ValidSiteId;
-import org.craftercms.engine.event.SiteContextPurgedEvent;
+import org.craftercms.engine.event.SiteContextRemovedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -129,11 +129,11 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
 	protected boolean modePreview;
 
 	public SiteContextManager(SiteContextFactory contextFactory, SiteContextFactory fallbackContextFactory,
-				  final SiteListResolver siteListResolver, boolean waitForContextInit,
-				  Executor jobThreadPoolExecutor, final String defaultSiteName, final int contextBuildRetryMaxCount,
-				  final long contextBuildRetryWaitTimeBase, final int contextBuildRetryWaitTimeMultiplier,
-				  final boolean modePreview, final String[] watcherPaths, final String[] watcherIgnorePaths,
-				  final int watcherCounterLimit, final int watcherIntervalPeriod) {
+	                          final SiteListResolver siteListResolver, boolean waitForContextInit,
+	                          Executor jobThreadPoolExecutor, final String defaultSiteName, final int contextBuildRetryMaxCount,
+	                          final long contextBuildRetryWaitTimeBase, final int contextBuildRetryWaitTimeMultiplier,
+	                          final boolean modePreview, final String[] watcherPaths, final String[] watcherIgnorePaths,
+	                          final int watcherCounterLimit, final int watcherIntervalPeriod) {
 		siteLockFactory = new WeakKeyBasedReentrantLockFactory();
 		contextRegistry = new ConcurrentHashMap<>();
 		directoryWatcherRegistry = new ConcurrentHashMap<>();
@@ -223,7 +223,6 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
 	/**
 	 * Register files watcher for preview mode
 	 * Any files from watcherPaths will be watched for CREATE, MODIFY, DELETE actions
-	 *
 	 * @param siteName site name
 	 */
 	protected void registerPreviewWatcher(String siteName) {
@@ -307,8 +306,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
 	 * Is the counter 5 (one second has passed)? Then, trigger a rebuild.
 	 * Has anything else changed (more changes since we slept)? If so, increment the counter and sleep for 200 milliseconds.
 	 * If nothing has changed, then trigger a rebuild.
-	 *
-	 * @param siteName   site name
+	 * @param siteName site name
 	 * @param isFallback is fallback
 	 */
 	public void registerPreviewRebuildTask(String siteName, boolean isFallback) {
@@ -372,9 +370,9 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
 		contextRegistry.forEach((siteName, siteContext) -> {
 			if (!siteContext.isFallback() && !siteNames.contains(siteName)) {
 				try {
-					destroyContext(siteName);
+					removeSiteContext(siteName);
 				} catch (Exception e) {
-					logger.error("Error destroying site context for site '{}'", siteName, e);
+					logger.error("Error removing site context for site '{}'", siteName, e);
 				}
 			}
 		});
@@ -398,7 +396,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
 		logger.info("==================================================");
 
 
-		for (Iterator<SiteContext> iter = contextRegistry.values().iterator(); iter.hasNext(); ) {
+		for (Iterator<SiteContext> iter = contextRegistry.values().iterator(); iter.hasNext();) {
 			SiteContext siteContext = iter.next();
 			String siteName = siteContext.getSiteName();
 
@@ -442,6 +440,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
 	 * @param siteName the context's site name
 	 * @param fallback if the context is a fallback (which means it will be used if no context can be resolved during
 	 *                 requests
+	 *
 	 * @return the context
 	 */
 	public SiteContext getContext(@ValidSiteId String siteName, boolean fallback) {
@@ -479,7 +478,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
 		} else if (!siteContext.isValid()) {
 			logger.error("Site context '{}' is not valid anymore", siteContext);
 
-			destroyContext(siteName);
+			removeSiteContext(siteName);
 
 			siteContext = null;
 		}
@@ -507,7 +506,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
 	public void startContextRebuild(String siteName, boolean fallback, Consumer<SiteContext> callback) {
 		jobThreadPoolExecutor.execute(() -> {
 			SiteContext siteContext = rebuildContext(siteName, fallback);
-			if (callback != null) {
+			if (callback != null){
 				callback.accept(siteContext);
 			}
 		});
@@ -517,7 +516,6 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
 	 * Get a site context and initializing if it does not exist.
 	 * If in preview mode, do not retry on failure and report the exception immediately.
 	 * If in live mode, retry on failure. After the max retries count, report the exception.
-	 *
 	 * @param siteName the site name of the context
 	 * @return the site context
 	 * @throws InterruptedException if the current thread is interrupted while waiting
@@ -559,7 +557,6 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
 
 	/**
 	 * Determine if a site has valid context
-	 *
 	 * @param siteId the site id
 	 * @return true if site has valid context, false otherwise
 	 */
@@ -569,12 +566,12 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
 	}
 
 	/**
-	 * Starts a destroy context in the background
+	 * Starts a remove site context in the background
 	 *
 	 * @param siteName the site name of the context
 	 */
-	public void startDestroyContext(String siteName) {
-		jobThreadPoolExecutor.execute(() -> destroyContext(siteName));
+	public void startRemoveSiteContext(String siteName) {
+		jobThreadPoolExecutor.execute(() -> removeSiteContext(siteName));
 	}
 
 	/**
@@ -582,8 +579,13 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
 	 *
 	 * @param siteName the site name of the context to destroy
 	 */
-	protected void destroyContext(String siteName) {
+	protected void removeSiteContext(String siteName) {
 		SiteContext siteContext;
+
+		logger.info("==================================================");
+		logger.info("<Removing site context: '{}'>", siteName);
+		logger.info("==================================================");
+
 		Lock siteLock = siteLockFactory.getLock(siteName);
 		siteLock.lock();
 		try {
@@ -607,39 +609,15 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
 		}
 
 		if (siteContext != null) {
-			logger.info("==================================================");
-			logger.info("<Destroying site context: '{}'>", siteName);
-			logger.info("==================================================");
-
 			try {
 				destroyContext(siteContext);
 			} finally {
-				applicationContext.publishEvent(new SiteContextPurgedEvent(siteContext));
-			}
-
-			logger.info("==================================================");
-			logger.info("</Destroying site context: '{}'>", siteName);
-			logger.info("==================================================");
-		}
-	}
-
-	protected void destroyContexts(Collection<String> siteNames) {
-		logger.info("==================================================");
-		logger.info("<DESTROYING SITE CONTEXTS>");
-		logger.info("==================================================");
-
-		if (CollectionUtils.isNotEmpty(siteNames)) {
-			for (String siteName : siteNames) {
-				try {
-					destroyContext(siteName);
-				} catch (Exception e) {
-					logger.error("Error destroying site context for site '{}'", siteName, e);
-				}
+				applicationContext.publishEvent(new SiteContextRemovedEvent(siteContext));
 			}
 		}
 
 		logger.info("==================================================");
-		logger.info("</DESTROYING SITE CONTEXTS>");
+		logger.info("</Removing site context: '{}'>", siteName);
 		logger.info("==================================================");
 	}
 
