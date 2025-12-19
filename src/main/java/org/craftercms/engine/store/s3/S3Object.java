@@ -55,7 +55,7 @@ public class S3Object extends S3File implements Content {
 	 * @param contentSupplier an InputStream supplier for the content
 	 */
 	public S3Object(String bucketName, String key, long lastModified, long contentLength,
-	                Supplier<InputStream> contentSupplier) {
+					Supplier<InputStream> contentSupplier) {
 		super(bucketName, key);
 
 		this.lastModified = lastModified;
@@ -81,10 +81,10 @@ public class S3Object extends S3File implements Content {
 	@Override
 	public String toString() {
 		return "S3Object{" +
-		       "bucketName='" + bucketName + '\'' +
-		       ", key='" + key + '\'' +
-		       ", lastModified=" + lastModified +
-		       ", contentLength=" + FileUtils.byteCountToDisplaySize(contentLength) +
-		       '}';
+			   "bucketName='" + bucketName + '\'' +
+			   ", key='" + key + '\'' +
+			   ", lastModified=" + lastModified +
+			   ", contentLength=" + FileUtils.byteCountToDisplaySize(contentLength) +
+			   '}';
 	}
 }

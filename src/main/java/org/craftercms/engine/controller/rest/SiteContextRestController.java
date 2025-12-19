@@ -80,7 +80,7 @@ public class SiteContextRestController extends RestControllerBase {
 		contextManager.startRemoveSiteContext(siteName);
 
 		return createResponseMessage(format("Started removal of site context for '%s' from the system. If a request " +
-		                                    "for the site is received in the future, a new site context will be created and registered.", siteName));
+											"for the site is received in the future, a new site context will be created and registered.", siteName));
 	}
 
 	@GetMapping(URL_REBUILD_ALL)
@@ -102,7 +102,7 @@ public class SiteContextRestController extends RestControllerBase {
 		// Don't rebuild context if the context was just created in this request
 		if (SiteEvent.getLatestRequestEvent(SiteContextCreatedEvent.class, request) != null) {
 			return createResponseMessage(format("Site context for '%s' created during the request. " +
-			                                    "Context rebuild not necessary", siteName));
+												"Context rebuild not necessary", siteName));
 		} else {
 			contextManager.startContextRebuild(siteName, siteContext.isFallback());
 
@@ -121,7 +121,7 @@ public class SiteContextRestController extends RestControllerBase {
 		// Don't rebuild GraphQL schema if the context was just created in this request
 		if (SiteEvent.getLatestRequestEvent(SiteContextCreatedEvent.class, request) != null) {
 			return createResponseMessage(format("Site context for '%s' created during the request. " +
-			                                    "GraphQL schema rebuild not necessary", siteName));
+												"GraphQL schema rebuild not necessary", siteName));
 		} else {
 			siteContext.startGraphQLSchemaBuild();
 
