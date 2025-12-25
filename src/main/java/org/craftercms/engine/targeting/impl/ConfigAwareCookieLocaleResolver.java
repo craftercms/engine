@@ -21,7 +21,7 @@ import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.lang3.LocaleUtils;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.util.ConfigUtils;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,9 +50,9 @@ public class ConfigAwareCookieLocaleResolver implements LocaleResolver {
 		this.cookieName = cookieName;
 	}
 
-	@NotNull
+	@NonNull
 	@Override
-	public Locale resolveLocale(@NotNull final HttpServletRequest request) {
+	public Locale resolveLocale(@NonNull final HttpServletRequest request) {
 		// Return the request attribute if already resolved
 		Locale locale = (Locale) request.getAttribute(CookieLocaleResolver.LOCALE_REQUEST_ATTRIBUTE_NAME);
 		if (locale != null) {
@@ -65,7 +65,7 @@ public class ConfigAwareCookieLocaleResolver implements LocaleResolver {
 	}
 
 	@Override
-	public void setLocale(@NotNull HttpServletRequest request, @Nullable HttpServletResponse response, @Nullable Locale locale) {
+	public void setLocale(@NonNull HttpServletRequest request, @Nullable HttpServletResponse response, @Nullable Locale locale) {
 		new CookieLocaleResolver(getCookieName())
 				.setLocaleContext(request, response, (locale != null ? new SimpleLocaleContext(locale) : null));
 	}
