@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2025 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -13,24 +13,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.craftercms.engine.event;
 
-import org.craftercms.engine.service.context.SiteContext;
+package org.craftercms.engine.store.s3;
+
+import java.io.ByteArrayInputStream;
 
 /**
- * Event published when a {@link SiteContext} has been completely removed from the system.
+ * Represents an S3 object that can be cached internal or in a distributed cache like Redis.
  *
  * @author avasquez
+ * @since 4.5.0
  */
-public class SiteContextPurgedEvent extends SiteEvent {
+public class S3CachedObject extends S3Object {
 
-	/**
-	 * Create a new event.
-	 *
-	 * @param siteContext the site's context
-	 */
-	public SiteContextPurgedEvent(SiteContext siteContext) {
-		super(siteContext);
+	protected byte[] content;
+
+	public S3CachedObject(String bucketName, String key, long lastModified, long contentLength, byte[] content) {
+		super(bucketName, key, lastModified, contentLength, () -> new ByteArrayInputStream(content));
+		this.content = content;
+	}
+
+	public byte[] getContent() {
+		return content;
 	}
 
 }
