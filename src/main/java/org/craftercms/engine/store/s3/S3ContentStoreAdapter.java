@@ -72,10 +72,10 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
 	protected final String[] cacheAllowedPaths;
 
 	@ConstructorProperties({"pathValidator", "descriptorFileExtension", "metadataFileExtension", "cacheTemplate",
-							"clientBuilder", "contentMaxLength", "cacheAllowedPaths"})
+	                        "clientBuilder", "contentMaxLength", "cacheAllowedPaths"})
 	public S3ContentStoreAdapter(Validator pathValidator, String descriptorFileExtension,
-								 String metadataFileExtension, CacheTemplate cacheTemplate,
-								 final S3ClientBuilder clientBuilder, final int contentMaxLength, final String[] cacheAllowedPaths) {
+	                             String metadataFileExtension, CacheTemplate cacheTemplate,
+	                             final S3ClientBuilder clientBuilder, final int contentMaxLength, final String[] cacheAllowedPaths) {
 		super(pathValidator, descriptorFileExtension, metadataFileExtension, cacheTemplate);
 		this.clientBuilder = clientBuilder;
 		this.contentMaxLength = contentMaxLength;
@@ -99,7 +99,7 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
 	 */
 	protected boolean isResultEmpty(ListObjectsV2Response result) {
 		return (!result.hasCommonPrefixes() || result.commonPrefixes().isEmpty())
-				&& (!result.hasContents() || result.contents().isEmpty());
+		       && (!result.hasContents() || result.contents().isEmpty());
 	}
 
 	/**
@@ -107,8 +107,8 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
 	 */
 	@Override
 	public Context createContext(final String id, final String rootFolderPath, final boolean mergingOn,
-								 final boolean cacheOn, final int maxAllowedItemsInCache,
-								 final boolean ignoreHiddenFiles, Map<String, String> configurationVariables)
+	                             final boolean cacheOn, final int maxAllowedItemsInCache,
+	                             final boolean ignoreHiddenFiles, Map<String, String> configurationVariables)
 		throws RootFolderNotFoundException, StoreException, AuthenticationException {
 
 		S3Uri uri = client.utilities().parseUri(URI.create(removeEnd(rootFolderPath, DELIMITER)));
@@ -128,7 +128,7 @@ public class S3ContentStoreAdapter extends AbstractCachedFileBasedContentStoreAd
 
 	@Override
 	protected Content getContent(Context context, CachingOptions cachingOptions,
-								 File file) throws InvalidContextException, StoreException {
+	                             File file) throws InvalidContextException, StoreException {
 		if (!(file instanceof S3Object s3Object)) {
 			throw new StoreException(format("'%s' is not an S3 object", file));
 		}

@@ -36,9 +36,9 @@ public class S3Context extends ContextImpl {
 	protected S3Uri rootFolderUri;
 
 	public S3Context(final String id, final ContentStoreAdapter storeAdapter, final String rootFolderPath,
-					 final boolean mergingOn, final boolean cacheOn, final int maxAllowedItemsInCache,
-					 final boolean ignoreHiddenFiles, final S3Uri rootFolderUri,
-					 final Map<String, String> configurationVariables) {
+	                 final boolean mergingOn, final boolean cacheOn, final int maxAllowedItemsInCache,
+	                 final boolean ignoreHiddenFiles, final S3Uri rootFolderUri,
+	                 final Map<String, String> configurationVariables) {
 		super(id, storeAdapter, rootFolderPath, mergingOn, cacheOn, maxAllowedItemsInCache, ignoreHiddenFiles, configurationVariables);
 		this.rootFolderUri = rootFolderUri;
 	}

@@ -125,11 +125,11 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
 	protected boolean modePreview;
 
 	public SiteContextManager(SiteContextFactory contextFactory, SiteContextFactory fallbackContextFactory,
-							  final SiteListResolver siteListResolver, boolean waitForContextInit,
-							  Executor jobThreadPoolExecutor, final String defaultSiteName, final int contextBuildRetryMaxCount,
-							  final long contextBuildRetryWaitTimeBase, final int contextBuildRetryWaitTimeMultiplier,
-							  final boolean modePreview, final String[] watcherPaths, final String[] watcherIgnorePaths,
-							  final int watcherCounterLimit, final int watcherIntervalPeriod, final LockByKey<String> lockByKey) {
+	                          final SiteListResolver siteListResolver, boolean waitForContextInit,
+	                          Executor jobThreadPoolExecutor, final String defaultSiteName, final int contextBuildRetryMaxCount,
+	                          final long contextBuildRetryWaitTimeBase, final int contextBuildRetryWaitTimeMultiplier,
+	                          final boolean modePreview, final String[] watcherPaths, final String[] watcherIgnorePaths,
+	                          final int watcherCounterLimit, final int watcherIntervalPeriod, final LockByKey<String> lockByKey) {
 		contextRegistry = new ConcurrentHashMap<>();
 		directoryWatcherRegistry = new ConcurrentHashMap<>();
 		directoryWatcherLastProcessedHash = new ConcurrentHashMap<>();
@@ -219,7 +219,6 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
 	/**
 	 * Register files watcher for preview mode
 	 * Any files from watcherPaths will be watched for CREATE, MODIFY, DELETE actions
-	 *
 	 * @param siteName site name
 	 */
 	protected void registerPreviewWatcher(String siteName) {
@@ -306,8 +305,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
 	 * Is the counter 5 (one second has passed)? Then, trigger a rebuild.
 	 * Has anything else changed (more changes since we slept)? If so, increment the counter and sleep for 200 milliseconds.
 	 * If nothing has changed, then trigger a rebuild.
-	 *
-	 * @param siteName   site name
+	 * @param siteName site name
 	 * @param isFallback is fallback
 	 */
 	public void registerPreviewRebuildTask(String siteName, boolean isFallback) {
@@ -398,7 +396,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
 		logger.info("==================================================");
 
 
-		for (Iterator<SiteContext> iter = contextRegistry.values().iterator(); iter.hasNext(); ) {
+		for (Iterator<SiteContext> iter = contextRegistry.values().iterator(); iter.hasNext();) {
 			SiteContext siteContext = iter.next();
 			String siteName = siteContext.getSiteName();
 
@@ -454,6 +452,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
 	 * @param siteName the context's site name
 	 * @param fallback if the context is a fallback (which means it will be used if no context can be resolved during
 	 *                 requests
+	 *
 	 * @return the context
 	 */
 	public SiteContext getContext(@ValidSiteId String siteName, boolean fallback) {
@@ -518,7 +517,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
 	public void startContextRebuild(String siteName, boolean fallback, Consumer<SiteContext> callback) {
 		jobThreadPoolExecutor.execute(() -> {
 			SiteContext siteContext = rebuildContext(siteName, fallback);
-			if (callback != null) {
+			if (callback != null){
 				callback.accept(siteContext);
 			}
 		});
@@ -528,7 +527,6 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
 	 * Get a site context and initializing if it does not exist.
 	 * If in preview mode, do not retry on failure and report the exception immediately.
 	 * If in live mode, retry on failure. After the max retries count, report the exception.
-	 *
 	 * @param siteName the site name of the context
 	 * @return the site context
 	 * @throws InterruptedException if the current thread is interrupted while waiting
@@ -570,7 +568,6 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
 
 	/**
 	 * Determine if a site has valid context
-	 *
 	 * @param siteId the site id
 	 * @return true if site has valid context, false otherwise
 	 */

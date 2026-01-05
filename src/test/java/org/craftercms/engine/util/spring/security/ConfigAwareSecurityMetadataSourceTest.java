@@ -16,11 +16,7 @@
 
 package org.craftercms.engine.util.spring.security;
 
-import java.util.Collection;
-
 import jakarta.servlet.http.HttpServletRequest;
-
-import org.craftercms.commons.http.RequestContext;
 import org.craftercms.core.util.cache.CacheTemplate;
 import org.craftercms.engine.test.utils.CacheTemplateMockUtils;
 import org.craftercms.engine.test.utils.ConfigAwareTestBase;
@@ -29,6 +25,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.web.FilterInvocation;
+
+import java.util.Collection;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -59,10 +57,12 @@ public class ConfigAwareSecurityMetadataSourceTest extends ConfigAwareTestBase {
 
 	@Test
 	public void testProcessRequest() {
-		HttpServletRequest request = RequestContext.getCurrent().getRequest();
+		HttpServletRequest request = mock(HttpServletRequest.class);
+		when(request.getServletPath()).thenReturn("/");
 
 		FilterInvocation invocation = mock(FilterInvocation.class);
 		when(invocation.getRequest()).thenReturn(request);
+		when(invocation.getHttpRequest()).thenReturn(request);
 
 		Collection<ConfigAttribute> attributes = metadataSource.getAttributes(invocation);
 
