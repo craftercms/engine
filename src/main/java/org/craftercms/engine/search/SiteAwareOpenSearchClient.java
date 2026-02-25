@@ -246,8 +246,8 @@ public class SiteAwareOpenSearchClient extends AbstractOpenSearchClientWrapper {
 		}
 		updates.setQuery(q -> q
 			.bool(b -> b
-				.must(mainQuery._toQuery())
-				.filter(securityQuery.build()._toQuery())
+				.must(mainQuery.toQuery())
+				.filter(securityQuery.build().toQuery())
 			)
 		);
 	}

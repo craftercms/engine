@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2025 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -16,15 +16,15 @@
 
 package org.craftercms.engine.util.spring.security;
 
+import jakarta.servlet.Filter;
+import jakarta.servlet.http.HttpServletRequest;
+import org.craftercms.engine.util.spring.security.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
+
 import java.beans.ConstructorProperties;
 import java.util.List;
 import java.util.stream.Stream;
-
-import jakarta.servlet.Filter;
-import jakarta.servlet.http.HttpServletRequest;
-
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import static java.util.stream.Collectors.toList;
 

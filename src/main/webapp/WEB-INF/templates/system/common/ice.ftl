@@ -521,6 +521,9 @@ attrs...
 	</#if>
 </#macro>
 
+<#-- Wrapper for Crafter Engine's renderComponent macro, it can be called as '@crafter.renderComponent' -->
+<#assign renderComponent = renderComponent />
+
 <#function cleanDotNotationString str>
 	<#return str?replace('^[.]+|[.]+$', '', 'r')?replace('[.]{2,}', '.', 'r')>
 </#function>
