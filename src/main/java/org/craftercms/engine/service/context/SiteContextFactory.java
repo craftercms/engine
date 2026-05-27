@@ -478,43 +478,53 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
                 }
             }
 
-            if (appContextResource != null) {
-                GenericApplicationContext appContext;
-                if (disableVariableRestrictions) {
-                    appContext = new GenericApplicationContext(globalApplicationContext);
-                } else {
-                    appContext = new RestrictedApplicationContext(globalApplicationContext, defaultPublicBeans);
-                }
-                appContext.setClassLoader(classLoader);
+			if (appContextResource == null) {
+				return null;
+			}
+			GenericApplicationContext appContext;
+			if (disableVariableRestrictions) {
+				appContext = new GenericApplicationContext(globalApplicationContext);
+			} else {
+				appContext = new RestrictedApplicationContext(globalApplicationContext, defaultPublicBeans);
+			}
+			appContext.setClassLoader(classLoader);
 
-                if (!enableExpressions) {
-                    appContext.addBeanFactoryPostProcessor(factory -> factory.setBeanExpressionResolver(null));
-                }
+			if (!enableExpressions) {
+				appContext.addBeanFactoryPostProcessor(factory -> factory.setBeanExpressionResolver(null));
+			}
 
-                if (config != null) {
-                    MutablePropertySources propertySources = appContext.getEnvironment().getPropertySources();
-                    propertySources.addFirst(new ApacheCommonsConfiguration2PropertySource(CONFIG_BEAN_NAME, config));
-                    appContext.getBeanFactory().registerSingleton(CONFIG_BEAN_NAME, config);
-                }
+			if (config != null) {
+				MutablePropertySources propertySources = appContext.getEnvironment().getPropertySources();
+				propertySources.addFirst(new ApacheCommonsConfiguration2PropertySource(CONFIG_BEAN_NAME, config));
+				appContext.getBeanFactory().registerSingleton(CONFIG_BEAN_NAME, config);
+			}
 
-                XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(appContext);
-                reader.setValidationMode(XmlBeanDefinitionReader.VALIDATION_XSD);
+			XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(appContext);
+			reader.setValidationMode(XmlBeanDefinitionReader.VALIDATION_XSD);
 
-                reader.loadBeanDefinitions(appContextResource);
+			reader.loadBeanDefinitions(appContextResource);
 
-                appContext.refresh();
+			refreshContext(appContext);
 
-                return appContext;
-            } else {
-                return null;
-            }
-        } catch (Exception e) {
+			return appContext;
+		} catch (Exception e) {
             throw new SiteContextCreationException("Unable to load application context for site '" + siteName + "'", e);
         } finally {
             logger.info("--------------------------------------------------");
             logger.info("</Loading application context for site: " + siteName + ">");
             logger.info("--------------------------------------------------");
         }
+    }
+
+    /**
+     * Refresh the given application context. This method is synchronized to avoid multiple contexts being
+     * refreshed at the same time, which can cause issues with groovy grapes downloads when multiple sites
+     * download the same dependencies via @Grab annotations.
+     *
+     * @param appContext the application context to refresh
+     */
+    protected synchronized void refreshContext(GenericApplicationContext appContext) {
+        appContext.refresh();
     }
 
     protected UrlRewriter getUrlRewriter(SiteContext siteContext, String[] urlRewriteConfPaths,
