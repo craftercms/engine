@@ -1602,7 +1602,7 @@ paths:
       operationId: version
       description: |
         Module: Engine <br>
-        Returns the Crafter Engine JVM status details.
+        Returns the Crafter Engine JVM version details.
       parameters:
         - name: token
           in: query
