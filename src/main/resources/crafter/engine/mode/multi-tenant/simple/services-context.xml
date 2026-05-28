@@ -58,7 +58,7 @@
         <constructor-arg name="macroResolver" ref="crafter.macroResolver"/>
     </bean>
 
-    <bean id="crafter.siteContextManager" class="org.craftercms.engine.service.context.SiteContextManager">
+    <bean id="crafter.siteContextManager" class="org.craftercms.engine.service.context.SiteContextManager" parent="crafter.siteContextManagerBase">
         <constructor-arg name="contextFactory" ref="crafter.siteContextFactory"/>
         <constructor-arg name="fallbackContextFactory" ref="crafter.fallbackSiteContextFactory"/>
         <constructor-arg name="siteListResolver" ref="crafter.siteListResolver"/>

@@ -63,6 +63,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
     protected boolean waitForContextInit;
     protected Executor jobThreadPoolExecutor;
     protected String defaultSiteName;
+    protected final Executor singleThreadExecutor;
 
     /**
      * Directory watcher registry for each site
@@ -129,7 +130,8 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
                               Executor jobThreadPoolExecutor, final String defaultSiteName, final int contextBuildRetryMaxCount,
                               final long contextBuildRetryWaitTimeBase, final int contextBuildRetryWaitTimeMultiplier,
                               final boolean modePreview, final String[] watcherPaths, final String[] watcherIgnorePaths,
-                              final int watcherCounterLimit, final int watcherIntervalPeriod, final LockByKey<String> lockByKey) {
+                              final int watcherCounterLimit, final int watcherIntervalPeriod, final LockByKey<String> lockByKey,
+                              final Executor singleThreadExecutor) {
         contextRegistry = new ConcurrentHashMap<>();
         directoryWatcherRegistry = new ConcurrentHashMap<>();
         directoryWatcherLastProcessedHash = new ConcurrentHashMap<>();
@@ -151,6 +153,7 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
         this.watcherCounterLimit = watcherCounterLimit;
         this.watcherIntervalPeriod = watcherIntervalPeriod;
         this.sitesLock = lockByKey;
+        this.singleThreadExecutor = singleThreadExecutor;
     }
 
     @Override
@@ -515,9 +518,11 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
      * @param callback function to call with the new context after it has been rebuilt
      */
     public void startContextRebuild(String siteName, boolean fallback, Consumer<SiteContext> callback) {
-        jobThreadPoolExecutor.execute(() -> {
+        // Use the single thread executor to make sure the rebuilds for the same site are executed sequentially,
+        // in case there are multiple events triggering the rebuild at the same time
+        singleThreadExecutor.execute(() -> {
             SiteContext siteContext = rebuildContext(siteName, fallback);
-            if (callback != null ){
+            if (callback != null) {
                 callback.accept(siteContext);
             }
         });
