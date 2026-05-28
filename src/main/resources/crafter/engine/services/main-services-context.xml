@@ -551,10 +551,9 @@
         <constructor-arg name="defaultSiteName" value="${crafter.engine.site.default.name}"/>
     </bean>
 
-    <bean id="crafter.siteContextManager" class="org.craftercms.engine.service.context.SiteContextManager">
+    <bean id="crafter.siteContextManagerBase" abstract="true">
         <constructor-arg name="contextFactory" ref="crafter.siteContextFactory"/>
         <constructor-arg name="fallbackContextFactory" ref="crafter.fallbackSiteContextFactory"/>
-        <constructor-arg name="siteListResolver" ref="crafter.siteResolver"/>
         <constructor-arg name="waitForContextInit" value="${crafter.engine.site.context.waitForInit}"/>
         <constructor-arg name="jobThreadPoolExecutor" ref="crafter.jobThreadPoolExecutor"/>
         <constructor-arg name="defaultSiteName" value="${crafter.engine.site.default.name}"/>
@@ -568,6 +567,10 @@
         <constructor-arg name="watcherIntervalPeriod" value="${crafter.engine.watcher.interval.period}"/>
         <constructor-arg name="lockByKey" ref="crafter.lockByKey"/>
         <property name="entitlementValidator" ref="crafter.entitlementValidator"/>
+    </bean>
+
+    <bean id="crafter.siteContextManager" class="org.craftercms.engine.service.context.SiteContextManager" parent="crafter.siteContextManagerBase">
+        <constructor-arg name="siteListResolver" ref="crafter.siteResolver"/>
     </bean>
 
     <bean id="crafter.siteContextsBootstrap" class="org.craftercms.engine.service.context.SiteContextsBootstrap">
