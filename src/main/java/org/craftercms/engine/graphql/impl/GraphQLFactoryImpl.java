@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2026 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -211,7 +211,7 @@ public class GraphQLFactoryImpl implements GraphQLFactory, ServletContextAware {
 		runInitScript(siteContext, rootType, codeRegistry, customizer, siteTypes);
 
 		// Build the content-type related types, needs to be done after the init script to support custom fields
-		Set<GraphQLType> additionalTypes = new HashSet<>();
+		Set<GraphQLNamedType> additionalTypes = new HashSet<>();
 		siteTypes.forEach((name, type) -> additionalTypes.add(type.build()));
 
 		return GraphQLSchema.newSchema()

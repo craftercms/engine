@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2026 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -24,13 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import graphql.schema.DataFetcher;
-import graphql.schema.GraphQLCodeRegistry;
-import graphql.schema.GraphQLFieldDefinition;
-import graphql.schema.GraphQLObjectType;
-import graphql.schema.GraphQLType;
-import graphql.schema.StaticDataFetcher;
-import graphql.schema.TypeResolver;
+import graphql.schema.*;
 import org.apache.commons.lang3.StringUtils;
 import org.craftercms.engine.graphql.impl.fetchers.ConverterDataFetcher;
 import org.slf4j.Logger;
@@ -68,7 +62,7 @@ public class SchemaCustomizer {
 	/**
 	 * List of additional types to add
 	 */
-	protected List<GraphQLType> additionalTypes = new LinkedList<>();
+	protected List<GraphQLNamedType> additionalTypes = new LinkedList<>();
 
 	/**
 	 * Adds a custom field to the root type
@@ -136,7 +130,7 @@ public class SchemaCustomizer {
 	 *
 	 * @param types the types to add
 	 */
-	public void additionalTypes(GraphQLType... types) {
+	public void additionalTypes(GraphQLNamedType... types) {
 		additionalTypes.addAll(Arrays.asList(types));
 	}
 
@@ -191,7 +185,7 @@ public class SchemaCustomizer {
 	/**
 	 * Returns the set of additional types to add
 	 */
-	public Set<GraphQLType> getAdditionalTypes() {
+	public Set<GraphQLNamedType> getAdditionalTypes() {
 		return new HashSet<>(additionalTypes);
 	}
 
