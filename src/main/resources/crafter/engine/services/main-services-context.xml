@@ -118,6 +118,7 @@
             <map>
                 <entry key="crafter.modePreview" value="${crafter.engine.preview}"/>
                 <entry key="crafter.environment" value="${crafter.engine.environment}"/>
+                <entry key="org.apache.commons.configuration2.io.FileLocationStrategy.schemes" value="${crafter.engine.configuration.schemes}"/>
             </map>
         </property>
     </bean>
