@@ -579,6 +579,8 @@
         <property name="createConcurrently" value="${crafter.engine.site.cache.warmUp.enabled}"/>
     </bean>
 
+    <bean id="engineGrapeIvy" class="org.craftercms.engine.scripting.impl.ExclusiveAccessGrapeIvy" init-method="register"/>
+
     <bean id="crafter.siteContextFactoryBase" abstract="true" class="org.craftercms.engine.service.context.SiteContextFactory">
         <constructor-arg name="proxyConfigPaths" value="${crafter.engine.site.default.proxy.config.paths}"/>
         <constructor-arg name="groovyGlobalVars" ref="crafter.restScriptsVariables"/>
