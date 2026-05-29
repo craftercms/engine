@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  * Copyright (C) 2007-2025 Crafter Software Corporation. All Rights Reserved.
+  * Copyright (C) 2007-2026 Crafter Software Corporation. All Rights Reserved.
   *
   * This program is free software: you can redistribute it and/or modify
   * it under the terms of the GNU General Public License version 3 as published by
@@ -583,6 +583,8 @@
 		<constructor-arg name="siteContextManager" ref="crafter.siteContextManager"/>
 		<property name="createConcurrently" value="${crafter.engine.site.cache.warmUp.enabled}"/>
 	</bean>
+
+	<bean id="engineGrapeIvy" class="org.craftercms.engine.scripting.impl.ExclusiveAccessGrapeIvy" init-method="register"/>
 
 	<bean id="crafter.siteContextFactoryBase" abstract="true" class="org.craftercms.engine.service.context.SiteContextFactory">
 		<constructor-arg name="proxyConfigPaths" value="${crafter.engine.site.default.proxy.config.paths}"/>
