@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2026 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -23,6 +23,7 @@ import org.craftercms.core.service.Context;
 import org.craftercms.engine.event.*;
 import org.craftercms.engine.service.context.SiteContext;
 import org.craftercms.engine.service.context.SiteContextManager;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEvent;
@@ -40,7 +41,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Utility class that runs on a cron job (configurable) and checks every site to see if they have a deployment
- * events file (by default {@code deployment-events.properties}, which should contain timestamps sent by the
+ * events file (by default {@code deployment-events.properties}), which should contain timestamps sent by the
  * Deployer indicating requests for clearing the site cache and/or rebuilding the context.
  *
  * @author avasquez
@@ -67,6 +68,7 @@ public class DeploymentEventsWatcher implements ApplicationListener<ApplicationE
         this.siteContextManager = siteContextManager;
     }
 
+    @SuppressWarnings("unused")
     public void setDeploymentEventsFileUrl(String deploymentEventsFileUrl) {
         this.deploymentEventsFileUrl = deploymentEventsFileUrl;
     }
@@ -143,7 +145,7 @@ public class DeploymentEventsWatcher implements ApplicationListener<ApplicationE
     }
 
     @Override
-    public void onApplicationEvent(ApplicationEvent event) {
+    public void onApplicationEvent(@NonNull ApplicationEvent event) {
         if (event instanceof SiteContextsBootstrappedEvent) {
             startupCompleted = true;
         } else if (event instanceof SiteContextRemovedEvent) {
