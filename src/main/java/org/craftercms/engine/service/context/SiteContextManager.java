@@ -24,6 +24,7 @@ import org.craftercms.commons.entitlements.model.EntitlementType;
 import org.craftercms.commons.entitlements.validator.EntitlementValidator;
 import org.craftercms.commons.validation.annotations.param.ValidSiteId;
 import org.craftercms.engine.event.SiteContextRemovedEvent;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -39,7 +40,6 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -54,75 +54,75 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
 	private static final Logger logger = LoggerFactory.getLogger(SiteContextManager.class);
 
 	protected ApplicationContext applicationContext;
-	protected LockByKey<String> sitesLock;
-	protected Map<String, SiteContext> contextRegistry;
-	protected SiteContextFactory contextFactory;
-	protected SiteContextFactory fallbackContextFactory;
-	protected SiteListResolver siteListResolver;
+	protected final LockByKey<String> sitesLock;
+	protected final Map<String, SiteContext> contextRegistry;
+	protected final SiteContextFactory contextFactory;
+	protected final SiteContextFactory fallbackContextFactory;
+	protected final SiteListResolver siteListResolver;
 	protected EntitlementValidator entitlementValidator;
-	protected boolean waitForContextInit;
-	protected Executor jobThreadPoolExecutor;
-	protected String defaultSiteName;
+	protected final boolean waitForContextInit;
+	protected final Executor jobThreadPoolExecutor;
+	protected final String defaultSiteName;
 
 	/**
 	 * Directory watcher registry for each site
 	 */
-	protected Map<String, DirectoryWatcher> directoryWatcherRegistry;
+	protected final Map<String, DirectoryWatcher> directoryWatcherRegistry;
 
 	/**
 	 * Directory watcher processed event hash
 	 */
-	protected Map<String, String> directoryWatcherLastProcessedHash;
+	protected final Map<String, String> directoryWatcherLastProcessedHash;
 
 	/**
 	 * Directory watcher counter to count modified events
 	 */
-	protected Map<String, AtomicInteger> directoryWatcherCounter;
+	protected final Map<String, AtomicInteger> directoryWatcherCounter;
 
 	/**
 	 * Directory watcher site rebuild tasks
 	 */
-	protected Map<String, ScheduledExecutorService> directoryWatcherExecutor;
+	protected final Map<String, ScheduledExecutorService> directoryWatcherExecutor;
 
 	/**
 	 * Directory watcher watch paths
 	 */
-	protected String[] watcherPaths = {};
+	protected final String[] watcherPaths;
 
 	/**
 	 * Directory watcher ignore paths
 	 */
-	protected String[] watcherIgnorePaths = {};
+	protected final String[] watcherIgnorePaths;
 
 	/**
 	 * Directory watcher counter limit to run rebuild
 	 */
-	protected int watcherCounterLimit;
+	protected final int watcherCounterLimit;
 
 	/**
 	 * Directory watcher interval period to run rebuild task check
 	 */
-	protected int watcherIntervalPeriod;
+	protected final int watcherIntervalPeriod;
 
 	/**
 	 * Context build retry max count
 	 */
-	protected int contextBuildRetryMaxCount;
+	protected final int contextBuildRetryMaxCount;
 
 	/**
 	 * Context build retry wait time base in milliseconds
 	 */
-	protected long contextBuildRetryWaitTimeBase;
+	protected final long contextBuildRetryWaitTimeBase;
 
 	/**
 	 * Context build retry wait time multiple
 	 */
-	protected int contextBuildRetryWaitTimeMultiplier;
+	protected final int contextBuildRetryWaitTimeMultiplier;
 
 	/**
 	 * true if Engine is in preview mode, false otherwise
 	 */
-	protected boolean modePreview;
+	protected final boolean modePreview;
 
 	public SiteContextManager(SiteContextFactory contextFactory, SiteContextFactory fallbackContextFactory,
 							  final SiteListResolver siteListResolver, boolean waitForContextInit,
@@ -154,11 +154,12 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
 	}
 
 	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) {
+	public void setApplicationContext(@NonNull ApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
 	}
 
 	@Autowired
+	@SuppressWarnings("unused")
 	public void setEntitlementValidator(@Lazy final EntitlementValidator entitlementValidator) {
 		this.entitlementValidator = entitlementValidator;
 	}
@@ -227,10 +228,10 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
 			String siteRootPath = contextFactory.resolveRootFolderPath(siteName);
 			List<Path> paths = Arrays.stream(watcherPaths)
 				.map(resource -> Paths.get(siteRootPath + resource))
-				.collect(Collectors.toList());
+				.toList();
 			List<Path> ignorePaths = Arrays.stream(watcherIgnorePaths)
 				.map(resource -> Paths.get(siteRootPath + resource))
-				.collect(Collectors.toList());
+				.toList();
 			DirectoryWatcher watcher = DirectoryWatcher.builder()
 				.paths(paths)
 				.fileHasher(FileHasher.LAST_MODIFIED_TIME)
