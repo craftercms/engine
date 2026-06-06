@@ -1611,13 +1611,51 @@ paths:
           schema:
             type: string
           example: defaultManagementToken
-        - name: crafterSite
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  packageName:
+                    type: string
+                    example: "Crafter Engine"
+                  packageVersion:
+                    type: string
+                    example: "4.0.3-SNAPSHOT"
+                  packageBuild:
+                    type: string
+                    example: "48d29a56c6011f2908fb160f7648f66785d44b81"
+                  packageBuildDate:
+                    type: string
+                    example: "2023-03-08T21:53:22.558Z"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/1/monitoring/sysinfo.json:
+    get:
+      security: []
+      tags:
+        - monitoring
+      summary: Get Version
+      operationId: sysinfo
+      description: |
+        Module: Engine <br>
+        Returns the Crafter Engine JVM version details.
+      parameters:
+        - name: token
           in: query
+          description: The authorization token
           required: true
-          description: Used to set the project/site value
           schema:
             type: string
-          example: "my-editorial"
+          example: defaultManagementToken
       responses:
         '200':
           description: OK
