@@ -74,6 +74,9 @@
 
 	<bean id="crafter.previewSecurityFilter" class="org.springframework.security.web.FilterChainProxy">
 		<constructor-arg index="0" ref="crafter.previewSecurityFilterChain"/>
+		<property name="requestRejectedHandler">
+			<bean class="org.craftercms.engine.http.impl.MinimalLoggingRequestRejectedHandler"/>
+		</property>
 	</bean>
 
 	<util:list id="crafter.authenticationProviders">

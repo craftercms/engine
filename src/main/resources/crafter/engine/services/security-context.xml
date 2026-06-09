@@ -271,6 +271,9 @@
 
 	<bean id="crafter.securityFilter" class="org.springframework.security.web.FilterChainProxy">
 		<constructor-arg index="0" ref="crafter.securityFilterChain"/>
+		<property name="requestRejectedHandler">
+			<bean class="org.craftercms.engine.http.impl.MinimalLoggingRequestRejectedHandler"/>
+		</property>
 	</bean>
 
 	<!--    This is meant to be in preview mode context with a PreviewAccessTokenFilter -->
