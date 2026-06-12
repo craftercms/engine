@@ -40,7 +40,9 @@ paths:
         - context
       summary: Get the ID for the site context
       operationId: getSiteContextID
-      description: Get the ID for the site context resolved for the current request, the value returned will depend on the SiteResolver implementation used.
+      description: |
+        Module: Engine <br>
+        Get the ID for the site context resolved for the current request, the value returned will depend on the SiteResolver implementation used.
       parameters:
         - name: token
           in: query
@@ -82,7 +84,9 @@ paths:
         - context
       summary: Get the site context status
       operationId: getSiteContextStatus
-      description: Get the status for the site context resolved for the current request, the value returned will depend on the SiteResolver implementation used.
+      description: |
+        Module: Engine <br>
+        Get the status for the site context resolved for the current request, the value returned will depend on the SiteResolver implementation used.
       parameters:
         - name: token
           in: query
@@ -124,7 +128,9 @@ paths:
         - context
       summary: Destroy the site context
       operationId: destroySiteContext
-      description: Destroy the site context resolved for the current request. Destroying the context involves clearing the cache, destroying any loaded configuration and Spring beans for the site, and destroying the Groovy classloader for the site.
+      description: |
+        Module: Engine <br>
+        Destroy the site context resolved for the current request. Destroying the context involves clearing the cache, destroying any loaded configuration and Spring beans for the site, and destroying the Groovy classloader for the site.
       parameters:
         - name: token
           in: query
@@ -166,7 +172,9 @@ paths:
         - context
       summary: Rebuild the site context
       operationId: rebuildSiteContext
-      description: Rebuild the site context resolved for the current request, which means destroying and then creating the context again.
+      description: |
+        Module: Engine <br>
+        Rebuild the site context resolved for the current request, which means destroying and then creating the context again.
       parameters:
         - name: token
           in: query
@@ -208,7 +216,9 @@ paths:
         - context
       summary: Rebuild all site contexts
       operationId: rebuildAllSiteContexts
-      description: Rebuild all site contexts currently found in the registry
+      description: |
+        Module: Engine <br>
+        Rebuild all site contexts currently found in the registry
       parameters:
         - name: token
           in: query
@@ -243,7 +253,9 @@ paths:
         - context
       summary: Rebuild GraphQL Schema
       operationId: rebuildGraphQLSchema
-      description: Rebuild the GraphQL schema for the site context resolved for the current request.
+      description: |
+        Module: Engine <br>
+        Rebuild the GraphQL schema for the site context resolved for the current request.
       parameters:
         - name: token
           in: query
@@ -285,7 +297,9 @@ paths:
         - other
       summary: List jobs
       operationId: listJobs
-      description: Get a list of all scheduled jobs for the current site.
+      description: |
+        Module: Engine <br>
+        Get a list of all scheduled jobs for the current site.
       parameters:
         - name: token
           in: query
@@ -333,7 +347,9 @@ paths:
         - context
       summary: Reload the mappings
       operationId: mappingsReload
-      description: Reload the mappings used to resolve sites by Crafter Engine. This endpoint is only available when Crafter Engine is in mapped multi-tenant mode.
+      description: |
+        Module: Engine <br>
+        Reload the mappings used to resolve sites by Crafter Engine. This endpoint is only available when Crafter Engine is in mapped multi-tenant mode.
       parameters:
         - name: crafterSite
           in: query
@@ -372,7 +388,9 @@ paths:
         - cache
       summary: Clear content cache
       operationId: cacheClear
-      description: Clear the content cache scope and the Freemarker cache for the current site context.
+      description: |
+        Module: Engine <br>
+        Clear the content cache scope and the Freemarker cache for the current site context.
       parameters:
         - name: token
           in: query
@@ -427,7 +445,9 @@ paths:
         - cache
       summary: Statistics
       operationId: cacheStatistics
-      description: Get the statistics for all cache scopes for the current site context. <br><br> <i>Note:</i> <br> <i>The result of this call can change based on the configuration of the system, for example when Crafter Engine is configured in preview mode the cache will be disabled and the result will always be an empty object. There could be also different statistics returned depending on the cache implementation that is being used.</i>
+      description: |
+        Module: Engine <br>
+        Get the statistics for all cache scopes for the current site context. <br><br> <i>Note:</i> <br> <i>The result of this call can change based on the configuration of the system, for example when Crafter Engine is configured in preview mode the cache will be disabled and the result will always be an empty object. There could be also different statistics returned depending on the cache implementation that is being used.</i>
       parameters:
         - name: token
           in: query
@@ -478,7 +498,9 @@ paths:
         - content
       summary: Get Item
       operationId: getItem
-      description: "Get an Item from the content store. <br> This API is used to get pages, components and folders. It returns the content and other metadata such as url, descriptorUrl, folder flag, and extra properties <br><br><i> Note: This API also returns 'disabled' items when Crafter Engine is in preview mode to support authoring use cases.</i>"
+      description: |
+        Module: Engine <br>
+        Get an Item from the content store. <br> This API is used to get pages, components and folders. It returns the content and other metadata such as url, descriptorUrl, folder flag, and extra properties <br><br>To render the response (content and other metadata) in JSON, use <i>/api/1/site/content_store/item.json</i><br><br>To render the response (content and other metadata) in XML, use <i>/api/1/site/content_store/item.xml</i><br><br><i> Note: This API also returns 'disabled' items when Crafter Engine is in preview mode to support authoring use cases.</i>
       parameters:
         - name: url
           in: query
@@ -634,7 +656,9 @@ paths:
         - content
       summary: Get Children
       operationId: getChildren
-      description: Get the list of Items directly under a folder in the content store.
+      description: |
+        Module: Engine <br>
+        Get the list of Items directly under a folder in the content store.
       parameters:
         - name: url
           in: query
@@ -896,7 +920,9 @@ paths:
         - content
       summary: Get Tree
       operationId: getTree
-      description: Get the complete Item hierarchy under the specified folder in the content store.
+      description: |
+        Module: Engine <br>
+        Get the complete Item hierarchy under the specified folder in the content store.
       parameters:
         - name: url
           in: query
@@ -943,7 +969,9 @@ paths:
         - other
       summary: Get Profile
       operationId: getProfile
-      description: Get the current user’s profile from the session, if no profile is set an empty one will be created. Only use it in conjunction with Studio’s Personas.
+      description: |
+        Module: Engine <br>
+        Get the current user’s profile from the session, if no profile is set an empty one will be created. Only use it in conjunction with Studio’s Personas.
       parameters:
         - name: url
           in: query
@@ -978,7 +1006,9 @@ paths:
         - other
       summary: Set Profile
       operationId: setProfile
-      description: Set the current user’s profile, all parameters are added to the profile and stored in the session. Only use it in conjunction with Studio’s Personas. <br><br> <i>Note:</i> <br> <i>Any parameter included in the request will be added as a property for the user profile, if the request is made without any parameter then profile will be cleared.</i>
+      description: |
+        Module: Engine <br>
+        Set the current user’s profile, all parameters are added to the profile and stored in the session. Only use it in conjunction with Studio’s Personas. <br><br> <i>Note:</i> <br> <i>Any parameter included in the request will be added as a property for the user profile, if the request is made without any parameter then profile will be cleared.</i>
       parameters:
         - name: age
           in: query
@@ -1023,7 +1053,9 @@ paths:
         - navigation
       summary: Breadcrumb
       operationId: breadcrumb
-      description: Returns the navigation items that form the breadcrumb for the specified store URL.
+      description: |
+        Module: Engine <br>
+        Returns the navigation items that form the breadcrumb for the specified store URL.
       parameters:
         - name: url
           in: query
@@ -1072,7 +1104,9 @@ paths:
         - navigation
       summary: Tree
       operationId: tree
-      description: Returns the navigation tree with the specified depth for the specified store URL.
+      description: |
+        Module: Engine <br>
+        Returns the navigation tree with the specified depth for the specified store URL.
       parameters:
         - name: url
           in: query
@@ -1138,7 +1172,9 @@ paths:
         - navigation
       summary: Transform
       operationId: transform
-      description: Transforms a URL, based on the current site’s configuration.
+      description: |
+        Module: Engine <br>
+        Transforms a URL, based on the current site’s configuration.
       parameters:
         - name: url
           in: query
@@ -1180,7 +1216,9 @@ paths:
         - search
       summary: Search
       operationId: search
-      description: Performs a search operation in the OpenSearch index of the current site resolved for the request and optional other indexes. See <a class="reference external" href="https://craftercms.com/docs/current/reference/api/search.html#search-multi-index-query" rel="noopener noreferrer" target="_blank">Multi-index Query</a> for more information on performing a multiple index search. <br><br> <i>Note:</i> <br> <i>The request body must be a valid OpenSearch JSON query as described in the</i> <a class="reference external" href="https://opensearch.org/docs/latest/api-reference/search/" rel="noopener noreferrer" target="_blank">official docs</a>
+      description: |
+        Module: Engine <br>
+        Performs a search operation in the OpenSearch index of the current site resolved for the request and optional other indexes. See <a class="reference external" href="https://craftercms.com/docs/current/reference/api/search.html#search-multi-index-query" rel="noopener noreferrer" target="_blank">Multi-index Query</a> for more information on performing a multiple index search. <br><br> <i>Note:</i> <br> <i>The request body must be a valid OpenSearch JSON query as described in the</i> <a class="reference external" href="https://opensearch.org/docs/latest/api-reference/search/" rel="noopener noreferrer" target="_blank">official docs</a>
       parameters:
         - name: index
           in: query
@@ -1255,7 +1293,9 @@ paths:
         - content
       summary: Query (GET)
       operationId: query
-      description: Performs a query in the GraphQL instance of the current site resolved for the request. <br><br> <i>Note:</i> <br> <i>The query string must be a valid GraphQL query as described in the</i> <a class="reference external" href="https://graphql.org/learn/queries/" rel="noopener noreferrer" target="_blank">official docs</a>
+      description: |
+        Module: Engine <br>
+        Performs a query in the GraphQL instance of the current site resolved for the request. <br><br> <i>Note:</i> <br> <i>The query string must be a valid GraphQL query as described in the</i> <a class="reference external" href="https://graphql.org/learn/queries/" rel="noopener noreferrer" target="_blank">official docs</a>
       parameters:
         - name: query
           in: query
@@ -1332,7 +1372,9 @@ paths:
         - content
       summary: Query (POST)
       operationId: queryPost
-      description: Performs a query in the GraphQL instance of the current site resolved for the request. <br><br> <i>Note:</i> <br> <i>The query string must be a valid GraphQL query as described in the</i> <a class="reference external" href="https://graphql.org/learn/queries/" rel="noopener noreferrer" target="_blank">official docs</a>
+      description: |
+        Module: Engine <br>
+        Performs a query in the GraphQL instance of the current site resolved for the request. <br><br> <i>Note:</i> <br> <i>The query string must be a valid GraphQL query as described in the</i> <a class="reference external" href="https://graphql.org/learn/queries/" rel="noopener noreferrer" target="_blank">official docs</a>
       parameters:
         - name: crafterSite
           in: query
@@ -1421,7 +1463,9 @@ paths:
         - other
       summary: Preview
       operationId: preview
-      description: Indicates if Engine is configured in preview mode.
+      description: |
+        Module: Engine <br>
+        Indicates if Engine is configured in preview mode.
       parameters:
         - name: crafterSite
           in: query
@@ -1449,7 +1493,9 @@ paths:
         - monitoring
       summary: Get Memory Stats
       operationId: memory
-      description: Returns the Crafter Engine JVM memory details.
+      description: |
+        Module: Engine <br>
+        Returns the Crafter Engine JVM memory details.
       parameters:
         - name: token
           in: query
@@ -1508,7 +1554,9 @@ paths:
         - monitoring
       summary: Get Status
       operationId: status
-      description: Returns the Crafter Engine JVM status details.
+      description: |
+        Module: Engine <br>
+        Returns the Crafter Engine JVM status details.
       parameters:
         - name: token
           in: query
@@ -1552,7 +1600,9 @@ paths:
         - monitoring
       summary: Get Version
       operationId: version
-      description: Returns the Crafter Engine JVM status details.
+      description: |
+        Module: Engine <br>
+        Returns the Crafter Engine JVM version details.
       parameters:
         - name: token
           in: query
@@ -1561,13 +1611,51 @@ paths:
           schema:
             type: string
           example: defaultManagementToken
-        - name: crafterSite
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  packageName:
+                    type: string
+                    example: "Crafter Engine"
+                  packageVersion:
+                    type: string
+                    example: "4.0.3-SNAPSHOT"
+                  packageBuild:
+                    type: string
+                    example: "48d29a56c6011f2908fb160f7648f66785d44b81"
+                  packageBuildDate:
+                    type: string
+                    example: "2023-03-08T21:53:22.558Z"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/1/monitoring/sysinfo.json:
+    get:
+      security: []
+      tags:
+        - monitoring
+      summary: Get Version
+      operationId: sysinfo
+      description: |
+        Module: Engine <br>
+        Returns the Crafter Engine JVM version details.
+      parameters:
+        - name: token
           in: query
+          description: The authorization token
           required: true
-          description: Used to set the project/site value
           schema:
             type: string
-          example: "my-editorial"
+          example: defaultManagementToken
       responses:
         '200':
           description: OK
@@ -1620,7 +1708,9 @@ paths:
         - monitoring
       summary: Get Log Events
       operationId: log
-      description: Returns all events recorded in the Crafter Engine log for a given site in a specific time period.
+      description: |
+        Module: Engine <br>
+        Returns all events recorded in the Crafter Engine log for a given site in a specific time period.
       parameters:
         - name: site
           in: query
@@ -1717,7 +1807,9 @@ paths:
         - other
       summary: Get Component
       operationId: getComponent
-      description: Get a component.
+      description: |
+        Module: Engine <br>
+        Get a component.
       parameters:
         - name: path
           in: query

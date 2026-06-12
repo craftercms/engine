@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2026 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -16,19 +16,9 @@
 
 package org.craftercms.engine.graphql.impl;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.Executor;
-
-import jakarta.servlet.ServletContext;
-
 import graphql.GraphQL;
 import graphql.schema.*;
+import jakarta.servlet.ServletContext;
 import org.apache.commons.collections.CollectionUtils;
 import org.craftercms.core.service.ContentStoreService;
 import org.craftercms.core.service.Item;
@@ -43,6 +33,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StopWatch;
 import org.springframework.web.context.ServletContextAware;
+
+import java.util.*;
+import java.util.concurrent.Executor;
 
 import static graphql.schema.AsyncDataFetcher.async;
 import static graphql.schema.FieldCoordinates.coordinates;
@@ -209,7 +202,7 @@ public class GraphQLFactoryImpl implements GraphQLFactory, ServletContextAware {
         runInitScript(siteContext, rootType, codeRegistry, customizer, siteTypes);
 
         // Build the content-type related types, needs to be done after the init script to support custom fields
-        Set<GraphQLType> additionalTypes = new HashSet<>();
+        Set<GraphQLNamedType> additionalTypes = new HashSet<>();
         siteTypes.forEach((name, type) -> additionalTypes.add(type.build()));
 
         return GraphQLSchema.newSchema()
