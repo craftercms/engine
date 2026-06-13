@@ -39,6 +39,8 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
 import org.tuckey.web.filters.urlrewrite.UrlRewriter;
@@ -201,9 +203,45 @@ public class SiteContext {
         // With this executor maintenance tasks are executed sequentially in the order they're received. This is
         // important when a cache warm is submitted and a GraphQL re-build needs to wait till the cache warm is
         // finished
-        maintenanceTaskExecutor = Executors.newSingleThreadExecutor();
+        maintenanceTaskExecutor = createMaintenanceTaskExecutor();
         state = State.INITIALIZING;
         initializationLatch = new CountDownLatch(1);
+    }
+
+    private ExecutorService createMaintenanceTaskExecutor() {
+        ThreadFactory threadFactory = runnable -> {
+            Thread thread = Executors.defaultThreadFactory().newThread(runnable);
+            thread.setName("site-context-maintenance-" + thread.threadId());
+            return thread;
+        };
+
+        return new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(), threadFactory) {
+            @Override
+            protected void beforeExecute(Thread t, Runnable r) {
+                clearSpringThreadContexts();
+                super.beforeExecute(t, r);
+            }
+
+            @Override
+            protected void afterExecute(Runnable r, Throwable t) {
+                try {
+                    super.afterExecute(r, t);
+
+                    // Log errors from execute() tasks directly. For submit() tasks, the caller is responsible
+                    // for calling future.get() and handling the exception, so we don't log here to avoid duplicates.
+                    if (t != null) {
+                        logger.error("Error running maintenance task for site '{}'", siteName, t);
+                    }
+                } finally {
+                    clearSpringThreadContexts();
+                }
+            }
+        };
+    }
+
+    private void clearSpringThreadContexts() {
+        RequestContextHolder.resetRequestAttributes();
+        LocaleContextHolder.resetLocaleContext();
     }
 
     public ContentStoreService getStoreService() {
