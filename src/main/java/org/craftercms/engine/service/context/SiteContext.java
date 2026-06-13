@@ -39,6 +39,8 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
 import org.tuckey.web.filters.urlrewrite.UrlRewriter;
@@ -58,7 +60,8 @@ import static org.craftercms.commons.locale.LocaleUtils.CONFIG_KEY_DEFAULT_LOCAL
 import static org.craftercms.commons.locale.LocaleUtils.CONFIG_KEY_SUPPORTED_LOCALES;
 
 /**
- * Wrapper for a {@link Context} that adds properties specific to Crafter Engine.
+ * Wrapper for a {@link Context} that adds properties specific to Crafter
+ * Engine.
  *
  * @author Alfonso Vásquez
  */
@@ -126,11 +129,12 @@ public class SiteContext {
 	}
 
 	/**
-	 * Returns the item from the cache of the current site context. If there's no current site context, the loader
+	 * Returns the item from the cache of the current site context. If there's no
+	 * current site context, the loader
 	 * is called directly to get the item.
 	 *
-	 * @param loader        the loader used to retrieve the item if it's not in cache
-	 * @param keyElements   the elements that conform the key
+	 * @param loader      the loader used to retrieve the item if it's not in cache
+	 * @param keyElements the elements that conform the key
 	 *
 	 * @return the cached item
 	 */
@@ -198,12 +202,52 @@ public class SiteContext {
 	}
 
 	public SiteContext() {
-		// With this executor maintenance tasks are executed sequentially in the order they're received. This is
-		// important when a cache warm is submitted and a GraphQL re-build needs to wait till the cache warm is
+		// With this executor maintenance tasks are executed sequentially in the order
+		// they're received. This is
+		// important when a cache warm is submitted and a GraphQL re-build needs to wait
+		// till the cache warm is
 		// finished
-		maintenanceTaskExecutor = Executors.newSingleThreadExecutor();
+		maintenanceTaskExecutor = createMaintenanceTaskExecutor();
 		state = State.INITIALIZING;
 		initializationLatch = new CountDownLatch(1);
+	}
+
+	private ExecutorService createMaintenanceTaskExecutor() {
+		ThreadFactory threadFactory = runnable -> {
+			Thread thread = Executors.defaultThreadFactory().newThread(runnable);
+			thread.setName("site-context-maintenance-" + thread.threadId());
+			return thread;
+		};
+
+		return new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(), threadFactory) {
+			@Override
+			protected void beforeExecute(Thread t, Runnable r) {
+				clearSpringThreadContexts();
+				super.beforeExecute(t, r);
+			}
+
+			@Override
+			protected void afterExecute(Runnable r, Throwable t) {
+				try {
+					super.afterExecute(r, t);
+
+					// Log errors from execute() tasks directly. For submit() tasks, the caller is
+					// responsible
+					// for calling future.get() and handling the exception, so we don't log here to
+					// avoid duplicates.
+					if (t != null) {
+						logger.error("Error running maintenance task for site '{}'", siteName, t);
+					}
+				} finally {
+					clearSpringThreadContexts();
+				}
+			}
+		};
+	}
+
+	private void clearSpringThreadContexts() {
+		RequestContextHolder.resetRequestAttributes();
+		LocaleContextHolder.resetLocaleContext();
 	}
 
 	public ContentStoreService getStoreService() {
@@ -416,8 +460,8 @@ public class SiteContext {
 
 	public boolean isTranslationEnabled() {
 		return translationConfig != null &&
-			   translationConfig.containsKey(CONFIG_KEY_DEFAULT_LOCALE) &&
-			   isNotEmpty(translationConfig.configurationsAt(CONFIG_KEY_SUPPORTED_LOCALES));
+				translationConfig.containsKey(CONFIG_KEY_DEFAULT_LOCALE) &&
+				isNotEmpty(translationConfig.configurationsAt(CONFIG_KEY_SUPPORTED_LOCALES));
 	}
 
 	public LocaleResolver getLocaleResolver() {
@@ -472,7 +516,8 @@ public class SiteContext {
 				} catch (Exception e) {
 					// to avoid a deadlock during destroy()
 					SiteContext.clear();
-					// If there is any exception during the init process then release the resources created so far
+					// If there is any exception during the init process then release the resources
+					// created so far
 					this.destroy();
 					throw e;
 				} finally {
@@ -482,7 +527,8 @@ public class SiteContext {
 			};
 
 			if (waitTillFinished) {
-				// Done through the executor so that maintenance tasks submitted while init are queued
+				// Done through the executor so that maintenance tasks submitted while init are
+				// queued
 				Future<?> future = maintenanceTaskExecutor.submit(initTask);
 				try {
 					future.get();
@@ -634,7 +680,7 @@ public class SiteContext {
 		stopWatch.stop();
 
 		logger.info("GraphQL schema build completed for site '{}' in {} secs", siteName,
-					stopWatch.getTime(TimeUnit.SECONDS));
+				stopWatch.getTime(TimeUnit.SECONDS));
 	}
 
 	protected void executeInitScript() {
@@ -659,7 +705,8 @@ public class SiteContext {
 			globalApplicationContext.publishEvent(event);
 		}
 
-		// Store a request attribute for the event so it's known later if the event was fired during the request
+		// Store a request attribute for the event so it's known later if the event was
+		// fired during the request
 		RequestContext requestContext = RequestContext.getCurrent();
 		if (requestContext != null) {
 			requestContext.getRequest().setAttribute(event.getClass().getName(), event);
@@ -692,14 +739,14 @@ public class SiteContext {
 	@Override
 	public String toString() {
 		return "SiteContext{" +
-			   "siteName='" + siteName + '\'' +
-			   ", context=" + context +
-			   ", fallback=" + fallback +
-			   ", staticAssetsPath='" + staticAssetsPath + '\'' +
-			   ", templatesPath='" + templatesPath + '\'' +
-			   ", restScriptsPath='" + restScriptsPath + '\'' +
-			   ", controllerScriptsPath='" + controllerScriptsPath + '\'' +
-			   '}';
+				"siteName='" + siteName + '\'' +
+				", context=" + context +
+				", fallback=" + fallback +
+				", staticAssetsPath='" + staticAssetsPath + '\'' +
+				", templatesPath='" + templatesPath + '\'' +
+				", restScriptsPath='" + restScriptsPath + '\'' +
+				", controllerScriptsPath='" + controllerScriptsPath + '\'' +
+				'}';
 	}
 
 }
