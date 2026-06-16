@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2025 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2026 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -15,16 +15,13 @@
  */
 package org.craftercms.engine.controller;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import jakarta.servlet.http.HttpServletRequest;
-
-import org.apache.commons.io.IOUtils;
 import org.craftercms.engine.http.impl.DefaultExceptionHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Controller used to render status code errors like 404, 500, etc.
@@ -42,7 +39,7 @@ public class ErrorPageRenderController {
     public static final String ERROR_MESSAGE_ATTRIBUTE = "errorMessage";
     public static final String SERVLET_REQUEST_ERROR_MESSAGE_ATTRIBUTE = "jakarta.servlet.error.message";
 
-    private String errorViewNamePrefix;
+    private final String errorViewNamePrefix;
 
     public ErrorPageRenderController(String errorViewNamePrefix) {
         this.errorViewNamePrefix = errorViewNamePrefix;
@@ -55,15 +52,7 @@ public class ErrorPageRenderController {
 
         Exception error = (Exception)request.getAttribute(DefaultExceptionHandler.EXCEPTION_ATTRIBUTE);
         if (error != null) {
-            StringWriter errorWriter = new StringWriter();
-
-            try {
-                error.printStackTrace(new PrintWriter(errorWriter));
-            } finally {
-                IOUtils.closeQuietly(errorWriter);
-            }
-
-            mv.addObject(STACK_TRACE_ATTRIBUTE, errorWriter.toString());
+            mv.addObject(STACK_TRACE_ATTRIBUTE, error.getMessage());
         }
 
         String errorMessage = (String) request.getAttribute(SERVLET_REQUEST_ERROR_MESSAGE_ATTRIBUTE);

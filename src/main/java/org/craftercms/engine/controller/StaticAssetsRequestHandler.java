@@ -18,7 +18,6 @@ package org.craftercms.engine.controller;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +33,8 @@ import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Request handler to render static assets using the {@link ContentStoreService} as source.
@@ -107,10 +108,10 @@ public class StaticAssetsRequestHandler extends ResourceHttpRequestHandler {
             return null;
         }
 
-        return toResource(content, path);
+        return toResource(content, path, siteContext.getSiteName());
     }
 
-    protected Resource toResource(Content content, String path) {
+    protected Resource toResource(Content content, String path, String siteName) {
         return new AbstractResource() {
 
             @Override
@@ -136,7 +137,11 @@ public class StaticAssetsRequestHandler extends ResourceHttpRequestHandler {
 
             @Override
             public InputStream getInputStream() throws IOException {
-                return content.getInputStream();
+                try {
+                    return content.getInputStream();
+                } catch (IOException e) {
+                    throw new IOException(String.format("Error getting input stream for content for site '%s' at path: '%s'", siteName, path), e);
+                }
             }
 
         };
