@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2022 Crafter Software Corporation. All Rights Reserved.
+ * Copyright (C) 2007-2026 Crafter Software Corporation. All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published by
@@ -15,19 +15,20 @@
  */
 package org.craftercms.engine.http.impl;
 
+import java.io.IOException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import static org.craftercms.commons.http.HttpUtils.getFullRequestUri;
+import static org.craftercms.commons.lang.UrlUtils.cleanUrlForLog;
 import org.craftercms.engine.http.ExceptionHandler;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-
-import static org.craftercms.commons.http.HttpUtils.getFullRequestUri;
-import static org.craftercms.commons.lang.UrlUtils.cleanUrlForLog;
 
 /**
- * Default {@link org.craftercms.engine.http.ExceptionHandler}, which logs all exceptions and sends a HTTP 500 status.
+ * Default {@link org.craftercms.engine.http.ExceptionHandler}, which logs all
+ * exceptions and sends a HTTP 500 status.
  *
  * @author Alfonso Vásquez
  */
@@ -39,7 +40,11 @@ public class DefaultExceptionHandler implements ExceptionHandler {
 
     @Override
     public boolean handle(HttpServletRequest request, HttpServletResponse response, Exception ex) throws IOException {
-        logger.error(request.getMethod() + " " + cleanUrlForLog(getFullRequestUri(request, true)) + " failed", ex);
+        if (logger.isDebugEnabled()) {
+            logger.error(String.format("%s %s failed.", request.getMethod(), cleanUrlForLog(getFullRequestUri(request, true))), ex);
+        } else {
+            logger.error(String.format("%s %s failed: %s", request.getMethod(), cleanUrlForLog(getFullRequestUri(request, true)), ex.getMessage()));
+        }
 
         request.setAttribute(EXCEPTION_ATTRIBUTE, ex);
         response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
