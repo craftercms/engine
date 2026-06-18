@@ -1643,11 +1643,11 @@ paths:
       security: []
       tags:
         - monitoring
-      summary: Get Version
+      summary: Get System Information
       operationId: sysinfo
       description: |
         Module: Engine <br>
-        Returns the Crafter Engine JVM version details.
+        Returns the Crafter Engine system information details.
       parameters:
         - name: token
           in: query
