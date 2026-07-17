@@ -28,4 +28,10 @@ public interface ScriptFactory {
 
     Script getScript(String url) throws ScriptException;
 
+    /**
+     * Releases resources held by this factory (e.g. Groovy class loaders).
+     */
+    default void destroy() {
+    }
+
 }

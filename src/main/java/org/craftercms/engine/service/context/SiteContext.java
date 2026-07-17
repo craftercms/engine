@@ -609,11 +609,23 @@ public class SiteContext {
                         logger.error("Error while closing application context for {}", this, e);
                     }
                 }
+                // Close the GroovyScriptEngine's ScriptClassLoader (child) before the parent site class loader
+                if (scriptFactory != null) {
+                    try {
+                        scriptFactory.destroy();
+                    } catch (Exception e) {
+                        logger.error("Error while destroying script factory for {}", this, e);
+                    } finally {
+                        scriptFactory = null;
+                    }
+                }
                 if (classLoader != null) {
                     try {
                         classLoader.close();
                     } catch (Exception e) {
                         logger.error("Error while closing class loader for {}", this, e);
+                    } finally {
+                        classLoader = null;
                     }
                 }
 

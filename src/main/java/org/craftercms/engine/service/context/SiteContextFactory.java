@@ -17,6 +17,7 @@ package org.craftercms.engine.service.context;
 
 import groovy.lang.GroovyClassLoader;
 import jakarta.servlet.ServletContext;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.logging.Log;
@@ -74,8 +75,11 @@ import java.util.stream.Stream;
 
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
+
 import static org.craftercms.commons.locale.LocaleUtils.CONFIG_KEY_DEFAULT_LOCALE;
 import static org.craftercms.engine.util.GroovyScriptUtils.getCompilerConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Factory for creating {@link SiteContext} with common properties. It also uses the {@link MacroResolver} to resolve
@@ -97,7 +101,7 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
     public static final String DEFAULT_PUBLISHING_TARGET_MACRO_NAME = "publishingTarget";
     public static final String CONFIG_KEY_ALLOWED_TEMPLATE_PATHS = "templates.allowed";
 
-    private static final Log logger = LogFactory.getLog(SiteContextFactory.class);
+    private static final Logger logger = LoggerFactory.getLogger(SiteContextFactory.class);
 
     protected ServletContext servletContext;
     protected String siteNameMacroName;
@@ -291,8 +295,9 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
                                                   mergingOn, cacheOn, maxAllowedItemsInCache, ignoreHiddenFiles,
                                                   configVariables);
 
+        SiteContext siteContext = null;
         try {
-            SiteContext siteContext = new SiteContext();
+            siteContext = new SiteContext();
             siteContext.setInitTimeout(initTimeout);
             siteContext.setStoreService(storeService);
             siteContext.setCacheTemplate(cacheTemplate);
@@ -372,8 +377,17 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
         } catch (Exception e) {
             logger.error("Error creating context for site '" + siteName + "'", e);
 
-            // Destroy context if the site context creation failed
-            storeService.destroyContext(context);
+            // Release any Groovy class loaders / app context created before the failure
+            if (siteContext != null) {
+                try {
+                    siteContext.destroy();
+                } catch (Exception destroyEx) {
+                    logger.error("Error destroying partially created site context for site '{}'", siteName, destroyEx);
+                    storeService.destroyContext(context);
+                }
+            } else {
+                storeService.destroyContext(context);
+            }
 
             throw e;
         }

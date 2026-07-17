@@ -668,7 +668,11 @@ public class SiteContextManager implements ApplicationContextAware, DisposableBe
             SiteContext newContext = createContext(siteName, fallback);
 
             if (oldSiteContext != null) {
-                oldSiteContext.destroy();
+                try {
+                    destroyContext(oldSiteContext);
+                } catch (Exception e) {
+                    logger.error("Error destroying previous site context for site '{}'", siteName, e);
+                }
             }
 
             logger.info("==================================================");
