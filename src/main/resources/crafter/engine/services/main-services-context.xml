@@ -720,20 +720,21 @@
     <alias name="crafter.searchService" alias="crafter.elasticsearchService"/>
     <alias name="crafter.searchClient" alias="crafter.elasticsearchClient"/>
 
+
+	<bean id="searchClient" class="org.craftercms.search.opensearch.spring.OpenSearchClientFactory">
+		<constructor-arg name="serverUrls" ref="crafter.searchUrls"/>
+		<property name="username" ref="crafter.searchUsername"/>
+		<property name="password" ref="crafter.searchPassword"/>
+		<property name="connectTimeout" ref="crafter.searchConnectTimeout"/>
+		<property name="socketTimeout" ref="crafter.searchSocketTimeout"/>
+		<property name="threadCount" ref="crafter.searchThreadCount"/>
+		<property name="socketKeepAlive" ref="crafter.searchSocketKeepAlive"/>
+		<property name="maxTotalConnections" value="${crafter.engine.search.maxTotalConnections}"/>
+		<property name="maxConnectionsPerRoute" value="${crafter.engine.search.maxConnectionsPerRoute}"/>
+	</bean>
+
     <bean id="crafter.searchClient" class="org.craftercms.engine.search.SiteAwareOpenSearchClient">
-        <constructor-arg name="client">
-            <bean class="org.craftercms.search.opensearch.spring.OpenSearchClientFactory">
-                <constructor-arg name="serverUrls" ref="crafter.searchUrls"/>
-                <property name="username" ref="crafter.searchUsername"/>
-                <property name="password" ref="crafter.searchPassword"/>
-                <property name="connectTimeout" ref="crafter.searchConnectTimeout"/>
-                <property name="socketTimeout" ref="crafter.searchSocketTimeout"/>
-                <property name="threadCount" ref="crafter.searchThreadCount"/>
-                <property name="socketKeepAlive" ref="crafter.searchSocketKeepAlive"/>
-                <property name="maxTotalConnections" value="${crafter.engine.search.maxTotalConnections}"/>
-                <property name="maxConnectionsPerRoute" value="${crafter.engine.search.maxConnectionsPerRoute}"/>
-            </bean>
-        </constructor-arg>
+        <constructor-arg name="client" ref="searchClient"/>
         <constructor-arg name="indexIdFormat" value="${crafter.engine.search.index.format}"/>
         <constructor-arg name="enableTranslation" value="${crafter.engine.translation.enable}"/>
         <constructor-arg name="enableDefaultFilters" value="${crafter.engine.search.defaultFilters.enabled}"/>
