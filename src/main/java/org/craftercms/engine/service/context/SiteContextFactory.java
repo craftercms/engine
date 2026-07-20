@@ -378,16 +378,21 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
 		} catch (Exception e) {
 			logger.error("Error creating context for site '" + siteName + "'", e);
 
-			// Release any Groovy class loaders / app context created before the failure
-			if (siteContext != null) {
-				try {
-					siteContext.destroy();
-				} catch (Exception destroyEx) {
-					logger.error("Error destroying partially created site context for site '{}'", siteName, destroyEx);
+			try {
+				// Release any Groovy class loaders / app context created before the failure
+				if (siteContext != null) {
+					try {
+						siteContext.destroy();
+					} catch (Exception destroyEx) {
+						logger.error("Error destroying partially created site context for site '{}'", siteName, destroyEx);
+						storeService.destroyContext(context);
+					}
+				} else {
 					storeService.destroyContext(context);
 				}
-			} else {
-				storeService.destroyContext(context);
+			} catch (Exception destroyEx) {
+				logger.error("Error destroying partially created site context for site '" + siteName + "'", e);
+				e.addSuppressed(destroyEx);
 			}
 			throw e;
 		}
