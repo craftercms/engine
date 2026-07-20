@@ -15,16 +15,28 @@
  */
 package org.craftercms.engine.service.context;
 
-import groovy.lang.GroovyClassLoader;
-import jakarta.servlet.ServletContext;
+import java.io.File;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import static java.util.Collections.singletonList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.Executor;
+import static java.util.stream.Collectors.toList;
+import java.util.stream.Stream;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.config.ConfigurationException;
 import org.craftercms.commons.config.EncryptionAwareConfigurationReader;
 import org.craftercms.commons.config.PublishingTargetResolver;
+import static org.craftercms.commons.locale.LocaleUtils.CONFIG_KEY_DEFAULT_LOCALE;
 import org.craftercms.commons.spring.ApacheCommonsConfiguration2PropertySource;
 import org.craftercms.commons.spring.context.RestrictedApplicationContext;
 import org.craftercms.commons.spring.groovy.SandboxInterceptorFactory;
@@ -39,6 +51,7 @@ import org.craftercms.engine.macro.MacroResolver;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.scripting.ScriptJobResolver;
 import org.craftercms.engine.scripting.impl.GroovyScriptFactory;
+import static org.craftercms.engine.util.GroovyScriptUtils.getCompilerConfiguration;
 import org.craftercms.engine.util.SchedulingUtils;
 import org.craftercms.engine.util.config.SiteAwarePublishingTargetResolver;
 import org.craftercms.engine.util.groovy.ContentStoreGroovyResourceLoader;
@@ -48,6 +61,8 @@ import org.craftercms.engine.util.quartz.JobContext;
 import org.craftercms.engine.util.spring.ContentStoreResourceLoader;
 import org.craftercms.engine.util.spring.servlet.i18n.ChainLocaleResolver;
 import org.quartz.Scheduler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
@@ -64,22 +79,8 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
 import org.tuckey.web.filters.urlrewrite.Conf;
 import org.tuckey.web.filters.urlrewrite.UrlRewriter;
 
-import java.io.File;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLClassLoader;
-import java.util.*;
-import java.util.concurrent.Executor;
-import java.util.stream.Stream;
-
-import static java.util.Collections.singletonList;
-import static java.util.stream.Collectors.toList;
-
-import static org.craftercms.commons.locale.LocaleUtils.CONFIG_KEY_DEFAULT_LOCALE;
-import static org.craftercms.engine.util.GroovyScriptUtils.getCompilerConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import groovy.lang.GroovyClassLoader;
+import jakarta.servlet.ServletContext;
 
 /**
  * Factory for creating {@link SiteContext} with common properties. It also uses the {@link MacroResolver} to resolve
@@ -349,19 +350,20 @@ public class SiteContextFactory implements ApplicationContextAware, ServletConte
 
             configureScriptSandbox(siteContext, resourceLoader);
             URLClassLoader classLoader = getClassLoader(siteContext);
+            siteContext.setClassLoader(classLoader);
             ScriptFactory scriptFactory = getScriptFactory(siteContext, classLoader);
-            ConfigurableApplicationContext appContext = getApplicationContext(siteContext, classLoader, config,
+            siteContext.setScriptFactory(scriptFactory);
+			ConfigurableApplicationContext appContext = getApplicationContext(siteContext, classLoader, config,
                                                                               resolvedAppContextPaths, resourceLoader);
+            siteContext.setApplicationContext(appContext);
             UrlRewriter urlRewriter = getUrlRewriter(siteContext, resolvedUrlRewriteConfPaths, resourceLoader);
             HierarchicalConfiguration proxyConfig = getProxyConfig(siteContext, resolvedProxyConfPaths, resourceLoader);
             HierarchicalConfiguration translationConfig =
                     getTranslationConfig(siteContext, resolvedTranslationConfPaths, resourceLoader);
 
-            siteContext.setScriptFactory(scriptFactory);
+            
             siteContext.setConfig(config);
             siteContext.setGlobalApplicationContext(globalApplicationContext);
-            siteContext.setApplicationContext(appContext);
-            siteContext.setClassLoader(classLoader);
             siteContext.setUrlRewriter(urlRewriter);
             siteContext.setProxyConfig(proxyConfig);
             siteContext.setTranslationConfig(translationConfig);
