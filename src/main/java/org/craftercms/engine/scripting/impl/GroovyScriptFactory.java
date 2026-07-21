@@ -16,6 +16,7 @@
 
 package org.craftercms.engine.scripting.impl;
 
+import groovy.lang.GroovyClassLoader;
 import groovy.util.GroovyScriptEngine;
 import groovy.util.ResourceConnector;
 import groovy.util.ResourceException;
@@ -24,8 +25,11 @@ import org.craftercms.engine.exception.ScriptNotFoundException;
 import org.craftercms.engine.scripting.Script;
 import org.craftercms.engine.scripting.ScriptFactory;
 import org.craftercms.engine.service.context.SiteContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Map;
 
 import static org.craftercms.engine.util.GroovyScriptUtils.getCompilerConfiguration;
@@ -37,6 +41,8 @@ import static org.craftercms.engine.util.GroovyScriptUtils.getCompilerConfigurat
  * @author Alfonso Vásquez
  */
 public class GroovyScriptFactory implements ScriptFactory {
+
+    private static final Logger logger = LoggerFactory.getLogger(GroovyScriptFactory.class);
 
     public static final String CACHE_CONST_KEY_ELEM_SCRIPT = "groovyScript";
 
@@ -50,7 +56,7 @@ public class GroovyScriptFactory implements ScriptFactory {
                                Map<String, Object> globalVariables, boolean enableScriptSandbox) {
         this.siteContext = siteContext;
         this.scriptEngine = new GroovyScriptEngine(resourceConnector);
-        this.scriptEngine.setConfig(getCompilerConfiguration(enableScriptSandbox));
+        applyCompilerConfiguration(enableScriptSandbox);
         this.globalVariables = globalVariables;
     }
 
@@ -59,7 +65,7 @@ public class GroovyScriptFactory implements ScriptFactory {
                                boolean enableScriptSandbox) {
         this.siteContext = siteContext;
         this.scriptEngine = new GroovyScriptEngine(resourceConnector, parentClassLoader);
-        this.scriptEngine.setConfig(getCompilerConfiguration(enableScriptSandbox));
+        applyCompilerConfiguration(enableScriptSandbox);
         this.globalVariables = globalVariables;
     }
 
@@ -82,6 +88,36 @@ public class GroovyScriptFactory implements ScriptFactory {
                 }
             }
         }, url, CACHE_CONST_KEY_ELEM_SCRIPT);
+    }
+
+    @Override
+    public void destroy() {
+        closeGroovyClassLoader(scriptEngine != null ? scriptEngine.getGroovyClassLoader() : null);
+    }
+
+    /**
+     * {@link GroovyScriptEngine#setConfig} always replaces its internal {@link GroovyClassLoader}; close the
+     * previous one so it is not orphaned on every site context create.
+     */
+    protected void applyCompilerConfiguration(boolean enableScriptSandbox) {
+        GroovyClassLoader previousLoader = scriptEngine.getGroovyClassLoader();
+        scriptEngine.setConfig(getCompilerConfiguration(enableScriptSandbox));
+        GroovyClassLoader currentLoader = scriptEngine.getGroovyClassLoader();
+        if (previousLoader != null && previousLoader != currentLoader) {
+            closeGroovyClassLoader(previousLoader);
+        }
+    }
+
+    protected void closeGroovyClassLoader(GroovyClassLoader groovyClassLoader) {
+        if (groovyClassLoader == null) {
+            return;
+        }
+        try {
+            // close() -> clearCache() also removes MetaClasses via InvokerHelper.removeClass
+            groovyClassLoader.close();
+        } catch (IOException e) {
+            logger.error("Error while closing Groovy class loader", e);
+        }
     }
 
 }

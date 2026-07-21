@@ -67,6 +67,12 @@ public class GroovyScriptFactoryTest {
 
     @After
     public void tearDown() throws Exception {
+        if (scriptFactory != null) {
+            scriptFactory.destroy();
+        }
+        if (classLoader != null) {
+            classLoader.close();
+        }
         removeCurrentRequest();
         destroyApplicationContext();
     }
